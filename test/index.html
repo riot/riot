@@ -1,0 +1,17 @@
+
+<head>
+   <script src="../benchmark/jquery.min.js"></script>
+   <script src="../mvc.js"></script>
+   <script>
+
+   // test emitter
+   var el = $.emitter({});
+
+   el.on("test.k", function(a, b, c) {
+      console.info("jpp", a, b, c);
+   })
+
+   el.emit("test", 8980, 0987, 0980)
+
+   </script>
+</head>

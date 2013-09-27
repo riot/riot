@@ -1,0 +1,127 @@
+
+<head>
+   <script src="../lib/jquery.min.js"></script>
+   <script src="micro-templating.js"></script>
+   <script src="hogan.js"></script>
+   <script src="handlebars.min.js"></script>
+   <script src="../riot.js"></script>
+
+   <script>
+   $(function() {
+
+      var data = {
+         firstname: 'Alex',
+         lastname: 'Hermunen',
+         job_title: 'Developer',
+         description: 'Client side templating',
+         phone: '+23 22389 0239',
+         address: 'Sim street 89, 2033, Kallio',
+         city: 'Helsinki'
+      };
+
+      // number for real situations
+      var repeat = 1;
+
+      function test(name, template, fn) {
+         var start = +new Date, str;
+
+         for (var i = 0; i < repeat; i++) {
+            str = fn(template, data);
+         }
+
+         console.info(str, name, +new Date - start)
+      }
+
+      // riot templating
+      test("riot", $("#riot").html(), $.render);
+
+      // resig
+      test("resig", $("#resig").html().replace(/&lt;/g, "<").replace(/&gt;/g, ">"), tmpl);
+
+      // hogan
+      var hoganed = Hogan.compile($("#hogan_template").html());
+
+      test("hogan", null, function() {
+         return hoganed.render(data)
+      });
+
+      var hb = Handlebars.compile($("#hogan_template").html());
+
+      test("handlebars", null, function() {
+         return hb(data)
+      });
+
+
+   })
+   </script>
+</head>
+
+<body>
+
+   <div id="riot">
+
+      <div class="vcard">
+
+         <div class="hgroup">
+            <h1 class="main-title">{ firstname } { lastname }</h1>
+            <h2>{ job_title }</h2>
+         </div>
+
+         <h3> { description }</h3>
+
+         <div class="meta">
+            <p>Phone   <span>{ phone }</span></p>
+            <p>Address <span>{ address }</span></p>
+            <p>City    <span>{ city }</span></p>
+         </div>
+
+      </div>
+
+   </div>
+
+   <div id="resig">
+
+      <div class="vcard">
+
+         <div class="hgroup">
+            <h1 class="main-title"><%= firstname %> <%= lastname %></h1>
+            <h2><%= job_title %></h2>
+         </div>
+
+         <h3> <%= description %></h3>
+
+         <div class="meta">
+            <p>Phone   <span><%= phone %></span></p>
+            <p>Address <span><%= address %></span></p>
+            <p>City    <span><%= city %></span></p>
+         </div>
+
+      </div>
+
+   </div>
+
+   <div id="hogan_template">
+
+      <div class="vcard">
+
+         <div class="hgroup">
+            <h1 class="main-title">{{ firstname }} {{ lastname }}</h1>
+            <h2>{{ job_title }}</h2>
+         </div>
+
+         <h3> {{ description }}</h3>
+
+         <div class="meta">
+            <p>Phone   <span>{{ phone }}</span></p>
+            <p>Address <span>{{ address }}</span></p>
+            <p>City    <span>{{ city }}</span></p>
+         </div>
+
+      </div>
+
+   </div>
+
+
+
+</body>
+
