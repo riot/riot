@@ -1,11 +1,10 @@
-/*
-   Riot.js v1.0
+/*!
 
-   "The 1kb MVP "framework".
+   Riot!js v1.0 | https://moot.it/riotjs
 
-   https://moot.it/riotjs
+   (c) 2013 Moot Inc
 
-   MIT Licensed
+   License: MIT
 
 */
 (function($) {
@@ -24,22 +23,21 @@
       return $($.trim($.render(tmpl, data)));
    }
 
-   function last(args) {
-      return [].slice.call(args).slice(1);
-   }
-
-   $.emitter = function(obj) {
+   $.observable = function(obj) {
       var jq = $({});
 
       $.each(['on', 'one', 'emit', 'off'], function(i, name) {
          obj[name] = function(names, fn) {
 
             if (i < 2) {
-               jq[name](names, function() {
-                  fn.apply(obj, last(arguments));
+               jq[name](names, function(e) {
+                  var args = [].slice.call(arguments, 1);
+                  if (names.split(" ")[1]) args.unshift(e.type);
+                  fn.apply(obj, args);
                })
+
             } else if (i == 2) {
-               jq.trigger(names, last(arguments));
+               jq.trigger(names, [].slice.call(arguments, 1));
 
             } else {
                jq.off(names, fn);
@@ -52,18 +50,21 @@
       return obj;
    }
 
+   // $(document).on("click.todo", 'a[href~="#"]', $.route);
+
    $.route = function(fn) {
       if (typeof fn == "string") {
          history.pushState(null, null, "#" + fn);
 
       } else {
-         $(window).bind("popstate.mvc", function() {
-            fn(location.hash.split("#")[1] || "");
+         $(window).bind("popstate.riot", function(e) {
+            fn(location.hash.split("#")[1] || "", e.originalEvent.state);
          })
       }
    }
 
-   // manual trigger of popstate for non-webkit
-   if ('state' in window.history) $(window).triggerHandler("popstate.mvc");
+   // popstate should fire on page load according to the spec
+   if ('state' in window.history) $(window).triggerHandler("popstate.riot");
+
 
 })(jQuery)

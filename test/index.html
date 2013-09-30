@@ -1,17 +1,21 @@
 
 <head>
-   <script src="../benchmark/jquery.min.js"></script>
-   <script src="../mvc.js"></script>
+   <script src="../lib/jquery.min.js"></script>
+   <script src="../riot.js"></script>
    <script>
 
-   // test emitter
-   var el = $.emitter({});
+   // test observable
+   var el = $.observable({});
 
-   el.on("test.k", function(a, b, c) {
-      console.info("jpp", a, b, c);
+   el.on("foo", function(a, b, c, d) {
+      console.info("single", a, b, c, d);
    })
 
-   el.emit("test", 8980, 0987, 0980)
+   el.on("foo bar", function(a, b, c, d) {
+      console.info("multi", a, b, c, d);
+   })
+
+   el.emit("foo", 8980, 0987, 0980)
 
    </script>
 </head>

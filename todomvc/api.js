@@ -3,11 +3,11 @@ function Todo(db) {
 
    db = db || DB("todos-jmvc");
 
-   var self = $.emitter(this),
+   var self = $.observable(this),
       items = db.get();
 
    self.add = function(name) {
-      var item = { id: ("" + Math.random()).slice(2), name: name }
+      var item = { id: "_" + ("" + Math.random()).slice(2), name: name }
       items[item.id] = item;
       self.emit("add", item);
    }
@@ -27,17 +27,18 @@ function Todo(db) {
 
    self.toggle = function(filter, flag) {
       var els = self.items(filter);
+
       $.each(els, function() {
          items[this.id].done = !items[this.id].done;
       })
       self.emit("toggle", els, filter);
    }
 
-   // @param filter: <empty>, "active", "completed"
+   // @param filter: <empty>, id, "active", "completed"
    self.items = function(filter) {
       var ret = [];
       $.each(items, function(id, item) {
-         if (!filter || parseInt(filter) == id || filter == (item.done ? "completed" : "active")) ret.push(item)
+         if (!filter || filter == id || filter == (item.done ? "completed" : "active")) ret.push(item)
       })
       return ret;
    }

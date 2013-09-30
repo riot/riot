@@ -3,12 +3,12 @@
 	<head>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<title>ANARCHY – The 1kb framework</title>
+		<title>Riot.js | The 1kb framework</title>
 		<link rel="stylesheet" href="bower_components/todomvc-common/base.css">
-		<link rel="stylesheet" href="css/app.css">
 	</head>
-	<script id="todo-tmpl" type="text/tmpl">
-		<li>
+
+	<script type="html/todo">
+		<li id="{id}">
 			<div class="view">
 				<input class="toggle" type="checkbox">
 				<label>{name}</label>
@@ -17,6 +17,7 @@
 			<input class="edit" value="{name}">
 		</li>
 	</script>
+
 	<body>
 		<section id="todoapp">
 			<header id="header">

@@ -4,17 +4,16 @@
 (function() { 'use strict';
 
    /*
-      A Model instance.
-      Can be used from browser's console. Try for example:
+      A Model instance. Exposed to global space so it can be used
+      on the browser's console. Try for example:
 
       todo.add("My task");
    */
    window.todo = new Todo();
 
    // HTML for a sintle todo item
-   var template = $("#todo-tmpl").html(),
+   var template = $("[type='html/todo']").html(),
       root = $("#todo-list"),
-      els = {},
       filter;
 
    // actions call model methods
@@ -37,16 +36,16 @@
    // listen to model
    todo.on("add", add).on("remove", function(items) {
       $.each(items, function() {
-         els[this.id].remove()
+         $("#" + this.id).remove()
       })
 
    }).on("toggle", function(items) {
       $.each(items, function() {
-         toggle(els[this.id], !!this.done)
+         toggle($("#" + this.id), !!this.done)
       })
 
    }).on("edit", function(item) {
-      var el = els[item.id];
+      var el = $(item.id);
       el.removeClass("editing");
       $("label, .edit", el).text(item.name).val(item.name);
 
@@ -108,7 +107,6 @@
          todo.remove(item.id);
       })
 
-      els[item.id] = el;
    }
 
    function counts() {
