@@ -25,13 +25,10 @@ function Todo(db) {
       self.emit("remove", els);
    }
 
-   self.toggle = function(filter, flag) {
-      var els = self.items(filter);
-
-      $.each(els, function() {
-         items[this.id].done = !items[this.id].done;
-      })
-      self.emit("toggle", els, filter);
+   self.toggle = function(id) {
+      var item = items[id];
+      item.done = !item.done;
+      self.emit("toggle", item);
    }
 
    // @param filter: <empty>, id, "active", "completed"

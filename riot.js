@@ -7,7 +7,10 @@
    License: MIT
 
 */
-(function($) {
+(function($, win) {
+
+   // jQuerify window object
+   win = $(win);
 
    // Precompiled templates (JavaScript functions)
    var FN = {};
@@ -31,9 +34,9 @@
 
             if (i < 2) {
                jq[name](names, function(e) {
-                  var args = [].slice.call(arguments, 1);
-                  if (names.split(" ")[1]) args.unshift(e.type);
-                  fn.apply(obj, args);
+                  var args = [].slice.call(arguments, 1)
+                  if (names.split(" ")[1]) args.unshift(e.type)
+                  fn.apply(obj, args)
                })
 
             } else if (i == 2) {
@@ -51,20 +54,23 @@
    }
 
    // $(document).on("click.todo", 'a[href~="#"]', $.route);
-
-   $.route = function(fn) {
-      if (typeof fn == "string") {
-         history.pushState(null, null, "#" + fn);
+   $.url = function(fn, data) {
+      if ($.isFunction(fn)) {
+         win.on("popstate", function(e) {
+            fn(location.hash.slice(1), e.originalEvent.state);
+         })
 
       } else {
-         $(window).bind("popstate.riot", function(e) {
-            fn(location.hash.split("#")[1] || "", e.originalEvent.state);
-         })
+         if (history.pushState) {
+            history.pushState(data, null, "#" + fn)
+         } else {
+            win.trigger("popstate", [fn])
+         }
       }
    }
 
    // popstate should fire on page load according to the spec
-   if ('state' in window.history) $(window).triggerHandler("popstate.riot");
+   if (win[0].history.state) win.trigger("popstate")
 
 
-})(jQuery)
+})(jQuery, window)

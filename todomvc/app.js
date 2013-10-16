@@ -2,7 +2,6 @@
 /* The presenter */
 
 (function() { 'use strict';
-
    /*
       A Model instance. Exposed to global space so it can be used
       on the browser's console. Try for example:
@@ -14,7 +13,7 @@
    // HTML for a sintle todo item
    var template = $("[type='html/todo']").html(),
       root = $("#todo-list"),
-      filter;
+      nav = $("#filters a");
 
    // actions call model methods
    $("#new-todo").keyup(function(e) {
@@ -26,7 +25,9 @@
    })
 
    $("#toggle-all").click(function() {
-      todo.toggle(filter);
+      $("li", root).each(function() {
+         todo.toggle(this.id);
+      })
    })
 
    $("#clear-completed").click(function() {
@@ -39,10 +40,8 @@
          $("#" + this.id).remove()
       })
 
-   }).on("toggle", function(items) {
-      $.each(items, function() {
-         toggle($("#" + this.id), !!this.done)
-      })
+   }).on("toggle", function(item) {
+      toggle($("#" + item.id), !!item.done)
 
    }).on("edit", function(item) {
       var el = $(item.id);
@@ -53,22 +52,19 @@
    }).on("add remove toggle", counts)
 
    // routing
-   var nav = $("#filters a").click(function() {
-      $.route($(this).attr("href").slice(1));
+   nav.click(function() {
+      $.url($(this).attr("href").slice(1));
    })
 
-   $.route(function(path) {
-      filter = path.slice(1);
+   $.url(function(path) {
 
-      root.empty();
+      // clear list and add new ones
+      root.empty() && $.each(todo.items(path.slice(1)), add)
 
-      $.each(todo.items(filter), function(i, item) {
-         add(item);
-      })
-
-      // nav
+      // selected class
       nav.removeClass("selected").filter("[href='#" + path + "']").addClass("selected");
 
+      // update counts
       counts()
    })
 
@@ -79,6 +75,8 @@
    }
 
    function add(item) {
+      if (this.id) item = this;
+
       var el = $.el(template, item).appendTo(root),
          input = $(".edit", el);
 
@@ -111,11 +109,11 @@
 
    function counts() {
       var active = todo.items("active").length,
-         comp = todo.items("completed").length;
+          done = todo.items("completed").length;
 
-      $("#todo-count").html("<strong>" + active + "</strong> " + (active == 1 ? "item" : "items") + " left")
-      $("#clear-completed").toggle(comp > 0).text("Clear completed (" + comp + ")")
-      $("#footer").toggle(active + comp > 0)
+      $("#todo-count").html("<strong>" +active+ "</strong> item" +(active == 1 ? "" : "s")+ " left")
+      $("#clear-completed").toggle(done > 0).text("Clear completed (" + done + ")")
+      $("#footer").toggle(active + done > 0)
    }
 
 })()

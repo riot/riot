@@ -4,11 +4,11 @@ function DB(key) {
 
    return {
       get: function() {
-         return JSON.parse(store.getItem(key) || '{}')
+         return JSON.parse(store[key] || '{}')
       },
 
       put: function(data) {
-         store.setItem(key, JSON.stringify(data))
+         store[key] = JSON.stringify(data)
       }
    }
 }
