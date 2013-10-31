@@ -9,23 +9,23 @@
 */
 (function($, win) {
 
-   // jQuerify window object
-   win = $(win);
-
    // Precompiled templates (JavaScript functions)
    var FN = {};
 
-   $.render = function(tmpl, data) {
-      return (FN[tmpl] = FN[tmpl] || Function("_", "return '" +
-         tmpl.replace(/\n/g, "").replace(/\{\s*([^\}]+)\s*\}/g, "'+_.$1+'") + "'")
+
+   // Render a template with data
+   $.render = function(template, data) {
+      return (FN[template] = FN[template] || Function("_", "return '" +
+         template.replace(/\n/g, "").replace(/\{([^\}]+)\}/g, "'+_.$1+'") + "'")
       )(data);
    }
 
-   // @return jQuery element
-   $.el = function(tmpl, data) {
-      return $($.trim($.render(tmpl, data)));
+   // A convenience render method to return a jQuery element
+   $.el = function(template, data) {
+      return $($.render(template, data));
    }
 
+   // A classic pattern to enable MVP
    $.observable = function(obj) {
       var jq = $({});
 
@@ -53,24 +53,38 @@
       return obj;
    }
 
-   // $(document).on("click.todo", 'a[href~="#"]', $.route);
-   $.url = function(fn, data) {
-      if ($.isFunction(fn)) {
-         win.on("popstate", function(e) {
-            fn(location.hash.slice(1), e.originalEvent.state);
+   // jQueried window object
+   win = $(win);
+
+   // emit window.popstate event consistently on page load, on every browser
+   var page_popped;
+
+   win.on("load", function(e) {
+      setTimeout(function() {
+         if (!page_popped) win.trigger("popstate")
+      }, 1);
+
+   }).on("popstate", function(e) {
+      if (!page_popped) page_popped = true;
+
+   })
+
+   // Change the browser URL or listen to changes on the URL
+   $.route = function(url) {
+
+      // listen
+      if ($.isFunction(url)) {
+         win.on("popstate", function(e, to) {
+            url(to || location.hash)
          })
 
-      } else {
-         if (history.pushState) {
-            history.pushState(data, null, "#" + fn)
-         } else {
-            win.trigger("popstate", [fn])
-         }
+      // fire
+      } else if (url != location.hash) {
+         if (history.pushState) history.pushState("", "", url)
+         win.trigger("popstate", [url]);
       }
-   }
 
-   // popstate should fire on page load according to the spec
-   if (win[0].history.state) win.trigger("popstate")
+   }
 
 
 })(jQuery, window)

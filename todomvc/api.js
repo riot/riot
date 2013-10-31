@@ -1,7 +1,9 @@
 
+/* The model */
+
 function Todo(db) {
 
-   db = db || DB("todos-jmvc");
+   db = db || DB("todo-riot");
 
    var self = $.observable(this),
       items = db.get();
