@@ -15,10 +15,10 @@
    // functions injected into the compiled template.
    var templateFunctions = {
       // minifiers will not alter object keys
-      raw: function (string) { // raw
+      raw: function (string) {
          return string;
       },
-      html: function (string) { // HTML escaped
+      html: function (string) {
          return string.replace(/[&<>"']/g, function (m) { return '&' + m.charCodeAt() + ';'; });
       }
    };
