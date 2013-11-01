@@ -1,10 +1,10 @@
-/*!
+/*
 
-   Riot!js v1.0 | https://moot.it/riotjs
+   Riot.js 0.9.0 | moot.it/riotjs
 
-   (c) 2013 Moot Inc
+   (c) 2013 Tero Piirainen, Moot Inc
 
-   License: MIT
+   @license: MIT
 
 */
 (function($, win) {
@@ -25,7 +25,7 @@
       return $($.render(template, data));
    }
 
-   // A classic pattern to enable MVP
+   // A classic pattern for separating concerns
    $.observable = function(obj) {
       var jq = $({});
 
@@ -70,18 +70,18 @@
    })
 
    // Change the browser URL or listen to changes on the URL
-   $.route = function(url) {
+   $.route = function(to) {
 
       // listen
-      if ($.isFunction(url)) {
-         win.on("popstate", function(e, to) {
-            url(to || location.hash)
+      if ($.isFunction(to)) {
+         win.on("popstate", function(e, hash) {
+            to(hash || location.hash)
          })
 
       // fire
-      } else if (url != location.hash) {
-         if (history.pushState) history.pushState("", "", url)
-         win.trigger("popstate", [url]);
+      } else if (to != location.hash) {
+         if (history.pushState) history.pushState("", "", to)
+         win.trigger("popstate", [to]);
       }
 
    }

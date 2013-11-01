@@ -13,7 +13,7 @@
    .stat label { width: 15%; }
    .stat em    { width: 10%; color: #777; }
    .stat div   { width: 74%; }
-   .stat span  { height: 7px; background-color: blue; min-width: 1px;}
+   .stat span  { height: 7px; background-color: blue; min-width: 1px; border-radius: 4px;}
    </style>
 
    <script src="../../lib/jquery.min.js"></script>
@@ -41,8 +41,8 @@
       // container for times
       var times = {};
 
-      // repeat amounts
-      var amounts = [100, 500, 2000];
+      // repeat amounts for each run
+      var amounts = [200, 500, 2000, 5000];
 
       // test function
       function test(name, repeat_amount, template, templateFunction) {
@@ -69,64 +69,73 @@
          ejb_syntax = $("#ejb_syntax").html().replace(/&lt;/g, "<").replace(/&gt;/g, ">"),
          moustache_syntax = $("#moustache_syntax").html();
 
-      // go trough tests
-      $.each(amounts, function(i, repeat) {
 
-         // riot
-         test("Riot", repeat, riot_syntax, $.render)
+      function run() {
 
-         // resig
-         test("Resig", repeat, ejb_syntax, tmpl)
+         times = {};
 
-         // hogan
-         test("Hogan", repeat, function() {
-            return Hogan.compile(moustache_syntax)
+         // go trough tests
+         $.each(amounts, function(i, repeat) {
 
-         }, function(tmpl) {
-            return tmpl.render(data)
+            // riot
+            test("Riot", repeat, riot_syntax, $.render)
+
+            // resig
+            test("Resig", repeat, ejb_syntax, tmpl)
+
+            // hogan
+            test("Hogan", repeat, function() {
+               return Hogan.compile(moustache_syntax)
+
+            }, function(tmpl) {
+               return tmpl.render(data)
+            })
+
+            // underscore
+            test("Underscore", repeat, function() {
+               return _.template(ejb_syntax)
+
+            }, function(tmpl) {
+               return tmpl(data)
+            })
+
+            // handlebars
+            test("Handlebars", repeat, function() {
+               return Handlebars.compile(moustache_syntax)
+
+            }, function(tmpl) {
+               return tmpl(data)
+            })
+
          })
 
-         // underscore
-         test("Underscore", repeat, function() {
-            return _.template(ejb_syntax)
+         // render results
+         var stat_root = $("#speed_stats").empty(),
+            stat_tmpl = $("#stat_el").html(),
+            max = [0, 0, 0, 0];
 
-         }, function(tmpl) {
-            return tmpl(data)
+         // find max values
+         $.each(times, function(name, values) {
+            $.each(values, function(i, value) {
+               if (value > max[i]) max[i] = value;
+            })
          })
 
-         // handlebars
-         test("Handlebars", repeat, function() {
-            return Handlebars.compile(moustache_syntax)
-
-         }, function(tmpl) {
-            return tmpl(data)
+         // render bars
+         $.each(times, function(engine, times) {
+            stat_root.append($("<h3/>", { text: engine }))
+            $.each(times, function(i, time) {
+               stat_root.append($.render(stat_tmpl, {
+                  stat: amounts[i] + " repeats",
+                  width: time / max[i] * 100,
+                  value: time + "ms"
+               }))
+            })
          })
 
-      })
+      }
 
-      // render results
-      var stat_root = $("#speed_stats"),
-         stat_tmpl = $("#stat_el").html(),
-         max = [0, 0, 0];
-
-      // find max values
-      $.each(times, function(name, values) {
-         $.each(values, function(i, value) {
-            if (value > max[i]) max[i] = value;
-         })
-      })
-
-      // render bars
-      $.each(times, function(engine, times) {
-         stat_root.append($("<h3/>", { text: engine }))
-         $.each(times, function(i, time) {
-            stat_root.append($.render(stat_tmpl, {
-               stat: "Repeat " + amounts[i],
-               width: time / max[i] * 100,
-               value: time + "ms"
-            }))
-         })
-      })
+      $("button").click(run)
 
    })
    </script>
@@ -235,6 +244,8 @@
    </script>
 
    <div id="speed_stats"></div>
+
+   <button>Run</button>
 
 </body>
 
