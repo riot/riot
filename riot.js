@@ -16,7 +16,7 @@
    // Render a template with data
    $.render = function(template, data) {
       return (FN[template] = FN[template] || Function("_", "return '" +
-         $.trim(template).replace(/\n/g, "").replace(/\{([^\}]+)\}/g, "'+_.$1+'") + "'")
+         $.trim(template).replace(/\n/g, "").replace(/'/g, "\\'").replace(/\{([^\}]+)\}/g, "'+_.$1+'") + "'")
       )(data);
    }
 
