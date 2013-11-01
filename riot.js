@@ -87,4 +87,4 @@
    }
 
 
-})(jQuery, window)
+})(jQuery || Zepto, window)
