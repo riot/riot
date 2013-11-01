@@ -3,7 +3,7 @@
 
 ### The 1kb client side MVP framework
 
-Riot is the fastest, smallest and most powerful client side framework for building large scale web applications. Despite the hilarious size all the building blocks are there: a template engine, router, event library and a strict MVP pattern to keep things organized. Your views are automatically updated when the underlying model changes.
+Riot is an incredibly fast, powerful yet tiny client side framework for building large scale web applications. Despite the small size all the building blocks are there: a template engine, router, event library and a strict MVP pattern to keep things organized. Your views are automatically updated when the underlying model changes.
 
 Current frameworks base their existence on false assumptions.
 
