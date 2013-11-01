@@ -15,9 +15,7 @@
 
    // Render a template with data
    $.render = function(template, data) {
-      return (FN[template] = FN[template] || Function("_", "return '" +
-         $.trim(template).replace(/\n/g, "").replace(/\{([^\}]+)\}/g, "'+_.$1+'") + "'")
-      )(data);
+      return null;
    }
 
    // A convenience render method to return a jQuery element
