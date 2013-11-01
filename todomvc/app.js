@@ -1,4 +1,3 @@
-
 /* The presenter */
 
 (function() { 'use strict';
@@ -10,7 +9,7 @@
    */
    window.todo = new Todo();
 
-   // HTML for a sintle todo item
+   // HTML for a single todo item
    var template = $("[type='html/todo']").html(),
       root = $("#todo-list"),
       nav = $("#filters a");
