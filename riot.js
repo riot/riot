@@ -10,14 +10,35 @@
 (function($, win) {
 
    // Precompiled templates (JavaScript functions)
-   var FN = {};
+   var tplFuncs = {};
 
+	// functions injected into the compiled template.
+	var tplEscapers = {
+		// minifiers will not alter object keys
+		r: function (string) { // raw
+			return string;
+		},
+		e: function (string) { // HTML escaped
+			return string.replace(/[&<>"']/g, function (m) { return '&' + m.charCodeAt() + ';'; });
+		}
+	};
+	
+	function compileTpl(template) {
+		var strContent = $.trim(template)
+			.replace(/[\n\\']/g, function (m) { return {"\n":"\\n", "\\":"\\\\", "'":"\\'"}[m]; })
+			.replace(/\{([er]:)?([a-zA-Z_$][0-9a-zA-Z_$]*)\}/g, function (m, f, id) {
+				if (!f) {
+					// default to raw
+					f = "r:";
+				}
+				return "'+(_." + id + "!==undefined?h." + f[0] + "(_." + id + "):'')+'";
+			});
+		return Function('_', 'h', "return '" + strContent + "'");
+	}
 
    // Render a template with data
    $.render = function(template, data) {
-      return (FN[template] = FN[template] || Function("_", "return '" +
-         $.trim(template).replace(/\n/g, "").replace(/\{([^\}]+)\}/g, "'+_.$1+'") + "'")
-      )(data);
+      return (tplFuncs[template] = tplFuncs[template] || compileTpl(template))(data, tplEscapers);
    }
 
    // A convenience render method to return a jQuery element
