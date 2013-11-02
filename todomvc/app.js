@@ -45,7 +45,7 @@
       toggle($("#" + item.id), !!item.done)
 
    }).on("edit", function(item) {
-      var el = $(item.id);
+      var el = $("#" + item.id);
       el.removeClass("editing");
       $("label, .edit", el).text(item.name).val(item.name);
 
