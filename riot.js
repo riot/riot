@@ -24,7 +24,9 @@
          }
       },
 
-      page_popped;
+      pagePopped,
+
+      slice = [].slice;
 
    /**
     * Turn an arbitrary template value into a string
@@ -103,7 +105,7 @@
 
             if (i < 2) {
                jq[name](names, function(e) {
-                  var args = [].slice.call(arguments, 1);
+                  var args = slice.call(arguments, 1);
                   if (names.split(" ")[1]) {
                      args.unshift(e.type);
                   }
@@ -111,7 +113,7 @@
                });
 
             } else if (i == 2) {
-               jq.trigger(names, [].slice.call(arguments, 1));
+               jq.trigger(names, slice.call(arguments, 1));
 
             } else {
                jq.off(names, fn);
@@ -128,15 +130,15 @@
    win = $(win);
 
    // emit window.popstate event consistently on page load, on every browser
-   win.on("load", function(e) {
+   win.on("load", function() {
       setTimeout(function() {
-         if (!page_popped) {
+         if (!pagePopped) {
             win.trigger("popstate");
          }
       }, 1);
 
-   }).on("popstate", function(e) {
-      page_popped = true;
+   }).on("popstate", function() {
+      pagePopped = true;
    });
 
    /**
