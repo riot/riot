@@ -20,11 +20,13 @@ $(function () {
             num: 42
          },
          expected = '&60;hr&62;&38;amp;&39;&34;\\\n{unknown_helper:prop}\\t<hr>&amp;\'"\',{}true}42';
+
       reporter($.render(tpl, data) === expected);
    });
 
    test('el()', function (reporter) {
       var $el = $.el('<b>{b}</b>', {b: "boom"});
+
       reporter(
          $el.constructor === $ &&
             $el.html() === 'boom' &&
@@ -36,33 +38,53 @@ $(function () {
       var Observable = {};
 
       reporter(Observable === $.observable(Observable));
-
-      test('observable events', function (reporter) {
-
-         var counters = {i: 0, j: 0};
-
-         Observable.on('inc1', function (c) {
-            c.i += 1;
-         });
-
-         Observable.on('inc1', function (c) {
-            if (c.i === 3) {
-               Observable.off('inc1');
-            }
-         });
-
-         Observable.one('inc2', function (c) {
-            c.j += 1;
-         });
-
-         for (var i = 0; i < 4; i++) {
-            Observable.emit('inc1', counters);
-            Observable.emit('inc2', counters);
-         }
-
-         reporter(counters.i === 3 && counters.j === 1);
-      });
    });
+
+   test('observable() on and emit', function (reporter) {
+      var Observable = {},
+          i = 0;
+      $.observable(Observable);
+
+      Observable.on('foo', function () {
+         i++;
+         if (i == 2) {
+            reporter(true);
+         }
+      });
+
+      Observable.emit('foo');
+      Observable.emit('foo');
+   });
+
+   test('observable() on', function (reporter) {
+      var Observable = {},
+          i = 0;
+      $.observable(Observable);
+
+      Observable.one('foo', function () {
+         i++;
+      });
+
+      Observable.emit('foo');
+      Observable.emit('foo');
+
+      reporter(i == 1);
+   });
+
+   test('observable() off', function (reporter) {
+      var Observable = {},
+          i = 0,
+          listener = function () { i++; };
+      $.observable(Observable);
+
+      Observable.on('foo', listener);
+      Observable.off('foo', listener);
+
+      Observable.emit('foo');
+
+      reporter(i == 0);
+   });
+
 
 //   test('route()', function (reporter) {
 //      reporter(false);
