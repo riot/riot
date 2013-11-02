@@ -10,7 +10,8 @@
 (function($, win) {
 
    // Precompiled templates (JavaScript functions)
-   var FN = {};
+   var FN = {},
+      slice = [].slice;
 
 
    // Render a template with data
@@ -34,13 +35,13 @@
 
             if (i < 2) {
                jq[name](names, function(e) {
-                  var args = [].slice.call(arguments, 1)
+                  var args = slice.call(arguments, 1)
                   if (names.split(" ")[1]) args.unshift(e.type)
                   fn.apply(obj, args)
                })
 
             } else if (i == 2) {
-               jq.trigger(names, [].slice.call(arguments, 1));
+               jq.trigger(names, slice.call(arguments, 1));
 
             } else {
                jq.off(names, fn);
