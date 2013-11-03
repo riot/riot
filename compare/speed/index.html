@@ -6,14 +6,15 @@
    <title>Riot.js | Speed comparison</title>
 
    <style>
-   body { font-family: "myriad pro", "helvetica neue", "verdana"; }
-   #speed_stats { max-width: 800px; margin: 3em auto; }
+   body { font-family: "myriad pro", "verdana"; max-width: 800px; margin: 3em auto; }
+   #speed_stats { margin-bottom: 2em; }
    .stat       { font-size: 90%; }
    .stat *     { display: inline-block; }
    .stat label { width: 15%; }
    .stat em    { width: 10%; color: #777; }
    .stat div   { width: 74%; }
-   .stat span  { height: 7px; background-color: blue; min-width: 1px; border-radius: 4px;}
+   .stat span  { height: 7px; background-color: blue; min-width: 1px; border-radius: 4px; }
+   button      { padding: .6em 1em; font-size: 100%; cursor: pointer;}
    </style>
 
    <script src="../../lib/jquery.min.js"></script>
@@ -38,19 +39,19 @@
          length: 178
       }
 
-      // container for times
-      var times = {};
+      // container for results
+      var results = {};
 
       // repeat amounts for each run
-      var amounts = [200, 500, 2000, 5000];
+      var repeat_amounts = [20, 50, 200, 500];
 
       // test function
       function test(name, repeat_amount, template, templateFunction) {
          var start = +new Date, str,
-            stat = times[name];
+            stat = results[name];
 
          // container for stats
-         if (!stat) stat = times[name] = [];
+         if (!stat) stat = results[name] = [];
 
          // compile time
          if ($.isFunction(template)) template = template()
@@ -72,10 +73,10 @@
 
       function run() {
 
-         times = {};
+         results = {};
 
          // go trough tests
-         $.each(amounts, function(i, repeat) {
+         $.each(repeat_amounts, function(i, repeat) {
 
             // riot
             test("Riot", repeat, riot_syntax, $.render)
@@ -111,31 +112,39 @@
 
          // render results
          var stat_root = $("#speed_stats").empty(),
-            stat_tmpl = $("#stat_el").html(),
+            stat_tmpl = $("#stat_tmpl").html(),
             max = [0, 0, 0, 0];
 
          // find max values
-         $.each(times, function(name, values) {
+         $.each(results, function(name, values) {
             $.each(values, function(i, value) {
                if (value > max[i]) max[i] = value;
             })
          })
 
          // render bars
-         $.each(times, function(engine, times) {
-            stat_root.append($("<h3/>", { text: engine }))
-            $.each(times, function(i, time) {
+         $.each(repeat_amounts, function(i, amount) {
+
+            stat_root.append($("<h3/>", { text: amount + " repeats" }))
+
+            $.each(results, function(engine, results) {
+
+               var time = results[i];
+
                stat_root.append($.render(stat_tmpl, {
-                  stat: amounts[i] + " repeats",
+                  stat: engine,
                   width: time / max[i] * 100,
                   value: time + "ms"
                }))
             })
+
          })
 
       }
 
       $("button").click(run)
+
+      run()
 
    })
    </script>
@@ -143,7 +152,7 @@
 
 <body>
 
-   <script type="text/tmpl" id="stat_el">
+   <script type="text/tmpl" id="stat_tmpl">
       <div class="stat">
          <label>{ stat }</label>
          <em>{value}</em>
@@ -245,7 +254,7 @@
 
    <div id="speed_stats"></div>
 
-   <button>Run</button>
+   <button>Run again</button>
 
 </body>
 
