@@ -1,12 +1,11 @@
-/*
-
-   Riot.js 0.9.0 | moot.it/riotjs
-
-   (c) 2013 Tero Piirainen, Moot Inc
-
-   @license: MIT
-
-*/
+/*!
+ * Riot.js 0.9.0
+ * http://moot.it/riotjs
+ *
+ * Copyright 2013 Tero Piirainen, Moot Inc. and other contributors
+ * Released under the MIT license
+ * https://raw.github.com/moot/riotjs/master/MIT-LICENSE.txt
+ */
 (function($, win) {
 
    // Precompiled templates (JavaScript functions)
