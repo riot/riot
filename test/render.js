@@ -27,5 +27,12 @@ describe("$.render", function() {
       assert($.render("{{x}}", { x: 'x' }) == "{x}");
    })
 
+   /*
+   it("Line breaks", function() {
+      assert($.render("x\r") == "x\r");
+      // \u2028, and \u2029.
+   })
+   */
+
 
 })

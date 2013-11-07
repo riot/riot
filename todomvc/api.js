@@ -11,12 +11,12 @@ function Todo(db) {
    self.add = function(name) {
       var item = { id: "_" + ("" + Math.random()).slice(2), name: name }
       items[item.id] = item;
-      self.emit("add", item);
+      self.trigger("add", item);
    }
 
    self.edit = function(item) {
       items[item.id] = item;
-      self.emit("edit", item);
+      self.trigger("edit", item);
    }
 
    self.remove = function(filter) {
@@ -24,13 +24,13 @@ function Todo(db) {
       $.each(els, function() {
          delete items[this.id]
       })
-      self.emit("remove", els);
+      self.trigger("remove", els);
    }
 
    self.toggle = function(id) {
       var item = items[id];
       item.done = !item.done;
-      self.emit("toggle", item);
+      self.trigger("toggle", item);
    }
 
    // @param filter: <empty>, id, "active", "completed"
