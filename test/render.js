@@ -2,14 +2,19 @@
 describe("$.render", function() {
 
    it("Simple ", function() {
-      assert($.render("|hi|") == "|hi|");
-      assert($.render("|hi|", {}) == "|hi|");
-      assert($.render("|{hi}|", { hi: "hi" }) == "|hi|");
+      assert($.render("x") == "x");
+      assert($.render("x", {}) == "x");
+      assert($.render("{x}", { x: "x" }) == "x");
    })
 
    it("Single quotes", function() {
-      assert($.render("'Hello'") == "'Hello'");
-      assert($.render("\'Hello.\';") == "\'Hello.\';");
+      assert($.render("'x'") == "'x'");
+      assert($.render("\'x.\';") == "\'x.\';");
+   })
+
+   it("Empty value", function() {
+      assert($.render("{x}", { x: undefined }) == "");
+      assert($.render("{x}", { x: null }) == "");
    })
 
 })
