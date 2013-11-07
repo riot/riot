@@ -21,8 +21,7 @@
     "bower_components",
     "test",
     "todomvc",
-    "compare",
-    "lib"
+    "compare"
   ],
   "dependencies": {
     "jquery": "~2.0.3"
