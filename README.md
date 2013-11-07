@@ -1,5 +1,5 @@
 
-![This is a RIOT!](https://moot.it/m/img/riotjs/riot-landscape.png)
+![This is a RIOT!](https://moot.it/m/img/riotjs/riot.png)
 
 ### The 1kb client side MVP framework
 
