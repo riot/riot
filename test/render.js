@@ -9,6 +9,7 @@ describe("$.render", function() {
 
    it("Single quotes", function() {
       assert($.render("'Hello'") == "'Hello'");
+      assert($.render("\'Hello.\';") == "\'Hello.\';");
    })
 
 })
