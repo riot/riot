@@ -22,7 +22,6 @@
     "test",
     "todomvc",
     "compare",
-    "lib"
   ],
   "dependencies": {
     "jquery": "~2.0.3"

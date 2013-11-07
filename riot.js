@@ -1,18 +1,12 @@
 /*
-
-   Riot.js 0.9.0 | moot.it/riotjs
-
-   (c) 2013 Tero Piirainen, Moot Inc
-
-   @license: MIT
-
-*/
+ * Riot.js 0.9.1 | moot.it/riotjs
+ * Copyright 2013 Tero Piirainen, Moot Inc. and other contributors
+ * Released under the MIT license
+ */
 (function($, win) {
 
    // Precompiled templates (JavaScript functions)
-   var FN = {},
-      slice = [].slice;
-
+   var FN = {}, slice = [].slice;
 
    // Render a template with data
    $.render = function(template, data) {
@@ -86,6 +80,5 @@
       }
 
    }
-
 
 })(jQuery, window)
