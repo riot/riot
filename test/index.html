@@ -1,61 +1,15 @@
+<html>
+  <head>
+    <script src="../lib/jquery.min.js"></script>
+    <script src="../riot.js"></script>
+    <script src="./test.js"></script>
+    <script>
+      test(window, console);
+    </script>
+  </head>
 
-<head>
-   <script src="../lib/jquery.min.js"></script>
-
-   <script>
-
-   var win = $(window),
-      page_popped;
-
-   // fire popstate consistently on page load, on every browser
-   win.on("load", function(e) {
-      setTimeout(function() {
-         if (!page_popped) win.trigger("popstate")
-      }, 1);
-
-   }).on("popstate", function(e) {
-      if (!page_popped) page_popped = true;
-   });
-
-
-   // Change the browser URL or listen to changes on the URL
-   $.route = function(url) {
-
-      // listen
-      if ($.isFunction(url)) {
-         win.on("popstate", function(e, to) {
-            url(to || location.hash)
-         })
-
-      // fire
-      } else if (url != location.hash) {
-         if (history.pushState) history.pushState("", "", url)
-         win.trigger("popstate", [url]);
-      }
-
-   }
-
-
-   $(function() {
-
-      $.route(function(url) {
-         console.info("Here we go!!", url)
-      })
-
-      $("a").click(function(e) {
-         $.route($(this).attr("href"))
-         return false;
-      })
-   })
-
-
-
-   </script>
-
-</head>
-
-<body>
-   <a href="#/salama">A link!</a>
-
-
-</body>
+  <body>
+    <script src="./riot_test.js"></script>
+    <h1>See the tests on the console!</h1>
+  </body>
+</html>
