@@ -1,22 +1,19 @@
-function test (self, console){
 
-  self.describe = function(description, fn) {
-    console.group(description);
-    fn.call(self);
-    console.groupEnd();
-  };
+function describe(msg, fn) {
+   console.group(msg);
+   fn();
+   console.groupEnd();
+}
 
-  self.it = function(description, fn) {
-    try {
+function it(msg, fn) {
+   try {
       fn();
-      console.log(description);
-    } catch (err) {
-      console.error(err +" (" + description + ")");
-    }
-  };
+      console.log(msg);
+   } catch (err) {
+      console.error(err + " (" + msg + ")");
+   }
+}
 
-  self.assert = function(ok, details){
-    if (!ok) throw (details || "Assertion Failed");
-  };
-
-};
+function assert(ok, msg) {
+   if (!ok) throw (msg);
+}
