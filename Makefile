@@ -1,5 +1,5 @@
 
 min:
-	uglifyjs riot.js --comments --mangle -o riot.min.js
+	uglifyjs riot.js --comments --mangle -o min/riot.min.js
 
 .PHONY: test compare

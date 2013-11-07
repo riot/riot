@@ -10,10 +10,10 @@ function it(msg, fn) {
       fn();
       console.log(msg);
    } catch (err) {
-      console.error(err + " (" + msg + ")");
+      console.error(msg, err);
    }
 }
 
 function assert(ok, msg) {
-   if (!ok) throw (msg);
+   if (!ok) throw (msg || "fails");
 }

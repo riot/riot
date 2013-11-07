@@ -1,9 +1,10 @@
+
 /* The presenter */
 
 (function() { 'use strict';
    /*
-      A Model instance. Exposed to global space so it can be used
-      on the browser's console. Try for example:
+      A Model instance exposed to global space so you can
+      use the Todo APi from the console. For example:
 
       todo.add("My task");
    */
@@ -13,6 +14,8 @@
    var template = $("[type='html/todo']").html(),
       root = $("#todo-list"),
       nav = $("#filters a");
+
+
 
    /* Listen to user events */
 
@@ -34,6 +37,8 @@
       todo.remove("completed");
    })
 
+
+
    /* Listen to model events */
 
    todo.on("add", add).on("remove", function(items) {
@@ -52,7 +57,10 @@
    // counts
    }).on("add remove toggle", counts)
 
-   // routing
+
+
+   /* Routing */
+
    nav.click(function() {
       return $.route($(this).attr("href"))
    })
@@ -69,7 +77,10 @@
       counts()
    })
 
-   // private functions
+
+
+   /* Private functions */
+
    function toggle(el, flag) {
       el.toggleClass("completed", flag);
       $(":checkbox", el).prop("checked", flag);
@@ -78,22 +89,28 @@
    function add(item) {
       if (this.id) item = this;
 
-      var el = $.el(template, item).appendTo(root),
+      var el = $($.render(template, item)).appendTo(root),
          input = $(".edit", el);
 
       $(".toggle", el).click(function() {
          todo.toggle(item.id);
       })
 
+      function blur() {
+         el.removeClass("editing")
+      }
+
       toggle(el, !!item.done);
 
       // edit
-      input.keydown(function(e) {
+      input.blur(blur).keydown(function(e) {
          var val = $.trim(this.value);
          if (e.which == 13 && val) {
             item.name = val;
             todo.edit(item);
          }
+
+         if (e.which == 27) blur()
       })
 
       $("label", el).dblclick(function() {
