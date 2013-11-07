@@ -1,11 +1,12 @@
 function test (self, console){
-  self.describe = function describe(description, fn){
+
+  self.describe = function(description, fn) {
     console.group(description);
-    fn.call(self)
-  console.groupEnd();
+    fn.call(self);
+    console.groupEnd();
   };
 
-  self.it = function it(description, fn){
+  self.it = function(description, fn) {
     try {
       fn();
       console.log(description);
@@ -15,6 +16,7 @@ function test (self, console){
   };
 
   self.assert = function(ok, details){
-    if(!ok) throw (details || "Assertion Failed");
+    if (!ok) throw (details || "Assertion Failed");
   };
+
 };
