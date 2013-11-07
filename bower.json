@@ -27,5 +27,8 @@
   ],
   "dependencies": {
     "jquery": "~2.0.3"
+  },
+  "devDependencies": {
+    "todomvc-common": "~0.1.9"
   }
 }
