@@ -28,31 +28,53 @@
 
    // A classic pattern for separating concerns
    $.observable = function(obj) {
-      var jq = $({});
+      var
+         // keep a jQuery instance private to the obj
+         jq = $({}),
+
+         // maintain a collection of the user-given listeners, along with the anonymous wrappers
+         // created for them. See https://github.com/moot/riotjs/issues/25
+         listeners = [];
 
       $.each(['on', 'one', 'emit', 'off'], function(i, name) {
          obj[name] = function(names, fn) {
 
             if (i < 2) {
-               jq[name](names, function(e) {
-                  var args = slice.call(arguments, 1)
-                  if (names.split(" ")[1]) args.unshift(e.type)
-                  fn.apply(obj, args)
-               })
+               var listener = {
+                  fn: fn,
+                  wrapper: function(e) {
+                     var args = slice.call(arguments, 1);
+                     if (names.split(" ")[1]) {
+                        args.unshift(e.type);
+                     }
+                     fn.apply(obj, args);
+                  }
+               };
+               jq[name](names, listener.wrapper);
+               listeners.push(listener);
 
             } else if (i == 2) {
                jq.trigger(names, slice.call(arguments, 1));
 
             } else {
+               // try to match fn with the original handler set by the user, but instead pass
+               // in the wrapper to jq.off
+               for (var j = 0, l = listeners.length; j < l; j++) {
+                  if (fn === listeners[j].fn) {
+                     jq.off(names, listeners[j].wrapper);
+                     return obj;
+                  }
+               }
+
                jq.off(names, fn);
             }
 
             return obj;
-         }
-      })
+         };
+      });
 
       return obj;
-   }
+   };
 
    // jQueried window object
    win = $(win);
