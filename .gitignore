@@ -3,6 +3,7 @@
 !.gitmodules
 *~
 
+node_modules
 bower_components
 Thumbs.db
 ehthumbs.db
