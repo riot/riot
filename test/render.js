@@ -20,6 +20,13 @@ describe("$.render", function() {
       assert.equal($.render("{x}", { x: null }), "");
    });
 
+   it("With spaces", function() {
+      assert.equal($.render("{ x }", { x: 'x' }), "x");
+      assert.equal($.render("{x }", { x: 'x' }), "x");
+      assert.equal($.render("{ x}", { x: 'x' }), "x");
+      assert.equal($.render("{  x   }", { x: 'x' }), "x");
+   });
+
    it("Nearby brackets", function() {
       assert.equal($.render("{{x}", { x: 'x' }), "{x");
       assert.equal($.render("{x}}", { x: 'x' }), "x}");

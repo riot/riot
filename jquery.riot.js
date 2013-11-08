@@ -10,14 +10,14 @@
 
    // Render a template with data
    $.render = function(template, data) {
-     FN[template] = FN[template] || function (data) {
-       return template.replace(/(\{(\w+)\})/g, function (){
-         var key = arguments[2];
-         return data[key] || "";
-       });
-     };
-     return FN[template](data);
-   };
+      return template && (FN[template] = FN[template] || new Function("_", "return '" +
+         template
+            .replace(/\n/g, "\\n")
+            .replace(/\r/g, "\\r")
+            .replace(/'/g, "\\'")
+            .replace(/\{\s*(\w+)\s*\}/g, "' + (_.$1 || '') + '") + "'")
+      )(data);
+   }
 
    // A classic pattern for separating concerns
    $.observable = function(obj) {
