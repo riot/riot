@@ -8,7 +8,7 @@
     "other contributors"
   ],
   "description": "The 1kb client side MVP framework",
-  "main": "lib/jquery.riot.js",
+  "main": "jquery.riot.js",
   "keywords": [
     "MVP",
     "MVC",
