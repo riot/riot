@@ -9,7 +9,7 @@
 
    // Render a template with data
    $.render = function(template, data) {
-      return (FN[template] = FN[template] || Function("_", "return '" +
+      return !template ? '' : (FN[template] = FN[template] || Function("_", "return '" +
          $.trim(template)
             .replace(/\n/g, "\\n")
             .replace(/'/g, "\\'")
@@ -24,6 +24,7 @@
       $.each(['on', 'one', 'trigger', 'off'], function(i, name) {
          obj[name] = function(names, fn) {
 
+            // on, one
             if (i < 2) {
                jq[name](names, function(e) {
                   var args = slice.call(arguments, 1)
@@ -31,11 +32,13 @@
                   fn.apply(obj, args)
                })
 
+            // trigger
             } else if (i == 2) {
                jq.trigger(names, slice.call(arguments, 1));
 
+            // off
             } else {
-               jq.off(names, fn);
+               jq.off(names);
             }
 
             return obj;

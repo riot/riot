@@ -21,17 +21,19 @@ describe("$.render", function() {
       assert($.render("{x}", { x: null }) == "");
    })
 
+   it("Empty template", function() {
+      assert($.render() === "");
+   })
+
    it("Nearby brackets", function() {
       assert($.render("{{x}", { x: 'x' }) == "{x");
       assert($.render("{x}}", { x: 'x' }) == "x}");
       assert($.render("{{x}}", { x: 'x' }) == "{x}");
    })
 
-   /*
-   it("Line breaks", function() {
-      assert($.render("x\r") == "x\r");
+   it("<template> tag", function() {
+      assert($.render($("#test1").html(), {x: 'x'}) == "x");
       // \u2028, and \u2029.
    })
-   */
 
 })
