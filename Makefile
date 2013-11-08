@@ -1,5 +1,5 @@
-
 min:
-	uglifyjs lib/riot.js --comments --mangle -o bin/riot.min.js
+	bower install
+	uglifyjs lib/jquery.riot.js --comments --mangle -o jquery.riot.min.js
 
 .PHONY: test compare
