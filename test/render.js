@@ -1,37 +1,33 @@
-
 describe("$.render", function() {
-
    it("Single token", function() {
-      assert($.render("x") == "x");
-      assert($.render("x", {}) == "x");
-      assert($.render("{x}", { x: "x" }) == "x");
-   })
+      assert.equal($.render("x"), "x");
+      assert.equal($.render("x", {}), "x");
+      assert.equal($.render("{x}", { x: "x" }), "x");
+      assert.equal($.render("{x}", { x: "z" }), "z");
+   });
 
    it("Multiple tokens", function() {
       assert($.render("{x}{y}", { x: "x", y: "y" }) == "xy");
-   })
+   });
 
    it("Single quotes", function() {
-      assert($.render("'x'") == "'x'");
-      assert($.render("\'x.\';") == "\'x.\';");
-   })
+      assert.equal($.render("'x'"), "'x'");
+      assert.equal($.render("\'x.\';"), "\'x.\';");
+   });
 
    it("Empty value", function() {
-      assert($.render("{x}", { x: undefined }) == "");
-      assert($.render("{x}", { x: null }) == "");
-   })
+      assert.equal($.render("{x}", { x: undefined }), "");
+      assert.equal($.render("{x}", { x: null }), "");
+   });
 
    it("Nearby brackets", function() {
-      assert($.render("{{x}", { x: 'x' }) == "{x");
-      assert($.render("{x}}", { x: 'x' }) == "x}");
-      assert($.render("{{x}}", { x: 'x' }) == "{x}");
-   })
+      assert.equal($.render("{{x}", { x: 'x' }), "{x");
+      assert.equal($.render("{x}}", { x: 'x' }), "x}");
+      assert.equal($.render("{{x}}", { x: 'x' }), "{x}");
+   });
 
-   /*
    it("Line breaks", function() {
-      assert($.render("x\r") == "x\r");
-      // \u2028, and \u2029.
-   })
-   */
-
-})
+      assert.equal($.render("x\r"), "x\r");
+      assert.equal($.render("x\n"), "x\n");
+   });
+});
