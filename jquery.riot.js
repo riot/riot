@@ -1,14 +1,14 @@
 /*
-  Riot.js 0.9.2 | moot.it/riotjs | @license MIT
+  Riot.js 0.9.3 | moot.it/riotjs | @license MIT
   (c) 2013 Tero Piirainen, Moot Inc and other contributors.
  */
 "use strict";
-(function($, win) {
+(function() {
 
   // avoid multiple execution. popstate should be fired only once etc.
   if ($.riot) return;
 
-  $.riot = "0.9.2";
+  $.riot = "0.9.3";
 
   // Precompiled templates (JavaScript functions)
   var FN = {}, slice = [].slice;
@@ -27,7 +27,8 @@
 
   // A classic pattern for separating concerns
   $.observable = function(obj) {
-    var jq = $({});
+
+    var jq = $(""); // plain object not working on Zepto
 
     $.each(['on', 'one', 'trigger', 'off'], function(i, name) {
       obj[name] = function(names, fn) {
@@ -58,7 +59,7 @@
   };
 
   // jQueried window object
-  win = $(win);
+  var win = $(window);
 
   // emit window.popstate event consistently on page load, on every browser
   var page_popped;
@@ -70,6 +71,7 @@
 
   }).on("popstate", function(e) {
     if (!page_popped) page_popped = true;
+
   });
 
   // Change the browser URL or listen to changes on the URL
@@ -86,6 +88,7 @@
       if (history.pushState) history.pushState("", "", to);
       win.trigger("popstate", [to]);
     }
+
   };
 
-})(jQuery, window);
+})();
