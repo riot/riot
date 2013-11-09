@@ -2,8 +2,8 @@
   Riot.js 0.9.3 | moot.it/riotjs | @license MIT
   (c) 2013 Tero Piirainen, Moot Inc and other contributors.
  */
-"use strict";
 (function() {
+  "use strict";
 
   // avoid multiple execution. popstate should be fired only once etc.
   if ($.riot) return;
