@@ -5,6 +5,11 @@
 "use strict";
 (function($, win) {
 
+  // avoid multiple execution. popstate should be fired only once etc.
+  if ($.riot) return;
+
+  $.riot = "0.9.2";
+
   // Precompiled templates (JavaScript functions)
   var FN = {}, slice = [].slice;
 
