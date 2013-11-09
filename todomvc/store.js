@@ -1,14 +1,14 @@
 
 function DB(key) {
-   var store = window.localStorage;
+  var store = window.localStorage;
 
-   return {
-      get: function() {
-         return JSON.parse(store[key] || '{}')
-      },
+  return {
+    get: function() {
+      return JSON.parse(store[key] || '{}')
+    },
 
-      put: function(data) {
-         store[key] = JSON.stringify(data)
-      }
-   }
+    put: function(data) {
+      store[key] = JSON.stringify(data)
+    }
+  }
 }
