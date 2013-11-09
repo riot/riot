@@ -99,15 +99,15 @@
     fn = $.observable({});
 
   function pop(hash) {
-    fn.trigger("pop", hash || location.hash);
+    fn.trigger("pop", hash || top.location.hash);
   }
 
   function on(event, fn) {
-    window.addEventListener(event, fn, false);
+    top.addEventListener(event, fn, false);
   }
 
   on("load", function() {
-    setTimeout(function() { page_popped || pop(); }, 1);
+    top.setTimeout(function() { page_popped || pop(); }, 1);
   });
 
   on("popstate", function(e) {
@@ -123,8 +123,8 @@
       fn.on("pop", to);
 
     // fire
-    } else if (to != location.hash) {
-      if (history.pushState) history.pushState("", "", to);
+    } else if (to != top.location.hash) {
+      if (top.history.pushState) top.history.pushState("", "", to);
       pop(to);
     }
 

@@ -2,8 +2,10 @@
   Riot.js 0.9.4 | moot.it/riotjs | @license MIT
   (c) 2013 Tero Piirainen, Moot Inc and other contributors.
  */
-(function() {
+(function(top) {
   "use strict";
+
+  var $ = top.$; // jQuery or Zepto
 
   // avoid multiple execution. popstate should be fired only once etc.
   if ($.riot) return;
@@ -15,14 +17,14 @@
 
   $.observable = function(obj) {
 
-    var jq = $("<a/>"); // plain object not working on Zepto
+    var $el = $("<a/>"); // plain object not working on Zepto
 
     $.each(['on', 'one', 'trigger', 'off'], function(i, name) {
       obj[name] = function(names, fn) {
 
         // on, one
         if (i < 2) {
-          jq[name](names, function(e) {
+          $el[name](names, function(e) {
             var args = slice.call(arguments, 1);
             if (names.split(" ")[1]) args.unshift(e.type);
             fn.apply(obj, args);
@@ -30,11 +32,11 @@
 
         // trigger
         } else if (i === 2) {
-          jq.trigger(names, slice.call(arguments, 1));
+          $el.trigger(names, slice.call(arguments, 1));
 
         // off
         } else {
-          jq.off(names);
+          $el.off(names);
         }
 
         return obj;
@@ -46,13 +48,13 @@
   };
 
   // jQueried window object
-  var win = $(window);
+  var $win = $(top);
 
   // emit window.popstate event consistently on page load, on every browser
   var page_popped;
 
-  win.on("load", function(e) {
-    setTimeout(function() { page_popped || win.trigger("popstate"); }, 1);
+  $win.on("load", function(e) {
+    top.setTimeout(function() { page_popped || $win.trigger("popstate"); }, 1);
 
   }).on("popstate", function(e) {
     if (!page_popped) page_popped = true;
@@ -64,16 +66,16 @@
 
     // listen
     if ($.isFunction(to)) {
-      win.on("popstate", function(e, hash) {
-        to(hash || location.hash);
+      $win.on("popstate", function(e, hash) {
+        to(hash || top.location.hash);
       });
 
     // fire
-    } else if (to != location.hash) {
-      if (history.pushState) history.pushState("", "", to);
-      win.trigger("popstate", [to]);
+    } else if (to != top.location.hash) {
+      if (top.history.pushState) top.history.pushState("", "", to);
+      $win.trigger("popstate", [to]);
     }
 
   };
 
-})();
+})(window);
