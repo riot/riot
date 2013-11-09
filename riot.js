@@ -32,7 +32,7 @@
         }
       }
       return el;
-    }
+    };
 
     el.off = function(events, fn) {
       events = events.split(/\s+/);
@@ -53,7 +53,7 @@
         if (pos >= 0) fns.splice(pos, 1);
       }
       return el;
-    }
+    };
 
     // only single event supported
     el.one = function(type, fn) {
@@ -69,7 +69,7 @@
       }
 
       return el;
-    }
+    };
 
     el.trigger = function(type) {
 
@@ -83,27 +83,27 @@
         if (!fn) continue;
 
         // add event argument when multiple listeners
-        fn.apply(el, fn.typed ? [type].concat(args) : args)
+        fn.apply(el, fn.typed ? [type].concat(args) : args);
 
       }
 
       return el;
-    }
+    };
 
     return el;
 
-  }
+  };
 
   // emit window.popstate event consistently on page load, on every browser
   var page_popped,
     fn = $.observable({});
 
   function pop(hash) {
-    fn.trigger("pop", hash || location.hash)
+    fn.trigger("pop", hash || location.hash);
   }
 
   function on(event, fn) {
-    window.addEventListener(event, fn, false)
+    window.addEventListener(event, fn, false);
   }
 
   on("load", function() {

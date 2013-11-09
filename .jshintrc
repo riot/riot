@@ -1,0 +1,7 @@
+{
+  "globals": {
+    "$": false
+  },
+  "-W054": true,
+  "expr": true
+}
