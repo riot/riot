@@ -1,12 +1,15 @@
 
 describe("Observable", function() {
 
-  var el = $.observable({});
+  var el = $.observable({}),
+    total = 8,
+    count = 0;
 
   it("Single listener", function() {
 
     el.on("a", function(arg) {
       assert.equal(arg, true)
+      count++;
     });
 
     el.trigger("a", true);
@@ -15,14 +18,16 @@ describe("Observable", function() {
 
   it("Multiple listeners", function() {
 
-    var count = 0;
+    var counter = 0;
 
     el.on("b c d", function(e) {
-      if (++count == 3) assert.equal(e, "d")
+      if (++counter == 3) assert.equal(e, "d")
+      count++;
     })
 
     el.one("d", function(a) {
       assert.equal(a, true)
+      count++;
     })
 
     el.trigger("b").trigger("c").trigger("d", true);
@@ -35,6 +40,7 @@ describe("Observable", function() {
 
     el.one("g", function() {
       assert.equal(++counter, 1);
+      count++;
     })
 
     el.trigger("g").trigger("g");
@@ -47,6 +53,7 @@ describe("Observable", function() {
 
     function r() {
       assert.equal(++counter, 1);
+      count++;
     }
 
     el.on("r", r).on("s", r).off("s", r).trigger("r").trigger("s");
@@ -73,10 +80,13 @@ describe("Observable", function() {
     el.on("j", function(a, b) {
       assert.equal(a, 1);
       assert.equal(b[0], 2);
+      count++;
     })
 
     el.trigger("j", 1, [2]);
 
   })
+
+  assert.equal(total, count)
 
 })

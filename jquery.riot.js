@@ -15,7 +15,7 @@
 
   $.observable = function(obj) {
 
-    var jq = $(""); // plain object not working on Zepto
+    var jq = $("<a/>"); // plain object not working on Zepto
 
     $.each(['on', 'one', 'trigger', 'off'], function(i, name) {
       obj[name] = function(names, fn) {

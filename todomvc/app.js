@@ -92,6 +92,7 @@
     var el = $($.render(template, item)).appendTo(root),
       input = $(".edit", el);
 
+
     $(".toggle", el).click(function() {
       todo.toggle(item.id);
     })
