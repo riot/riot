@@ -3,8 +3,7 @@
   Riot.js 0.9.4 | moot.it/riotjs | @license MIT
   (c) 2013 Tero Piirainen, Moot Inc and other contributors.
  */
-"use strict";
-(function(top) {
+(function(top) { "use strict";
 
   top.$ = top.$ || {};
 
