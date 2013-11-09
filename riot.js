@@ -5,7 +5,7 @@
  */
 (function(top) { "use strict";
 
-  top.$ = top.$ || {};
+  var $ = top.$ = top.$ || {};
 
   // avoid multiple execution. popstate should be fired only once etc.
   if ($.riot) return;
