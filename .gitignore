@@ -1,4 +1,5 @@
 .*
+!.jshintrc
 !.gitignore
 !.gitmodules
 *~
