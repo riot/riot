@@ -1,0 +1,27 @@
+<!doctype html>
+
+<head>
+  <script src="../riot.js"></script>
+
+  <script>
+    $.route(function(hash) {
+      console.info("route:", hash);
+    })
+
+    var links = document.getElementsByTagName("a");
+
+    for (var i = 0; i < links.length; i++) {
+      links[i].onclick = function() {
+        $.route(this.href);
+      }
+    }
+  </script>
+
+</head>
+
+<body>
+  <a href="#!/hash1">First</a>
+  <a href="#!/hash2">Second</a>
+  <a href="#!/hash3">Third</a>
+  <a href="#!/hash4">Fourth</a>
+</body>

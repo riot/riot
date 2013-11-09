@@ -1,4 +1,6 @@
+
 describe("$.render", function() {
+
   it("Single token", function() {
     assert.equal($.render("x"), "x");
     assert.equal($.render("x", {}), "x");
@@ -40,7 +42,7 @@ describe("$.render", function() {
   });
 
   it("<template> tag", function() {
-    assert($.trim($.render($("#test1").html(), {x: 'x'})) == "x");
+    if ($.trim) assert($.trim($.render($("#test1").html(), {x: 'x'})) == "x");
   })
 
   it("Line breaks", function() {

@@ -1,5 +1,5 @@
 /*
-  Riot.js 0.9.3 | moot.it/riotjs | @license MIT
+  Riot.js 0.9.4 | moot.it/riotjs | @license MIT
   (c) 2013 Tero Piirainen, Moot Inc and other contributors.
  */
 "use strict";
@@ -8,24 +8,11 @@
   // avoid multiple execution. popstate should be fired only once etc.
   if ($.riot) return;
 
-  $.riot = "0.9.3";
-
-  // Precompiled templates (JavaScript functions)
-  var FN = {}, slice = [].slice;
-
-  // Render a template with data
-  $.render = function(template, data) {
-    return !template ? '' : (FN[template] = FN[template] || new Function("_",
-      "return '" + template
-        .replace(/\n/g, "\\n")
-        .replace(/\r/g, "\\r")
-        .replace(/'/g, "\\'")
-        .replace(/\{\s*(\w+)\s*\}/g, "' + (_.$1 === undefined || _.$1 === null ? '' : _.$1) + '") +
-      "'"
-    ))(data);
-  }
+  $.riot = "0.9.4";
 
   // A classic pattern for separating concerns
+  var slice = [].slice;
+
   $.observable = function(obj) {
 
     var jq = $(""); // plain object not working on Zepto
@@ -65,9 +52,7 @@
   var page_popped;
 
   win.on("load", function(e) {
-    setTimeout(function() {
-      if (!page_popped) win.trigger("popstate");
-    }, 1);
+    setTimeout(function() { page_popped || win.trigger("popstate"); }, 1);
 
   }).on("popstate", function(e) {
     if (!page_popped) page_popped = true;
