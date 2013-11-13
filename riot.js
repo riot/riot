@@ -13,9 +13,7 @@
 
   $.riot = "0.9.4";
 
-  function isFunction(el) {
-    return Object.prototype.toString.call(el) == '[object Function]';
-  }
+  // http://stackoverflow.com/questions/17108122/isfunctiona-vs-typeof-a-function-javascript
 
   $.observable = function(el) {
 
@@ -23,7 +21,8 @@
       slice = [].slice;
 
     el.on = function(events, fn) {
-      if (isFunction(fn)) {
+
+      if (typeof fn == "function") {
         events = events.split(/\s+/);
 
         for (var i = 0, len = events.length, type; i < len; i++) {
@@ -47,13 +46,8 @@
 
     // only single event supported
     el.one = function(type, fn) {
-
-      if (isFunction(fn)) {
-        fn.one = true;
-        el.on(type, fn);
-      }
-
-      return el;
+      if (fn) fn.one = true;
+      return el.on(type, fn);
 
     };
 
@@ -105,7 +99,7 @@
   $.route = function(to) {
 
     // listen
-    if (isFunction(to)) {
+    if (typeof to == "function") {
       fn.on("pop", to);
 
     // fire
