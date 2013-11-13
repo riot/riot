@@ -90,7 +90,7 @@
 
   } else {
     doc.attachEvent("onreadystatechange", function() {
-      if (doc.readyState == "complete") pop();
+      if (doc.readyState == "complete") pop("");
     });
 
   }
@@ -102,7 +102,7 @@
     if (typeof to == "function") return fn.on("pop", to);
 
     // fire
-    if (history.pushState) history.pushState("", "", to);
+    if (history.pushState) history.pushState(0, 0, to);
     pop(to);
 
   };

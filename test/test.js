@@ -1,8 +1,13 @@
 
 function describe(msg, fn) {
-  console.group(msg);
-  fn();
-  console.groupEnd();
+  if (console.group) {
+    console.group(msg);
+    fn();
+    console.groupEnd();
+  } else {
+    console.info("---" + msg + "---");
+    fn();
+  }
 }
 
 function it(msg, fn) {

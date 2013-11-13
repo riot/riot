@@ -7,17 +7,6 @@
     <script src="../jquery.riot.js"></script>
     <script src="../ext/render.js"></script>
     <script src="test.js"></script>
-
-    <script>
-      $.route(function(hash) {
-        console.info("route:", hash);
-      })
-
-      $("a").click(function(e) {
-        $.route($(this).attr("href"));
-        e.preventDefault();
-      })
-    </script>
   </head>
 
   <body>
@@ -35,5 +24,15 @@
 
   <script src="./render.js"></script>
   <script src="./observable.js"></script>
+  <script>
+    $.route(function(hash) {
+      console.info("route:", hash);
+    })
+
+    $("a").click(function(e) {
+      $.route($(this).attr("href"));
+      e.preventDefault();
+    })
+  </script>
 
 </html>

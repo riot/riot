@@ -6,21 +6,6 @@
     <script src="../riot.js"></script>
     <script src="../ext/render.js"></script>
     <script src="test.js"></script>
-
-    <script>
-      $.route(function(hash) {
-        console.info("route:", hash);
-      })
-
-      var links = document.getElementsByTagName("a");
-
-      for (var i = 0; i < links.length; i++) {
-        links[i].onclick = function() {
-          $.route(this.href);
-          return false;
-        }
-      }
-    </script>
   </head>
 
   <body>
@@ -32,11 +17,24 @@
     <a href="#!/hash4">Fourth</a>
   </body>
 
-  <template id="test1">
+  <script type="text/tmpl" id="test1">
     {x}
-  </template>
+  </script>
 
   <script src="./render.js"></script>
   <script src="./observable.js"></script>
+  <script>
+    $.route(function(hash) {
+      console.info("route:", hash);
+    })
 
+    var links = document.getElementsByTagName("a");
+
+    for (var i = 0; i < links.length; i++) {
+      links[i].onclick = function() {
+        $.route(this.getAttribute("href"));
+        return false;
+      }
+    }
+  </script>
 </html>
