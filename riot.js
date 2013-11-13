@@ -1,19 +1,17 @@
 
 /*
-  Riot.js 0.9.4 | moot.it/riotjs | @license MIT
+  Riot.js 0.9.5 | moot.it/riotjs | @license MIT
   (c) 2013 Tero Piirainen, Moot Inc and other contributors.
  */
 (function(top) { "use strict";
-  /*global setTimeout, history, location */
+  /*global setTimeout, history, location, document */
 
   var $ = top.$ = top.$ || {};
 
   // avoid multiple execution. popstate should be fired only once etc.
   if ($.riot) return;
 
-  $.riot = "0.9.4";
-
-  // http://stackoverflow.com/questions/17108122/isfunctiona-vs-typeof-a-function-javascript
+  $.riot = "0.9.5";
 
   $.observable = function(el) {
 
@@ -74,39 +72,38 @@
 
   };
 
-  // emit window.popstate event consistently on page load, on every browser
-  var page_popped,
-    fn = $.observable({});
+  // cross browser popstate
+  var currentHash,
+    fn = $.observable({}),
+    listen = top.addEventListener,
+    doc = document;
 
   function pop(hash) {
-    fn.trigger("pop", hash || location.hash);
+    hash = hash.type ? location.hash : hash;
+    if (hash != currentHash) fn.trigger("pop", hash);
+    currentHash = hash;
   }
 
-  function on(event, fn) {
-    top.addEventListener(event, fn, false);
+  if (listen) {
+    listen("popstate", pop, false);
+    doc.addEventListener("DOMContentLoaded", pop, false);
+
+  } else {
+    doc.attachEvent("onreadystatechange", function() {
+      if (doc.readyState == "complete") pop();
+    });
+
   }
-
-  on("load", function() {
-    setTimeout(function() { page_popped || pop(); }, 1);
-  });
-
-  on("popstate", function(e) {
-    if (!page_popped) page_popped = true;
-    pop();
-  });
 
   // Change the browser URL or listen to changes on the URL
   $.route = function(to) {
 
     // listen
-    if (typeof to == "function") {
-      fn.on("pop", to);
+    if (typeof to == "function") return fn.on("pop", to);
 
     // fire
-    } else if (to != location.hash) {
-      if (history.pushState) history.pushState("", "", to);
-      pop(to);
-    }
+    if (history.pushState) history.pushState("", "", to);
+    pop(to);
 
   };
 

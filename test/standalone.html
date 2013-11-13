@@ -6,10 +6,30 @@
     <script src="../riot.js"></script>
     <script src="../ext/render.js"></script>
     <script src="test.js"></script>
+
+    <script>
+      $.route(function(hash) {
+        console.info("route:", hash);
+      })
+
+      var links = document.getElementsByTagName("a");
+
+      for (var i = 0; i < links.length; i++) {
+        links[i].onclick = function() {
+          $.route(this.href);
+          return false;
+        }
+      }
+    </script>
   </head>
 
   <body>
     <p>Open console to view the results</p>
+
+    <a href="#!/hash1">First</a>
+    <a href="#!/hash2">Second</a>
+    <a href="#!/hash3">Third</a>
+    <a href="#!/hash4">Fourth</a>
   </body>
 
   <template id="test1">
