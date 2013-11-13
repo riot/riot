@@ -1,9 +1,10 @@
 
 
-(function(top) { "use strict";
-  /*global setTimeout, history, location, document */
+(function(is_node) { "use strict";
+  /*global exports, window, setTimeout, history, location, document */
 
-  var $ = top.$ = top.$ || {};
+  var top = is_node ? exports : window,
+    $ = is_node ? top : top.$ = top.$ || {};
 
   // avoid multiple execution. popstate should be fired only once etc.
   if ($.riot) return;
@@ -69,6 +70,8 @@
 
   };
 
+  if (is_node) return;
+
   // cross browser popstate
   var currentHash,
     fn = $.observable({}),
@@ -104,4 +107,4 @@
 
   };
 
-})(window);
+})(typeof exports == "object");
