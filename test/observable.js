@@ -2,7 +2,7 @@
 describe("Observable", function() {
 
   var el = $.observable({}),
-    total = 8,
+    total = 11,
     count = 0;
 
   it("Single listener", function() {
@@ -44,6 +44,24 @@ describe("Observable", function() {
     })
 
     el.trigger("g").trigger("g");
+  })
+
+  it("One & on", function() {
+
+    var counter = 0;
+
+    el.one("y", function() {
+      count++;
+      counter++;
+
+    }).on("y", function() {
+      count++;
+      counter++;
+
+    }).trigger("y").trigger("y");
+
+    assert.equal(counter, 3);
+
   })
 
 

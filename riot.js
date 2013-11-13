@@ -4,6 +4,7 @@
   (c) 2013 Tero Piirainen, Moot Inc and other contributors.
  */
 (function(top) { "use strict";
+  /*global setTimeout, history, location */
 
   var $ = top.$ = top.$ || {};
 
@@ -34,41 +35,26 @@
       return el;
     };
 
-    el.off = function(events, fn) {
+    el.off = function(events) {
       events = events.split(/\s+/);
 
-      for (var j = 0, type; j < events.length; j++) {
-        type = events[j];
-
-        // remove single type
-        if (!fn) { callbacks[type] = []; continue; }
-
-        var fns = callbacks[type] || [],
-          pos = -1;
-
-        for (var i = 0, len = fns.length; i < len; i++) {
-          if (fns[i] === fn || fns[i].listener === fn) { pos = i; break; }
-        }
-
-        if (pos >= 0) fns.splice(pos, 1);
+      for (var i = 0; i < events.length; i++) {
+        callbacks[events[i]] = [];
       }
+
       return el;
     };
 
     // only single event supported
     el.one = function(type, fn) {
 
-      function on() {
-        el.off(type, fn);
-        fn.apply(el, arguments);
-      }
-
       if (isFunction(fn)) {
-        on.listener = fn;
-        el.on(type, on);
+        fn.one = true;
+        el.on(type, fn);
       }
 
       return el;
+
     };
 
     el.trigger = function(type) {
@@ -76,15 +62,15 @@
       var args = slice.call(arguments, 1),
         fns = callbacks[type] || [];
 
-      for (var i = 0, len = fns.length, fn, added; i < len; ++i) {
+      for (var i = 0, fn; i < fns.length; ++i) {
         fn = fns[i];
 
-        // possibly removed
-        if (!fn) continue;
+        if (fn.one && fn.done) continue;
 
         // add event argument when multiple listeners
         fn.apply(el, fn.typed ? [type].concat(args) : args);
 
+        fn.done = true;
       }
 
       return el;
@@ -99,7 +85,7 @@
     fn = $.observable({});
 
   function pop(hash) {
-    fn.trigger("pop", hash || top.location.hash);
+    fn.trigger("pop", hash || location.hash);
   }
 
   function on(event, fn) {
@@ -107,7 +93,7 @@
   }
 
   on("load", function() {
-    top.setTimeout(function() { page_popped || pop(); }, 1);
+    setTimeout(function() { page_popped || pop(); }, 1);
   });
 
   on("popstate", function(e) {
@@ -123,8 +109,8 @@
       fn.on("pop", to);
 
     // fire
-    } else if (to != top.location.hash) {
-      if (top.history.pushState) top.history.pushState("", "", to);
+    } else if (to != location.hash) {
+      if (history.pushState) history.pushState("", "", to);
       pop(to);
     }
 

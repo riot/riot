@@ -2,8 +2,8 @@
   Riot.js 0.9.4 | moot.it/riotjs | @license MIT
   (c) 2013 Tero Piirainen, Moot Inc and other contributors.
  */
-(function(top) {
-  "use strict";
+(function(top) { "use strict";
+  /*global setTimeout, history, location */
 
   var $ = top.$; // jQuery or Zepto
 
@@ -54,7 +54,7 @@
   var page_popped;
 
   $win.on("load", function(e) {
-    top.setTimeout(function() { page_popped || $win.trigger("popstate"); }, 1);
+    setTimeout(function() { page_popped || $win.trigger("popstate"); }, 1);
 
   }).on("popstate", function(e) {
     if (!page_popped) page_popped = true;
@@ -67,12 +67,12 @@
     // listen
     if ($.isFunction(to)) {
       $win.on("popstate", function(e, hash) {
-        to(hash || top.location.hash);
+        to(hash || location.hash);
       });
 
     // fire
-    } else if (to != top.location.hash) {
-      if (top.history.pushState) top.history.pushState("", "", to);
+    } else if (to != location.hash) {
+      if (history.pushState) history.pushState("", "", to);
       $win.trigger("popstate", [to]);
     }
 
