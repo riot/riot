@@ -1,24 +1,15 @@
-
-
-(function(is_node) { "use strict";
-  /*global exports, window, setTimeout, history, location, document */
-
-  var top = is_node ? exports : window,
-    $ = is_node ? top : top.$ = top.$ || {};
-
+(function($) { "use strict";
   // avoid multiple execution. popstate should be fired only once etc.
   if ($.riot) return;
 
   $.riot = "0.9.5";
 
   $.observable = function(el) {
-
-    var callbacks = {},
-      slice = [].slice;
+    var callbacks = {}, slice = [].slice;
 
     el.on = function(events, fn) {
 
-      if (typeof fn == "function") {
+      if (typeof fn === "function") {
         events = events.split(/\s+/);
 
         for (var i = 0, len = events.length, type; i < len; i++) {
@@ -70,12 +61,28 @@
 
   };
 
-  if (is_node) return;
+  // Precompiled templates (JavaScript functions)
+  var FN = {};
+
+  // Render a template with data
+  $.render = function(template, data) {
+    if(!template) return '';
+    return (FN[template] = FN[template] || new Function("_",
+      "return '" + template
+        .replace(/\n/g, "\\n")
+        .replace(/\r/g, "\\r")
+        .replace(/'/g, "\\'")
+        .replace(/\{\s*(\w+)\s*\}/g, "'+(_.$1?(_.$1+'').replace(/&/g,'&amp;').replace(/\"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):(_.$1===0?0:''))+'") + "'"
+    ))(data);
+  };
+
+  // Early return for node
+  if (typeof window === "undefined") return;
 
   // cross browser popstate
   var currentHash,
     fn = $.observable({}),
-    listen = top.addEventListener,
+    listen = window.addEventListener,
     doc = document;
 
   function pop(hash) {
@@ -90,16 +97,15 @@
 
   } else {
     doc.attachEvent("onreadystatechange", function() {
-      if (doc.readyState == "complete") pop("");
+      if (doc.readyState === "complete") pop("");
     });
-
   }
 
   // Change the browser URL or listen to changes on the URL
   $.route = function(to) {
 
     // listen
-    if (typeof to == "function") return fn.on("pop", to);
+    if (typeof to === "function") return fn.on("pop", to);
 
     // fire
     if (history.pushState) history.pushState(0, 0, to);
@@ -107,4 +113,6 @@
 
   };
 
-})(typeof exports == "object");
+})(typeof exports !== "undefined" ?
+  exports : window.$ || (window.$ = {})
+);
