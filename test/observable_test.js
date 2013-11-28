@@ -13,7 +13,6 @@ describe("Observable", function() {
     });
 
     el.trigger("a", true);
-
   })
 
   it("Multiple listeners", function() {
