@@ -1,8 +1,5 @@
-
-(function(top) { "use strict";
-  /*global setTimeout, history, location */
-
-  var $ = top.$; // jQuery or Zepto
+(function($, window) {
+  "use strict";
 
   // avoid multiple execution. popstate should be fired only once etc.
   if ($.riot) return;
@@ -13,7 +10,6 @@
   var slice = [].slice;
 
   $.observable = function(obj) {
-
     var $el = $("<a/>"); // plain object not working on Zepto
 
     $.each(['on', 'one', 'trigger', 'off'], function(i, name) {
@@ -44,6 +40,20 @@
     return obj;
   };
 
+  // Presenters
+  var presenters = {};
+
+  // sets a presenter
+  $.present = function (name, callback) {
+    presenters[name] = callback;
+  };
+
+  // uses presenter as a simple plugin
+  $.fn.present = function (name, options) {
+    presenters[name](this, options);
+    return this;
+  };
+
   // cross browser popstate
   var currentHash,
     fn = $.observable({});
@@ -55,18 +65,16 @@
   }
 
   $(pop);
-  $(top).on("popstate", pop);
+  $(window).on("popstate", pop);
 
   // Change the browser URL or listen to changes on the URL
   $.route = function(to) {
-
     // listen
     if (typeof to == "function") return fn.on("pop", to);
 
     // fire
     if (history.pushState) history.pushState("", "", to);
     pop(to);
-
   };
 
-})(window);
+})($, window);
