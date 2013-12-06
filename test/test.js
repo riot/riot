@@ -1,28 +1,31 @@
+(function (global){
+  "use strict"
 
-function describe(msg, fn) {
-  if (console.group) {
-    console.group(msg);
-    fn();
-    console.groupEnd();
-  } else {
-    console.info("---" + msg + "---");
-    fn();
+  function describe(msg, fn) {
+    if (console.group) {
+      console.group(msg);
+      fn();
+      console.groupEnd();
+    } else {
+      console.info("\n--- " + msg + " ---");
+      fn();
+    }
   }
-}
 
-function it(msg, fn) {
-  try {
-    fn();
+  function it(msg, fn) {
     console.log(msg);
-  } catch (err) {
-    console.error(msg, err);
+    fn();
   }
-}
 
-function assert(ok, msg) {
-  if (!ok) throw (msg || "fails");
-}
+  function assert(ok, msg) {
+    console.assert(ok, msg);
+  }
 
-assert.equal = function (value, expected) {
-  assert(value === expected, value +" != "+ expected);
-};
+  assert.equal = function (value, expected) {
+    assert(value === expected, '"'+ value +'" != "'+ expected +'"');
+  };
+
+  global.describe = describe;
+  global.it = it;
+  global.assert = assert;
+}(typeof global !== "undefined" ? global : window))

@@ -1,4 +1,3 @@
-
 describe("$.render", function() {
 
   it("Single token", function() {
@@ -20,7 +19,7 @@ describe("$.render", function() {
   it("Empty value", function() {
     assert.equal($.render("{x}", { x: undefined }), "");
     assert.equal($.render("{x}", { x: null }), "");
-    assert.equal($.render("{x}", { x: false }), "false");
+    assert.equal($.render("{x}", { x: false }), "");
     assert.equal($.render("{x}", { x: 0 }), "0");
   });
 
@@ -41,9 +40,11 @@ describe("$.render", function() {
     assert.equal($.render("{{x}}", { x: 'x' }), "{x}");
   });
 
-  it("<template> tag", function() {
-    if ($.trim) assert($.trim($.render($("#test1").html(), {x: 'x'})) == "x");
-  })
+  if ($.trim) {
+    it("<template> tag", function() {
+      assert($.trim($.render($("#test1").html(), {x: 'x'})) == "x");
+    });
+  }
 
   it("Line breaks", function() {
     assert.equal($.render("x\r"), "x\r");

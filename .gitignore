@@ -2,6 +2,7 @@
 !.jshintrc
 !.gitignore
 !.gitmodules
+!.travis.yml
 *~
 
 node_modules
