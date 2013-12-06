@@ -18,7 +18,7 @@
    </style>
 
    <script src="../bower_components/jquery/jquery.min.js"></script>
-   <script src="../jquery.riot.js"></script>
+   <script src="../riot.js"></script>
 
    <script>
    $(function() {
@@ -41,7 +41,8 @@
          var els = framework.split(" ");
 
          root.append($.render(stat_tmpl, {
-            stat: els[0] + "<strong>" + els[1] + "</strong>",
+            stat: els[0],
+            version: els[1],
             width: size / 249552 * 100,
             value: Math.round(size * 10 / 1000)  / 10+ "kb"
          }))
@@ -79,7 +80,7 @@
 
    <script type="text/tmpl" id="stat_tmpl">
       <div class="stat">
-         <label>{ stat }</label>
+         <label>{ stat } <strong>{ version }</strong></label>
          <em>{value}</em>
          <div class="bar">
             <span style="width: { width }%"></span>
