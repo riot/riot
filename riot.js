@@ -2,7 +2,7 @@
   // avoid multiple execution. popstate should be fired only once etc.
   if ($.riot) return;
 
-  $.riot = "0.9.5";
+  $.riot = "0.9.6";
 
   $.observable = function(el) {
     var callbacks = {}, slice = [].slice;

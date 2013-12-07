@@ -1,13 +1,15 @@
 
+// smaller version, depends on jQuery, possibly removed in the future
+
 (function(top) { "use strict";
-  /*global setTimeout, history, location */
+  /*global setTimeout, history, location, window, document */
 
   var $ = top.$; // jQuery or Zepto
 
   // avoid multiple execution. popstate should be fired only once etc.
   if ($.riot) return;
 
-  $.riot = "0.9.5";
+  $.riot = "0.9.6";
 
   // A classic pattern for separating concerns
   var slice = [].slice;
@@ -42,6 +44,24 @@
     });
 
     return obj;
+  };
+
+  // Precompiled templates (JavaScript functions)
+  var FN = {};
+
+  // Render a template with data
+  $.render = function(template, data) {
+    if(!template) return '';
+
+    FN[template] = FN[template] || new Function("_",
+      "return '" + template
+        .replace(/\n/g, "\\n")
+        .replace(/\r/g, "\\r")
+        .replace(/'/g, "\\'")
+        .replace(/\{\s*(\w+)\s*\}/g, "'+(_.$1?(_.$1+'').replace(/&/g,'&amp;').replace(/\"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):(_.$1===0?0:''))+'") + "'"
+    );
+
+    return FN[template](data);
   };
 
   // cross browser popstate

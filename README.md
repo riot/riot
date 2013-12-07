@@ -17,6 +17,6 @@ Current applications could be faster, simpler and smaller. They could be maintai
 
 *Riot is a manifesto for vanilla JavaScript and jQuery.*
 
-Release December 2013 &bull; Get notified on [Facebook](https://facebook.com/letsmoot)
+Release **February 2014** &bull; Follow the progress on [Facebook](https://www.facebook.com/letsmoot/posts/608060729258518)
 
 ### [Read the Introduction](https://moot.it/blog/technology/riotjs-the-1kb-mvp-framework.html)
