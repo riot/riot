@@ -4,6 +4,7 @@
   "homepage": "https://moot.it/riotjs/",
   "authors": [
     "Tero Piirainen",
+    "Marcelo Eden",
     "Moot Inc.",
     "Other contributors"
   ],
@@ -26,8 +27,5 @@
   ],
   "dependencies": {
     "jquery": "~1.10.2"
-  },
-  "devDependencies": {
-    "todomvc-common": "~0.1.9"
   }
 }
