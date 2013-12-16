@@ -1,7 +1,7 @@
 global.$ = require("../riot");
 
 [
-  "test",
+  "../bdd",
   "observable_test",
   "render_test"
 ].forEach(function(file){
