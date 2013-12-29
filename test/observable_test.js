@@ -5,6 +5,13 @@ describe("Observable", function() {
     total = 11,
     count = 0;
 
+  it("adds several methods to the given object", function() {
+    assert.equal(typeof el.on, 'function');
+    assert.equal(typeof el.one, 'function');
+    assert.equal(typeof el.off, 'function');
+    assert.equal(typeof el.trigger, 'function');
+  });
+
   it("Single listener", function() {
 
     el.on("a", function(arg) {
