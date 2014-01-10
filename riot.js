@@ -77,7 +77,7 @@ if (typeof top != "object") return;
 
 // cross browser popstate
 var currentHash,
-  pops    = $.observable({}),
+  pops    = Riot.observable({}),
   listen  = window.addEventListener,
   doc     = document;
 
