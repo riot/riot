@@ -1,4 +1,4 @@
-global.$ = require("../riot");
+global.Riot = require("../riot");
 
 [
   "../bdd",

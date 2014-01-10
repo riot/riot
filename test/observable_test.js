@@ -1,7 +1,7 @@
 
 describe("Observable", function() {
 
-  var el = $.observable({}),
+  var el = Riot.observable({}),
     total = 11,
     count = 0;
 
