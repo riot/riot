@@ -24,10 +24,9 @@
     "todomvc",
     "compare"
   ],
-  "dependencies": {
-    "jquery": "~1.10.2"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "todomvc-common": "~0.1.9"
+    "todomvc-common": "~0.1.9",
+    "jquery": "~1.10.2"
   }
 }
