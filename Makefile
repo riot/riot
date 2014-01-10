@@ -6,9 +6,9 @@ jshint:
 
 riot:
 	@ cat license.js > riot.js
-	@ echo '(function($$) { "use strict";' >> riot.js
+	@ echo '(function(Riot) { "use strict";' >> riot.js
 	@ cat lib/* >> riot.js
-	@ echo '})(typeof top == "object" ? window.$$ || (window.$$ = {}) : exports);' >> riot.js
+	@ echo '})(typeof top == "object" ? window.Riot || (window.Riot = {}) : exports);' >> riot.js
 
 min: riot
 	uglifyjs riot.js --comments --mangle -o riot.min.js

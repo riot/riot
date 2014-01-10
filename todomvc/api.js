@@ -5,7 +5,7 @@ function Todo(db) {
 
   db = db || DB("todo-riot");
 
-  var self = $.observable(this),
+  var self = Riot.observable(this),
     items = db.get();
 
   self.add = function(name) {
