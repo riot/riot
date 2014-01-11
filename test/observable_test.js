@@ -104,6 +104,23 @@ describe("Observable", function() {
 
   });
 
+  it("Remove all listeners", function() {
+
+    var counter = 0;
+
+    function fn() {
+      counter++;
+    }
+
+    el.on("aa", fn).on("aa", fn).on("bb", fn);
+    el.off("*")
+
+    el.trigger("aa").trigger("bb");
+
+    assert.equal(counter, 0);
+
+  });
+
   assert.equal(total, count);
 
 });
