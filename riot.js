@@ -1,22 +1,15 @@
-/*
-	Riot.js 0.9.7 | moot.it/riotjs | @license MIT
-	(c) 2013 Tero Piirainen, Moot Inc and other contributors.
-*/
+/* Riot 0.9.7, moot.it/riotjs | @license MIT (C) 2013 Moot Inc + contributors */
 (function($) { "use strict";
 
 $.observable = function(el) {
   var callbacks = {}, slice = [].slice;
 
   el.on = function(events, fn) {
-
     if (typeof fn === "function") {
-      events = events.split(/\s+/);
-
-      for (var i = 0, len = events.length, type; i < len; i++) {
-        type = events[i];
+      events.replace(/\w+/g, function(type, pos) {
         (callbacks[type] = callbacks[type] || []).push(fn);
-        if (len > 1) fn.typed = true;
-      }
+        fn.typed = pos > 0;
+      });
     }
     return el;
   };
