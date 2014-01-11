@@ -5,5 +5,6 @@ global.$ = require("../riot");
   "observable_test",
   "render_test"
 ].forEach(function(file){
-  require("./" + file + ".js")
+  require("./" + file + ".js");
+
 });

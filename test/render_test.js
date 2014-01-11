@@ -32,7 +32,7 @@ describe("$.render", function() {
 
   it("Empty template", function() {
     assert($.render() === "");
-  })
+  });
 
   it("Nearby brackets", function() {
     assert.equal($.render("{{x}", { x: 'x' }), "{x");
