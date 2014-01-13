@@ -19,17 +19,18 @@ describe("Observable", function() {
 
     var counter = 0;
 
-    el.on("b c d", function(e) {
-      if (++counter == 3) assert.equal(e, "d");
+    // try with special characters on event name
+    el.on("b/4 c-d d:x", function(e) {
+      if (++counter == 3) assert.equal(e, "d:x");
       count++;
     });
 
-    el.one("d", function(a) {
+    el.one("d:x", function(a) {
       assert.equal(a, true);
       count++;
     });
 
-    el.trigger("b").trigger("c").trigger("d", true);
+    el.trigger("b/4").trigger("c-d").trigger("d:x", true);
 
   });
 
