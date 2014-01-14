@@ -92,7 +92,7 @@ describe("Observable", function() {
 
   });
 
-  it("does call trigger infinitely", function() {
+  it("does not call trigger infinitely", function() {
     var counter = 0,
       otherEl = $.observable({});
 
