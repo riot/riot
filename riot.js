@@ -33,9 +33,11 @@ $.observable = function(el) {
       fns = callbacks[name] || [];
 
     for (var i = 0, fn; fn = fns[i]; ++i) {
-      if (!fn.one || !fn.done) {
+      if (!((fn.one && fn.done) || fn.busy)) {
+        fn.busy = true;
         fn.apply(el, fn.typed ? [name].concat(args) : args);
         fn.done = true;
+        fn.busy = false;
       }
     }
 
@@ -45,6 +47,7 @@ $.observable = function(el) {
   return el;
 
 };
+
 // Precompiled templates (JavaScript functions)
 var FN = {};
 

@@ -92,6 +92,36 @@ describe("Observable", function() {
 
   });
 
+  it("does call trigger infinitely", function() {
+    var counter = 0,
+      otherEl = $.observable({});
+
+    el.on("update", function(value) {
+      if (counter++ < 1) { // 2 calls are enough to know the test failed
+        otherEl.trigger("update", value);
+      }
+    });
+
+    otherEl.on("update", function(value) {
+      el.trigger("update", value);
+    });
+
+    el.trigger("update", "foo");
+
+    assert.equal(1, counter);
+  });
+
+  it("is able to trigger events inside a listener", function() {
+    var e2 = false;
+
+    el.on("e1", function() { this.trigger("e2"); });
+    el.on("e1", function() { e2 = true; });
+
+    el.trigger("e1");
+
+    assert(e2);
+  });
+
 
   it("Multiple arguments", function() {
 
