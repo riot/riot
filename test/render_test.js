@@ -51,4 +51,16 @@ describe("$.render", function() {
     assert.equal($.render("x\n"), "x\n");
   });
 
+  it("Converts unicode paragraph separators", function(){
+    assert.equal($.render("x\u2028"), "x\n");
+    assert.equal($.render("x\u2029"), "x\n");
+  });
+
+  it("Escapes backslashes", function(){
+    assert.equal($.render("x\\y"), "x\y");
+    assert.equal($.render("x\y"), "x\y");
+    assert.equal($.render("x\\x"), "x\\x");
+    assert.equal($.render("x\\u"), "x\\u");
+    assert.equal($.render("x\\xt"), "x\\xt");
+  });
 });
