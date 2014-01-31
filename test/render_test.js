@@ -51,4 +51,22 @@ describe("$.render", function() {
     assert.equal($.render("x\n"), "x\n");
   });
 
+  it("Passes through unicode paragraph separators", function(){
+    assert.equal($.render("x\u2028"), "x\u2028");
+    assert.equal($.render("x\u2029"), "x\u2029");
+  });
+
+  it("Passes through regular unicode characters", function(){
+    assert.equal($.render("x\u1021"), "x\u1021");
+  });
+
+  it("Escapes backslashes", function(){
+    assert.equal($.render("x\\y"), "x\y");
+    assert.equal($.render("x\y"), "x\y");
+    assert.equal($.render("x\\x"), "x\\x");
+    assert.equal($.render("x\\u"), "x\\u");
+    assert.equal($.render("a\\xa"), "a\\xa");
+    assert.equal($.render("a\\ua"), "a\\ua");
+  });
+
 });

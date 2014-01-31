@@ -47,7 +47,6 @@ $.observable = function(el) {
   return el;
 
 };
-
 // Precompiled templates (JavaScript functions)
 var FN = {};
 
@@ -60,12 +59,15 @@ $.render = function(template, data) {
       .replace(/\n/g, "\\n")
       .replace(/\r/g, "\\r")
       .replace(/'/g, "\\'")
+      .replace('\\x', '\\\\x')
+      .replace('\\u', '\\\\u')
+      .replace(/\u2028/g, "\\u2028")
+      .replace(/\u2029/g, "\\u2029")
       .replace(/\{\s*(\w+)\s*\}/g, "'+(_.$1?(_.$1+'').replace(/&/g,'&amp;').replace(/\"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):(_.$1===0?0:''))+'") + "'"
   );
 
   return FN[template](data);
 };
-
 
 /* Cross browser popstate */
 
