@@ -16,6 +16,17 @@ describe("$.render", function() {
     assert.equal($.render("\'x.\';"), "\'x.\';");
   });
 
+  it("Double Quotes", function(){
+    assert.equal($.render("\""), "\"");
+    assert.equal($.render("{x}", {x: '"'}), "\&quot;");
+  });
+
+  it("HTML in data is escaped", function(){
+    assert.equal(
+      $.render("<p>{x}</p>", {x: '<p>x</p>'}),
+      "<p>&lt;p&gt;x&lt;/p&gt;</p>");
+  });
+
   it("Empty value", function() {
     assert.equal($.render("{x}", { x: undefined }), "");
     assert.equal($.render("{x}", { x: null }), "");
