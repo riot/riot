@@ -46,9 +46,15 @@ describe("$.render", function() {
     });
   }
 
-  it("Line breaks", function() {
+  it("String-breaking characters", function() {
     assert.equal($.render("x\r"), "x\r");
     assert.equal($.render("x\n"), "x\n");
+    assert.equal($.render("x\u2028"), "x\u2028");
+    assert.equal($.render("x\u2029"), "x\u2029");
+  });
+
+  it("Backslashes", function() {
+    assert.equal($.render("\\{x}", { x: 'x' }), "\\x");
   });
 
 });
