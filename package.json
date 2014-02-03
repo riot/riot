@@ -1,0 +1,34 @@
+{
+  "name": "riotjs",
+  "version": "0.9.8",
+  "description": "Riot is an incredibly fast and powerful yet tiny client side library for building large scale web applications.",
+  "keywords": [
+    "MVP",
+    "MVC",
+    "framework",
+    "library"
+  ],
+  "main": "riot.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "uglifyjs": "~2.3.6",
+    "jshint": "~2.4.3"
+  },
+  "devDependencies": {
+    "jshint": "~2.4.3",
+    "uglify-js": "~2.4.12"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/moot/riotjs.git"
+  },
+  "author": "Tero Piirainen",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "aee612dbaef2cb3f7bfe477218d04b1ec5c21513"
+}
