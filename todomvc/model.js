@@ -1,12 +1,12 @@
 
 /* The model */
 
-function Todo(db) {
+function Model(Store) {
 
-  db = db || DB("todo-riot");
+  Store = Store || Store("default");
 
   var self = $.observable(this),
-    items = db.get();
+    items = Store.get();
 
   self.add = function(name) {
     var item = { id: "_" + ("" + Math.random()).slice(2), name: name }
@@ -44,7 +44,7 @@ function Todo(db) {
 
   // sync database
   self.on("add remove toggle edit", function() {
-    db.put(items);
+    Store.put(items);
   })
 
 }
