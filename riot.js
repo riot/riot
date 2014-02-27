@@ -32,7 +32,8 @@ $.observable = function(el) {
     var args = slice.call(arguments, 1),
       fns = callbacks[name] || [];
 
-    for (var i = 0, fn; (fn = fns[i]); ++i) {
+    for (var i = 0, fn; i < fns.length; ++i) {
+    	fn = fns[i];
       if (!((fn.one && fn.done) || fn.busy)) {
         fn.busy = true;
         fn.apply(el, fn.typed ? [name].concat(args) : args);
