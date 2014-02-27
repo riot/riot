@@ -57,4 +57,11 @@ describe("$.render", function() {
     assert.equal($.render("\\{x}", { x: 'x' }), "\\x");
   });
 
+  it("Entities", function() {
+    assert.equal($.render("{x}", { x: '&' }), "&amp;");
+    assert.equal($.render("{x}", { x: '"' }), "&quot;");
+    assert.equal($.render("{x}", { x: '<' }), "&lt;");
+    assert.equal($.render("{x}", { x: '>' }), "&gt;");
+  });
+
 });
