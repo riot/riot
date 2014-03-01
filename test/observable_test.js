@@ -7,7 +7,7 @@ describe("Observable", function() {
 
   it("Single listener", function() {
 
-    el.on("a", function(arg) {
+    el.on("a", function(evt, arg) {
       assert.equal(arg, true);
       count++;
     });
@@ -20,12 +20,15 @@ describe("Observable", function() {
     var counter = 0;
 
     // try with special characters on event name
-    el.on("b/4 c-d d:x", function(e) {
-      if (++counter == 3) assert.equal(e, "d:x");
+    el.on("b/4 c-d d:x", function(evt, arg) {
+      counter++;
+      if (counter == 1) assert.equal(evt.type, "b/4");
+      if (counter == 2) assert.equal(evt.type, "c-d");
+      if (counter == 3) assert.equal(evt.type, "d:x");
       count++;
     });
 
-    el.one("d:x", function(a) {
+    el.one("d:x", function(evt, a) {
       assert.equal(a, true);
       count++;
     });
@@ -96,13 +99,13 @@ describe("Observable", function() {
     var counter = 0,
       otherEl = $.observable({});
 
-    el.on("update", function(value) {
+    el.on("update", function(evt, value) {
       if (counter++ < 1) { // 2 calls are enough to know the test failed
         otherEl.trigger("update", value);
       }
     });
 
-    otherEl.on("update", function(value) {
+    otherEl.on("update", function(evt, value) {
       el.trigger("update", value);
     });
 
@@ -125,7 +128,7 @@ describe("Observable", function() {
 
   it("Multiple arguments", function() {
 
-    el.on("j", function(a, b) {
+    el.on("j", function(evt, a, b) {
       assert.equal(a, 1);
       assert.equal(b[0], 2);
       count++;
