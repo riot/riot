@@ -71,10 +71,10 @@ var ENTITIES_MAP = {
 $.render = function(template, data) {
   if(!template) return '';
 
-  FN[template] = FN[template] || new Function("_", "ENTITIES_MAP",
+  FN[template] = FN[template] || new Function("_", "E",
     "return '" + template
       .replace(/[\\\n\r\u2028\u2029']/g, function(escape) { return ESCAPING_MAP[escape]; })
-      .replace(/\{\s*(\w+)\s*\}/g, "'+(_.$1?(_.$1+'').replace(/[&\"<>]/g,function(e){return ENTITIES_MAP[e];}):(_.$1===0?0:''))+'") + "'"
+      .replace(/\{\s*([\.\w]+)\s*\}/g, "'+(_.$1?(_.$1+'').replace(/[&\"<>]/g,function(e){return E[e];}):(_.$1===0?0:''))+'") + "'"
   );
 
   return FN[template](data, ENTITIES_MAP);

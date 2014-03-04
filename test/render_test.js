@@ -64,4 +64,8 @@ describe("$.render", function() {
     assert.equal($.render("{x}", { x: '>' }), "&gt;");
   });
 
+  it("Nested objects", function() {
+    assert.equal($.render("{x.y}", { x: { y: 'x' }}), "x");
+  });
+
 });
