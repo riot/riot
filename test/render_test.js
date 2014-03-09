@@ -68,4 +68,9 @@ describe("$.render", function() {
     assert.equal($.render("{x.y}", { x: { y: 'x' }}), "x");
   });
 
+  it("Undefined properties", function() {
+    assert.equal($.render("{x}", {}), "");
+    assert.equal($.render("{x.y.z}", {}), "");
+  });
+
 });

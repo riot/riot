@@ -73,8 +73,13 @@ $.render = function(template, data) {
 
   FN[template] = FN[template] || new Function("_", "E",
     "return '" + template
-      .replace(/[\\\n\r\u2028\u2029']/g, function(escape) { return ESCAPING_MAP[escape]; })
-      .replace(/\{\s*([\.\w]+)\s*\}/g, "'+(_.$1?(_.$1+'').replace(/[&\"<>]/g,function(e){return E[e];}):(_.$1===0?0:''))+'") + "'"
+      .replace(
+        /[\\\n\r\u2028\u2029']/g,
+        function(escape) { return ESCAPING_MAP[escape]; }
+      ).replace(
+        /\{\s*([\.\w]+)\s*\}/g,
+        "'+(function(){try{return(_.$1?(_.$1+'').replace(/[&\"<>]/g,function(e){return E[e];}):(_.$1===0?0:''))}catch(e){return ''}})()+'"
+      )+"'"
   );
 
   return FN[template](data, ENTITIES_MAP);
