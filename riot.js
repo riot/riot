@@ -18,7 +18,7 @@ $.observable = function(el) {
     events.replace(/[^\s]+/g, function(name) {
       callbacks[name] = [];
     });
-    if (events == "*") callbacks = {};
+    if (events === "*") callbacks = {};
     return el;
   };
 
@@ -89,7 +89,7 @@ $.render = function(template, data) {
 /* Cross browser popstate */
 
 // for browsers only
-if (typeof top != "object") return;
+if (typeof top !== "object") return;
 
 var currentHash,
   pops = $.observable({}),
@@ -98,7 +98,7 @@ var currentHash,
 
 function pop(hash) {
   hash = hash.type ? location.hash : hash;
-  if (hash != currentHash) pops.trigger("pop", hash);
+  if (hash !== currentHash) pops.trigger("pop", hash);
   currentHash = hash;
 }
 
@@ -121,4 +121,4 @@ $.route = function(to) {
   if (history.pushState) history.pushState(0, 0, to);
   pop(to);
 
-};})(typeof top == "object" ? window.$ || (window.$ = {}) : exports);
+};})(typeof top === "object" ? window.$ || (window.$ = {}) : exports);
