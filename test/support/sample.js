@@ -27,7 +27,9 @@ var sample = {
   }
 }
 
-sample.handlebars = sample.template.replace(/{/g, '{{').replace(/}/g, '}}');
-sample.resig = sample.handlebars.replace(/{{/g, '<%=').replace(/}}/g, '%>');
+sample.mustache = sample.template.replace(/{/g, '{{').replace(/}/g, '}}');
+sample.mustache_safe = sample.template.replace(/{/g, '{{{').replace(/}/g, '}}}');
+sample.ejs = sample.template.replace(/{/g, '<%=').replace(/}/g, '%>');
+sample.ejs_safe = sample.template.replace(/{/g, '<%-').replace(/}/g, '%>');
 
 module.exports = sample;
