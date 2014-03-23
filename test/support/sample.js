@@ -29,6 +29,8 @@ var sample = {
 
 sample.mustache = sample.template.replace(/{/g, '{{').replace(/}/g, '}}');
 sample.mustache_safe = sample.template.replace(/{/g, '{{{').replace(/}/g, '}}}');
+// mustache escapes the forward slash as well
+sample.mustache_escaped_output = sample.escaped_output.replace(/&lt;\//g, '&lt;&#x2F;');
 sample.ejs = sample.template.replace(/{/g, '<%=').replace(/}/g, '%>');
 sample.ejs_safe = sample.template.replace(/{/g, '<%-').replace(/}/g, '%>');
 
