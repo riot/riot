@@ -1,4 +1,4 @@
-/* Riot 0.9.8, @license MIT, (c) 2014 Moot Inc + contributors */
+/* Riot 0.9.9, @license MIT, (c) 2014 Moot Inc + contributors */
 (function($) { "use strict";
 
 $.observable = function(el) {
@@ -33,10 +33,10 @@ $.observable = function(el) {
       fns = callbacks[name] || [];
 
     for (var i = 0, fn; (fn = fns[i]); ++i) {
-      if (!((fn.one && fn.done) || fn.busy)) {
+      if (!fn.busy) {
         fn.busy = true;
         fn.apply(el, fn.typed ? [name].concat(args) : args);
-        fn.done = true;
+        if (fn.one) { fns.splice(i, 1); i--; }
         fn.busy = false;
       }
     }
