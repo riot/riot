@@ -48,43 +48,30 @@ $.observable = function(el) {
 
 };
 
-// Precompiled templates (JavaScript functions)
-var FN = {};
+var FN = {}, // Precompiled templates (JavaScript functions)
+  template_escape = {"\\": "\\\\", "\n": "\\n", "\r": "\\r", "'": "\\'"},
+  render_escape = {'&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;'};
 
-var ESCAPING_MAP = {
-  "\\": "\\\\",
-  "\n": "\\n",
-  "\r": "\\r",
-  "\u2028": "\\u2028",
-  "\u2029": "\\u2029",
-  "'": "\\'"
+function escape(str) {
+  return !(str || str === 0 || str === false) ? '' : (str+'').replace(/[&\"<>]/g, function(char) {
+    return render_escape[char];
+  });
+}
+
+$.render = function(tmpl, data, escape_fn) {
+  if (typeof escape_fn != 'function' && escape_fn !== false) escape_fn = escape;
+  tmpl = tmpl || '';
+
+  return (FN[tmpl] = FN[tmpl] || new Function("_", "e", "return '" +
+
+    tmpl.replace(/[\\\n\r']/g, function(char) {
+      return template_escape[char];
+
+    }).replace(/{\s*([\w\.]+)\s*}/g, "'+(function(){try{return e?e(_.$1):_.$1}catch(e){return ''}})()+'") + "'"
+
+  ))(data, escape_fn);
+
 };
-
-var ENTITIES_MAP = {
-  '&': '&amp;',
-  '"': '&quot;',
-  '<': '&lt;',
-  '>': '&gt;'
-};
-
-// Render a template with data
-$.render = function(template, data) {
-  if(!template) return '';
-
-  FN[template] = FN[template] || new Function("_", "E",
-    "return '" + template
-      .replace(
-        /[\\\n\r\u2028\u2029']/g,
-        function(escape) { return ESCAPING_MAP[escape]; }
-      ).replace(
-        /\{\s*([\.\w]+)\s*\}/g,
-        "'+(function(){try{return(typeof(_.$1)!=='undefined'&&_.$1!==null?(_.$1+'').replace(/[&\"<>]/g,function(e){return E[e];}):'')}catch(e){return ''}})()+'"
-      )+"'"
-  );
-
-  return FN[template](data, ENTITIES_MAP);
-};
-
 
 /* Cross browser popstate */
 
