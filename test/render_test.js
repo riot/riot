@@ -19,7 +19,8 @@ describe("$.render", function() {
   it("Empty value", function() {
     assert.equal($.render("{x}", { x: undefined }), "");
     assert.equal($.render("{x}", { x: null }), "");
-    assert.equal($.render("{x}", { x: false }), "");
+    assert.equal($.render("{x}", { x: true }), "true");
+    assert.equal($.render("{x}", { x: false }), "false");
     assert.equal($.render("{x}", { x: 0 }), "0");
   });
 

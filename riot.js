@@ -53,7 +53,7 @@ var FN = {}, // Precompiled templates (JavaScript functions)
   render_escape = {'&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;'};
 
 function escape(str) {
-  return !(str || str === 0) ? '' : (str+'').replace(/[&\"<>]/g, function(char) {
+  return !(str || str === 0 || str === false) ? '' : (str+'').replace(/[&\"<>]/g, function(char) {
     return render_escape[char];
   });
 }
