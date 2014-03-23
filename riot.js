@@ -48,35 +48,30 @@ $.observable = function(el) {
 
 };
 
-// Precompiled templates (JavaScript functions)
-var FN = {},
-  escape_fn = function(data) {
-    return (data || data === 0) ? (data+'').replace(
-      /[&\"<>]/g,
-      function(e){ return render_escape[e];}
-    ): '';
-  },
-  no_escape_fn = function(x){ return x; },
+var FN = {}, // Precompiled templates (JavaScript functions)
   template_escape = {"\\": "\\\\", "\n": "\\n", "\r": "\\r", "'": "\\'"},
   render_escape = {'&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;'};
 
-$.render = function(tmpl, data, esc) {
-  esc = (typeof esc == 'function') ? esc : (esc === false) ? no_escape_fn : escape_fn;
-  tmpl = tmpl ? tmpl : '';
+function escape(str) {
+  return !(str || str === 0) ? '' : (str+'').replace(/[&\"<>]/g, function(char) {
+    return render_escape[char];
+  });
+}
+
+$.render = function(tmpl, data, escape_fn) {
+  if (typeof escape_fn != 'function' && escape_fn !== false) escape_fn = escape;
+  tmpl = tmpl || '';
 
   return (FN[tmpl] = FN[tmpl] || new Function("_", "e", "return '" +
-    tmpl
-      .replace(
-        /[\\\n\r']/g,
-        function(escape) { return template_escape[escape]; }
-      )
-      .replace(
-        /{\s*([\w\.]+)\s*}/g,
-        "'+(function(){try{return e(_.$1)}catch(e){return ''}})()+'"
-      ) + "'"
-  ))(data, esc);
-};
 
+    tmpl.replace(/[\\\n\r']/g, function(char) {
+      return template_escape[char];
+
+    }).replace(/{\s*([\w\.]+)\s*}/g, "'+(function(){try{return e?e(_.$1):_.$1}catch(e){return ''}})()+'") + "'"
+
+  ))(data, escape_fn);
+
+};
 
 /* Cross browser popstate */
 
