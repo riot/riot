@@ -18,7 +18,11 @@
   },
   "devDependencies": {
     "jshint": "~2.4.3",
-    "uglify-js": "~2.4.12"
+    "uglify-js": "~2.4.12",
+    "benchmark": "^1.0.0",
+    "underscore": "^1.6.0",
+    "mustache": "^0.8.1",
+    "ejs": "^0.8.6"
   },
   "scripts": {
     "test": "make test"

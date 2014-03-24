@@ -16,4 +16,7 @@ min: riot
 test: min
 	node test/node.js
 
+benchmark: riot
+	node test/benchmark.js
+
 .PHONY: test compare
