@@ -18,7 +18,7 @@ $.observable = function(el) {
     events.replace(/[^\s]+/g, function(name) {
       callbacks[name] = [];
     });
-    if (events == "*") callbacks = {};
+    if (events.trim() == "*") callbacks = {};
     return el;
   };
 
