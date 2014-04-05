@@ -1,50 +1,61 @@
-
-/* The model */
-
-function Todo(db) {
-
-  db = db || DB("todo-riot");
-
-  var self = $.observable(this),
-    items = db.get();
-
-  self.add = function(name) {
-    var item = { id: "_" + ("" + Math.random()).slice(2), name: name }
-    items[item.id] = item;
-    self.trigger("add", item);
+/**
+ * define the class for every item
+ */
+function TodoItem(item) {
+  // Generate id if not given
+  item.id = item.id || ("_" + ("" + Math.random()).slice(2));
+  // extend self
+  var self = $.observable($.extend(this, item))
+  
+  self.update = function(name){
+    self.name = name;
+    self.trigger('update')
   }
-
-  self.edit = function(item) {
-    items[item.id] = item;
-    self.trigger("edit", item);
+  
+  self.toggle = function(){
+    self.done = !self.done;
+    self.trigger('toggle')
   }
-
-  self.remove = function(filter) {
-    var els = self.items(filter);
-    $.each(els, function() {
-      delete items[this.id]
-    })
-    self.trigger("remove", els);
-  }
-
-  self.toggle = function(id) {
-    var item = items[id];
-    item.done = !item.done;
-    self.trigger("toggle", item);
-  }
-
+}
+/**
+ * define the class for todolist
+ */
+function TodoList(db){
+  
+  db = db || DB("todolist-riot"), self = $.observable(this)
+  
   // @param filter: <empty>, id, "active", "completed"
-  self.items = function(filter) {
+  // @param onlydata: true, false
+  self.items = function (filter, onlydata) {
     var ret = [];
-    $.each(items, function(id, item) {
-      if (!filter || filter == id || filter == (item.done ? "completed" : "active")) ret.push(item)
+    $.each(this, function(id, item) {
+      if (item && item.id && (!filter || filter == id || filter == (item.done ? "completed" : "active"))) 
+        ret.push(onlydata? {id: item.id, name: item.name, done: item.done}: item)
     })
     return ret;
   }
-
-  // sync database
-  self.on("add remove toggle edit", function() {
-    db.put(items);
+  
+  self.save = function (){
+    db.put(this.items(false, true))
+  }
+  
+  self.additem = function (item){
+    var todo = new TodoItem(item);
+    self.trigger('additem', self[todo.id] = todo)
+    return todo
+  }
+  
+  // using "one", means just init the list once.
+  self.one('init', function(){ 
+    // init item list from db
+    return $.each(db.get(), function(id, item) {
+      self.additem(item)
+    })
   })
-
+  
+  self.show = function(filter){
+    return $.each(todolist.items(filter), function (i,n){
+      n.trigger('add')
+    }) 
+  }
 }
