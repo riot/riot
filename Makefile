@@ -11,7 +11,7 @@ riot:
 	@ echo '})(typeof top == "object" ? window.$$ || (window.$$ = {}) : exports);' >> riot.js
 
 min: riot
-	./node_modules/uglify-js/bin/uglifyjs riot.js --comments --mangle -o riot.min.js
+	./node_modules/uglify-js/bin/uglifyjs riot.js --comments --mangle -o riot.min.js --source-map=riot.min.js.map
 
 test: min
 	node test/node.js
