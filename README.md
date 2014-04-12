@@ -1,5 +1,5 @@
 
-![This is a RIOT!](https://moot.it/m/img/riotjs/riot.png)
+![This is a RIOT!](https://muut.com/m/img/riotjs/riot.png)
 
 ### The 1kb client side MVP library
 
@@ -19,7 +19,7 @@ Current applications could be faster, simpler and smaller. They could be maintai
 
 Official release (v1.0) **April 2014** &bull; Follow the progress on [Facebook](https://www.facebook.com/getmuut/posts/608060729258518)
 
-[Official website](https://moot.it/riotjs/) &bull;
-[Building modular applications with Riot.js](https://moot.it/riotjs/docs/) &bull;
-[Demo application](https://moot.it/riotjs/demo/) &bull;
-[Original blog post](https://moot.it/blog/technology/riotjs-the-1kb-mvp-framework.html)
+[Official website](https://muut.com/riotjs/) &bull;
+[Building modular applications with Riot.js](https://muut.com/riotjs/docs/) &bull;
+[Demo application](https://muut.com/riotjs/demo/) &bull;
+[Original blog post](https://muut.com/blog/technology/riotjs-the-1kb-mvp-framework.html)
