@@ -50,6 +50,8 @@ describe("$.render", function() {
   it("Newline characters", function() {
     assert.equal($.render("x\r"), "x\r");
     assert.equal($.render("x\n"), "x\n");
+    assert.equal($.render("x\u2028", {}, true), "x\n");
+    assert.equal($.render("x\u2029", {}, true), "x\n");
   });
 
   it("Backslashes", function() {
