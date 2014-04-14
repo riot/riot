@@ -1,4 +1,4 @@
-/* Riot 0.9.9, @license MIT, (c) 2014 Moot Inc + contributors */
+/* Riot 0.9.10, @license MIT, (c) 2014 Muut Inc + contributors */
 (function($) { "use strict";
 
 $.observable = function(el) {
@@ -52,22 +52,23 @@ var FN = {}, // Precompiled templates (JavaScript functions)
   template_escape = {"\\": "\\\\", "\n": "\\n", "\r": "\\r", "'": "\\'"},
   render_escape = {'&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;'};
 
-function escape(str) {
+function default_escape_fn(str, key) {
   return str == undefined ? '' : (str+'').replace(/[&\"<>]/g, function(char) {
     return render_escape[char];
   });
 }
 
 $.render = function(tmpl, data, escape_fn) {
-  if (typeof escape_fn != 'function' && escape_fn !== false) escape_fn = escape;
+  if (escape_fn === true) escape_fn = default_escape_fn;
   tmpl = tmpl || '';
 
   return (FN[tmpl] = FN[tmpl] || new Function("_", "e", "return '" +
 
-    tmpl.replace(/[\\\n\r']/g, function(char) {
+    tmpl.replace(/\u2028|\u2029/g, '\n').replace(/[\\\n\r']/g, function(char) {
       return template_escape[char];
 
-    }).replace(/{\s*([\w\.]+)\s*}/g, "'+(function(){try{return e?e(_.$1):_.$1}catch(e){return ''}})()+'") + "'"
+    }).replace(/{\s*([\w\.]+)\s*}/g,
+      "'+(function(){try{return e?e(_.$1,'$1'):_.$1||(_.$1==undefined?'':_.$1)}catch(e){return ''}})()+'") + "'"
 
   ))(data, escape_fn);
 
@@ -89,17 +90,21 @@ function pop(hash) {
   currentHash = hash;
 }
 
+/* Always fire pop event upon page load (normalize behaviour across browsers) */
+
+// standard browsers
 if (listen) {
   listen("popstate", pop, false);
   doc.addEventListener("DOMContentLoaded", pop, false);
 
+// IE
 } else {
   doc.attachEvent("onreadystatechange", function() {
     if (doc.readyState === "complete") pop("");
   });
 }
 
-// Change the browser URL or listen to changes on the URL
+/* Change the browser URL or listen to changes on the URL */
 $.route = function(to) {
   // listen
   if (typeof to === "function") return pops.on("pop", to);
