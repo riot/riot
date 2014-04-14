@@ -32,7 +32,7 @@ suite
   console.log("Templating without HTML escaping...\n");
 })
 .add("riot", function(){
-  output = riot.render(sample.template, sample.data, false);
+  output = riot.render(sample.template, sample.data);
 })
 .add("mustache", function(){
   output = mustache.render(sample.mustache_safe, sample.data);
@@ -58,7 +58,7 @@ suite2
   console.log("\nTemplating with HTML escaping...\n");
 })
 .add("riot", function(){
-  output = riot.render(sample.template, sample.data);
+  output = riot.render(sample.template, sample.data, true);
 })
 .add("mustache", function(){
   mustache_escaped_output = mustache.render(sample.mustache, sample.data);
