@@ -57,10 +57,10 @@ describe("$.render", function() {
   });
 
   it("Entities", function() {
-    assert.equal($.render("{x}", { x: '&' }), "&amp;");
-    assert.equal($.render("{x}", { x: '"' }), "&quot;");
-    assert.equal($.render("{x}", { x: '<' }), "&lt;");
-    assert.equal($.render("{x}", { x: '>' }), "&gt;");
+    assert.equal($.render("{x}", { x: '&' }, true), "&amp;");
+    assert.equal($.render("{x}", { x: '"' }, true), "&quot;");
+    assert.equal($.render("{x}", { x: '<' }, true), "&lt;");
+    assert.equal($.render("{x}", { x: '>' }, true), "&gt;");
   });
 
   it("Nested objects", function() {
