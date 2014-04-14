@@ -79,12 +79,19 @@ describe("$.render", function() {
     assert.equal($.render(template, data, false), '<script>test</script>');
   });
 
-  it('Can be passed a custom escape function', function(){
+  it('Custom escape function', function(){
     var template = '{x}'
     ,   data = {x: 'custom-replace-function'}
     ,   escape_fn = function(text){ return text.replace(/-/g, '!')}
     ;
     assert.equal($.render(template, data, escape_fn), 'custom!replace!function');
+  });
+
+  it('Custom escape function args', function(){
+    $.render('{x}', { x: 'foo'}, function(val, key) {
+      assert.equal(key, 'x');
+      assert.equal(val, 'foo');
+    });
   });
 
 });
