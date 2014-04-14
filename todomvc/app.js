@@ -62,10 +62,10 @@
   /* Routing */
 
   nav.click(function() {
-    return $.route($(this).attr("href"))
+    return riot.route($(this).attr("href"))
   })
 
-  $.route(function(hash) {
+  riot.route(function(hash) {
 
     // clear list and add new ones
     root.empty() && $.each(todo.items(hash.slice(2)), add)
@@ -89,7 +89,7 @@
   function add(item) {
     if (this.id) item = this;
 
-    var el = $($.render(template, item)).appendTo(root),
+    var el = $(riot.render(template, item)).appendTo(root),
       input = $(".edit", el);
 
 

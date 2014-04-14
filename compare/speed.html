@@ -79,7 +79,7 @@
          $.each(repeat_amounts, function(i, repeat) {
 
             // riot
-            test("Riot", repeat, riot_syntax, $.render)
+            test("Riot", repeat, riot_syntax, riot.render)
 
             // resig
             test("Resig", repeat, ejb_syntax, tmpl)
@@ -131,7 +131,7 @@
 
                var time = results[i];
 
-               stat_root.append($.render(stat_tmpl, {
+               stat_root.append(riot.render(stat_tmpl, {
                   stat: engine,
                   width: time / max[i] * 100,
                   value: time + "ms"

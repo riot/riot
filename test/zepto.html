@@ -22,12 +22,12 @@
   <script src="render_test.js"></script>
   <script src="observable_test.js"></script>
   <script>
-    $.route(function(hash) {
+    riot.route(function(hash) {
       console.info("route:", hash);
     })
 
     $("a").click(function(e) {
-      $.route($(this).attr("href"));
+      riot.route($(this).attr("href"));
       e.preventDefault();
     })
   </script>

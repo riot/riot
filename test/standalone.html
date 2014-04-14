@@ -23,7 +23,7 @@
   <script src="./render_test.js"></script>
   <script src="./observable_test.js"></script>
   <script>
-    $.route(function(hash) {
+    riot.route(function(hash) {
       console.info("route:", hash);
     })
 
@@ -31,7 +31,7 @@
 
     for (var i = 0; i < links.length; i++) {
       links[i].onclick = function() {
-        $.route(this.getAttribute("href"));
+        riot.route(this.getAttribute("href"));
         return false;
       }
     }

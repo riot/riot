@@ -40,7 +40,7 @@
 
          var els = framework.split(" ");
 
-         root.append($.render(stat_tmpl, {
+         root.append(riot.render(stat_tmpl, {
             stat: els[0],
             version: els[1],
             width: size / 249552 * 100,
@@ -64,7 +64,7 @@
 
          var size = sizes[0] + sizes[1];
 
-         root.append($.render(stat_tmpl, {
+         root.append(riot.render(stat_tmpl, {
             stat: framework,
             width: size / 8192 * 100,
             value: Math.round(size * 10 / 1000) / 10+ "kb"

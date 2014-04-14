@@ -1,7 +1,7 @@
 /* Riot 0.9.10, @license MIT, (c) 2014 Muut Inc + contributors */
-(function($) { "use strict";
+(function(riot) { "use strict";
 
-$.observable = function(el) {
+riot.observable = function(el) {
   var callbacks = {}, slice = [].slice;
 
   el.on = function(events, fn) {
@@ -58,13 +58,13 @@ function default_escape_fn(str, key) {
   });
 }
 
-$.render = function(tmpl, data, escape_fn) {
+riot.render = function(tmpl, data, escape_fn) {
   if (escape_fn === true) escape_fn = default_escape_fn;
   tmpl = tmpl || '';
 
   return (FN[tmpl] = FN[tmpl] || new Function("_", "e", "return '" +
 
-    tmpl.replace(/\u2028|\u2029/g, '\n').replace(/[\\\n\r']/g, function(char) {
+    tmpl.replace(/[\\\n\r']/g, function(char) {
       return template_escape[char];
 
     }).replace(/{\s*([\w\.]+)\s*}/g,
@@ -80,7 +80,7 @@ $.render = function(tmpl, data, escape_fn) {
 if (typeof top != "object") return;
 
 var currentHash,
-  pops = $.observable({}),
+  pops = riot.observable({}),
   listen = window.addEventListener,
   doc = document;
 
@@ -105,7 +105,7 @@ if (listen) {
 }
 
 /* Change the browser URL or listen to changes on the URL */
-$.route = function(to) {
+riot.route = function(to) {
   // listen
   if (typeof to === "function") return pops.on("pop", to);
 
@@ -113,4 +113,4 @@ $.route = function(to) {
   if (history.pushState) history.pushState(0, 0, to);
   pop(to);
 
-};})(typeof top == "object" ? window.$ || (window.$ = {}) : exports);
+};})(typeof top == "object" ? window.riot = {} : exports);
