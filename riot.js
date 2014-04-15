@@ -1,4 +1,4 @@
-/* Riot 0.9.10, @license MIT, (c) 2014 Muut Inc + contributors */
+/* Riot 1.0.0, @license MIT, (c) 2014 Muut Inc + contributors */
 (function(riot) { "use strict";
 
 riot.observable = function(el) {
@@ -62,15 +62,15 @@ riot.render = function(tmpl, data, escape_fn) {
   if (escape_fn === true) escape_fn = default_escape_fn;
   tmpl = tmpl || '';
 
-  return (FN[tmpl] = FN[tmpl] || new Function("_", "e", "return '" +
-
+  return (FN[tmpl] = FN[tmpl] || new Function("_", "e", "try { return '" +
     tmpl.replace(/[\\\n\r']/g, function(char) {
       return template_escape[char];
 
-    }).replace(/{\s*([\w\.]+)\s*}/g,
-      "'+(function(){try{return e?e(_.$1,'$1'):_.$1||(_.$1==undefined?'':_.$1)}catch(e){return ''}})()+'") + "'"
+    }).replace(/{\s*([\w\.]+)\s*}/g, "' + (e?e(_.$1,'$1'):_.$1||(_.$1==undefined?'':_.$1)) + '")
+      + "' } catch(e) { return '' }"
+    )
 
-  ))(data, escape_fn);
+  )(data, escape_fn);
 
 };
 

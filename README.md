@@ -15,9 +15,9 @@ Riot will [teach you](https://muut.com/riotjs/docs/) that none of the above is t
 
 *Riot is a manifesto for vanilla JavaScript and jQuery.*
 
-Official release (v1.0) **April 2014** &bull; Follow the progress on [Facebook](https://www.facebook.com/getmuut/posts/608060729258518)
+---
 
 [Official website](https://muut.com/riotjs/) &bull;
-[Building modular applications with Riot.js](https://muut.com/riotjs/docs/) &bull;
 [Demo application](https://muut.com/riotjs/demo/) &bull;
-[Original blog post](https://muut.com/blog/technology/riotjs-the-1kb-mvp-framework.html)
+[Original blog post](https://muut.com/blog/technology/riotjs-the-1kb-mvp-framework.html) &bull;
+[Frameworkless JavaScript](https://muut.com/blog/technology/frameworkless-javascript.html)

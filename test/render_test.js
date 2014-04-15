@@ -56,7 +56,7 @@ describe("riot.render", function() {
     assert.equal(riot.render("\\{x}", { x: 'x' }), "\\x");
   });
 
-  it("Entities", function() {
+  it("Escaping", function() {
     assert.equal(riot.render("{x}", { x: '&' }, true), "&amp;");
     assert.equal(riot.render("{x}", { x: '"' }, true), "&quot;");
     assert.equal(riot.render("{x}", { x: '<' }, true), "&lt;");
@@ -72,13 +72,6 @@ describe("riot.render", function() {
     assert.equal(riot.render("{x.y.z}", {}), "");
   });
 
-  it('Can be set to not escape', function(){
-    var template = '{x}'
-    ,   data = {x: '<script>test</script>'}
-    ;
-    assert.equal(riot.render(template, data, false), '<script>test</script>');
-  });
-
   it('Custom escape function', function(){
     var template = '{x}'
     ,   data = {x: 'custom-replace-function'}
@@ -92,6 +85,13 @@ describe("riot.render", function() {
       assert.equal(key, 'x');
       assert.equal(val, 'foo');
     });
+  });
+
+  it('Can be set to not escape', function(){
+    var template = '{x}'
+    ,   data = {x: '<script>test</script>'}
+    ;
+    assert.equal(riot.render(template, data), '<script>test</script>');
   });
 
 });

@@ -1,6 +1,6 @@
 {
   "name": "riotjs",
-  "version": "0.9.10",
+  "version": "1.0.0",
   "description": "Riot is an incredibly fast and powerful yet tiny client side library for building large scale web applications.",
   "keywords": [
     "MVP",
@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/moot/riotjs.git"
+    "url": "git://github.com/muut/riotjs.git"
   },
   "author": "Tero Piirainen",
   "license": "MIT",
