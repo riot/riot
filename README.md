@@ -1,4 +1,3 @@
-
 ![This is a RIOT!](https://muut.com/m/img/riotjs/riot-1.png)
 
 ### The 1kb client side MVP library
@@ -19,5 +18,6 @@ Riot will [teach you](https://muut.com/riotjs/docs/) that none of the above is t
 
 [Official website](https://muut.com/riotjs/) &bull;
 [Demo application](https://muut.com/riotjs/demo/) &bull;
+[CDN Support](http://osscdn.com/#/riotjs) &bull;
 [Original blog post](https://muut.com/blog/technology/riotjs-the-1kb-mvp-framework.html) &bull;
 [Frameworkless JavaScript](https://muut.com/blog/technology/frameworkless-javascript.html)
