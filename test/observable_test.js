@@ -2,7 +2,7 @@
 describe("Observable", function() {
 
   var el = riot.observable({}),
-    total = 11,
+    total = 12,
     count = 0;
 
   it("Single listener", function() {
@@ -149,6 +149,31 @@ describe("Observable", function() {
     el.trigger("aa").trigger("bb");
 
     assert.equal(counter, 0);
+
+  });
+
+  it("Remove specific listener", function() {
+    var one = 0,
+      two = 0;
+
+    function fn() {
+      count++;
+      one++;
+    }
+
+    el.on("bb", fn).on("bb", function() {
+      two++;
+    });
+
+    el.trigger("bb");
+    el.off("bb", fn);
+    el.trigger("bb");
+
+    assert.equal(one, 1);
+    assert.equal(two, 2);
+
+    // should not throw internal error
+    el.off("non-existing", fn);
 
   });
 
