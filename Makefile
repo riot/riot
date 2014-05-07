@@ -19,4 +19,4 @@ test: min
 benchmark: riot
 	node test/benchmark.js
 
-.PHONY: test compare
+.PHONY: test
