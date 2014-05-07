@@ -1,7 +1,7 @@
 {
   "name": "riotjs",
-  "version": "1.0.0",
-  "description": "Riot is an incredibly fast and powerful yet tiny client side library for building large scale web applications.",
+  "version": "1.0.1",
+  "description": "The 1kb MV* library for building modular web applications.",
   "keywords": [
     "MVP",
     "MVC",
@@ -31,7 +31,7 @@
     "type": "git",
     "url": "git://github.com/muut/riotjs.git"
   },
-  "author": "Tero Piirainen",
+  "author": "Tero Piirainen and other contributors",
   "license": "MIT",
   "readmeFilename": "README.md",
   "gitHead": "aee612dbaef2cb3f7bfe477218d04b1ec5c21513"
