@@ -12,11 +12,9 @@
   "directories": {
     "test": "test"
   },
-  "dependencies": {
-    "uglifyjs": "~2.3.6",
-    "jshint": "~2.4.3"
-  },
+  "browserDependencies": {},
   "devDependencies": {
+    "uglifyjs": "~2.3.6",
     "jshint": "~2.4.3",
     "uglify-js": "~2.4.12",
     "benchmark": "latest",
