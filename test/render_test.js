@@ -69,7 +69,6 @@ describe("riot.render", function() {
 
   it("Undefined properties", function() {
     assert.equal(riot.render("{x}", {}), "");
-    assert.equal(riot.render("{x.y.z}", {}), "");
   });
 
   it('Custom escape function', function(){
