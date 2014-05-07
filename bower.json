@@ -1,13 +1,13 @@
 {
   "name": "riotjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "homepage": "https://muut.com/riotjs/",
   "authors": [
     "Tero Piirainen",
     "Muut Inc.",
     "Other contributors"
   ],
-  "description": "The 1kb client side MVP framework",
+  "description": "The 1kb client side MVP library",
   "main": "riot.js",
   "keywords": [
     "MVP",
@@ -19,15 +19,6 @@
   "ignore": [
     "**/.*",
     "node_modules",
-    "bower_components",
-    "test",
-    "todomvc",
-    "compare"
-  ],
-  "dependencies": {
-    "jquery": "~1.10.2"
-  },
-  "devDependencies": {
-    "todomvc-common": "~0.1.9"
-  }
+    "test"
+  ]
 }
