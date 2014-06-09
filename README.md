@@ -19,7 +19,6 @@ Riot will [teach you](https://muut.com/riotjs/docs/) that none of the above is t
 <small>
 [Official website](https://muut.com/riotjs/) &bull;
 [Demo application](https://muut.com/riotjs/demo/) &bull;
-[Demo](https://muut.com/riotjs/demo/) &bull;
 [Todo MVC](http://www.3den.org/riotjs-todomvc/) &bull;
 [Original blog post](https://muut.com/blog/technology/riotjs-the-1kb-mvp-framework.html) &bull;
 [Frameworkless JavaScript](https://muut.com/blog/technology/frameworkless-javascript.html) &bull;
