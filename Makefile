@@ -13,7 +13,7 @@ riot:
 min: riot
 	./node_modules/uglify-js/bin/uglifyjs riot.js --comments --mangle -o riot.min.js --source-map=riot.min.js.map
 
-test: min
+test: riot
 	node test/node.js
 
 benchmark: riot
