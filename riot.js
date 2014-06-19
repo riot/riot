@@ -65,7 +65,6 @@ function default_escape_fn(str, key) {
 }
 
 riot.render = function(tmpl, data, escape_fn) {
-  // this is very confusing..
   if (escape_fn === true) escape_fn = default_escape_fn;
   tmpl = tmpl || '';
 

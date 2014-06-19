@@ -61,6 +61,7 @@ describe("riot.render", function() {
     assert.equal(riot.render("{x}", { x: '"' }, true), "&quot;");
     assert.equal(riot.render("{x}", { x: '<' }, true), "&lt;");
     assert.equal(riot.render("{x}", { x: '>' }, true), "&gt;");
+    assert.equal(riot.render("{x}", { x: '>' }), ">");
   });
 
   it("Nested objects", function() {
