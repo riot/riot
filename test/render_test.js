@@ -16,7 +16,7 @@ describe("riot.render", function() {
     assert.equal(riot.render("\'x.\';"), "\'x.\';");
   });
 
-  it("Empty value", function() {
+  it("Empty values", function() {
     assert.equal(riot.render("{x}", { x: undefined }), "");
     assert.equal(riot.render("{x}", { x: null }), "");
     assert.equal(riot.render("{x}", { x: true }), "true");
@@ -61,6 +61,21 @@ describe("riot.render", function() {
     assert.equal(riot.render("{x}", { x: '"' }, true), "&quot;");
     assert.equal(riot.render("{x}", { x: '<' }, true), "&lt;");
     assert.equal(riot.render("{x}", { x: '>' }, true), "&gt;");
+  });
+
+  it("Escaping empty values", function() {
+    assert.equal(riot.render("{x}", { x: undefined }, true), "");
+    assert.equal(riot.render("{x}", { x: null }, true), "");
+    assert.equal(riot.render("{x}", { x: true }, true), "true");
+    assert.equal(riot.render("{x}", { x: false }, true), "false");
+    assert.equal(riot.render("{x}", { x: 0 }, true), "0");
+  });
+
+  it("Not Escaping", function() {
+    assert.equal(riot.render("{x}", { x: '&' }), "&");
+    assert.equal(riot.render("{x}", { x: '"' }), "\"");
+    assert.equal(riot.render("{x}", { x: '<' }), "<");
+    assert.equal(riot.render("{x}", { x: '>' }), ">");
   });
 
   it("Nested objects", function() {

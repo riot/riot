@@ -1,10 +1,11 @@
 {
   "name": "riotjs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "homepage": "https://muut.com/riotjs/",
   "authors": [
     "Tero Piirainen",
-    "Muut Inc.",
+    "Marcelo Eden",
+    "Moot Inc.",
     "Other contributors"
   ],
   "description": "The 1kb client side MVP library",
