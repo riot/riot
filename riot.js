@@ -60,7 +60,7 @@ var FN = {}, // Precompiled templates (JavaScript functions)
   render_escape = {'&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;'};
 
 function default_escape_fn(str, key) {
-  return str == undefined ? '' : (str+'').replace(/[&\"<>]/g, function(char) {
+  return str == null ? '' : (str+'').replace(/[&\"<>]/g, function(char) {
     return render_escape[char];
   });
 }
@@ -73,7 +73,7 @@ riot.render = function(tmpl, data, escape_fn) {
     tmpl.replace(/[\\\n\r']/g, function(char) {
       return template_escape[char];
 
-    }).replace(/{\s*([\w\.]+)\s*}/g, "' + (e?e(_.$1,'$1'):_.$1||(_.$1==undefined?'':_.$1)) + '") + "'")
+    }).replace(/{\s*([\w\.]+)\s*}/g, "' + (e?e(_.$1,'$1'):_.$1||(_.$1==null?'':_.$1)) + '") + "'")
 
   )(data, escape_fn);
 
