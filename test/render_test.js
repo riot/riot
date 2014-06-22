@@ -1,4 +1,4 @@
-describe("riot.render", function() {
+describe("#render", function() {
 
   it("Single token", function() {
     assert.equal(riot.render("x"), "x");
@@ -87,10 +87,10 @@ describe("riot.render", function() {
   });
 
   it('Custom escape function', function(){
-    var template = '{x}'
-    ,   data = {x: 'custom-replace-function'}
-    ,   escape_fn = function(text){ return text.replace(/-/g, '!')}
-    ;
+    var template = '{x}',
+      data = {x: 'custom-replace-function'},
+      escape_fn = function(text){ return text.replace(/-/g, '!')};
+
     assert.equal(riot.render(template, data, escape_fn), 'custom!replace!function');
   });
 
@@ -102,9 +102,9 @@ describe("riot.render", function() {
   });
 
   it('Can be set to not escape', function(){
-    var template = '{x}'
-    ,   data = {x: '<script>test</script>'}
-    ;
+    var template = '{x}',
+      data = {x: '<script>test</script>'};
+
     assert.equal(riot.render(template, data), '<script>test</script>');
   });
 

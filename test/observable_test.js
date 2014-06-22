@@ -1,5 +1,4 @@
-
-describe("Observable", function() {
+describe("#observable", function() {
 
   var el = riot.observable({}),
     total = 12,
@@ -31,7 +30,6 @@ describe("Observable", function() {
     });
 
     el.trigger("b/4").trigger("c-d").trigger("d:x", true);
-
   });
 
   it("One", function() {
