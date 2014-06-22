@@ -24,4 +24,8 @@
   assert.equal = function (value, expected) {
     assert(value === expected, '"'+ value +'" != "'+ expected +'"');
   };
+
+  assert.deepEqual = function (value, expected) {
+    assert.equal(JSON.stringify(value), JSON.stringify(expected));
+  }
 }(typeof global !== "undefined" ? global : window))
