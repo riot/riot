@@ -74,12 +74,13 @@ riot.render = function(tmpl, data, escape_fn) {
     }).replace(/{\s*([\w\.]+)\s*}/g, "' + (e?e(_.$1,'$1'):_.$1||(_.$1==null?'':_.$1)) + '") + "'")
   )(data, escape_fn);
 };
-/* Change the browser URL or listen to changes on the URL */
+
 riot.route = (function() {
   var map = {},
       paramsRegEx = /\{\w+\}/g,
       paramsReplace = "(\\w+)",
-      escapeRegEx  = /[\/\=\?\$\^]/g;
+      escapeRegEx  = /[\/\=\?\$\^]/g,
+      escapeReplace = "\\$&";
 
   function route(to, callback) {
     (callback || typeof to === "object") ? set(to, callback) : execute(to);
@@ -102,11 +103,11 @@ riot.route = (function() {
     var keys = Object.keys(map),
       i, key, matches, matchKeys, regex;
 
-    for(i = 0; i < keys.length; i++) {
+    for (i = 0; i < keys.length; i++) {
       key = keys[i];
       matchKeys = key.match(paramsRegEx);
       regex = key
-        .replace(escapeRegEx, '\\$&')
+        .replace(escapeRegEx, escapeReplace)
         .replace(paramsRegEx, paramsReplace);
 
       matches = to.match(new RegExp("^\#?\!?" + regex + "$"));
@@ -148,7 +149,7 @@ if (typeof window !== "undefined") {
     }, false);
 
   // If IE event model is used
-  } else if ( document.attachEvent ) {
+  } else if (document.attachEvent) {
     document.attachEvent("onreadystatechange", function() {
       if (document.readyState === "complete") riot.route.trigger("load");
     });
