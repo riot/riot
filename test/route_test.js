@@ -8,14 +8,21 @@ describe("#route", function() {
 
   it("matches a route", function() {
     assertRoute("/home", "/home");
-//    assertRoute("/items/{item}", "/items/debby");
+    assertRoute("/items/{item}", "/items/debby");
+    assertRoute("/items/{item}/{id}", "/items/debby/2", {
+      path: "/items/debby/2", item: "debby", id: "2"});
+    assertRoute("/items?search={q}", "/items?search=ddd");
   });
 
-  function assertRoute(route, path) {
+  function assertRoute(route, path, params) {
     var received = false;
-    riot.route(route, function() { received = true });
+    riot.route(route, function(p) {
+      received = true
+      params && assert.deepEqual(p, params)
+    });
+
     riot.route(path);
-    assert(received);
+    assert(received, "Invalid route to => " + path);
   }
 
 });

@@ -105,9 +105,13 @@ function pop(hash) {
 
 /* Change the browser URL or listen to changes on the URL */
 riot.route = (function() {
-  var route = riot.observable(function(to, callback) {
-    (callback || typeof to === "object") ? set(to, callback) : redirect(to);
-  }), map = {};
+  var map = {},
+      paramsRegExp = /\{\w+\}/g,
+      paramsReplace = "(\\w+)",
+      escapeRegExp  = /[\/\=\?\$\^]/g,
+      route = riot.observable(function(to, callback) {
+        (callback || typeof to === "object") ? set(to, callback) : execute(to);
+      });
 
   function set(to, callback) {
     if (!callback) {
@@ -118,9 +122,35 @@ riot.route = (function() {
     route.trigger("map", to, callback);
   }
 
-  function redirect(to) {
-    map[to](to);
+  function execute(to) {
+    map[to] ? map[to]({path: to}) : fetch(to);
     route.trigger("redirect", to);
+  }
+
+  function fetch(to) {
+    var keys = Object.keys(map),
+      i, key, matches, matchKeys, regex;
+
+    for(i = 0; i < keys.length; i++) {
+      key = keys[i];
+      matchKeys = key.match(paramsRegExp);
+      regex = key
+        .replace(escapeRegExp, '\\$&')
+        .replace(paramsRegExp, paramsReplace);
+
+      matches = to.match(new RegExp("^" + regex + "$"));
+      if (matches) return map[key](getParams(to, matchKeys, matches));
+    }
+  }
+
+  function getParams(to, keys, values) {
+    var params = {path: to}, i;
+
+    for (i = 1; i < values.length; i++) {
+      params[keys[i - 1].slice(1, -1).trim()] = values[i];
+    }
+
+    return params;
   }
 
   route.map = map
