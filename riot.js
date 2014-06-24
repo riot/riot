@@ -1,4 +1,4 @@
-/* Riot 1.0.2, @license MIT, (c) 2014 Muut Inc + contributors */
+/* Riot 1.1.0, @license MIT, (c) 2014 Muut Inc + contributors */
 (function(riot) { "use strict";
 
 riot.observable = function(el) {
@@ -74,44 +74,16 @@ riot.render = function(tmpl, data, escape_fn) {
     }).replace(/{\s*([\w\.]+)\s*}/g, "' + (e?e(_.$1,'$1'):_.$1||(_.$1==null?'':_.$1)) + '") + "'")
   )(data, escape_fn);
 };
-/* Cross browser popstate */
-// for browsers only
-//if (typeof window === "undefined") return;
-
-var currentHash,
-  pops = riot.observable({}),
-  listen = window.addEventListener,
-  doc = document;
-
-function pop(hash) {
-  hash = hash.type ? location.hash : hash;
-  if (hash !== currentHash) pops.trigger("pop", hash);
-  currentHash = hash;
-}
-
-/* Always fire pop event upon page load (normalize behaviour across browsers) */
-
-// standard browsers
-//if (listen) {
-//  listen("popstate", pop, false);
-//  doc.addEventListener("DOMContentLoaded", pop, false);
-
-//// IE
-//} else {
-//  doc.attachEvent("onreadystatechange", function() {
-//    if (doc.readyState === "complete") pop("");
-//  });
-//}
-
 /* Change the browser URL or listen to changes on the URL */
 riot.route = (function() {
   var map = {},
-      paramsRegExp = /\{\w+\}/g,
+      paramsRegEx = /\{\w+\}/g,
       paramsReplace = "(\\w+)",
-      escapeRegExp  = /[\/\=\?\$\^]/g,
-      route = riot.observable(function(to, callback) {
-        (callback || typeof to === "object") ? set(to, callback) : execute(to);
-      });
+      escapeRegEx  = /[\/\=\?\$\^]/g;
+
+  function route(to, callback) {
+    (callback || typeof to === "object") ? set(to, callback) : execute(to);
+  }
 
   function set(to, callback) {
     if (!callback) {
@@ -119,12 +91,11 @@ riot.route = (function() {
     }
 
     map[to] = callback;
-    route.trigger("map", to, callback);
   }
 
   function execute(to) {
     map[to] ? map[to]({path: to}) : fetch(to);
-    route.trigger("redirect", to);
+    route.trigger("execute", to);
   }
 
   function fetch(to) {
@@ -133,12 +104,12 @@ riot.route = (function() {
 
     for(i = 0; i < keys.length; i++) {
       key = keys[i];
-      matchKeys = key.match(paramsRegExp);
+      matchKeys = key.match(paramsRegEx);
       regex = key
-        .replace(escapeRegExp, '\\$&')
-        .replace(paramsRegExp, paramsReplace);
+        .replace(escapeRegEx, '\\$&')
+        .replace(paramsRegEx, paramsReplace);
 
-      matches = to.match(new RegExp("^" + regex + "$"));
+      matches = to.match(new RegExp("^\#?\!?" + regex + "$"));
       if (matches) return map[key](getParams(to, matchKeys, matches));
     }
   }
@@ -154,6 +125,33 @@ riot.route = (function() {
   }
 
   route.map = map
-  return route;
+  return riot.observable(route);
 })();
-})(typeof exports !== "undefined" ? exports : window.riot = {});
+
+// Browser Navigation
+if (typeof window !== "undefined") {
+  // redirect to route, push state
+  riot.route.on("execute", function(to) {
+    try {
+      history.pushState(null, null, to);
+    } catch (err) {
+      window.location = to[0] === "#" ? to : "#" + to;
+    }
+  }).on("load", function() {
+    this(location.pathname + location.search + location.hash);
+  });
+
+  // Mozilla, Opera and webkit nightlies currently support this event
+  if (document.addEventListener) {
+    document.addEventListener("DOMContentLoaded", function() {
+      riot.route.trigger("load");
+    }, false);
+
+  // If IE event model is used
+  } else if ( document.attachEvent ) {
+    document.attachEvent("onreadystatechange", function() {
+      if (document.readyState === "complete") riot.route.trigger("load");
+    });
+  }
+}
+})(typeof window !== "undefined" ? window.riot = {} : exports);
