@@ -87,8 +87,11 @@ riot.route = (function() {
   }
 
   function set(to, callback) {
+    var key;
+
     if (!callback) {
-      return Object.keys(to).forEach(function(key) { set(key, to[key]) });
+      for (key in to) to.hasOwnProperty(key) && set(key, to[key]);
+      return;
     }
 
     map[to] = callback;
@@ -100,11 +103,10 @@ riot.route = (function() {
   }
 
   function fetch(to) {
-    var keys = Object.keys(map),
-      i, key, matches, matchKeys, regex;
+    var key, matches, matchKeys, regex;
 
-    for (i = 0; i < keys.length; i++) {
-      key = keys[i];
+    for (key in map) {
+      if (!map.hasOwnProperty(key)) continue;
       matchKeys = key.match(paramsRegEx);
       regex = key
         .replace(escapeRegEx, escapeReplace)
