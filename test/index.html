@@ -1,0 +1,32 @@
+<!doctype html>
+
+<html>
+  <head>
+    <title>Tests | RiotJS | Standalone</title>
+    <script src="../riot.js"></script>
+    <script src="../bdd.js"></script>
+  </head>
+
+  <body>
+    <p>Open console to view the results</p>
+
+    <a href="/hash1">First</a>
+    <a href="/hash2">Second</a>
+    <a href="/hash3">Third</a>
+    <a href="/hash4">Fourth</a>
+  </body>
+
+  <script src="./lib/render_test.js"></script>
+  <script src="./lib/observable_test.js"></script>
+  <script src="./lib/route_test.js"></script>
+  <script>
+    var links = document.getElementsByTagName("a"), i;
+    riot.route("/hash{i}", function (params) { console.log(params) });
+    for (i = 0; i < links.length; i++) {
+      links[i].onclick = function() {
+        riot.route(this.getAttribute("href"));
+        return false;
+      }
+    }
+  </script>
+</html>

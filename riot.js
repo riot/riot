@@ -1,4 +1,4 @@
-/* Riot 1.0.2, @license MIT, (c) 2014 Muut Inc + contributors */
+/* Riot 1.1.0, @license MIT, (c) 2014 Muut Inc + contributors */
 (function(riot) { "use strict";
 
 riot.observable = function(el) {
@@ -74,45 +74,99 @@ riot.render = function(tmpl, data, escape_fn) {
     }).replace(/{\s*([\w\.]+)\s*}/g, "' + (e?e(_.$1,'$1'):_.$1||(_.$1==null?'':_.$1)) + '") + "'")
   )(data, escape_fn);
 };
-/* Cross browser popstate */
-(function () {
-  // for browsers only
-  if (typeof window === "undefined") return;
 
-  var currentHash,
-    pops = riot.observable({}),
-    listen = window.addEventListener,
-    doc = document;
+riot.route = (function() {
+  var map = {},
+      fnMap = [],
+      paramsRegEx = /\{\w+\}/g,
+      paramsReplace = "(\\w+)",
+      escapeRegEx  = /[\/\=\?\$\^]/g,
+      escapeReplace = "\\$&";
 
-  function pop(hash) {
-    hash = hash.type ? location.hash : hash;
-    if (hash !== currentHash) pops.trigger("pop", hash);
-    currentHash = hash;
+  function route(to, callback) {
+    if (typeof to === "function") {
+      fnMap.push(to);
+    } else if (callback || typeof to === "object") {
+      set(to, callback);
+    } else execute(to);
+    return to;
   }
 
-  /* Always fire pop event upon page load (normalize behaviour across browsers) */
+  function set(to, callback) {
+    var key;
 
-  // standard browsers
-  if (listen) {
-    listen("popstate", pop, false);
-    doc.addEventListener("DOMContentLoaded", pop, false);
+    if (!callback) {
+      for (key in to) to.hasOwnProperty(key) && set(key, to[key]);
+      return;
+    }
 
-  // IE
-  } else {
-    doc.attachEvent("onreadystatechange", function() {
-      if (doc.readyState === "complete") pop("");
+    map[to] = callback;
+  }
+
+  function execute(to) {
+    map[to] ? map[to]({path: to}) : execMatch(to) || execFn(to);
+    route.trigger("execute", to);
+  }
+
+  function execMatch(to) {
+    var key, matches, matchKeys, regex;
+
+    for (key in map) {
+      if (!map.hasOwnProperty(key)) continue;
+      matchKeys = key.match(paramsRegEx);
+      regex = key
+        .replace(escapeRegEx, escapeReplace)
+        .replace(paramsRegEx, paramsReplace);
+
+      matches = to.match(new RegExp("^\#?\!?" + regex + "$"));
+      if (matches) return map[key](getParams(to, matchKeys, matches));
+    }
+  }
+
+  function execFn(to) {
+    var callbacks = riot.route.fnMap, i;
+    for (i = 0; i < callbacks.length; i++) callbacks[i](to);
+  }
+
+  function getParams(to, keys, values) {
+    var params = {path: to}, i;
+
+    for (i = 1; i < values.length; i++) {
+      params[keys[i - 1].slice(1, -1).trim()] = values[i];
+    }
+
+    return params;
+  }
+
+  route.map = map;
+  route.fnMap = fnMap;
+  return riot.observable(route);
+})();
+
+// Browser Navigation
+if (typeof window !== "undefined") {
+  // redirect to route, push state
+  riot.route.on("execute", function(to) {
+    try {
+      history.pushState(null, null, to);
+    } catch (err) {
+      window.location = to[0] === "#" ? to : "#" + to;
+    }
+  }).on("load", function() {
+    this(location.pathname + location.search + location.hash);
+  });
+
+  // Mozilla, Opera and webkit nightlies currently support this event
+  if (document.addEventListener) {
+    document.addEventListener("DOMContentLoaded", function() {
+      riot.route.trigger("load");
+    }, false);
+
+  // If IE event model is used
+  } else if (document.attachEvent) {
+    document.attachEvent("onreadystatechange", function() {
+      if (document.readyState === "complete") riot.route.trigger("load");
     });
   }
-
-  /* Change the browser URL or listen to changes on the URL */
-  riot.route = function(to) {
-    // listen
-    if (typeof to === "function") return pops.on("pop", to);
-
-    // fire
-    if (history.pushState) history.pushState(0, 0, to);
-    pop(to);
-
-  };
-})();
+}
 })(typeof window !== "undefined" ? window.riot = {} : exports);

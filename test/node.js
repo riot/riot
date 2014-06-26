@@ -2,8 +2,9 @@ global.riot = require("../riot");
 
 [
   "../bdd",
-  "observable_test",
-  "render_test"
+  "./lib/route_test",
+  "./lib/observable_test",
+  "./lib/render_test"
 ].forEach(function(file){
   require("./" + file + ".js");
 
