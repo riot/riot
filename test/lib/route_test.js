@@ -16,6 +16,17 @@ describe("#route", function() {
     assertRoute(".*/items", "/items");
   });
 
+  it("can use the old route", function() {
+    var count = 0, routes = [];
+    riot.route(function(path){ count++; routes.push(path) });
+    riot.route(function(path){ count++ });
+    riot.route(function(path){ count++ });
+
+    riot.route("/any_randow_route") && assert.equal(count, 3);
+    riot.route("/other_randow_route") && assert.equal(count, 6);
+    assert.deepEqual(routes, ["/any_randow_route", "/other_randow_route"])
+  });
+
   it("matches the params", function() {
     assertRoute("/items?search={q}", "/items?search=hi",
       {path: "/items?search=hi", q: "hi"});

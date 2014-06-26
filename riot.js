@@ -77,13 +77,19 @@ riot.render = function(tmpl, data, escape_fn) {
 
 riot.route = (function() {
   var map = {},
+      fnMap = [],
       paramsRegEx = /\{\w+\}/g,
       paramsReplace = "(\\w+)",
       escapeRegEx  = /[\/\=\?\$\^]/g,
       escapeReplace = "\\$&";
 
   function route(to, callback) {
-    (callback || typeof to === "object") ? set(to, callback) : execute(to);
+    if (typeof to === "function") {
+      fnMap.push(to);
+    } else if (callback || typeof to === "object") {
+      set(to, callback);
+    } else execute(to);
+    return to;
   }
 
   function set(to, callback) {
@@ -98,11 +104,11 @@ riot.route = (function() {
   }
 
   function execute(to) {
-    map[to] ? map[to]({path: to}) : fetch(to);
+    map[to] ? map[to]({path: to}) : execMatch(to) || execFn(to);
     route.trigger("execute", to);
   }
 
-  function fetch(to) {
+  function execMatch(to) {
     var key, matches, matchKeys, regex;
 
     for (key in map) {
@@ -117,6 +123,11 @@ riot.route = (function() {
     }
   }
 
+  function execFn(to) {
+    var callbacks = riot.route.fnMap, i;
+    for (i = 0; i < callbacks.length; i++) callbacks[i](to);
+  }
+
   function getParams(to, keys, values) {
     var params = {path: to}, i;
 
@@ -127,7 +138,8 @@ riot.route = (function() {
     return params;
   }
 
-  route.map = map
+  route.map = map;
+  route.fnMap = fnMap;
   return riot.observable(route);
 })();
 
