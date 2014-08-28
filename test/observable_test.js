@@ -92,6 +92,19 @@ describe("Observable", function() {
 
   });
 
+  it("Removes duplicate callbacks on 'off' for specific handler", function() {
+
+    var counter = 0;
+
+    function fn() {
+      counter++;
+    }
+
+    el.on("a1", fn).on("a1", fn).trigger("a1").off("a1", fn).trigger("a1");
+
+    assert.equal(counter, 2);
+  });
+
   it("does not call trigger infinitely", function() {
     var counter = 0,
       otherEl = riot.observable({});
