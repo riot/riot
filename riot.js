@@ -6,7 +6,7 @@ riot.observable = function(el) {
 
   el.on = function(events, fn) {
     if (typeof fn === "function") {
-      events.replace(/[^\s]+/g, function(name, pos) {
+      events.replace(/\S+/g, function(name, pos) {
         (callbacks[name] = callbacks[name] || []).push(fn);
         fn.typed = pos > 0;
       });
