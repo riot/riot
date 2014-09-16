@@ -6,6 +6,6 @@ if (typeof exports === 'object') {
   define(function() { return riot; });
 } else {
   // support browser
-  this.riot = riot;
+  window.riot = riot;
 }
 

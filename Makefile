@@ -9,7 +9,7 @@ riot:
 	@ echo '(function(riot) { "use strict";' >> riot.js
 	@ cat lib/* >> riot.js
 	@ cat loaders.js >> riot.js
-	@ echo '})(typeof window !== "undefined" ? window : global);' >> riot.js
+	@ echo '})({});' >> riot.js
 
 min: riot
 	./node_modules/uglify-js/bin/uglifyjs riot.js --comments --mangle -o riot.min.js --source-map=riot.min.js.map
