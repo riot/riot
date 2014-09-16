@@ -1,6 +1,6 @@
 {
   "name": "riotjs",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "The 1kb MV* library for building modular web applications.",
   "keywords": [
     "MVP",
