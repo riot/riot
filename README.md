@@ -22,5 +22,6 @@ Riot will [teach you](https://muut.com/riotjs/docs/) that none of the above is t
 [Todo MVC](http://www.3den.org/riotjs-todomvc/) &bull;
 [Original blog post](https://muut.com/blog/technology/riotjs-the-1kb-mvp-framework.html) &bull;
 [Frameworkless JavaScript](https://muut.com/blog/technology/frameworkless-javascript.html) &bull;
-[CDN Support](http://osscdn.com/#/riotjs)
+[CDN Support](http://osscdn.com/#/riotjs) &bull;
+IRC: #riot.js on freenode
 </small>
