@@ -84,9 +84,9 @@ riot.render = function(tmpl, data, escape_fn) {
     listen = window.addEventListener,
     doc = document;
 
-  function pop(hash) {
+  function pop(hash, redirect) {
     hash = hash.type ? location.hash : hash;
-    if (hash !== currentHash) pops.trigger("pop", hash);
+    if (hash !== currentHash && redirect) pops.trigger("pop", hash);
     currentHash = hash;
   }
 
@@ -105,13 +105,16 @@ riot.render = function(tmpl, data, escape_fn) {
   }
 
   /* Change the browser URL or listen to changes on the URL */
-  riot.route = function(to) {
+  riot.route = function(to, redirect) {
+    // default redirect value is true
+    redirect = typeof redirect !== "undefined" ? !!redirect : true;
+
     // listen
     if (typeof to === "function") return pops.on("pop", to);
 
     // fire
     if (history.pushState) history.pushState(0, 0, to);
-    pop(to);
+    pop(to, redirect);
 
   };
 })();
