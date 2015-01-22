@@ -7,9 +7,9 @@ jshint:
 
 riot:
 	@ mkdir -p dist
-	@ cat license.js | sed "s/VERSION/$(VERSION)/" > dist/riot.js
-	@ echo "var riot = { version: 'v$(VERSION)' } ; 'use strict';" >> dist/riot.js
+	@ cat prefix.js | sed "s/VERSION/$(VERSION)/" > dist/riot.js
 	@ cat lib/* >> dist/riot.js
+	@ cat suffix.js >> dist/riot.js
 
 min: riot
 	@./node_modules/uglify-js/bin/uglifyjs dist/riot.js --comments --mangle -o dist/riot.min.js
