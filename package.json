@@ -1,38 +1,31 @@
 {
-  "name": "riotjs",
-  "version": "1.0.4",
-  "description": "The 1kb MV* library for building modular web applications.",
+  "name": "riot",
+  "version": "2.0.0-beta2",
+  "description": "A React- like, 2.5K user interface library",
+  "homepage": "https://muut.com/riotjs/",
+  "repository": "muut/riotjs",
+  "author": "Muut, Inc. and other contributors",
+  "license": "MIT",
   "keywords": [
-    "MVP",
-    "MVC",
-    "framework",
-    "library",
-    "micro"
+    "Custom tags",
+    "Web components",
+    "Polymer",
+    "React",
+    "Minimal",
+    "Client-side"
   ],
-  "main": "riot.js",
-  "directories": {
-    "test": "test"
+  "preferGlobal": true,
+  "bin": {
+    "riot": "compiler/make.js"
+  },
+  "main": "compiler/make.js",
+  "dependencies": {
+    "gaze": "~0.6.4",
+    "minimist": "~1.1.0",
+    "shelljs": "~0.3.0"
   },
   "devDependencies": {
-    "uglifyjs": "~2.3.6",
-    "jshint": "~2.4.3",
-    "uglify-js": "~2.4.12",
-    "benchmark": "latest",
-    "underscore": "latest",
-    "mustache": "latest",
-    "ejs": "latest"
-  },
-  "scripts": {
-    "test": "make test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/muut/riotjs.git"
-  },
-  "bugs": {
-    "url": "https://github.com/muut/riotjs/issues"
-  },
-  "homepage": "https://muut.com/riotjs",
-  "author": "Tero Piirainen <tero@muut.com>",
-  "license": "MIT"
+    "jshint": "latest",
+    "uglify-js": "latest"
+  }
 }

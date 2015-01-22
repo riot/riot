@@ -1,0 +1,47 @@
+<!doctype html>
+
+<head>
+  <title>Riot tag tests</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <style>
+    body { font-family: 'myriad pro', sans-serif; font-size: 90% }
+    #tags { margin: 30px auto; max-width: 1000px }
+    #tags > * { display: inline-block; vertical-align: top; margin: 20px 50px }
+    a { color: blue; cursor: pointer }
+  </style>
+
+  <!--[if lt IE 9]>
+    <script src="ie8/es5-shim.js"></script>
+    <script src="ie8/html5-shiv.js"></script>
+    <script>
+    html5.addElements('timetable timer loop-manip loop-child looped-child loop-context loop-replace loop-position ' +
+      'tag-nesting inner1 inner2 inner-html loop-strings loop-object loop-nested')
+    </script>
+  <![endif]-->
+</head>
+
+<body>
+
+  <div id="tags">
+
+    <timetable></timetable>
+
+    <tag-nesting></tag-nesting>
+    <loop-context></loop-context>
+    <loop-replace></loop-replace>
+    <loop-strings></loop-strings>
+    <loop-object></loop-object>
+    <loop-manip></loop-manip>
+    <loop-child></loop-child>
+    <loop-nested></loop-nested>
+    <inner-html><h3>Inner title</h3></inner-html>
+    <loop-position></loop-position>
+    <!--
+    -->
+
+  </div>
+
+  <script src="../dist/riot.js"></script>
+  <script src="../dist/tags.js"></script>
+  <script>riot.mount('*')</script>
+</body>

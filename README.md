@@ -1,27 +1,69 @@
-![This is a RIOT!](https://muut.com/m/img/riotjs/riot-1.png)
 
-### The 1kb client side MVP library
+## A React- like, 2.5K user interface library
 
-Riot is an incredibly fast, powerful yet tiny client side (MV*) library for building large scale web applications. Despite the small size all the building blocks are there: a template engine, router, event library and a strict MVP pattern to keep things organized. On a finished application your views are automatically updated when the underlying model changes.
+### Custom tags • Virtual DOM • Full stack • IE8
 
-Current frameworks base their existence on following assumptions:
+Riot brings custom tags to all browsers starting from IE8. Think React + Polymer, but squeezed into 2.5K.
 
-1. There's a big mass of common problems
-2. MVC (or MVP) requires a framework
-3. jQuery leads to spaghetti
+![Riot logo](doc/logo/riot480x.png)
 
-Riot will [teach you](https://muut.com/riotjs/docs/) that none of the above is true. Client applications can be faster, simpler and smaller. They could be maintained with less people, less knowledge, and less worries.
+#### Tag definition
 
-*Riot is a manifesto for vanilla JavaScript and jQuery.*
+``` html
+<timer>
 
----
+  <p>Seconds Elapsed: { time }</p>
 
-<small>
-[Official website](https://muut.com/riotjs/) &bull;
-[Demo application](https://muut.com/riotjs/demo/) &bull;
-[Todo MVC](http://www.3den.org/riotjs-todomvc/) &bull;
-[Original blog post](https://muut.com/blog/technology/riotjs-the-1kb-mvp-framework.html) &bull;
-[Frameworkless JavaScript](https://muut.com/blog/technology/frameworkless-javascript.html) &bull;
-[CDN Support](http://osscdn.com/#/riotjs) &bull;
-IRC: #riot.js on freenode
-</small>
+  this.time = opts.start || 0
+
+  tick() {
+    this.update({ time: ++this.time })
+  }
+
+  var timer = setInterval(this.tick, 1000)
+
+  this.on('unmount', function() {
+    console.info('timer cleared')
+    clearInterval(timer)
+  })
+
+</timer>
+```
+
+#### Mounting
+
+``` javascript
+riot.mount('time', { start: 0 })
+```
+
+#### Nesting
+
+Custom tags lets you build complex views with HTML.
+
+``` html
+<timetable>
+  <timer start="0"></timer>
+  <timer start="10"></timer>
+  <timer start="20"></timer>
+<timetable>
+```
+
+HTML syntax is the de facto language on the web and it's designed for building user interfaces. The syntax is explicit, nesting is inherent to the language and attributes offer a clean way to provide options for custom tags.
+
+
+### Virtual DOM
+- Smallest possible amount of DOM updates and reflows.
+- All expressions are pre-compiled cached for high performance.
+- No extra HTML root elements or `data-` attributes.
+- No event loops or batching.
+
+
+### Close to standards
+- No proprietary event system.
+- Event normalization for IE8.
+- The rendered DOM can be freely manipulated with other tools.
+- Plays well with jQuery.
+
+
+https://muut.com/riotjs/
+

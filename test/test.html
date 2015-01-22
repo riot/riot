@@ -1,0 +1,24 @@
+<!doctype html>
+
+<head>
+  <script src="../dist/riot.js"></script>
+  <script type="tmpl" id="tmpl">
+    <input type="checkbox"  __autofill="{ val }" kamis="{ val }">
+    <p>{ val } joo</p>
+  </script>
+  <style>body { text-align: center; font-size: 300% }</style>
+</head>
+
+<body>
+
+  <test></test>
+
+  <script>
+    riot.tag('test', tmpl.innerHTML, function() {
+      this.val = false
+    })
+
+    riot.mount('test')
+  </script>
+
+</body>

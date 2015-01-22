@@ -1,0 +1,23 @@
+<!doctype html>
+
+<head>
+  <title>Riot 2.0 route test</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <script src="../dist/riot.js"></script>
+</script>
+
+<body>
+
+  <script>
+  riot.route(function(first, second) {
+    console.info("listen", first, second)
+  })
+
+  riot.route.exec(function(first, second) {
+    console.info("exec", first, second)
+  })
+
+  riot.route("mummypowder/logo-and-key")
+  </script>
+
+</body>

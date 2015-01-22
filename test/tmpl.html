@@ -1,0 +1,111 @@
+<head>
+<title>riot.tmpl test</title>
+<script>var riot = {}</script>
+<script src="../lib/tmpl.js"></script>
+</head>
+
+<body>
+<div id="app"></div>
+<script>
+
+var data = {
+  yes: true,
+  no: false,
+  str: 'x',
+  obj: {val:2},
+  arr: [2],
+  x: 2,
+  fn: function(s) { return ['hi', s].join(' ') }
+}
+
+test('<div class="one two three four">',
+     '<div class="{'
+       + 'one: !no,'
+       + 'two: false || null || !no && yes,'
+       + 'three: 4 > 2,'
+       + 'four: fn()'
+     + '}">')
+
+test('a b c', '{ true ? "a b c" : "foo" }')
+test('a "b" c', '{ true ? "a \\"b\\" c" : "foo" }')
+
+test(undefined)
+test(undefined, '')
+test(undefined, '{}')
+test(undefined, '{ }')
+test(' ', '{ } ')
+test('1', '{ "1" }')
+test('1 ', '{ "1" } ')
+
+test('{ 1 }', '{ "\\{ 1 \\}" }')
+test('{ 1 }', '\\{ 1 }')
+test('}', '{ "\\}" }')
+test('{', '{ "\\{" }')
+
+test(undefined, '{ /* comment */ }')
+test(' ', ' { /* comment */ }')
+test(2, '{ 1 /* comment */ + 1 }')
+test('2 ', '{ 1 /* comment */ + 1 } ')
+
+test(' ', ' { nonExistingVar }')
+test(undefined, '{ undefined }')
+test(' ', ' { no }')
+
+test(undefined, '{ nonExistingVar }')
+test(null, '{ null }')
+test(false, '{ no }')
+test(true, '{ yes }')
+test(true, '{ false || null || !no && yes }')
+test('yes', '{ !no ? "yes" : "no" }')
+test('no', '{ !yes ? "yes" : "no" }')
+test(true, '{ /^14/.test(+new Date()) }')
+test('number', '{ typeof Math.random() }')
+test('hi there', '{ fn("there") }')
+
+test('2 ', '{ obj.val } ')
+test(2, '{ obj.val }')
+test(2, '{ arr[0] }')
+test(2, '{ arr.pop() }')
+
+test('hi x', '{ fn(str) }')
+
+test('[object Object] ', '{ obj } ')
+test(data.obj, '{ obj }')
+test(data.arr, '{ arr }')
+test(data.fn, '{ fn }')
+
+test('x y z', '{ str + " y" + \' z\'}')
+test('ok', '{ ok : yes }')
+test('a-a b-b c-c', '{ "a-a" : yes, \'b-b\': yes, c-c: yes }')
+test('loading', '{ loading: !nonExistingVar.length }')
+
+test('\n  2 \n', '\n  { yes \n ? 2 \n : 4} \n')
+
+test('ok', '{ yes && "ok" }')
+test(false, '{ no && "ok" }')
+
+test('no', '{ nonExistingVar ? "yes" : "no" }')
+test('yes', '{ !nonExistingVar ? "yes" : "no" }')
+
+var globalVar = 5
+test(undefined, '{ globalVar }')
+
+data.esc = '\'\n\\'
+test(data.esc, '{ esc }')
+
+test('x', '{ this.str }')
+
+test(2, '{ x }')
+test('y', '{ y: x }')
+
+function test(a, b, escape) {
+  assert(a, riot._tmpl(b, data), b)
+}
+
+function assert(a, b, should) {
+  var ok = a === b
+  console[ok ? 'log' : 'error'](ok ? 'OK' : 'ERR', a, '===', should, ok ? '' : '// ' + b)
+}
+
+</script>
+</body>

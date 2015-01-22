@@ -1,0 +1,242 @@
+
+red = #fa0043
+hero_bg = #e6
+
+
+.riot-tag
+  display inline-block
+  font-family icon
+  color white
+  bg red
+  padding .1em uh
+  border-radius 3px
+  text-indent .02em
+
+#header-wrapper
+  height 2.5em
+  margin-bottom u4
+
+#riot-home
+  #riot-logo, #muut-logo
+    display none
+
+#riot-header
+  padding u 0
+  bg hero_bg
+  margin-bottom u4
+  min-height u3
+  top -40px
+
+  &.fixed
+    fixed 0 0
+    width 100%
+    z-index 1
+    transition top .3s
+
+    #riot-logo, #muut-logo
+      display inline
+
+#muut-logo
+  font 80% #9
+  margin-left uh
+
+  .icon
+    relative .15em
+
+    &:hover
+      color blue
+
+
+#hero
+  font center
+  padding 4.5em u3 5.5em
+  margin -u6   0 u5
+  bg hero_bg
+
+  .riot-tag
+    font 350%
+
+  .small
+    color #9
+    margin u
+    display block
+
+    &:hover
+      color #3
+
+  h1
+    font 230% 100 uppercase
+    letter-spacing 1px
+    margin u 0 .2em
+
+    .max-600 &
+      font 200%
+
+  h2
+    font 120% 1.4 normal
+    margin 0
+
+
+#to-top
+  display none
+  float right
+  font 90% #9
+  relative .2em
+
+  .fixed &
+    display inline
+
+
+.hgroup
+  border-bottom 1px solid #d
+  margin-bottom -u3
+
+  h1
+    font 250% / 1.3 bold
+    margin 0
+
+  h2
+    margin 0 0 uh
+    font #7 / normal
+
+
+#toc
+  width 240px
+  padding-right u2
+  font-size 90%
+  %inline
+
+  h3
+    font uppercase normal
+    margin-bottom u
+
+    &:first-child
+      margin-top uh
+
+  div
+    margin 0 0 u2
+
+  p
+    margin 0
+    line-height 1.2
+
+  a
+    display inline-block
+    padding uh u
+    font 95%
+
+    &:after
+      content " "
+      display block
+      clear both
+
+  .current
+    bg red
+    font white
+    border-radius .2em
+
+  .close
+    display none
+
+
+#content
+  %inline
+  max-width 680px
+  padding-bottom u8
+
+  :first-child
+    margin-top 0
+
+.tweets
+  margin-top u4
+  relative 0 -u3
+
+  .wrap
+    padding 0 0 0 u2
+    border-left uh solid #d
+
+  p
+    font 120% italic #6
+    margin u 0
+
+  a
+    font 80%
+    white-space nowrap
+
+    &:before
+      content "— "
+
+
+#api-page #content
+  h3
+    %monospaced
+    color darken(red, 20)
+
+#burger
+  display none
+  font 80% #7 uppercase
+  float right
+
+  &:hover
+    color #3
+
+  .icon
+    font 120%
+    margin-left uh
+    relative 1px
+
+.max-1150
+  #burger
+    display inline
+
+  #to-top
+    display none
+
+  #toc
+    fixed 0 0
+    size 100%
+    bg white
+    padding 5% 15%
+    overflow auto
+    display none
+    z-index 2
+
+    h3
+      border-bottom 1px solid #d
+      padding-bottom u
+
+
+    .close
+      display inline
+      font-size 150%
+      color #c
+
+      &:hover
+        color #3
+
+    &.active
+      display block
+
+  #content
+    display block
+    margin 0 auto
+
+
+#riot-forum
+  .muut
+    display block
+    margin-top 3em
+
+  .m-header
+    height 3em
+
+  .m-subnavi
+    background-color #f
+    padding 0 .3em
+
+  .m-login, .m-myname
+    color #3
+
+  .m-navi
+    display none
+

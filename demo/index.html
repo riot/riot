@@ -1,0 +1,37 @@
+<!doctype html5>
+
+<html>
+  <head>
+    <title>Riot.js Demo</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="todo.css">
+
+    <!--[if lt IE 9]>
+    <script src="js/es5-shim.js"></script>
+    <script src="js/html5-shiv.js"></script>
+    <script>html5.addElements('todo')</script>
+    <![endif]-->
+
+  </head>
+
+  <body>
+
+    <todo></todo>
+
+    <script src="js/riot.js"></script>
+    <script src="todo.js"></script>
+
+    <script>
+    riot.mount('todo', {
+      title: 'I want to behave!',
+      items: [
+        { title: 'Avoid excessive coffeine', done: true },
+        { title: 'Be less provocative' },
+        { title: 'Be nice to people' }
+      ]
+    })
+    </script>
+
+  </body>
+
+</html>

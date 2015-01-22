@@ -1,1 +1,1 @@
-/* Riot 1.0.4, @license MIT, (c) 2014 Muut Inc + contributors */
+/* Riot VERSION, @license MIT, (c) 2015 Muut Inc. + contributors */

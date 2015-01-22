@@ -1,0 +1,54 @@
+
+body {
+  font-family: 'myriad pro', sans-serif;
+  font-size: 20px;
+  border: 0;
+}
+
+todo {
+  display: block;
+  max-width: 400px;
+  margin: 5% auto;
+}
+
+form input {
+  font-size: 100%;
+  padding: .6em;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+button {
+  background-color: #1FADC5;
+  border: 1px solid rgba(0,0,0,.2);
+  font-size: 100%;
+  color: #fff;
+  padding: .6em 1.2em;
+  border-radius: 3em;
+  cursor: pointer;
+  margin: 0 .3em;
+  outline: none;
+}
+
+button[disabled] {
+  background-color: #ddd;
+  color: #aaa;
+}
+
+ul {
+  padding: 0;
+}
+
+li {
+  list-style-type: none;
+  padding: .2em 0;
+}
+
+.completed {
+  text-decoration: line-through;
+  color: #ccc;
+}
+
+label {
+  cursor: pointer;
+}

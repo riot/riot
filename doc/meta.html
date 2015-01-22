@@ -1,0 +1,93 @@
+
+style: /riotjs/css/riot
+script: /riotjs/site
+noheader: true
+
+==== layout
+
+<div id="header-wrapper">
+
+  <div id="riot-header">
+    <div class="wrap">
+      <a id="riot-logo" href="/riotjs/" class="riot-tag">{</a>
+      <a id="muut-logo" href="/">by <span class="icon">M</span></a>
+      <a id="to-top">Back to top</a>
+      <a id="burger">menu<span class="icon">0</span></a>
+    </div>
+  </div>
+
+</div>
+
+{% if hero %}
+<div id="hero">
+  <div class="riot-tag">{</div>
+  <a class="small" href="download.html">Version 2.0</a>
+  <h1>A React- like, 2.5K user interface library</h1>
+  <h2>Custom tags • Virtual DOM • Full stack • IE8</h2>
+</div>
+{% endif %}
+
+<div class="wrap">
+
+  <nav id="toc" class="normal">
+
+    <h3>Get started</h3>
+
+    <div>
+      <p><a href="/riotjs/">Why Riot?</a></p>
+      <p><a href="/riotjs/compare.html">Compare</a></p>
+      <p><a href="/riotjs/faq.html">FAQ</a></p>
+      <p><a href="/riotjs/download.html">Download</a></p>
+      <p><a href="/riotjs/forum/">Forum</a></p>
+    </div>
+
+    <h3>Guide</h3>
+
+    <h5>Custom tags</h5>
+
+    <div>
+      <p><a href="/riotjs/guide/">Example</a></p>
+      <p><a href="/riotjs/guide/#tag-syntax">Tag syntax</a></p>
+      <p><a href="/riotjs/guide/#mounting">Mounting</a></p>
+      <p><a href="/riotjs/guide/#options">Options</a></p>
+      <p><a href="/riotjs/guide/#tag-lifecycle">Tag lifecycle</a></p>
+      <p><a href="/riotjs/guide/#expressions">Expressions</a></p>
+      <p><a href="/riotjs/guide/#nested-tags">Nested tags</a></p>
+      <p><a href="/riotjs/guide/#named-elements">Named elements</a></p>
+      <p><a href="/riotjs/guide/#event-handlers">Event handlers</a></p>
+      <p><a href="/riotjs/guide/#conditionals">Conditionals</a></p>
+      <p><a href="/riotjs/guide/#loops">Loops</a></p>
+      <p><a href="/riotjs/guide/#compiler">Compiler</a></p>
+    </div>
+
+    <h5>Application design</h5>
+
+    <div>
+      <p><a href="/riotjs/guide/#tools-not-policy">Tools, not policy</a></p>
+      <p><a href="/riotjs/guide/#observable">Observable</a></p>
+      <p><a href="/riotjs/guide/#routing">Routing</a></p>
+    </div>
+
+    <h3>API</h3>
+
+    <div>
+      <p><a href="/riotjs/api/">Custom tags</a></p>
+      <p><a href="/riotjs/api/#observable">Observable</a></p>
+      <p><a href="/riotjs/api/#router">Router</a></p>
+    </div>
+
+    <a class="close">x</a>
+
+  </nav><!--
+
+--><div id="content" class="normal">
+
+    <div class="hgroup">
+      <h1>{{ title }}</h1>
+      <h2>{{ description }}</h2>
+    </div>
+
+    {{ body }}
+   </div>
+
+</div>
