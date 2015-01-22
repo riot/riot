@@ -1,6 +1,6 @@
 
 VERSION=`node -pe "require('./package.json').version"`
-DIST=../www/pages/riotjs/dist
+DIST=dist/download
 
 jshint:
 	./node_modules/jshint/bin/jshint lib/*.js
