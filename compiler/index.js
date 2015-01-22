@@ -51,16 +51,13 @@ module.exports = function(input, opts) {
       // tag end
       if (is_tag_end) {
 
-        /*
-          quoted: value={ expr } --> value="{ expr }"
-          boolean: checked={ expr } --> __checked={ expr } // IE8 looses boolean expressions
+        // foo={ bar } --> foo="{ bar }"
+        html = html.replace(/=(\{[^\}]+\})([\s\>])/g, '="$1"$2')
 
-          test: <div href="joo{kama}" id="{ key }-page" fo={ bar } ka={ jou } class={ loading: is_loading }>
-        */
-        html = html.replace(/([\w\-]+)=["']?(\{[^\}]+\})(["'\s\>])/g, function(full, name, expr, end) {
+        // checked={ expr } --> __checked={ expr } // IE8 looses boolean expressions
+        html = html.replace(/([\w\-]+)=["'](\{[^\}]+\})["']/g, function(full, name, expr) {
           if (BOOL_ATTR.indexOf(name.toLowerCase()) >= 0) name = '__' + name
-          if (/["']/.test(end)) end = ''
-          return name + '="' + expr + '"' + end
+          return name + '="' + expr + '"'
         })
 
         // escape single quotes
