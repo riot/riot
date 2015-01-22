@@ -25,8 +25,8 @@ If for example the hash changes to `#customers/987987/edit` then in the above ex
 
 ``` js
 collection = 'customers'
-id = 'edit'
-action = '987987'
+id = '987987'
+action = 'edit'
 ```
 
 The hash can change in the following ways:
