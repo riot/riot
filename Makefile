@@ -1,5 +1,5 @@
 
-VERSION=`node -pe "require('./package.json').version"`
+VERSION?=`node -pe "require('./package.json').version"`
 DIST=dist/download
 
 jshint:
@@ -33,3 +33,41 @@ watch: demo
 	@./compiler/make.js --watch demo
 
 .PHONY: test dist demo
+
+
+## Making new releases
+#  
+#  1. Make sure you have the latest changes and nothing uncommited.
+#  
+#    git checkout master
+#    git pull origin master
+#    git status
+#  
+#  2. Create & publish a release.
+#  
+#  	 make release VERSION=2.0.0
+#    make publish
+#
+
+# set version and generate files
+bump:
+	# update version number in package.json, component.json, bower.json
+	@ sed -i '' 's/\("version": "\)[^"]*/\1'$(VERSION)'/' *.json
+	# generate riot distribution files
+	@ make dist
+	# copy riot.js and riot.min.js to root (from gitignored /dist)
+	@ cp dist/riot*.js .
+
+# create version commit and tag
+# (also creating a release on github)
+release: bump
+	@ git commit -am "$(VERSION)"
+	@ git tag -a 'v'$(VERSION) -m $(VERSION)
+
+# push new version to npm ant github
+# (no need to "push" to bower and component, they'll grab it from github)
+publish:
+	npm publish
+	git push origin master
+	git push origin master --tags
+
