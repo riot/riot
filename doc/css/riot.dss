@@ -2,6 +2,10 @@
 red = #fa0043
 hero_bg = #e6
 
+#fork-me
+  absolute 0 right 0
+  width 170px
+
 
 .riot-tag
   display inline-block
@@ -189,7 +193,7 @@ hero_bg = #e6
   #burger
     display inline
 
-  #to-top
+  #to-top, #fork-me
     display none
 
   #toc
