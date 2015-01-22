@@ -11,7 +11,7 @@ Riot 2.0 is inspired by React and from the idea of "cohesion". According to Face
 
 We totally respect you guys from this important insight. By combining these JavaScript and HTML together under the view becomes cleaner.
 
-React worked us well, and we still use it on our [Disqus Impoter](/importer/) but we were bothered about the syntax and size of React. We started thinking whether it could be simpler; both the internally and for the user. Especially the verbose syntax bothered us.
+React worked us well, and we still use it on our [Disqus Importer](/importer/) but we were bothered about the syntax and size of React. We started thinking whether it could be simpler; both the internally and for the user. Especially the verbose syntax bothered us.
 
 
 ### React syntax
@@ -113,7 +113,7 @@ When a component is initialized React parses a string and Riot traverses a DOM t
 
 Riot takes the expressions from the tree and on each run these expressions are evaluated and compared to the values on the DOM. When a value has changed the corresponding DOM node is updated.
 
-Since these expressions can be cached an update cycle is fast. Going trough 100 or 1000 expressions usually takes 1ms or less.
+Since these expressions can be cached an update cycle is fast. Going through 100 or 1000 expressions usually takes 1ms or less.
 
 React sync algorithm is much more complex since the HTML layout can change randomly after each update. Given the enormous challenge, Facebook developers did an impressive job with it.
 
@@ -171,7 +171,7 @@ Conceptually Riot is the same thing but there are differences:
 
 1. Riot uses virtual DOM and only the elements that have changed are updated causing less expensive DOM operations.
 
-2. The standard syntax is more verbose and needs more books to study. And Polymer adds some of it's own syntax to the stack.
+2. The standard syntax is more verbose and needs more books to study. And Polymer adds some of its own syntax to the stack.
 
 3. Individual components are imported with HTML `link rel="import"`. Polyfills must resort to queued up XHRs, which makes it painfully slow. Riot tags are imported with `script src` and multiple tags can be combined with regular tooling.
 
