@@ -113,7 +113,7 @@ When a component is initialized React parses a string and Riot traverses a DOM t
 
 Riot takes the expressions from the tree and on each run these expressions are evaluated and compared to the values on the DOM. When a value has changed the corresponding DOM node is updated.
 
-Since these expressions can be cached an update cycle is fast. Going trough 100 or 1000 expressions usually takes 1ms or less.
+Since these expressions can be cached an update cycle is fast. Going through 100 or 1000 expressions usually takes 1ms or less.
 
 The React sync algorithm is much more complex since the HTML layout can change randomly after each update. Given the enormous challenge, Facebook developers did an impressive job with it.
 
