@@ -4,6 +4,8 @@ description: none
 
 ====
 
+#### Version {{ riot_version }} | .tall
+
 ## NPM
 
 ``` sh
@@ -39,7 +41,7 @@ You can now edit `demo/todo.tag` file and the compiler automatically watch for c
 
 ## Direct download
 
-[riot.min.js](/riotjs/dist/riot-{{ riot_version }}.min.js) – For production. 5.5K minified / 2.5K gzipped
+[riot.min.js](/riotjs/dist/riot-{{ riot_version }}.min.js) – For production. 5.7K minified / 2.5K gzipped
 
 [riot.js](/riotjs/dist/riot-{{ riot_version }}.js) – For development
 

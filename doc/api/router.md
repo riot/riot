@@ -20,7 +20,8 @@ riot.route(function(collection, id, action) {
 })
 ```
 
-If for example the hash changes to `#customers/987987/edit` then on the above example the arguments would be:
+If for example the hash changes to `#customers/987987/edit` then in the above example the arguments would be:
+
 
 ``` js
 collection = 'customers'

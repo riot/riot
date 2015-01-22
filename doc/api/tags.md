@@ -41,6 +41,7 @@ riot.mountTo(document.getElementById('slide'), 'users', api)
 
 This is helpful in the case in which you find you often need to install a different tag on the same DOM node (ie. slideshows, dialogs, alert boxes) or when you want to enrich existing DOM nodes with Riot tags but you can't place custom tags in the markup because it's out of your control.
 
+
 ## Tag instance
 
 Following properties are set for each tag instance:
@@ -49,7 +50,8 @@ Following properties are set for each tag instance:
 - `parent` - the parent tag if any
 - `root` - root DOM node
 
-You can use these references in both the HTML and JavaScript code. For example
+You can use these references in both the HTML and JavaScript code. For example:
+
 
 ``` html
 <my-tag>
@@ -59,7 +61,7 @@ You can use these references in both the HTML and JavaScript code. For example
 </my-tag>
 ```
 
-You can freely set any data to the instance (aka "context") and they are available on the HTML expressions. For example:
+You can freely set any data to the instance (aka "context") and they are available in the HTML expressions. For example:
 
 ``` html
 <my-tag>
@@ -74,7 +76,7 @@ You can freely set any data to the instance (aka "context") and they are availab
 
 Updates the expressions on the current tag instance. This method is automatically called every time an event handler is called when user interacts with the application.
 
-Other than that riot does not update the UI automatically so you need to call this method manually. This typically happens after some non- UI related event: after `setTimeout`, AJAX call or on some server event. For example:
+Other than that riot does not update the UI automatically so you need to call this method manually. This typically happens after some non-UI related event: after `setTimeout`, AJAX call or on some server event. For example:
 
 ``` html
 <my-tag>
@@ -94,12 +96,12 @@ Other than that riot does not update the UI automatically so you need to call th
 </my-tag>
 ```
 
-On above example the error message is displayed on the UI after the `update()` method has been called. We assign `this` variable to `self` since inside the AJAX callback `this`- variable points to the response object and not to the tag instance.
+On above example the error message is displayed on the UI after the `update()` method has been called. We assign `this` variable to `self` since inside the AJAX callback `this` variable points to the response object and not to the tag instance.
 
 
 ### this.update(data) | #this-update-data
 
-Set values to the current instance and update the expressions. This is same as `this.update()` but allows you to set context data at the same time. So instead of this:
+Set values of the current instance and update the expressions. This is same as `this.update()` but allows you to set context data at the same time. So instead of this:
 
 ``` js
 self.error = error_message
@@ -135,7 +137,7 @@ this.on('unmount', function() {
 
 #### Reserved words
 
-Above method and property names are reserved words for Riot tags. Don't use any of following as your instance variable or method name: `opts`, `parent`, `root`, `update`, `on`, `one` and `trigger`. Local variables can be freely named. For example:
+The above method and property names are reserved words for Riot tags. Don't use any of following as your instance variable or method name: `opts`, `parent`, `root`, `update`, `on`, `one` and `trigger`. Local variables can be freely named. For example:
 
 ``` html
 <my-tag>

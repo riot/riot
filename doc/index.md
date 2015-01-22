@@ -110,7 +110,7 @@ Riot has 10x or even 100x times less API methods than others.
 <small><em>polymer.min.js</em> – 120K</small>
 <span class="bar red" style="width: 94%"></span>
 
-<small><em>riot.min.js</em> – 5.4K</small>
+<small><em>riot.min.js</em> – 5.7K</small>
 <span class="bar blue" style="width: 4.3%"></span>
 
 
@@ -127,8 +127,7 @@ Riot has all the essential building blocks for modern-client side applications:
 - Event library for building API's with isolated modules.
 - Router for taking care of URL and the back button.
 
-Riot is an "open stack". Meant for developers who want to avoid framework specific idioms. The generic tools lest you to mix and match design patterns. Systems like Facebook Flux can be self-made.
-
+Riot is an "open stack". Meant for developers who want to avoid framework specific idioms. The generic tools let you mix and match design patterns. Systems like Facebook Flux can be self-made.
 
 
 ==== .tweets.section
@@ -146,11 +145,11 @@ Riot.js is so tiny, I learned most of it while waiting for my GF trying on cloth
 
 ## Conclusion
 
-Riot is React + Polymer + models + routing without the bloat. It works today, even on IE8. It's dead simple to use and it weights almost nothing. No reinventing the wheel, but rather taking the good parts of what's there and making the simplest tool possible.
+Riot is React + Polymer + models + routing without the bloat. It works today, even on IE8. It's dead simple to use and it weighs almost nothing. No reinventing the wheel, but rather taking the good parts of what's there and making the simplest tool possible.
 
-Riot 2.0 keeps true with the original [Frameworkless JavaScript](/blog/technology/frameworkless-javascript.html) blog post. While the situation has changed due to the latest realizations in client side engineering (virtual dom, composable views, one way binding) the original Riot principles remain: *extremely small size and full control*.
+Riot 2.0 keeps true to the original [Frameworkless JavaScript](/blog/technology/frameworkless-javascript.html) blog post. While the situation has changed due to the latest realizations in client side engineering (virtual dom, composable views, one way binding) the original Riot principles remain: *extremely small size and full control*.
 
-According to developers of React:
+According to the developers of React:
 
 > "Templates separate technologies, not concerns."
 
