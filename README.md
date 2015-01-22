@@ -33,7 +33,7 @@ Riot brings custom tags to all browsers starting from IE8. Think React + Polymer
 #### Mounting
 
 ``` javascript
-riot.mount('time', { start: 0 })
+riot.mount('timer', { start: 0 })
 ```
 
 #### Nesting
