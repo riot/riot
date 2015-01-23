@@ -115,8 +115,9 @@ var self = module.exports = {
     ;(opt.flow[1] == 'f' ? toFile : toDir)(from, to)
 
     // Print what's been done
+    
     from.map(function(src, i) {
-      log(toRelative(src) + ' -> ' + toRelative(to[i]))
+      log(toRelative(src) + ' -> ' + toRelative(to[i] || to[0]))
     })
 
   },
