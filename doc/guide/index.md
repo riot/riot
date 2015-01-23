@@ -142,7 +142,7 @@ Inside the tag the options can be referenced with the `opts` variable as follows
 <my-tag>
 
   <!-- Options in HTML -->
-  <h3>{ opts.title }</my-tag>
+  <h3>{ opts.title }</h3>
 
   // Options in JavaScript
   var title = opts.title
