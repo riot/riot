@@ -1,5 +1,6 @@
 
-title: Compare
+title: Riot vs React vs Polymer
+subtitle: Compare
 description: How Riot differs from React and Polymer
 
 ====

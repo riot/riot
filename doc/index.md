@@ -1,5 +1,6 @@
 
-title: Why Riot?
+title: Riot 2.0 | A React- like UI library
+subtitle: Why Riot?
 description: And why we need a new UI library
 body_id: riot-home
 hero: true

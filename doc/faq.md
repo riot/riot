@@ -1,5 +1,6 @@
 
-title: FAQ
+title: Riot FAQ
+subtitle: FAQ
 description: none
 
 ====

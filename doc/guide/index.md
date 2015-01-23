@@ -1,5 +1,6 @@
 
-title: Guide
+title: Riot developer guide
+subtitle: Guide
 description: Developing client-side applications with Riot
 
 ====
