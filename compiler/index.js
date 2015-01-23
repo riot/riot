@@ -8,7 +8,7 @@
 //
 //   var riot = require('riot')
 //   riot.make({ from: 'foo', to: 'bar', compact: true })
-//   riot.make({ from: 'foo.js', to: 'bar.js', watch: true })
+//   riot.watch({ from: 'foo.js', to: 'bar.js' })
 //
 
 function help() {
