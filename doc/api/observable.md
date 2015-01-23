@@ -82,6 +82,11 @@ el.on('start', doStart)
 el.off('start', doStart)
 ```
 
+### el.off('*')
+
+Removes all listeners from all event types.
+
+
 
 ### el.trigger(event) | #observable-trigger
 
