@@ -67,9 +67,9 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Virtual DOM
 - Smallest possible amount of DOM updates and reflows.
-- All expressions are pre-compiled cached for high performance.
+- All expressions are pre-compiled and cached for high performance.
 - No extra HTML root elements or `data-` attributes.
-- No event loops or batching.
+- Lifecycle events for more special needs.
 
 
 ### Close to standards
@@ -89,7 +89,7 @@ Minimalism sets Riot apart from others:
 One of the design goals was to introduce a powerful tag syntax with as little boilerplate as possible:
 
 - Power shortcuts: `class={ enabled: is_enabled, hidden: hasErrors() }`.
-- No `componentWillMount`, `getInitialState` and the like.
+- No extra brain load such as `getInitialState` or `shouldComponentUpdate`
 - Interpolation: `Add #{ items.length + 1 }`
 - No `render` method, no `state` object.
 - Compact ES6 method syntax.
@@ -133,11 +133,11 @@ Riot is an "open stack". Meant for developers who want to avoid framework specif
 
 ==== .tweets.section
 
+I looked at the riot.js example, and it feels so clean, it's scary. [@paulbjensen](https://twitter.com/paulbjensen/status/558378720403419137)
+
+This is what I would aim for if I wanted to make a JS framework. [@ddunderfelt](https://twitter.com/ddunderfelt/status/558522477081788416)
+
 This is one of the best piece of code I have seen in #js world. [@notarianni](https://twitter.com/notarianni/status/421388764334669825)
-
-Love the attention to design principles and simplicity. [@sbellware](https://twitter.com/sbellware/status/420025919428755456)
-
-The JavaScript manifesto I wish I could have written. [@trentvb](https://twitter.com/trentvb/status/422904021696122880)
 
 Riot.js is so tiny, I learned most of it while waiting for my GF trying on clothes. [@kkovacs](https://twitter.com/kkovacs/status/422063156945764352)
 
@@ -159,9 +159,6 @@ This is the biggest change from Riot 1.0 to 2.0. JavaScript and HTML are now par
 
 ==== .section.tweets
 
-
 This is how a javascript frameworks should work - Everything else is bloat and abstraction from necessity. [@devayes](https://twitter.com/devayes/status/396311780407783426)
-
-If like me you think js frameworks over complicate things, then take a look at Riot.js [@livingos](https://twitter.com/livingos/status/425557004896460800)
 
 Falled in love with #riotjs. Small, fast and the code, oh, so clean. This is how every framework should be! [@nongeekboy](https://twitter.com/nongeekboy/status/436086922419515392)
