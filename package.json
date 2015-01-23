@@ -31,11 +31,6 @@
     "riotjs",
     "riot.js"
   ],
-  "preferGlobal": true,
-  "bin": {
-    "riot": "compiler/index.js"
-  },
-  "main": "compiler/index.js",
   "dependencies": {
     "gaze": "~0.6.4",
     "minimist": "~1.1.0",
@@ -44,5 +39,15 @@
   "devDependencies": {
     "jshint": "latest",
     "uglify-js": "latest"
-  }
+  },
+  "preferGlobal": true,
+  "files": [
+    "compiler",
+    "riot.js",
+    "riot.min.js"
+  ],
+  "bin": {
+    "riot": "compiler/index.js"
+  },
+  "main": "compiler/index.js"
 }
