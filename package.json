@@ -33,9 +33,9 @@
   ],
   "preferGlobal": true,
   "bin": {
-    "riot": "compiler/make.js"
+    "riot": "compiler/index.js"
   },
-  "main": "compiler/make.js",
+  "main": "compiler/index.js",
   "dependencies": {
     "gaze": "~0.6.4",
     "minimist": "~1.1.0",

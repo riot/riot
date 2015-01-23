@@ -1,4 +1,4 @@
-var riot = require('./make'),
+var riot = require('./'),
     fs = require('fs'),
     exec = require('child_process').exec,
     assert = require('assert'),

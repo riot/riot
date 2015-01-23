@@ -5,7 +5,7 @@
 require('shelljs/global')
 
 var gaze = require('gaze'),
-    compile = require('../compiler')
+    compile = require('../compiler/compile')
 
 
 // watch and build riot.js

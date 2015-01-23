@@ -35,7 +35,7 @@ dist: min demo
 	ls $(DIST)
 
 watch: demo
-	@ ./compiler/make.js --watch demo
+	@ ./compiler --watch demo
 
 
 ## Making new releases
