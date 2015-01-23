@@ -32,8 +32,10 @@ Please clone the repository and run the demo locally.
 ``` sh
 git clone git@github.com:muut/riotjs.git
 cd riotjs
-open demo/index.html
+npm install
+make riot
 make watch
+open demo/index.html
 ```
 
 You can now edit `demo/todo.tag` file and the compiler automatically watch for changes and transforms it to .js file.
