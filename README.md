@@ -45,7 +45,7 @@ Custom tags lets you build complex views with HTML.
   <timer start="0"></timer>
   <timer start="10"></timer>
   <timer start="20"></timer>
-<timetable>
+</timetable>
 ```
 
 HTML syntax is the de facto language on the web and it's designed for building user interfaces. The syntax is explicit, nesting is inherent to the language and attributes offer a clean way to provide options for custom tags.
