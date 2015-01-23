@@ -558,7 +558,7 @@ Run `riot --help` for more information.
 Once [installed](/riotjs/download.html) with `npm` you can do as follows:
 
 ```
-var riot_compile = require('riotjs/compiler')
+var riot_compile = require('riot/compiler')
 
 var js = riot_compile(tag, { compact: true })
 ```
