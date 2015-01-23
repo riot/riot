@@ -47,7 +47,7 @@ function help() {
 
 var ph = require('path'),
     sh = require('shelljs'),
-    gaze = require('gaze'),
+    chokidar = require('chokidar'),
     compile = require('./compile')
 
 
@@ -127,17 +127,11 @@ var self = module.exports = {
 
     self.make(opt)
 
-    var glob = toRelative(opt.flow[0] == 'f' ? opt.from : ph.join(opt.from, '**/*.tag'))
-
-    gaze(glob, function() {
-
-      log('Watching ' + glob)
-
-      this.on('all', function() {
-        self.make(opt)
-      })
-
-    })
+    var glob = opt.flow[0] == 'f' ? opt.from : ph.join(opt.from, '**/*.tag')
+    
+    chokidar.watch(glob, { ignoreInitial: true })
+      .on('ready', function() { log('Watching ' + toRelative(glob)) })
+      .on('all', function(e, path) { self.make(opt) })
 
   }
 

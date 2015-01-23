@@ -32,7 +32,7 @@
     "riot.js"
   ],
   "dependencies": {
-    "gaze": "~0.6.4",
+    "chokidar": "~1.0.0-rc2",
     "minimist": "~1.1.0",
     "shelljs": "~0.3.0"
   },

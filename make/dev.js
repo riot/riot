@@ -4,23 +4,15 @@
 
 require('shelljs/global')
 
-var gaze = require('gaze'),
-    compile = require('../compiler/compile')
+var chokidar = require('chokidar'),
+    riot = require('../compiler')
 
 
 // watch and build riot.js
-gaze('lib/*.js', function() {
-  this.on('changed', function() {
-    exec('make riot')
-  })
-})
+chokidar
+  .watch('lib/*.js', { ignoreInitial: true })
+  .on('all', function() { exec('make riot') })
 
 
 // watch and build tags.js for testing
-var tags = 'test/tag/*.tag'
-
-gaze(tags, function() {
-  this.on('changed', function() {
-    compile(cat(tags)).to('dist/tags.js')
-  })
-})
+riot.watch({ from: 'test', to: 'dist/tags.js' })
