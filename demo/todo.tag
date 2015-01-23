@@ -16,8 +16,6 @@
     <button disabled={ !text }>Add #{ items.length + 1 }</button>
   </form>
 
-  this.disabled = true
-
   this.items = opts.items
 
   edit(e) {
