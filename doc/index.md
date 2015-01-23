@@ -37,7 +37,7 @@ Riot brings custom tags to all browsers starting from IE8.
 
 </todo>
 ```
-A custom tag glues relevant HTML and JavaScript together forming a reusable component. You can roughly think of React + Polymer, but squeezed into 2.5K.
+A custom tag glues relevant HTML and JavaScript together forming a reusable component. You can roughly think of React + Polymer, but squeezed into 2.5Kb.
 
 
 ### Human readable
@@ -105,13 +105,13 @@ Riot has 10x or even 100x times less API methods than others.
 
 ### 3. Minimal size
 
-<small><em>react.min.js</em> – 127K</small>
+<small><em>react.min.js</em> – 127Kb</small>
 <span class="bar red"></span>
 
-<small><em>polymer.min.js</em> – 120K</small>
+<small><em>polymer.min.js</em> – 120Kb</small>
 <span class="bar red" style="width: 94%"></span>
 
-<small><em>riot.min.js</em> – 5.7K</small>
+<small><em>riot.min.js</em> – 5.7Kb</small>
 <span class="bar blue" style="width: 4.3%"></span>
 
 

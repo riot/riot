@@ -15,7 +15,7 @@ Here's is what happened:
 
 * Human readable architecture due to custom HTML tags. Our new employees can gasp the code, regardless of background.
 
-* 130K of bandwidth savings and reduced time on initial JS execution
+* 130Kb of bandwidth savings and reduced time on initial JS execution
 
 We arleady used Riot 1.0 for events and routing so we couldn't strip any bits from these areas or make them any simpler (on our taste).
 
