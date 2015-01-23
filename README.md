@@ -66,6 +66,6 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### DEMOS
  - [TODO](https://muut.com/riotjs/dist/demo/)
- - [Timmer](http://jsbin.com/dopedo/edit?html,output)
+ - [Timmer](http://jsfiddle.net/gnumanth/h9kuozp5/)
 
 
