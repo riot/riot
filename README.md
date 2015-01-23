@@ -5,7 +5,7 @@
 
 Riot brings custom tags to all browsers starting from IE8. Think React + Polymer, but squeezed into 2.5K.
 
-![Riot logo](doc/logo/riot480x.png)
+[![Riot logo](doc/logo/riot480x.png)](https://muut.com/riotjs/)
 
 #### Tag definition
 
@@ -64,6 +64,8 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - The rendered DOM can be freely manipulated with other tools.
 - Plays well with jQuery.
 
+### DEMOS
+ - [TODO](https://muut.com/riotjs/dist/demo/)
+ - [Timmer](http://jsbin.com/dopedo/edit?html,output)
 
-https://muut.com/riotjs/
 
