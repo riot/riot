@@ -53,8 +53,8 @@ hero_bg = #e6
 
 #hero
   font center
-  padding 4.5em u3 5.5em
-  margin -u6   0 u5
+  padding 4.5em u3 2em
+  margin -u6 0 u5
   bg hero_bg
 
   .riot-tag
@@ -67,6 +67,10 @@ hero_bg = #e6
 
     &:hover
       color #3
+
+  .normal
+    font 120% bold
+    margin-top u3
 
   h1
     font 230% 100 uppercase
