@@ -2,9 +2,7 @@
   "name": "riot",
   "version": "2.0.1",
   "description": "A React- like, 2.5K user interface library",
-  "homepage": "https://muut.com/riotjs/",
   "repository": "muut/riotjs",
-  "author": "Muut, Inc. and other contributors",
   "license": "MIT",
   "keywords": [
     "custom tags",
@@ -31,23 +29,6 @@
     "riotjs",
     "riot.js"
   ],
-  "dependencies": {
-    "chokidar": "~1.0.0-rc2",
-    "minimist": "~1.1.0",
-    "shelljs": "~0.3.0"
-  },
-  "devDependencies": {
-    "jshint": "latest",
-    "uglify-js": "latest"
-  },
-  "preferGlobal": true,
-  "files": [
-    "compiler",
-    "riot.js",
-    "riot.min.js"
-  ],
-  "bin": {
-    "riot": "compiler/index.js"
-  },
-  "main": "compiler/index.js"
+  "scripts": ["riot.js"],
+  "main": "riot.js"
 }
