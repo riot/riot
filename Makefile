@@ -35,19 +35,19 @@ dist: min demo
 	ls $(DIST)
 
 watch: demo
-	@ ./compiler --watch demo
+	@ ./compiler/index.js --watch demo
 
 
 ## Making new releases
-#  
+#
 #  1. Make sure you have the latest changes and nothing uncommited.
-#  
+#
 #    git checkout master
 #    git pull origin master
 #    git status
-#  
+#
 #  2. Create & publish a release.
-#  
+#
 #  	 make release VERSION=2.0.0
 #    make publish
 
@@ -55,7 +55,7 @@ watch: demo
 # - update version number in package.json, component.json, bower.json
 # - generate riot distribution files
 # - copy riot.js and riot.min.js to root (from gitignored /dist)
-	
+
 bump:
 	@ sed -i '' 's/\("version": "\)[^"]*/\1'$(VERSION)'/' *.json
 	@ make dist

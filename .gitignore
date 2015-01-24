@@ -16,3 +16,4 @@ $RECYCLE.BIN/
 dist
 demo/js
 npm-debug.log 
+make.js

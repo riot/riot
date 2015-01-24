@@ -4,7 +4,7 @@
   <h3>{ opts.title }</h3>
 
   <ul>
-    <li each={ items }>
+    <li each={ items.filter(filter) }>
       <label class={ completed: done }>
         <input type="checkbox" checked={ done } onclick={ parent.toggle }> { title }
       </label>
@@ -27,6 +27,11 @@
       this.items.push({ title: this.text })
       this.text = this.input.value = ''
     }
+  }
+
+  // an example how to filter items on the list
+  filter(item) {
+    return !item.hidden
   }
 
   toggle(e) {
