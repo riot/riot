@@ -49,5 +49,5 @@
   "bin": {
     "riot": "compiler/index.js"
   },
-  "main": "compiler/index.js"
+  "main": "riot.js"
 }
