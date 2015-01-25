@@ -13,6 +13,7 @@
 
 function help() {
   log([
+    '',
     'Builds .tag files to .js',
     '',
     'Options:',
