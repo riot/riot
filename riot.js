@@ -44,6 +44,7 @@ riot.observable = function(el) {
         fn.busy = 1
         fn.apply(el, fn.typed ? [name].concat(args) : args)
         if (fn.one) { fns.splice(i, 1); i-- }
+        else if (fns[i] && fns[i] !== fn) { i-- } // Makes self-removal possible during iteration
         fn.busy = 0
       }
     }
