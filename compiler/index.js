@@ -115,7 +115,7 @@ var self = module.exports = {
     ;(opt.flow[1] == 'f' ? toFile : toDir)(from, to)
 
     // Print what's been done
-    
+
     from.map(function(src, i) {
       log(toRelative(src) + ' -> ' + toRelative(to[i] || to[0]))
     })
@@ -129,12 +129,15 @@ var self = module.exports = {
     self.make(opt)
 
     var glob = opt.flow[0] == 'f' ? opt.from : ph.join(opt.from, '**/*.tag')
-    
+
     chokidar.watch(glob, { ignoreInitial: true })
       .on('ready', function() { log('Watching ' + toRelative(glob)) })
       .on('all', function(e, path) { self.make(opt) })
 
-  }
+  },
+
+
+  compile: compile
 
 }
 
@@ -187,4 +190,3 @@ function cli() {
 
 
 if (!module.parent) cli()
-
