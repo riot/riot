@@ -64,6 +64,7 @@ Custom tags lets you build complex views with HTML. Your application might look 
 
 HTML syntax is the de facto language on the web and it's designed for building user interfaces. The syntax is explicit, nesting is inherent to the language and attributes offer a clean way to provide options for custom tags.
 
+<span class="tag">note</span> the tags are [converted](guide/#compiler) to JavaScript before browsers can execute them.
 
 ### Virtual DOM
 - Smallest possible amount of DOM updates and reflows.
@@ -153,6 +154,8 @@ Riot 2.0 keeps true to the original [Frameworkless JavaScript](/blog/technology/
 According to the developers of React:
 
 > "Templates separate technologies, not concerns."
+
+We should be building reusable components instead of templates. By combining these related technologies together under the same component the system becomes cleaner. We respect React from this important insight.
 
 This is the biggest change from Riot 1.0 to 2.0. JavaScript and HTML are now part of the same module.
 
