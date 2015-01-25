@@ -10,7 +10,7 @@ jshint:
 dev:
 	@ node make/dev.js
 
-riot:
+riot: jshint
 	@ mkdir -p dist
 	@ cat make/prefix.js | sed "s/VERSION/$(VERSION)/" > dist/riot.js
 	@ cat lib/* >> dist/riot.js
