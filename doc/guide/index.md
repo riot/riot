@@ -54,6 +54,40 @@ Riot custom tags are the building blocks for user interfaces. They make the "vie
 
 See [live demo](/riotjs/dist/demo/) or download [demo.zip](/riotjs/dist/riot-{{ riot_version }}.zip)
 
+__Simple Timer example:__
+
+```js
+riot.tag('timer', '<p>Seconds Elapsed: { time }</p>', function (opts) {
+    this.time = opts.start || 0;
+
+    this.tick = (function () {
+        this.update({
+            time: ++this.time
+        });
+    }).bind(this);
+
+    var timer = setInterval(this.tick, 1000);
+
+    this.on('unmount', function () {
+        console.info('timer cleared');
+        clearInterval(timer);
+    });
+});
+
+riot.mount('timer', {
+    start: 0
+});
+```
+
+```html
+<timetable>
+    <timer start="0"></timer>
+    <timer start="10"></timer>
+    <timer start="20"></timer>
+</timetable>
+```
+Checkout the [timer demo](http://jsfiddle.net/gnumanth/h9kuozp5/)
+
 ### Tag syntax
 
 In a Riot custom tag the HTML layout is defined first, JavaSript second. HTML is coupled with expressions that are 100% JavaScript.
