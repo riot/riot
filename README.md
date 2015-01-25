@@ -1,32 +1,33 @@
 
-## A React- like, 2.5K user interface library
+## A React- like, 2.5KB user interface library
 
 [![Riot logo](doc/logo/riot480x.png)](https://muut.com/riotjs/)
 
 ### Custom tags • Virtual DOM • Full stack • IE8
 
-Riot brings custom tags to all browsers starting from IE8. Think React + Polymer, but squeezed into 2.5K.
+Riot brings custom tags to all browsers starting from IE8. Think React + Polymer, but squeezed into 5.7KB (2.5KB when gzipped).
 
 
 #### Tag definition
 
-```js
- riot.tag('timer','<p>Seconds Elapsed: { time }</p>', function(opts){
-   this.time = opts.start || 0;
+``` javascript
+<timer>
 
-   this.tick = (function() {
-     this.update({ time: ++this.time });
-   }).bind(this)
+  <p>Seconds Elapsed: { time }</p>
 
-   var timer = setInterval(this.tick, 1000);
+  this.time = opts.start || 0
 
-   this.on('unmount', function() {
-     console.info('timer cleared');
-     clearInterval(timer);
-   });
- });
+  tick() {
+    this.update({ time: ++this.time })
+  }
 
- riot.mount('timer',{ start: 0 });
+  var timer = setInterval(this.tick, 1000)
+
+  this.on('unmount', function() {
+    clearInterval(timer)
+  })
+
+</timer>
 ```
 
 #### Mounting

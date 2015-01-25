@@ -1,11 +1,11 @@
 
 title: Download Riot
-subtitle: Download
+subtitle: Get Riot
 description: none
 
 ====
 
-#### Version {{ riot_version }} | .tall
+#### Version *{{ riot_version }}*  • *[Release notes](release-notes.html)* | .tall
 
 
 Three steps and you'll be rocking with Riot in no time:
