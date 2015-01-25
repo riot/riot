@@ -37,7 +37,7 @@ Riot brings custom tags to all browsers starting from IE8.
 
 </todo>
 ```
-A custom tag glues relevant HTML and JavaScript together forming a reusable component. You can roughly think of React + Polymer, but squeezed into 2.5Kb.
+A custom tag glues relevant HTML and JavaScript together forming a reusable component. You can roughly think of React + Polymer, but squeezed into 2.5KB.
 
 
 ### Human readable
@@ -105,13 +105,13 @@ Riot has 10x or even 100x times less API methods than others.
 
 ### 3. Minimal size
 
-<small><em>react.min.js</em> – 127Kb</small>
+<small><em>react.min.js</em> – 127KB</small>
 <span class="bar red"></span>
 
-<small><em>polymer.min.js</em> – 120Kb</small>
+<small><em>polymer.min.js</em> – 120KB</small>
 <span class="bar red" style="width: 94%"></span>
 
-<small><em>riot.min.js</em> – 5.7Kb</small>
+<small><em>riot.min.js</em> – 5.7KB</small>
 <span class="bar blue" style="width: 4.3%"></span>
 
 
@@ -128,7 +128,7 @@ Riot has all the essential building blocks for modern-client side applications:
 - Event library for building API's with isolated modules.
 - Router for taking care of URL and the back button.
 
-Riot is an "open stack". Meant for developers who want to avoid framework specific idioms. The generic tools let you mix and match design patterns. Systems like Facebook Flux can be self-made.
+Riot is an "open stack". Meant for developers who want to avoid framework specific idioms. The generic tools let you mix and match design patterns. Systems like Facebook Flux can be [self-made](https://github.com/jimsparkman/RiotControl).
 
 
 ==== .tweets.section

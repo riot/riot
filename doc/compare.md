@@ -133,30 +133,30 @@ Riot comes bundled with custom tags, an event emitter (observable) and router. W
 
 Just like Flux, Riot is flexible and leaves the bigger architectural decisions for the developer. It's just a library to help you achieve the goal.
 
-You can build a Flux-like system by using Riot's observable and router. Or you can use some ready made Flux implementation together with Riot.
+You can build a Flux-like system by using Riot's observable and router. In fact such thing [already exists](https://github.com/jimsparkman/RiotControl).
 
 
 ### 24x - 128x bigger
 
 React is 24x bigger than Riot.
 
-<small><em>react.min.js</em> – 127Kb</small>
+<small><em>react.min.js</em> – 127KB</small>
 <span class="bar red"></span>
 
-<small><em>riot.min.js</em> – 5.7Kb</small>
+<small><em>riot.min.js</em> – 5.7KB</small>
 <span class="bar blue" style="width: 4.3%"></span>
 
 <br>
 
 The recommended React router is 128x larger than Riot router.
 
-<small><em>react-router.min.js</em> – 54.9Kb</small>
+<small><em>react-router.min.js</em> – 54.9KB</small>
 <span class="bar red"></span>
 
-<small><em>react-mini-router.min.js</em> – 8.6Kb</small>
+<small><em>react-mini-router.min.js</em> – 8.6KB</small>
 <span class="bar red" style="width: 15.6%"></span>
 
-<small><em>riot.router.min.js</em> – 0.43Kb</small>
+<small><em>riot.router.min.js</em> – 0.43KB</small>
 <span class="bar blue" style="width: 0.7%"></span>
 
 Admittedly this router comparison is a bit unfair because [react-router](https://github.com/rackt/react-router) has a lot more features. But the above chart clearly highlights the goal of Riot: to provide the most minimalistic API for the job.
@@ -185,10 +185,10 @@ Conceptually Riot is the same thing but there are differences:
 
 Polymer (v0.5.2) is 22x bigger than Riot
 
-<small><em>polymer.min.js</em> – 120Kb</small>
+<small><em>polymer.min.js</em> – 120KB</small>
 <span class="bar red"></span>
 
-<small><em>riot.min.js</em> – 5.7Kb</small>
+<small><em>riot.min.js</em> – 5.7KB</small>
 <span class="bar blue" style="width: 4.5%"></span>
 
 Web components are said to be the [King of all polyfilling challenges](http://developer.telerik.com/featured/web-components-arent-ready-production-yet/) and this is why Polymer requires such a large amount of code.

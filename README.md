@@ -1,30 +1,31 @@
 
 ## A React- like, 2.5K user interface library
 
+[![Riot logo](doc/logo/riot480x.png)](https://muut.com/riotjs/)
+
 ### Custom tags • Virtual DOM • Full stack • IE8
 
 Riot brings custom tags to all browsers starting from IE8. Think React + Polymer, but squeezed into 2.5K.
 
-[![Riot logo](doc/logo/riot480x.png)](https://muut.com/riotjs/)
 
 #### Tag definition
 
 ```js
  riot.tag('timer','<p>Seconds Elapsed: { time }</p>', function(opts){
    this.time = opts.start || 0;
-   
+
    this.tick = (function() {
      this.update({ time: ++this.time });
    }).bind(this)
-   
+
    var timer = setInterval(this.tick, 1000);
-   
+
    this.on('unmount', function() {
      console.info('timer cleared');
      clearInterval(timer);
    });
  });
-  
+
  riot.mount('timer',{ start: 0 });
 ```
 
@@ -63,7 +64,8 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - Plays well with jQuery.
 
 ### DEMOS
- - [TODO](https://muut.com/riotjs/dist/demo/)
+ - [Simple TODO](https://muut.com/riotjs/dist/demo/)
  - [Timer](http://jsfiddle.net/gnumanth/h9kuozp5/)
+ - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
 
-
+https://muut.com/riotjs/

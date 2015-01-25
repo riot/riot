@@ -44,7 +44,7 @@ You can now edit `demo/todo.tag` file and the compiler automatically watch for c
 
 ## Direct download
 
-[riot.min.js](/riotjs/dist/riot-{{ riot_version }}.min.js) – For production. 5.7Kb minified / 2.5Kb gzipped
+[riot.min.js](/riotjs/dist/riot-{{ riot_version }}.min.js) – For production. 5.7KB minified / 2.5KB gzipped
 
 [riot.js](/riotjs/dist/riot-{{ riot_version }}.js) – For development
 
