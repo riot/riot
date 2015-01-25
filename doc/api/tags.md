@@ -5,7 +5,7 @@ nogen: true
 
 # Custom tags
 
-### riot.mount(selector, [opts]) | #riot-mount
+### riot.mount(selector, [opts]) | #mount
 
 Mounts (constructs) all custom tags on the document specified by `selector`. Optional `opts` object is passed to the tags for consumption. Examples:
 
@@ -31,7 +31,7 @@ riot.mount('*')
 @returns: an array of [tag instances](#tag-instance)
 
 
-### riot.mountTo(domNode, tagName, [opts]) | #riot-mountto
+### riot.mountTo(domNode, tagName, [opts]) | #mount-to
 
 Mount a custom tag named `tagName` on a given `domNode` passing optional data with `opts`. For example:
 
@@ -155,7 +155,7 @@ The above method and property names are reserved words for Riot tags. Don't use 
 ```
 
 
-### riot.tag(tagName, html, [constructor]) | #riot-tag
+### riot.tag(tagName, html, [constructor]) | #tag
 
 Creates a new custom tag named `tagName` and having `html` as the layout. `constructor` is called before the tag expressions are calculated and before the tag is mounted. The `html` layout can contain [expressions](/riotjs/guide/#expressions). For example:
 
@@ -198,7 +198,7 @@ With the compiler the above tag definition becomes this:
 
 @returns: [tag instance](#tag-instance)
 
-### riot.update() | #riot-update
+### riot.update() | #update
 
 Updates all the mounted tags and their expressions on the page.
 

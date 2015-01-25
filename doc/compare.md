@@ -6,11 +6,14 @@ description: How Riot differs from React and Polymer
 ====
 
 # React
+
 Riot 2.0 is inspired by React and from the idea of "cohesion". According to Facebook developers:
 
 > "Templates separate technologies, not concerns."
 
-We totally respect you guys because of this important insight. By combining these related technologies together under the same component our code became cleaner.
+We should be building reusable components instead of templates. By separating logic from the templates we are actually keeping out things that should be together.
+
+By combining these related technologies together under the same component the system becomes cleaner. We respect React because of this important insight.
 
 React worked well for us, and we still use it in our [Disqus Importer](/importer/) but we were bothered by the syntax and size of React (*especially* the syntax). We started thinking it could be simpler; both internally and for the user.
 
