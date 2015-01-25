@@ -44,12 +44,23 @@ Changes the browser URL and notifies all the listeners assigned with `riot.route
 riot.route('customers/267393/edit')
 ```
 
-### riot.route.exec() | #riot-route-exec
+### riot.route.exec(callback) | #riot-route-exec
 
-Study the current hash "in place" without waiting for it to change. For example
+Study the current hash "in place" using given `callback` without waiting for it to change. For example
 
 ``` js
 riot.route.exec(function(collection, id, action) {
 
+})
+```
+
+### riot.route.parser(callback) | #riot-route-parser
+
+Changes riot.route default path parser to user given `callback` parser
+
+``` js
+riot.route.parser(function(path) {
+  //example !/customers/267393/edit
+  return path.slice(2).slice('/')
 })
 ```

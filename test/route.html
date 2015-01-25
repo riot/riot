@@ -18,6 +18,13 @@
   })
 
   riot.route("mummypowder/logo-and-key")
+
+  riot.route.parser(function(path) {
+    var r = path.slice(2).split('/')
+    console.info("parser", r)
+    return r
+  })
+  riot.route("!/mummypowder/logo-and-key")
   </script>
 
 </body>
