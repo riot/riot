@@ -42,9 +42,10 @@
   },
   "preferGlobal": true,
   "files": [
-    "compiler",
-    "riot.js",
-    "riot.min.js"
+    "compiler/compile.js",
+    "compiler/index.js",
+    "riot.min.js",
+    "riot.js"
   ],
   "bin": {
     "riot": "compiler/index.js"
