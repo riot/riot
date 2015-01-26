@@ -584,6 +584,10 @@ var js = riot_compile(tag, { compact: true })
 
 The compile function takes a string and returns a string.
 
+### Task runners
+
+- [Gulp plugin](https://github.com/e-jigsaw/gulp-riot)
+- [Grunt plugin](https://github.com/ariesjia/grunt-riot)
 
 ### Creating tags manually
 
