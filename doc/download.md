@@ -32,9 +32,9 @@ Choose the preferred way:
 
 ####  Direct download
 
-[riot.min.js](/riotjs/dist/riot-{{ riot_version }}.min.js) – for production ( 5.7KB minified / 2.5KB gzipped )
+[riot.min.js](https://raw.githubusercontent.com/muut/riotjs/master/riot.min.js) – for production ( 5.7KB minified / 2.5KB gzipped )
 
-[riot.js](/riotjs/dist/riot-{{ riot_version }}.js) – for development
+[riot.js](https://raw.githubusercontent.com/muut/riotjs/master/riot.js) – for development
 
 
 #### CDN
