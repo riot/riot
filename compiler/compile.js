@@ -6,136 +6,108 @@ var BOOL_ATTR = ('allowfullscreen,async,autofocus,autoplay,checked,compact,contr
   'typemustmatch,visible').split(',')
 
 
-module.exports = function(input, opts) {
-
-  opts = opts || {}
-
-  var lines = input.split('\n'),
-      is_markup,
-      is_comment,
-      es6_ident,
-      tag_name,
-      html = '',
-      out = [],
-      tag
+// (tagname) (html) (javascript) endtag
+var CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\/]>$)([^\x00]*?)^<\/\1>/gim,
+    SCRIPT = /<script([^>]+)?>([^\x00]*?)<\/script>/gm,
+    HTML_COMMENT = /<!--.*-->/g,
+    CLOSED_TAG = /<([\w\-]+)([^\/]*)\/\s*>/g,
+    LINE_COMMENT = /^\s*\/\/.*$/gm,
+    JS_COMMENT = /\/\*[^\x00]*?\*\//gm
 
 
-  lines.map(function(line, i) {
-    var l = line.trim(),
-        beg = l[0],
-        end = l.slice(-1)
+function compileHTML(html, opts) {
 
-    // line comment
-    if (l.slice(0, 2) == '//') return
+  // whitespace
+  html = html.replace(/\s+/g, ' ')
 
-    // multiline comment
-    if (l.slice(0, 2) == '/*' || l.slice(0, 4) == '<!--') is_comment = true
+  // strip comments
+  html = html.trim().replace(HTML_COMMENT, '')
 
-    // comment end
-    if (is_comment) {
-      if (l.slice(-2) == '*/' || l.slice(-3) == '-->') is_comment = false
-      return
-    }
+  // foo={ bar } --> foo="{ bar }"
+  html = html.replace(/=(\{[^\}]+\})([\s\>])/g, '="$1"$2')
 
-    // tag name
-    if (beg == '<') tag_name = l.slice(1).split(/[^\w-]/)[0]
-
-
-    // custom tag start && end
-    if (line[0] == '<') {
-
-      var is_tag_end  = line[1] == '/'
-
-      is_markup = !is_tag_end
-
-      // tag end
-      if (is_tag_end) {
-
-        // foo={ bar } --> foo="{ bar }"
-        html = html.replace(/=(\{[^\}]+\})([\s\>])/g, '="$1"$2')
-
-        // checked={ expr } --> __checked={ expr } // IE8 looses boolean expressions
-        html = html.replace(/([\w\-]+)=["'](\{[^\}]+\})["']/g, function(full, name, expr) {
-          if (BOOL_ATTR.indexOf(name.toLowerCase()) >= 0) name = '__' + name
-          return name + '="' + expr + '"'
-        })
-
-        // escape single quotes
-        html = html.replace(/'/g, "\\'")
-
-        // compact
-        if (opts.compact) html = html.replace(/> </g, '><')
-
-        out[tag.index] = 'riot.tag(\'' +tag.name+ '\', \'' + html.trim() + '\', function(opts) {'
-
-        html = tag = ''
-
-        out.push('});')
-
-      // tag start
-      } else {
-        tag = { index: out.length, name: tag_name }
-
-      }
-
-      return
-    }
-
-    // start of JavaScript
-    if (is_markup && (/^(var\s|function|this)/.test(l) || (end == '{' || end == ')'))) {
-      is_markup = false
-      out.push(line)
-    }
-
-    // nested HTML
-    if (is_markup) {
-
-      // <foo/> -> <foo></foo>
-      if (line.slice(-2) == '/>') line = line.replace('/>', '></' + tag_name + '>')
-
-      if (tag_name == 'textarea' || tag_name == 'pre') {
-        line += '\\n'
-      } else {
-        line = line.replace(/\s+/g, ' ')
-      }
-
-      html += line
-      return
-
-
-    // nested JS
-    } else if (l && tag) {
-
-      /* ES6 method signatures */
-
-      // method start
-      if (l.indexOf('(') > 0 && l.slice(-1) == '{' && l.indexOf('function') == -1) {
-        var m = /(\s+)([\w]+)\s*\(([\w,\s]*)\)\s*\{/.exec(line)
-
-        if (m && !/^(if|while|switch|for)$/.test(m[2])) {
-          line = '  this.' + m[2] + ' = function(' + m[3] + ') {'
-          es6_ident = m[1]
-        }
-
-      }
-
-      // method end
-      if (line == es6_ident + '}') {
-        line += '.bind(this);'
-        es6_ident = ''
-      }
-
-    }
-
-    out.push(line)
-
+  // IE8 looses boolean attr values: `checked={ expr }` --> `__checked={ expr }`
+  html = html.replace(/([\w\-]+)=["'](\{[^\}]+\})["']/g, function(full, name, expr) {
+    if (BOOL_ATTR.indexOf(name.toLowerCase()) >= 0) name = '__' + name
+    return name + '="' + expr + '"'
   })
 
-  return out.join('\n')
+  // <foo/> -> <foo></foo>
+  html = html.replace(CLOSED_TAG, function(_, tagName, attr) {
+    return '<' + tagName + (attr ? ' ' + attr.trim() : '') + '></' + tagName + '>'
+  })
 
-    // preserve escaped curly brackets (so they don't get parsed by JavaScript to just "{")
-    .replace(/\\[{}]/g, '\\$&')
+  // escape single quotes
+  html = html.replace(/'/g, "\\'")
+
+
+  // \{ jotain \} --> \\{ jotain \\}
+  html = html.replace(/\\[{}]/g, '\\$&')
+
+  // compact: no whitespace between tags
+  if (opts.compact) html = html.replace(/> </g, '><')
+
+  return html
 
 }
 
 
+function compileJS(js) {
+
+  // strip comments
+  js = js.replace(LINE_COMMENT, '').replace(JS_COMMENT, '')
+
+
+  // ES6 method signatures
+  var lines = js.split('\n'),
+      es6_ident = ''
+
+  lines.forEach(function(line, i) {
+    var l = line.trim()
+
+    // method start
+    if (l[0] != '}' && l.indexOf('(') > 0 && l.slice(-1) == '{' && l.indexOf('function') == -1) {
+      var m = /(\s+)([\w]+)\s*\(([\w,\s]*)\)\s*\{/.exec(line)
+
+      if (m && !/^(if|while|switch|for)$/.test(m[2])) {
+        lines[i] = m[1] + 'this.' + m[2] + ' = function(' + m[3] + ') {'
+        es6_ident = m[1]
+      }
+
+    }
+
+    // method end
+    if (line.slice(0, es6_ident.length + 1) == es6_ident + '}') {
+      lines[i] += '.bind(this);'
+      es6_ident = ''
+    }
+
+  })
+
+  return lines.join('\n')
+
+}
+
+module.exports = function(source, opts) {
+
+  opts = opts || {}
+
+  return source.replace(CUSTOM_TAG, function(_, tagName, html, js) {
+    var script_type
+
+    // js wrapped inside <script> tag
+    if (!js.trim()) {
+      html = html.replace(SCRIPT, function(_, type, script) {
+        script_type = type && type.replace(/['"]/g, '').split(/type=/i)[1]
+        js = script
+        return ''
+      })
+    }
+
+    return 'riot.tag(\'' +tagName+ '\', \'' + compileHTML(html, opts) + '\', function(opts) {' +
+      compileJS(js) +
+    '\n});'
+
+  })
+
+}
