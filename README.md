@@ -64,6 +64,13 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - The rendered DOM can be freely manipulated with other tools.
 - Plays well with jQuery.
 
+
+### Growing ecosystem
+- NPM, CommonJS, AMD, Bower and Component support
+- [Gulp](https://github.com/e-jigsaw/gulp-riot) and [Grunt](https://github.com/ariesjia/grunt-riot) plugins
+- Hosted on [cdnjs](https://cdnjs.com/libraries/riot) and [jsdelivr](http://www.jsdelivr.com/#!riot)
+
+
 ### DEMOS
 - [Simple TODO](https://muut.com/riotjs/dist/demo/)
 - [Multi TODO](http://plnkr.co/edit/UZ2BfP?p=preview)
