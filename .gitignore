@@ -14,6 +14,6 @@ Desktop.ini
 $RECYCLE.BIN/
 .DS_Store
 dist
-demo/js
 npm-debug.log 
 make.js
+test/compiler

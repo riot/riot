@@ -13,7 +13,7 @@
 
   <form onsubmit={ add }>
     <input name="input" onkeyup={ edit }>
-    <button disabled={ !text }>Add #{ items.length + 1 }</button>
+    <button disabled={ !text }>Add #{ items.filter(filter).length + 1 }</button>
   </form>
 
   this.items = opts.items

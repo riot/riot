@@ -70,7 +70,7 @@ module.exports = function(input, opts) {
 
         html = tag = ''
 
-        out.push('})')
+        out.push('});')
 
       // tag start
       } else {
@@ -121,7 +121,7 @@ module.exports = function(input, opts) {
 
       // method end
       if (line == es6_ident + '}') {
-        line += '.bind(this)'
+        line += '.bind(this);'
         es6_ident = ''
       }
 

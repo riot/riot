@@ -54,39 +54,7 @@ Riot custom tags are the building blocks for user interfaces. They make the "vie
 
 See [live demo](/riotjs/dist/demo/) or download [demo.zip](/riotjs/dist/riot-{{ riot_version }}.zip)
 
-__Simple Timer example:__
 
-```js
-riot.tag('timer', '<p>Seconds Elapsed: { time }</p>', function (opts) {
-    this.time = opts.start || 0;
-
-    this.tick = (function () {
-        this.update({
-            time: ++this.time
-        });
-    }).bind(this);
-
-    var timer = setInterval(this.tick, 1000);
-
-    this.on('unmount', function () {
-        console.info('timer cleared');
-        clearInterval(timer);
-    });
-});
-
-riot.mount('timer', {
-    start: 0
-});
-```
-
-```html
-<timetable>
-    <timer start="0"></timer>
-    <timer start="10"></timer>
-    <timer start="20"></timer>
-</timetable>
-```
-Checkout the [timer demo](http://jsfiddle.net/gnumanth/h9kuozp5/)
 
 ### Tag syntax
 
@@ -112,7 +80,7 @@ Tag definition always starts on the beginning of the line:
 
 </my-tag>
 
-  <!-- fails, because of indentation -->
+  <!-- this fails, because of indentation -->
   <my-tag>
 
   </my-tag>
@@ -260,8 +228,24 @@ Expressions are 100% JavaScript. A few examples:
 { Math.round(rating) }
 ```
 
-### Boolean attributes
+The goal is to keep the expressions small so your HTML stays as clean as possible. If your expression grows in complexity consider moving some of logic to the "update" event. For example:
 
+
+```
+<my-tag>
+
+  <!-- the `val` is calculated below .. -->
+  <p>{ val }</p>
+
+  // ..on every update
+  this.on('update', function() {
+    this.val = some / complex * expression ^ here
+  })
+</my-tag>
+```
+
+
+### Boolean attributes
 
 Boolean attributes (checked, selected etc..) are ignored when the expression value is falsy:
 
@@ -600,18 +584,35 @@ var js = riot_compile(tag, { compact: true })
 
 The compile function takes a string and returns a string.
 
+### Task runners
+
+- [Gulp plugin](https://github.com/e-jigsaw/gulp-riot)
+- [Grunt plugin](https://github.com/ariesjia/grunt-riot)
 
 ### Creating tags manually
 
 You can create cusom tags without the compiler using `riot.tag`. For example:
 
 ``` js
-riot.tag('tag-name', '<h3>{ opts.hello }</h3>', function(opts) {
+riot.tag('timer', '<p>Seconds Elapsed: { time }</p>', function (opts) {
+  this.time = opts.start || 0
+
+  this.tick = (function () {
+    this.update({
+        time: ++this.time
+    })
+  }).bind(this)
+
+  var timer = setInterval(this.tick, 1000)
+
+  this.on('unmount', function () {
+    clearInterval(timer)
+  })
 
 })
 ```
 
-See [riot.tag](/riotjs/api/#riot-tag) API docs for more details.
+See [timer demo](http://jsfiddle.net/gnumanth/h9kuozp5/) and [riot.tag](/riotjs/api/#tag) API docs for more details.
 
 
 # Application architecture

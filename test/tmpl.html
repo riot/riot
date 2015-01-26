@@ -30,9 +30,9 @@ test('a b c', '{ true ? "a b c" : "foo" }')
 test('a "b" c', '{ true ? "a \\"b\\" c" : "foo" }')
 
 test(undefined)
-test(undefined, '')
 test(undefined, '{}')
 test(undefined, '{ }')
+test('', '')
 test(' ', '{ } ')
 test('1', '{ "1" }')
 test('1 ', '{ "1" } ')
@@ -98,6 +98,11 @@ test('x', '{ this.str }')
 
 test(2, '{ x }')
 test('y', '{ y: x }')
+
+// maybe / later:
+
+//test('html', '{ location.href.split(".").pop() }')
+//test('{"x":5}', '{ JSON.stringify({ x: 5 }) }')
 
 function test(a, b, escape) {
   assert(a, riot._tmpl(b, data), b)

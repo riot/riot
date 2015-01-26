@@ -1,83 +1,111 @@
 
 title: Download Riot
-subtitle: Download
+subtitle: Get Riot
 description: none
+minify: false
 
 ====
 
-#### Version {{ riot_version }} | .tall
+#### Version *{{ riot_version }}*  • *[Release notes](release-notes.html)* | .tall
 
-## NPM
+
+## The steps
+
+1. [Install Riot compiler](#riot-compiler) for translating `.tag` files to `.js`
+2. [Get riot.js](#riotjs)
+3. [Develop](#develop)
+
+
+## 1. Install Riot compiler | #riot-compiler
 
 ``` sh
 npm install riot -g
 ```
 
-### Compiler
+After the installation type `riot --help` to make sure it works. [node.js](http://nodejs.org/) is required on your machine.
 
-Riot compiler transforms `.tag` files to `.js` for browsers. For example:
+
+## 2. Get riot.js | #riotjs
+
+Choose the preferred way:
+
+
+####  Direct download
+
+[riot.min.js](/riotjs/dist/riot-{{ riot_version }}.min.js) – for production ( 5.7KB minified / 2.5KB gzipped )
+
+[riot.js](/riotjs/dist/riot-{{ riot_version }}.js) – for development
+
+
+#### CDN
+
+[cdnjs](https://cdnjs.com/libraries/riot): `https://cdnjs.cloudflare.com/ajax/libs/riot/{{ riot_version }}/riot.min.js`
+
+[jsDelivr](http://www.jsdelivr.com/#!riot): `https://cdn.jsdelivr.net/riot/{{ riot_version }}/riot.min.js`
+
+
+#### Package manager
+
+[Bower](http://bower.io/search/?q=riot.js): `bower install riot`
+
+[Component](http://component.github.io/?q=riot): `component install muut/riotjs`
+
+[NPM](https://www.npmjs.com/package/riot): `npm install riot`
+
+
+#### GitHub
+
+[muut/riotjs](https://github.com/muut/riotjs): `git clone git@github.com:muut/riotjs.git`
+
+
+## 3. Develop | #develop
+
+Compile custom tags to JavaScript:
 
 ``` sh
-riot --watch my/custom.tag
+riot --watch test.tag
 ```
 
-This detects changes on the .tag file and generates a .js files automatically. See [compiler guide](/riotjs/guide/#compiler) or run `riot --help` for more information.
+Include `riot.js` and your compiled tags
 
-
-## Git
-
-<span class="tag">URL</span> https://github.com/muut/riotjs
-
-Please clone the repository and run the demo locally.
-
-``` sh
-git clone git@github.com:muut/riotjs.git
-cd riotjs
-npm install
-make riot
-make watch
-open demo/index.html
+```
+<script src="riot.js"></script>
+<script src="test.js"></script>
 ```
 
-You can now edit `demo/todo.tag` file and the compiler automatically watch for changes and transforms it to .js file.
+Mount tags on the page:
 
+``` html
+<todo></todo>
 
-## Direct download
+&lt;script>riot.mount('todo')</script>
+```
 
-[riot.min.js](/riotjs/dist/riot-{{ riot_version }}.min.js) – For production. 5.7KB minified / 2.5KB gzipped
+See [docs](/riotjs/guide/) for more info. Please also check [live demo](/riotjs/dist/demo/) or download [demo.zip](/riotjs/dist/riot-{{ riot_version }}.zip).
 
-[riot.js](/riotjs/dist/riot-{{ riot_version }}.js) – For development
-
-[demo.zip](/riotjs/dist/riot-{{ riot_version }}.zip) - Working demo with unminified version
-
-[live demo](/riotjs/dist/demo/)
+If you make something great, please [share it](https://github.com/muut/riotjs/issues/58) !
 
 
 ## IE8 support
 
-IE8 requires that both [es5-shim](https://github.com/es-shims/es5-shim) and [html5-shiv](https://github.com/aFarkas/html5shiv) are included on the `<head>` of your page and IE is configured to work with the latest rendering engine. Here's how you do it:
+For IE8 support you need to include [es5-shim](https://github.com/es-shims/es5-shim) and [html5-shiv](https://github.com/aFarkas/html5shiv) and tell it to use the latest rendering engine:
 
 ``` html
 <head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
   <!--[if lt IE 9]>
-    <script src="es5-shim.js"></script>
-    <script src="html5-shiv.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.0.5/es5-shim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
     &lt;script>html5.addElements('test')</script>
   <![endif]-->
 </head>
 ```
 
-You must tell IE8 what custom tags are being used on the page with `html5.addElements`. For example
+...and let it know about your custom tags before using them on a page:
 
 ``` html
 &lt;script>html5.addElements('todo todo-item account plan')</script>
 ```
-
-That's a space separated list of tag names.
-
-See a [live demo](/riotjs/dist/demo/) or download the [demo.zip](/riotjs/dist/riot-{{ riot_version }}.zip).
 
 
 ## Known issues

@@ -149,7 +149,7 @@ hero_bg = #e6
 
 #content
   %inline
-  max-width 680px
+  width 680px
   padding-bottom u8
 
   :first-child
@@ -228,7 +228,8 @@ hero_bg = #e6
   #content
     display block
     margin 0 auto
-
+    max-width 680px
+    width auto
 
 #riot-forum
   .muut
@@ -248,3 +249,10 @@ hero_bg = #e6
   .m-navi
     display none
 
+#riot-releases
+  .hgroup
+    margin-bottom u3
+
+  h3 em
+    font 70% #7
+    margin-left u

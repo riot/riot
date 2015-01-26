@@ -6,13 +6,14 @@
 //
 // Use in Node:
 //
-//   var riot = require('riot')
+//   var riot = require('riot/compiler')
 //   riot.make({ from: 'foo', to: 'bar', compact: true })
 //   riot.watch({ from: 'foo.js', to: 'bar.js' })
 //
 
 function help() {
   log([
+    '',
     'Builds .tag files to .js',
     '',
     'Options:',

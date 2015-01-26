@@ -2,7 +2,7 @@
 VERSION ?= `node -pe "require('./package.json').version"`
 DIST = dist/download
 
-.PHONY: test dist demo
+.PHONY: test dist
 
 jshint:
 	./node_modules/jshint/bin/jshint lib/*.js
@@ -10,7 +10,7 @@ jshint:
 dev:
 	@ node make/dev.js
 
-riot:
+riot: jshint
 	@ mkdir -p dist
 	@ cat make/prefix.js | sed "s/VERSION/$(VERSION)/" > dist/riot.js
 	@ cat lib/* >> dist/riot.js
@@ -20,12 +20,7 @@ min: riot
 	@ ./node_modules/uglify-js/bin/uglifyjs dist/riot.js --comments --mangle -o dist/riot.min.js
 	@ echo minified
 
-demo:
-	@ mkdir -p demo/js
-	@ cp dist/riot.js demo/js
-	@ cp test/ie8/* demo/js
-
-dist: min demo
+dist: min
 	@ mkdir -p $(DIST)
 	@ rm -rf $(DIST)/*
 	@ cp dist/riot.js "$(DIST)/riot-$(VERSION).js"
@@ -33,9 +28,6 @@ dist: min demo
 	@ zip -r "$(DIST)/riot-$(VERSION).zip" demo
 	@ cp -r demo $(DIST)
 	ls $(DIST)
-
-watch: demo
-	@ ./compiler/index.js --watch demo
 
 
 ## Making new releases
@@ -58,6 +50,7 @@ watch: demo
 
 bump:
 	@ sed -i '' 's/\("version": "\)[^"]*/\1'$(VERSION)'/' *.json
+	@ sed -i '' "s/VERSION/$(VERSION)/" demo/index.html
 	@ make dist
 	@ cp dist/riot*.js .
 

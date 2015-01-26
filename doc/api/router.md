@@ -10,7 +10,7 @@ Riot router is the most minimal router implementation you can find and it works 
 The Riot router is best in routing schemes in which the route's hierarchical parts, after the "#", are separated with the "/" character. In that case Riot gives you direct access to these parts.
 
 
-### riot.route(callback) | #riot-route
+### riot.route(callback) | #route
 
 Execute the given `callback` when the URL hash changes. For example
 
@@ -36,7 +36,7 @@ The hash can change in the following ways:
 3. When `riot.route(to)` is called
 
 
-### riot.route(to) | #riot-route-to
+### riot.route(to) | #route-to
 
 Changes the browser URL and notifies all the listeners assigned with `riot.route(callback)`. For example:
 
