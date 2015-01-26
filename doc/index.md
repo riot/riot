@@ -82,7 +82,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Growing ecosystem
 - NPM, CommonJS, AMD, Bower and Component support
-- [Gulp](https://github.com/e-jigsaw/gulp-riot) and [Grunt](https://github.com/ariesjia/grunt-riot) plugins
+- [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot), [Browserify](https://github.com/jhthorsen/riotify) plugins
 - Hosted on [cdnjs](https://cdnjs.com/libraries/riot) and [jsdelivr](http://www.jsdelivr.com/#!riot)
 
 
