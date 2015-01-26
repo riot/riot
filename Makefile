@@ -73,9 +73,11 @@ docs:
 # create version commit and tag
 # (also creating a release on github)
 
-release: bump docs
+version:
 	git commit -am "$(VERSION)"
 	git tag -a 'v'$(VERSION) -m $(VERSION)
+
+release: bump docs version
 
 # push new version to npm ant github
 # (no need to "push" to bower and component, they'll grab it from github)
