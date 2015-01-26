@@ -301,6 +301,17 @@ riot._tmpl = (function() {
     return el
   }
 
+  function addEvent( obj, type, fn ) {
+    if ( obj.attachEvent ) {
+      obj['e'+type+fn] = fn
+      obj[type+fn] = function(){
+        obj['e'+type+fn]( window.event )
+      }
+      obj.attachEvent(type, obj[type+fn] )
+    } else{
+      obj.addEventListener( type.replace(/^on/,''), fn, false )
+    }
+  }
 
   function update(expressions, instance) {
 
@@ -344,15 +355,10 @@ riot._tmpl = (function() {
 
       // event handler
       if (typeof value == 'function') {
-        dom[attr_name] = function(e) {
-
-          // cross browser event fix
-          e = e || window.event
+        addEvent(dom,attr_name,function(e){
           e.which = e.which || e.charCode || e.keyCode
           e.target = e.target || e.srcElement
           e.currentTarget = dom
-
-          // currently looped item
           e.item = instance.__item || instance
 
           // prevent default behaviour (by default)
@@ -360,10 +366,8 @@ riot._tmpl = (function() {
             e.preventDefault && e.preventDefault()
             e.returnValue = false
           }
-
-          instance.update()
-        }
-
+          instance.update();
+        });
       // show / hide / if
       } else if (/^(show|hide|if)$/.test(attr_name)) {
         remAttr(attr_name)
