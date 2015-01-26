@@ -1,6 +1,14 @@
 
-VERSION ?= `node -pe "require('./package.json').version"`
+# default to package version if no "v" var given
+v ?= $(shell node -pe "require('./package.json').version")
+
+# expand variable immediatelly
+# because we might not have access to package.json later
+# e.g. when we switch to gh-pages branch later with `make docs`
+VERSION := $(v)
+
 DIST = dist/download
+
 
 .PHONY: test dist
 
@@ -40,7 +48,7 @@ dist: min
 #
 #  2. Create & publish a release.
 #
-#    make release VERSION=2.0.0
+#    make release v=2.0.0
 #    make publish
 
 # set version and generate files
@@ -53,10 +61,19 @@ bump:
 	@ make dist
 	@ cp dist/riot*.js .
 
+# commit docs from master to gh-pages branch
+# (whitelist extensions to keep folder clean w/o .gitignore)
+
+docs:
+	git checkout gh-pages
+	git checkout master demo
+	git commit -m "$(VERSION)" *.tag *.js *.css *.html
+	git checkout master
+
 # create version commit and tag
 # (also creating a release on github)
 
-release: bump
+release: bump docs
 	git commit -am "$(VERSION)"
 	git tag -a 'v'$(VERSION) -m $(VERSION)
 
@@ -65,5 +82,6 @@ release: bump
 
 publish:
 	npm publish
+	git push origin gh-pages
 	git push origin master
 	git push origin master --tags
