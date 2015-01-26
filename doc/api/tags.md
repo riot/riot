@@ -196,7 +196,6 @@ With the compiler the above tag definition becomes this:
 </tag-name>
 ```
 
-@returns: [tag instance](#tag-instance)
 
 ### riot.update() | #update
 
