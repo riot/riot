@@ -50,7 +50,6 @@ dist: min
 
 bump:
 	@ sed -i '' 's/\("version": "\)[^"]*/\1'$(VERSION)'/' *.json
-	@ sed -i '' "s/VERSION/$(VERSION)/" demo/index.html
 	@ make dist
 	@ cp dist/riot*.js .
 
