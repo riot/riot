@@ -464,7 +464,7 @@ The looped items are [tag instances](/riotjs/api/#tag-instance). Riot does not t
 
 ### Event handlers with looped items
 
-Event handlers can access individual items in a collection with `event.data`. Now let's implement the `remove` function:
+Event handlers can access individual items in a collection with `event.item`. Now let's implement the `remove` function:
 
 ```
 <todo>
