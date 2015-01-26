@@ -52,7 +52,7 @@ Riot custom tags are the building blocks for user interfaces. They make the "vie
 </todo>
 ```
 
-See [live demo](/riotjs/dist/demo/) or download [demo.zip](/riotjs/dist/riot-{{ riot_version }}.zip)
+See [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/muut/riotjs/tree/gh-pages/demo), or download the [zip](https://github.com/muut/riotjs/archive/gh-pages.zip).
 
 
 

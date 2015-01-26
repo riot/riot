@@ -81,7 +81,7 @@ Mount tags on the page:
 &lt;script>riot.mount('todo')</script>
 ```
 
-See [docs](/riotjs/guide/) for more info. Please also check [live demo](/riotjs/dist/demo/) or download [demo.zip](/riotjs/dist/riot-{{ riot_version }}.zip).
+See [docs](/riotjs/guide/) for more info. Please also check [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/muut/riotjs/tree/gh-pages/demo), or download the [zip](https://github.com/muut/riotjs/archive/gh-pages.zip)
 
 If you make something great, please [share it](https://github.com/muut/riotjs/issues/58) !
 
