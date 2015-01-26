@@ -83,7 +83,7 @@ Mount tags on the page:
 
 See [docs](/riotjs/guide/) for more info. Please also check [live demo](/riotjs/dist/demo/) or download [demo.zip](/riotjs/dist/riot-{{ riot_version }}.zip).
 
-If you make something great, please [share it](https://github.com/muut/riotjs/issues) !
+If you make something great, please [share it](https://github.com/muut/riotjs/issues/58) !
 
 
 ## IE8 support
