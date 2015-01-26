@@ -40,7 +40,7 @@ dist: min
 #
 #  2. Create & publish a release.
 #
-#  	 make release VERSION=2.0.0
+#    make release VERSION=2.0.0
 #    make publish
 
 # set version and generate files
