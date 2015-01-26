@@ -31,6 +31,6 @@
     "riotjs",
     "riot.js"
   ],
-  "ignore": ["./!(riot*.js)"],
+  "ignore": ["**/*", "!/riot.min.js", "!/riot.js"],
   "main": "riot.js"
 }
