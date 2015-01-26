@@ -389,7 +389,7 @@ The event handler receives the standard event object as the first argument. The 
 - `e.relatedTarget` points to the element where the event handler is specified.
 - `e.target` is the originating element. This is not necessarily the same as `relatedTarget`.
 - `e.which` is the key code in a keyboard event (`keypress`, `keyup`, etc...).
-- `e.data` is the current element in a loop. See [loops](#loops) for more details.
+- `e.item` is the current element in a loop. See [loops](#loops) for more details.
 
 
 ## Conditionals
