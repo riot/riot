@@ -70,7 +70,7 @@ module.exports = function(input, opts) {
 
         html = tag = ''
 
-        out.push('})')
+        out.push('});')
 
       // tag start
       } else {
