@@ -1,22 +1,14 @@
 
-# default to package version if no "v" var given
+# if no "v" var given, default to package version
 v ?= $(shell node -pe "require('./package.json').version")
 
-# expand variable immediatelly
-# because we might not have access to package.json later
-# e.g. when we switch to gh-pages branch later with `make docs`
+# expand variable (so we can use it on branches w/o package.json, e.g. gh-pages)
 VERSION := $(v)
 
-DIST = dist/download
-
-
-.PHONY: test dist
+.PHONY: test min
 
 jshint:
 	./node_modules/jshint/bin/jshint lib/*.js
-
-dev:
-	@ node make/dev.js
 
 riot: jshint
 	@ mkdir -p dist
@@ -28,62 +20,100 @@ min: riot
 	@ ./node_modules/uglify-js/bin/uglifyjs dist/riot.js --comments --mangle -o dist/riot.min.js
 	@ echo minified
 
-dist: min
-	@ mkdir -p $(DIST)
-	@ rm -rf $(DIST)/*
-	@ cp dist/riot.js "$(DIST)/riot-$(VERSION).js"
-	@ cp dist/riot.min.js "$(DIST)/riot-$(VERSION).min.js"
-	@ zip -r "$(DIST)/riot-$(VERSION).zip" demo
-	@ cp -r demo $(DIST)
-	ls $(DIST)
 
 
-## Making new releases
+#################################################
+# Making new releases:
 #
-#  1. Make sure you have the latest changes and nothing uncommited.
+#   make release v=2.0.0 
+#   make publish
 #
-#    git checkout master
-#    git pull origin master
-#    git status
+# ...which is a shorter version of:
 #
-#  2. Create & publish a release.
+#   make bump v=2.0.0 
+#   make version
+#   make pages
+#   make publish
 #
-#    make release v=2.0.0
-#    make publish
-
-# set version and generate files
-# - update version number in package.json, component.json, bower.json
-# - generate riot distribution files
-# - copy riot.js and riot.min.js to root (from gitignored /dist)
+# Bad luck? Revert with -undo, e.g.:
+#
+#   make bump-undo
+#
 
 bump:
+	# grab all latest changes to master
+	# (if there's any uncommited changes, it will stop here)
+	@ git checkout master
+	@ git pull --rebase origin master
+	# bump version in *.json files
 	@ sed -i '' 's/\("version": "\)[^"]*/\1'$(VERSION)'/' *.json
-	@ make dist
+	# generate riot.js & riot.min.js
+	@ make min
 	@ cp dist/riot*.js .
+	@ git status --short
 
-# commit docs from master to gh-pages branch
-# (whitelist extensions to keep folder clean w/o .gitignore)
+bump-undo:
+	# remove all uncommited changes
+	@ git checkout master
+	@ git reset --hard
 
-docs:
-	git checkout gh-pages
-	git checkout master demo
-	git commit -m "$(VERSION)" *.tag *.js *.css *.html
-	git checkout master
-
-# create version commit and tag
-# (also creating a release on github)
 
 version:
-	git commit -am "$(VERSION)"
-	git tag -a 'v'$(VERSION) -m $(VERSION)
+	@ git checkout master
+	# create version commit
+	@ git status --short
+	@ git commit -am "$(VERSION)"
+	@ git log --oneline -2
+	# create version tag
+	@ git tag -a 'v'$(VERSION) -m $(VERSION)
+	@ git describe
 
-release: bump docs version
+version-undo:
+	@ git checkout master
+	# remove the version tag
+	@ git tag -d 'v'$(VERSION)
+	@ git describe
+	# remove the version commit
+	@ git reset `git rev-parse :/$(VERSION)`
+	@ git reset HEAD^
+	@ git log --oneline -2
 
-# push new version to npm ant github
-# (no need to "push" to bower and component, they'll grab it from github)
+
+pages:
+	# get the latest gh-pages branch
+	@ git fetch origin
+	@ git checkout gh-pages
+	@ git reset --hard origin/gh-pages
+	# commit the demo files from master to gh-pages
+	@ git checkout master .gitignore demo
+	@ git status --short
+	@ git commit -am "$(VERSION)"
+	@ git log --oneline -2
+	# return back to master branch
+	@ git checkout master
+
+pages-undo:
+	# reset all local changes
+	@ git checkout gh-pages
+	@ git reset --hard origin/gh-pages
+	@ git status --short
+	@ git log --oneline -2
+	@ git checkout master
+
+
+release: bump version pages
+
+release-undo:
+	make pages-undo
+	make version-undo
+	make bump-undo
+
 
 publish:
-	npm publish
-	git push origin gh-pages
-	git push origin master
-	git push origin master --tags
+	# push new version to npm ant github
+	# (github tag triggers update in bower, component, cdnjs, etc)
+	@ npm publish
+	@ git push origin gh-pages
+	@ git push origin master
+	@ git push origin master --tags
+
