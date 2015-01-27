@@ -24,16 +24,20 @@ function compileHTML(html, parser, opts) {
   html = html.trim().replace(HTML_COMMENT, '')
 
   // foo={ bar } --> foo="{ bar }"
-  html = html.replace(/=(\{([^\}]+)\})([\s\>])/g, function(_, match, expr, end) {
-    if (parser && opts.expr) expr = parser(expr, opts, true).trim()
-    return '="{ ' + expr + ' }"' + end
-  })
+  html = html.replace(/=(\{[^\}]+\})([\s\>])/g, '="$1"$2')
 
   // IE8 looses boolean attr values: `checked={ expr }` --> `__checked={ expr }`
   html = html.replace(/([\w\-]+)=["'](\{[^\}]+\})["']/g, function(full, name, expr) {
     if (BOOL_ATTR.indexOf(name.toLowerCase()) >= 0) name = '__' + name
     return name + '="' + expr + '"'
   })
+
+  // run trough parser
+  if (opts.expr) {
+    html = html.replace(/\{([^\}]+)\}/g, function(_, expr) {
+       return '{' + parser(expr, opts, true).trim() + '}'
+    })
+  }
 
   // <foo/> -> <foo></foo>
   html = html.replace(CLOSED_TAG, function(_, tagName, attr) {
@@ -127,7 +131,7 @@ module.exports = function(source, opts) {
     }
 
     // parser available?
-    var parser = type ? parsers[type] : riotjs
+    var parser = opts.parser || (type ? parsers[type] : riotjs)
     if (!parser) throw new Error('Parser not found "' + type + '"')
 
     return 'riot.tag(\'' +tagName+ '\', \'' + compileHTML(html, parser, opts) + '\', function(opts) {' +
