@@ -146,7 +146,6 @@ function compile(riot_tag, opts) {
 
 module.exports = {
   html: compileHTML,
-  script: compileJS,
   compile: compile
 }
 

@@ -1,8 +1,12 @@
 
+// node ./test/compiler/suite.js
+
+require('shelljs/global')
+
 var compiler = require('../../compiler/compiler')
 
 function assert(test, should) {
-  if (test === should) console.info('OK', test)
+  if (test === should) console.info('OK', test.replace(/\n/g, '').trim())
   else throw new Error(test + ' != ' + should)
 }
 
@@ -41,4 +45,25 @@ function testHTML() {
 
 }
 
+
+function testFiles() {
+
+  function test(name, type) {
+    var dir = 'test/compiler',
+        basename = name + (type ? '.' + type : ''),
+        src = cat(dir + '/' + basename + '.tag'),
+        should = cat(dir + '/js/' + basename + '.js')
+
+    assert(compiler.compile(src, { type: type }).trim(), should)
+  }
+
+  test('test')
+  test('complex')
+  test('test', 'cs')
+  test('test', 'es6')
+
+}
+
 testHTML()
+testFiles()
+
