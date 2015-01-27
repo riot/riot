@@ -42,7 +42,7 @@
   },
   "preferGlobal": true,
   "files": [
-    "compiler/compile.js",
+    "compiler/compiler.js",
     "compiler/index.js",
     "riot.min.js",
     "riot.js"
