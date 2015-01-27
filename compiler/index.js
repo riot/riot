@@ -21,7 +21,7 @@ function help() {
     '  -h, --help      You\'re reading it',
     '  -w, --watch     Watch for changes',
     '  -c, --compact   Minify </p> <p> to </p><p>',
-    '  -t, --type      Script type: coffeescript, typescript, es6 ...',
+    '  -t, --type      JavaScript parser: none, es6, coffeescript ...',
     '  --expr          Run expressions trough parser defined with --type',
     '',
     'Build a single .tag file:',

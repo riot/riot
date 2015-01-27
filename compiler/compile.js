@@ -62,6 +62,10 @@ function es6(js, opts) {
   return require('6to5').transform(js, opts).code
 }
 
+function plainjs(js) {
+  return js
+}
+
 function riotjs(js) {
 
   // strip comments
@@ -99,6 +103,7 @@ function riotjs(js) {
 
 var parsers = {
   coffeescript: coffee,
+  none: plainjs,
   cs: coffee,
   es6: es6
 }

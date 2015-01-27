@@ -3,7 +3,9 @@
 
   <h3>{ test }</h3>
 
-  this.test = `In JavaScript
+  var type = 'JavaScript'
+
+  this.test = `In ${type}
     this is
     totally
     not legal.`
