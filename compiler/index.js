@@ -52,7 +52,7 @@ function help() {
 var ph = require('path'),
     sh = require('shelljs'),
     chokidar = require('chokidar'),
-    compile = require('./compile')
+    compiler = require('./compiler')
 
 
 function init(opt) {
@@ -113,7 +113,7 @@ var self = module.exports = {
 
     // Process files
 
-    function parse(from) { return compile(sh.cat(from), opt.compile_opts) }
+    function parse(from) { return compiler.compile(sh.cat(from), opt.compile_opts) }
     function toFile(from, to) { from.map(parse).join('\n').to(to[0]) }
     function toDir(from, to) { from.map(function(from, i) { parse(from).to(to[i]) }) }
     ;(opt.flow[1] == 'f' ? toFile : toDir)(from, to)
@@ -164,7 +164,7 @@ function cli() {
 
   var args = require('minimist')(process.argv.slice(2), {
     boolean: ['watch', 'compact', 'help'],
-    alias: { w: 'watch', c: 'compact', h: 'help' }
+    alias: { w: 'watch', c: 'compact', h: 'help', t: 'type' }
   })
 
   // Translate args into options hash

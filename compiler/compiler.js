@@ -9,13 +9,13 @@ var BOOL_ATTR = ('allowfullscreen,async,autofocus,autoplay,checked,compact,contr
 // (tagname) (html) (javascript) endtag
 var CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\/]>$)([^\x00]*?)^<\/\1>/gim,
     SCRIPT = /<script(\s+type=['"]?([^>'"]+)['"]?)?>([^\x00]*?)<\/script>/gm,
-    HTML_COMMENT = /<!--.*-->/g,
+    HTML_COMMENT = /<!--.*?-->/g,
     CLOSED_TAG = /<([\w\-]+)([^\/]*)\/\s*>/g,
     LINE_COMMENT = /^\s*\/\/.*$/gm,
     JS_COMMENT = /\/\*[^\x00]*?\*\//gm
 
 
-function compileHTML(html, parser, opts) {
+function compileHTML(html, opts, type) {
 
   // whitespace
   html = html.replace(/\s+/g, ' ')
@@ -34,8 +34,8 @@ function compileHTML(html, parser, opts) {
 
   // run trough parser
   if (opts.expr) {
-    html = html.replace(/\{([^\}]+)\}/g, function(_, expr) {
-       return '{' + parser(expr, opts, true).trim() + '}'
+    html = html.replace(/\{\s*([^\}]+)\s*\}/g, function(_, expr) {
+       return '{' + compileJS(expr, opts, type).trim() + '}'
     })
   }
 
@@ -58,8 +58,8 @@ function compileHTML(html, parser, opts) {
 
 }
 
-function coffee(js, opts, is_expr) {
-  return require('coffee-script').compile(js, { bare: is_expr })
+function coffee(js, opts) {
+  return require('coffee-script').compile(js, { bare: true })
 }
 
 function es6(js, opts) {
@@ -105,7 +105,7 @@ function riotjs(js) {
 
 }
 
-var parsers = {
+var PARSERS = {
   coffeescript: coffee,
   none: plainjs,
   cs: coffee,
@@ -113,11 +113,17 @@ var parsers = {
 }
 
 
-module.exports = function(source, opts) {
+function compileJS(js, opts, type) {
+  var parser = opts.parser || (type ? PARSERS[type] : riotjs)
+  if (!parser) throw new Error('Parser not found "' + type + '"')
+  return parser(js, opts)
+}
+
+function compile(riot_tag, opts) {
 
   opts = opts || {}
 
-  return source.replace(CUSTOM_TAG, function(_, tagName, html, js) {
+  return riot_tag.replace(CUSTOM_TAG, function(_, tagName, html, js) {
 
     // js wrapped inside <script> tag
     var type = opts.type
@@ -130,14 +136,17 @@ module.exports = function(source, opts) {
       })
     }
 
-    // parser available?
-    var parser = opts.parser || (type ? parsers[type] : riotjs)
-    if (!parser) throw new Error('Parser not found "' + type + '"')
-
-    return 'riot.tag(\'' +tagName+ '\', \'' + compileHTML(html, parser, opts) + '\', function(opts) {' +
-      parser(js, opts) +
+    return 'riot.tag(\'' +tagName+ '\', \'' + compileHTML(html, opts, type) + '\', function(opts) {' +
+      compileJS(js, opts, type) +
     '\n});'
 
   })
 
 }
+
+module.exports = {
+  html: compileHTML,
+  script: compileJS,
+  compile: compile
+}
+
