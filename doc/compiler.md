@@ -100,7 +100,11 @@ The `--expr` argument specifies that all the expressions are also processed as w
 </kids>
 ```
 
-Note that `each` attribute is CoffeeScript as well.
+Note that `each` attribute is CoffeeScript as well. CoffeeScript must be present on your machine:
+
+``` sh
+npm install coffee-script -g
+```
 
 
 ### EcmaScript 6
@@ -125,7 +129,11 @@ An sample tag written in ES6:
 </test>
 ```
 
-All ECMAScript 6 [features](https://github.com/lukehoban/es6features) can be used. [6to5](https://6to5.org/) is used for the transformation.
+All ECMAScript 6 [features](https://github.com/lukehoban/es6features) can be used. [6to5](https://6to5.org/) is used for the transformation:
+
+``` sh
+npm install 6to5
+```
 
 
 ### Your favorite language

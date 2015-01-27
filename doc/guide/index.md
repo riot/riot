@@ -59,8 +59,7 @@ See [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https:
 
 ### Tag syntax
 
-
-In a Riot custom tag the HTML layout is defined first, JavaSript second. HTML is coupled with expressions that are 100% JavaScript.
+In a Riot custom tag the HTML layout is defined first, JavaSript second. The JavaScript starts where the last HTML tag ends. HTML is coupled with expressions that are 100% JavaScript.
 
 Characteristics:
 
@@ -87,6 +86,39 @@ Tag definition always starts on the beginning of the line:
 
   </my-tag>
 ```
+
+### Script tag
+
+Tag logic can optionally be nested inside a `script` tag:
+
+```
+<todo>
+
+  <!-- layout -->
+  <h3>{ opts.title }</h3>
+
+  &lt;script>
+    // logic comes here
+  </script>
+
+</todo>
+```
+
+This is more explicit and you can possibly take advantage of your editor's syntax highlight feature.
+
+### Pre-processor
+
+You can specify a pre-processor with `type` attribute. For example:
+
+```
+<script type="coffeescript">
+  # your logic is here
+</script>
+````
+
+Currently available options are "coffeescript", "es6" and "none". You can also prefix the language with "text/", such as "text/coffeescript".
+
+See [pre processors](/riotjs/compiler.html#pre-processors) for more details.
 
 
 ## Mounting
