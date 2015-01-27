@@ -1,24 +1,18 @@
 <!doctype html>
 
 <head>
-  <script src="../dist/riot.js"></script>
-  <script type="tmpl" id="tmpl">
-    <input type="checkbox"  __autofill="{ val }" kamis="{ val }">
-    <p>{ val } joo</p>
-  </script>
-  <style>body { text-align: center; font-size: 300% }</style>
+  <title>Test single tag</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!--[if lt IE 9]>
+    <script src="ie8/es5-shim.js"></script>
+    <script src="ie8/html5-shiv.js"></script>
+    <script>html5.addElements('event-error')</script>
+  <![endif]-->
 </head>
 
 <body>
-
-  <test></test>
-
-  <script>
-    riot.tag('test', tmpl.innerHTML, function() {
-      this.val = false
-    })
-
-    riot.mount('test')
-  </script>
-
+  <kids></kids>
+  <script src="../dist/riot.js"></script>
+  <script src="../dist/foo.js"></script>
+  <script>riot.mount('*')</script>
 </body>

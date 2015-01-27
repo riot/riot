@@ -1,6 +1,6 @@
 {
   "name": "riot",
-  "version": "2.0.2",
+  "version": "2.0.5",
   "description": "A React- like, 2.5K user interface library",
   "homepage": "https://muut.com/riotjs/",
   "repository": { "type": "git", "url": "git://github.com/muut/riotjs.git" },
@@ -31,6 +31,6 @@
     "riotjs",
     "riot.js"
   ],
-  "ignore": ["./!(riot*.js)"],
+  "ignore": ["**/*", "!/riot.min.js", "!/riot.js"],
   "main": "riot.js"
 }

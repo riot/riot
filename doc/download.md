@@ -32,9 +32,9 @@ Choose the preferred way:
 
 ####  Direct download
 
-[riot.min.js](/riotjs/dist/riot-{{ riot_version }}.min.js) – for production ( 5.7KB minified / 2.5KB gzipped )
+[riot.min.js](https://raw.githubusercontent.com/muut/riotjs/master/riot.min.js) – for production ( 5.7KB minified / 2.5KB gzipped )
 
-[riot.js](/riotjs/dist/riot-{{ riot_version }}.js) – for development
+[riot.js](https://raw.githubusercontent.com/muut/riotjs/master/riot.js) – for development
 
 
 #### CDN
@@ -81,7 +81,7 @@ Mount tags on the page:
 &lt;script>riot.mount('todo')</script>
 ```
 
-See [docs](/riotjs/guide/) for more info. Please also check [live demo](/riotjs/dist/demo/) or download [demo.zip](/riotjs/dist/riot-{{ riot_version }}.zip).
+See [compiler manual](/riotjs/compiler.html) for more info. Please also check [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/muut/riotjs/tree/gh-pages/demo), or download the [zip](https://github.com/muut/riotjs/archive/gh-pages.zip)
 
 If you make something great, please [share it](https://github.com/muut/riotjs/issues/58) !
 

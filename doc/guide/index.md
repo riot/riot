@@ -9,7 +9,6 @@ description: Developing client-side applications with Riot
 
 Riot custom tags are the building blocks for user interfaces. They make the "view" part of the application. Here is an extended TODO example showing various features of Riot:
 
-
 ```
 <todo>
 
@@ -52,13 +51,15 @@ Riot custom tags are the building blocks for user interfaces. They make the "vie
 </todo>
 ```
 
-See [live demo](/riotjs/dist/demo/) or download [demo.zip](/riotjs/dist/riot-{{ riot_version }}.zip)
+Custom tags are [compiled](compiler.html) to JavaScript.
+
+See [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/muut/riotjs/tree/gh-pages/demo), or download the [zip](https://github.com/muut/riotjs/archive/gh-pages.zip).
 
 
 
 ### Tag syntax
 
-In a Riot custom tag the HTML layout is defined first, JavaSript second. HTML is coupled with expressions that are 100% JavaScript.
+In a Riot custom tag the HTML layout is defined first, JavaSript second. The JavaScript starts where the last HTML tag ends. HTML is coupled with expressions that are 100% JavaScript.
 
 Characteristics:
 
@@ -85,6 +86,39 @@ Tag definition always starts on the beginning of the line:
 
   </my-tag>
 ```
+
+### Script tag
+
+Tag logic can optionally be nested inside a `script` tag:
+
+```
+<todo>
+
+  <!-- layout -->
+  <h3>{ opts.title }</h3>
+
+  &lt;script>
+    // logic comes here
+  </script>
+
+</todo>
+```
+
+This is more explicit and you can possibly take advantage of your editor's syntax highlight feature.
+
+### Pre-processor
+
+You can specify a pre-processor with `type` attribute. For example:
+
+```
+<script type="coffeescript">
+  # your logic is here
+</script>
+````
+
+Currently available options are "coffeescript", "es6" and "none". You can also prefix the language with "text/", such as "text/coffeescript".
+
+See [pre processors](/riotjs/compiler.html#pre-processors) for more details.
 
 
 ## Mounting
@@ -389,7 +423,7 @@ The event handler receives the standard event object as the first argument. The 
 - `e.relatedTarget` points to the element where the event handler is specified.
 - `e.target` is the originating element. This is not necessarily the same as `relatedTarget`.
 - `e.which` is the key code in a keyboard event (`keypress`, `keyup`, etc...).
-- `e.data` is the current element in a loop. See [loops](#loops) for more details.
+- `e.item` is the current element in a loop. See [loops](#loops) for more details.
 
 
 ## Conditionals
@@ -464,7 +498,7 @@ The looped items are [tag instances](/riotjs/api/#tag-instance). Riot does not t
 
 ### Event handlers with looped items
 
-Event handlers can access individual items in a collection with `event.data`. Now let's implement the `remove` function:
+Event handlers can access individual items in a collection with `event.item`. Now let's implement the `remove` function:
 
 ```
 <todo>
@@ -536,83 +570,6 @@ Plain objects can also be looped. For example:
 ```
 
 Object loops are not recommended since internally Riot detects changes on the object with `JSON.stringify`. The *whole* object is studied and when there is a change the whole loop is re-rendered. This can be slow. Normal arrays are much faster and only the changes are drawn on the page.
-
-
-
-## Compiler
-
-The `.tag` files needs to be transformed to `.js` files before the browser can execute them. Here's how you do it:
-
-``` sh
-# compile a file to current folder
-riot some.tag
-
-# compile file to target folder
-riot some.tag some_folder
-
-# compile file to target path
-riot some.tag some_folder/some.js
-
-# compile all tag files on a folder to target folder
-riot some/folder path/to/dist
-```
-
-You can install the `riot` command line tool with `npm install -g riot`.
-
-Compiled files can be normal JavaScript files with custom tags mixed together. There can be multiple custom tags in the same file.
-
-Both HTML and JS comments are stripped from the resulting file and newlines are preserved inside `textarea` and `pre` tags. Compilation is a very lightweight process for the CPU.
-
-### Watch mode
-
-You can watch directories and automatically transform files when they are changed. For example:
-
-`riot -w src dist`
-
-Run `riot --help` for more information.
-
-
-### Use as a Node module
-
-Once [installed](/riotjs/download.html) with `npm` you can do as follows:
-
-```
-var riot_compile = require('riot/compiler')
-
-var js = riot_compile(tag, { compact: true })
-```
-
-The compile function takes a string and returns a string.
-
-### Task runners
-
-- [Gulp plugin](https://github.com/e-jigsaw/gulp-riot)
-- [Grunt plugin](https://github.com/ariesjia/grunt-riot)
-
-### Creating tags manually
-
-You can create cusom tags without the compiler using `riot.tag`. For example:
-
-``` js
-riot.tag('timer', '<p>Seconds Elapsed: { time }</p>', function (opts) {
-  this.time = opts.start || 0
-
-  this.tick = (function () {
-    this.update({
-        time: ++this.time
-    })
-  }).bind(this)
-
-  var timer = setInterval(this.tick, 1000)
-
-  this.on('unmount', function () {
-    clearInterval(timer)
-  })
-
-})
-```
-
-See [timer demo](http://jsfiddle.net/gnumanth/h9kuozp5/) and [riot.tag](/riotjs/api/#tag) API docs for more details.
 
 
 # Application architecture

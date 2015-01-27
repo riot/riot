@@ -6,6 +6,14 @@ body_id: riot-releases
 
 ====
 
+### 2.0.3 *Jan 27, 2015*
+
+- An ability to plug in a JavaScript pre-processor
+- Build-in CoffeeScript support
+- Build-in EcmaScript 6 support
+
+
+
 ### 2.0.2 *Jan 26, 2015*
 
 - CommonJS and AMD support
