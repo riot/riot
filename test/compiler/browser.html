@@ -1,0 +1,48 @@
+
+<!doctype html>
+
+<head>
+  <title>Riot browser compilation</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!--[if lt IE 9]>
+    <script src="../ie8/es5-shim.js"></script>
+    <script src="../ie8/html5-shiv.js"></script>
+  <![endif]-->
+
+  <script type="riot/tag">
+    <timer>
+
+      <p>Seconds Elapsed: { time }</p>
+
+      this.time = opts.start || 0
+
+      tick() {
+        this.update({ time: ++this.time })
+      }
+
+      var timer = setInterval(this.tick, 1000)
+
+      this.on('unmount', function() {
+        console.info('timer cleared')
+        clearInterval(timer)
+      })
+    </timer>
+  </script>
+
+  <script src="../tag/timetable.tag" type="riot/tag"></script>
+
+</head>
+
+<body>
+  <timetable></timetable>
+  <script src="../../dist/riot.js"></script>
+  <script src="../../dist/riot.js"></script>
+  <script src="../../compiler/compiler.js"></script>
+
+  <script>
+    riot.compile(function() {
+      riot.mount('*')
+    })
+  </script>
+</body>
