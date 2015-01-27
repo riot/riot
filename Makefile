@@ -40,6 +40,9 @@ min: riot
 #   make bump-undo
 #
 
+MINOR_VERSION = `echo $(VERSION) | sed 's/\.[^.]*$$//'`
+
+
 bump:
 	# grab all latest changes to master
 	# (if there's any uncommited changes, it will stop here)
@@ -47,6 +50,8 @@ bump:
 	@ git pull --rebase origin master
 	# bump version in *.json files
 	@ sed -i '' 's/\("version": "\)[^"]*/\1'$(VERSION)'/' *.json
+	# bump to minor version in demo
+	@ sed -i '' 's/[^/]*\(\/riot\.min\)/'$(MINOR_VERSION)'\1/' demo/index.html
 	# generate riot.js & riot.min.js
 	@ make min
 	@ cp dist/riot*.js .
@@ -110,8 +115,8 @@ release-undo:
 
 
 publish:
-	# push new version to npm ant github
-	# (github tag triggers update in bower, component, cdnjs, etc)
+	# push new version to npm and github
+	# (github tag will also trigger an update in bower, component, cdnjs, etc)
 	@ npm publish
 	@ git push origin gh-pages
 	@ git push origin master
