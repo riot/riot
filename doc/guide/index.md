@@ -9,7 +9,6 @@ description: Developing client-side applications with Riot
 
 Riot custom tags are the building blocks for user interfaces. They make the "view" part of the application. Here is an extended TODO example showing various features of Riot:
 
-
 ```
 <todo>
 
@@ -52,11 +51,14 @@ Riot custom tags are the building blocks for user interfaces. They make the "vie
 </todo>
 ```
 
+Custom tags are [compiled](compiler.html) to JavaScript.
+
 See [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/muut/riotjs/tree/gh-pages/demo), or download the [zip](https://github.com/muut/riotjs/archive/gh-pages.zip).
 
 
 
 ### Tag syntax
+
 
 In a Riot custom tag the HTML layout is defined first, JavaSript second. HTML is coupled with expressions that are 100% JavaScript.
 
@@ -536,84 +538,6 @@ Plain objects can also be looped. For example:
 ```
 
 Object loops are not recommended since internally Riot detects changes on the object with `JSON.stringify`. The *whole* object is studied and when there is a change the whole loop is re-rendered. This can be slow. Normal arrays are much faster and only the changes are drawn on the page.
-
-
-
-## Compiler
-
-The `.tag` files needs to be transformed to `.js` files before the browser can execute them. Here's how you do it:
-
-``` sh
-# compile a file to current folder
-riot some.tag
-
-# compile file to target folder
-riot some.tag some_folder
-
-# compile file to target path
-riot some.tag some_folder/some.js
-
-# compile all tag files on a folder to target folder
-riot some/folder path/to/dist
-```
-
-You can install the `riot` command line tool with `npm install -g riot`.
-
-Compiled files can be normal JavaScript files with custom tags mixed together. There can be multiple custom tags in the same file.
-
-Both HTML and JS comments are stripped from the resulting file and newlines are preserved inside `textarea` and `pre` tags. Compilation is a very lightweight process for the CPU.
-
-### Watch mode
-
-You can watch directories and automatically transform files when they are changed. For example:
-
-`riot -w src dist`
-
-Run `riot --help` for more information.
-
-
-### Use as a Node module
-
-Once [installed](/riotjs/download.html) with `npm` you can do as follows:
-
-```
-var riot_compile = require('riot/compiler')
-
-var js = riot_compile(tag, { compact: true })
-```
-
-The compile function takes a string and returns a string.
-
-### Plug into your workflow
-
-- [Gulp](https://github.com/e-jigsaw/gulp-riot)
-- [Grunt](https://github.com/ariesjia/grunt-riot)
-- [Browserify](https://github.com/jhthorsen/riotify)
-
-### Creating tags manually
-
-You can create cusom tags without the compiler using `riot.tag`. For example:
-
-``` js
-riot.tag('timer', '<p>Seconds Elapsed: { time }</p>', function (opts) {
-  this.time = opts.start || 0
-
-  this.tick = (function () {
-    this.update({
-        time: ++this.time
-    })
-  }).bind(this)
-
-  var timer = setInterval(this.tick, 1000)
-
-  this.on('unmount', function () {
-    clearInterval(timer)
-  })
-
-})
-```
-
-See [timer demo](http://jsfiddle.net/gnumanth/h9kuozp5/) and [riot.tag](/riotjs/api/#tag) API docs for more details.
 
 
 # Application architecture

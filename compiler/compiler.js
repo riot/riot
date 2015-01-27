@@ -58,12 +58,12 @@ function compileHTML(html, opts, type) {
 
 }
 
-function coffee(js, opts) {
+function coffee(js) {
   return require('coffee-script').compile(js, { bare: true })
 }
 
-function es6(js, opts) {
-  return require('6to5').transform(js, opts).code
+function es6(js) {
+  return require('6to5').transform(js).code
 }
 
 function plainjs(js) {

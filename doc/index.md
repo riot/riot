@@ -64,7 +64,7 @@ Custom tags lets you build complex views with HTML. Your application might look 
 
 HTML syntax is the de facto language on the web and it's designed for building user interfaces. The syntax is explicit, nesting is inherent to the language and attributes offer a clean way to provide options for custom tags.
 
-<span class="tag">note</span> the tags are [converted](guide/#compiler) to JavaScript before browsers can execute them.
+<span class="tag">note</span> the tags are [converted](compiler.html) to JavaScript before browsers can execute them.
 
 ### Virtual DOM
 - Smallest possible amount of DOM updates and reflows.
@@ -84,7 +84,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - NPM, CommonJS, AMD, Bower and Component support
 - [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot), [Browserify](https://github.com/jhthorsen/riotify) plugins
 - Hosted on [cdnjs](https://cdnjs.com/libraries/riot) and [jsdelivr](http://www.jsdelivr.com/#!riot)
-
+- Use CoffeeScript, ES6 or any pre-processor you want
 
 
 
