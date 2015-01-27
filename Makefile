@@ -92,7 +92,7 @@ pages:
 	# commit the demo files from master to gh-pages
 	@ git checkout master .gitignore demo
 	@ git status --short
-	@ git commit -am "$(VERSION)"
+	-@ git commit -am "$(VERSION)"
 	@ git log --oneline -2
 	# return back to master branch
 	@ git checkout master
