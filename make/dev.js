@@ -15,4 +15,4 @@ chokidar
 
 
 // watch and build tags.js for testing
-riot.watch({ from: 'test', to: 'dist/tags.js' })
+riot.watch({ from: 'test/tag', to: 'dist/tags.js' })

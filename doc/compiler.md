@@ -58,7 +58,7 @@ riot -w src dist
 
 
 ```
-var compiler = require('riot/compiler')
+var compiler = require('riot/compiler/compiler') // this path will be shortened!
 
 var js = compiler.compile(source_string)
 ```

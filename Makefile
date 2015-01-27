@@ -10,13 +10,13 @@ VERSION := $(v)
 jshint:
 	./node_modules/jshint/bin/jshint lib/*.js
 
-riot: jshint
+riot:
 	@ mkdir -p dist
 	@ cat make/prefix.js | sed "s/VERSION/$(VERSION)/" > dist/riot.js
 	@ cat lib/* >> dist/riot.js
 	@ cat make/suffix.js >> dist/riot.js
 
-min: riot
+min: jshint riot
 	@ ./node_modules/uglify-js/bin/uglifyjs dist/riot.js --comments --mangle -o dist/riot.min.js
 	@ echo minified
 
@@ -25,12 +25,12 @@ min: riot
 #################################################
 # Making new releases:
 #
-#   make release v=2.0.0 
+#   make release v=2.0.0
 #   make publish
 #
 # ...which is a shorter version of:
 #
-#   make bump v=2.0.0 
+#   make bump v=2.0.0
 #   make version
 #   make pages
 #   make publish
