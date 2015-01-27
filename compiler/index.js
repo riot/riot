@@ -21,6 +21,8 @@ function help() {
     '  -h, --help      You\'re reading it',
     '  -w, --watch     Watch for changes',
     '  -c, --compact   Minify </p> <p> to </p><p>',
+    '  -t, --type      Script type: coffeescript, typescript, es6 ...',
+    '  --expr          Run expressions trough parser defined with --type',
     '',
     'Build a single .tag file:',
     '',
@@ -41,6 +43,7 @@ function help() {
     '  riot --watch foo bar',
     '  riot --compact foo bar',
     '  riot foo bar --compact',
+    '  riot test.tag --type coffeescript --expr',
     ''
   ].join('\n'))
 }
@@ -110,13 +113,13 @@ var self = module.exports = {
 
     // Process files
 
-    function parse(from) { return compile(sh.cat(from), {compact: opt.compact}) }
+    function parse(from) { return compile(sh.cat(from), opt.compile_opts) }
     function toFile(from, to) { from.map(parse).join('\n').to(to[0]) }
     function toDir(from, to) { from.map(function(from, i) { parse(from).to(to[i]) }) }
     ;(opt.flow[1] == 'f' ? toFile : toDir)(from, to)
 
     // Print what's been done
-    
+
     from.map(function(src, i) {
       log(toRelative(src) + ' -> ' + toRelative(to[i] || to[0]))
     })
@@ -130,7 +133,7 @@ var self = module.exports = {
     self.make(opt)
 
     var glob = opt.flow[0] == 'f' ? opt.from : ph.join(opt.from, '**/*.tag')
-    
+
     chokidar.watch(glob, { ignoreInitial: true })
       .on('ready', function() { log('Watching ' + toRelative(glob)) })
       .on('all', function(e, path) { self.make(opt) })
@@ -169,7 +172,11 @@ function cli() {
   var opts = {
     help: args.help,
     method: args.watch ? 'watch' : 'make',
-    compact: args.compact,
+    compile_opts: {
+      compact: args.compact,
+      type: args.type,
+      expr: args.expr
+    },
     from: args._.shift(),
     to: args._.shift()
   }

@@ -8,14 +8,14 @@ var BOOL_ATTR = ('allowfullscreen,async,autofocus,autoplay,checked,compact,contr
 
 // (tagname) (html) (javascript) endtag
 var CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\/]>$)([^\x00]*?)^<\/\1>/gim,
-    SCRIPT = /<script([^>]+)?>([^\x00]*?)<\/script>/gm,
+    SCRIPT = /<script(\s+type=['"]?([^>'"]+)['"]?)?>([^\x00]*?)<\/script>/gm,
     HTML_COMMENT = /<!--.*-->/g,
     CLOSED_TAG = /<([\w\-]+)([^\/]*)\/\s*>/g,
     LINE_COMMENT = /^\s*\/\/.*$/gm,
     JS_COMMENT = /\/\*[^\x00]*?\*\//gm
 
 
-function compileHTML(html, opts) {
+function compileHTML(html, parser, opts) {
 
   // whitespace
   html = html.replace(/\s+/g, ' ')
@@ -24,7 +24,10 @@ function compileHTML(html, opts) {
   html = html.trim().replace(HTML_COMMENT, '')
 
   // foo={ bar } --> foo="{ bar }"
-  html = html.replace(/=(\{[^\}]+\})([\s\>])/g, '="$1"$2')
+  html = html.replace(/=(\{([^\}]+)\})([\s\>])/g, function(_, match, expr, end) {
+    if (parser && opts.expr) expr = parser(expr, opts, true).trim()
+    return '="{ ' + expr + ' }"' + end
+  })
 
   // IE8 looses boolean attr values: `checked={ expr }` --> `__checked={ expr }`
   html = html.replace(/([\w\-]+)=["'](\{[^\}]+\})["']/g, function(full, name, expr) {
@@ -51,12 +54,14 @@ function compileHTML(html, opts) {
 
 }
 
+function coffee(js, opts, is_expr) {
+  return require('coffee-script').compile(js, { bare: is_expr })
+}
 
-function compileJS(js) {
+function riotJS(js) {
 
   // strip comments
   js = js.replace(LINE_COMMENT, '').replace(JS_COMMENT, '')
-
 
   // ES6 method signatures
   var lines = js.split('\n'),
@@ -88,24 +93,35 @@ function compileJS(js) {
 
 }
 
+var parsers = {
+  coffeescript: coffee,
+  cs: coffee
+}
+
+
 module.exports = function(source, opts) {
 
   opts = opts || {}
 
   return source.replace(CUSTOM_TAG, function(_, tagName, html, js) {
-    var script_type
 
     // js wrapped inside <script> tag
+    var type = opts.type
+
     if (!js.trim()) {
-      html = html.replace(SCRIPT, function(_, type, script) {
-        script_type = type && type.replace(/['"]/g, '').split(/type=/i)[1]
+      html = html.replace(SCRIPT, function(_, fullType, _type, script) {
+        if (_type) type = _type.replace('text/', '')
         js = script
         return ''
       })
     }
 
-    return 'riot.tag(\'' +tagName+ '\', \'' + compileHTML(html, opts) + '\', function(opts) {' +
-      compileJS(js) +
+    // parser available?
+    var parser = type ? parsers[type] : riotJS
+    if (!parser) throw new Error('Parser not found "' + type + '"')
+
+    return 'riot.tag(\'' +tagName+ '\', \'' + compileHTML(html, parser, opts) + '\', function(opts) {' +
+      parser(js, opts) +
     '\n});'
 
   })

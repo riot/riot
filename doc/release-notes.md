@@ -6,6 +6,12 @@ body_id: riot-releases
 
 ====
 
+### 2.0.3 *Jan 27, 2015*
+
+-
+- Multiple compiler fixes
+
+
 ### 2.0.2 *Jan 26, 2015*
 
 - CommonJS and AMD support

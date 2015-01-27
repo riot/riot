@@ -41,7 +41,6 @@ test('{ 1 }', '{ "\\{ 1 \\}" }')
 test('{ 1 }', '\\{ 1 }')
 test('}', '{ "\\}" }')
 test('{', '{ "\\{" }')
-test('{ 2 }', '\\{ { arr[0] } \\}')
 
 
 test(undefined, '{ /* comment */ }')
@@ -68,6 +67,7 @@ test('2 ', '{ obj.val } ')
 test(2, '{ obj.val }')
 test(2, '{ obj["val"] }')
 test(2, '{ arr[0] }')
+test(2, '{ arr[0]; }')
 test(2, '{ arr.pop() }')
 
 test('hi x', '{ fn(str) }')
