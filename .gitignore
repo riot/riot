@@ -16,4 +16,3 @@ $RECYCLE.BIN/
 dist
 npm-debug.log 
 make.js
-test/compiler

@@ -58,7 +58,11 @@ function coffee(js, opts, is_expr) {
   return require('coffee-script').compile(js, { bare: is_expr })
 }
 
-function riotJS(js) {
+function es6(js, opts) {
+  return require('6to5').transform(js, opts).code
+}
+
+function riotjs(js) {
 
   // strip comments
   js = js.replace(LINE_COMMENT, '').replace(JS_COMMENT, '')
@@ -95,7 +99,8 @@ function riotJS(js) {
 
 var parsers = {
   coffeescript: coffee,
-  cs: coffee
+  cs: coffee,
+  es6: es6
 }
 
 
@@ -117,7 +122,7 @@ module.exports = function(source, opts) {
     }
 
     // parser available?
-    var parser = type ? parsers[type] : riotJS
+    var parser = type ? parsers[type] : riotjs
     if (!parser) throw new Error('Parser not found "' + type + '"')
 
     return 'riot.tag(\'' +tagName+ '\', \'' + compileHTML(html, parser, opts) + '\', function(opts) {' +
