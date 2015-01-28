@@ -6,7 +6,14 @@ body_id: riot-releases
 
 ====
 
-### 2.0.3 *Jan 27, 2015*
+### 2.0.6 *Jan 28, 2015*
+
+- Build-in Typescript support
+- Quick in-browser compilation with: `<script type="riot/tag">`
+- Markup can be written with valid XML and HTML5 void tags are not self-closed
+
+
+### 2.0.5 *Jan 27, 2015*
 
 - An ability to plug in a JavaScript pre-processor
 - Build-in CoffeeScript support

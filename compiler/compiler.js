@@ -8,6 +8,8 @@
     'pauseonexit,readonly,required,reversed,scoped,seamless,selected,sortable,spellcheck,translate,truespeed,'+
     'typemustmatch,visible').split(',')
 
+  var VOID_TAGS = 'area,base,br,col,command,embed,hr,img,input,keygen,link,meta,param,source,track,wbr'.split(',')
+
 
   // (tagname) (html) (javascript) endtag
   var CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\/]>$)([^\x00]*?)^<\/\1>/gim,
@@ -43,8 +45,12 @@
     }
 
     // <foo/> -> <foo></foo>
-    html = html.replace(CLOSED_TAG, function(_, tagName, attr) {
-      return '<' + tagName + (attr ? ' ' + attr.trim() : '') + '></' + tagName + '>'
+    html = html.replace(CLOSED_TAG, function(_, name, attr) {
+      var tag = '<' + name + (attr ? ' ' + attr.trim() : '') + '>'
+
+      // Do not self-close HTML5 void tags
+      if (VOID_TAGS.indexOf(name.toLowerCase()) == -1) tag += '</' + name + '>'
+      return tag
     })
 
     // escape single quotes
