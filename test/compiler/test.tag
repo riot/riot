@@ -3,3 +3,7 @@
   <input />
   <div />
 </kids>
+
+<kooma>
+
+</kooma>
