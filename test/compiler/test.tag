@@ -5,5 +5,5 @@
 </kids>
 
 <kooma>
-
+  var foo = 'bar'
 </kooma>

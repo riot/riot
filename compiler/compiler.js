@@ -196,8 +196,8 @@
   function GET(url, fn) {
     var req = new XMLHttpRequest()
 
-    req.onload = function() {
-      if (req.status >= 200 && req.status < 400) fn(req.responseText)
+    req.onreadystatechange = function() {
+      if (req.readyState == 4 && req.status == 200) fn(req.responseText)
     }
     req.open('GET', url, true)
     req.send('')
@@ -218,7 +218,7 @@
       function addTag(html) {
         script.parentNode.removeChild(script)
         var node = doc.createElement('script')
-        node.innerHTML = compile(html)
+        node.text = compile(html)
         doc.documentElement.appendChild(node)
         if (i + 1 == scripts.length) fn()
       }

@@ -80,11 +80,10 @@ HTML syntax is the *de facto* language of the web and it's designed for building
 - Plays well with jQuery.
 
 
-### Growing ecosystem
-- NPM, CommonJS, AMD, Bower and Component support
-- [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot), [Browserify](https://github.com/jhthorsen/riotify) plugins
-- Hosted on [cdnjs](https://cdnjs.com/libraries/riot) and [jsdelivr](http://www.jsdelivr.com/#!riot)
-- Use CoffeeScript, ES6 or any pre-processor you want
+### Use your favorite tools
+- Create tags with CoffeeScript, Typescript, ES6 or [any pre-processor](compiler.html#pre-processors) you want.
+- Integrate with NPM, CommonJS, AMD, Bower or Component
+- Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot) or [Browserify](https://github.com/jhthorsen/riotify) plugins
 
 
 
