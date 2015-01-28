@@ -70,6 +70,10 @@ function typescript(js) {
   return require('typescript-simple')(js)
 }
 
+function jade(html) {
+  return require('jade').render(html, {pretty: true})
+}
+
 function plainjs(js) {
   return js
 }
@@ -117,6 +121,9 @@ var PARSERS = {
   typescript: typescript
 }
 
+var TEMPLATE_PARSERS = {
+  jade: jade
+}
 
 function compileJS(js, opts, type) {
   var parser = opts.parser || (type ? PARSERS[type] : riotjs)
@@ -124,9 +131,19 @@ function compileJS(js, opts, type) {
   return parser(js, opts)
 }
 
+function compileTemplate(lang, html) {
+  var parser = TEMPLATE_PARSERS[lang]
+  if (!parser) throw new Error('Template parser not found "' + lang + '"')
+  return parser(html)
+}
+
 function compile(riot_tag, opts) {
 
   opts = opts || {}
+
+  if (opts.template) {
+    riot_tag = compileTemplate(opts.template, riot_tag)
+  }
 
   return riot_tag.replace(CUSTOM_TAG, function(_, tagName, html, js) {
 
