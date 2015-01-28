@@ -175,7 +175,9 @@
 
   // browsers
   var doc = document,
-      fns = riot.observable()
+      promise,
+      ready
+
 
   function GET(url, fn) {
     var req = new XMLHttpRequest()
@@ -188,28 +190,59 @@
   }
 
   function unindent(src) {
-    var ident = /[ \t]+/.exec(src)[0],
-        re = new RegExp('^' + ident, 'gm')
-    return src.replace(re, '')
+    var ident = /[ \t]+/.exec(src)
+    if (ident) src = src.replace(new RegExp('^' + ident[0], 'gm'), '')
+    return src
   }
 
-  riot.compile = function(fn) {
+  function globalEval(js) {
+    var node = doc.createElement('script')
+    node.text = compile(js)
+    doc.documentElement.appendChild(node)
+  }
+
+  function compileScripts(fn) {
     var scripts = doc.querySelectorAll('script[type="riot/tag"]')
 
     ;[].map.call(scripts, function(script, i) {
       var url = script.getAttribute('src')
 
-      function addTag(html) {
+      function compileTag(source) {
         script.parentNode.removeChild(script)
-        var node = doc.createElement('script')
-        node.text = compile(html)
-        doc.documentElement.appendChild(node)
-        if (i + 1 == scripts.length) fn()
+        globalEval(source)
+
+        if (i + 1 == scripts.length) {
+          promise.trigger('ready')
+          ready = true
+          fn && fn()
+        }
       }
 
-      return url ? GET(url, addTag) : addTag(unindent(script.innerHTML))
-
+      return url ? GET(url, compileTag) : compileTag(unindent(script.innerHTML))
     })
+
+  }
+
+  riot.compile = function(arg) {
+
+    // string -> compile a new tag
+    if (typeof arg == 'string') return globalEval(unindent(compile(arg)))
+
+    // must be a function
+    if (typeof arg != 'function') arg = undefined
+
+    // all compiled
+    if (ready) return arg && arg()
+
+    // add to queue
+    if (promise) {
+      arg && promise.on('ready', arg)
+
+    // grab riot/tag elements + load & execute them
+    } else {
+      promise = riot.observable()
+      compileScripts(arg)
+    }
 
   }
 
