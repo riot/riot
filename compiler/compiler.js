@@ -174,7 +174,8 @@
   }
 
   // browsers
-  var doc = document
+  var doc = document,
+      fns = riot.observable()
 
   function GET(url, fn) {
     var req = new XMLHttpRequest()

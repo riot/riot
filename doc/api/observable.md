@@ -7,7 +7,7 @@ nogen: true
 
 ### riot.observable(el)
 
-Adds an [Observer](http://en.wikipedia.org/wiki/Observer_pattern) support for the given object. After this the object is able to trigger and listen to events. For example:
+Adds an [Observer](http://en.wikipedia.org/wiki/Observer_pattern) support for the given object `el` or if the argument is empty a new observable instance is created and returned. After this the object is able to trigger and listen to events. For example:
 
 ``` js
 function Car() {
@@ -29,6 +29,8 @@ var car = new Car()
 car.trigger('start')
 ```
 
+@returns the given object `el` or a new observable instance
+
 
 ### el.on(events, callback) | #observable-on
 
@@ -48,6 +50,8 @@ el.on('start stop', function(type) {
 })
 ```
 
+@returns `el`
+
 ### el.one(event, callback) | #observable-one
 
 Listen to the given `event` and execute the `callback` at most once.
@@ -59,6 +63,8 @@ el.one('start', function() {
 })
 ```
 
+@returns `el`
+
 ### el.off(events) | #observable-off
 
 Removes the given space separated list of event listeners
@@ -66,6 +72,8 @@ Removes the given space separated list of event listeners
 ``` js
 el.off('start stop')
 ```
+
+@returns `el`
 
 ### el.off(event, fn)
 
@@ -82,10 +90,13 @@ el.on('start', doStart)
 el.off('start', doStart)
 ```
 
+@returns `el`
+
 ### el.off('*')
 
 Removes all listeners from all event types.
 
+@returns `el`
 
 
 ### el.trigger(event) | #observable-trigger
@@ -95,6 +106,8 @@ Execute all callback functions that listen to the given `event`
 ``` js
 el.trigger('start')
 ```
+
+@returns `el`
 
 ### el.trigger(event, arg1 ... argN)
 
@@ -110,3 +123,5 @@ el.on('start', function(engine_details, is_rainy_day) {
 el.trigger('start', { fuel: 89 }, true)
 
 ```
+
+@returns `el`
