@@ -135,6 +135,33 @@ All ECMAScript 6 [features](https://github.com/lukehoban/es6features) can be use
 npm install 6to5
 ```
 
+### TypeScript
+
+TypeScript adds type to JavaScript:
+
+``` sh
+# use TypeScript pre-processor
+riot --type typescript source.tag
+```
+
+An sample tag written in TypeScript:
+
+```
+<test>
+
+  <h3>{ test }</h3>
+
+  var test: string = 'JavaScript';
+  this.test = test;
+
+</test>
+```
+
+[typescript-simple](https://github.com/teppeis/typescript-simple) is used for the transformation:
+
+``` sh
+npm install typescript-simple
+```
 
 ### Your favorite language
 
