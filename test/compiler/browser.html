@@ -11,7 +11,7 @@
     <script>html5.addElements('timetable timer')</script>
   <![endif]-->
 
-  <script type="riot/tag">
+  <script type="riot/tag" id="timer">
     <timer>
 
       <p>Seconds Elapsed: { time }</p>
@@ -29,7 +29,6 @@
         clearInterval(timer)
       })
     </timer>
-
   </script>
 
   <script src="../tag/timetable.tag" type="riot/tag"></script>
@@ -45,13 +44,23 @@
   <script src="../../compiler/compiler.js"></script>
 
   <script>
+
+    // grab source code for performance tests
+    var timer_src = timer.innerHTML
+
     riot.compile(function() {
       riot.mount('*')
     })
 
-    riot.compile(function() {
-      console.info('all compiled')
-    })
+    // compile timer 1000 times and see how long it takes
+    var begin = +new Date
+
+    for (var i = 0; i < 1000; i++) {
+      riot.compile(timer_src, true)
+    }
+
+    console.info(+new Date - begin)
+
   </script>
 
 </body>
