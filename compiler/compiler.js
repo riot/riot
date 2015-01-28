@@ -66,6 +66,10 @@ function es6(js) {
   return require('6to5').transform(js).code
 }
 
+function typescript(js) {
+  return require('typescript-simple')(js)
+}
+
 function plainjs(js) {
   return js
 }
@@ -109,7 +113,8 @@ var PARSERS = {
   coffeescript: coffee,
   none: plainjs,
   cs: coffee,
-  es6: es6
+  es6: es6,
+  typescript: typescript
 }
 
 
@@ -148,4 +153,3 @@ module.exports = {
   html: compileHTML,
   compile: compile
 }
-
