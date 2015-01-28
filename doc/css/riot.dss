@@ -16,13 +16,16 @@ hero_bg = #e6
   border-radius 3px
   text-indent .02em
 
+
 #header-wrapper
   height 2.5em
   margin-bottom u4
 
+
 #riot-home
   #riot-logo, #muut-logo
     display none
+
 
 #riot-header
   padding u 0
@@ -154,6 +157,15 @@ hero_bg = #e6
 
   :first-child
     margin-top 0
+
+  h2[id], h3[id]
+    cursor pointer
+
+    &:hover
+      color #6
+      &:after
+        content " #"
+        font blue
 
 .tweets
   margin-top u4
