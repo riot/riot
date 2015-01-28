@@ -11,6 +11,7 @@ body_id: riot-releases
 - Build-in Typescript support
 - Quick in-browser compilation with: `<script type="riot/tag">`
 - Markup can be written with valid XML and HTML5 void tags are not self-closed
+- Allow definition of empty placeholder tags. Good on development phase.
 
 
 ### 2.0.5 *Jan 27, 2015*

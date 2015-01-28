@@ -8,6 +8,7 @@
   <!--[if lt IE 9]>
     <script src="../ie8/es5-shim.js"></script>
     <script src="../ie8/html5-shiv.js"></script>
+    <script>html5.addElements('timetable timer')</script>
   <![endif]-->
 
   <script type="riot/tag">
@@ -28,6 +29,7 @@
         clearInterval(timer)
       })
     </timer>
+
   </script>
 
   <script src="../tag/timetable.tag" type="riot/tag"></script>
@@ -35,8 +37,9 @@
 </head>
 
 <body>
+
   <timetable></timetable>
-  <script src="../../dist/riot.js"></script>
+
   <script src="../../dist/riot.js"></script>
   <script src="../../compiler/compiler.js"></script>
 

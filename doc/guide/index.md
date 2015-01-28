@@ -64,10 +64,9 @@ In a Riot custom tag the HTML layout is defined first, JavaSript second. The Jav
 
 Characteristics:
 
-* Tags can be HTML only. JavaScript logic and `{ expressions }` are optional.
-* Expressions are placed inside tags or as attribute values.
-* Quotes around attribute expressions are optional. You can write `<foo bar={ baz }>` instead of `<foo bar="{ baz }">`.
-* Methods can be defined with compact ES6 syntax. `methodName()` becomes `this.methodName = function()` and `this` variable always points to the current tag instance.
+* Tags can be empty, HTML only or JavaScript only and `{ expressions }` are optional.
+* Quotes are optional: `<foo bar={ baz }>` becomes `<foo bar="{ baz }">`.
+* ES6 method syntax is supported: `methodName()` becomes `this.methodName = function()` and `this` variable always points to the current tag instance.
 * A shorthand syntax for class names is available: `class={ completed: done }`.
 * Boolean attributes (checked, selected etc..) are ignored when the expression value is falsy: `<input checked={ undefined }>` becomes `<input>`.
 * Self-closing tags are supported: `<div/>` equals `<div></div>`. Well known "open tags" such as `<br>`, `<hr>`, `<img>` or `<input>` need not to be closed.
@@ -90,7 +89,7 @@ Tag definition always starts on the beginning of the line:
 
 ### Script tag
 
-Tag logic can optionally be nested inside a `script` tag:
+You can explicitly nest the logic inside a `script` tag:
 
 ```
 <todo>
@@ -105,7 +104,8 @@ Tag logic can optionally be nested inside a `script` tag:
 </todo>
 ```
 
-This is more explicit and you can possibly take advantage of your editor's syntax highlight feature.
+This allows you to take advantage of your editor's possible syntax highlight feature and you can more clearly see where the logic starts and layout ends.
+
 
 ### Pre-processor
 
@@ -117,7 +117,7 @@ You can specify a pre-processor with `type` attribute. For example:
 </script>
 ````
 
-Currently available options are "coffeescript", "es6" and "none". You can also prefix the language with "text/", such as "text/coffeescript".
+Currently available options are "coffeescript", "typescript", "es6" and "none". You can also prefix the language with "text/", such as "text/coffeescript".
 
 See [pre processors](/riotjs/compiler.html#pre-processors) for more details.
 
