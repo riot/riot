@@ -213,9 +213,12 @@
   }
 
   function globalEval(js) {
-    var node = doc.createElement('script')
+    var node = doc.createElement('script'),
+        root = doc.documentElement
+
     node.text = compile(js)
-    doc.documentElement.appendChild(node)
+    root.appendChild(node)
+    root.removeChild(node)
   }
 
   function compileScripts(fn) {
@@ -240,10 +243,14 @@
 
   }
 
-  riot.compile = function(arg) {
+  riot.compile = function(arg, skip_eval) {
 
     // string -> compile a new tag
-    if (typeof arg == 'string') return globalEval(unindent(compile(arg)))
+    if (typeof arg == 'string') {
+      var js = unindent(compile(arg))
+      if (!skip_eval) globalEval(js)
+      return js
+    }
 
     // must be a function
     if (typeof arg != 'function') arg = undefined

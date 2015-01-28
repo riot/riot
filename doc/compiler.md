@@ -5,9 +5,73 @@ description: From &lt;custom-tag> to JavaScript
 
 ====
 
-## Installation
+## In-browser compilation
 
-Custom tags need to be transformed to JavaScript before the browser can execute them. You need a `riot` executable for the job. Install it with NPM as follows:
+Custom tags need to be transformed to JavaScript before the browser can execute them. You can do this by setting a `type="riot/tag"` attribute for your script tags. The compilation happens as follows:
+
+
+``` html
+<!-- mount point -->
+<my-tag></my-tag>
+
+<!-- inlined tag definition -->
+&lt;script type="riot/tag">
+  <my-tag>
+    <h3>Tag layout</h3>
+    <inner-tag />
+  </my-tag>
+</script>
+
+<!-- <inner-tag/> is specified on external file -->
+<script src="path/to/javascript/with-tags.js" type="riot/tag"></script>
+
+<!-- include riot.js and the compiler -->
+<script src="//cdn.jsdelivr.net/riot/{{ riot_version }}/riot.min.js"></script>
+<script src="//cdn.jsdelivr.net/riot/{{ riot_version }}/riot.compiler.min.js"></script>
+
+<!-- compile and run -->
+&lt;script>
+riot.compile(function() {
+  riot.mount('*')
+})
+</script>
+```
+
+The script tag and the external file can contain multiple tags combined with regular javascript.
+
+The compilation is very cheap and takes no time at all. Compiling a [timer tag](https://github.com/muut/riotjs/blob/master/test/tag/timer.tag) 30 times takes 2 milliseconds on a regular laptop. If you have a crazy page with 1000 different timer-sized tags, the compilation takes 35ms.
+
+The compiler weights only 3.2KB (1.7K gzipped) so you can safely perform client side compilation on production without download or performance or issues.
+
+Just like Riot itself the compiler works on IE8 as well.
+
+
+### riot.compile( ) method
+
+Riot compile method works as follows:
+
+``` javascript
+riot.compile(function() {
+  // done
+})
+```
+
+It takes inlined tags and loads external tags and compiles them so they can be run on the browser. You can have multiple `riot.compile` methods on the page and they are all executed when all the tags are compiled.
+
+You can call the method even after the execution in which case the function is executed immediately.
+
+You can also compile tags directly as follows:
+
+``` js
+var javascript = riot.compile(tag_source)
+```
+
+`tag_source` can be a single tag or multiple tags with regular javascript combined. After the call the compiled tags are usable on the browser.
+
+
+## Pre-compilation
+
+Tags can be pre-compiled on the server side with `riot` executable. Install it with NPM as follows:
 
 ``` sh
 npm install riot -g
@@ -18,22 +82,22 @@ Type `riot --help` and make sure it works. [node.js](http://nodejs.org/) is requ
 
 ### Using
 
-Here is how you compile...
+Here is how it works:
 
 ``` sh
-# a file to current folder
+# compile a file to current folder
 riot some.tag
 
-# file to target folder
+# compile file to target folder
 riot some.tag some_folder
 
-# file to target path
+# compile file to target path
 riot some.tag some_folder/some.js
 
-# all files from source folder to target folder
+# compile all files from source folder to target folder
 riot some/folder path/to/dist
 
-# all files from source folder to a single concatenated file
+# compile all files from source folder to a single concatenated file
 riot some/folder all-my-tags.js
 
 ```
@@ -58,7 +122,8 @@ riot -w src dist
 
 
 ```
-var compiler = require('riot/compiler/compiler') // this path will be shortened!
+var compiler = require('riot/compiler/compiler')
+// NOTE: the above path will be shortened to "riot/compiler"
 
 var js = compiler.compile(source_string)
 ```
@@ -73,6 +138,9 @@ The compile function takes a string and returns a string.
 
 
 ## Pre-processors
+
+This is the main fruit of pre- compilation. You can use your favourite pre- processor to create custom tags.
+
 
 ### CoffeeScript
 
@@ -163,7 +231,7 @@ An sample tag written in TypeScript:
 npm install typescript-simple
 ```
 
-### Your favorite language
+### Any language
 
 You can configure your favourite language by making a custom parser function. For example:
 
@@ -176,7 +244,7 @@ function myParser(js, options) {
 This parser is then passed for the compiler with `parser` option:
 
 ``` js
-var compiler = require('riot/compiler')
+var compiler = require('riot/compiler/compiler')
 
 var js = compiler.compile(source_string, { parser: myParser, expr: true })
 ```
