@@ -17,8 +17,6 @@ riot:
 	@ cat riot.js compiler.js > riot+compiler.js
 	@ cat make/suffix.js | tee -a riot.js riot+compiler.js > /dev/null
 
-# TODO: refactor this into single line
-
 min: jshint riot
 	@ for f in riot compiler riot+compiler; do ./node_modules/uglify-js/bin/uglifyjs $$f.js --comments --mangle -o $$f.min.js; done
 
