@@ -121,3 +121,27 @@ publish:
 	@ git push origin master
 	@ git push origin master --tags
 
+
+
+#################################################
+# Testing the packages locally
+# (do this before publishing)
+# 
+# Create a dir in sibling directory next to riot
+# 
+# 	mkdir test && cd $_
+# 
+# Bower
+# 
+#   rm -rf bower_components && bower cache clean && bower install ../riotjs#master --offline
+#   ls -al bower_components/riot
+# 
+# NPM
+# 
+#   rm -rf node_modules && npm install ../riotjs
+#   ls -al node_modules/riot
+#   node -e "console.log(require('riot').compile('<tag>\n<p>{2+2}</p>\n</tag>'))"
+#   echo "require('riot')" > test.js
+#   browserify test.js | subl
+#
+
