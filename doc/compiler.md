@@ -204,7 +204,7 @@ npm install 6to5
 
 ### TypeScript
 
-TypeScript adds type to JavaScript:
+TypeScript adds type to JavaScript. Use `--type typescript` to enable it:
 
 ``` sh
 # use TypeScript pre-processor
@@ -229,6 +229,33 @@ An sample tag written in TypeScript:
 ``` sh
 npm install typescript-simple
 ```
+
+### Jade
+
+HTML layout can be processed with `template` configuration option. Here's an example with Jade – a "clean, whitespace sensitive syntax for writing html"
+
+
+``` sh
+# use Jade HTML pre-processor
+riot --template jade source.tag
+```
+
+A Jade sample:
+
+```
+sample
+  p test { value }
+  script(type='text/coffeescript').
+    @value = 'sample'
+```
+
+As you notice, you can define the script type on the template as well. Above we use coffeescript. [jade](https://github.com/jadejs/jade) is used for the transformation:
+
+``` sh
+npm install jade
+```
+
+
 
 ### Any language
 
