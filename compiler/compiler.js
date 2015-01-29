@@ -10,6 +10,17 @@
 
   var VOID_TAGS = 'area,base,br,col,command,embed,hr,img,input,keygen,link,meta,param,source,track,wbr'.split(',')
 
+  var HTML_PARSERS = {
+    jade: jade
+  }
+
+  var JS_PARSERS = {
+    coffeescript: coffee,
+    none: plainjs,
+    cs: coffee,
+    es6: es6,
+    typescript: typescript
+  }
 
   // (tagname) (html) (javascript) endtag
   var CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\/]>$)?([^\x00]*?)^<\/\1>/gim,
@@ -126,17 +137,6 @@
 
   }
 
-  var HTML_PARSERS = {
-    jade: jade
-
-  }, JS_PARSERS = {
-    coffeescript: coffee,
-    none: plainjs,
-    cs: coffee,
-    es6: es6,
-    typescript: typescript
-  }
-
 
   function compileJS(js, opts, type) {
     var parser = opts.parser || (type ? JS_PARSERS[type] : riotjs)
@@ -154,9 +154,7 @@
 
     opts = opts || {}
 
-    if (opts.template) {
-      riot_tag = compileTemplate(opts.template, riot_tag)
-    }
+    if (opts.template) riot_tag = compileTemplate(opts.template, riot_tag)
 
     return riot_tag.replace(CUSTOM_TAG, function(_, tagName, html, js) {
 
@@ -243,7 +241,7 @@
 
   }
 
-  riot.compile = function(arg, skip_eval) {
+  function browserCompile(arg, skip_eval) {
 
     // string -> compile a new tag
     if (typeof arg == 'string') {
@@ -275,11 +273,15 @@
       mountTo = riot.mountTo
 
   riot.mount = function(a, b) {
-    riot.compile(function() { mount(a, b) })
+    browserCompile(function() { mount(a, b) })
   }
 
   riot.mountTo = function(a, b, c) {
-    riot.compile(function() { mountTo(a, b, c) })
+    browserCompile(function() { mountTo(a, b, c) })
+  }
+
+  riot._compile = function(str) {
+    return browserCompile(str, true)
   }
 
 })(!this.top)

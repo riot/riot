@@ -53,7 +53,7 @@
     var begin = +new Date
 
     for (var i = 0; i < 1000; i++) {
-      riot.compile(timer_src, true)
+      riot._compile(timer_src)
     }
 
     console.info(+new Date - begin)
