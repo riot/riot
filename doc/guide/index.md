@@ -316,6 +316,34 @@ You can output an expression without evaluation by escaping the opening bracket:
 Expressions inside `<style>` tags are ignored.
 
 
+### Render unescaped HTML
+
+Riot expressions can only render text values without HTML formatting. However you can make a custom tag to do the job. For example:
+
+```
+<raw>
+  <span></span>
+
+  this.root.innerHTML = opts.content
+</raw>
+```
+
+After the tag is defined you can use it inside other tags. For example
+
+```
+<my-tag>
+  <p>Here is some raw content: <raw content="{ html }"/> </p>
+
+  this.html = 'Hello, <strong>world!</raw>'
+</raw>
+```
+
+[demo on jsfiddle](http://jsfiddle.net/23g73yvx/)
+
+<span class="tag red">warning</span> this could expose the user to XSS attacks so make sure you never load data from an untrusted source.
+
+
+
 ## Nested tags
 
 Let's define a parent tag `<account>` and with a nested tag `<subscription>`:
@@ -567,18 +595,6 @@ Plain objects can also be looped. For example:
     key2: 1110.8900,
     key3: Math.random()
   }
-</my-tag>
-```
-
-### Render unescaped HTML
-
-Easily manipulate the DOM. Never load data from an untrusted source, this could expose the user to XSS attacks.
-
-```
-<my-tag>  
-  <div id='content'></div>
-
-  this.content.innerHTML = '<b>My raw html</b>'
 </my-tag>
 ```
 
