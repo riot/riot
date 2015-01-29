@@ -29,6 +29,9 @@
     "riotjs",
     "riot.js"
   ],
-  "scripts": ["riot.js"],
+  "scripts": [
+    "riot.js",
+    "riot+compiler.js"
+  ],
   "main": "riot.js"
 }
