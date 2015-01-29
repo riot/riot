@@ -9,9 +9,9 @@ body_id: riot-releases
 ### 2.0.7 *Jan 29, 2015*
 
 - Super fast [in-browser compilation](compile.html) for: `<script type="riot/tag">`
-- Build-in [Typescript support](compiler.html#typescript)
+- Built-in [Typescript support](compiler.html#typescript)
 - Ability to plug in a HTML pre-processor (along with JS processor)
-- Build-in [Jade support](compiler.html#jade)
+- Built-in [Jade support](compiler.html#jade)
 - Ability to define [custom parsers](api/#route-parser) for router.
 - Markup can be written with valid XML and HTML5 void tags are not self-closed
 - Allow definition of empty placeholder tags. Good on development phase.
@@ -28,8 +28,8 @@ var js_string = riot.compile(tag_source_string)
 ### 2.0.5 *Jan 27, 2015*
 
 - An ability to plug in a JavaScript pre-processor
-- Build-in CoffeeScript support
-- Build-in EcmaScript 6 support
+- Build-it CoffeeScript support
+- Build-it EcmaScript 6 support
 
 
 ### 2.0.2 *Jan 26, 2015*
