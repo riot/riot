@@ -171,11 +171,3 @@ This is the biggest change from Riot 1.0 to 2.0. JavaScript and HTML are now par
 #### Muut blog: [From React to Riot 2.0](/blog/technology/riot-2.0/) | .tall
 
 
-==== .section.tweets
-
-
-This is how a javascript frameworks should work - Everything else is bloat and abstraction from necessity. [@devayes](https://twitter.com/devayes/status/396311780407783426)
-
-Falled in love with #riotjs. Small, fast and the code, oh, so clean. This is how every framework should be! [@nongeekboy](https://twitter.com/nongeekboy/status/436086922419515392)
-
-This is one of the best piece of code I have seen in #js world. [@notarianni](https://twitter.com/notarianni/status/421388764334669825)

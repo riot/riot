@@ -92,6 +92,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 
 ### Resources
+- [Module loader for WebPack](https://www.npmjs.com/package/riotjs-loader)
 - [Riot module for AngularJS](https://github.com/lucasbrigida/angular-riot)
 - [Riot + Meteor]( https://atmospherejs.com/xaiki/riotjs)
 - [Riot on CodeClimate](https://codeclimate.com/github/muut/riotjs/code)

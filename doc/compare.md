@@ -115,7 +115,7 @@ We think Riot syntax is the cleanest way to separate layout and logic while enjo
 
 When a component is initialized React parses a string and Riot traverses a DOM tree.
 
-Riot takes the expressions from the tree and stores them to an array. Each expression has a pointer to a DOM node. On each run these expressions are evaluated and compared to the values on the DOM. When a value has changed the corresponding DOM node is updated. In a way Riot also has a virtual DOM, just much a simpler one.
+Riot takes the expressions from the tree and stores them to an array. Each expression has a pointer to a DOM node. On each run these expressions are evaluated and compared to the values on the DOM. When a value has changed the corresponding DOM node is updated. In a way Riot also has a virtual DOM, just a much simpler one.
 
 Since these expressions can be cached an update cycle is fast. Going through 100 or 1000 expressions usually takes 1ms or less.
 
