@@ -22,6 +22,7 @@ function help() {
     '  -w, --watch     Watch for changes',
     '  -c, --compact   Minify </p> <p> to </p><p>',
     '  -t, --type      JavaScript parser: none, es6, coffeescript ...',
+    '  --template      HTML pre-processor: jade...',
     '  --expr          Run expressions trough parser defined with --type',
     '',
     'Build a single .tag file:',
@@ -175,7 +176,8 @@ function cli() {
     compile_opts: {
       compact: args.compact,
       type: args.type,
-      expr: args.expr
+      expr: args.expr,
+      template: args.template
     },
     from: args._.shift(),
     to: args._.shift()
@@ -195,4 +197,3 @@ function cli() {
 
 
 if (!module.parent) cli()
-
