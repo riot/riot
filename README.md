@@ -3,7 +3,7 @@
 
 [![Riot logo](doc/logo/riot480x.png)](https://muut.com/riotjs/)
 
-### Custom tags • Virtual DOM • Full stack • IE8
+### Custom tags • Minimal syntax • Less DOM reflows • Full stack • IE8
 
 Riot brings custom tags to all browsers starting from IE8. Think React + Polymer, but squeezed into 5.7KB (2.5KB when gzipped).
 
@@ -51,11 +51,11 @@ Custom tags lets you build complex views with HTML.
 HTML syntax is the de facto language on the web and it's designed for building user interfaces. The syntax is explicit, nesting is inherent to the language and attributes offer a clean way to provide options for custom tags.
 
 
-### Virtual DOM
-- Smallest possible amount of DOM updates and reflows.
-- All expressions are pre-compiled cached for high performance.
+### Intelligent DOM manipulation
+- Absolutely the smallest possible amount of DOM updates and reflows.
+- Expressions are pre-compiled and cached for high performance.
 - No extra HTML root elements or `data-` attributes.
-- No event loops or batching.
+- Lifecycle events for more special needs.
 
 
 ### Close to standards
@@ -66,10 +66,16 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 
 ### Use your dearest language and tools
-- Create tags with CoffeeScript, Typescript, ES6 or [any pre-processor](compiler.html#pre-processors) you want.
+- Create tags with CoffeeScript, Jade, Typescript, ES6 or [any pre-processor](https://muut.com/riotjs/compiler.html#pre-processors) you want.
 - Integrate with NPM, CommonJS, AMD, Bower or Component
 - Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot) or [Browserify](https://github.com/jhthorsen/riotify) plugins
 
+
+### Minimal syntax
+- Power shortcuts: `class={ enabled: is_enabled, hidden: hasErrors() }`.
+- No extra brain load such as `render`, `state`, `constructor` or `shouldComponentUpdate`
+- Interpolation: `Add #{ items.length + 1 }` or `class="item { selected: flag }"`
+- Compact ES6 method syntax.
 
 
 ### DEMOS

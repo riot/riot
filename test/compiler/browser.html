@@ -39,6 +39,7 @@
 <body>
 
   <timetable></timetable>
+  <div id="foo"></div>
 
   <script src="../../dist/riot.js"></script>
   <script src="../../compiler/compiler.js"></script>
@@ -48,10 +49,6 @@
     // grab source code for performance tests
     var timer_src = timer.innerHTML
 
-    riot.compile(function() {
-      riot.mount('*')
-    })
-
     // compile timer 1000 times and see how long it takes
     var begin = +new Date
 
@@ -60,6 +57,12 @@
     }
 
     console.info(+new Date - begin)
+
+    riot.mount('*')
+
+    setTimeout(function() {
+      riot.mountTo(foo, 'timetable')
+    }, 1000)
 
   </script>
 

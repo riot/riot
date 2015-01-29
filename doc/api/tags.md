@@ -157,13 +157,43 @@ The above method and property names are reserved words for Riot tags. Don't use 
 
 ### riot.tag(tagName, html, [constructor]) | #tag
 
-Creates a new custom tag named `tagName` and having `html` as the layout. `constructor` is called before the tag expressions are calculated and before the tag is mounted. The `html` layout can contain [expressions](/riotjs/guide/#expressions). For example:
+Creates a new custom tag "manually" without the compiler.
+
+- `tagName` the tag name
+- `html` is the layout with [expressions](/riotjs/guide/#expressions)
+- `constructor` is the initialization function being called before the tag expressions are calculated and before the tag is mounted
+
+
+#### Example
 
 ``` js
-riot.tag('tag-name', '<h3>{ opts.hello }</h3>', function(opts) {
+riot.tag('timer', '<p>Seconds Elapsed: { time }</p>', function (opts) {
+  this.time = opts.start || 0
+
+  this.tick = (function () {
+    this.update({
+        time: ++this.time
+    })
+  }).bind(this)
+
+  var timer = setInterval(this.tick, 1000)
+
+  this.on('unmount', function () {
+    clearInterval(timer)
+  })
 
 })
 ```
+
+See [timer demo](http://jsfiddle.net/gnumanth/h9kuozp5/) and [riot.tag](/riotjs/api/#tag) API docs for more details and *limitations*.
+
+
+<span class="tag red">Warning</span> by using `riot.tag` you cannot enjoy the advantages of compiler and following features are not supported:
+
+1. Self- closing tags
+2. Unquoted expressions. Write `value="{ val }"` instead of `value={ val }`
+3. Boolean attributes. Write `__checked="{ flag }"` instead of `checked={ flag }`
+
 
 You can take advantage of `template` or `script` tags as follows:
 
@@ -180,21 +210,6 @@ riot.tag('tag-name', my_tmpl.innerHTML, function(opts) {
 </script>
 ```
 
-<span class="tag red">Warning</span> When creating tags manually with `riot.tag` you cannot enjoy the advantages of compiler and following features are not supported:
-
-1. Self- closing tags
-2. Unquoted expressions. Write `value="{ val }"` instead of `value={ val }`
-3. Boolean attributes. Write `__checked="{ flag }"` instead of `checked={ flag }`
-4. ES6 method signatures.
-
-With the compiler the above tag definition becomes this:
-
-``` html
-<tag-name>
-  <h3>{ opts.hello }</h3>
-  <p>And a paragraph</p>
-</tag-name>
-```
 
 
 ### riot.update() | #update

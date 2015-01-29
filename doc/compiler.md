@@ -7,7 +7,7 @@ description: From &lt;custom-tag> to JavaScript
 
 ## In-browser compilation
 
-Custom tags need to be transformed to JavaScript before the browser can execute them. You can do this by setting a `type="riot/tag"` attribute for your script tags. The compilation happens as follows:
+Custom tags need to be transformed to JavaScript before the browser can execute them. You can do this by setting a `type="riot/tag"` attribute for your script tags. For example:
 
 
 ``` html
@@ -26,52 +26,35 @@ Custom tags need to be transformed to JavaScript before the browser can execute 
 <script src="path/to/javascript/with-tags.js" type="riot/tag"></script>
 
 <!-- include riot.js and the compiler -->
-<script src="//cdn.jsdelivr.net/riot/{{ riot_version }}/riot.min.js"></script>
-<script src="//cdn.jsdelivr.net/riot/{{ riot_version }}/riot.compiler.min.js"></script>
+<script src="//cdn.jsdelivr.net/riot/2.0/riot+compiler.min.js"></script>
 
-<!-- compile and run -->
+<!-- mount normally -->
 &lt;script>
-riot.compile(function() {
-  riot.mount('*')
-})
+riot.mount('*')
 </script>
 ```
 
-The script tag and the external file can contain multiple tags combined with regular javascript.
+The script tag and the external file can contain multiple tags definitions combined with regular javascript.
 
-The compilation is very cheap and takes no time at all. Compiling a [timer tag](https://github.com/muut/riotjs/blob/master/test/tag/timer.tag) 30 times takes 2 milliseconds on a regular laptop. If you have a crazy page with 1000 different timer-sized tags, the compilation takes 35ms.
+Riot automatically takes inlined and external tags and compiles them before the tags are rendered with the `riot.mount()` call.
+
+Compilation phase is basically free and takes no time at all. Compiling a [timer tag](https://github.com/muut/riotjs/blob/master/test/tag/timer.tag) 30 times takes 2 milliseconds on a regular laptop. If you have a crazy page with 1000 different timer-sized tags, the compilation takes around 35ms.
 
 The compiler weights only 3.2KB (1.7K gzipped) so you can safely perform client side compilation on production without download or performance or issues.
 
 Just like Riot itself the compiler works on IE8 as well.
 
 
-### riot.compile( ) method
-
-Riot compile method works as follows:
-
-``` javascript
-riot.compile(function() {
-  // done
-})
-```
-
-It takes inlined tags and loads external tags and compiles them so they can be run on the browser. You can have multiple `riot.compile` methods on the page and they are all executed when all the tags are compiled.
-
-You can call the method even after the execution in which case the function is executed immediately.
-
-You can also compile tags directly as follows:
-
-``` js
-var javascript = riot.compile(tag_source)
-```
-
-`tag_source` can be a single tag or multiple tags with regular javascript combined. After the call the compiled tags are usable on the browser.
-
-
 ## Pre-compilation
 
-Tags can be pre-compiled on the server side with `riot` executable. Install it with NPM as follows:
+Pre- compilation on the server gives you following benefits:
+
+- Ability to compile tags with your [favorite pre-processor](#pre-processors).
+- Small performance benefit. No need to load and execute the compiler on browser.
+- "Isomorphic apps" and the ability to pre- render tags on the server (released soon).
+
+
+Pre-compilation happens with a `riot` executable, which can be installed with with NPM as follows:
 
 ``` sh
 npm install riot -g
@@ -79,10 +62,28 @@ npm install riot -g
 
 Type `riot --help` and make sure it works. [node.js](http://nodejs.org/) is required on your machine.
 
+With pre-compilation your HTML is something like this:
+
+``` html
+<!-- mount point -->
+<my-tag></my-tag>
+
+<!-- include riot.js only -->
+<script src="//cdn.jsdelivr.net/riot/2.0/riot.min.js"></script>
+
+<!-- include pre-compiled tags (normal javascript) -->
+<script src="path/to/javascript/with-tags.js"></script>
+
+<!-- mount the same way -->
+&lt;script>
+riot.mount('*')
+</script>
+```
+
 
 ### Using
 
-Here is how it works:
+Here is how `riot` command works:
 
 ``` sh
 # compile a file to current folder
@@ -102,7 +103,6 @@ riot some/folder all-my-tags.js
 
 ```
 
-
 The source file can contain one or more custom tags and there can be regular JavaScript mixed together with custom tags. The compiler will only transform the custom tags and does not touch other parts of the source file.
 
 For more information, type: `riot --help`
@@ -119,7 +119,6 @@ riot -w src dist
 
 
 ### Node module
-
 
 ```
 var compiler = require('riot/compiler/compiler')
@@ -139,7 +138,7 @@ The compile function takes a string and returns a string.
 
 ## Pre-processors
 
-This is the main fruit of pre- compilation. You can use your favourite pre- processor to create custom tags.
+This is the main fruit of pre- compilation. You can use your favourite pre- processor to create custom tags. Both HTML and JavaScript processor can be customized.
 
 
 ### CoffeeScript
@@ -262,27 +261,8 @@ riot --type none --expr source.tag
 ```
 
 
-## Creating tags manually
+See [compiler manual](/riotjs/compiler.html) for more info. Please also check [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/muut/riotjs/tree/gh-pages/demo), or download the [zip](https://github.com/muut/riotjs/archive/gh-pages.zip)
 
-You can create cusom tags without the compiler using `riot.tag`. For example:
+If you make something great, please [share it](https://github.com/muut/riotjs/issues/58) !
 
-``` js
-riot.tag('timer', '<p>Seconds Elapsed: { time }</p>', function (opts) {
-  this.time = opts.start || 0
 
-  this.tick = (function () {
-    this.update({
-        time: ++this.time
-    })
-  }).bind(this)
-
-  var timer = setInterval(this.tick, 1000)
-
-  this.on('unmount', function () {
-    clearInterval(timer)
-  })
-
-})
-```
-
-See [timer demo](http://jsfiddle.net/gnumanth/h9kuozp5/) and [riot.tag](/riotjs/api/#tag) API docs for more details and *limitations*.

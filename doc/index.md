@@ -66,9 +66,10 @@ HTML syntax is the *de facto* language of the web and it's designed for building
 
 <span class="tag">note</span> the tags are [converted](compiler.html) to JavaScript before browsers can execute them.
 
-### Virtual DOM
-- Smallest possible amount of DOM updates and reflows.
-- All expressions are pre-compiled and cached for high performance.
+
+### Intelligent DOM manipulation
+- Absolutely the smallest possible amount of DOM updates and reflows.
+- Expressions are pre-compiled and cached for high performance.
 - No extra HTML root elements or `data-` attributes.
 - Lifecycle events for more special needs.
 
@@ -81,7 +82,7 @@ HTML syntax is the *de facto* language of the web and it's designed for building
 
 
 ### Use your favorite tools
-- Create tags with CoffeeScript, Typescript, ES6 or [any pre-processor](compiler.html#pre-processors) you want.
+- Create tags with CoffeeScript, Jade, Typescript, ES6 or [any pre-processor](compiler.html#pre-processors) you want.
 - Integrate with NPM, CommonJS, AMD, Bower or Component
 - Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot) or [Browserify](https://github.com/jhthorsen/riotify) plugins
 
@@ -97,9 +98,8 @@ Minimalism sets Riot apart from others:
 One of the design goals was to introduce a powerful tag syntax with as little boilerplate as possible:
 
 - Power shortcuts: `class={ enabled: is_enabled, hidden: hasErrors() }`.
-- No extra brain load such as `getInitialState` or `shouldComponentUpdate`
-- Interpolation: `Add #{ items.length + 1 }`
-- No `render` method, no `state` object.
+- No extra brain load such as `render`, `state`, `constructor` or `shouldComponentUpdate`
+- Interpolation: `Add #{ items.length + 1 }` or `class="item { selected: flag }"`
 - Compact ES6 method syntax.
 
 

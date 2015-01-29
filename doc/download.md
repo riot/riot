@@ -4,86 +4,60 @@ subtitle: Get Riot
 description: none
 minify: false
 
+base: https://raw.githubusercontent.com/muut/riotjs/master
+cdnjs: https://cdnjs.cloudflare.com/ajax/libs/riot
 ====
 
-#### Version *{{ riot_version }}*  • *[Release notes](release-notes.html)* | .tall
+##### [<span class="tag">v{{ riot_version }}</span> release notes](release-notes.html) | .tall
 
 
-## The steps
+### Direct download
 
-1. [Install Riot compiler](#riot-compiler) for translating `.tag` files to `.js`
-2. [Get riot.js](#riotjs)
-3. [Develop](#develop)
+[riot+compiler.min.js]({{ base }}/riot+compiler.min.js)
 
+[riot+compiler.js]({{ base }}/riot+compiler.js)
 
-## 1. Install Riot compiler | #riot-compiler
+[riot.min.js]({{ base }}/riot.min.js)
 
-``` sh
-npm install riot -g
-```
-
-After the installation type `riot --help` to make sure it works. [node.js](http://nodejs.org/) is required on your machine.
+[riot.js]({{ base }}/riot.js)
 
 
-## 2. Get riot.js | #riotjs
+### Content delivery networks
 
-Choose the preferred way:
+#### [cdnjs](https://cdnjs.com/libraries/riot)
 
+`{{ cdnjs }}/{{ riot_version }}/riot+compiler.min.js`
 
-####  Direct download
+`{{ cdnjs }}/{{ riot_version }}/riot.min.js`
 
-[riot.min.js](https://raw.githubusercontent.com/muut/riotjs/master/riot.min.js) – for production ( 5.7KB minified / 2.5KB gzipped )
+#### [jsdelivr](http://www.jsdelivr.com/#!riot)
 
-[riot.js](https://raw.githubusercontent.com/muut/riotjs/master/riot.js) – for development
+`https://cdn.jsdelivr.net/riot/{{ riot_version }}/riot+compiler.min.js`
 
-
-#### CDN
-
-[cdnjs](https://cdnjs.com/libraries/riot): `https://cdnjs.cloudflare.com/ajax/libs/riot/{{ riot_version }}/riot.min.js`
-
-[jsDelivr](http://www.jsdelivr.com/#!riot): `https://cdn.jsdelivr.net/riot/{{ riot_version }}/riot.min.js`
+`https://cdn.jsdelivr.net/riot/{{ riot_version }}/riot.min.js`
 
 
-#### Package manager
+### Package managers
 
-[Bower](http://bower.io/search/?q=riot.js): `bower install riot`
+#### [Bower](http://bower.io/search/?q=riot.js)
 
-[Component](http://component.github.io/?q=riot): `component install muut/riotjs`
+`bower install riot`
 
-[NPM](https://www.npmjs.com/package/riot): `npm install riot`
+#### [Component](http://component.github.io/?q=riot)
+
+`component install muut/riotjs`
+
+#### [NPM](https://www.npmjs.com/package/riot)
+
+`npm install riot`
 
 
-#### GitHub
+### GitHub
 
-[muut/riotjs](https://github.com/muut/riotjs): `git clone git@github.com:muut/riotjs.git`
+#### [muut/riotjs](https://github.com/muut/riotjs)
 
+`git clone git@github.com:muut/riotjs.git`
 
-## 3. Develop | #develop
-
-Compile custom tags to JavaScript:
-
-``` sh
-riot --watch test.tag
-```
-
-Include `riot.js` and your compiled tags
-
-```
-<script src="riot.js"></script>
-<script src="test.js"></script>
-```
-
-Mount tags on the page:
-
-``` html
-<todo></todo>
-
-&lt;script>riot.mount('todo')</script>
-```
-
-See [compiler manual](/riotjs/compiler.html) for more info. Please also check [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/muut/riotjs/tree/gh-pages/demo), or download the [zip](https://github.com/muut/riotjs/archive/gh-pages.zip)
-
-If you make something great, please [share it](https://github.com/muut/riotjs/issues/58) !
 
 
 ## IE8 support
@@ -101,16 +75,20 @@ For IE8 support you need to include [es5-shim](https://github.com/es-shims/es5-s
 </head>
 ```
 
-...and let it know about your custom tags before using them on a page:
+Also let it know about all your custom tags before using them on a page:
 
 ``` html
-&lt;script>html5.addElements('todo todo-item account plan')</script>
+&lt;script>html5.addElements('my-tag my-another-tag')</script>
 ```
+
+That's a space separated list of tag names.
 
 
 ## Known issues
 
-On current version conditionals are implemented with `style="display: none"`. This will be fixed on upcoming version where `if` attribute will add/remove the element from the DOM completely.
+- On current version conditionals are implemented with `style="display: none"`. This will be fixed on upcoming version where `if` attribute will add/remove the element from the DOM completely.
+
+- Looping table rows or cells with `each` attribute is not working on IE8 and IE9.
 
 
 ## Media
