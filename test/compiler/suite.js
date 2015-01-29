@@ -46,21 +46,23 @@ function testHTML() {
 }
 
 
-function testFiles() {
+function testFiles(opts) {
 
-  function test(name, type) {
-    var dir = 'test/compiler',
+  function test(name, opts) {
+
+    var type = opts.type,
+        dir = 'test/compiler',
         basename = name + (type ? '.' + type : ''),
         src = cat(dir + '/' + basename + '.tag'),
         should = cat(dir + '/js/' + basename + '.js')
 
-    assert(compiler.compile(src, { type: type }).trim(), should)
+    assert(compiler.compile(src, opts).trim(), should)
   }
 
-  test('test')
-  test('complex')
-  test('test', 'cs')
-  test('test', 'es6')
+  test('complex', {})
+  test('test', { type: 'cs' })
+  test('test', { type: 'es6' })
+  test('test.jade', { template: 'jade' })
 
 }
 

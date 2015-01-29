@@ -60,7 +60,7 @@ See [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https:
 
 ### Tag syntax
 
-In a Riot custom tag the HTML layout is defined first, JavaSript second. The JavaScript starts where the last HTML tag ends. HTML is coupled with expressions that are 100% JavaScript.
+In a Riot custom tag the HTML layout is defined first, JavaScript second. The JavaScript starts where the last HTML tag ends. HTML is coupled with expressions that are 100% JavaScript.
 
 Characteristics:
 

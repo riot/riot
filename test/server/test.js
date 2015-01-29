@@ -1,15 +1,29 @@
 
-// override riot.tag
+global.riot = {}
 
-riot.tag = function(html, fn) {
-  FN.push({html: html, fn: fn })
+require('../../lib/tmpl')
+
+var TAGS = {}
+
+riot.tag = function(name, html, fn) {
+  TAGS[name] = { html: html, fn: fn }
 }
 
-var tags = cat(tags)
+// import tags
+riot.tag('test', '<p>foo: { opts.foo }</p> <p>bar: { opts.bar }</p>', function(opts) {
 
+})
 
+var html = "BEGIN <test></test> END"
 
+riot.mount = function(tagName, opts) {
 
-riot.render = function(tagName, data) {
+  var impl = TAGS[tagName],
+      tag = { root: {}, opts: opts, parent: {} }
 
+  impl.fn.call(tag, opts)
+
+  console.info(riot._tmpl(impl.html, tag))
 }
+
+riot.mount('test', { foo: 809, bar: 987987 })

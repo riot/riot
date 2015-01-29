@@ -6,20 +6,31 @@ body_id: riot-releases
 
 ====
 
-### 2.0.6 *Jan 28, 2015*
+### 2.0.6 *Jan 29, 2015*
 
 - Build-in Typescript support
+- Ability to plug in a HTML pre-processor (along with JS processor)
+- Build-in Jade support
 - Quick in-browser compilation with: `<script type="riot/tag">`
 - Markup can be written with valid XML and HTML5 void tags are not self-closed
 - Allow definition of empty placeholder tags. Good on development phase.
 - `riot.observable()` now returns a new observable when called without the argument
+- Ability to define [custom parsers](api/#route-parser) for router.
+- Compiler is now called like this:
+
+
+```
+var riot = require('riot')
+var js_string = riot.compile(tag_source_string)
+```
+
+
 
 ### 2.0.5 *Jan 27, 2015*
 
 - An ability to plug in a JavaScript pre-processor
 - Build-in CoffeeScript support
 - Build-in EcmaScript 6 support
-
 
 
 ### 2.0.2 *Jan 26, 2015*

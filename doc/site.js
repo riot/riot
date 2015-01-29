@@ -2,7 +2,9 @@
 !(function() {
 
   var toc = $('#toc'),
-      links = $('a', toc )
+      links = $('a', toc ),
+      content = $('#content')
+
 
   // navi highlight
   links.click(function() {
@@ -40,12 +42,22 @@
   })
 
   $('#to-top').click(function() {
-    global.scroll($('#content'), 80)
+    global.scroll(content, 80)
   })
 
 
   $('#burger, #toc .close').click(function() {
     toc.toggleClass('active')
   })
+
+
+  // clickable hashes
+  $('h2, h3', content).click(function() {
+    var el = $(this)
+    global.scroll(el, 10, function() {
+      location.hash = el.attr('id')
+    })
+  })
+
 
 })()
