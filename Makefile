@@ -66,6 +66,7 @@ version:
 	@ git checkout master
 	# create version commit
 	@ git status --short
+	@ git add --all
 	@ git commit -am "$(VERSION)"
 	@ git log --oneline -2
 	# create version tag
@@ -91,6 +92,7 @@ pages:
 	# commit the demo files from master to gh-pages
 	@ git checkout master .gitignore demo
 	@ git status --short
+	@ git add --all
 	-@ git commit -am "$(VERSION)"
 	@ git log --oneline -2
 	# return back to master branch
