@@ -94,10 +94,6 @@
     return require('typescript-simple')(js)
   }
 
-  function plainjs(js) {
-    return js
-  }
-
   function jade(html) {
     return require('jade').render(html, {pretty: true})
   }
