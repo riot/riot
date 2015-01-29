@@ -10,14 +10,17 @@ VERSION := $(v)
 jshint:
 	./node_modules/jshint/bin/jshint lib/*.js
 
+# TODO: refactor riot & min tasks
+
 riot:
-	@ mkdir -p dist
-	@ cat make/prefix.js | sed "s/VERSION/$(VERSION)/" > dist/riot.js
-	@ cat lib/* >> dist/riot.js
-	@ cat make/suffix.js >> dist/riot.js
+	@ cat make/prefix.js | sed "s/VERSION/$(VERSION)/" | tee riot.js riot+compiler.js
+	@ cat lib/observable.js lib/router.js lib/tmpl.js lib/view.js | tee -a riot.js riot+compiler.js
+	@ cat lib/compiler.js >> riot+compiler.js
+	@ cat make/suffix.js | tee -a riot.js riot+compiler.js
 
 min: jshint riot
-	@ ./node_modules/uglify-js/bin/uglifyjs dist/riot.js --comments --mangle -o dist/riot.min.js
+	@ ./node_modules/uglify-js/bin/uglifyjs riot.js --comments --mangle -o riot.min.js
+	@ ./node_modules/uglify-js/bin/uglifyjs riot+compiler.js --comments --mangle -o riot+compiler.min.js
 	@ echo minified
 
 
@@ -54,7 +57,6 @@ bump:
 	@ sed -i '' 's/[^/]*\(\/riot\.min\)/'$(MINOR_VERSION)'\1/' demo/index.html
 	# generate riot.js & riot.min.js
 	@ make min
-	@ cp dist/riot*.js .
 	@ git status --short
 
 bump-undo:
