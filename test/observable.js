@@ -8,11 +8,16 @@ var el = riot.observable(),
   count = 0,
   counter
 
+function echo(msg) {
+  console.info(msg)
+}
+
 function assert(test, should) {
   if (test !== should) throw new Error(test + ' != ' + should)
 }
 
-// single listener
+
+echo('single listener')
 el.on('a', function(arg) {
   assert(arg, true)
   count++
@@ -21,7 +26,7 @@ el.on('a', function(arg) {
 el.trigger('a', true)
 
 
-// multiple listeners with special chars
+echo('multiple listeners with special chars')
 counter = 0
 
 el.on('b/4 c-d d:x', function(e) {
@@ -37,7 +42,8 @@ el.one('d:x', function(a) {
 el.trigger('b/4').trigger('c-d').trigger('d:x', true)
 
 
-// one
+
+echo('one')
 counter = 0
 
 el.one('g', function() {
@@ -47,9 +53,10 @@ el.one('g', function() {
 
 el.trigger('g').trigger('g')
 
-
-// one & on
+echo('one & on')
 counter = 0
+
+
 
 el.one('y', function() {
   count++
@@ -65,7 +72,7 @@ assert(counter, 3)
 
 
 
-// Remove listeners
+echo('Remove listeners')
 counter = 0
 
 function r() {
@@ -76,7 +83,7 @@ function r() {
 el.on('r', r).on('s', r).off('s', r).trigger('r').trigger('s')
 
 
-// Remove multiple listeners
+echo('Remove multiple listeners')
 counter = 0
 
 function fn() {
@@ -88,7 +95,7 @@ el.on('a1 b1', fn).on('c1', fn).off('a1 b1').off('c1').trigger('a1').trigger('b1
 assert(counter, 0)
 
 
-// Removes duplicate callbacks on 'off' for specific handler
+echo('Removes duplicate callbacks on off for specific handler')
 counter = 0
 
 function func() {
@@ -101,11 +108,11 @@ el.on('a1', func).on('a1', func).trigger('a1').off('a1', func).trigger('a1')
 assert(counter, 2)
 
 
-// does not call trigger infinitely
+echo('does not call trigger infinitely')
 var counter = 0,
   otherEl = riot.observable()
 
-// 2 calls are enough to know the test failed
+echo('2 calls are enough to know the test failed')
 el.on('update', function(value) {
   if (counter++ < 1) {
     otherEl.trigger('update', value)
@@ -121,7 +128,7 @@ el.trigger('update', 'foo')
 assert(1, counter)
 
 
-// is able to trigger events inside a listener
+echo('is able to trigger events inside a listener')
 var e2 = false
 
 el.on('e1', function() { this.trigger('e2') })
@@ -133,7 +140,7 @@ el.trigger('e1')
 assert(e2, true)
 
 
-// Multiple arguments
+echo('Multiple arguments')
 
 el.on('j', function(a, b) {
   assert(a, 1)
@@ -144,7 +151,7 @@ el.on('j', function(a, b) {
 el.trigger('j', 1, [2])
 
 
-// Remove all listeners
+echo('Remove all listeners')
 
 counter = 0
 
@@ -160,7 +167,7 @@ el.trigger('aa').trigger('bb')
 assert(counter, 0)
 
 
-// Remove specific listener
+echo('Remove specific listener')
 var one = 0,
   two = 0
 
@@ -180,8 +187,32 @@ el.trigger('bb')
 assert(one, 1)
 assert(two, 2)
 
-// should not throw internal error
+echo('should not throw internal error')
 el.off('non-existing', fn)
 
 
 assert(total, count)
+
+
+echo('remove handler while triggering')
+counter = 0
+
+function handler() {
+  el.off('rem', handler)
+}
+
+el.on('rem', handler)
+
+el.on('rem', function() {
+  counter++
+})
+
+el.on('rem', function() {
+  counter++
+})
+
+el.trigger('rem')
+
+assert(counter, 2)
+
+return
