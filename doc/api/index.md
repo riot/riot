@@ -4,9 +4,11 @@ description: none
 
 ====
 
+# Properties
+
 ### riot.version
 
-The current Riot version: '{{ riot_version }}'
+the current Riot version number as string: '{{ riot_version }}'
 
 <include tags.md />
 <include observable.md />

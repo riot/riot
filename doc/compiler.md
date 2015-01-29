@@ -26,7 +26,8 @@ Custom tags need to be transformed to JavaScript before the browser can execute 
 <script src="path/to/javascript/with-tags.js" type="riot/tag"></script>
 
 <!-- include riot.js and the compiler -->
-<script src="//cdn.jsdelivr.net/riot/2.0/riot+compiler.min.js"></script>
+<script src="//cdn.jsdelivr.net/g/riot@2.0/riot.min.js+compiler.min.js"></script>
+
 
 <!-- mount normally -->
 &lt;script>
@@ -130,10 +131,9 @@ riot -w src dist
 ### Node module
 
 ```
-var compiler = require('riot/compiler/compiler')
-// NOTE: the above path will be shortened to "riot/compiler"
+var riot = require('riot')
 
-var js = compiler.compile(source_string)
+var js = riot.compile(source_string)
 ```
 
 The compile function takes a string and returns a string.
@@ -279,9 +279,9 @@ function myParser(js, options) {
 This parser is then passed for the compiler with `parser` option:
 
 ``` js
-var compiler = require('riot/compiler/compiler')
+var riot = require('riot')
 
-var js = compiler.compile(source_string, { parser: myParser, expr: true })
+var js = riot.compile(source_string, { parser: myParser, expr: true })
 ```
 
 Set `expr: true` if you want the expressions to be parsed as well.

@@ -168,6 +168,9 @@ We should be building reusable components instead of templates. By combining the
 This is the biggest change from Riot 1.0 to 2.0. JavaScript and HTML are now part of the same module.
 
 
+#### Muut blog: [From React to Riot 2.0](/blog/technology/riot-2.0/) | .tall
+
+
 ==== .section.tweets
 
 

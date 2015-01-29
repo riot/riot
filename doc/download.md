@@ -6,6 +6,8 @@ minify: false
 
 base: https://raw.githubusercontent.com/muut/riotjs/master
 cdnjs: https://cdnjs.cloudflare.com/ajax/libs/riot
+version: 2.0
+
 ====
 
 ##### [<span class="tag">v{{ riot_version }}</span> release notes](release-notes.html) | .tall
@@ -13,9 +15,9 @@ cdnjs: https://cdnjs.cloudflare.com/ajax/libs/riot
 
 ### Direct download
 
-[riot+compiler.min.js]({{ base }}/riot+compiler.min.js)
+[riot.compiler.min.js]({{ base }}/riot.compiler.min.js)
 
-[riot+compiler.js]({{ base }}/riot+compiler.js)
+[riot.compiler.js]({{ base }}/riot.compiler.js)
 
 [riot.min.js]({{ base }}/riot.min.js)
 
@@ -24,17 +26,25 @@ cdnjs: https://cdnjs.cloudflare.com/ajax/libs/riot
 
 ### Content delivery networks
 
+
+#### [jsdelivr](http://www.jsdelivr.com/#!riot)
+
+`https://cdn.jsdelivr.net/g/riot@2.0/riot.min.js+compiler.min.js` <small>(latest 2.0.X)</small>
+
+`https://cdn.jsdelivr.net/riot/2.0/riot.min.js` <small>(latest 2.0.X)</small>
+
+`https://cdn.jsdelivr.net/g/riot@{{ riot_version }}/riot.min.js+compiler.min.js`
+
+`https://cdn.jsdelivr.net/riot/{{ riot_version }}/riot.min.js`
+
+
 #### [cdnjs](https://cdnjs.com/libraries/riot)
 
 `{{ cdnjs }}/{{ riot_version }}/riot+compiler.min.js`
 
 `{{ cdnjs }}/{{ riot_version }}/riot.min.js`
 
-#### [jsdelivr](http://www.jsdelivr.com/#!riot)
 
-`https://cdn.jsdelivr.net/riot/{{ riot_version }}/riot+compiler.min.js`
-
-`https://cdn.jsdelivr.net/riot/{{ riot_version }}/riot.min.js`
 
 
 ### Package managers

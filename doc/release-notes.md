@@ -16,6 +16,13 @@ body_id: riot-releases
 - Allow definition of empty placeholder tags. Good on development phase.
 - `riot.observable()` now returns a new observable when called without the argument
 - Ability to define [custom parsers](api/#route-parser) for router.
+- Compiler is now called like this:
+
+
+```
+var riot = require('riot')
+var js_string = riot.compile(tag_source_string)
+```
 
 
 
