@@ -5,7 +5,7 @@
 require('shelljs/global')
 
 var chokidar = require('chokidar'),
-    riot = require('../compiler')
+    riot = require('../lib/compiler')
 
 
 // watch and build riot.js

@@ -3,7 +3,7 @@
 
 require('shelljs/global')
 
-var compiler = require('../../compiler/compiler')
+var compiler = require('../../lib/compiler')
 
 function assert(test, should) {
   if (test === should) console.info('OK', test.replace(/\n/g, '').trim())
