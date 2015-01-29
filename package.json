@@ -45,8 +45,8 @@
     "lib",
     "riot.js",
     "riot.min.js",
-    "comppiler.js",
-    "comppiler.min.js",
+    "compiler.js",
+    "compiler.min.js",
     "riot+compiler.js",
     "riot+compiler.min.js"
   ],
