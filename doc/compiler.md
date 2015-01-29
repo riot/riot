@@ -45,6 +45,15 @@ The compiler weights only 3.2KB (1.7K gzipped) so you can safely perform client 
 Just like Riot itself the compiler works on IE8 as well.
 
 
+### Demos
+
+- [In-browser compiled](http://muut.github.io/riotjs/demo/)
+- [Pre-compiled](http://muut.github.io/riotjs/demo/)
+- [Source code](https://github.com/muut/riotjs/tree/gh-pages/demo)
+- Download the demo as a [zip file](https://github.com/muut/riotjs/archive/gh-pages.zip)
+
+
+
 ## Pre-compilation
 
 Pre- compilation on the server gives you following benefits:
@@ -286,9 +295,6 @@ By default Riot uses a build-in transpiler that simply enables shorter ES6- styl
 # no pre-processor
 riot --type none --expr source.tag
 ```
-
-
-See [compiler manual](/riotjs/compiler.html) for more info. Please also check [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/muut/riotjs/tree/gh-pages/demo), or download the [zip](https://github.com/muut/riotjs/archive/gh-pages.zip)
 
 If you make something great, please [share it](https://github.com/muut/riotjs/issues/58) !
 
