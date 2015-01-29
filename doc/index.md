@@ -40,9 +40,9 @@ Riot brings custom tags to all browsers starting from IE8.
 A custom tag glues relevant HTML and JavaScript together forming a reusable component. You can roughly think of React + Polymer, but squeezed into 2.5KB.
 
 
-### Human readable
+### Human-readable
 
-Custom tags lets you build complex views with HTML. Your application might look something like this:
+Custom tags let you build complex views with HTML. Your application might look something like this:
 
 ``` html
 <body>
@@ -62,7 +62,7 @@ Custom tags lets you build complex views with HTML. Your application might look 
 </body>
 ```
 
-HTML syntax is the de facto language on the web and it's designed for building user interfaces. The syntax is explicit, nesting is inherent to the language and attributes offer a clean way to provide options for custom tags.
+HTML syntax is the *de facto* language of the web and it's designed for building user interfaces. The syntax is explicit, nesting is inherent to the language, and attributes offer a clean way to provide options for custom tags.
 
 <span class="tag">note</span> the tags are [converted](compiler.html) to JavaScript before browsers can execute them.
 
@@ -106,7 +106,7 @@ One of the design goals was to introduce a powerful tag syntax with as little bo
 
 ### 2. Minimal API
 
-Riot has 10x or even 100x times less API methods than others.
+Riot has between 10 and 100 times fewer API methods than other UI libraries.
 
 1. Less to learn. Fewer books and tutorials to view
 2. Less proprietary stuff and more standard stuff
@@ -124,20 +124,20 @@ Riot has 10x or even 100x times less API methods than others.
 <span class="bar blue" style="width: 4.3%"></span>
 
 
-1. Less bugs.
+1. Fewer bugs.
 4. Faster to parse and cheaper to download.
 3. Embeddable. The library should be smaller than the application.
 4. Less to maintain. We don't need a big team to maintain Riot.
 
 ### 4. Minimal, but complete
 
-Riot has all the essential building blocks for modern-client side applications:
+Riot has all the essential building blocks for modern client-side applications:
 
 - "Reactive" views for building user interfaces.
-- Event library for building API's with isolated modules.
+- Event library for building APIs with isolated modules.
 - Router for taking care of URL and the back button.
 
-Riot is an "open stack". Meant for developers who want to avoid framework specific idioms. The generic tools let you mix and match design patterns. Systems like Facebook Flux can be [self-made](https://github.com/jimsparkman/RiotControl).
+Riot is an "open stack". It's meant for developers who want to avoid framework specific idioms. The generic tools let you mix and match design patterns. Systems like Facebook Flux can be [self-made](https://github.com/jimsparkman/RiotControl).
 
 
 ==== .tweets.section
@@ -157,13 +157,13 @@ Riot.js is so tiny, I learned most of it while waiting for my GF trying on cloth
 
 Riot is React + Polymer + models + routing without the bloat. It works today, even on IE8. It's dead simple to use and it weighs almost nothing. No reinventing the wheel, but rather taking the good parts of what's there and making the simplest tool possible.
 
-Riot 2.0 keeps true to the original [Frameworkless JavaScript](/blog/technology/frameworkless-javascript.html) blog post. While the situation has changed due to the latest realizations in client side engineering (virtual dom, composable views, one way binding) the original Riot principles remain: *extremely small size and full control*.
+Riot 2.0 keeps true to the original [Frameworkless JavaScript](/blog/technology/frameworkless-javascript.html) blog post. While the landscape has changed due to the latest advances in client-side engineering (virtual dom, composable views, one way binding), the original Riot principles remain: *extremely small size and full control*.
 
 According to the developers of React:
 
 > "Templates separate technologies, not concerns."
 
-We should be building reusable components instead of templates. By combining these related technologies together under the same component the system becomes cleaner. We respect React from this important insight.
+We should be building reusable components instead of templates. By combining these related technologies together under the same component the system becomes cleaner. We respect React for this important insight.
 
 This is the biggest change from Riot 1.0 to 2.0. JavaScript and HTML are now part of the same module.
 
