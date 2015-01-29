@@ -10,18 +10,17 @@ VERSION := $(v)
 jshint:
 	./node_modules/jshint/bin/jshint lib/*.js
 
-# TODO: refactor riot & min tasks
-
 riot:
-	@ cat make/prefix.js | sed "s/VERSION/$(VERSION)/" | tee riot.js riot+compiler.js
-	@ cat lib/observable.js lib/router.js lib/tmpl.js lib/view.js | tee -a riot.js riot+compiler.js
-	@ cat lib/compiler.js >> riot+compiler.js
-	@ cat make/suffix.js | tee -a riot.js riot+compiler.js
+	@ cat lib/compiler.js > compiler.js
+	@ cat make/prefix.js | sed "s/VERSION/$(VERSION)/" > riot.js
+	@ cat lib/observable.js lib/router.js lib/tmpl.js lib/view.js >> riot.js
+	@ cat riot.js compiler.js > riot+compiler.js
+	@ cat make/suffix.js | tee -a riot.js riot+compiler.js > /dev/null
+
+# TODO: refactor this into single line
 
 min: jshint riot
-	@ ./node_modules/uglify-js/bin/uglifyjs riot.js --comments --mangle -o riot.min.js
-	@ ./node_modules/uglify-js/bin/uglifyjs riot+compiler.js --comments --mangle -o riot+compiler.min.js
-	@ echo minified
+	@ for f in riot compiler riot+compiler; do ./node_modules/uglify-js/bin/uglifyjs $$f.js --comments --mangle -o $$f.min.js; done
 
 
 
