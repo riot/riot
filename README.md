@@ -78,12 +78,25 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - Compact ES6 method syntax.
 
 
-### DEMOS
+### Demos
 - [Simple TODO](https://muut.com/riotjs/dist/demo/)
 - [Multi TODO](http://plnkr.co/edit/UZ2BfP?p=preview)
 - [Timer](http://jsfiddle.net/gnumanth/h9kuozp5/)
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
 - [Multi- selector](http://plnkr.co/edit/NmcxgZ?p=preview)
+
+
+### Tutorials
+- [Building tabs with Riot](http://www.robertwpearce.com/blog/riotjs-example/)
+- [The "React tutorial" for Riot](https://juriansluiman.nl/article/154/the-react-tutorial-for-riot)
+
+
+### Resources
+- [Riot module for AngularJS](https://github.com/lucasbrigida/angular-riot)
+- [Riot + Meteor]( https://atmospherejs.com/xaiki/riotjs)
+- [Riot on CodeClimate](https://codeclimate.com/github/muut/riotjs/code)
+
+
 
 https://muut.com/riotjs/
 
