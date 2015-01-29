@@ -172,12 +172,16 @@ hero_bg = #e6
   relative 0 -u3
 
   .wrap
-    padding 0 0 0 u2
+    padding 0 0 0 u3
     border-left uh solid #d
 
+  .block
+    padding 0
+    margin u5 0
+
   p
-    font 120% italic #6
-    margin u 0
+    font 120% / 1.2 italic #6
+    margin u2 0
 
   a
     font 80%

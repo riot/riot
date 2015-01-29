@@ -141,14 +141,15 @@ Riot is an "open stack". It's meant for developers who want to avoid framework s
 
 ==== .tweets.section
 
+Today I have used #riotjs 2.0 for the first time and I could admit that It will be a long term relationship #js highly recommended. [@gianlucaguarini](https://twitter.com/gianlucaguarini/status/559756081862574080)
+
+I am not a fan of the custom tags and DOM events binding but I've tested riotjs and it is damn fast/performant #impressed. [‏@gianlucaguarini](https://twitter.com/gianlucaguarini/status/559429908179714049)
+
+looking at RiotJS https://muut.com/riotjs/  - blown away by its simplicity. [@defeated](https://twitter.com/defeated/status/559215403541757952)
+
+Played with riot.js and like it so much more than react. Minimalistic, fast and a comprehensible API. [@juriansluiman](https://twitter.com/juriansluiman/status/560399379035865088)
+
 I looked at the riot.js example, and it feels so clean, it's scary. [@paulbjensen](https://twitter.com/paulbjensen/status/558378720403419137)
-
-This is what I would aim for if I wanted to make a JS framework. [@ddunderfelt](https://twitter.com/ddunderfelt/status/558522477081788416)
-
-This is one of the best piece of code I have seen in #js world. [@notarianni](https://twitter.com/notarianni/status/421388764334669825)
-
-Riot.js is so tiny, I learned most of it while waiting for my GF trying on clothes. [@kkovacs](https://twitter.com/kkovacs/status/422063156945764352)
-
 
 ==== .section.narrow
 
@@ -169,6 +170,9 @@ This is the biggest change from Riot 1.0 to 2.0. JavaScript and HTML are now par
 
 ==== .section.tweets
 
+
 This is how a javascript frameworks should work - Everything else is bloat and abstraction from necessity. [@devayes](https://twitter.com/devayes/status/396311780407783426)
 
 Falled in love with #riotjs. Small, fast and the code, oh, so clean. This is how every framework should be! [@nongeekboy](https://twitter.com/nongeekboy/status/436086922419515392)
+
+This is one of the best piece of code I have seen in #js world. [@notarianni](https://twitter.com/notarianni/status/421388764334669825)
