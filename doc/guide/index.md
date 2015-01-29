@@ -570,6 +570,18 @@ Plain objects can also be looped. For example:
 </my-tag>
 ```
 
+### Render unescaped HTML
+
+Easily manipulate the DOM. Never load data from an untrusted source, this could expose the user to XSS attacks.
+
+```
+<my-tag>  
+  <div id='content'></div>
+
+  this.content.innerHTML = '<b>My raw html</b>'
+</my-tag>
+```
+
 Object loops are not recommended since internally Riot detects changes on the object with `JSON.stringify`. The *whole* object is studied and when there is a change the whole loop is re-rendered. This can be slow. Normal arrays are much faster and only the changes are drawn on the page.
 
 
