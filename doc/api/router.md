@@ -54,12 +54,13 @@ riot.route.exec(function(collection, id, action) {
 })
 ```
 
-### riot.route.parser(callback) | #route-parser
+### riot.route.parser(parser) | #route-parser
 
-Changes riot.route default path parser to user given `callback` parser
+Changes the default parser to a custom one. Here's one that parses paths like this:
+
+`!/user/activation?token=xyz`
 
 ``` js
-//example !/user/activation?token=xyz
 riot.route.parser(function(path) {
   var raw = path.slice(2).split('?'),
       uri = raw[0].split('/'),
@@ -76,9 +77,18 @@ riot.route.parser(function(path) {
   uri.push(params)
   return uri
 })
+```
 
-//module: user, action: activation, params: { token: xyz } 
-riot.route(function(module, action, params) {
-  
+And here you'll receive the params when the URL changes:
+
+```
+riot.route(function(target, action, params) {
+
+  /*
+    target = 'user'
+    action = 'activation'
+    params = { token: 'xyz' }
+  */
+
 })
 ```
