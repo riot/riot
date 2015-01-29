@@ -48,7 +48,7 @@
     "riot.js"
   ],
   "bin": {
-    "riot": "compiler/index.js"
+    "riot": "lib/node/cli.js"
   },
-  "main": "riot.js"
+  "main": "lib/node/index.js"
 }
