@@ -270,4 +270,16 @@
 
   }
 
+  // reassign mount methods
+  var mount = riot.mount,
+      mountTo = riot.mountTo
+
+  riot.mount = function(a, b) {
+    riot.compile(function() { mount(a, b) })
+  }
+
+  riot.mountTo = function(a, b, c) {
+    riot.compile(function() { mountTo(a, b, c) })
+  }
+
 })(!this.top)
