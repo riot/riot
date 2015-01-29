@@ -63,17 +63,16 @@ hero_bg = #e6
   .riot-tag
     font 350%
 
-  .small
-    color #9
-    margin u
-    display block
+  .tease
+    margin-top u4
+    font 110%
 
-    &:hover
-      color #3
+    .tag
+      font 110% bold #f lowercase
 
-  .normal
-    font 120% bold
-    margin-top u3
+      &:hover
+        bg darkblue
+
 
   h1
     font 230% 100 uppercase

@@ -6,7 +6,7 @@ body_id: riot-releases
 
 ====
 
-### 2.0.6 *Jan 29, 2015*
+### 2.0.7 *Jan 29, 2015*
 
 - Build-in Typescript support
 - Ability to plug in a HTML pre-processor (along with JS processor)
@@ -23,7 +23,6 @@ body_id: riot-releases
 var riot = require('riot')
 var js_string = riot.compile(tag_source_string)
 ```
-
 
 
 ### 2.0.5 *Jan 27, 2015*
