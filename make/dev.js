@@ -5,7 +5,7 @@
 require('shelljs/global')
 
 var chokidar = require('chokidar'),
-    riot = require('../lib/compiler')
+    cli = require('../lib/cli')
 
 
 // watch and build riot.js
@@ -15,4 +15,4 @@ chokidar
 
 
 // watch and build tags.js for testing
-riot.watch({ from: 'test/tag', to: 'dist/tags.js' })
+cli.watch({ from: 'test/tag', to: 'dist/tags.js' })
