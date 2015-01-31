@@ -272,19 +272,29 @@ riot._tmpl = (function() {
   }
 
 })()
+function Tag(def, root, parent) {
+  var self = riot.observable(this)
+
+  self.on('')
+}
+
 ;(function(riot, is_browser) {
 
   if (!is_browser) return
 
   var tmpl = riot._tmpl,
       all_tags = [],
-      tag_impl = {},
+      IMPL = {},
       doc = document
 
   function each(nodes, fn) {
     for (var i = 0; i < (nodes || []).length; i++) {
       if (fn(nodes[i], i) === false) i--
     }
+  }
+
+  function remAttr(dom, name) {
+    dom.removeAttribute(name)
   }
 
   function extend(obj, from) {
@@ -301,7 +311,8 @@ riot._tmpl = (function() {
   }
 
   function walk(dom, fn) {
-    dom = fn(dom) === false ? dom.nextSibling : dom.firstChild
+    fn(dom)
+    dom = dom.firstChild
 
     while (dom) {
       walk(dom, fn)
@@ -315,6 +326,7 @@ riot._tmpl = (function() {
         root_tag = /td|th/.test(tag_name) ? 'tr' : tag_name == 'tr' ? 'tbody' : 'div'
         el = doc.createElement(root_tag)
 
+    el.stub = true
     el.innerHTML = tmpl
     return el
   }
@@ -334,12 +346,10 @@ riot._tmpl = (function() {
       e.item = instance.__item || instance
 
       // prevent default behaviour (by default)
-      if (handler.call(instance, e) !== true) {
+      if (handler(e) !== true) {
         e.preventDefault && e.preventDefault()
         e.returnValue = false
       }
-
-      instance.update()
     }
 
   }
@@ -347,20 +357,14 @@ riot._tmpl = (function() {
 
   function update(expressions, instance) {
 
-    // allow recalculation of context data
-    instance.trigger('update')
-
     each(expressions, function(expr) {
       var tag = expr.tag,
           dom = expr.dom
 
-      function remAttr(name) {
-        dom.removeAttribute(name)
-      }
 
       // loops first: TODO remove from expressions arr
       if (expr.loop) {
-        remAttr('each')
+        remAttr(dom, 'each')
         return loop(expr, instance)
       }
 
@@ -368,6 +372,8 @@ riot._tmpl = (function() {
       if (tag) return tag.update ? tag.update() :
         expr.tag = createTag({ tmpl: tag[0], fn: tag[1], root: dom, parent: instance })
 
+      // for IE8 only
+      if (expr.expr.indexOf('parent') != -1 && !instance.parent) return
 
       var attr_name = expr.attr,
           value = tmpl(expr.expr, instance)
@@ -383,7 +389,7 @@ riot._tmpl = (function() {
       if (!attr_name) return dom.nodeValue = value
 
       // attribute
-      if (!value && expr.bool || /obj|func/.test(typeof value)) remAttr(attr_name)
+      if (!value && expr.bool || /obj|func/.test(typeof value)) remAttr(dom, attr_name)
 
       // event handler
       if (typeof value == 'function') {
@@ -391,7 +397,7 @@ riot._tmpl = (function() {
 
       // show / hide / if
       } else if (/^(show|hide|if)$/.test(attr_name)) {
-        remAttr(attr_name)
+        remAttr(dom, attr_name)
         if (attr_name == 'hide') value = !value
         dom.style.display = value ? '' : 'none'
 
@@ -407,8 +413,6 @@ riot._tmpl = (function() {
       }
 
     })
-
-    instance.trigger('updated')
 
   }
 
@@ -446,7 +450,7 @@ riot._tmpl = (function() {
         }
 
         // custom tag?
-        var tag = tag_impl[dom.tagName.toLowerCase()]
+        var tag = IMPL[dom.tagName.toLowerCase()]
 
         // attributes
         each(dom.attributes, function(attr) {
@@ -461,7 +465,7 @@ riot._tmpl = (function() {
             var bool = name.split('__')[1]
             addExpr(dom, value, { attr: bool || name, bool: bool })
             if (bool) {
-              dom.removeAttribute(name)
+              remAttr(dom, name)
               return false
             }
           }
@@ -479,8 +483,7 @@ riot._tmpl = (function() {
   }
 
 
-
-  // create new custom tag (component)
+  // create new tag
   function createTag(conf) {
 
     var opts = conf.opts || {},
@@ -502,55 +505,49 @@ riot._tmpl = (function() {
     function updateOpts() {
       Object.keys(attributes).map(function(name) {
         var val = opts[name] = tmpl(attributes[name], parent || tag)
-        if (typeof val == 'object') mountNode.removeAttribute(name)
+        if (typeof val == 'object') remAttr(mountNode, name)
       })
     }
 
     updateOpts()
 
+    // tags are observables
     if (!tag.on) {
       riot.observable(tag)
       delete tag.off // off method not needed
     }
 
+    tag.update = function() {}
+
+    // constructor function
     if (conf.fn) conf.fn.call(tag, opts)
 
+    tag.update = function(data) {
+      var send_event = data !== false
+      extend(tag, data)
+      extend(tag, tag.__item)
+      updateOpts()
 
-    tag.update = function(data, _system) {
+      send_event && tag.trigger('update')
+      update(ast.expr, tag)
+      send_event && tag.trigger('updated')
 
-      /*
-        If loop is defined on the root of the HTML template
-        the original parent is a temporary <div/> by mkdom()
-      */
-      if (parent && dom && !dom.firstChild) {
-        mountNode = parent.root
-        dom = null
-      }
-
-      if (_system || doc.body.contains(mountNode)) {
-        extend(tag, data)
-        extend(tag, tag.__item)
-        updateOpts()
-        update(ast.expr, tag)
-
-        // update parent
-        !_system && tag.__item && parent.update()
-        return true
-
-      } else {
-        tag.trigger('unmount')
-      }
-
+      parent && parent.update(false)
     }
 
-    tag.update(0, true)
+    tag.unmount = function() {
+      mountNode.parentNode.removeChild(mountNode)
+      all_tags.splice(all_tags.indexOf(tag), 1)
+      tag.trigger('unmount')
+    }
 
-    // append to root
+    tag.update(false)
+
+    // mount
     while (dom.firstChild) {
       if (conf.before) mountNode.insertBefore(dom.firstChild, conf.before)
       else mountNode.appendChild(dom.firstChild)
     }
-
 
     tag.trigger('mount')
 
@@ -648,7 +645,7 @@ riot._tmpl = (function() {
         })
 
         instance.on('update', function() {
-          tag.update(0, true)
+          tag.update(false)
         })
 
       })
@@ -661,17 +658,16 @@ riot._tmpl = (function() {
   }
 
   riot.tag = function(name, tmpl, fn) {
-    fn = fn || noop,
-    tag_impl[name] = [tmpl, fn]
+    IMPL[name] = [tmpl, fn]
   }
 
   riot.mountTo = function(node, tagName, opts) {
-    var tag = tag_impl[tagName]
-    return tag && createTag({ tmpl: tag[0], fn: tag[1], root: node, opts: opts })
+    var impl = IMPL[tagName]
+    return impl && createTag({ tmpl: impl[0], fn: impl[1], root: node, opts: opts })
   }
 
   riot.mount = function(selector, opts) {
-    if (selector == '*') selector = Object.keys(tag_impl).join(', ')
+    if (selector == '*') selector = Object.keys(IMPL).join(', ')
 
     var instances = []
 
@@ -692,8 +688,8 @@ riot._tmpl = (function() {
 
   // update everything
   riot.update = function() {
-    return all_tags = all_tags.filter(function(tag) {
-      return !!tag.update()
+    return all_tags.map(function(tag) {
+      tag.update()
     })
   }
 
@@ -824,7 +820,7 @@ riot._tmpl = (function() {
 
       // method end
       if (line.slice(0, es6_ident.length + 1) == es6_ident + '}') {
-        lines[i] += '.bind(this);'
+        lines[i] = es6_ident + es6_ident + 'this.update()\n' + es6_ident + '}.bind(this);'
         es6_ident = ''
       }
 

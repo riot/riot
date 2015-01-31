@@ -13,25 +13,27 @@
 
   <script type="riot/tag" id="timer">
     <timer>
-
       <p>Seconds Elapsed: { time }</p>
 
-      this.time = opts.start || 0
+      this.time = opts.start
 
-      tick() {
-        this.update({ time: ++this.time })
-      }
-
-      var timer = setInterval(this.tick, 1000)
+      console.info(opts)
 
       this.on('unmount', function() {
         console.info('timer cleared')
-        clearInterval(timer)
       })
     </timer>
-  </script>
 
-  <script src="../tag/timetable.tag" type="riot/tag"></script>
+    <timetable>
+      <p>
+        <timer start={ parent.start } each={ items }></timer>
+      </p>
+
+      this.items = [1, 3]
+
+    </timetable>
+
+  </script>
 
 </head>
 
@@ -39,13 +41,17 @@
 <body>
 
   <timetable></timetable>
-  <div id="foo"></div>
+
 
   <script src="../../riot.js"></script>
   <script src="../../lib/compiler.js"></script>
 
   <script>
 
+    riot.mount('*')
+
+    /*
+    riot.update()
     // grab source code for performance tests
     var timer_src = timer.innerHTML
 
@@ -57,12 +63,7 @@
     }
 
     console.info(+new Date - begin)
-
-    riot.mount('*')
-
-    setTimeout(function() {
-      riot.mountTo(foo, 'timetable')
-    }, 1000)
+    */
 
   </script>
 

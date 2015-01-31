@@ -1,6 +1,17 @@
 
 global.riot = {}
 
+var tag_html = [
+  '<p if="{ opts.foo == 9 }">',
+    'foo: { opts.foo }',
+  '</p>'
+].join('\n')
+
+
+return echo(tag_html)
+
+
+
 require('../../lib/tmpl')
 
 var TAGS = {}
@@ -10,7 +21,7 @@ riot.tag = function(name, html, fn) {
 }
 
 // import tags
-riot.tag('test', '<p>foo: { opts.foo }</p> <p>bar: { opts.bar }</p>', function(opts) {
+riot.tag('test', tag_html, function(opts) {
 
 })
 
