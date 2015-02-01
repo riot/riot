@@ -31,6 +31,10 @@ function testHTML() {
   test('<a a={ a } b={ b }>', '<a a="{ a }" b="{ b }">')
   test('<a href="a?b={ c }">', '<a href="a?b={ c }">')
   test('<a id="{ a }b">', '<a id="{ a }b">')
+  test('<input id={ a }/>', '<input id="{ a }">')
+  test('<a id={ a }/>', '<a id="{ a }"></a>')
+  test('<a><b/></a>', '<a><b></b></a>')
+
   test('<a loop={ a } defer="{ b }" visible>', '<a __loop="{ a }" __defer="{ b }" visible>')
 
   test('{ a }<!-- c -->', '{ a }')
@@ -67,5 +71,5 @@ function testFiles(opts) {
 }
 
 testHTML()
-testFiles()
+// testFiles()
 
