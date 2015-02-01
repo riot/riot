@@ -692,7 +692,7 @@ riot.update = function() {
   var CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\-\/]>$)?([^\x00]*?)^<\/\1>/gim,
       SCRIPT = /<script(\s+type=['"]?([^>'"]+)['"]?)?>([^\x00]*?)<\/script>/gm,
       HTML_COMMENT = /<!--.*?-->/g,
-      CLOSED_TAG = /<([\w\-]+)([^\/]*)\/\s*>/g,
+      CLOSED_TAG = /<([\w\-]+)([^>]*)\/\s*>/g,
       LINE_COMMENT = /^\s*\/\/.*$/gm,
       JS_COMMENT = /\/\*[^\x00]*?\*\//gm
 
@@ -706,7 +706,7 @@ riot.update = function() {
     html = html.trim().replace(HTML_COMMENT, '')
 
     // foo={ bar } --> foo="{ bar }"
-    html = html.replace(/=(\{[^\}]+\})([\s\>])/g, '="$1"$2')
+    html = html.replace(/=(\{[^\}]+\})([\s\/\>])/g, '="$1"$2')
 
     // IE8 looses boolean attr values: `checked={ expr }` --> `__checked={ expr }`
     html = html.replace(/([\w\-]+)=["'](\{[^\}]+\})["']/g, function(full, name, expr) {
