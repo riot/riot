@@ -10,6 +10,7 @@ riot.tag('2nd', '<p></p>', function(opts) {
 
   this.foo = function() {
 
+    this.update()
   }.bind(this);
 
 });
