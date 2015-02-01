@@ -77,6 +77,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Timer](http://jsfiddle.net/gnumanth/h9kuozp5/)
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
 - [Multi- selector](http://plnkr.co/edit/NmcxgZ?p=preview)
+- [Form & Table -Chinese Demo](https://github.com/cheft/cheftjs.git)
 
 https://muut.com/riotjs/
 
