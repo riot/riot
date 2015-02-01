@@ -1,9 +1,18 @@
 <kids>
-  <h3 foo={ test }></h3>
-  <input />
-  <div />
-</kids>
 
-<kooma>
-  var foo = 'bar'
-</kooma>
+  <label each={ id, label in opts.values }>
+    <input type="radio" id={ id }/>
+    { label }
+  </label>
+  <!--
+
+    is this working??
+
+  -->
+
+  /*
+
+    another villanen
+
+  */
+</kids>

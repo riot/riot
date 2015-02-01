@@ -23,7 +23,7 @@
   }
 
   // (tagname) (html) (javascript) endtag
-  var CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\/]>$)?([^\x00]*?)^<\/\1>/gim,
+  var CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\-\/]>$)?([^\x00]*?)^<\/\1>/gim,
       SCRIPT = /<script(\s+type=['"]?([^>'"]+)['"]?)?>([^\x00]*?)<\/script>/gm,
       HTML_COMMENT = /<!--.*?-->/g,
       CLOSED_TAG = /<([\w\-]+)([^\/]*)\/\s*>/g,
