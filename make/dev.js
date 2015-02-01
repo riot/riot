@@ -19,4 +19,4 @@ chokidar
 
 
 // watch and build tags.js for testing
-// cli.watch({ from: 'test/tag', to: 'dist/tags.js' })
+cli.watch({ from: 'test/tag', to: 'dist/tags.js' })

@@ -10,10 +10,11 @@ VERSION := $(v)
 jshint:
 	./node_modules/jshint/bin/jshint lib/*.js
 
+
 riot:
 	@ cat lib/compiler.js > compiler.js
 	@ cat make/prefix.js | sed "s/VERSION/$(VERSION)/" > riot.js
-	@ cat lib/observable.js lib/router.js lib/tmpl.js lib/view.js >> riot.js
+	@ cat lib/observable.js lib/router.js lib/tmpl.js lib/tag/*.js >> riot.js
 	@ cat riot.js compiler.js > riot+compiler.js
 	@ cat make/suffix.js | tee -a riot.js riot+compiler.js > /dev/null
 
@@ -128,18 +129,18 @@ publish:
 #################################################
 # Testing the packages locally
 # (do this before publishing)
-# 
+#
 # Create a dir in sibling directory next to riot
-# 
+#
 # 	mkdir test && cd $_
-# 
+#
 # Bower
-# 
+#
 #   rm -rf bower_components && bower cache clean && bower install ../riotjs#master --offline
 #   ls -al bower_components/riot
-# 
+#
 # NPM
-# 
+#
 #   rm -rf node_modules && npm install ../riotjs
 #   ls -al node_modules/riot
 #   node -e "console.log(require('riot').compile('<tag>\n<p>{2+2}</p>\n</tag>'))"
