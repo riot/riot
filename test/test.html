@@ -22,17 +22,25 @@
 
   })
 
-  riot.tag('test', '<p each="{items}">{ val }</p>', function(opts) {
+  riot.tag('test', '<p each="{items}" onclick="{ parent.remove }">{ val }</p>', function(opts) {
+    var self = this
+
     this.items = [
       { val: 'hello '},
-      { val: 'world '},
-      { val: 'order '}
+      { val: 'bad '},
+      { val: 'world '}
     ]
+
+    this.remove = function(e) {
+      self.items.splice(self.items.indexOf(e.item), 1)
+      self.update()
+    }
+
   })
 
   var tags = riot.mount('test', { world: 'world!' })
 
-  console.info(tags[0])
+  // console.info(tags[0])
   </script>
 
 </body>

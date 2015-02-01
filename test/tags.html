@@ -24,24 +24,28 @@
 
   <div id="tags">
 
-    <loop-context></loop-context>
     <!--
-    <timetable></timetable>
-    <table-data></table-data>
-    <tag-nesting></tag-nesting>
-    <loop-replace></loop-replace>
-    <loop-strings></loop-strings>
-    <loop-object></loop-object>
-    <loop-manip></loop-manip>
     <loop-child></loop-child>
-    <loop-nested></loop-nested>
+    <loop-manip></loop-manip>
+    <loop-context></loop-context>
+    <table-data></table-data>
+    <loop-replace></loop-replace>
+    <timetable></timetable>
+    <tag-nesting></tag-nesting>
+    <loop-strings></loop-strings>
     <inner-html><h3>Inner title</h3></inner-html>
     <loop-position></loop-position>
+    <loop-nested></loop-nested>
     -->
+
+    <loop-object></loop-object>
 
   </div>
 
-  <script src="../riot.js"></script>
+  <script>var riot = {}</script>
+  <script src="../dist/riot.js"></script>
   <script src="../dist/tags.js"></script>
-  <script>riot.mount('*')</script>
+  <script>var tags = riot.mount('*')</script>
+
 </body>
+
