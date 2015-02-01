@@ -1,18 +1,14 @@
 <kids>
 
   <label each={ id, label in opts.values }>
-    <input type="radio" id={ id }/>
+    <input type="radio">
     { label }
   </label>
+
   <!--
 
     is this working??
 
   -->
 
-  /*
-
-    another villanen
-
-  */
 </kids>
