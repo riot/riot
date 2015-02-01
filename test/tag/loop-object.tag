@@ -12,9 +12,9 @@
   var self = this
 
   setTimeout(function() {
-    self.obj.zero = 'zero'
-    self.obj.two = 'two'
-    self.update()
+    // self.obj.zero = 'zero'
+    // self.obj.two = 'two'
+    // self.update()
   }, 200)
 
 </loop-object>

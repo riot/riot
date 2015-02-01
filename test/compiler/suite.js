@@ -63,6 +63,7 @@ function testFiles(opts) {
     assert(compiler.compile(src, opts).trim(), should)
   }
 
+
   test('complex', {})
   test('test', { type: 'cs' })
   test('test', { type: 'es6' })
@@ -71,5 +72,5 @@ function testFiles(opts) {
 }
 
 testHTML()
-// testFiles()
+testFiles()
 

@@ -13,7 +13,9 @@
 </head>
 
 <body>
+
   <test></test>
+
   <script>var riot = {}</script>
   <script src="../dist/riot.js"></script>
 
@@ -22,7 +24,9 @@
 
   })
 
-  riot.tag('test', '<p each="{items}" onclick="{ parent.remove }">{ val }</p>', function(opts) {
+  var loop = '<p each="{items}" onclick="{ parent.remove }">{ val }</p>'
+
+  riot.tag('test', loop + loop, function(opts) {
     var self = this
 
     this.items = [
@@ -40,7 +44,7 @@
 
   var tags = riot.mount('test', { world: 'world!' })
 
-  // console.info(tags[0])
+  console.info(tags[0])
   </script>
 
 </body>

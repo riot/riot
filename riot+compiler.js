@@ -297,10 +297,6 @@ function loop(dom, parent, expr) {
       tags = [],
       checksum
 
-  function startPos() {
-    return Array.prototype.indexOf.call(root.childNodes, prev) + 1
-  }
-
   expr = loopKeys(expr)
 
   // clean template code after update (and let walk finish it's parse)
@@ -330,20 +326,20 @@ function loop(dom, parent, expr) {
 
     }
 
-    // remove redundant
+    // unmount redundant
     arrDiff(rendered, items).map(function(item) {
-      var pos = rendered.indexOf(item)
-      root.removeChild(root.childNodes[startPos() + pos])
+      var pos = rendered.indexOf(item),
+          tag = tags[pos]
 
-      var tag = tags[pos]
-      tag.unmount()
-
+      tag && tag.unmount()
       rendered.splice(pos, 1)
     })
 
-    // add new
+    // mount new
     arrDiff(items, rendered).map(function(item, i) {
-      var pos = items.indexOf(item)
+      var pos = items.indexOf(item),
+          nodes = root.childNodes,
+          prev_index = Array.prototype.indexOf.call(nodes, prev) + 1
 
       if (!checksum && expr.key) {
         var obj = {}
@@ -353,14 +349,14 @@ function loop(dom, parent, expr) {
       }
 
       var tag = new Tag({ tmpl: template }, {
-        before: root.childNodes[startPos() + pos],
+        before: nodes[prev_index],
         parent: parent,
         root: root,
         loop: true,
         item: item
       })
 
-      parent.children.push(tag)
+      parent.children.unshift(tag)
       tags[pos] = tag
 
     })
@@ -471,7 +467,8 @@ function Tag(impl, conf) {
 
   this.update = function() {}
 
-  var dom = parse(impl.tmpl, this, expressions)
+  var dom = parse(impl.tmpl, this, expressions),
+      loop_dom
 
   // constructor function
   if (impl.fn) impl.fn.call(this, opts)
@@ -487,20 +484,31 @@ function Tag(impl, conf) {
 
   this.mount = function() {
     while (dom.firstChild) {
-      if (is_loop) root.insertBefore(dom.firstChild, conf.before)
-      else root.appendChild(dom.firstChild)
+      if (is_loop) {
+        loop_dom = dom.firstChild
+        root.insertBefore(dom.firstChild, conf.before)
+
+      } else {
+        root.appendChild(dom.firstChild)
+      }
     }
 
+    if (!root.parentNode) self.root = root = parent.root
     self.trigger('mount')
   }
 
+
   this.unmount = function() {
 
-    // remove from DOM
-    var p = root.parentNode
-    if (!is_loop && p) p.removeChild(root)
+    if (is_loop) {
+      root.removeChild(loop_dom)
 
-    // remove from parent
+    } else {
+      var p = root.parentNode
+      p.removeChild(root)
+    }
+
+    // splice from parent.children[]
     if (parent) {
       var els = parent.children
       els.splice(els.indexOf(self), 1)
@@ -635,9 +643,13 @@ riot.tag = function(name, tmpl, fn) {
 riot.mountTo = function(root, tagName, opts) {
   var impl = tag_impl[tagName], tag
 
-  if (impl) {
-    tag = new Tag(impl, { root: root, opts: opts })
-    tag && virtual_dom.push(tag)
+  if (impl) tag = new Tag(impl, { root: root, opts: opts })
+
+  if (tag) {
+    virtual_dom.push(tag)
+    tag.on('unmount', function() {
+      virtual_dom.splice(virtual_dom.indexOf(tag), 1)
+    })
     return tag
   }
 }
