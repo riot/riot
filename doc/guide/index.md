@@ -332,10 +332,10 @@ After the tag is defined you can use it inside other tags. For example
 
 ```
 <my-tag>
-  <p>Here is some raw content: <raw content="{ html }"/> </p>
+  <p>Here is some raw content: <raw content="{ html }"></raw> </p>
 
-  this.html = 'Hello, <strong>world!</raw>'
-</raw>
+  this.html = 'Hello, <strong>world!</strong>';
+</my-tag>
 ```
 
 [demo on jsfiddle](http://jsfiddle.net/23g73yvx/)
