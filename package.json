@@ -54,5 +54,15 @@
     "riot": "lib/cli.js"
   },
   "main": "lib/compiler.js",
-  "browser": "riot.js"
+  "browser": "riot.js",
+  "spm": {
+    "main": "riot.js",
+    "ignore": [
+      "demo",
+      "doc",
+      "test",
+      "lib",
+      "make"
+    ]
+  }
 }
