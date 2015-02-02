@@ -101,13 +101,18 @@ test('x', '{ this.str }')
 test(2, '{ x }')
 test('y', '{ y: x }')
 
+// custom brackets
+test(2, '[ x ]', { brackets: '[]' })
+test(2, '<% x %>', { brackets: ['<%', '%>'] })
+test('x', '[ str\\[0\\] ]', { brackets: '[]' })
+
 // maybe / later:
 
 //test('html', '{ location.href.split(".").pop() }')
 //test('{"x":5}', '{ JSON.stringify({ x: 5 }) }')
 
-function test(a, b, escape) {
-  assert(a, riot._tmpl(b, data), b)
+function test(a, b, opts) {
+  assert(a, riot._tmpl(b, data, opts), b)
 }
 
 function assert(a, b, should) {
