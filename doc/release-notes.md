@@ -28,8 +28,8 @@ var js_string = riot.compile(tag_source_string)
 ### 2.0.5 *Jan 27, 2015*
 
 - An ability to plug in a JavaScript pre-processor
-- Build-it CoffeeScript support
-- Build-it EcmaScript 6 support
+- Built-in CoffeeScript support
+- Built-in EcmaScript 6 support
 
 
 ### 2.0.2 *Jan 26, 2015*
