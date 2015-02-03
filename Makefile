@@ -4,6 +4,13 @@ v ?= $(shell node -pe "require('./package.json').version")
 
 # expand variable (so we can use it on branches w/o package.json, e.g. gh-pages)
 VERSION := $(v)
+WATCH = "\
+	var arg = process.argv, path = arg[1], cmd = arg[2];  \
+	require('chokidar') 																  \
+		.watch(path, { ignoreInitial: true }) 						  \
+		.on('all', function() { 													  \
+			require('shelljs').exec(cmd) 										  \
+		})"
 
 .PHONY: test min
 
@@ -124,6 +131,11 @@ publish:
 	@ git push origin master
 	@ git push origin master --tags
 
+watch:
+	# watch and rebuild riot and its tests
+	@ $(shell \
+		node -e $(WATCH) "lib/**/*.js" "make riot" & \
+		node ./lib/cli.js --watch test/tag dist/tags.js )
 
 
 #################################################
