@@ -10,8 +10,8 @@ WATCH = "\
 
 
 jshint:
-	./node_modules/jshint/bin/jshint lib/*.js
-
+	# check code quality
+	@ ./node_modules/jshint/bin/jshint lib/*.js
 
 riot:
 	@ cat lib/compiler.js > compiler.js
@@ -19,9 +19,11 @@ riot:
 	@ cat lib/observable.js lib/router.js lib/tmpl.js lib/tag/*.js >> riot.js
 	@ cat riot.js compiler.js > riot+compiler.js
 	@ cat make/suffix.js | tee -a riot.js riot+compiler.js > /dev/null
+	# build riot
 
 min: jshint riot
 	@ for f in riot compiler riot+compiler; do ./node_modules/uglify-js/bin/uglifyjs $$f.js --comments --mangle -o $$f.min.js; done
+	# minify riot
 
 watch:
 	# watch and rebuild riot and its tests
