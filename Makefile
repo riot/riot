@@ -17,7 +17,7 @@ jshint:
 riot:
 	# build riot
 	@ mkdir -p $(DIST)
-	@ cat lib/compiler.js | sed "s/VERSION/$(VERSION)/" > $(DIST)compiler.js
+	@ cat lib/compiler.js > $(DIST)compiler.js
 	@ cat lib/wrap/prefix.js > $(DIST)riot.js
 	@ cat lib/observable.js lib/router.js lib/tmpl.js lib/tag/*.js >> $(DIST)riot.js
 	@ cat $(DIST)riot.js $(DIST)compiler.js > $(DIST)riot+compiler.js
