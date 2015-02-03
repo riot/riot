@@ -37,4 +37,4 @@ watch:
 
 
 # riot maintainer tasks
--include ../riot-make/Makefile
+-include ../riot-tasks/Makefile
