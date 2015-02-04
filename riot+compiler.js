@@ -528,6 +528,12 @@ riot._tmpl = (function() {
       if (_system || doc.body.contains(mountNode) || doc.querySelectorAll("[data-riot-tag='" + mountNode.nodeName + "']").length > 0) {
         extend(tag, data)
         extend(tag, tag.__item)
+
+        if (opts.transclude) {
+          // If transclude is enabled collect all the child elements of root node on a temporary node and save for later use
+          opts.include = moveChildren(mountNode, doc.createElement('div'))
+        }
+
         updateOpts()
         update(ast.expr, tag)
 
@@ -545,7 +551,13 @@ riot._tmpl = (function() {
 
     if (opts.replacetag) {
       dom.firstChild.setAttribute("data-riot-tag", mountNode.nodeName);
-      mountNode = mountNode.parentNode.replaceChild(dom.firstChild, mountNode)
+      if ((mountNode.nodeName == 'INCLUDE') && (parent.opts.include)) {
+        //if the parent has a stored include el and the current root node is INCLUDE
+        moveChildren(parent.opts.include, dom.firstChild)
+        mountNode = mountNode.parentNode.replaceChild(dom.firstChild, mountNode)
+      } else {
+        mountNode = mountNode.parentNode.replaceChild(dom.firstChild, mountNode)
+      }
     }
     else {
         // append to root
@@ -699,6 +711,11 @@ riot._tmpl = (function() {
       return !!tag.update()
     })
   }
+
+  riot.tag('include', '<span></span>', function(opts) {
+    opts.replacetag = true
+  });
+
 
 })(riot, this.top)
 
