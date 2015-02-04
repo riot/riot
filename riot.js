@@ -480,7 +480,7 @@ riot._tmpl = (function() {
 
 
 
-  // create new custom tag (component)
+// create new custom tag (component)
   function createTag(conf) {
 
     var opts = conf.opts || {},
@@ -515,9 +515,7 @@ riot._tmpl = (function() {
 
     if (conf.fn) conf.fn.call(tag, opts)
 
-
     tag.update = function(data, _system) {
-
       /*
         If loop is defined on the root of the HTML template
         the original parent is a temporary <div/> by mkdom()
@@ -527,7 +525,8 @@ riot._tmpl = (function() {
         dom = null
       }
 
-      if (_system || doc.body.contains(mountNode)) {
+      if (_system || doc.body.contains(mountNode) || doc.querySelectorAll("[data-riot-tag='" + mountNode.nodeName + "']").length > 0) {
+      //if (_system || doc.body.contains(mountNode)) {
         extend(tag, data)
         extend(tag, tag.__item)
         updateOpts()
@@ -545,12 +544,17 @@ riot._tmpl = (function() {
 
     tag.update(0, true)
 
-    // append to root
-    while (dom.firstChild) {
-      if (conf.before) mountNode.insertBefore(dom.firstChild, conf.before)
-      else mountNode.appendChild(dom.firstChild)
+    if (opts.replacetag) {
+      dom.firstChild.setAttribute("data-riot-tag", mountNode.nodeName);
+      mountNode = mountNode.parentNode.replaceChild(dom.firstChild, mountNode)
     }
-
+    else {
+        // append to root
+        while (dom.firstChild) {
+          if (conf.before) mountNode.insertBefore(dom.firstChild, conf.before)
+          else mountNode.appendChild(dom.firstChild)
+        }
+    }
 
     tag.trigger('mount')
 
@@ -698,7 +702,6 @@ riot._tmpl = (function() {
   }
 
 })(riot, this.top)
-
 
 // support CommonJS
 if (typeof exports === 'object')
