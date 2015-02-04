@@ -480,7 +480,7 @@ riot._tmpl = (function() {
 
 
 
-// create new custom tag (component)
+  // create new custom tag (component)
   function createTag(conf) {
 
     var opts = conf.opts || {},
@@ -526,7 +526,6 @@ riot._tmpl = (function() {
       }
 
       if (_system || doc.body.contains(mountNode) || doc.querySelectorAll("[data-riot-tag='" + mountNode.nodeName + "']").length > 0) {
-      //if (_system || doc.body.contains(mountNode)) {
         extend(tag, data)
         extend(tag, tag.__item)
         updateOpts()
