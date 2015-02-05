@@ -478,7 +478,12 @@ riot._tmpl = (function() {
 
   }
 
-
+  function moveChildren(src, dst) {
+    while (src.firstChild) {
+      dst.appendChild(src.removeChild(src.firstChild))
+    }
+    return dst
+  }
 
   // create new custom tag (component)
   function createTag(conf) {
