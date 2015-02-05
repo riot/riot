@@ -11,44 +11,43 @@
     <script>html5.addElements('timetable timer')</script>
   <![endif]-->
 
-  <script type="riot/tag" id="timer">
-    <timer>
-      <p>Seconds Elapsed: { time }</p>
+  <script type="riot/tag">
+    <foo>
+      <p>{ opts.baz }{ bar }</p>
 
-      this.time = opts.start
-
-      console.info(opts)
-
-      this.on('unmount', function() {
-        console.info('timer cleared')
-      })
-    </timer>
-
+      this.bar = 'romutus'
+    </foo>
     <timetable>
-      <p>
-        <timer start={ parent.start } each={ items }></timer>
-      </p>
+      <timer start={ time } each={ time, i in times }></timer>
 
-      this.items = [1, 3]
+      <foo barz="899" baz="90"></foo>
 
+      <p>{ kama }</p>
+
+      this.times = [ 1, 3, 5 ]
+      this.kama = 'jooo'
     </timetable>
-
   </script>
 
-</head>
+  <!--
+  <script type="riot/tag" src="../tag/timer.tag"></script>
+  -->
 
+</head>
 
 <body>
 
   <timetable></timetable>
 
-
-  <script src="../../riot/riot.js"></script>
+  <script src="../../dist/riot.js"></script>
   <script src="../../lib/compiler.js"></script>
 
   <script>
 
-    riot.mount('*')
+    riot.compile(function() {
+      tags = riot.mount('timetable', { start: 0 })
+    })
+
 
     /*
     riot.update()
