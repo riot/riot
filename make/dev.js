@@ -14,7 +14,7 @@ chokidar
   .on('all', function() {
     ('var riot = {}; (function(riot, is_browser) {' +
       cat('lib/observable.js', 'lib/tmpl.js', 'lib/tag/*') +
-    '})(riot, this.top)').to('dist/riot.js')
+    '})(riot, this.top)').to('dist/riot/riot.js')
   })
 
 
