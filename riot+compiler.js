@@ -271,6 +271,279 @@ riot._tmpl = (function() {
       + '}}).call(d)'
   }
 
+})()/* Riot 2.0.7, @license MIT, (c) 2015 Muut Inc. + contributors */
+
+;(function() {
+
+var riot = { version: 'v2.0.7' }
+
+'use strict'
+
+riot.observable = function(el) {
+
+  el = el || {}
+
+  var callbacks = {}
+
+  el.on = function(events, fn) {
+    if (typeof fn == 'function') {
+      events.replace(/\S+/g, function(name, pos) {
+        (callbacks[name] = callbacks[name] || []).push(fn)
+        fn.typed = pos > 0
+      })
+    }
+    return el
+  }
+
+  el.off = function(events, fn) {
+    if (events == '*') callbacks = {}
+    else if (fn) {
+      var arr = callbacks[events]
+      for (var i = 0, cb; (cb = arr && arr[i]); ++i) {
+        if (cb == fn) { arr.splice(i, 1); i-- }
+      }
+    } else {
+      events.replace(/\S+/g, function(name) {
+        callbacks[name] = []
+      })
+    }
+    return el
+  }
+
+  // only single event supported
+  el.one = function(name, fn) {
+    if (fn) fn.one = 1
+    return el.on(name, fn)
+  }
+
+  el.trigger = function(name) {
+    var args = [].slice.call(arguments, 1),
+        fns = callbacks[name] || []
+
+    for (var i = 0, fn; (fn = fns[i]); ++i) {
+      if (!fn.busy) {
+        fn.busy = 1
+        fn.apply(el, fn.typed ? [name].concat(args) : args)
+        if (fn.one) { fns.splice(i, 1); i-- }
+         else if (fns[i] !== fn) { i-- } // Makes self-removal possible during iteration
+        fn.busy = 0
+      }
+    }
+
+    return el
+  }
+
+  return el
+
+}
+;(function(riot, evt) {
+
+  // browsers only
+  if (!this.top) return
+
+  var loc = location,
+      fns = riot.observable(),
+      current = hash(),
+      win = window
+
+  function hash() {
+    return loc.hash.slice(1)
+  }
+
+  function parser(path) {
+    return path.split('/')
+  }
+
+  function emit(path) {
+    if (path.type) path = hash()
+
+    if (path != current) {
+      fns.trigger.apply(null, ['H'].concat(parser(path)))
+      current = path
+    }
+  }
+
+  var r = riot.route = function(arg) {
+    // string
+    if (arg[0]) {
+      loc.hash = arg
+      emit(arg)
+
+    // function
+    } else {
+      fns.on('H', arg)
+    }
+  }
+
+  r.exec = function(fn) {
+    fn.apply(null, parser(hash()))
+  }
+
+  r.parser = function(fn) {
+    parser = fn
+  }
+
+  win.addEventListener ? win.addEventListener(evt, emit, false) : win.attachEvent('on' + evt, emit)
+
+})(riot, 'hashchange')
+/*
+
+//// How it works?
+
+
+Three ways:
+
+1. Expressions: tmpl('{ value }', data).
+   Returns the result of evaluated expression as a raw object.
+
+2. Templates: tmpl('Hi { name } { surname }', data).
+   Returns a string with evaluated expressions.
+
+3. Filters: tmpl('{ show: !done, highlight: active }', data).
+   Returns a space separated list of trueish keys (mainly
+   used for setting html classes), e.g. "show highlight".
+
+
+// Template examples
+
+tmpl('{ title || "Untitled" }', data)
+tmpl('Results are { results ? "ready" : "loading" }', data)
+tmpl('Today is { new Date() }', data)
+tmpl('{ message.length > 140 && "Message is too long" }', data)
+tmpl('This item got { Math.round(rating) } stars', data)
+tmpl('<h1>{ title }</h1>{ body }', data)
+
+
+// Falsy expressions in templates
+
+In templates (as opposed to single expressions) all falsy values
+except zero (undefined/null/false) will default to empty string:
+
+tmpl('{ undefined } - { false } - { null } - { 0 }', {})
+// will return: " - - - 0"
+
+*/
+
+riot._tmpl = (function() {
+
+  var cache = {},
+
+      // find variable names
+      re_vars = /("|').+?[^\\]\1|\.\w*|\w*:|\b(?:this|true|false|null|undefined|new|typeof|Number|String|Object|Array|Math|Date|JSON)\b|([a-z_]\w*)/gi
+              // [ 1            ][ 2  ][ 3 ][ 4                                                                                        ][ 5       ]
+              // 1. skip quoted strings: "a b", 'a b', 'a \'b\''
+              // 2. skip object properties: .name
+              // 3. skip object literals: name:
+              // 4. skip reserved words
+              // 5. match var name
+
+  // build a template (or get it from cache), render with data
+
+  return function(str, data) {
+    return str && (cache[str] = cache[str] || tmpl(str))(data)
+  }
+
+
+  // create a template instance
+
+  function tmpl(s, p) {
+    p = (s || '{}')
+
+      // temporarily convert \{ and \} to a non-character
+      .replace(/\\{/g, '\uFFF0')
+      .replace(/\\}/g, '\uFFF1')
+
+      // split string to expression and non-expresion parts
+      .split(/({[\s\S]*?})/)
+
+    return new Function('d', 'return ' + (
+
+      // is it a single expression or a template? i.e. {x} or <b>{x}</b>
+      !p[0] && !p[2]
+
+        // if expression, evaluate it
+        ? expr(p[1])
+
+        // if template, evaluate all expressions in it
+        : '[' + p.map(function(s, i) {
+
+            // is it an expression or a string (every second part is an expression)
+            return i % 2
+
+              // evaluate the expressions
+              ? expr(s, 1)
+
+              // process string parts of the template:
+              : '"' + s
+
+                  // preserve new lines
+                  .replace(/\n/g, '\\n')
+
+                  // escape quotes
+                  .replace(/"/g, '\\"')
+
+                + '"'
+
+          }).join(',') + '].join("")'
+      )
+
+      // bring escaped { and } back
+      .replace(/\uFFF0/g, '{')
+      .replace(/\uFFF1/g, '}')
+
+    )
+
+  }
+
+
+  // parse { ... } expression
+
+  function expr(s, n) {
+    s = s
+
+      // convert new lines to spaces
+      .replace(/\n/g, ' ')
+
+      // trim whitespace, curly brackets, strip comments
+      .replace(/^[{ ]+|[ }]+$|\/\*.+?\*\//g, '')
+
+    // is it an object literal? i.e. { key : value }
+    return /^\s*[\w-"']+ *:/.test(s)
+
+      // if object literal, return trueish keys
+      // e.g.: { show: isOpen(), done: item.done } -> "show done"
+      ? '[' + s.replace(/\W*([\w-]+)\W*:([^,]+)/g, function(_, k, v) {
+
+          // safely execute vars to prevent undefined value errors
+          return v.replace(/\w[^,|& ]*/g, function(v) { return wrap(v, n) }) + '?"' + k + '":"",'
+
+        }) + '].join(" ")'
+
+      // if js expression, evaluate as javascript
+      : wrap(s, n)
+
+  }
+
+
+  // execute js w/o breaking on errors or undefined vars
+
+  function wrap(s, nonull) {
+    return '(function(v){try{v='
+
+        // prefix vars (name => data.name)
+        + (s.replace(re_vars, function(s, _, v) { return v ? 'd.' + v : s })
+
+          // break the expression if its empty (resulting in undefined value)
+          || 'x')
+
+      + '}finally{return '
+
+        // default to empty string for falsy values except zero
+        + (nonull ? '!v&&v!==0?"":v' : 'v')
+
+      + '}}).call(d)'
+  }
+
 })()
 ;(function(riot, is_browser) {
 
@@ -496,6 +769,10 @@ riot._tmpl = (function() {
         tag = { root: mountNode, opts: opts, parent: parent, __item: conf.item },
         attributes = {}
 
+    if (!opts.tag) {
+      opts.tag = {}
+    }
+
     // named elements
     extend(tag, ast.elem)
 
@@ -534,9 +811,9 @@ riot._tmpl = (function() {
         extend(tag, data)
         extend(tag, tag.__item)
 
-        if (opts.transclude) {
-          // If transclude is enabled collect all the child elements of root node on a temporary node and save for later use
-          opts.include = moveChildren(mountNode, doc.createElement('div'))
+        if (opts.tag && opts.tag.transclusion) {
+          // If transclusion is enabled collect all the child elements of root node on a temporary node and save for later use
+          opts.tag.__include = moveChildren(mountNode, doc.createElement('div'))
         }
 
         updateOpts()
@@ -554,11 +831,11 @@ riot._tmpl = (function() {
 
     tag.update(0, true)
 
-    if (opts.replacetag) {
+    if (opts.tag && opts.tag.skipRootNode) {
       dom.firstChild.setAttribute("data-riot-tag", mountNode.nodeName);
-      if ((mountNode.nodeName == 'INCLUDE') && (parent.opts.include)) {
-        //if the parent has a stored include el and the current root node is INCLUDE
-        moveChildren(parent.opts.include, dom.firstChild)
+      if ((mountNode.nodeName == 'TRANSCLUDE') && parent && parent.opts && parent.opts.tag && parent.opts.tag.__include) {
+        //if the parent has a stored include el and the current root node is TRANSCLUDE
+        moveChildren(parent.opts.tag.__include, dom.firstChild)
         mountNode = mountNode.parentNode.replaceChild(dom.firstChild, mountNode)
       } else {
         mountNode = mountNode.parentNode.replaceChild(dom.firstChild, mountNode)
@@ -717,12 +994,26 @@ riot._tmpl = (function() {
     })
   }
 
-  riot.tag('include', '<span></span>', function(opts) {
-    opts.replacetag = true
+  riot.tag('transclude', '<span></span>', function(opts) {
+    opts.tag.skipRootNode = true
   });
 
 
 })(riot, this.top)
+
+// support CommonJS
+if (typeof exports === 'object')
+  module.exports = riot
+
+// support AMD
+else if (typeof define === 'function' && define.amd)
+  define(function() { return riot })
+
+// support browser
+else
+  this.riot = riot
+
+})();
 
 
 (function(is_node) {
