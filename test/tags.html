@@ -15,7 +15,7 @@
     <script src="ie8/html5-shiv.js"></script>
     <script>
     html5.addElements('timetable timer loop-manip loop-child looped-child loop-context loop-replace loop-position ' +
-      'tag-nesting inner1 inner2 inner-html loop-strings loop-object loop-multi loop-nested table-data')
+      'tag-nesting inner1 inner2 inner-html loop-strings loop-object loop-multi loop-nested table-data if-test')
     </script>
   <![endif]-->
 </head>
@@ -24,6 +24,9 @@
 
   <div id="tags">
 
+    <if-test></if-test>
+
+    <!--
     <loop-multi></loop-multi>
     <loop-replace></loop-replace>
     <loop-object></loop-object>
@@ -37,13 +40,10 @@
     <loop-nested></loop-nested>
     <inner-html><h3>Inner title</h3></inner-html>
     <loop-position></loop-position>
-    <!--
     -->
-
 
   </div>
 
-  <script>var riot = {}</script>
   <script src="../dist/riot/riot.js"></script>
   <script src="../dist/tags.js"></script>
   <script>var tags = riot.mount('*')</script>
