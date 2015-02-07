@@ -1,6 +1,6 @@
 
 
-(function(is_node) {
+;(function(is_node) {
 
   var BOOL_ATTR = ('allowfullscreen,async,autofocus,autoplay,checked,compact,controls,declare,default,'+
     'defaultchecked,defaultmuted,defaultselected,defer,disabled,draggable,enabled,formnovalidate,hidden,'+
@@ -280,4 +280,4 @@
     return browserCompile(str, true)
   }
 
-})(!this.top)
+})(!this.top);
