@@ -387,6 +387,7 @@ riot._tmpl = (function() {
 
       // event handler
       if (typeof value == 'function') {
+        remAttr(attr_name)
         setEventHandler(attr_name, value, dom, instance)
 
       // show / hide / if
