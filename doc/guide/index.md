@@ -483,12 +483,9 @@ Again, the expression can be just a simple property or a full JavaScript express
 
 - `show` – show the element using `style="display: ''"` when the value is true
 - `hide` – hide the element using `style="display: none"` when the value is true
-- `if` – add (true value) or remove (false value) the element from the document*
+- `if` – add (true value) or remove (false value) the element from the document
 
 The equality operator is `==` and not `===`. For example: `'a string' == true`.
-
-<small>Currently `if` is implemented with CSS display property as well.</small>
-
 
 
 ## Loops
