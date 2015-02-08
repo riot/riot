@@ -10,8 +10,8 @@ body_id: riot-releases
 ### 2.0.8 *Feb --, 2015*
 
 - Global variables in expressions, e.g. `{ location }`
-- Customizable `{` brackets `}`, e.g. `[ ]`, `<% %>`
-- Customizable `.tag` extension, e.g. `.html`
+- Customizable `.tag` extension, e.g. `riot --ext html`
+- Customizable `{` brackets `}`, e.g. `riot.brackets('[]')`, `riot.brackets(['<%', '%>'])`
 
 
 ### 2.0.7 *Jan 29, 2015*
