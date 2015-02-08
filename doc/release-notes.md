@@ -11,7 +11,7 @@ body_id: riot-releases
 
 - Global variables in expressions, e.g. `{ location }`
 - Customizable `.tag` extension, e.g. `riot --ext html`
-- Customizable `{` brackets `}`, e.g. `riot.brackets('[]')`, `riot.brackets(['<%', '%>'])`
+- Customizable `{` brackets `}`, e.g. `riot.settings({ brackets: '[ ]' })`
 
 
 ### 2.0.7 *Jan 29, 2015*
