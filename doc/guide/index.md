@@ -331,11 +331,11 @@ Riot expressions can only render text values without HTML formatting. However yo
 After the tag is defined you can use it inside other tags. For example
 
 ```
-<raw>
+<my-tag>
   <p>Here is some raw content: <raw content="{ html }"/> </p>
 
   this.html = 'Hello, <strong>world!</raw>'
-</raw>
+</my-tag>
 ```
 
 [demo on jsfiddle](http://jsfiddle.net/23g73yvx/)
