@@ -1,6 +1,6 @@
 <head>
 <title>tmpl test</title>
-<script>var riot = {}</script>
+<script src="../dist/riot/riot.js"></script>
 <script src="../lib/tmpl.js"></script>
 </head>
 
@@ -103,18 +103,18 @@ test(2, '{ x }')
 test('y', '{ y: x }')
 
 // custom brackets
-tmpl.brackets('[]')
+riot.settings({ brackets: '[]' })
 test(2, '[ x ]')
 test('x', '[ str\\[0\\] ]')
-tmpl.brackets('<%', '%>')
+riot.settings({ brackets: '<% %>' })
 test(2, '<% x %>')
-tmpl.brackets()
+riot.settings({ brackets: null })
 
 // maybe / later:
 //test('{"x":5}', '{ JSON.stringify({ x: 5 }) }')
 
-function test(a, b, opts) {
-  assert(a, tmpl(b, data, opts), b)
+function test(a, b) {
+  assert(a, tmpl(b, data), b)
 }
 
 function assert(a, b, should) {
