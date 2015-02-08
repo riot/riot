@@ -331,7 +331,7 @@ Riot expressions can only render text values without HTML formatting. However yo
 After the tag is defined you can use it inside other tags. For example
 
 ```
-<my-tag>
+<raw>
   <p>Here is some raw content: <raw content="{ html }"/> </p>
 
   this.html = 'Hello, <strong>world!</raw>'
