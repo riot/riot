@@ -128,6 +128,15 @@ riot -w src dist
 ```
 
 
+### Custom extension
+
+You're free to use any file extension for your tags (instead of default `.tag`):
+
+``` sh
+riot --ext html
+```
+
+
 ### Node module
 
 ```

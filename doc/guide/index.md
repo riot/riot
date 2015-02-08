@@ -307,11 +307,25 @@ Riot has a special syntax for CSS class names. For example:
 
 evaluates to "foo baz zorro". Property names whose value is truthful are appended to the list of class names. Of course you can use this notation in other places than class names if you find a suitable use case.
 
-### Miscellaneous
+
+### Printing brackets
 
 You can output an expression without evaluation by escaping the opening bracket:
 
 `\\{ this is not evaluated \\}` outputs `{ this is not evaluated }`
+
+
+### Customizing brackets
+
+You are free to customize the brackets to your liking:
+
+``` js
+riot.settings({ brackets: '[]' })
+riot.settings({ brackets: '<% %>' })
+```
+
+
+### Etc
 
 Expressions inside `<style>` tags are ignored.
 
