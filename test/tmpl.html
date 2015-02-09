@@ -107,12 +107,12 @@ test(2, '{ x }')
 test('y', '{ y: x }')
 
 // custom brackets
-riot.settings({ brackets: '[ ]' })
+riot.settings.brackets = '[ ]'
 test(2, '[ x ]')
 test('x', '[ str\\[0\\] ]')
-riot.settings({ brackets: '<% %>' })
+riot.settings.brackets = '<% %>'
 test(2, '<% x %>')
-riot.settings({ brackets: null })
+riot.settings.brackets = '{ }'
 
 // maybe / later:
 //test('{"x":5}', '{ JSON.stringify({ x: 5 }) }')
