@@ -222,7 +222,7 @@
       var url = script.getAttribute('src')
 
       function compileTag(source) {
-        script.parentNode.removeChild(script)
+        // script.parentNode.removeChild(script)
         globalEval(source)
 
         if (i + 1 == scripts.length) {
