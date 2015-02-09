@@ -271,8 +271,7 @@ riot._tmpl = (function() {
       + '}}).call(d)'
   }
 
-})()
-;(function(riot, is_browser) {
+})();(function(riot, is_browser) {
 
   if (!is_browser) return
 
@@ -478,7 +477,12 @@ riot._tmpl = (function() {
 
   }
 
-
+  function moveChildren(src, dst) {
+    while (src.firstChild) {
+      dst.appendChild(src.removeChild(src.firstChild))
+    }
+    return dst
+  }
 
   // create new custom tag (component)
   function createTag(conf) {
@@ -490,6 +494,10 @@ riot._tmpl = (function() {
         ast = parse(dom),
         tag = { root: mountNode, opts: opts, parent: parent, __item: conf.item },
         attributes = {}
+
+    if (!opts.tag) {
+      opts.tag = {}
+    }
 
     // named elements
     extend(tag, ast.elem)
@@ -515,9 +523,7 @@ riot._tmpl = (function() {
 
     if (conf.fn) conf.fn.call(tag, opts)
 
-
     tag.update = function(data, _system) {
-
       /*
         If loop is defined on the root of the HTML template
         the original parent is a temporary <div/> by mkdom()
@@ -527,9 +533,15 @@ riot._tmpl = (function() {
         dom = null
       }
 
-      if (_system || doc.body.contains(mountNode)) {
+      if (_system || doc.body.contains(mountNode) || doc.querySelectorAll("[data-riot-tag='" + mountNode.nodeName + "']").length > 0) {
         extend(tag, data)
         extend(tag, tag.__item)
+
+        if (opts.tag && opts.tag.transclusion) {
+          // If transclusion is enabled collect all the child elements of root node on a temporary node and save for later use
+          opts.tag.__include = moveChildren(mountNode, doc.createElement('div'))
+        }
+
         updateOpts()
         update(ast.expr, tag)
 
@@ -545,12 +557,23 @@ riot._tmpl = (function() {
 
     tag.update(0, true)
 
-    // append to root
-    while (dom.firstChild) {
-      if (conf.before) mountNode.insertBefore(dom.firstChild, conf.before)
-      else mountNode.appendChild(dom.firstChild)
+    if (opts.tag && opts.tag.skipRootNode) {
+      dom.firstChild.setAttribute("data-riot-tag", mountNode.nodeName);
+      if ((mountNode.nodeName == 'TRANSCLUDE') && parent && parent.opts && parent.opts.tag && parent.opts.tag.__include) {
+        //if the parent has a stored include el and the current root node is TRANSCLUDE
+        moveChildren(parent.opts.tag.__include, dom.firstChild)
+        mountNode = mountNode.parentNode.replaceChild(dom.firstChild, mountNode)
+      } else {
+        mountNode = mountNode.parentNode.replaceChild(dom.firstChild, mountNode)
+      }
     }
-
+    else {
+        // append to root
+        while (dom.firstChild) {
+          if (conf.before) mountNode.insertBefore(dom.firstChild, conf.before)
+          else mountNode.appendChild(dom.firstChild)
+        }
+    }
 
     tag.trigger('mount')
 
@@ -697,8 +720,12 @@ riot._tmpl = (function() {
     })
   }
 
-})(riot, this.top)
+  riot.tag('transclude', '<span></span>', function(opts) {
+    opts.tag.skipRootNode = true
+  });
 
+
+})(riot, this.top)
 
 // support CommonJS
 if (typeof exports === 'object')
