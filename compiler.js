@@ -1,6 +1,5 @@
 
-
-(function(is_node) {
+;(function(is_node) {
 
   var BOOL_ATTR = ('allowfullscreen,async,autofocus,autoplay,checked,compact,controls,declare,default,'+
     'defaultchecked,defaultmuted,defaultselected,defer,disabled,draggable,enabled,formnovalidate,hidden,'+
@@ -222,7 +221,6 @@
       var url = script.getAttribute('src')
 
       function compileTag(source) {
-        // script.parentNode.removeChild(script)
         globalEval(source)
 
         if (i + 1 == scripts.length) {
@@ -237,13 +235,26 @@
 
   }
 
-  function browserCompile(arg, skip_eval) {
 
-    // string -> compile a new tag
+  riot.compile = function(arg, fn) {
+
+    // string
     if (typeof arg == 'string') {
-      var js = unindent(compile(arg))
-      if (!skip_eval) globalEval(js)
-      return js
+
+      // compile & return
+      if (arg.trim()[0] == '<') {
+        var js = unindent(compile(arg))
+        if (!fn) globalEval(js)
+        return js
+
+      // URL
+      } else {
+        return GET(arg, function(str) {
+          var js = unindent(compile(str))
+          globalEval(js)
+          fn && fn(js, str)
+        })
+      }
     }
 
     // must be a function
@@ -269,15 +280,15 @@
       mountTo = riot.mountTo
 
   riot.mount = function(a, b) {
-    browserCompile(function() { mount(a, b) })
+    var ret
+    riot.compile(function() { ret = mount(a, b) })
+    return ret
   }
 
   riot.mountTo = function(a, b, c) {
-    browserCompile(function() { mountTo(a, b, c) })
-  }
-
-  riot._compile = function(str) {
-    return browserCompile(str, true)
+    var ret
+    riot.compile(function() { ret = mountTo(a, b, c) })
+    return ret
   }
 
 })(!this.top)
