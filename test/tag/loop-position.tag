@@ -7,7 +7,9 @@
 
   <h3>between</h3>
 
-  <span each="{ items }">{ x }</span>
+  <p>
+    <span each="{ items }">{ x }</span>
+  </p>
 
   this.items = [{ x: '1 ' }, { x: '2 ' }]
 

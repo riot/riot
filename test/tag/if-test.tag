@@ -7,13 +7,10 @@
 
   <p>before</p>
   <p if={ flag }>COND</p>
+
   <p>after</p>
 
-  <table border="1">
-    <tr>
-      <td each={ num, i in nums} if={ num == parent.flag }>{ num }</td>
-    </tr>
-  </table>
+  <p each={ num, i in nums} if={ num == parent.flag }>{ num }</p>
 
   // this.flag = true
   var self = this
