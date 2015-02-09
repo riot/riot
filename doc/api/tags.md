@@ -143,7 +143,7 @@ this.on('unmount', function() {
 
 #### Reserved words
 
-The above method and property names are reserved words for Riot tags. Don't use any of following as your instance variable or method name: `opts`, `parent`, `root`, `update`, `on`, `one` and `trigger`. Local variables can be freely named. For example:
+The above method and property names are reserved words for Riot tags. Don't use any of following as your instance variable or method name: `opts`, `parent`, `children`, `root`, `update`, `unmount`, `on`, `off`, `one` and `trigger`. Local variables can be freely named. For example:
 
 ``` html
 <my-tag>
@@ -155,7 +155,9 @@ The above method and property names are reserved words for Riot tags. Don't use 
   this.update = function() { }
 
   // not allowed
-  update() { }
+  update() {
+
+  }
 
 </my-tag>
 ```

@@ -8,8 +8,6 @@
   <button onclick={ top }>Top</button>
   <button onclick={ bottom }>Bottom</button>
 
-  var self = this
-
   this.items = [{ title: 'First' }, { title: 'Second' }]
 
   bottom() {
@@ -21,8 +19,8 @@
   }
 
   remove(e) {
-    var i = self.items.indexOf(e.item)
-    self.items.splice(i, 1)
+    var i = this.items.indexOf(e.item)
+    this.items.splice(i, 1)
   }
 
 </loop-manip>
