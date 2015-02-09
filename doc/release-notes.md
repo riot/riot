@@ -7,7 +7,7 @@ body_id: riot-releases
 ====
 
 
-### 2.0.8 *Feb 10, 2015*
+### 2.0.8 *Feb 9, 2015*
 
 - New `unmount()` method and `children[]` property for [tag instances](/riotjs/api/#tag-instance)
 - One way data flow: updates and unmounts always propagate downwards from parent to children
