@@ -11,9 +11,9 @@
     <script>html5.addElements('timetable timer')</script>
   <![endif]-->
 
-  <script type="riot/tag">
+  <script type="riot/tag" id="tag_src">
     <foo>
-      <p>{ opts.baz }{ bar }</p>
+      <p>{ opts.baz } { bar }</p>
 
       this.bar = 'romutus'
     </foo>
@@ -30,8 +30,8 @@
   </script>
 
   <!--
-  <script type="riot/tag" src="../tag/timer.tag"></script>
   -->
+  <script type="riot/tag" src="../tag/timer.tag"></script>
 
 </head>
 
@@ -49,20 +49,19 @@
     })
 
 
-    /*
     riot.update()
     // grab source code for performance tests
-    var timer_src = timer.innerHTML
+
+    var src = tag_src.innerHTML
 
     // compile timer 1000 times and see how long it takes
     var begin = +new Date
 
     for (var i = 0; i < 1000; i++) {
-      riot._compile(timer_src)
+      riot.compile(src, true)
     }
 
     console.info(+new Date - begin)
-    */
 
   </script>
 
