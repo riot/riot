@@ -1,4 +1,4 @@
-
+f
 nogen: true
 
 ====
@@ -48,6 +48,7 @@ Following properties are set for each tag instance:
 
 - `opts` - the options object
 - `parent` - the parent tag if any
+- `children` - array of child tag instances (custom tags and looped items)
 - `root` - root DOM node
 
 You can use these references in both the HTML and JavaScript code. For example:
@@ -72,9 +73,9 @@ You can freely set any data to the instance (aka "context") and they are availab
 ```
 
 
-### this.update() | #this-update
+### this.update() | #tag-update
 
-Updates the expressions on the current tag instance. This method is automatically called every time an event handler is called when user interacts with the application.
+Updates all the expressions on the current tag instance as well as on all the children. This method is automatically called every time an event handler is called when user interacts with the application.
 
 Other than that riot does not update the UI automatically so you need to call this method manually. This typically happens after some non-UI related event: after `setTimeout`, AJAX call or on some server event. For example:
 
@@ -99,7 +100,7 @@ Other than that riot does not update the UI automatically so you need to call th
 On above example the error message is displayed on the UI after the `update()` method has been called. We assign `this` variable to `self` since inside the AJAX callback `this` variable points to the response object and not to the tag instance.
 
 
-### this.update(data) | #this-update-data
+### this.update(data) | #tag-update-data
 
 Set values of the current instance and update the expressions. This is same as `this.update()` but allows you to set context data at the same time. So instead of this:
 
@@ -115,6 +116,11 @@ self.update({ error: error_message })
 ```
 
 which is shorter and cleaner.
+
+
+### this.unmount() | #tag-unmount
+
+Detaches the tag and it's children from the page. An "unmount" event is fired.
 
 
 #### Events
@@ -193,7 +199,8 @@ See [timer demo](http://jsfiddle.net/gnumanth/h9kuozp5/) and [riot.tag](/riotjs/
 1. Self- closing tags
 2. Unquoted expressions. Write `value="{ val }"` instead of `value={ val }`
 3. Boolean attributes. Write `__checked="{ flag }"` instead of `checked={ flag }`
-
+4. Shorthand ES6 method signatures
+5. `this.update()` must be manually called on an event handler
 
 You can take advantage of `template` or `script` tags as follows:
 
@@ -209,6 +216,8 @@ riot.tag('tag-name', my_tmpl.innerHTML, function(opts) {
 })
 </script>
 ```
+
+This method is on the edge of being depreciated.
 
 
 

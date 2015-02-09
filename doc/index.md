@@ -67,17 +67,18 @@ HTML syntax is the *de facto* language of the web and it's designed for building
 <span class="tag">note</span> the tags are [converted](compiler.html) to JavaScript before browsers can execute them.
 
 
-### Intelligent DOM manipulation
+### Virtual DOM
 - Absolutely the smallest possible amount of DOM updates and reflows.
+- One way data flow: updates and unmounts are propagated downwards from parent to children.
 - Expressions are pre-compiled and cached for high performance.
-- No extra HTML root elements or `data-` attributes.
-- Lifecycle events for more special needs.
+- Lifecycle events for more control.
 
 
 ### Close to standards
 - No proprietary event system.
 - Event normalization for IE8.
 - The rendered DOM can be freely manipulated with other tools.
+- No extra HTML root elements or `data-` attributes.
 - Plays well with jQuery.
 
 
