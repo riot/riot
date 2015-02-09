@@ -1,13 +1,10 @@
 
 <inner-html>
 
-  <h3>Tag title</h3>
+  <h3 name="title">Tag title</h3>
 
-  var h3 = this.root.firstChild,
-      self = this
-
-  self.on('mount', function() {
-    self.root.appendChild(h3)
+  this.on('mount', function() {
+    this.root.appendChild(this.title)
   })
 
 </inner-html>
