@@ -9,9 +9,11 @@ body_id: riot-releases
 
 ### 2.0.8 *Feb --, 2015*
 
+- [Compiler API](/riotjs/api/#compiler)
 - Global variables in expressions, e.g. `{ location }`
 - Customizable `.tag` extension, e.g. `riot --ext html`
 - Customizable `{` brackets `}`, e.g. `riot.settings({ brackets: '[ ]' })`
+- The semi-hidden `riot._tmpl()` is now completely hidden and not part of the global `riot` object
 
 
 ### 2.0.7 *Jan 29, 2015*
