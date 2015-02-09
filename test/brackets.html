@@ -26,16 +26,21 @@
 
   <one/>
   <two/>
+  <three/>
 
   <script>
     
-    riot._tmpl.brackets('[]') // TODO: add a riot.brackets() shortcut?
+    riot.settings({ brackets: '[]' }) // TODO: add a riot.brackets() shortcut?
     riot.tag('one', '<p>[ x ]</p>', function() { this.x = 'ok' })
     riot.mount('one')
 
-    riot._tmpl.brackets('<%', '%>')
+    riot.settings({ brackets: '<% %>' })
     riot.tag('two', '<p><% x %></p>', function() { this.x = 'ok' })
     riot.mount('two')
+
+    riot.settings({ brackets: '${ }' })
+    riot.tag('three', '<p>${ x }</p>', function() { this.x = 'ok' })
+    riot.mount('three')
 
   </script>
 
