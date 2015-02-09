@@ -9,11 +9,16 @@ body_id: riot-releases
 
 ### 2.0.8 *Feb --, 2015*
 
-- [Compiler API](/riotjs/api/#compiler)
+- The `if` attribute now works as expected by adding or removing the root node from DOM
+- New `unmount()` method and `children[]` property for a [tag instance](/riotjs/api/#tag-instance)
+- One way data flow: updates and unmounts always propagate downwards from parent to children
+- [Compiler API](/riotjs/api/#compiler) exposed to the public
 - Global variables in expressions, e.g. `{ location }`
 - Customizable `.tag` extension, e.g. `riot --ext html`
 - Customizable `{` brackets `}`, e.g. `riot.settings({ brackets: '[ ]' })`
+- Ability to print the current version with: `riot --version`
 - The semi-hidden `riot._tmpl()` is now completely hidden and not part of the global `riot` object
+- Reorganized source code. The former big `view.js` is now split into multiple files.
 
 
 ### 2.0.7 *Jan 29, 2015*
