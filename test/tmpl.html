@@ -18,12 +18,12 @@ var data = {
   fn: function(s) { return ['hi', s].join(' ') }
 }
 
-test('<div class="one two three four">',
+test('<div class="one two th_r-e3 four five">',
      '<div class="{'
        + 'one: !no,'
        + 'two: false || null || !no && yes,'
-       + 'three: 4 > 2,'
-       + 'four: fn()'
+       + '\'th_r-e3\': 4 > 2,'
+       + '\'four five\': fn()'
      + '}">')
 
 test('a b c', '{ true ? "a b c" : "foo" }')
