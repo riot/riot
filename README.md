@@ -89,6 +89,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 ### Tutorials
 - [Building tabs with Riot](http://www.robertwpearce.com/blog/riotjs-example/)
 - [The "React tutorial" for Riot](https://juriansluiman.nl/article/154/the-react-tutorial-for-riot)
+- [How to package "tag libraries" in Riot](https://github.com/ivan-saorin/riot-tutorial-tags-pack-app)
 
 
 ### Resources
