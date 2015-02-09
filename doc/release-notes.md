@@ -9,13 +9,13 @@ body_id: riot-releases
 
 ### 2.0.8 *Feb 10, 2015*
 
+- New `unmount()` method and `children[]` property for [tag instances](/riotjs/api/#tag-instance)
 - One way data flow: updates and unmounts always propagate downwards from parent to children
 - The `if` attribute now works as expected by adding or removing the root node from DOM
-- New `unmount()` method and `children[]` property for [tag instances](/riotjs/api/#tag-instance)
 - [Compiler API](/riotjs/api/#compiler) exposed to the public
 - Global variables are supported in expressions, e.g. `{ location }`
 - Customizable `.tag` extension, e.g. `riot --ext html`
-- Customizable `{` brackets `}`, e.g. `riot.settings({ brackets: '[ ]' })`
+- [Customizable brackets](/riotjs/api/#brackets), e.g. `riot.settings.brackets = '${ }'`
 - Ability to print the current version with: `riot --version`
 - The semi-hidden `riot._tmpl()` is now completely hidden and not part of the global `riot` object
 - Reorganized source code. The former big `view.js` is now split into [multiple files](https://github.com/muut/riotjs/tree/master/lib/tag)

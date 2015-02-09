@@ -317,12 +317,15 @@ You can output an expression without evaluation by escaping the opening bracket:
 
 ### Customizing brackets
 
-You are free to customize the brackets to your liking:
+You are free to customize the brackets to your liking. For example:
 
 ``` js
-riot.settings({ brackets: '[]' })
-riot.settings({ brackets: '<% %>' })
+riot.settings.brackets = '${ }'
+riot.settings.brackets = '\{\{ }}'
 ```
+
+the start and end is separated with a space character.
+
 
 
 ### Etc
