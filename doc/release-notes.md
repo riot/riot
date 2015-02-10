@@ -6,6 +6,10 @@ body_id: riot-releases
 
 ====
 
+### 2.0.9 *Feb __, 2015*
+
+- Took away `children` property, which was designed for theoretical need mostly.
+
 
 ### 2.0.8 *Feb 9, 2015*
 
