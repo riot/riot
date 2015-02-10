@@ -3,7 +3,7 @@
 
 [![Riot logo](doc/logo/riot480x.png)](https://muut.com/riotjs/)
 
-### Custom tags • Minimal syntax • Less DOM reflows • Full stack • IE8
+### Custom tags • Minimal syntax • Virtual DOM • Full stack • IE8
 
 Riot brings custom tags to all browsers starting from IE8. Think React + Polymer, but squeezed into 5.7KB (2.5KB when gzipped).
 
@@ -51,17 +51,18 @@ Custom tags lets you build complex views with HTML.
 HTML syntax is the de facto language on the web and it's designed for building user interfaces. The syntax is explicit, nesting is inherent to the language and attributes offer a clean way to provide options for custom tags.
 
 
-### Intelligent DOM manipulation
+### Virtual DOM
 - Absolutely the smallest possible amount of DOM updates and reflows.
+- One way data flow: updates and unmounts are propagated downwards from parent to children.
 - Expressions are pre-compiled and cached for high performance.
-- No extra HTML root elements or `data-` attributes.
-- Lifecycle events for more special needs.
+- Lifecycle events for more control.
 
 
 ### Close to standards
 - No proprietary event system.
 - Event normalization for IE8.
 - The rendered DOM can be freely manipulated with other tools.
+- No extra HTML root elements or `data-` attributes.
 - Plays well with jQuery.
 
 
@@ -92,11 +93,11 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 
 ### Resources
+- [Riot + Angular](https://github.com/lucasbrigida/angular-riot)
 - [Module loader for WebPack](https://www.npmjs.com/package/riotjs-loader)
 - [Riot module for AngularJS](https://github.com/lucasbrigida/angular-riot)
 - [Riot + Meteor]( https://atmospherejs.com/xaiki/riotjs)
 - [Riot on CodeClimate](https://codeclimate.com/github/muut/riotjs/code)
-
 
 
 https://muut.com/riotjs/

@@ -15,7 +15,8 @@
   this.items = [
     { title: 'Existing #1', done: true },
     { title: 'Existing #2', fn: function() {
-      this.title = 'kissala'
+      self.items[2].title = 'kissala'
+      self.update()
     }}
   ]
 

@@ -6,13 +6,45 @@
   <!--[if lt IE 9]>
     <script src="ie8/es5-shim.js"></script>
     <script src="ie8/html5-shiv.js"></script>
-    <script>html5.addElements('table-data')</script>
+    <script>
+    html5.addElements('test')
+    </script>
   <![endif]-->
 </head>
 
 <body>
-  <table-data></table-data>
-  <script src="../riot.js"></script>
-  <script src="../dist/tags.js"></script>
-  <script>riot.mount('*')</script>
+
+  <test></test>
+
+  <script>var riot = {}</script>
+  <script src="../dist/riot/riot.js"></script>
+
+  <script>
+  riot.tag('inner', '<h3>{ opts.val }</h3>', function() {
+
+  })
+
+  var loop = '<p each="{items}" onclick="{ parent.remove }">{ val }</p>'
+
+  riot.tag('test', loop + loop, function(opts) {
+    var self = this
+
+    this.items = [
+      { val: 'hello '},
+      { val: 'bad '},
+      { val: 'world '}
+    ]
+
+    this.remove = function(e) {
+      self.items.splice(self.items.indexOf(e.item), 1)
+      self.update()
+    }
+
+  })
+
+  var tags = riot.mount('test', { world: 'world!' })
+
+  console.info(tags[0])
+  </script>
+
 </body>

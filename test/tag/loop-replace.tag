@@ -8,9 +8,9 @@
   </div>
 
   var self = this
-  self.items = [ { v: 'a' }, { v: 'b' } ]
+  self.items = [ { v: 'a' }, { v: 9 }, { v: 338 } ]
 
-  setTimeout(function() { self.update({ items: [ {v:'c'}, {v:'d'} ] }) }, 200)
-  setTimeout(function() { self.items = [ {v:'e'}, {v:'f'} ]; self.update() }, 400)
+  setTimeout(function() { self.update({ items: [ { v:'c'}, {v:'d'} ] }) }, 200)
+  setTimeout(function() { self.update({ items: [ {v:'e'}, {v:'f'} ] }) }, 400)
 
 </loop-replace>

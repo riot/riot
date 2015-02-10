@@ -6,6 +6,21 @@ body_id: riot-releases
 
 ====
 
+
+### 2.0.8 *Feb 9, 2015*
+
+- New `unmount()` method and `children[]` property for [tag instances](/riotjs/api/#tag-instance)
+- One way data flow: updates and unmounts always propagate downwards from parent to children
+- The `if` attribute now works as expected by adding or removing the root node from DOM
+- [Compiler API](/riotjs/api/#compiler) exposed to the public
+- Global variables are supported in expressions, e.g. `{ location }`
+- Customizable `.tag` extension, e.g. `riot --ext html`
+- [Customizable brackets](/riotjs/api/#brackets), e.g. `riot.settings.brackets = '${ }'`
+- Ability to print the current version with: `riot --version`
+- The semi-hidden `riot._tmpl()` is now completely hidden and not part of the global `riot` object
+- Reorganized source code. The former big `view.js` is now split into [multiple files](https://github.com/muut/riotjs/tree/master/lib/tag)
+
+
 ### 2.0.7 *Jan 29, 2015*
 
 - Super fast [in-browser compilation](compile.html) for: `<script type="riot/tag">`
@@ -28,8 +43,8 @@ var js_string = riot.compile(tag_source_string)
 ### 2.0.5 *Jan 27, 2015*
 
 - An ability to plug in a JavaScript pre-processor
-- Build-it CoffeeScript support
-- Build-it EcmaScript 6 support
+- Built-in CoffeeScript support
+- Built-in EcmaScript 6 support
 
 
 ### 2.0.2 *Jan 26, 2015*

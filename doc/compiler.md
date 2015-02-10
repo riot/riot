@@ -45,6 +45,8 @@ The compiler weights only 3.2KB (1.7K gzipped) so you can safely perform client 
 
 Just like Riot itself the compiler works on IE8 as well.
 
+Read the [compiler API](/riotjs/api/#compiler) for more details.
+
 
 ### Demos
 
@@ -125,6 +127,15 @@ You can watch directories and automatically transform files when they are change
 ``` sh
 # watch for
 riot -w src dist
+```
+
+
+### Custom extension
+
+You're free to use any file extension for your tags (instead of default `.tag`):
+
+``` sh
+riot --ext html
 ```
 
 
