@@ -250,6 +250,38 @@ An sample tag written in TypeScript:
 npm install typescript-simple
 ```
 
+
+### LiveScript
+
+The source language is specified with `--type` or `-t` argument:
+
+``` sh
+# use livescript pre-processor
+riot --type livescript --expr source.tag
+```
+
+The `--expr` argument specifies that all the expressions are also processed as well. You can also use "ls" as an alias to "livescript". Here is a sample tag written in LiveScript:
+
+```
+<kids>
+
+  <h3 each={ kids[1 .. 2] }>{ name }</h3>
+
+  # Here are the kids
+  this.kids =
+    * name: \Max
+    * name: \Ida
+    * name: \Joe
+
+</kids>
+```
+
+Note that `each` attribute is LiveScript as well. LiveScript must be present on your machine:
+
+``` sh
+npm install LiveScript -g
+```
+
 ### Jade
 
 HTML layout can be processed with `template` configuration option. Here's an example with Jade – a "clean, whitespace sensitive syntax for writing html"
@@ -308,5 +340,3 @@ riot --type none --expr source.tag
 ```
 
 If you make something great, please [share it](https://github.com/muut/riotjs/issues/58) !
-
-
