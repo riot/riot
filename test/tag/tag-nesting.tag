@@ -1,8 +1,7 @@
 
 <tag-nesting>
 
-  <inner1 foo={ foo } bar={ bar }/>
-  <inner1 foo={ foo } bar={ bar }/>
+  <inner1 bar="{ bar }" foo={ foo } />
 
   this.foo = { value: 10 }
   this.bar = { value: 20 }
@@ -17,11 +16,11 @@
 </tag-nesting>
 
 <inner1>
-  <p>foo: { opts.foo.value }</p>
-  <p>bar: { opts.bar.value }</p>
-  <inner2 bar={ opts.bar }/>
+  <p>Inner1 foo: { opts.foo.value }</p>
+  <p>Inner1 bar: { opts.bar.value }</p>
+  <inner2 bar={ opts.bar } />
 </inner1>
 
 <inner2>
-  <p>Inner: { opts.bar.value + 50 }</p>
+  <p>Inner2: { opts.bar.value + 50 }</p>
 </inner2>

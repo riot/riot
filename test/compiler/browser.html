@@ -11,58 +11,57 @@
     <script>html5.addElements('timetable timer')</script>
   <![endif]-->
 
-  <script type="riot/tag" id="timer">
-    <timer>
+  <script type="riot/tag" id="tag_src">
+    <foo>
+      <p>{ opts.baz } { bar }</p>
 
-      <p>Seconds Elapsed: { time }</p>
+      this.bar = 'romutus'
+    </foo>
+    <timetable>
+      <timer start={ time } each={ time, i in times }></timer>
 
-      this.time = opts.start || 0
+      <foo barz="899" baz="90"></foo>
 
-      tick() {
-        this.update({ time: ++this.time })
-      }
+      <p>{ kama }</p>
 
-      var timer = setInterval(this.tick, 1000)
-
-      this.on('unmount', function() {
-        console.info('timer cleared')
-        clearInterval(timer)
-      })
-    </timer>
+      this.times = [ 1, 3, 5 ]
+      this.kama = 'jooo'
+    </timetable>
   </script>
 
-  <script src="../tag/timetable.tag" type="riot/tag"></script>
+  <!--
+  -->
+  <script type="riot/tag" src="../tag/timer.tag"></script>
 
 </head>
-
 
 <body>
 
   <timetable></timetable>
-  <div id="foo"></div>
 
-  <script src="../../riot.js"></script>
+  <script src="../../dist/riot/riot.js"></script>
   <script src="../../lib/compiler.js"></script>
 
   <script>
 
+    riot.compile(function() {
+      tags = riot.mount('timetable', { start: 0 })
+    })
+
+
+    riot.update()
     // grab source code for performance tests
-    var timer_src = timer.innerHTML
+
+    var src = tag_src.innerHTML
 
     // compile timer 1000 times and see how long it takes
     var begin = +new Date
 
     for (var i = 0; i < 1000; i++) {
-      riot._compile(timer_src)
+      riot.compile(src, true)
     }
 
     console.info(+new Date - begin)
-
-    riot.mount('*')
-
-    setTimeout(function() {
-      riot.mountTo(foo, 'timetable')
-    }, 1000)
 
   </script>
 

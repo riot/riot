@@ -12,7 +12,8 @@
   var self = this
 
   setTimeout(function() {
-    self.obj.zero = 'the first'
+    self.obj.zero = 'zero'
+    self.obj.two = 'two'
     self.update()
   }, 200)
 

@@ -1,6 +1,6 @@
 <head>
-<title>riot.tmpl test</title>
-<script>var riot = {}</script>
+<title>tmpl test</title>
+<script src="../dist/riot/riot.js"></script>
 <script src="../lib/tmpl.js"></script>
 </head>
 
@@ -18,12 +18,12 @@ var data = {
   fn: function(s) { return ['hi', s].join(' ') }
 }
 
-test('<div class="one two three four">',
+test('<div class="one two th_r-e3 four five">',
      '<div class="{'
        + 'one: !no,'
        + 'two: false || null || !no && yes,'
-       + 'three: 4 > 2,'
-       + 'four: fn()'
+       + '\'th_r-e3\': 4 > 2,'
+       + '\'four five\': fn()'
      + '}">')
 
 test('a b c', '{ true ? "a b c" : "foo" }')
@@ -36,6 +36,10 @@ test('', '')
 test(' ', '{ } ')
 test('1', '{ "1" }')
 test('1 ', '{ "1" } ')
+test('11', '{ 1 }{ 1 }')
+test('11 ', '{ 1 }{ 1 } ')
+test(' 11', ' { 1 }{ 1 }')
+test('1 1', '{ 1 } { 1 }')
 
 test('{ 1 }', '{ "\\{ 1 \\}" }')
 test('{ 1 }', '\\{ 1 }')
@@ -91,7 +95,8 @@ test('no', '{ nonExistingVar ? "yes" : "no" }')
 test('yes', '{ !nonExistingVar ? "yes" : "no" }')
 
 var globalVar = 5
-test(undefined, '{ globalVar }')
+test(globalVar, '{ globalVar }')
+test('html', '{ location.href.split(".").pop() }')
 
 data.esc = '\'\n\\'
 test(data.esc, '{ esc }')
@@ -101,13 +106,19 @@ test('x', '{ this.str }')
 test(2, '{ x }')
 test('y', '{ y: x }')
 
-// maybe / later:
+// custom brackets
+riot.settings.brackets = '[ ]'
+test(2, '[ x ]')
+test('x', '[ str\\[0\\] ]')
+riot.settings.brackets = '<% %>'
+test(2, '<% x %>')
+riot.settings.brackets = '{ }'
 
-//test('html', '{ location.href.split(".").pop() }')
+// maybe / later:
 //test('{"x":5}', '{ JSON.stringify({ x: 5 }) }')
 
-function test(a, b, escape) {
-  assert(a, riot._tmpl(b, data), b)
+function test(a, b) {
+  assert(a, tmpl(b, data), b)
 }
 
 function assert(a, b, should) {

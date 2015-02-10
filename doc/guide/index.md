@@ -137,7 +137,7 @@ Once a tag is created you can mount it on the page as follows:
   &lt;script src="riot.min.js"></script>
 
   <!-- include the tag -->
-  &lt;script src="todo.js"></script>
+  &lt;script src="todo.js" type="riot/tag"></script>
 
   <!-- mount the tag -->
   &lt;script>riot.mount('todo')</script>
@@ -307,11 +307,28 @@ Riot has a special syntax for CSS class names. For example:
 
 evaluates to "foo baz zorro". Property names whose value is truthful are appended to the list of class names. Of course you can use this notation in other places than class names if you find a suitable use case.
 
-### Miscellaneous
+
+### Printing brackets
 
 You can output an expression without evaluation by escaping the opening bracket:
 
 `\\{ this is not evaluated \\}` outputs `{ this is not evaluated }`
+
+
+### Customizing brackets
+
+You are free to customize the brackets to your liking. For example:
+
+``` js
+riot.settings.brackets = '${ }'
+riot.settings.brackets = '\{\{ }}'
+```
+
+the start and end is separated with a space character.
+
+
+
+### Etc
 
 Expressions inside `<style>` tags are ignored.
 
@@ -335,7 +352,7 @@ After the tag is defined you can use it inside other tags. For example
   <p>Here is some raw content: <raw content="{ html }"/> </p>
 
   this.html = 'Hello, <strong>world!</raw>'
-</raw>
+</my-tag>
 ```
 
 [demo on jsfiddle](http://jsfiddle.net/23g73yvx/)
@@ -469,12 +486,9 @@ Again, the expression can be just a simple property or a full JavaScript express
 
 - `show` – show the element using `style="display: ''"` when the value is true
 - `hide` – hide the element using `style="display: none"` when the value is true
-- `if` – add (true value) or remove (false value) the element from the document*
+- `if` – add (true value) or remove (false value) the element from the document
 
 The equality operator is `==` and not `===`. For example: `'a string' == true`.
-
-<small>Currently `if` is implemented with CSS display property as well.</small>
-
 
 
 ## Loops

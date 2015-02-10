@@ -1,8 +1,8 @@
-/* Riot 2.0.7, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v2.0.8, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function() {
 
-var riot = { version: 'v2.0.7' }
+var riot = { version: 'v2.0.8', settings: {} }
 
 'use strict'
 
@@ -149,44 +149,64 @@ except zero (undefined/null/false) will default to empty string:
 tmpl('{ undefined } - { false } - { null } - { 0 }', {})
 // will return: " - - - 0"
 
+
+// Customizable brackets
+
+  riot.settings.brackets = '[ ]'
+  riot.settings.brackets = '<% %>'
+
 */
 
-riot._tmpl = (function() {
+var tmpl = (function() {
 
   var cache = {},
-
-      // find variable names
-      re_vars = /("|').+?[^\\]\1|\.\w*|\w*:|\b(?:this|true|false|null|undefined|new|typeof|Number|String|Object|Array|Math|Date|JSON)\b|([a-z_]\w*)/gi
-              // [ 1            ][ 2  ][ 3 ][ 4                                                                                        ][ 5       ]
+      brackets,
+      re_expr,
+      re_vars = /("|').+?[^\\]\1|\.\w*|\w*:|\b(?:(?:new|typeof|in|instanceof) |(?:this|true|false|null|undefined)\b|function *\()|([a-z_]\w*)/gi
+              // [ 1            ][ 2  ][ 3 ][ 4                                                                                  ][ 5       ]
+              // find variable names:
               // 1. skip quoted strings: "a b", 'a b', 'a \'b\''
               // 2. skip object properties: .name
               // 3. skip object literals: name:
-              // 4. skip reserved words
+              // 4. skip javascript keywords
               // 5. match var name
 
-  // build a template (or get it from cache), render with data
-
   return function(str, data) {
-    return str && (cache[str] = cache[str] || tmpl(str))(data)
+
+    // make sure we use current brackets setting
+    var b = riot.settings.brackets || '{ }'
+    if(b != brackets){
+      brackets = b.split(' ')
+      re_expr = re(/({[\s\S]*?})/)
+    }
+
+    // build a template (or get it from cache), render with data
+    // (or just test if string has expression when called w/o data)
+    return data
+      ? str && (cache[str] = cache[str] || tmpl(str))(data)
+      : re_expr.test(str)
+
   }
 
 
   // create a template instance
 
   function tmpl(s, p) {
-    p = (s || '{}')
+
+    // default template string to {}
+    p = (s || brackets.join(''))
 
       // temporarily convert \{ and \} to a non-character
-      .replace(/\\{/g, '\uFFF0')
-      .replace(/\\}/g, '\uFFF1')
-
+      .replace(re(/\\{/), '\uFFF0')
+      .replace(re(/\\}/), '\uFFF1')
+      
       // split string to expression and non-expresion parts
-      .split(/({[\s\S]*?})/)
+      .split(re_expr)
 
     return new Function('d', 'return ' + (
 
       // is it a single expression or a template? i.e. {x} or <b>{x}</b>
-      !p[0] && !p[2]
+      !p[0] && !p[2] && !p[3]
 
         // if expression, evaluate it
         ? expr(p[1])
@@ -215,8 +235,8 @@ riot._tmpl = (function() {
       )
 
       // bring escaped { and } back
-      .replace(/\uFFF0/g, '{')
-      .replace(/\uFFF1/g, '}')
+      .replace(/\uFFF0/g, brackets[0])
+      .replace(/\uFFF1/g, brackets[1])
 
     )
 
@@ -232,7 +252,7 @@ riot._tmpl = (function() {
       .replace(/\n/g, ' ')
 
       // trim whitespace, curly brackets, strip comments
-      .replace(/^[{ ]+|[ }]+$|\/\*.+?\*\//g, '')
+      .replace(re(/^[{ ]+|[ }]+$|\/\*.+?\*\//g), '')
 
     // is it an object literal? i.e. { key : value }
     return /^\s*[\w-"']+ *:/.test(s)
@@ -258,7 +278,7 @@ riot._tmpl = (function() {
     return '(function(v){try{v='
 
         // prefix vars (name => data.name)
-        + (s.replace(re_vars, function(s, _, v) { return v ? 'd.' + v : s })
+        + (s.replace(re_vars, function(s, _, v) { return v ? '(d.'+v+'===undefined?window.'+v+':d.'+v+')' : s })
 
           // break the expression if its empty (resulting in undefined value)
           || 'x')
@@ -271,437 +291,490 @@ riot._tmpl = (function() {
       + '}}).call(d)'
   }
 
+
+  // change regexp to use custom brackets
+
+  function re(r) {
+    return RegExp(r.source
+                   .split('{').join('\\'+brackets[0])
+                   .split('}').join('\\'+brackets[1]),
+                  r.global ? 'g' : '')
+  }
+
 })()
-;(function(riot, is_browser) {
+// { key, i in items} -> { key, i, items }
+function loopKeys(expr) {
+  var ret = { val: expr },
+      els = expr.split(/\s+in\s+/)
 
-  if (!is_browser) return
-
-  var tmpl = riot._tmpl,
-      all_tags = [],
-      tag_impl = {},
-      doc = document
-
-  function each(nodes, fn) {
-    for (var i = 0; i < (nodes || []).length; i++) {
-      if (fn(nodes[i], i) === false) i--
-    }
+  if (els[1]) {
+    ret.val = '{ ' + els[1]
+    els = els[0].slice(1).trim().split(/,\s*/)
+    ret.key = els[0]
+    ret.pos = els[1]
   }
+  return ret
+}
 
-  function extend(obj, from) {
-    from && Object.keys(from).map(function(key) {
-      obj[key] = from[key]
+function _each(dom, parent, expr) {
+
+  remAttr(dom, 'each')
+
+  var template = dom.outerHTML,
+      prev = dom.previousSibling,
+      root = dom.parentNode,
+      rendered = [],
+      tags = [],
+      checksum
+
+  expr = loopKeys(expr)
+
+  // clean template code after update (and let walk finish it's parse)
+  parent.one('update', function() {
+    root.removeChild(dom)
+
+  }).one('mount', function() {
+    if (!hasParent(root)) root = parent.root
+
+  }).on('update', function() {
+
+    var items = tmpl(expr.val, parent)
+    if (!items) return
+
+    // object loop. any changes cause full redraw
+    if (!Array.isArray(items)) {
+      var testsum = JSON.stringify(items)
+      if (testsum == checksum) return
+      checksum = testsum
+
+      // clear old items
+      tags.map(function(tag) {
+        tag.unmount()
+      })
+
+      tags = rendered = []
+
+      items = Object.keys(items).map(function(key, i) {
+        var obj = {}
+        obj[expr.key] = key
+        obj[expr.pos] = items[key]
+        return obj
+      })
+
+    }
+
+    // unmount redundant
+    arrDiff(rendered, items).map(function(item) {
+      var pos = rendered.indexOf(item),
+          tag = tags[pos]
+
+      if (tag) {
+        tag.unmount()
+        rendered.splice(pos, 1)
+        tags.splice(pos, 1)
+      }
     })
-    return obj
-  }
 
-  function diff(arr1, arr2) {
-    return arr1.filter(function(el) {
-      return arr2.indexOf(el) < 0
-    })
-  }
+    // mount new
+    var nodes = root.childNodes,
+        prev_index = Array.prototype.indexOf.call(nodes, prev)
 
-  function walk(dom, fn) {
-    dom = fn(dom) === false ? dom.nextSibling : dom.firstChild
+    arrDiff(items, rendered).map(function(item, i) {
 
-    while (dom) {
-      walk(dom, fn)
-      dom = dom.nextSibling
-    }
-  }
+      var pos = items.indexOf(item)
 
-
-  function mkdom(tmpl) {
-    var tag_name = tmpl.trim().slice(1, 3).toLowerCase(),
-        root_tag = /td|th/.test(tag_name) ? 'tr' : tag_name == 'tr' ? 'tbody' : 'div'
-        el = doc.createElement(root_tag)
-
-    el.innerHTML = tmpl
-    return el
-  }
-
-
-  function setEventHandler(name, handler, dom, instance) {
-
-    dom[name] = function(e) {
-
-      // cross browser event fix
-      e = e || window.event
-      e.which = e.which || e.charCode || e.keyCode
-      e.target = e.target || e.srcElement
-      e.currentTarget = dom
-
-      // currently looped item
-      e.item = instance.__item || instance
-
-      // prevent default behaviour (by default)
-      if (handler.call(instance, e) !== true) {
-        e.preventDefault && e.preventDefault()
-        e.returnValue = false
+      if (!checksum && expr.key) {
+        var obj = {}
+        obj[expr.key] = item
+        obj[expr.pos] = pos
+        item = obj
       }
 
-      instance.update()
-    }
+      var tag = new Tag({ tmpl: template }, {
+        before: nodes[prev_index + 1 + pos],
+        parent: parent,
+        root: root,
+        loop: true,
+        item: item
+      })
 
-  }
-
-
-  function update(expressions, instance) {
-
-    // allow recalculation of context data
-    instance.trigger('update')
-
-    each(expressions, function(expr) {
-      var tag = expr.tag,
-          dom = expr.dom
-
-      function remAttr(name) {
-        dom.removeAttribute(name)
-      }
-
-      // loops first: TODO remove from expressions arr
-      if (expr.loop) {
-        remAttr('each')
-        return loop(expr, instance)
-      }
-
-      // custom tag
-      if (tag) return tag.update ? tag.update() :
-        expr.tag = createTag({ tmpl: tag[0], fn: tag[1], root: dom, parent: instance })
-
-
-      var attr_name = expr.attr,
-          value = tmpl(expr.expr, instance)
-
-      if (value == null) value = ''
-
-      // no change
-      if (expr.value === value) return
-      expr.value = value
-
-
-      // text node
-      if (!attr_name) return dom.nodeValue = value
-
-      // attribute
-      if (!value && expr.bool || /obj|func/.test(typeof value)) remAttr(attr_name)
-
-      // event handler
-      if (typeof value == 'function') {
-        setEventHandler(attr_name, value, dom, instance)
-
-      // show / hide / if
-      } else if (/^(show|hide|if)$/.test(attr_name)) {
-        remAttr(attr_name)
-        if (attr_name == 'hide') value = !value
-        dom.style.display = value ? '' : 'none'
-
-      // normal attribute
-      } else {
-        if (expr.bool) {
-          dom[attr_name] = value
-          if (!value) return
-          value = attr_name
-        }
-
-        dom.setAttribute(attr_name, value)
-      }
+      tags.splice(pos, 0, tag)
 
     })
 
-    instance.trigger('updated')
+    rendered = items.slice()
 
-  }
+  })
 
-  function parse(root) {
+}
+function parseNamedElements(root, tag, expressions) {
+  walk(root, function(dom) {
+    if (dom.nodeType != 1) return
 
-    var named_elements = {},
-        expressions = []
-
-
-    function addExpr(dom, value, data) {
-      if (value ? value.indexOf('{') >= 0 : data) {
-        var expr = { dom: dom, expr: value }
-        expressions.push(extend(expr, data || {}))
-      }
-    }
-
-    walk(root, function(dom) {
-
-      var type = dom.nodeType,
-          value = dom.nodeValue
-
-      // text node
-      if (type == 3 && dom.parentNode.tagName != 'STYLE') {
-        addExpr(dom, value)
-
-      // element
-      } else if (type == 1) {
-
-        // loop?
-        value = dom.getAttribute('each')
-
-        if (value) {
-          addExpr(dom, value, { loop: 1 })
-          return false
-        }
-
-        // custom tag?
-        var tag = tag_impl[dom.tagName.toLowerCase()]
-
-        // attributes
-        each(dom.attributes, function(attr) {
-          var name = attr.name,
-              value = attr.value
-
-          // named elements
-          if (/^(name|id)$/.test(name)) named_elements[value] = dom
-
-          // expressions
-          if (!tag) {
-            var bool = name.split('__')[1]
-            addExpr(dom, value, { attr: bool || name, bool: bool })
-            if (bool) {
-              dom.removeAttribute(name)
-              return false
-            }
-          }
-
-        })
-
-        if (tag) addExpr(dom, 0, { tag: tag })
-
-      }
-
+    each(dom.attributes, function(attr) {
+      if (/^(name|id)$/.test(attr.name)) tag[attr.value] = dom
     })
+  })
+}
 
-    return { expr: expressions, elem: named_elements }
+function parseLayout(root, tag, expressions) {
 
+  function addExpr(dom, value, data) {
+    if (tmpl(value) || data) {
+      var expr = { dom: dom, expr: value }
+      expressions.push(extend(expr, data || {}))
+    }
   }
 
+  walk(root, function(dom) {
 
+    var type = dom.nodeType
 
-  // create new custom tag (component)
-  function createTag(conf) {
+    // text node
+    if (type == 3 && dom.parentNode.tagName != 'STYLE') addExpr(dom, dom.nodeValue)
+    if (type != 1) return
 
-    var opts = conf.opts || {},
-        dom = mkdom(conf.tmpl),
-        mountNode = conf.root,
-        parent = conf.parent,
-        ast = parse(dom),
-        tag = { root: mountNode, opts: opts, parent: parent, __item: conf.item },
-        attributes = {}
+    /* element */
 
-    // named elements
-    extend(tag, ast.elem)
+    // loop
+    var attr = dom.getAttribute('each')
+    if (attr) { _each(dom, tag, attr); return false }
+
+    // child tag
+    var impl = tag_impl[dom.tagName.toLowerCase()]
+    if (impl) {
+      impl = new Tag(impl, { root: dom, parent: tag })
+      return false
+    }
 
     // attributes
-    each(mountNode.attributes, function(attr) {
-      attributes[attr.name] = attr.value
-    })
+    each(dom.attributes, function(attr) {
+      var name = attr.name,
+          value = attr.value
 
-    function updateOpts() {
-      Object.keys(attributes).map(function(name) {
-        var val = opts[name] = tmpl(attributes[name], parent || tag)
-        if (typeof val == 'object') mountNode.removeAttribute(name)
-      })
-    }
+      // expressions
+      var bool = name.split('__')[1]
+      addExpr(dom, value, { attr: bool || name, bool: bool })
 
-    updateOpts()
-
-    if (!tag.on) {
-      riot.observable(tag)
-      delete tag.off // off method not needed
-    }
-
-    if (conf.fn) conf.fn.call(tag, opts)
-
-
-    tag.update = function(data, _system) {
-
-      /*
-        If loop is defined on the root of the HTML template
-        the original parent is a temporary <div/> by mkdom()
-      */
-      if (parent && dom && !dom.firstChild) {
-        mountNode = parent.root
-        dom = null
+      if (bool) {
+        remAttr(dom, name)
+        return false
       }
 
-      if (_system || doc.body.contains(mountNode)) {
-        extend(tag, data)
-        extend(tag, tag.__item)
-        updateOpts()
-        update(ast.expr, tag)
+    })
 
-        // update parent
-        !_system && tag.__item && parent.update()
-        return true
+  })
+
+}
+function Tag(impl, conf) {
+
+  var self = riot.observable(this),
+      expressions = [],
+      attributes = {},
+      parent = conf.parent,
+      is_loop = conf.loop,
+      root = conf.root,
+      opts = conf.opts,
+      item = conf.item
+
+  // cannot initialize twice on the same root element
+  if (!is_loop && root.riot) return
+  root.riot = 1
+
+  opts = opts || {}
+
+  extend(this, { parent: parent, root: root, opts: opts, children: [] })
+  extend(this, item)
+
+
+  // attributes
+  each(root.attributes, function(attr) {
+    var name = attr.name,
+        val = attr.value
+
+    attributes[name] = val
+
+    // remove dynamic attributes from node
+    if (val.indexOf('{') >= 0) {
+      remAttr(root, name)
+      return false
+    }
+  })
+
+  // options
+  function updateOpts() {
+    Object.keys(attributes).map(function(name) {
+      opts[name] = tmpl(attributes[name], parent || self)
+    })
+  }
+
+  updateOpts()
+
+  // child
+  parent && parent.children.push(this)
+
+  var dom = mkdom(impl.tmpl),
+      loop_dom
+
+  // named elements
+  parseNamedElements(dom, this)
+
+  this.update = function(data, init) {
+    extend(self, data)
+    extend(self, item)
+    self.trigger('update')
+    updateOpts()
+    update(expressions, self, item)
+    self.trigger('updated')
+  }
+
+  this.unmount = function() {
+
+    if (is_loop) {
+      root.removeChild(loop_dom)
+
+    } else {
+      var p = root.parentNode
+      p && p.removeChild(root)
+    }
+
+    // splice from parent.children[]
+    if (parent) {
+      var els = parent.children
+      els.splice(els.indexOf(self), 1)
+    }
+
+    self.trigger('unmount')
+
+    // cleanup
+    parent && parent.off('update', self.update)
+    mounted = false
+  }
+
+  function mount() {
+    while (dom.firstChild) {
+      if (is_loop) {
+        loop_dom = dom.firstChild
+        root.insertBefore(dom.firstChild, conf.before || null) // null needed for IE8
 
       } else {
-        tag.trigger('unmount')
+        root.appendChild(dom.firstChild)
       }
-
     }
 
-    tag.update(0, true)
+    if (!hasParent(root)) self.root = root = parent.root
 
-    // append to root
-    while (dom.firstChild) {
-      if (conf.before) mountNode.insertBefore(dom.firstChild, conf.before)
-      else mountNode.appendChild(dom.firstChild)
-    }
+    self.trigger('mount')
 
+    // one way data flow: propagate updates and unmounts downwards from parent to children
+    parent && parent.on('update', self.update).one('unmount', self.unmount)
 
-    tag.trigger('mount')
-
-    all_tags.push(tag)
-
-    return tag
   }
 
+  // initialize
+  if (impl.fn) impl.fn.call(this, opts)
 
-  function loop(expr, instance) {
+  // layout
+  parseLayout(dom, this, expressions)
 
-    // initialize once
-    if (expr.done) return
-    expr.done = true
+  this.update()
+  mount()
 
+}
+
+
+function setEventHandler(name, handler, dom, tag, item) {
+
+  dom[name] = function(e) {
+
+    // cross browser event fix
+    e = e || window.event
+    e.which = e.which || e.charCode || e.keyCode
+    e.target = e.target || e.srcElement
+    e.currentTarget = dom
+    e.item = item
+
+    // prevent default behaviour (by default)
+    if (handler.call(tag, e) !== true) {
+      e.preventDefault && e.preventDefault()
+      e.returnValue = false
+    }
+
+    tag.update()
+  }
+
+}
+
+function insertTo(root, node, before) {
+  if (root) {
+    root.insertBefore(before, node)
+    root.removeChild(node)
+  }
+}
+
+// item = currently looped item
+function update(expressions, tag, item) {
+
+  each(expressions, function(expr) {
     var dom = expr.dom,
-        prev = dom.previousSibling,
-        root = dom.parentNode,
-        template = dom.outerHTML,
-        val = expr.expr,
-        els = val.split(/\s+in\s+/),
-        rendered = [],
-        checksum,
-        keys
+        attr_name = expr.attr,
+        value = tmpl(expr.expr, tag)
 
+    if (value == null) value = ''
 
-    if (els[1]) {
-      val = '{ ' + els[1]
-      keys = els[0].slice(1).trim().split(/,\s*/)
+    // no change
+    if (expr.value === value) return
+    expr.value = value
+
+    // text node
+    if (!attr_name) return dom.nodeValue = value
+
+    // remove attribute
+    if (!value && expr.bool || /obj|func/.test(typeof value)) remAttr(dom, attr_name)
+
+    // event handler
+    if (typeof value == 'function') {
+      setEventHandler(attr_name, value, dom, tag, item)
+
+    // if- conditional
+    } else if (attr_name == 'if') {
+
+      remAttr(dom, attr_name)
+
+      var stub = expr.stub
+
+      // add to DOM
+      if (value) {
+        stub && insertTo(stub.parentNode, stub, dom)
+
+      // remove from DOM
+      } else {
+        stub = expr.stub = stub || document.createTextNode('')
+        insertTo(dom.parentNode, dom, stub)
+      }
+
+    // show / hide
+    } else if (/^(show|hide)$/.test(attr_name)) {
+      remAttr(dom, attr_name)
+      if (attr_name == 'hide') value = !value
+      dom.style.display = value ? '' : 'none'
+
+    // normal attribute
+    } else {
+      if (expr.bool) {
+        dom[attr_name] = value
+        if (!value) return
+        value = attr_name
+      }
+
+      dom.setAttribute(attr_name, value)
     }
 
-    // clean template code
-    instance.one('mount', function() {
-      var p = dom.parentNode
-      if (p) {
-        root = p
-        root.removeChild(dom)
-      }
-    })
+  })
 
-    function startPos() {
-      return Array.prototype.indexOf.call(root.childNodes, prev) + 1
-    }
-
-    instance.on('updated', function() {
-
-      var items = tmpl(val, instance),
-          is_array = Array.isArray(items)
-
-      if (is_array) items = items.slice(0)
-
-      else {
-
-        if (!items) return // some IE8 issue
-
-        // detect Object changes
-        var testsum = JSON.stringify(items)
-        if (testsum == checksum) return
-        checksum = testsum
-
-        items = Object.keys(items).map(function(key, i) {
-          var item = {}
-          item[keys[0]] = key
-          item[keys[1]] = items[key]
-          return item
-        })
-
-      }
-
-      // remove redundant
-      diff(rendered, items).map(function(item) {
-        var pos = rendered.indexOf(item)
-        root.removeChild(root.childNodes[startPos() + pos])
-        rendered.splice(pos, 1)
-      })
-
-      // add new
-      diff(items, rendered).map(function(item, i) {
-        var pos = items.indexOf(item)
-
-        // string array
-        if (keys && !checksum) {
-          var obj = {}
-          obj[keys[0]] = item
-          obj[keys[1]] = pos
-          item = obj
-        }
-
-        var tag = createTag({
-          before: root.childNodes[startPos() + pos],
-          parent: instance,
-          tmpl: template,
-          item: item,
-          root: root
-        })
-
-        instance.on('update', function() {
-          tag.update(0, true)
-        })
-
-      })
-
-      // assign rendered
-      rendered = items
-
-    })
-
+}
+function each(nodes, fn) {
+  for (var i = 0; i < (nodes || []).length; i++) {
+    if (fn(nodes[i], i) === false) i--
   }
+}
 
-  riot.tag = function(name, tmpl, fn) {
-    fn = fn || noop,
-    tag_impl[name] = [tmpl, fn]
+function remAttr(dom, name) {
+  dom.removeAttribute(name)
+}
+
+function extend(obj, from) {
+  from && Object.keys(from).map(function(key) {
+    obj[key] = from[key]
+  })
+  return obj
+}
+
+function mkdom(template) {
+  var tag_name = template.trim().slice(1, 3).toLowerCase(),
+      root_tag = /td|th/.test(tag_name) ? 'tr' : tag_name == 'tr' ? 'tbody' : 'div'
+      el = document.createElement(root_tag)
+
+  el.stub = true
+  el.innerHTML = template
+  return el
+}
+
+function walk(dom, fn) {
+  dom = fn(dom) === false ? dom.nextSibling : dom.firstChild
+
+  while (dom) {
+    walk(dom, fn)
+    dom = dom.nextSibling
   }
+}
 
-  riot.mountTo = function(node, tagName, opts) {
-    var tag = tag_impl[tagName]
-    return tag && createTag({ tmpl: tag[0], fn: tag[1], root: node, opts: opts })
-  }
+function arrDiff(arr1, arr2) {
+  return arr1.filter(function(el) {
+    return arr2.indexOf(el) < 0
+  })
+}
 
-  riot.mount = function(selector, opts) {
-    if (selector == '*') selector = Object.keys(tag_impl).join(', ')
+// HTMLDocument == IE8 thing
+function hasParent(el) {
+  var p = el.parentNode,
+      doc = window.HTMLDocument
 
-    var instances = []
+  return p && !(doc && p instanceof doc)
+}
 
-    each(doc.querySelectorAll(selector), function(node) {
-      if (node.riot) return
+/*
+ Virtual dom is an array of custom tags on the document.
+ Each tag stores an array of child tags.
+ Updates and unmounts propagate downwards from parent to children.
+*/
 
-      var tagName = node.tagName.toLowerCase(),
-          instance = riot.mountTo(node, tagName, opts)
+var virtual_dom = [],
+    tag_impl = {}
 
-      if (instance) {
-        instances.push(instance)
-        node.riot = 1
-      }
-    })
+riot.tag = function(name, html, fn) {
+  tag_impl[name] = { name: name, tmpl: html, fn: fn }
+}
 
-    return instances
-  }
+var mountTo = riot.mountTo = function(root, tagName, opts) {
+  var impl = tag_impl[tagName], tag
 
-  // update everything
-  riot.update = function() {
-    return all_tags = all_tags.filter(function(tag) {
-      return !!tag.update()
+  if (impl) tag = new Tag(impl, { root: root, opts: opts })
+
+  if (tag) {
+    virtual_dom.push(tag)
+    return tag.on('unmount', function() {
+      virtual_dom.splice(virtual_dom.indexOf(tag), 1)
     })
   }
+}
 
-})(riot, this.top)
+riot.mount = function(selector, opts) {
+  if (selector == '*') selector = Object.keys(tag_impl).join(', ')
+
+  var tags = []
+
+  each(document.querySelectorAll(selector), function(root) {
+
+    var tagName = root.tagName.toLowerCase(),
+        tag = mountTo(root, tagName, opts)
+
+    if (tag) tags.push(tag)
+  })
+
+  return tags
+}
+
+// update everything
+riot.update = function() {
+  virtual_dom.map(function(tag) {
+    tag.update()
+  })
+  return virtual_dom
+}
 
 
-
-(function(is_node) {
+;(function(is_node) {
 
   var BOOL_ATTR = ('allowfullscreen,async,autofocus,autoplay,checked,compact,controls,declare,default,'+
     'defaultchecked,defaultmuted,defaultselected,defer,disabled,draggable,enabled,formnovalidate,hidden,'+
@@ -724,10 +797,10 @@ riot._tmpl = (function() {
   }
 
   // (tagname) (html) (javascript) endtag
-  var CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\/]>$)?([^\x00]*?)^<\/\1>/gim,
+  var CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\-\/]>$)?([^\x00]*?)^<\/\1>/gim,
       SCRIPT = /<script(\s+type=['"]?([^>'"]+)['"]?)?>([^\x00]*?)<\/script>/gm,
       HTML_COMMENT = /<!--.*?-->/g,
-      CLOSED_TAG = /<([\w\-]+)([^\/]*)\/\s*>/g,
+      CLOSED_TAG = /<([\w\-]+)([^>]*)\/\s*>/g,
       LINE_COMMENT = /^\s*\/\/.*$/gm,
       JS_COMMENT = /\/\*[^\x00]*?\*\//gm
 
@@ -741,7 +814,7 @@ riot._tmpl = (function() {
     html = html.trim().replace(HTML_COMMENT, '')
 
     // foo={ bar } --> foo="{ bar }"
-    html = html.replace(/=(\{[^\}]+\})([\s\>])/g, '="$1"$2')
+    html = html.replace(/=(\{[^\}]+\})([\s\/\>])/g, '="$1"$2')
 
     // IE8 looses boolean attr values: `checked={ expr }` --> `__checked={ expr }`
     html = html.replace(/([\w\-]+)=["'](\{[^\}]+\})["']/g, function(full, name, expr) {
@@ -824,7 +897,7 @@ riot._tmpl = (function() {
 
       // method end
       if (line.slice(0, es6_ident.length + 1) == es6_ident + '}') {
-        lines[i] += '.bind(this);'
+        lines[i] = es6_ident + es6_ident + 'this.update()\n' + es6_ident + '}.bind(this);'
         es6_ident = ''
       }
 
@@ -923,7 +996,6 @@ riot._tmpl = (function() {
       var url = script.getAttribute('src')
 
       function compileTag(source) {
-        script.parentNode.removeChild(script)
         globalEval(source)
 
         if (i + 1 == scripts.length) {
@@ -938,13 +1010,26 @@ riot._tmpl = (function() {
 
   }
 
-  function browserCompile(arg, skip_eval) {
 
-    // string -> compile a new tag
+  riot.compile = function(arg, fn) {
+
+    // string
     if (typeof arg == 'string') {
-      var js = unindent(compile(arg))
-      if (!skip_eval) globalEval(js)
-      return js
+
+      // compile & return
+      if (arg.trim()[0] == '<') {
+        var js = unindent(compile(arg))
+        if (!fn) globalEval(js)
+        return js
+
+      // URL
+      } else {
+        return GET(arg, function(str) {
+          var js = unindent(compile(str))
+          globalEval(js)
+          fn && fn(js, str)
+        })
+      }
     }
 
     // must be a function
@@ -970,15 +1055,15 @@ riot._tmpl = (function() {
       mountTo = riot.mountTo
 
   riot.mount = function(a, b) {
-    browserCompile(function() { mount(a, b) })
+    var ret
+    riot.compile(function() { ret = mount(a, b) })
+    return ret
   }
 
   riot.mountTo = function(a, b, c) {
-    browserCompile(function() { mountTo(a, b, c) })
-  }
-
-  riot._compile = function(str) {
-    return browserCompile(str, true)
+    var ret
+    riot.compile(function() { ret = mountTo(a, b, c) })
+    return ret
   }
 
 })(!this.top)
