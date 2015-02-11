@@ -72,6 +72,7 @@ Characteristics:
 * Self-closing tags are supported: `<div/>` equals `<div></div>`. Well known "open tags" such as `<br>`, `<hr>`, `<img>` or `<input>` need not to be closed.
 * Nested `<style>` tags are supported, but nested expressions are not evaluated
 * Standard HTML tags (`label`, `table`, `a` etc..) can also be customized, but not necessarily a wise thing to do.
+* Custom tags always needs to be closed (normally or self-closed).
 
 Tag definition always starts on the beginning of the line:
 
