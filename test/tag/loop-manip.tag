@@ -1,7 +1,7 @@
 
 <loop-manip>
 
-  <li each={ item, i in items }>
+  <li each={ item in items }>
     { item.title } <a onclick={ parent.remove }>remove</a>
   </li>
 
@@ -19,7 +19,7 @@
   }
 
   remove(e) {
-    var i = this.items.indexOf(e.item)
+    var i = this.items.indexOf(e.item.item)
     this.items.splice(i, 1)
   }
 
