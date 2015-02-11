@@ -102,7 +102,6 @@ That's a space separated list of tag names.
 
 - `each` attribute does not detect if the looped items are sorted or otherwise re-ordered
 - Looping table rows or cells with `each` attribute is not working on IE8 and IE9.
-- `if / show / hide` attributes cannot be set on a root node of a custom tag
 
 
 ## Media
