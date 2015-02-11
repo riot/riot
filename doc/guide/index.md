@@ -28,26 +28,28 @@ Riot custom tags are the building blocks for user interfaces. They make the "vie
     <button disabled={ !text }>Add #{ items.length + 1 }</button>
   </form>
 
-  this.disabled = true
+  &lt;script>
+    this.disabled = true
 
-  this.items = opts.items
+    this.items = opts.items
 
-  edit(e) {
-    this.text = e.target.value
-  }
-
-  add(e) {
-    if (this.text) {
-      this.items.push({ title: this.text })
-      this.text = this.input.value = ''
+    edit(e) {
+      this.text = e.target.value
     }
-  }
 
-  toggle(e) {
-    var item = e.item
-    item.done = !item.done
-    return true
-  }
+    add(e) {
+      if (this.text) {
+        this.items.push({ title: this.text })
+        this.text = this.input.value = ''
+      }
+    }
+
+    toggle(e) {
+      var item = e.item
+      item.done = !item.done
+      return true
+    }
+  </script>
 
 </todo>
 ```
@@ -60,16 +62,16 @@ See [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https:
 
 ### Tag syntax
 
-In a Riot custom tag the HTML layout is defined first, JavaScript second. The JavaScript starts where the last HTML tag ends. HTML is coupled with expressions that are 100% JavaScript.
+Riot tag is a combination of layout (HTML) and logic (JavaScript). Here are the basic rules:
 
-Characteristics:
-
+* HTML is defined first and the logic is enclosed inside optional `<script>` tag.
+* Without `<script>` tag the JavaScript starts where the last HTML tag ends.
 * Tags can be empty, HTML only or JavaScript only and `{ expressions }` are optional.
 * Quotes are optional: `<foo bar={ baz }>` becomes `<foo bar="{ baz }">`.
 * ES6 method syntax is supported: `methodName()` becomes `this.methodName = function()` and `this` variable always points to the current tag instance.
 * A shorthand syntax for class names is available: `class={ completed: done }`.
 * Boolean attributes (checked, selected etc..) are ignored when the expression value is falsy: `<input checked={ undefined }>` becomes `<input>`.
-* Self-closing tags are supported: `<div/>` equals `<div></div>`. Well known "open tags" such as `<br>`, `<hr>`, `<img>` or `<input>` need not to be closed.
+* Self-closing tags are supported: `<div/>` equals `<div></div>`. Well known "open tags" such as `<br>`, `<hr>`, `<img>` or `<input>` are never closed after the compilation.
 * Nested `<style>` tags are supported, but nested expressions are not evaluated
 * Standard HTML tags (`label`, `table`, `a` etc..) can also be customized, but not necessarily a wise thing to do.
 * Custom tags always needs to be closed (normally or self-closed).
@@ -88,9 +90,9 @@ Tag definition always starts on the beginning of the line:
   </my-tag>
 ```
 
-### Script tag
+### No script tag
 
-You can explicitly nest the logic inside a `script` tag:
+You can leave out the `<script>` tag:
 
 ```
 <todo>
@@ -98,14 +100,13 @@ You can explicitly nest the logic inside a `script` tag:
   <!-- layout -->
   <h3>{ opts.title }</h3>
 
-  &lt;script>
-    // logic comes here
-  </script>
+  // logic comes here
+  this.items = [1, 2, 3]
 
 </todo>
 ```
 
-This allows you to take advantage of your editor's possible syntax highlight feature and you can more clearly see where the logic starts and layout ends.
+In which case the logic starts after the last HTML tag. This "open syntax" is more commonly used on the examples on this website.
 
 
 ### Pre-processor
@@ -199,8 +200,9 @@ Tag is created in following sequence:
 After the tag is mounted the expressions are updated as follows:
 
 1. Automatically after an event handler is called. For example the `toggle` method in the above example.
-2. When `this.update()` is called inside the tag instance.
-3. When `riot.update()` is called, which globally updates all expressions on the page.
+2. When `this.update()` is called on the current tag instance
+3. When `this.update()` is called on a parent tag, or any parent upwards. Updates flow uni-directionally from parent to child.
+4. When `riot.update()` is called, which globally updates all expressions on the page.
 
 The "update" event is fired every time the tag is updated.
 
