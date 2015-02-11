@@ -15,7 +15,7 @@
     <script src="ie8/html5-shiv.js"></script>
     <script>
       html5.addElements('timetable timer loop-manip loop-child looped-child loop-context loop-replace loop-position ' +
-      'tag-nesting inner1 inner2 inner-html loop-strings loop-object loop-multi loop-nested table-data if-test treeview')
+      'tag-nesting inner1 inner2 inner-html loop-strings loop-object loop-multi loop-nested table-data if-test treeview lazy-if')
     </script>
   <![endif]-->
 </head>
@@ -24,9 +24,8 @@
 
   <div id="tags">
 
+    <lazy-if></lazy-if>
     <loop-replace></loop-replace>
-
-    <!--
     <loop-manip></loop-manip>
     <if-test></if-test>
     <loop-multi></loop-multi>
@@ -41,6 +40,7 @@
     <tag-nesting></tag-nesting>
     <loop-nested></loop-nested>
     <treeview></treeview>
+    <!--
     -->
 
   </div>
