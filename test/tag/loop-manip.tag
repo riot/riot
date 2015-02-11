@@ -1,8 +1,8 @@
 
 <loop-manip>
 
-  <li each={ items }>
-    { title } <a onclick={ parent.remove }>remove</a>
+  <li each={ item, i in items }>
+    { item.title } <a onclick={ parent.remove }>remove</a>
   </li>
 
   <button onclick={ top }>Top</button>
