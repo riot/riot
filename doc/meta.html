@@ -1,6 +1,7 @@
 
 style: /riotjs/css/riot
 script: /riotjs/site
+content_class: normal
 noheader: true
 
 ==== layout
@@ -91,7 +92,7 @@ noheader: true
 
   </nav><!--
 
---><div id="content" class="normal">
+--><div id="content" class="{{ content_class }}">
 
     <div class="hgroup">
       <h1>{{ data.subtitle || data.title }}</h1>
