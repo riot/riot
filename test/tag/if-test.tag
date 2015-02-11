@@ -1,6 +1,11 @@
 
 <if-child>
   <p>A child</p>
+  <h3>And some more</h3>
+
+  this.on('mount unmount', function(e) {
+    console.info(this, e)
+  })
 </if-child>
 
 <if-test>
@@ -11,6 +16,8 @@
   <p>after</p>
 
   <p each={ num, i in nums} if={ num == parent.flag }>{ num }</p>
+
+  <if-child show={ flag } />
 
   // this.flag = true
   var self = this
