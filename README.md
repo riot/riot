@@ -82,12 +82,11 @@ HTML syntax is the de facto language on the web and it's designed for building u
 ### Demos
 - [Flux-like ES6 Todo](https://github.com/srackham/riot-todo)
 - [Simple TODO](https://muut.com/riotjs/dist/demo/)
-- [Multi TODO](http://plnkr.co/edit/UZ2BfP?p=preview)
 - [Timer](http://jsfiddle.net/gnumanth/h9kuozp5/)
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
-- [Multi- selector](http://plnkr.co/edit/NmcxgZ?p=preview)
 - [Vuejs examples by Riotjs](https://github.com/txchen/feplay/tree/gh-pages/riot_vue)
 - [Another flux demo caparable to React ones](http://txchen.github.io/feplay/riot_flux)
+- [Various experiments](http://richardbondi.net/programming/riot)
 
 
 ### Tutorials
