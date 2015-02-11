@@ -80,6 +80,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 
 ### Demos
+- [Flux-like ES6 Todo](https://github.com/srackham/riot-todo)
 - [Simple TODO](https://muut.com/riotjs/dist/demo/)
 - [Timer](http://jsfiddle.net/gnumanth/h9kuozp5/)
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
@@ -89,6 +90,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 
 ### Tutorials
+- [Building Apps with Riot, ES6 and Webpack](http://blog.srackham.com/posts/riot-es6-webpack-apps/)
 - [Building tabs with Riot](http://www.robertwpearce.com/blog/riotjs-example/)
 - [The "React tutorial" for Riot](https://juriansluiman.nl/article/154/the-react-tutorial-for-riot)
 - [How to package "tag libraries" in Riot](https://github.com/ivan-saorin/riot-tutorial-tags-pack-app)
