@@ -467,8 +467,8 @@ submit() {
 
 The event handler receives the standard event object as the first argument. The following properties are normalized to work across browsers:
 
-- `e.relatedTarget` points to the element where the event handler is specified.
-- `e.target` is the originating element. This is not necessarily the same as `relatedTarget`.
+- `e.currentTarget` points to the element where the event handler is specified.
+- `e.target` is the originating element. This is not necessarily the same as `currentTarget`.
 - `e.which` is the key code in a keyboard event (`keypress`, `keyup`, etc...).
 - `e.item` is the current element in a loop. See [loops](#loops) for more details.
 

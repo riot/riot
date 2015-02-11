@@ -10,7 +10,7 @@
 
   this.items = [{ title: 'First' }, { title: 'Second' }]
 
-  bottom() {
+  bottom(e) {
     this.items.push({ title: Math.random() })
   }
 
