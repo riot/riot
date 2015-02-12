@@ -1,19 +1,61 @@
-.*
-!.editorconfig
-!.jshintrc
-!.gitignore
-!.gitmodules
-!.travis.yml
-*~
+# --------------------
+# OSX Files
+# --------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
 
-node_modules
-bower_components
+# --------------------
+# Windows Files
+# --------------------
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
-.DS_Store
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# --------------------
+# Sublime Text Files
+# --------------------
+*.sublime-project
+*.sublime-workspace
+
+# --------------------
+# IntelliJ Files
+# --------------------
+*.iml
+*.ipr
+*.iws
+.idea/
+out/
+
+# --------------------
+# Eclipse Files
+# --------------------
+.project
+.metadata
+*.bak
+.classpath
+.settings/
+
+# --------------------
+# App Files
+# --------------------
+node_modules
+npm-debug.log
+bower_components
+coverage
 dist
-npm-debug.log 
 make.js
 test/server
+
+!.gitmodules
+!.travis.yml
