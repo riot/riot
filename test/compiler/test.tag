@@ -2,6 +2,8 @@
 
   <module-input>
     <input type="{ opts.type }">
+    <input type='text' />
+    <button>submit</button>
   </module-input>
 
   <!--
