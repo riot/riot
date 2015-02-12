@@ -9,6 +9,7 @@ body_id: riot-releases
 ### 2.0.9 *Feb __, 2015*
 
 - LiveScript support
+- Ability to set `if`, `show` and `hide` attributes for a custom tag
 - Multiple class shortcut: { 'foo bar': baz }
 - Took away `children` property, which was designed for theoretical need mostly.
 
