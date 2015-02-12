@@ -1,11 +1,11 @@
 
-## A React- like, 2.5KB user interface library
-
 [![Riot logo](doc/logo/riot480x.png)](https://muut.com/riotjs/)
 
-### Custom tags • Minimal syntax • Virtual DOM • Full stack • IE8
+## A React- like, 2.5KB UI lib
 
-Riot brings custom tags to all browsers starting from IE8. Think React + Polymer, but squeezed into 5.7KB (2.5KB when gzipped).
+### Custom tags • Concise syntax • Virtual DOM • Full stack • IE8
+
+Riot brings custom tags to all browsers, including IE8. Think React + Polymer but with ejoyable syntax and a small learning curve.
 
 
 #### Tag definition
@@ -18,7 +18,7 @@ Riot brings custom tags to all browsers starting from IE8. Think React + Polymer
   this.time = opts.start || 0
 
   tick() {
-    this.update({ time: ++this.time })
+    this.time++
   }
 
   var timer = setInterval(this.tick, 1000)
@@ -72,7 +72,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot) or [Browserify](https://github.com/jhthorsen/riotify) plugins
 
 
-### Minimal syntax
+### Concise syntax
 - Power shortcuts: `class={ enabled: is_enabled, hidden: hasErrors() }`.
 - No extra brain load such as `render`, `state`, `constructor` or `shouldComponentUpdate`
 - Interpolation: `Add #{ items.length + 1 }` or `class="item { selected: flag }"`
@@ -80,6 +80,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 
 ### Demos
+- [Flux-like ES6 Todo](https://github.com/srackham/riot-todo)
 - [Simple TODO](https://muut.com/riotjs/dist/demo/)
 - [Timer](http://jsfiddle.net/gnumanth/h9kuozp5/)
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
@@ -89,10 +90,11 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 
 ### Tutorials
+- [Building Apps with Riot, ES6 and Webpack](http://blog.srackham.com/posts/riot-es6-webpack-apps/)
 - [Building tabs with Riot](http://www.robertwpearce.com/blog/riotjs-example/)
 - [The "React tutorial" for Riot](https://juriansluiman.nl/article/154/the-react-tutorial-for-riot)
 - [How to package "tag libraries" in Riot](https://github.com/ivan-saorin/riot-tutorial-tags-pack-app)
-
+- [Another React tutorial with Riot](https://github.com/viliamjr/commentsTuto)
 
 ### Resources
 - [Riot + Angular](https://github.com/lucasbrigida/angular-riot)

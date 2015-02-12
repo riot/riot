@@ -7,7 +7,7 @@ hero: true
 
 ====
 
-# Custom tags
+# 1. Custom tags
 
 Riot brings custom tags to all browsers starting from IE8.
 
@@ -26,14 +26,16 @@ Riot brings custom tags to all browsers starting from IE8.
     <button>Add #{ items.length + 1 }</button>
   </form>
 
-  // logic
-  this.items = []
+  <!-- logic -->
+  &lt;script>
+    this.items = []
 
-  add(e) {
-    var input = e.target[0]
-    this.items.push(input.value)
-    input.value = ''
-  }
+    add(e) {
+      var input = e.target[0]
+      this.items.push(input.value)
+      input.value = ''
+    }
+  </script>
 
 </todo>
 ```
@@ -89,22 +91,23 @@ HTML syntax is the *de facto* language of the web and it's designed for building
 
 
 
-# Minimal
+# 2. Simple and minimalistic
 
 Minimalism sets Riot apart from others:
 
 
-### 1. Minimal syntax
+### 1. Enjoyable syntax
 
 One of the design goals was to introduce a powerful tag syntax with as little boilerplate as possible:
 
 - Power shortcuts: `class={ enabled: is_enabled, hidden: hasErrors() }`.
 - No extra brain load such as `render`, `state`, `constructor` or `shouldComponentUpdate`
 - Interpolation: `Add #{ items.length + 1 }` or `class="item { selected: flag }"`
-- Compact ES6 method syntax.
+- `<script>` tag to enclose the logic is optional
+- Compact ES6 method syntax
 
 
-### 2. Minimal API
+### 2. Small learning curve
 
 Riot has between 10 and 100 times fewer API methods than other UI libraries.
 
@@ -112,7 +115,7 @@ Riot has between 10 and 100 times fewer API methods than other UI libraries.
 2. Less proprietary stuff and more standard stuff
 
 
-### 3. Minimal size
+### 3. Tiny size
 
 <small><em>react.min.js</em> – 127KB</small>
 <span class="bar red"></span>
@@ -120,8 +123,8 @@ Riot has between 10 and 100 times fewer API methods than other UI libraries.
 <small><em>polymer.min.js</em> – 120KB</small>
 <span class="bar red" style="width: 94%"></span>
 
-<small><em>riot.min.js</em> – 5.7KB</small>
-<span class="bar blue" style="width: 4.3%"></span>
+<small><em>riot.min.js</em> – 6.7KB</small>
+<span class="bar blue" style="width: 4.8%"></span>
 
 
 1. Fewer bugs.
@@ -129,7 +132,7 @@ Riot has between 10 and 100 times fewer API methods than other UI libraries.
 3. Embeddable. The library should be smaller than the application.
 4. Less to maintain. We don't need a big team to maintain Riot.
 
-### 4. Minimal, but complete
+### 4. Small, but complete
 
 Riot has all the essential building blocks for modern client-side applications:
 
@@ -154,19 +157,15 @@ I looked at the riot.js example, and it feels so clean, it's scary. [@paulbjense
 
 ==== .section.narrow
 
-## Conclusion
+# Conclusion
 
 Riot is React + Polymer + models + routing without the bloat. It works today, even on IE8. It's dead simple to use and it weighs almost nothing. No reinventing the wheel, but rather taking the good parts of what's there and making the simplest tool possible.
 
-Riot 2.0 keeps true to the original [Frameworkless JavaScript](/blog/technology/frameworkless-javascript.html) blog post. While the landscape has changed due to the latest advances in client-side engineering (virtual dom, composable views, one way binding), the original Riot principles remain: *extremely small size and full control*.
-
-According to the developers of React:
+We should focus on reusable components instead of templates. According to the developers of React:
 
 > "Templates separate technologies, not concerns."
 
-We should be building reusable components instead of templates. By combining these related technologies together under the same component the system becomes cleaner. We respect React for this important insight.
-
-This is the biggest change from Riot 1.0 to 2.0. JavaScript and HTML are now part of the same module.
+By having related layout and logic together under the same component the overall system becomes cleaner. We respect React for this important insight.
 
 
 #### Muut blog: [From React to Riot 2.0](/blog/technology/riot-2.0/) | .tall

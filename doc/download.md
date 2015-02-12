@@ -40,10 +40,14 @@ version: 2.0
 
 #### [cdnjs](https://cdnjs.com/libraries/riot)
 
+<small>
+  <span class="tag red">note</span> v{{ riot_version }} was released on *{{ datetime }}*
+  and CDNJS takes around 30 hours to update.
+</small>
+
 `{{ cdnjs }}/{{ riot_version }}/riot+compiler.min.js`
 
 `{{ cdnjs }}/{{ riot_version }}/riot.min.js`
-
 
 
 
@@ -98,7 +102,6 @@ That's a space separated list of tag names.
 
 - `each` attribute does not detect if the looped items are sorted or otherwise re-ordered
 - Looping table rows or cells with `each` attribute is not working on IE8 and IE9.
-- `if / show / hide` attributes cannot be set on a root node of a custom tag
 
 
 ## Media
