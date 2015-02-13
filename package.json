@@ -37,6 +37,7 @@
     "shelljs": "~0.3.0"
   },
   "devDependencies": {
+    "jsdom": "^3.1.1",
     "jshint": "latest",
     "uglify-js": "latest"
   },
