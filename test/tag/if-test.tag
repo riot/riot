@@ -4,7 +4,7 @@
   <h3>And some more</h3>
 
   this.on('mount unmount', function(e) {
-    console.info(this, e)
+    // console.info(this, e)
   })
 </if-child>
 
