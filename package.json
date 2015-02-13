@@ -54,7 +54,7 @@
   "bin": {
     "riot": "lib/cli.js"
   },
-  "main": "lib/compiler.js",
+  "main": "lib/index.js",
   "browser": "riot.js",
   "spm": {
     "main": "riot.js",
