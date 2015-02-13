@@ -6,12 +6,13 @@ body_id: riot-releases
 
 ====
 
-### 2.0.9 *Feb __, 2015*
+### 2.0.9 *Feb 13, 2015*
 
 - LiveScript support
 - Ability to set `if`, `show` and `hide` attributes for a custom tag
-- Multiple class shortcut: { 'foo bar': baz }
+- Multiple class shortcut: `{ 'foo bar': baz }`
 - Took away `children` property, which was designed for theoretical need mostly.
+- A memory leak fix on `riot.observable`. Thanks to [@GianlucaGuarini](https://github.com/GianlucaGuarini) for the hard debug work and everyone else on this [pull request](https://github.com/muut/riotjs/issues/248)
 
 
 ### 2.0.8 *Feb 9, 2015*
