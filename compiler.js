@@ -18,7 +18,9 @@
     none: plainjs,
     cs: coffee,
     es6: es6,
-    typescript: typescript
+    typescript: typescript,
+    livescript: livescript,
+    ls: livescript
   }
 
   // (tagname) (html) (javascript) endtag
@@ -50,7 +52,7 @@
     // run trough parser
     if (opts.expr) {
       html = html.replace(/\{\s*([^\}]+)\s*\}/g, function(_, expr) {
-         return '{' + compileJS(expr, opts, type).trim() + '}'
+         return '{' + compileJS(expr, opts, type).trim().replace(/\r?\n|\r/g, '') + '}'
       })
     }
 
@@ -82,11 +84,15 @@
   }
 
   function es6(js) {
-    return require('6to5').transform(js).code
+    return require('6to5').transform(js, { blacklist: ['useStrict'] }).code
   }
 
   function typescript(js) {
     return require('typescript-simple')(js)
+  }
+
+  function livescript(js) {
+    return require('LiveScript').compile(js, { bare: true, header: false })
   }
 
   function plainjs(js) {

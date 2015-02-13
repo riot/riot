@@ -48,7 +48,6 @@ Following properties are set for each tag instance:
 
 - `opts` - the options object
 - `parent` - the parent tag if any
-- `children` - array of child tag instances (custom tags and looped items)
 - `root` - root DOM node
 
 You can use these references in both the HTML and JavaScript code. For example:
@@ -143,7 +142,7 @@ this.on('unmount', function() {
 
 #### Reserved words
 
-The above method and property names are reserved words for Riot tags. Don't use any of following as your instance variable or method name: `opts`, `parent`, `children`, `root`, `update`, `unmount`, `on`, `off`, `one` and `trigger`. Local variables can be freely named. For example:
+The above method and property names are reserved words for Riot tags. Don't use any of following as your instance variable or method name: `opts`, `parent`, `root`, `update`, `unmount`, `on`, `off`, `one` and `trigger`. Local variables can be freely named. For example:
 
 ``` html
 <my-tag>

@@ -3,7 +3,7 @@
 <head>
   <title>Riot 2.0 route test</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <script src="../riot/riot.js"></script>
+  <script src="../dist/riot/riot.js"></script>
 </script>
 
 <body>
@@ -19,7 +19,7 @@
 
   riot.route("mummypowder/logo-and-key")
 
-  riot.route.parser(function(path) {
+  false && riot.route.parser(function(path) {
     var raw = path.slice(2).split('?'),
         uri = raw[0].split('/'),
         qs = raw[1],
