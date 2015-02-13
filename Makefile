@@ -27,6 +27,10 @@ min: jshint riot
 	# minify riot
 	@ for f in riot compiler riot+compiler; do ./node_modules/uglify-js/bin/uglifyjs $(DIST)$$f.js --comments --mangle -o $(DIST)$$f.min.js; done
 
+perf:
+	@ make riot
+	@ node --expose-gc test/performance/mem
+
 watch:
 	# watch and rebuild riot and its tests
 	@ $(shell \
