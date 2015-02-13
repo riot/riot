@@ -6,6 +6,9 @@
   "repository": "muut/riotjs",
   "author": "Muut, Inc. and other contributors",
   "license": "MIT",
+  "scripts": {
+    "test": "make test"
+  },
   "keywords": [
     "custom tags",
     "custom elements",
