@@ -9,7 +9,9 @@ body_id: riot-releases
 ### 2.0.10 *Feb __, 2015*
 
 - [Todo MVC example](https://github.com/txchen/feplay/tree/gh-pages/riot_todo)
+- Ability to define tags on the same line: `<tag></tag>`
 - Single line ES6 style methods: `foo() { this.bar = 'baz' }`
+- Fix compiler to support custom brackets
 - [Contributing guidelines](https://github.com/muut/riotjs/blob/master/CONTRIBUTING.md)
 
 ### 2.0.9 *Feb 13, 2015*
