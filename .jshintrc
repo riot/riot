@@ -5,6 +5,5 @@
   "eqnull": true,
   "evil": true,
   "-W093": true,
-  "-W067": true,
-  "indent": 2
+  "-W067": true
 }
