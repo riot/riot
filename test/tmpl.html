@@ -66,6 +66,7 @@ test('no', '{ !yes ? "yes" : "no" }')
 test(true, '{ /^14/.test(+new Date()) }')
 test('number', '{ typeof Math.random() }')
 test('hi there', '{ fn("there") }')
+test('true', '{ str == "x" }')
 
 test('2 ', '{ obj.val } ')
 test(2, '{ obj.val }')
