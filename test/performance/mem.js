@@ -4,20 +4,19 @@
  *
  */
 
-var
-	jsdom = require('jsdom')
-	riot = require('../../dist/riot/riot')
-	myComponent = 'my-component'
-	myComponentHTML = [
-		'<h1>{ opts.title }</h1>',
-		'<p>{ opts.description }</p>',
-		'<my-list-item each="{ opts.items }">'
-	].join('')
-	myListItem = 'my-list-item'
-	myListItemHTML = [
-		'<input type="checkbox" onchange="{ onChange }">',
-		'<span if="{ opts.isActive }">I am active</span>',
-	].join('')
+var jsdom = require('jsdom')
+  riot = require('../../dist/riot/riot')
+  myComponent = 'my-component'
+  myComponentHTML = [
+    '<h1>{ opts.title }</h1>',
+    '<p>{ opts.description }</p>',
+    '<my-list-item each="{ opts.items }">'
+  ].join('')
+  myListItem = 'my-list-item'
+  myListItemHTML = [
+    '<input type="checkbox" onchange="{ onChange }">',
+    '<span if="{ opts.isActive }">I am active</span>',
+  ].join('')
 
 /**
  * Check the memory usage analizing the heap
@@ -26,11 +25,9 @@ var
  */
 
 function measure(fun) {
-	startTime = Date.now()
-	duration = null
-	fun()
-	duration = Date.now() - startTime
-	return [process.memoryUsage().heapUsed, duration]
+  var startTime = Date.now()
+  fun()
+  return [process.memoryUsage().heapUsed, Date.now() - startTime]
 }
 
 /**
@@ -38,27 +35,28 @@ function measure(fun) {
  * Adding the custom tags to the riot internal cache
  *
  */
+
 function setTags() {
-	riot.tag(myComponent, myComponentHTML,function (opts) {
-		var self = this
+  riot.tag(myComponent, myComponentHTML,function (opts) {
+    var self = this
     function loop () {
-        opts.items = generateItems(1000,{
-            isActive:false
-        })
-        result = measure(self.update.bind(self))
-				console.log(
-					(result[0] / 1024 / 1024).toFixed(2) + ' MiB',
-					result[1] + ' ms'
-				)
-        setTimeout(loop,1000)
+      opts.items = generateItems(1000,{
+          isActive:false
+      })
+      result = measure(self.update.bind(self))
+      console.log(
+        (result[0] / 1024 / 1024).toFixed(2) + ' MiB',
+        result[1] + ' ms'
+      )
+      setTimeout(loop,1000)
     }
     loop()
-	})
-	riot.tag(myListItem, myListItemHTML, function () {
-		this.onChange = function () {
-			opts.isActive = e.target.checked
-		}
-	})
+  })
+  riot.tag(myListItem, myListItemHTML, function () {
+    this.onChange = function () {
+      opts.isActive = e.target.checked
+    }
+  })
 }
 
 /**
@@ -68,13 +66,13 @@ function setTags() {
  */
 
 function mount() {
-	riot.mount(myComponent, {
-		title: 'hello world',
-		description: 'mad world',
-		items: generateItems(1000,{
-			isActive: false
-		})
-	})
+  riot.mount(myComponent, {
+    title: 'hello world',
+    description: 'mad world',
+    items: generateItems(1000,{
+      isActive: false
+    })
+  })
 }
 
 /**
@@ -83,12 +81,13 @@ function mount() {
  * @param  { * } data
  * @return array
  */
+
 function generateItems(amount, data) {
-	var items = []
-	while (--amount) {
-		items.push(data)
-	}
-	return items
+  var items = []
+  while (--amount) {
+    items.push(data)
+  }
+  return items
 }
 
 /**
@@ -98,21 +97,20 @@ function generateItems(amount, data) {
  */
 
 function test () {
-	global.gc()
-	mount()
+  global.gc()
+  mount()
 }
-
-
 
 /**
  * Pepare the DOM and mount the riot components
  */
+
 jsdom.env({
-	html: '<!doctype html><html><head></head><body><' + myComponent + ' /></body></html>',
-	done: function (errors, window) {
-		global.document = window.document
-		setTags()
-		test()
-	}
-});
+  html: '<!doctype html><html><head></head><body><' + myComponent + ' /></body></html>',
+  done: function (errors, window) {
+    global.document = window.document
+    setTags()
+    test()
+  }
+})
 
