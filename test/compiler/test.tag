@@ -1,20 +1,9 @@
-<kids>
 
-  <module-input>
-    <input type="{ opts.type }">
-    <input type='text' />
-    <button>submit</button>
-  </module-input>
+<img-test>
 
-  <!--
+  <img src="joku">
+  <img src={ src }>
 
-  <label each={ id, label in opts.values }>
-    <input type="radio">
-    { label }
-  </label>
+  var self = this
 
-    is this working??
-
-  -->
-
-</kids>
+</img-test>

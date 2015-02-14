@@ -114,5 +114,5 @@ jsdom.env({
     setTags()
     test()
   }
-});
+})
 

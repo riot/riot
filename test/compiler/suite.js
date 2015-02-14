@@ -3,6 +3,8 @@
 
 require('shelljs/global')
 
+global.riot = { settings: { brackets: '{ }' } }
+
 var compiler = require('../../lib/compiler')
 
 function assert(str, resStr) {
@@ -65,7 +67,7 @@ function testFiles(opts) {
 
 
   test('complex', {})
-  test('test', { type: 'cs' })
+  test('test', { type: 'cs', expr: true })
   test('test', { type: 'es6' })
   test('test.jade', { template: 'jade' })
   test('slide.jade', { template: 'jade' })
