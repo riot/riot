@@ -88,6 +88,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Another flux demo caparable to React ones](http://txchen.github.io/feplay/riot_flux)
 - [Various experiments](http://richardbondi.net/programming/riot)
 - [Hackernews reader](http://git.io/riot-hn)
+- [Riotjs TodoMvc](https://github.com/txchen/feplay/tree/gh-pages/riot_todo)
 
 
 ### Tutorials
