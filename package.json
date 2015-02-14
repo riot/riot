@@ -58,7 +58,7 @@
   "main": "lib/index.js",
   "browser": "riot.js",
   "scripts": {
-    "test": "tape test/tape/*.js"
+    "test": "tape test/*.js"
   },
   "spm": {
     "main": "riot.js",
