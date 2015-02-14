@@ -1,8 +1,4 @@
 
-### dev- branch
-
-Please start from dev- branch and hand your work with a pull request.
-
 ### Coding style
 
 The most important:
@@ -13,4 +9,8 @@ The most important:
 - Spacing around brackets: `if (foo) {` instead of `if(foo){`
 
 
-#### We are happy to merge your code. Thank you in advance!
+### Use `dev` branch
+
+Please start from `dev` branch and hand your work with a **pull request**.
+
+##### Thank you in advance! We are happy to merge your code.
