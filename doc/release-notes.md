@@ -11,6 +11,7 @@ body_id: riot-releases
 - [Todo MVC example](https://github.com/txchen/feplay/tree/gh-pages/riot_todo)
 - Ability to define tags on the same line: `<tag></tag>`
 - Single line ES6 style methods: `foo() { this.bar = 'baz' }`
+- No illegal server requests with images: `<img src={ src }>`
 - Fix compiler to support custom brackets
 - [Contributing guidelines](https://github.com/muut/riotjs/blob/master/CONTRIBUTING.md)
 

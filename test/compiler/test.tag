@@ -1,5 +1,9 @@
 
+<img-test>
 
-<plan>
-  <div class=${ plan.name } checked=${ true }></div>
-</plan>
+  <img src="joku">
+  <img src={ src }>
+
+  var self = this
+
+</img-test>

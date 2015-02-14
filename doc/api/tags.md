@@ -201,7 +201,9 @@ See [timer demo](http://jsfiddle.net/gnumanth/h9kuozp5/) and [riot.tag](/riotjs/
 2. Unquoted expressions. Write `value="{ val }"` instead of `value={ val }`
 3. Boolean attributes. Write `__checked="{ flag }"` instead of `checked={ flag }`
 4. Shorthand ES6 method signatures
-5. `this.update()` must be manually called on an event handler
+5. `this.update()` must be manually called at the end of an event handler
+6. `<img src={ src }>` must be written as `<img data-src={ src }>` in order to avoid illegal server requests
+
 
 You can take advantage of `template` or `script` tags as follows:
 
