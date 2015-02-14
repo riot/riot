@@ -39,6 +39,7 @@
   "devDependencies": {
     "jsdom": "^3.1.1",
     "jshint": "latest",
+    "tape": "^3.5.0",
     "uglify-js": "latest"
   },
   "preferGlobal": true,
@@ -56,6 +57,9 @@
   },
   "main": "lib/index.js",
   "browser": "riot.js",
+  "scripts": {
+    "test": "tape test/tape/*.js"
+  },
   "spm": {
     "main": "riot.js",
     "ignore": [
