@@ -49,8 +49,7 @@ out/
 # --------------------
 # App Files
 # --------------------
-node_modules/**
-!node_modules/riot
+node_modules
 npm-debug.log
 bower_components
 coverage

@@ -1,9 +1,15 @@
-var riot = require('riot').install()
+var riot = require('../lib').install()
+var timer = require('./tag/timer.tag')
+var timetable = require('./tag/timetable.tag')
 
-riot.doc('<timetable><timer start="10"></timer><timer></timer><timer start="30"></timer></timetable>')
+riot.doc(
+  '<timer></timer>',
+  '<timetable></timetable>'
+)
 
-require('riot/test/tag/timer.tag')
-riot.mountTo(riot.settings.doc.body.firstChild, 'timer', { start: 79 })
+riot.tag(timer)
+riot.tag(timetable)
+
 riot.mount('*', { start: 79 })
 
 var res = riot.render()
