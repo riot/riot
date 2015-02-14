@@ -1,0 +1,4 @@
+{
+    "validateIndentation": 2,
+    "excludeFiles": ["test/ie8/**","lib/wrap/*.js"]
+}

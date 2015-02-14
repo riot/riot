@@ -12,10 +12,16 @@ WATCH = "\
 
 jshint:
 	# check code quality
-	@ ./node_modules/jshint/bin/jshint lib/*.js
+	@ ./node_modules/jshint/bin/jshint lib test
+
+jscs:
+	# check code style
+	@ ./node_modules/jscs/bin/jscs lib test
 
 riot:
 	# build riot
+	@ make jshint
+	@ make jscs
 	@ mkdir -p $(DIST)
 	@ cat lib/compiler.js > $(DIST)compiler.js
 	@ cat lib/wrap/prefix.js > $(DIST)riot.js
@@ -28,6 +34,7 @@ min: jshint riot
 	@ for f in riot compiler riot+compiler; do ./node_modules/uglify-js/bin/uglifyjs $(DIST)$$f.js --comments --mangle -o $(DIST)$$f.min.js; done
 
 perf:
+	# run the performance tests
 	@ make riot
 	@ node --expose-gc test/performance/mem
 
