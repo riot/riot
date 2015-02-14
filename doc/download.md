@@ -15,13 +15,17 @@ version: 2.0
 
 ### Direct download
 
-[riot.compiler.min.js]({{ base }}/riot.compiler.min.js)
-
-[riot.compiler.js]({{ base }}/riot.compiler.js)
-
 [riot.min.js]({{ base }}/riot.min.js)
 
 [riot.js]({{ base }}/riot.js)
+
+[compiler.min.js]({{ base }}/compiler.min.js)
+
+[compiler.js]({{ base }}/compiler.js)
+
+[riot+compiler.min.js]({{ base }}/riot+compiler.min.js)
+
+[riot+compiler.js]({{ base }}/riot+compiler.js)
 
 
 ### Content delivery networks
