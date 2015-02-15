@@ -1,4 +1,4 @@
-f
+
 nogen: true
 
 ====
@@ -11,13 +11,13 @@ Mounts (constructs) all custom tags on the document specified by `selector`. Opt
 
 ``` js
 // mount all <plans> and <pricing> tags on the page
-riot.mount('plans pricing')
+var tags = riot.mount('plans pricing')
 
 // mount all custom tags with a class name .customer
-riot.mount('.customer')
+var tags = riot.mount('.customer')
 
 // mount <account> tag and pass an API object as options
-riot.mount('account', api)
+var tags = riot.mount('account', api)
 ```
 
 The passed options can be anything, ranging from a simple object to a full application API. Or it can be a Flux- store. Really depends on how you want to structure your client-side applications.
