@@ -6,8 +6,9 @@
     <button>Submit</button>
   </form>
 
-  submit() {
-    throw new Error('test');
+  submit(e) {
+    e.preventDefault()
+    throw new Error('event-error test');
   }
 
 </event-error>

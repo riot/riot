@@ -4,9 +4,11 @@ var riot = require('riot').install()
 
 var timer = require('riot/test/tag/timer.tag')
 var timetable = require('riot/test/tag/timetable.tag')
+var eventError = require('riot/test/tag/event-error.tag')
 
 riot.tag(timer)
 riot.tag(timetable)
+riot.tag(eventError)
 
 var app = express()
 app.engine('html', riot.renderFile)
