@@ -71,6 +71,7 @@ function testFiles(opts) {
   test('test', { type: 'es6' })
   test('test.jade', { template: 'jade' })
   test('slide.jade', { template: 'jade' })
+  test('style', {})
 
 }
 
