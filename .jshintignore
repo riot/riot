@@ -1,0 +1,2 @@
+lib/wrap/*.js
+test/ie8/*.js

@@ -7,9 +7,9 @@ global.riot = { settings: { brackets: '{ }' } }
 
 var compiler = require('../../lib/compiler')
 
-function assert(test, should) {
-  if (test === should) console.info('OK', test.replace(/\n/g, '').trim())
-  else throw new Error(test + ' != ' + should)
+function assert(str, resStr) {
+  if (str === resStr) console.info('OK', test.replace(/\n/g, '').trim())
+  else throw new Error(test + ' != ' + resStr)
 }
 
 // custom javscript parser
@@ -19,12 +19,12 @@ function parser(str) {
 
 function testHTML() {
 
-  function test(test, should) {
-    assert(compiler.html(test, {}), should)
+  function test(str, resStr) {
+    assert(compiler.html(str, {}), resStr)
   }
 
-  function testParser(test, should) {
-    assert(compiler.html(test, { parser: parser, expr: true }), should)
+  function testParser(str, resStr) {
+    assert(compiler.html(str, { parser: parser, expr: true }), resStr)
   }
 
   test('<p/>', '<p></p>')
