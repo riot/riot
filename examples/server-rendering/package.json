@@ -1,0 +1,16 @@
+{
+  "name": "riot-server",
+  "description": "Riot server rendering example.",
+  "repository": "muut/riotjs",
+  "scripts": {
+    "clean": "rm -rf public",
+    "compile": "riot -c ../../test/tag public",
+    "copy": "cp ../../riot.js public",
+    "server": "node server.js",
+    "start": "npm run clean && npm run compile && npm run copy && npm run server"
+  },
+  "dependencies": {
+    "riot": "latest",
+    "express": "^4.11.2"
+  }
+}
