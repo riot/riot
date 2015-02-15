@@ -4,15 +4,16 @@
  *
  */
 
-var jsdom = require('jsdom')
-  riot = require('../../dist/riot/riot')
-  myComponent = 'my-component'
+var
+  jsdom = require('jsdom'),
+  riot = require('../../dist/riot/riot'),
+  myComponent = 'my-component',
   myComponentHTML = [
     '<h1>{ opts.title }</h1>',
     '<p>{ opts.description }</p>',
     '<my-list-item each="{ opts.items }">'
-  ].join('')
-  myListItem = 'my-list-item'
+  ].join(''),
+  myListItem = 'my-list-item',
   myListItemHTML = [
     '<input type="checkbox" onchange="{ onChange }">',
     '<span if="{ opts.isActive }">I am active</span>',
@@ -25,9 +26,11 @@ var jsdom = require('jsdom')
  */
 
 function measure(fun) {
-  var startTime = Date.now()
+  startTime = Date.now()
+  duration = null
   fun()
-  return [process.memoryUsage().heapUsed, Date.now() - startTime]
+  duration = Date.now() - startTime
+  return [process.memoryUsage().heapUsed, duration]
 }
 
 /**
@@ -35,7 +38,6 @@ function measure(fun) {
  * Adding the custom tags to the riot internal cache
  *
  */
-
 function setTags() {
   riot.tag(myComponent, myComponentHTML,function (opts) {
     var self = this
@@ -81,7 +83,6 @@ function mount() {
  * @param  { * } data
  * @return array
  */
-
 function generateItems(amount, data) {
   var items = []
   while (--amount) {
@@ -101,10 +102,11 @@ function test () {
   mount()
 }
 
+
+
 /**
  * Pepare the DOM and mount the riot components
  */
-
 jsdom.env({
   html: '<!doctype html><html><head></head><body><' + myComponent + ' /></body></html>',
   done: function (errors, window) {

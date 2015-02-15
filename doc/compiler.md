@@ -216,10 +216,10 @@ An sample tag written in ES6:
 </test>
 ```
 
-All ECMAScript 6 [features](https://github.com/lukehoban/es6features) can be used. [6to5](https://6to5.org/) is used for the transformation:
+All ECMAScript 6 [features](https://github.com/lukehoban/es6features) can be used. [Babel](https://babeljs.io/) is used for the transformation:
 
 ``` sh
-npm install 6to5
+npm install babel
 ```
 
 ### TypeScript

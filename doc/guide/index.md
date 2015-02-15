@@ -64,8 +64,8 @@ See [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https:
 
 Riot tag is a combination of layout (HTML) and logic (JavaScript). Here are the basic rules:
 
-* HTML is defined first and the logic is enclosed inside optional `<script>` tag.
-* Without `<script>` tag the JavaScript starts where the last HTML tag ends.
+* HTML is defined first and the logic is enclosed inside optional `script` tag.
+* Without `script` tag the JavaScript starts where the last HTML tag ends.
 * Tags can be empty, HTML only or JavaScript only and `{ expressions }` are optional.
 * Quotes are optional: `<foo bar={ baz }>` becomes `<foo bar="{ baz }">`.
 * ES6 method syntax is supported: `methodName()` becomes `this.methodName = function()` and `this` variable always points to the current tag instance.
@@ -402,6 +402,44 @@ riot.mount('account', { plan: { name: 'small', term: 'monthly' } })
 
 Parent tag options are passed with the `riot.mount` method and child tag options are passed on the tag attribute.
 
+<span class="tag red">important</span> Nested tags are always declared inside a parent custom tag. They are not initialized if they are defined on the page.
+
+## Nested HTML
+
+Here is an example of a custom tag with nested HTML on the page:
+
+```
+<body>
+  <my-tag>
+    <h3>Hello world!</h3>
+  </my-tag>
+</body>
+
+<script>
+riot.mount('my-tag')
+</script>
+```
+
+We want to access the inner HTML inside a custom tag in a cute way as follows:
+
+```
+<my-tag>
+  <p>Some tag specific markup</p>
+  <!-- here comes the inner HTML defined on the page -->
+  <inner-html/>
+</my-tag>
+```
+
+Here is the source code for above `inner-html` tag:
+
+```
+<inner-content>
+  var p = this.parent.root
+  while (p.firstChild) this.root.appendChild(p.firstChild)
+</inner-content>
+```
+
+The above tag will be part of Riot "core tags" to be introduced later.
 
 ## Named elements
 
