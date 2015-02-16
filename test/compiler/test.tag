@@ -4,6 +4,7 @@
   <img src="joku">
   <img src={ src }>
 
-  var self = this
+  @kama joo ->
+    echo 'jooo'
 
 </img-test>

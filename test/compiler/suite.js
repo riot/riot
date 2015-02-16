@@ -8,8 +8,8 @@ global.riot = { settings: { brackets: '{ }' } }
 var compiler = require('../../lib/compiler')
 
 function assert(str, resStr) {
-  if (str === resStr) console.info('OK', test.replace(/\n/g, '').trim())
-  else throw new Error(test + ' != ' + resStr)
+  if (str === resStr) console.info('OK', str.replace(/\n/g, '').trim())
+  else throw new Error(str + ' != ' + resStr)
 }
 
 // custom javscript parser

@@ -424,7 +424,7 @@ Parent tag options are passed with the `riot.mount` method and child tag options
 
 <span class="tag red">important</span> Nested tags are always declared inside a parent custom tag. They are not initialized if they are defined on the page.
 
-## Nested HTML
+### Nested HTML
 
 Here is an example of a custom tag with nested HTML on the page:
 
@@ -440,7 +440,7 @@ riot.mount('my-tag')
 </script>
 ```
 
-We want to access the inner HTML inside a custom tag in a cute way as follows:
+We can access the inner HTML in a cute way by making a custom `inner-html` tag:
 
 ```
 <my-tag>
@@ -450,7 +450,7 @@ We want to access the inner HTML inside a custom tag in a cute way as follows:
 </my-tag>
 ```
 
-Here is the source code for above `inner-html` tag:
+Here is the `inner-html` source code:
 
 ```
 <inner-content>
@@ -460,6 +460,7 @@ Here is the source code for above `inner-html` tag:
 ```
 
 The above tag will be part of Riot "core tags" to be introduced later.
+
 
 ## Named elements
 

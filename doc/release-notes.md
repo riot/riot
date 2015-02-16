@@ -9,6 +9,7 @@ body_id: riot-releases
 ### 2.0.10 *Feb __, 2015*
 
 - [Todo MVC example](https://github.com/txchen/feplay/tree/gh-pages/riot_todo)
+- Nested `style` tags are automatically inject into `<head>` to avoid duplicate definitions
 - Ability to define tags on the same line: `<tag></tag>`
 - Single line ES6 style methods: `foo() { this.bar = 'baz' }`
 - No illegal server requests with images: `<img src={ src }>`
