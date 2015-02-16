@@ -85,7 +85,7 @@ HTML syntax is the *de facto* language of the web and it's designed for building
 
 
 ### Use your favorite tools
-- Create tags with CoffeeScript, Jade, Typescript, ES6 or [any pre-processor](compiler.html#pre-processors) you want.
+- Create tags with CoffeeScript, Jade, Typescript, LiveScript, ES6 or [any pre-processor](compiler.html#pre-processors) you want.
 - Integrate with NPM, CommonJS, AMD, Bower or Component
 - Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot) or [Browserify](https://github.com/jhthorsen/riotify) plugins
 

@@ -18,7 +18,7 @@ Riot brings custom tags to all browsers, including IE8. Think React + Polymer bu
   this.time = opts.start || 0
 
   tick() {
-    this.time++
+    this.update({ time: ++this.time })
   }
 
   var timer = setInterval(this.tick, 1000)
@@ -67,7 +67,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 
 ### Use your dearest language and tools
-- Create tags with CoffeeScript, Jade, Typescript, ES6 or [any pre-processor](https://muut.com/riotjs/compiler.html#pre-processors) you want.
+- Create tags with CoffeeScript, Jade, LiveScript, Typescript, ES6 or [any pre-processor](https://muut.com/riotjs/compiler.html#pre-processors) you want.
 - Integrate with NPM, CommonJS, AMD, Bower or Component
 - Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot) or [Browserify](https://github.com/jhthorsen/riotify) plugins
 

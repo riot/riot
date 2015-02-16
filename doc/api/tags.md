@@ -179,16 +179,15 @@ riot.tag('timer',
   '<p>Seconds Elapsed: { time }</p>',
   'timer { display: block; border: 2px }',
   function (opts) {
+    var self = this
     this.time = opts.start || 0
-  
-    this.tick = (function () {
-      this.update({
-          time: ++this.time
-      })
-    }).bind(this)
-  
+
+    this.tick = function () {
+      self.update({ time: ++this.time })
+    }
+
     var timer = setInterval(this.tick, 1000)
-  
+
     this.on('unmount', function () {
       clearInterval(timer)
     })
@@ -205,8 +204,7 @@ See [timer demo](http://jsfiddle.net/gnumanth/h9kuozp5/) and [riot.tag](/riotjs/
 2. Unquoted expressions. Write `value="{ val }"` instead of `value={ val }`
 3. Boolean attributes. Write `__checked="{ flag }"` instead of `checked={ flag }`
 4. Shorthand ES6 method signatures
-5. `this.update()` must be manually called at the end of an event handler
-6. `<img src={ src }>` must be written as `<img data-src={ src }>` in order to avoid illegal server requests
+5. `<img src={ src }>` must be written as `<img data-src={ src }>` in order to avoid illegal server requests
 
 
 You can take advantage of `template` or `script` tags as follows:
@@ -225,7 +223,6 @@ riot.tag('tag-name', my_tmpl.innerHTML, function(opts) {
 ```
 
 This method is on the edge of being depreciated.
-
 
 
 ### riot.update() | #update

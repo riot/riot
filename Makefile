@@ -18,10 +18,7 @@ jscs:
 	# check code style
 	@ ./node_modules/jscs/bin/jscs lib test
 
-riot:
-	# build riot
-	@ make jshint
-	@ make jscs
+raw:
 	@ mkdir -p $(DIST)
 	@ cat lib/compiler.js > $(DIST)compiler.js
 	@ cat lib/wrap/prefix.js > $(DIST)riot.js
@@ -29,19 +26,20 @@ riot:
 	@ cat $(DIST)riot.js $(DIST)compiler.js > $(DIST)riot+compiler.js
 	@ cat lib/wrap/suffix.js | tee -a $(DIST)riot.js $(DIST)riot+compiler.js > /dev/null
 
-min: jshint riot
+riot: jshint jscs raw
+
+min: riot
 	# minify riot
 	@ for f in riot compiler riot+compiler; do ./node_modules/uglify-js/bin/uglifyjs $(DIST)$$f.js --comments --mangle -o $(DIST)$$f.min.js; done
 
-perf:
+perf: riot
 	# run the performance tests
-	@ make riot
 	@ node --expose-gc test/performance/mem
 
 watch:
 	# watch and rebuild riot and its tests
 	@ $(shell \
-		node -e $(WATCH) "lib/**/*.js" "make riot" & \
+		node -e $(WATCH) "lib/**/*.js" "make raw" & \
 		node ./lib/cli.js --watch test/tag dist/tags.js )
 
 .PHONY: test min
