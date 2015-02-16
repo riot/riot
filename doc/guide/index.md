@@ -124,6 +124,26 @@ Currently available options are "coffeescript", "typescript", "es6" and "none". 
 See [pre processors](/riotjs/compiler.html#pre-processors) for more details.
 
 
+### Tag styling
+
+You can put `<style>` tag inside. Riot.js automatically take it out and inject it into `<head>`.
+
+```html
+<todo>
+
+  <!-- layout -->
+  <h3>{ opts.title }</h3>
+  
+  <style>
+    todo { display: block }
+    todo h3 { font-size: 120% }
+    /** other awesome stylings **/
+  </style>
+  
+</todo>
+```
+
+
 ## Mounting
 
 Once a tag is created you can mount it on the page as follows:
