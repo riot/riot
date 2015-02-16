@@ -18,14 +18,14 @@ var data = {
   fn: function(s) { return ['hi', s].join(' ') }
 }
 
-test('<div class="one two th_r-e3 four five six">',
-     '<div class="{'
-       + 'one: !no,'
-       + 'two: false || null || !no && yes,'
-       + '\'th_r-e3\': 4 > 2,'
-       + '\'four five\': fn(),'
-       + 'six: str == "x"'
-     + '}">')
+test('a b', '{ a: !no, b: yes }')
+test('a b', "{ 'a b': yes }")
+test('a_b-c3', '{ "a_b-c3": yes }')
+test('y', '{ y: false || null || !no && yes }')
+test('y', '{ y: 4 > 2 }')
+test('y', '{ y: fn() }')
+test('y', '{ y: str == "x" }')
+test('y', "{ y: new Date() }")
 
 test('a b c', '{ true ? "a b c" : "foo" }')
 test('a "b" c', '{ true ? "a \\"b\\" c" : "foo" }')
