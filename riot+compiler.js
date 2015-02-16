@@ -1,8 +1,8 @@
-/* Riot v2.0.9, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot WIP, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function() {
 
-var riot = { version: 'v2.0.9', settings: {} }
+var riot = { version: 'WIP', settings: {} }
 
 'use strict'
 
@@ -381,26 +381,38 @@ function _each(dom, parent, expr) {
 
     })
 
-    // mount new
+    // mount new / reorder
     var nodes = root.childNodes,
         prev_index = [].indexOf.call(nodes, prev)
 
-    arrDiff(items, rendered).map(function(item, i) {
-
+    items.forEach(function (item) {
       var pos = items.indexOf(item)
+      var oldPos = rendered.indexOf(item)
 
-      if (!checksum && expr.key) item = mkitem(expr, item, pos)
+      if (!~oldPos) {
+        // mount new
+        if (!checksum && expr.key) item = mkitem(expr, item, pos)
 
-      var tag = new Tag({ tmpl: template }, {
-        before: nodes[prev_index + 1 + pos],
-        parent: parent,
-        root: root,
-        loop: true,
-        item: item
-      })
+        var tag = new Tag({ tmpl: template }, {
+          before: nodes[prev_index + 1 + pos],
+          parent: parent,
+          root: root,
+          loop: true,
+          item: item
+        })
 
-      tags.splice(pos, 0, tag)
+        tags.splice(pos, 0, tag)
+        return
+      }
 
+      if (pos !== oldPos) {
+        // reorder
+        var tag = tags[oldPos]
+        root.insertBefore(nodes[prev_index + oldPos + 1], nodes[prev_index + pos + 1])
+        rendered.splice(pos, 0, rendered.splice(oldPos, 1))
+        tags.splice(pos, 0, tags.splice(oldPos, 1))
+        return
+      }
     })
 
     rendered = items.slice()
@@ -408,6 +420,7 @@ function _each(dom, parent, expr) {
   })
 
 }
+
 function parseNamedElements(root, tag, expressions) {
   walk(root, function(dom) {
     if (dom.nodeType != 1) return
@@ -736,6 +749,7 @@ riot.mount = function(selector, opts) {
   var tags = []
 
   each(document.querySelectorAll(selector), function(root) {
+    if (root.riot) return
 
     var tagName = root.tagName.toLowerCase(),
         tag = mountTo(root, tagName, opts)
