@@ -9,13 +9,7 @@ WATCH = "\
 			require('shelljs').exec(cmd) 										  \
 		})"
 
-<<<<<<< HEAD
 eslint:
-=======
-test:
-	# check code quality
-	@ ./node_modules/jshint/bin/jshint lib test
->>>>>>> c260173... fix again the indentation issues
 	# check code style
 	# TODO: Get ./test up to standards and add back
 	@ ./node_modules/eslint/bin/eslint.js -c ./.eslintrc lib
