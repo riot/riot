@@ -453,10 +453,10 @@ We can access the inner HTML in a cute way by making a custom `inner-html` tag:
 Here is the `inner-html` source code:
 
 ```
-<inner-content>
+<inner-html>
   var p = this.parent.root
   while (p.firstChild) this.root.appendChild(p.firstChild)
-</inner-content>
+</inner-html>
 ```
 
 The above tag will be part of Riot "core tags" to be introduced later.
