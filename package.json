@@ -40,9 +40,11 @@
     "shelljs": "~0.3.0"
   },
   "devDependencies": {
+    "chai": "^2.0.0",
     "jscs": "^1.11.3",
     "jsdom": "^3.1.1",
     "jshint": "latest",
+    "mocha": "^2.1.0",
     "uglify-js": "latest"
   },
   "preferGlobal": true,

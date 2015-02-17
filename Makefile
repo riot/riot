@@ -14,6 +14,8 @@ test:
 	@ ./node_modules/jshint/bin/jshint lib test
 	# check code style
 	@ ./node_modules/jscs/bin/jscs lib test
+	# run the mocha tests
+	@ ./node_modules/mocha/bin/mocha test/runner.js
 
 raw:
 	@ mkdir -p $(DIST)
@@ -23,7 +25,7 @@ raw:
 	@ cat $(DIST)riot.js $(DIST)compiler.js > $(DIST)riot+compiler.js
 	@ cat lib/wrap/suffix.js | tee -a $(DIST)riot.js $(DIST)riot+compiler.js > /dev/null
 
-riot: jshint jscs raw
+riot: test jscs raw
 
 min: riot
 	# minify riot
