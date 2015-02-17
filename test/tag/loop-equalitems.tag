@@ -1,6 +1,6 @@
 
 <loop-equalitems>
-  <h3>Loop equal items / test pos values</h3>
+  <h3>Equal items / reordering with pos values</h3>
 
   <h4>The loop:</h4>
   <span each="{name, i in items}">{name}({i}) </span>

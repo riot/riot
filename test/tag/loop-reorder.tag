@@ -1,6 +1,6 @@
 
 <loop-reorder>
-  <h3>Loop reordering</h3>
+  <h3>Object loop reordering</h3>
 
   <h4>The loop:</h4>
   <span each="{items}">{x} </span>
