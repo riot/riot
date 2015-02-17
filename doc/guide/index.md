@@ -347,7 +347,9 @@ riot.settings.brackets = '${ }'
 riot.settings.brackets = '\{\{ }}'
 ```
 
-the start and end is separated with a space character.
+The start and end is separated with a space character.
+
+When using [pre-compiler](compiler.html#pre-compilation) you'll have to set `brackets` option there as well.
 
 
 
