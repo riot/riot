@@ -9,12 +9,9 @@ WATCH = "\
 			require('shelljs').exec(cmd) 										  \
 		})"
 
-
-jshint:
+test:
 	# check code quality
 	@ ./node_modules/jshint/bin/jshint lib test
-
-jscs:
 	# check code style
 	@ ./node_modules/jscs/bin/jscs lib test
 
