@@ -84,7 +84,7 @@
   }
 
   function es6(js) {
-    return require('6to5').transform(js, { blacklist: ['useStrict'] }).code
+    return require('babel').transform(js, { blacklist: ['useStrict'] }).code
   }
 
   function typescript(js) {
