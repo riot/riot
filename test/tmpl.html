@@ -1,12 +1,14 @@
 <head>
 <title>tmpl test</title>
 <script src="../dist/riot/riot.js"></script>
-<script src="../lib/tmpl.js"></script>
 </head>
 
 <body>
 <div id="app"></div>
 <script>
+
+var tmpl = riot._('tmpl'),
+    brackets = riot._('brackets')
 
 var data = {
   yes: true,
@@ -110,12 +112,14 @@ test(2, '{ x }')
 test('y', '{ y: x }')
 
 // custom brackets
-riot.settings.brackets = '[ ]'
+brackets('[ ]')
 test(2, '[ x ]')
 test('x', '[ str\\[0\\] ]')
-riot.settings.brackets = '<% %>'
+brackets('<% %>')
 test(2, '<% x %>')
-riot.settings.brackets = '{ }'
+brackets('${ }')
+test(2, '${ x }')
+brackets()
 
 // maybe / later:
 //test('{"x":5}', '{ JSON.stringify({ x: 5 }) }')
