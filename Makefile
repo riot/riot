@@ -15,7 +15,7 @@ test:
 	# check code style
 	@ ./node_modules/jscs/bin/jscs lib test
 	# run the mocha tests
-	@ ./node_modules/mocha/bin/mocha test/runner.js
+	@ ./node_modules/mocha/bin/mocha -r jscoverage test/runner.js --covout=html
 
 raw:
 	@ mkdir -p $(DIST)
