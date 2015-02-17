@@ -8,9 +8,6 @@ describe('Tmpl tests',function(){
     x: 2,
     fn: function(s) { return ['hi', s].join(' ') }
   }
-  function compile(str) {
-    return tmpl(str,data)
-  }
 
   it('compile specs',function(){
 
