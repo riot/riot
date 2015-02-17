@@ -9,7 +9,7 @@ describe('Tmpl tests',function(){
     fn: function(s) { return ['hi', s].join(' ') }
   }
 
-  it('compile specs',function(){
+  it('compiles specs',function(){
 
     var data = {
       yes: true,
