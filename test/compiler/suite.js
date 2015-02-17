@@ -72,6 +72,7 @@ function testFiles(opts) {
   test('test.jade', { template: 'jade' })
   test('slide.jade', { template: 'jade' })
   test('style', {})
+  test('brackets', { brackets: '${ }' })
 
 }
 

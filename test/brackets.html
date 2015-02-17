@@ -3,13 +3,6 @@
 <head>
   <title>Riot tag tests</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <style>
-    body { font-family: 'myriad pro', sans-serif; font-size: 90% }
-    #tags { margin: 30px auto; max-width: 1000px }
-    #tags > * { display: inline-block; vertical-align: top; margin: 20px 50px }
-    a { color: blue; cursor: pointer }
-  </style>
-
   <!--[if lt IE 9]>
     <script src="ie8/es5-shim.js"></script>
     <script src="ie8/html5-shiv.js"></script>
@@ -22,27 +15,76 @@
 
 <body>
 
+
+  <!-- Custom brackets with riot.tag() -->
+
   <script src="../dist/riot/riot.js"></script>
 
-  <one/>
-  <two/>
-  <three/>
+  <test-a></test-a>
+  <test-b></test-b>
+  <test-c></test-c>
+  <test-d></test-d>
 
   <script>
-    
-    riot.settings.brackets = '[ ]' // TODO: add a riot.brackets() shortcut?
-    riot.tag('one', '<p>[ x ]</p>', function() { this.x = 'ok' })
-    riot.mount('one')
+      
+    riot.settings.brackets = '[ ]'
+    riot.tag('test-a', '<p>[ x ]</p>', function() { this.x = 'ok' })
+    riot.mount('test-a')
 
     riot.settings.brackets = '<% %>'
-    riot.tag('two', '<p><% x %></p>', function() { this.x = 'ok' })
-    riot.mount('two')
+    riot.tag('test-b', '<p><% x %></p>', function() { this.x = 'ok' })
+    riot.mount('test-b')
 
     riot.settings.brackets = '${ }'
-    riot.tag('three', '<p>${ x }</p>', function() { this.x = 'ok' })
-    riot.mount('three')
+    riot.tag('test-c', '<p>${ x }</p>', function() { this.x = 'ok' })
+    riot.mount('test-c')
+
+    riot.settings.brackets = null
+    riot.tag('test-d', '<p>{ x }</p>', function() { this.x = 'ok' })
+    riot.mount('test-d')
 
   </script>
 
-</body>
 
+  <!-- Custom brackets with compiler.js -->
+
+  <script src="../dist/riot/compiler.js"></script>
+
+  <test-e></test-e>
+  <test-f></test-f>
+  <test-g></test-g>
+
+  <script type="riot/tag">
+    
+    <test-e>
+      <p>[ x ]</p>
+      this.x = 'ok'
+    </test-e>
+    
+    <test-f>
+      <p>${ x }</p>
+      this.x = 'ok'
+    </test-f>
+    
+    <test-g>
+      <p>{ x }</p>
+      this.x = 'ok'
+    </test-g>
+
+  </script>
+
+  <script>
+
+    riot.settings.brackets = '[ ]'
+    riot.mount('test-e')
+
+    riot.settings.brackets = '${ }'
+    riot.mount('test-f')
+
+    riot.settings.brackets = null
+    riot.mount('test-g')
+
+  </script>
+  
+
+</body>
