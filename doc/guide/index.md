@@ -133,13 +133,13 @@ You can put `<style>` tag inside. Riot.js automatically take it out and inject i
 
   <!-- layout -->
   <h3>{ opts.title }</h3>
-  
+
   <style>
     todo { display: block }
     todo h3 { font-size: 120% }
     /** other awesome stylings **/
   </style>
-  
+
 </todo>
 ```
 
@@ -677,7 +677,7 @@ Plain objects can also be looped. For example:
 Object loops are not recommended since internally Riot detects changes on the object with `JSON.stringify`. The *whole* object is studied and when there is a change the whole loop is re-rendered. This can be slow. Normal arrays are much faster and only the changes are drawn on the page.
 
 
-# Application architecture
+# Application design
 
 
 ## Tools, not policy
@@ -721,3 +721,63 @@ You can place routing logic everywhere; in custom tags or non-UI modules. Some a
 Every browser application needs routing since there is always an URL in the location bar.
 
 [Router API](/riotjs/api/#router)
+
+
+## Modularity
+
+Riot tags make the view part of your application. On modular application these tags should not be aware of each other and they shou be isolated. Ideally you can use the same tag on across projects regardless of the outer HTML layout.
+
+If two tags know about each other they become depdendent and a "tight coupling" is introduced. These tags cannot be freely moved around without breaking the system.
+
+To reduce coupling the idea is that the tags listen to events rather than call each other directly. What you need is a publish/subscribe system built with `riot.observable` or similar.
+
+This event emitting system can range from a simple API to a larger architectural choice like Facebook Flux.
+
+### Example Riot application design
+
+Here is a very bare bones Riot application structure for user login:
+
+```
+// Login API
+var auth = riot.observable()
+
+auth.login = function(params) {
+  $.get('/api', params, function(json) {
+    auth.trigger('login', json)
+  })
+}
+
+
+<!-- login view -->
+<login>
+  <form onsubmit="{ login }">
+    <input name="username" type="text" placeholder="username">
+    <input name="password" type="password" placeholder="password">
+  </form>
+
+  login() {
+    opts.login({
+      username: this.username.value,
+      password: this.password.value
+    })
+  }
+
+  // any tag on the system can listen to login event
+  opts.on('login', function() {
+    $(body).addClass('logged')
+  })
+</login>
+```
+
+And here we mount the application
+
+```
+<body>
+  <login></login>
+  &lt;script>riot.mount('login', auth)</script>
+</body>
+```
+
+On the above setup the other tags on the system do not need to know about each other since they can simply listen to the "login" event and do what they please.
+
+Observable is a classic building block for a decoupled (modular) appliction.
