@@ -25,7 +25,7 @@ raw:
 	@ cat $(DIST)riot.js $(DIST)compiler.js > $(DIST)riot+compiler.js
 	@ cat lib/wrap/suffix.js | tee -a $(DIST)riot.js $(DIST)riot+compiler.js > /dev/null
 
-riot: test jscs raw
+riot: test raw
 
 min: riot
 	# minify riot
