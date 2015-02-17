@@ -84,17 +84,7 @@
   }
 
   function es6(js) {
-    var library
-    try {
-      library = require('babel')
-    } catch (noBabel) {
-      try {
-        library = require('6to5')
-      } catch (no6to5) {
-        throw new Error('Cannot find module babel or 6to5')
-      }
-    }
-    return library.transform(js, { blacklist: ['useStrict'] }).code
+    return require('babel').transform(js, { blacklist: ['useStrict'] }).code
   }
 
   function typescript(js) {
