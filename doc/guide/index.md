@@ -8,7 +8,7 @@ minify: false
 
 # Custom tag example
 
-Riot custom tags are the building blocks for user interfaces. They make the "view" part of the application. Here is an extended TODO example showing various features of Riot:
+Riot custom tags are the building blocks for user interfaces. They make the "view" part of the application. Let's start with an extended TODO example highlighting various features of Riot:
 
 ```
 <todo>
@@ -66,15 +66,17 @@ Riot tag is a combination of layout (HTML) and logic (JavaScript). Here are the 
 
 * HTML is defined first and the logic is enclosed inside optional `script` tag.
 * Without `script` tag the JavaScript starts where the last HTML tag ends.
-* Tags can be empty, HTML only or JavaScript only and `{ expressions }` are optional.
+* Custom tags can be empty, HTML only or JavaScript only
 * Quotes are optional: `<foo bar={ baz }>` becomes `<foo bar="{ baz }">`.
 * ES6 method syntax is supported: `methodName()` becomes `this.methodName = function()` and `this` variable always points to the current tag instance.
 * A shorthand syntax for class names is available: `class={ completed: done }`.
 * Boolean attributes (checked, selected etc..) are ignored when the expression value is falsy: `<input checked={ undefined }>` becomes `<input>`.
+* All attribute names must be *lowercase*.
 * Self-closing tags are supported: `<div/>` equals `<div></div>`. Well known "open tags" such as `<br>`, `<hr>`, `<img>` or `<input>` are never closed after the compilation.
-* Nested `<style>` tags are supported, but nested expressions are not evaluated
-* Standard HTML tags (`label`, `table`, `a` etc..) can also be customized, but not necessarily a wise thing to do.
 * Custom tags always needs to be closed (normally or self-closed).
+* Standard HTML tags (`label`, `table`, `a` etc..) can also be customized, but not necessarily a wise thing to do.
+
+
 
 Tag definition always starts on the beginning of the line:
 
@@ -83,6 +85,9 @@ Tag definition always starts on the beginning of the line:
 <my-tag>
 
 </my-tag>
+
+<!-- also works -->
+<my-tag></my-tag>
 
   <!-- this fails, because of indentation -->
   <my-tag>
@@ -143,6 +148,7 @@ You can put `<style>` tag inside. Riot.js automatically take it out and inject i
 </todo>
 ```
 
+This happens once, no matter how many times the tag is initialized.
 
 ## Mounting
 
@@ -166,6 +172,9 @@ Once a tag is created you can mount it on the page as follows:
 
 </body>
 ```
+
+Custom tags inside the `body` of the page needs to be closed normally: `<todo></todo>` and self-closing: `<todo/>` is not supported.
+
 
 Some example uses of the mount method:
 
