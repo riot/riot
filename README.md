@@ -89,6 +89,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Various experiments](http://richardbondi.net/programming/riot)
 - [Hackernews reader](http://git.io/riot-hn)
 - [Riotjs TodoMvc](https://github.com/txchen/feplay/tree/gh-pages/riot_todo)
+- [Riot-Snake](http://cdn.rawgit.com/muut/riotjs/master/demo/riot-snake.html)
 
 
 ### Tutorials
