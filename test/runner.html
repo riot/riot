@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Riot.js tests</title>
+    <link rel="stylesheet" href="../node_modules/mocha/mocha.css" type="text/css" />
+  </head>
+  <body>
+    <div id="mocha"></div>
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script src="../node_modules/chai/chai.js"></script>
+    <script>
+      mocha.setup('bdd');
+      // Setup chai
+      var expect = chai.expect;
+    </script>
+    <script src="../dist/riot/riot.js"></script>
+    <script src="../lib/tmpl.js"></script>
+    <script src="specs/tmpl.js"></script>
+    <script src="runner.js"></script>
+  </body>
+</html>

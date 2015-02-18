@@ -4,15 +4,15 @@
  *
  */
 
-var jsdom = require('jsdom')
-  riot = require('../../dist/riot/riot')
-  myComponent = 'my-component'
+var jsdom = require('jsdom'),
+  riot = require('../../dist/riot/riot'),
+  myComponent = 'my-component',
   myComponentHTML = [
     '<h1>{ opts.title }</h1>',
     '<p>{ opts.description }</p>',
     '<my-list-item each="{ opts.items }">'
-  ].join('')
-  myListItem = 'my-list-item'
+  ].join(''),
+  myListItem = 'my-list-item',
   myListItemHTML = [
     '<input type="checkbox" onchange="{ onChange }">',
     '<span if="{ opts.isActive }">I am active</span>',

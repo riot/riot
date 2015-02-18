@@ -9,14 +9,13 @@ WATCH = "\
 			require('shelljs').exec(cmd) 										  \
 		})"
 
-
-jshint:
+test:
 	# check code quality
 	@ ./node_modules/jshint/bin/jshint lib test
-
-jscs:
 	# check code style
 	@ ./node_modules/jscs/bin/jscs lib test
+	# run the mocha tests
+	@ ./node_modules/mocha/bin/mocha -r jscoverage test/runner.js --covout=html
 
 raw:
 	@ mkdir -p $(DIST)
@@ -26,7 +25,7 @@ raw:
 	@ cat $(DIST)riot.js $(DIST)compiler.js > $(DIST)riot+compiler.js
 	@ cat lib/wrap/suffix.js | tee -a $(DIST)riot.js $(DIST)riot+compiler.js > /dev/null
 
-riot: jshint jscs raw
+riot: raw test
 
 min: riot
 	# minify riot
