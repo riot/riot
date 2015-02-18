@@ -12,11 +12,9 @@
   <body>
     <div id="mocha"></div>
     <script src="../node_modules/mocha/mocha.js"></script>
-    <script src="../node_modules/chai/chai.js"></script>
+    <script src="../node_modules/expect.js/index.js"></script>
     <script>
       mocha.setup('bdd');
-      // Setup chai
-      var expect = chai.expect;
     </script>
     <script src="../dist/riot/riot.js"></script>
     <script src="specs/tmpl.js"></script>

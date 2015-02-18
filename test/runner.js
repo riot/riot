@@ -13,9 +13,8 @@ if (isNode) {
     })
   });
 
-  var chai = require('chai')
   global.riot = require('../dist/riot/riot')
-  global.expect = chai.expect
+  global.expect = require('expect.js')
   require('./specs/tmpl')
 } else {
   mocha.run()
