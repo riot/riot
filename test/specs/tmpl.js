@@ -36,9 +36,9 @@ describe('Tmpl tests',function() {
     expect(render('{ true ? "a b c" : "foo" }')).to.equal('a b c')
     expect(render('{ true ? "a \\"b\\" c" : "foo" }')).to.equal('a "b" c')
 
-    expect(render()).to.be.undefined
-    expect(render('{}')).to.be.undefined
-    expect(render('{ }')).to.be.undefined
+    expect(render()).to.be(undefined)
+    expect(render('{}')).to.be(undefined)
+    expect(render('{ }')).to.be(undefined)
     expect(render('')).to.equal('')
     expect(render('{ } ')).to.equal(' ')
     expect(render('{ "1" }')).to.equal('1')
@@ -54,16 +54,16 @@ describe('Tmpl tests',function() {
     expect(render('{ "\\{" }')).to.equal('{')
 
 
-    expect(render('{ /* comment */ }')).to.be.undefined
+    expect(render('{ /* comment */ }')).to.be(undefined)
     expect(render(' { /* comment */ }')).to.equal(' ')
     expect(render('{ 1 /* comment */ + 1 }')).to.equal(2)
     expect(render('{ 1 /* comment */ + 1 } ')).to.equal('2 ')
 
     expect(render(' { nonExistingVar }')).to.equal(' ')
-    expect(render('{ undefined }')).to.be.undefined
+    expect(render('{ undefined }')).to.be(undefined)
     expect(render(' { no }')).to.equal(' ')
 
-    expect(render('{ nonExistingVar }')).to.be.undefined
+    expect(render('{ nonExistingVar }')).to.be(undefined)
     expect(render('{ null }')).to.equal(null)
     expect(render('{ no }')).to.equal(false)
     expect(render('{ yes }')).to.equal(true)
