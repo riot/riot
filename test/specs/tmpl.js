@@ -7,7 +7,8 @@ describe('Tmpl tests',function(){
     arr: [2],
     x: 2,
     fn: function(s) { return ['hi', s].join(' ') }
-  }
+  },
+  tmpl = riot.util.tmpl;
 
   it('compiles specs',function(){
 
