@@ -15,7 +15,6 @@ if (isNode) {
 
   var chai = require('chai')
   global.riot = require('../dist/riot/riot')
-  global.tmpl = require('../lib/tmpl')
   global.expect = chai.expect
   require('./specs/tmpl')
 } else {
