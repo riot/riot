@@ -40,7 +40,7 @@ watch:
 	# watch and rebuild riot and its tests
 	@ $(shell \
 		node -e $(WATCH) "lib/**/*.js" "make raw" & \
-		node ./lib/cli.js --watch test/tag dist/tags.js )
+		export RIOT="../dist/riot/riot" && node ./lib/cli.js --watch test/tag dist/tags.js)
 
 .PHONY: test min
 
