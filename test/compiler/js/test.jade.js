@@ -1,3 +1,4 @@
-riot.tag('sample', '<p>test { value }</p>', function(opts) {this.value = 'sample'
-
-})
+sample
+  p test { value }
+  script(type='text/coffeescript').
+    @value = 'sample'

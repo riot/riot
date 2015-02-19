@@ -1,4 +1,3 @@
-
 describe('Observable', function() {
   var el = riot.observable(),
       counter = 0

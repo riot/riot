@@ -43,7 +43,7 @@ function testHTML() {
   test('<!-- c -->{ a }', '{ a }')
   test('<!-- c -->{ a }<!-- c --><p/><!-- c -->', '{ a }<p></p>')
 
-  test('{ "a" }', '{ \\"a\\"" }')
+  test('{ "a" }', '{ \"a\" }')
   test('\\{ a \\}', '\\\\{ a \\\\}')
 
   testParser('<a href={ a }>', '<a href="{@a}">')

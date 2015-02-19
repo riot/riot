@@ -1,11 +1,12 @@
-riot.tag('kids', '<h3 each="{kids.slice(1, 3)}">{name}</h3>', function(opts) {this.kids = [
-  {
-    name: 'Max'
-  }, {
-    name: 'Ida'
-  }, {
-    name: 'Joe'
-  }
-]
 
-})
+riot.tag('kids', '<h3 each="{ kids[1 .. 2] }">{ name }</h3>', function(opts) {
+
+  # Here are the kids
+  this.kids = [
+    { name: "Max" }
+    { name: "Ida" }
+    { name: "Joe" }
+  ]
+
+
+});
