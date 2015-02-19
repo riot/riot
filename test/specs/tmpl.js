@@ -1,14 +1,5 @@
 describe('Tmpl tests',function() {
-  var data = {
-      yes: true,
-      no: false,
-      str: 'x',
-      obj: {val:2},
-      arr: [2],
-      x: 2,
-      fn: function(s) { return ['hi', s].join(' ') }
-    },
-    tmpl = riot.util.tmpl
+  var tmpl = riot.util.tmpl
 
   it('compiles specs',function() {
 
@@ -16,7 +7,7 @@ describe('Tmpl tests',function() {
       yes: true,
       no: false,
       str: 'x',
-      obj: {val:2},
+      obj: {val: 2},
       arr: [2],
       x: 2,
       fn: function(s) { return ['hi', s].join(' ') }

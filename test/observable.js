@@ -109,8 +109,9 @@ assert(counter, 2)
 
 
 echo('does not call trigger infinitely')
-var counter = 0,
-  otherEl = riot.observable()
+var otherEl = riot.observable()
+
+counter = 0
 
 echo('2 calls are enough to know the test failed')
 el.on('update', function(value) {
@@ -214,5 +215,3 @@ el.on('rem', function() {
 el.trigger('rem')
 
 assert(counter, 2)
-
-return

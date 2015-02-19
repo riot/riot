@@ -15,7 +15,7 @@ var jsdom = require('jsdom'),
   myListItem = 'my-list-item',
   myListItemHTML = [
     '<input type="checkbox" onchange="{ onChange }">',
-    '<span if="{ opts.isActive }">I am active</span>',
+    '<span if="{ opts.isActive }">I am active</span>'
   ].join('')
 
 /**
@@ -41,7 +41,7 @@ function setTags() {
     var self = this
     function loop () {
       opts.items = generateItems(1000,{
-          isActive:false
+        isActive: false
       })
       result = measure(self.update.bind(self))
       console.log(

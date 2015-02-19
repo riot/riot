@@ -11,7 +11,7 @@ if (isNode) {
         next()
       }
     })
-  });
+  })
 
   global.riot = require('../dist/riot/riot')
   global.expect = require('expect.js')

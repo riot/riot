@@ -3,7 +3,7 @@
 
 require('shelljs/global')
 
-// global.riot = { settings: { brackets: '{ }' } }
+// global.riot = {settings: { brackets: '{ }' } }
 
 var compiler = require('../../lib/compiler')
 
@@ -43,8 +43,8 @@ function testHTML() {
   test('<!-- c -->{ a }', '{ a }')
   test('<!-- c -->{ a }<!-- c --><p/><!-- c -->', '{ a }<p></p>')
 
-  test("{ 'a' }", "{ \\'a\\' }")
-  test("\\{ a \\}", "\\\\{ a \\\\}")
+  test('{ "a" }', '{ \\"a\\"" }')
+  test('\\{ a \\}', '\\\\{ a \\\\}')
 
   testParser('<a href={ a }>', '<a href="{@a}">')
   testParser('<a>{ b }</a>', '<a>{@b}</a>')
