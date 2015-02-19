@@ -1,30 +1,35 @@
+# Contributing to Riot.js
 
+If you’d like to contribute a feature or bug fix, you can [fork](https://help.github.com/articles/fork-a-repo/) Riot, commit your changes, & [send a pull request](https://help.github.com/articles/using-pull-requests/).
+Please make sure to [search the issue tracker](https://github.com/mutt/riotjs/issues) first.
 
-**Always start from `dev` branch**
+### Development Process
 
-### Coding style
+`master` is considered safe and should be identical to the last release tag. When submitting pull requests please use the `dev` branch.
 
-- Leave out semicolons
-- Use single quotes instead of double quotes
-- Prefer `==` over `===` unless it's a must
-- Spacing around brackets: `if (foo) {` instead of `if(foo){`
-- Prefer classic conditionals `i < 0` over bitwise operators `!~pos`
+### Coding Guidelines
 
-``` javascript
-var foo = 'bar',
-    baz = 'boo'
-```
+Please follow the coding style established in the rest of the codebase.
 
-instead of
+  **Spacing**:<br>
+  Use two spaces for indentation. No tabs.
+  Spacing around brackets: `if (foo) {` instead of `if(foo){`
 
-``` javascript
-var foo = 'bar'
-var baz = 'boo'
-```
+  **Quotes**:<br>
+  Single-quoted strings are preferred to double-quoted strings.
 
-### Something ready?
+  **Equality Checking**:<br>
+  Prefer `==` over `===` unless it's a must.
 
-- Improvement or fix --> Make a **pull request** against `dev` branch
-- Demo --> Add a link to the bottom of our README file and make a pull request
+  **Bitwise Operations**:<br>
+  Prefer classic conditionals `i < 0` over bitwise operators `!~pos`
 
-Thank you in advance! We are happy to merge your code.
+### Reporting New Issues
+
+  We use [Github Issues](https://github.com/muut/riotjs/issues) as the Riot.js bug tracker. The best way to get your bug fixed is to provide a reduced test case. jsFiddle, jsBin, and other sites provide a way to give live examples.
+
+### Adding a new Demo
+
+  Please just add a link to the bottom of the README.md file
+
+#### We are happy to accept PRs so thank you in advance!
