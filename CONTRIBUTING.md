@@ -1,17 +1,30 @@
+# Contributing to Riot.js
 
-### Coding style
+If you’d like to contribute a feature or bug fix, you can [fork](https://help.github.com/articles/fork-a-repo/) Riot, commit your changes, & [send a pull request](https://help.github.com/articles/using-pull-requests/).
+Please make sure to [search the issue tracker](https://github.com/mutt/riotjs/issues) first.
 
-The most important:
+### Development Process
 
-- Leave out semicolons
-- Use single quotes and not double quotes
-- Prefer `==` over `===` unless it's a must
-- Spacing around brackets: `if (foo) {` instead of `if(foo){`
+`master` is considered safe and should be identical to the last release tag. When submitting pull requests please use the `dev` branch.
 
+### Coding Guidelines
 
-### Use `dev` branch
+Please follow the coding style established in the rest of the codebase.
 
-Please start from `dev` branch and hand your work with a **pull request**.
+  **Spacing**:<br>
+  Use two spaces for indentation. No tabs.
+  Spacing around brackets: `if (foo) {` instead of `if(foo){`
+
+##### Thank you in advance! We are happy to merge your code.
+
+  **Quotes**:<br>
+  Single-quoted strings are preferred to double-quoted strings.
+
+  **Equality Checking**:<br>
+  Prefer `==` over `===` unless it's a must.
+
+  **Bitwise Operations**:<br>
+  Prefer classic conditionals `i < 0` over bitwise operators `!~pos`
 
 ### Run the tests
 
@@ -21,4 +34,13 @@ Before any pull request please run the following command from your terminal to b
 $ make riot
 ```
 
-##### Thank you in advance! We are happy to merge your code.
+### Reporting New Issues
+
+  We use [Github Issues](https://github.com/muut/riotjs/issues) as the Riot.js bug tracker. The best way to get your bug fixed is to provide a reduced test case. jsFiddle, jsBin, and other sites provide a way to give live examples.
+
+### Adding a new Demo
+
+  Please just add a link to the bottom of the README.md file
+
+#### We are happy to accept PRs so thank you in advance!
+

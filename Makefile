@@ -9,13 +9,15 @@ WATCH = "\
 			require('shelljs').exec(cmd) 										  \
 		})"
 
+
 test:
-	# check code quality
-	@ ./node_modules/jshint/bin/jshint lib test
-	# check code style
-	@ ./node_modules/jscs/bin/jscs lib test
+	@ make eslint
 	# run the mocha tests
 	@ ./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha -- test/runner.js -R spec
+
+eslint:
+	# check code style
+	@ ./node_modules/eslint/bin/eslint.js -c ./.eslintrc lib test
 
 raw:
 	@ mkdir -p $(DIST)

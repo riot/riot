@@ -69,9 +69,7 @@
       html = html.replace(brackets(EXPR), function(_, expr) {
         var ret = compileJS(expr, opts, type).trim().replace(/\r?\n|\r/g, '').trim()
         if (ret.slice(-1) == ';') ret = ret.slice(0, -1)
-
-        var b = brackets()
-        return b[0] + ret + b[1]
+        return B[0] + ret + B[1]
       })
     }
 
@@ -204,7 +202,7 @@
     if (opts.template) src = compileTemplate(opts.template, src)
 
     src = src.replace(LINE_TAG, function(_, tagName, html) {
-      return mktag(tagName, compileHTML(html, opts), '', '')
+      return mktag(tagName, compileHTML(html, opts), '')
     })
 
     return src.replace(CUSTOM_TAG, function(_, tagName, html, js) {

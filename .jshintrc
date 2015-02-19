@@ -1,9 +1,0 @@
-{
-  "expr": true,
-  "asi": true,
-  "laxbreak": true,
-  "eqnull": true,
-  "evil": true,
-  "-W093": true,
-  "-W067": true
-}

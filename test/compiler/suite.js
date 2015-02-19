@@ -3,7 +3,7 @@
 
 require('shelljs/global')
 
-global.riot = { settings: { brackets: '{ }' } }
+// global.riot = { settings: { brackets: '{ }' } }
 
 var compiler = require('../../lib/compiler')
 

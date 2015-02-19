@@ -1,10 +1,10 @@
-/* Riot v2.0.9, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v2.0.10, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function() {
 
-var riot = { version: 'v2.0.9', settings: {} }
+  var riot = { version: 'v2.0.10', settings: {} }
 
-'use strict'
+  'use strict'
 
 riot.observable = function(el) {
 
@@ -152,43 +152,46 @@ except zero (undefined/null/false) will default to empty string:
 tmpl('{ undefined } - { false } - { null } - { 0 }', {})
 // will return: " - - - 0"
 
-
-// Customizable brackets
-
-  riot.settings.brackets = '[ ]'
-  riot.settings.brackets = '<% %>'
-
 */
+
+
+var brackets = (function(orig, s, b) {
+  return function(x) {
+
+    // make sure we use the current setting
+    s = riot.settings.brackets || orig
+    if (b != s) b = s.split(' ')
+
+    // if regexp given, rewrite it with current brackets (only if differ from default)
+    // else, get brackets
+    return x && x.test
+      ? s == orig
+        ? x : RegExp(x.source
+                      .replace(/\{/g, b[0].replace(/(?=.)/g, '\\'))
+                      .replace(/\}/g, b[1].replace(/(?=.)/g, '\\')),
+                    x.global ? 'g' : '')
+      : b[x]
+
+  }
+})('{ }')
+
 
 var tmpl = (function() {
 
   var cache = {},
-      brackets,
-      re_expr,
-      re_vars = /("|').+?[^\\]\1|\.\w*|\w*:|\b(?:(?:new|typeof|in|instanceof) |(?:this|true|false|null|undefined)\b|function *\()|([a-z_]\w*)/gi
-              // [ 1            ][ 2  ][ 3 ][ 4                                                                                  ][ 5       ]
+      re_expr = /({[\s\S]*?})/,
+      re_vars = /(['"\/]).*?[^\\]\1|\.\w*|\w*:|\b(?:(?:new|typeof|in|instanceof) |(?:this|true|false|null|undefined)\b|function *\()|([a-z_]\w*)/gi
+              // [ 1               ][ 2  ][ 3 ][ 4                                                                                  ][ 5       ]
               // find variable names:
-              // 1. skip quoted strings: "a b", 'a b', 'a \'b\''
+              // 1. skip quoted strings and regexps: "a b", 'a b', 'a \'b\'', /a b/
               // 2. skip object properties: .name
               // 3. skip object literals: name:
               // 4. skip javascript keywords
               // 5. match var name
 
+  // build a template (or get it from cache), render with data
   return function(str, data) {
-
-    // make sure we use current brackets setting
-    var b = riot.settings.brackets || '{ }'
-    if (b != brackets) {
-      brackets = b.split(' ')
-      re_expr = re(/({[\s\S]*?})/)
-    }
-
-    // build a template (or get it from cache), render with data
-    // (or just test if string has expression when called w/o data)
-    return data
-      ? str && (cache[str] = cache[str] || tmpl(str))(data)
-      : re_expr.test(str)
-
+    return str && (cache[str] = cache[str] || tmpl(str))(data)
   }
 
 
@@ -197,14 +200,14 @@ var tmpl = (function() {
   function tmpl(s, p) {
 
     // default template string to {}
-    p = (s || brackets.join(''))
+    p = (s || (brackets(0) + brackets(1)))
 
       // temporarily convert \{ and \} to a non-character
-      .replace(re(/\\{/), '\uFFF0')
-      .replace(re(/\\}/), '\uFFF1')
+      .replace(brackets(/\\{/), '\uFFF0')
+      .replace(brackets(/\\}/), '\uFFF1')
 
       // split string to expression and non-expresion parts
-      .split(re_expr)
+      .split(brackets(re_expr))
 
     return new Function('d', 'return ' + (
 
@@ -218,7 +221,7 @@ var tmpl = (function() {
         : '[' + p.map(function(s, i) {
 
             // is it an expression or a string (every second part is an expression)
-            return i % 2
+          return i % 2
 
               // evaluate the expressions
               ? expr(s, 1)
@@ -234,12 +237,12 @@ var tmpl = (function() {
 
                 + '"'
 
-          }).join(',') + '].join("")'
+        }).join(',') + '].join("")'
       )
 
       // bring escaped { and } back
-      .replace(/\uFFF0/g, brackets[0])
-      .replace(/\uFFF1/g, brackets[1])
+      .replace(/\uFFF0/g, brackets(0))
+      .replace(/\uFFF1/g, brackets(1))
 
     )
 
@@ -255,7 +258,7 @@ var tmpl = (function() {
       .replace(/\n/g, ' ')
 
       // trim whitespace, curly brackets, strip comments
-      .replace(re(/^[{ ]+|[ }]+$|\/\*.+?\*\//g), '')
+      .replace(brackets(/^[{ ]+|[ }]+$|\/\*.+?\*\//g), '')
 
     // is it an object literal? i.e. { key : value }
     return /^\s*[\w- "']+ *:/.test(s)
@@ -264,10 +267,9 @@ var tmpl = (function() {
       // e.g.: { show: isOpen(), done: item.done } -> "show done"
       ? '[' + s.replace(/\W*([\w- ]+)\W*:([^,]+)/g, function(_, k, v) {
 
-          // safely execute vars to prevent undefined value errors
-          return v.replace(/\w[^,|& ]*/g, function(v) { return wrap(v, n) }) + '?"' + k.trim() + '":"",'
+        return v.replace(/[^&|=!><]+/g, wrap) + '?"' + k.trim() + '":"",'
 
-        }) + '].join(" ")'
+      }) + '].join(" ")'
 
       // if js expression, evaluate as javascript
       : wrap(s, n)
@@ -278,7 +280,8 @@ var tmpl = (function() {
   // execute js w/o breaking on errors or undefined vars
 
   function wrap(s, nonull) {
-    return '(function(v){try{v='
+    s = s.trim()
+    return !s ? '' : '(function(v){try{v='
 
         // prefix vars (name => data.name)
         + (s.replace(re_vars, function(s, _, v) { return v ? '(d.'+v+'===undefined?window.'+v+':d.'+v+')' : s })
@@ -294,16 +297,6 @@ var tmpl = (function() {
       + '}}).call(d)'
   }
 
-
-  // change regexp to use custom brackets
-
-  function re(r) {
-    return RegExp(r.source
-                   .split('{').join('\\'+brackets[0])
-                   .split('}').join('\\'+brackets[1]),
-                  r.global ? 'g' : '')
-  }
-
 })()
 // { key, i in items} -> { key, i, items }
 function loopKeys(expr) {
@@ -311,8 +304,8 @@ function loopKeys(expr) {
       els = expr.split(/\s+in\s+/)
 
   if (els[1]) {
-    ret.val = expr_begin + els[1]
-    els = els[0].slice(expr_begin.length).trim().split(/,\s*/)
+    ret.val = brackets(0) + els[1]
+    els = els[0].slice(brackets(0).length).trim().split(/,\s*/)
     ret.key = els[0]
     ret.pos = els[1]
   }
@@ -327,6 +320,8 @@ function mkitem(expr, key, val) {
   return item
 }
 
+
+/* Beware: heavy stuff */
 function _each(dom, parent, expr) {
 
   remAttr(dom, 'each')
@@ -339,6 +334,12 @@ function _each(dom, parent, expr) {
       checksum
 
   expr = loopKeys(expr)
+
+  function add(pos, item, tag) {
+    rendered.splice(pos, 0, item)
+    tags.splice(pos, 0, tag)
+  }
+
 
   // clean template code after update (and let walk finish it's parse)
   parent.one('update', function() {
@@ -359,8 +360,9 @@ function _each(dom, parent, expr) {
       checksum = testsum
 
       // clear old items
-      tags.map(function(tag) { tag.unmount() })
-      tags = rendered = []
+      each(tags, function(tag) { tag.unmount() })
+      rendered = []
+      tags = []
 
       items = Object.keys(items).map(function(key) {
         return mkitem(expr, key, items[key])
@@ -369,7 +371,7 @@ function _each(dom, parent, expr) {
     }
 
     // unmount redundant
-    arrDiff(rendered, items).map(function(item) {
+    each(arrDiff(rendered, items), function(item) {
       var pos = rendered.indexOf(item),
           tag = tags[pos]
 
@@ -381,25 +383,48 @@ function _each(dom, parent, expr) {
 
     })
 
-    // mount new
+    // mount new / reorder
     var nodes = root.childNodes,
         prev_index = [].indexOf.call(nodes, prev)
 
-    arrDiff(items, rendered).map(function(item, i) {
+    each(items, function(item, i) {
 
-      var pos = items.indexOf(item)
+      // start index search from position based on the current i
+      var pos = items.indexOf(item, i),
+          oldPos = rendered.indexOf(item, i)
 
-      if (!checksum && expr.key) item = mkitem(expr, item, pos)
+      // if not found, search backwards from current i position
+      pos < 0 && (pos = items.lastIndexOf(item, i))
+      oldPos < 0 && (oldPos = rendered.lastIndexOf(item, i))
 
-      var tag = new Tag({ tmpl: template }, {
-        before: nodes[prev_index + 1 + pos],
-        parent: parent,
-        root: root,
-        loop: true,
-        item: item
-      })
+      // mount new
+      if (oldPos < 0) {
+        if (!checksum && expr.key) item = mkitem(expr, item, pos)
 
-      tags.splice(pos, 0, tag)
+        var tag = new Tag({ tmpl: template }, {
+          before: nodes[prev_index + 1 + pos],
+          parent: parent,
+          root: root,
+          loop: true,
+          item: item
+        })
+
+        return add(pos, item, tag)
+      }
+
+      // change pos value
+      if (expr.pos && tags[oldPos][expr.pos] != pos) {
+        tags[oldPos].one('update', function(item) {
+          item[expr.pos] = pos
+        })
+        tags[oldPos].update()
+      }
+
+      // reorder
+      if (pos != oldPos) {
+        root.insertBefore(nodes[prev_index + oldPos + 1], nodes[prev_index + pos + 1])
+        return add(pos, rendered.splice(oldPos, 1)[0], tags.splice(oldPos, 1)[0])
+      }
 
     })
 
@@ -408,6 +433,7 @@ function _each(dom, parent, expr) {
   })
 
 }
+
 function parseNamedElements(root, tag, expressions) {
   walk(root, function(dom) {
     if (dom.nodeType != 1) return
@@ -421,7 +447,7 @@ function parseNamedElements(root, tag, expressions) {
 function parseLayout(root, tag, expressions) {
 
   function addExpr(dom, val, extra) {
-    if (val.indexOf(expr_begin) >= 0) {
+    if (val.indexOf(brackets(0)) >= 0) {
       var expr = { dom: dom, expr: val }
       expressions.push(extend(expr, extra))
     }
@@ -472,7 +498,7 @@ function Tag(impl, conf) {
       parent = conf.parent,
       is_loop = conf.loop,
       root = conf.root,
-      opts = conf.opts,
+      opts = inherit(conf.opts),
       item = conf.item
 
   // cannot initialize twice on the same root element
@@ -493,7 +519,7 @@ function Tag(impl, conf) {
     attributes[name] = val
 
     // remove dynamic attributes from node
-    if (val.indexOf(expr_begin) >= 0) {
+    if (val.indexOf(brackets(0)) >= 0) {
       remAttr(root, name)
       return false
     }
@@ -501,7 +527,7 @@ function Tag(impl, conf) {
 
   // options
   function updateOpts() {
-    Object.keys(attributes).map(function(name) {
+    each(Object.keys(attributes), function(name) {
       opts[name] = tmpl(attributes[name], parent || self)
     })
   }
@@ -518,7 +544,7 @@ function Tag(impl, conf) {
   this.update = function(data, init) {
     extend(self, data)
     extend(self, item)
-    self.trigger('update')
+    self.trigger('update', item)
     updateOpts()
     update(expressions, self, item)
     self.trigger('updated')
@@ -531,7 +557,8 @@ function Tag(impl, conf) {
     if (p) {
       p.removeChild(el)
       self.trigger('unmount')
-      parent && parent.off('update', self.update)
+      parent && parent.off('update', self.update).off('unmount', self.unmount)
+      self.off('*')
     }
   }
 
@@ -565,7 +592,6 @@ function Tag(impl, conf) {
 
 }
 
-
 function setEventHandler(name, handler, dom, tag, item) {
 
   dom[name] = function(e) {
@@ -583,11 +609,14 @@ function setEventHandler(name, handler, dom, tag, item) {
       e.returnValue = false
     }
 
-    tag.update()
+    var el = item ? tag.parent : tag
+    el.update()
+
   }
 
 }
 
+// used by if- attribute
 function insertTo(root, node, before) {
   if (root) {
     root.insertBefore(before, node)
@@ -612,8 +641,8 @@ function update(expressions, tag, item) {
     // text node
     if (!attr_name) return dom.nodeValue = value
 
-    // remove attribute
-    if (!value && expr.bool || /obj|func/.test(typeof value)) remAttr(dom, attr_name)
+    // remove original attribute
+    remAttr(dom, attr_name)
 
     // event handler
     if (typeof value == 'function') {
@@ -621,8 +650,6 @@ function update(expressions, tag, item) {
 
     // if- conditional
     } else if (attr_name == 'if') {
-      remAttr(dom, attr_name)
-
       var stub = expr.stub
 
       // add to DOM
@@ -637,13 +664,16 @@ function update(expressions, tag, item) {
 
     // show / hide
     } else if (/^(show|hide)$/.test(attr_name)) {
-      remAttr(dom, attr_name)
       if (attr_name == 'hide') value = !value
       dom.style.display = value ? '' : 'none'
 
-    // normal attribute
+    // field value
     } else if (attr_name == 'value') {
       dom.value = value
+
+    // <img src="{ expr }">
+    } else if (attr_name == 'riot-src') {
+      value ? dom.setAttribute('src', value) : remAttr(dom, 'src')
 
     } else {
       if (expr.bool) {
@@ -653,14 +683,17 @@ function update(expressions, tag, item) {
       }
 
       dom.setAttribute(attr_name, value)
+
     }
 
   })
 
 }
-function each(nodes, fn) {
-  for (var i = 0; i < (nodes || []).length; i++) {
-    if (fn(nodes[i], i) === false) i--
+function each(els, fn) {
+  for (var i = 0, len = (els || []).length, el; i < len; i++) {
+    el = els[i]
+    // return false -> reomve current item during loop
+    if (el != null && fn(el, i) === false) i--
   }
 }
 
@@ -669,7 +702,7 @@ function remAttr(dom, name) {
 }
 
 function extend(obj, from) {
-  from && Object.keys(from).map(function(key) {
+  from && each(Object.keys(from), function(key) {
     obj[key] = from[key]
   })
   return obj
@@ -700,17 +733,30 @@ function arrDiff(arr1, arr2) {
   })
 }
 
+function inherit(parent) {
+  function Child() {}
+  Child.prototype = parent
+  return new Child()
+}
+
+
 /*
  Virtual dom is an array of custom tags on the document.
  Updates and unmounts propagate downwards from parent to children.
 */
 
 var virtual_dom = [],
-    tag_impl = {},
-    expr_begin
+    tag_impl = {}
 
-riot.tag = function(name, html, fn) {
-  expr_begin = expr_begin || (riot.settings.brackets || '{ }').split(' ')[0]
+function injectStyle(css) {
+  var node = document.createElement('style')
+  node.innerHTML = css
+  document.head.appendChild(node)
+}
+
+riot.tag = function(name, html, css, fn) {
+  if (typeof css == 'function') fn = css
+  else if (css) injectStyle(css)
   tag_impl[name] = { name: name, tmpl: html, fn: fn }
 }
 
@@ -736,6 +782,7 @@ riot.mount = function(selector, opts) {
   var tags = []
 
   each(document.querySelectorAll(selector), function(root) {
+    if (root.riot) return
 
     var tagName = root.tagName.toLowerCase(),
         tag = mountTo(root, tagName, opts)
@@ -748,23 +795,26 @@ riot.mount = function(selector, opts) {
 
 // update everything
 riot.update = function() {
-  virtual_dom.map(function(tag) {
+  each(virtual_dom, function(tag) {
     tag.update()
   })
   return virtual_dom
 }
 
+  
+  // share methods for other riot parts, e.g. compiler
+  riot.util = { brackets: brackets, tmpl: tmpl }
 
-// support CommonJS
-if (typeof exports === 'object')
-  module.exports = riot
+  // support CommonJS
+  if (typeof exports === 'object')
+    module.exports = riot
 
-// support AMD
-else if (typeof define === 'function' && define.amd)
-  define(function() { return riot })
+  // support AMD
+  else if (typeof define === 'function' && define.amd)
+    define(function() { return riot })
 
-// support browser
-else
-  this.riot = riot
+  // support browser
+  else
+    this.riot = riot
 
 })();

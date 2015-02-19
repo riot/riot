@@ -6,11 +6,11 @@
   var self = this
 
   setTimeout(function() {
-    self.update({ src: 'http://cdn.muut.me/sprite.png' })
-  }, 100)
+    self.update({ src: '../doc/logo/riot60x.png' })
+  }, 10)
 
   setTimeout(function() {
     self.update({ src: '' })
-  }, 200)
+  }, 2000)
 
 </img-test>
