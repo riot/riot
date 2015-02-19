@@ -1,7 +1,7 @@
-describe('Tmpl tests',function() {
+describe('Tmpl', function() {
   var tmpl = riot.util.tmpl
 
-  it('compiles specs',function() {
+  it('compiles specs', function() {
 
     var data = {
       yes: true,

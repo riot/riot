@@ -37,10 +37,10 @@ function measure(fun) {
  */
 
 function setTags() {
-  riot.tag(myComponent, myComponentHTML,function (opts) {
+  riot.tag(myComponent, myComponentHTML, function(opts) {
     var self = this
     function loop () {
-      opts.items = generateItems(1000,{
+      opts.items = generateItems(1000, {
         isActive: false
       })
       result = measure(self.update.bind(self))
@@ -48,7 +48,7 @@ function setTags() {
         (result[0] / 1024 / 1024).toFixed(2) + ' MiB',
         result[1] + ' ms'
       )
-      setTimeout(loop,1000)
+      setTimeout(loop, 1000)
     }
     loop()
   })
@@ -69,7 +69,7 @@ function mount() {
   riot.mount(myComponent, {
     title: 'hello world',
     description: 'mad world',
-    items: generateItems(1000,{
+    items: generateItems(1000, {
       isActive: false
     })
   })
