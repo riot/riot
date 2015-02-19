@@ -1,20 +1,23 @@
 describe('Tmpl', function() {
-  var tmpl = riot.util.tmpl
+  var tmpl = riot.util.tmpl,
+      data = {
+        yes: true,
+        no: false,
+        str: 'x',
+        obj: {val: 2},
+        arr: [2],
+        x: 2,
+        fn: function(s) { return ['hi', s].join(' ') }
+      },
+      render = function (str) {
+        return tmpl(str, data)
+      }
+
+  afterEach(function() {
+    riot.settings.brackets = '{ }'
+  })
 
   it('compiles specs', function() {
-
-    var data = {
-      yes: true,
-      no: false,
-      str: 'x',
-      obj: {val: 2},
-      arr: [2],
-      x: 2,
-      fn: function(s) { return ['hi', s].join(' ') }
-    },
-    render = function (str) {
-      return tmpl(str, data)
-    }
 
     expect(render('<div class="{'
            + 'one: !no,'
@@ -107,14 +110,18 @@ describe('Tmpl', function() {
     expect(render('{ x }')).to.equal(2)
     expect(render('{ y: x }')).to.equal('y')
 
-    // custom brackets
+  })
+
+  it('custom brackets', function() {
+
     riot.settings.brackets = '[ ]'
     expect(render('[ x ]')).to.equal(2)
     expect(render('[ str\\[0\\] ]')).to.equal('x')
     riot.settings.brackets = '<% %>'
     expect(render('<% x %>')).to.equal(2)
-    riot.settings.brackets = '{ }'
+
   })
+
 })
 
 

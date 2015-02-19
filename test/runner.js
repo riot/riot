@@ -15,6 +15,7 @@ if (isNode) {
 
   global.riot = require('../dist/riot/riot')
   global.expect = require('expect.js')
+  require('./specs/compiler-cli')
   require('./specs/tmpl')
   require('./specs/observable')
 } else {
