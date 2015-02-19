@@ -18,6 +18,6 @@
     this.shouldbe = this.items.map(function (item) {return item.x}).join(' ')
     this.update()
 
-  }.bind(this), 2000)
+  }.bind(this), 1000)
 
 </loop-reorder>
