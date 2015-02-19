@@ -9,14 +9,10 @@ WATCH = "\
 			require('shelljs').exec(cmd) 										  \
 		})"
 
-
-jshint:
-	# check code quality
-	@ ./node_modules/jshint/bin/jshint lib test
-
-jscs:
+eslint:
 	# check code style
-	@ ./node_modules/jscs/bin/jscs lib test
+	# TODO: Get ./test up to standards and add back
+	@ ./node_modules/eslint/bin/eslint.js -c ./.eslintrc lib
 
 raw:
 	@ mkdir -p $(DIST)
@@ -26,7 +22,7 @@ raw:
 	@ cat $(DIST)riot.js $(DIST)compiler.js > $(DIST)riot+compiler.js
 	@ cat lib/wrap/suffix.js | tee -a $(DIST)riot.js $(DIST)riot+compiler.js > /dev/null
 
-riot: jshint jscs raw
+riot: eslint raw
 
 min: riot
 	# minify riot
