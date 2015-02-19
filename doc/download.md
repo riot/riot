@@ -104,7 +104,6 @@ That's a space separated list of tag names.
 
 ## Known issues
 
-- `each` attribute does not detect if the looped items are sorted or otherwise re-ordered
 - Looping table rows or cells with `each` attribute is not working on IE8 and IE9.
 
 
