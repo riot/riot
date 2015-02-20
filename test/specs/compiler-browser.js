@@ -18,9 +18,10 @@ describe('Compiler Browser', function() {
 
          '  <\/timetable>',
          '<\/script>',
-         '<script type=\"riot\/tag\" src=\"..\/tag\/timer.tag\"><\/script>',
+         '<script type=\"riot\/tag\" src=\"tag\/timer.tag\"><\/script>',
          '<timetable><\/timetable>'
         ].join('\n'),
+      tags,
       div = document.createElement('div')
 
   before(function() {
