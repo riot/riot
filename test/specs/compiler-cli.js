@@ -41,7 +41,10 @@ describe('Compiler Cli', function() {
 
   })
 /*
+
   TODO: fix these tests
+  // they depend on the dependecies installed on the local machine
+
   it('files', function() {
 
     function test (name, opts) {
