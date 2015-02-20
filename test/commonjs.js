@@ -1,7 +1,6 @@
-var test = require('tape')
+var assert = require('assert')
+
 var riot = require('..')
 
-test('riot require extension test', function(t) {
-  t.plan(1)
-  t.ok(require('./tag/timer.tag'), 'requiring tag file')
-})
+assert.ok(require('./tag/timer.tag'))
+assert.equal(riot.render('timer', { start: 10 }), '<p>Seconds Elapsed: 10</p>')
