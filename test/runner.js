@@ -8,6 +8,7 @@ if (isNode) {
       done: function(errors, window) {
         global.window = window
         global.document = window.document
+        global.location = window.location
         next()
       }
     })
@@ -15,9 +16,11 @@ if (isNode) {
 
   global.riot = require('../dist/riot/riot')
   global.expect = require('expect.js')
-  require('./specs/compiler-cli')
+  require('./specs/compiler-cli') // TODO: fix some tests
   require('./specs/tmpl')
   require('./specs/observable')
+  // At moment it's not possible to run these tests on node
+  // require('./specs/route')
 } else {
   mocha.run()
 }
