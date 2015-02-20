@@ -1,7 +1,8 @@
+riot.tag('kids', '<h3 foo="{ test }"></h3>', function(opts) {
 
-riot.tag('foo', '<h4>jo</h4>', function(opts) {
-});
+  this.foo = function() {
 
-riot.tag('test', '<input __checked="{ undefined }">', function(opts) {
+    this.update()
+  }.bind(this);
 
 });
