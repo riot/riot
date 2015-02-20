@@ -40,11 +40,11 @@
     "shelljs": "~0.3.0"
   },
   "devDependencies": {
+    "eslint": "^0.14.1",
     "expect.js": "^0.3.1",
     "istanbul": "^0.3.5",
     "jsdom": "^3.1.1",
     "mocha": "^2.1.0",
-    "eslint": "^0.14.1",
     "uglify-js": "latest"
   },
   "preferGlobal": true,
