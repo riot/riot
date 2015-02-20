@@ -15,6 +15,8 @@ Please follow the coding style established in the rest of the codebase.
   Use two spaces for indentation. No tabs.
   Spacing around brackets: `if (foo) {` instead of `if(foo){`
 
+##### Thank you in advance! We are happy to merge your code.
+
   **Quotes**:<br>
   Single-quoted strings are preferred to double-quoted strings.
 
@@ -23,6 +25,14 @@ Please follow the coding style established in the rest of the codebase.
 
   **Bitwise Operations**:<br>
   Prefer classic conditionals `i < 0` over bitwise operators `!~pos`
+
+### Run the tests
+
+Before any pull request please run the following command from your terminal to be sure your changes will not break Riotjs:
+
+```shell
+$ make riot
+```
 
 ### Reporting New Issues
 
@@ -33,3 +43,4 @@ Please follow the coding style established in the rest of the codebase.
   Please just add a link to the bottom of the README.md file
 
 #### We are happy to accept PRs so thank you in advance!
+
