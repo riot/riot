@@ -2,6 +2,10 @@ describe('route', function() {
 
   var counter = 0
 
+  after(function() {
+    window.history.replaceState(null, '', window.location.pathname)
+  })
+
   it('it detecs the hash params', function() {
 
     riot.route(function(first, second, params) {

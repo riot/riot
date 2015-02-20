@@ -1,9 +1,4 @@
-
-require('shelljs/global')
-
-describe('Compiler', function() {
-
-  var compiler = require('../../lib/compiler')
+describe('Compiler Cli', function() {
 
   function parser(str) {
     return '@' + str

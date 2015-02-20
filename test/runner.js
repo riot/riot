@@ -1,26 +1,26 @@
 
 var isNode = typeof window === 'undefined'
 
-if (isNode) {
-  before(function(next) {
-    require('jsdom').env({
-      html: '<!doctype html><html><head></head><body></body></html>',
-      done: function(errors, window) {
-        global.window = window
-        global.document = window.document
-        global.location = window.location
-        next()
-      }
-    })
-  })
+describe('Riotjs tests',function() {
+  if (isNode) {
 
-  global.riot = require('../dist/riot/riot')
-  global.expect = require('expect.js')
-  require('./specs/compiler-cli') // TODO: fix some tests
-  require('./specs/tmpl')
-  require('./specs/observable')
-  // At moment it's not possible to run these tests on node
-  // require('./specs/route')
-} else {
-  mocha.run()
-}
+    global.document = require('jsdom').jsdom('<!doctype html><html><body></body></html>')
+    global.window = document.parentWindow
+    global.location = window.location
+    global.top = window
+
+    require('shelljs/global')
+    global.riot = require('../dist/riot/riot')
+    global.compiler = require('../lib/compiler')
+    global.expect = require('expect.js')
+
+    require('./specs/compiler-cli') // TODO: fix some tests
+    //require('./specs/compiler-browser')
+    require('./specs/tmpl')
+    require('./specs/observable')
+    require('./specs/route')
+
+  } else {
+    mocha.run()
+  }
+})

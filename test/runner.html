@@ -4,6 +4,11 @@
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
     <title>Riot.js tests</title>
     <link rel="stylesheet" href="../node_modules/mocha/mocha.css" type="text/css" />
+    <!--[if lt IE 9]>
+      <script src="ie8/es5-shim.js"></script>
+      <script src="ie8/html5-shiv.js"></script>
+      <script>html5.addElements('timetable timer')</script>
+    <![endif]-->
   </head>
   <body>
     <div id="mocha"></div>
@@ -12,7 +17,8 @@
     <script>
       mocha.setup('bdd')
     </script>
-    <script src="../dist/riot/riot.js"></script>
+    <script src="../dist/riot/riot+compiler.js"></script>
+    <script src="specs/compiler-browser.js"></script>
     <script src="specs/tmpl.js"></script>
     <script src="specs/observable.js"></script>
     <script src="specs/route.js"></script>
