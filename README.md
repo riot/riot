@@ -1,7 +1,7 @@
 
 [![Riot logo](doc/logo/riot480x.png)](https://muut.com/riotjs/)
 
-## A React- like, 2.5KB UI lib
+## A React- like, 3.5KB UI lib
 
 ### Custom tags • Concise syntax • Virtual DOM • Full stack • IE8
 
