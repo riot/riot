@@ -6,6 +6,9 @@
   "repository": "muut/riotjs",
   "author": "Muut, Inc. and other contributors",
   "license": "MIT",
+  "scripts": {
+    "test": "make test"
+  },
   "keywords": [
     "custom tags",
     "custom elements",
@@ -38,7 +41,10 @@
   },
   "devDependencies": {
     "eslint": "^0.14.1",
+    "expect.js": "^0.3.1",
+    "istanbul": "^0.3.5",
     "jsdom": "^3.1.1",
+    "mocha": "^2.1.0",
     "uglify-js": "latest"
   },
   "preferGlobal": true,

@@ -9,9 +9,14 @@ WATCH = "\
 			require('shelljs').exec(cmd) 										  \
 		})"
 
+test:
+	@ make eslint
+	# run the mocha tests
+	@ ./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha -- test/runner.js -R spec
+
+
 eslint:
 	# check code style
-	# TODO: Get ./test up to standards and add back
 	@ ./node_modules/eslint/bin/eslint.js -c ./.eslintrc lib
 
 raw:
@@ -22,7 +27,7 @@ raw:
 	@ cat $(DIST)riot.js $(DIST)compiler.js > $(DIST)riot+compiler.js
 	@ cat lib/wrap/suffix.js | tee -a $(DIST)riot.js $(DIST)riot+compiler.js > /dev/null
 
-riot: eslint raw
+riot: raw test
 
 min: riot
 	# minify riot

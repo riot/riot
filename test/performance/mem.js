@@ -4,8 +4,7 @@
  *
  */
 
-var
-  jsdom = require('jsdom'),
+var jsdom = require('jsdom'),
   riot = require('../../dist/riot/riot'),
   myComponent = 'my-component',
   myComponentHTML = [
@@ -16,7 +15,7 @@ var
   myListItem = 'my-list-item',
   myListItemHTML = [
     '<input type="checkbox" onchange="{ onChange }">',
-    '<span if="{ opts.isActive }">I am active</span>',
+    '<span if="{ opts.isActive }">I am active</span>'
   ].join('')
 
 /**
@@ -26,11 +25,9 @@ var
  */
 
 function measure(fun) {
-  startTime = Date.now()
-  duration = null
+  var startTime = Date.now()
   fun()
-  duration = Date.now() - startTime
-  return [process.memoryUsage().heapUsed, duration]
+  return [process.memoryUsage().heapUsed, Date.now() - startTime]
 }
 
 /**
@@ -38,19 +35,20 @@ function measure(fun) {
  * Adding the custom tags to the riot internal cache
  *
  */
+
 function setTags() {
-  riot.tag(myComponent, myComponentHTML,function (opts) {
+  riot.tag(myComponent, myComponentHTML, function(opts) {
     var self = this
     function loop () {
-      opts.items = generateItems(1000,{
-          isActive:false
+      opts.items = generateItems(1000, {
+        isActive: false
       })
       result = measure(self.update.bind(self))
       console.log(
         (result[0] / 1024 / 1024).toFixed(2) + ' MiB',
         result[1] + ' ms'
       )
-      setTimeout(loop,1000)
+      setTimeout(loop, 1000)
     }
     loop()
   })
@@ -71,7 +69,7 @@ function mount() {
   riot.mount(myComponent, {
     title: 'hello world',
     description: 'mad world',
-    items: generateItems(1000,{
+    items: generateItems(1000, {
       isActive: false
     })
   })
@@ -83,6 +81,7 @@ function mount() {
  * @param  { * } data
  * @return array
  */
+
 function generateItems(amount, data) {
   var items = []
   while (--amount) {
@@ -102,11 +101,10 @@ function test () {
   mount()
 }
 
-
-
 /**
  * Pepare the DOM and mount the riot components
  */
+
 jsdom.env({
   html: '<!doctype html><html><head></head><body><' + myComponent + ' /></body></html>',
   done: function (errors, window) {
@@ -115,4 +113,3 @@ jsdom.env({
     test()
   }
 })
-

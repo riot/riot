@@ -1,2 +1,3 @@
 lib/wrap
 test/ie8
+test/compiler/js
