@@ -205,6 +205,7 @@ See [timer demo](http://jsfiddle.net/gnumanth/h9kuozp5/) and [riot.tag](/riotjs/
 3. Boolean attributes. Write `__checked="{ flag }"` instead of `checked={ flag }`
 4. Shorthand ES6 method signatures
 5. `<img src={ src }>` must be written as `<img riot-src={ src }>` in order to avoid illegal server requests
+6. `style="color: { color }"` must be written as `riot-style="color: { color }"` so that style attribute expressions work in IE.
 
 
 You can take advantage of `template` or `script` tags as follows:
