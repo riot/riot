@@ -1,6 +1,8 @@
 
-<foo><h4>jo</h4></foo>
+<my-tag>
+  <p each={ items }>{ val }</p>
 
-<test>
-  <input checked={ undefined }/>
-</test>
+  this.on('mount', function() {
+    this.update({ items: [{ val: 'kissa' }, { val: 'koira' }] })
+  })
+</my-tag>
