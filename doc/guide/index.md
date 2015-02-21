@@ -97,7 +97,7 @@ Tag definition always starts on the beginning of the line:
 
 ### No script tag
 
-You can leave out the `<script>` tag:
+You can leave out the `script` tag:
 
 ```
 <todo>
