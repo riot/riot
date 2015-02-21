@@ -75,19 +75,19 @@ el.off('start stop')
 
 @returns `el`
 
-### el.off(event, fn)
+### el.off(events, fn)
 
 Removes the given callback from the list of events
 
 ``` js
-function doStart() {
-  console.log('starting')
+function doIt() {
+  console.log('starting or ending')
 }
 
-el.on('start', doStart)
+el.on('start middle end', doIt)
 
-// remove a specific listener
-el.off('start', doStart)
+// remove a specific listener from start and end events
+el.off('start end', doIt)
 ```
 
 @returns `el`

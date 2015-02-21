@@ -180,6 +180,15 @@ describe('Observable', function() {
 
   })
 
+  it('multi off', function() {
+    var el = riot.observable(),
+        fn = function() { counter++ }
+
+    el.on('foo', fn).on('bar', fn)
+    el.off('foo bar', fn)
+    el.trigger('foo').trigger('bar')
+    expect(counter).to.be(0)
+  })
 
   it('remove handler while triggering', function() {
 
