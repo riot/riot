@@ -1,5 +1,5 @@
 
-DIST = "dist/riot/"
+DIST = "./"
 
 WATCH = "\
 	var arg = process.argv, path = arg[1], cmd = arg[2];  \

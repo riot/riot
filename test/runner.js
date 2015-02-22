@@ -10,7 +10,7 @@ describe('Riotjs tests', function() {
     global.top = window
 
     require('shelljs/global')
-    global.riot = require('../dist/riot/riot')
+    global.riot = require('../riot')
     global.compiler = require('../lib/compiler')
     global.expect = require('expect.js')
 
