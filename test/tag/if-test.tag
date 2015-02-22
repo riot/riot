@@ -12,7 +12,9 @@
 
   <p each={ num, i in nums} if={ num == parent.flag }>{ num }</p>
 
-  <if-child show={ flag } />
+  <p>
+    <if-child show={ flag } />
+  </p>
 
   // this.flag = true
   var self = this
