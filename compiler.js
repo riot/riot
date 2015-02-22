@@ -25,7 +25,7 @@
 
   var LINE_TAG = /^<([\w\-]+)>(.*)<\/\1>/gim,
       QUOTE = /=({[^}]+})([\s\/\>])/g,
-      BOOLEAN = /([\w\-]+)=["']({[^}]+})["']/g,
+      SET_ATTR = /([\w\-]+)=["']([^"']+)["']/g,
       EXPR = /{\s*([^}]+)\s*}/g,
       // (tagname) (html) (javascript) endtag
       CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\/}]>$)?([^\x00]*?)^<\/\1>/gim,
@@ -52,24 +52,26 @@
     html = html.replace(brackets(QUOTE), '="$1"$2')
 
     // alter special attribute names
-    html = html.replace(brackets(BOOLEAN), function(full, name, expr) {
-      name = name.toLowerCase()
+    html = html.replace(SET_ATTR, function(full, name, expr) {
+      if (expr.indexOf(brackets(0)) >= 0) {
+        name = name.toLowerCase()
 
-      // <img src> --> <img riot-src>
-      if (name == 'src') name = 'riot-' + name
+        // <img src> --> <img riot-src>
+        if (/style|src/.test(name)) name = 'riot-' + name
 
-      // IE8 looses boolean attr values: `checked={ expr }` --> `__checked={ expr }`
-      else if (BOOL_ATTR.indexOf(name) >= 0) name = '__' + name
+        // IE8 looses boolean attr values: `checked={ expr }` --> `__checked={ expr }`
+        else if (BOOL_ATTR.indexOf(name) >= 0) name = '__' + name
+      }
 
       return name + '="' + expr + '"'
     })
 
-    // run trough parser
+    // run expressions trough parser
     if (opts.expr) {
       html = html.replace(brackets(EXPR), function(_, expr) {
         var ret = compileJS(expr, opts, type).trim().replace(/\r?\n|\r/g, '').trim()
         if (ret.slice(-1) == ';') ret = ret.slice(0, -1)
-        return B[0] + ret + B[1]
+        return brackets(0) + ret + brackets(1)
       })
     }
 
@@ -84,7 +86,6 @@
 
     // escape single quotes
     html = html.replace(/'/g, "\\'")
-
 
     // \{ jotain \} --> \\{ jotain \\}
     html = html.replace(brackets(/\\{|\\}/g), '\\$&')
@@ -202,7 +203,7 @@
     if (opts.template) src = compileTemplate(opts.template, src)
 
     src = src.replace(LINE_TAG, function(_, tagName, html) {
-      return mktag(tagName, compileHTML(html, opts), '')
+      return mktag(tagName, compileHTML(html, opts), '', '')
     })
 
     return src.replace(CUSTOM_TAG, function(_, tagName, html, js) {

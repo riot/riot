@@ -1,8 +1,8 @@
-/* Riot v2.0.10, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot WIP, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function() {
 
-  var riot = { version: 'v2.0.10', settings: {} }
+  var riot = { version: 'WIP', settings: {} }
 
   'use strict'
 
@@ -15,7 +15,7 @@ riot.observable = function(el) {
 
   el.on = function(events, fn) {
     if (typeof fn == 'function') {
-      fn._id = _id++
+      fn._id = typeof fn._id == 'undefined' ? _id++ : fn._id
 
       events.replace(/\S+/g, function(name, pos) {
         (callbacks[name] = callbacks[name] || []).push(fn)
@@ -27,14 +27,16 @@ riot.observable = function(el) {
 
   el.off = function(events, fn) {
     if (events == '*') callbacks = {}
-    else if (fn) {
-      var arr = callbacks[events]
-      for (var i = 0, cb; (cb = arr && arr[i]); ++i) {
-        if (cb._id == fn._id) { arr.splice(i, 1); i-- }
-      }
-    } else {
+    else {
       events.replace(/\S+/g, function(name) {
-        callbacks[name] = []
+        if (fn) {
+          var arr = callbacks[name]
+          for (var i = 0, cb; (cb = arr && arr[i]); ++i) {
+            if (cb._id == fn._id) { arr.splice(i, 1); i-- }
+          }
+        } else {
+          callbacks[name] = []
+        }
       })
     }
     return el
@@ -244,7 +246,7 @@ var tmpl = (function() {
       .replace(/\uFFF0/g, brackets(0))
       .replace(/\uFFF1/g, brackets(1))
 
-    )
+    + ';')
 
   }
 
@@ -345,7 +347,7 @@ function _each(dom, parent, expr) {
   parent.one('update', function() {
     root.removeChild(dom)
 
-  }).one('mount', function() {
+  }).one('premount', function() {
     if (root.stub) root = parent.root
 
   }).on('update', function() {
@@ -436,11 +438,11 @@ function _each(dom, parent, expr) {
 
 function parseNamedElements(root, tag, expressions) {
   walk(root, function(dom) {
-    if (dom.nodeType != 1) return
-
-    each(dom.attributes, function(attr) {
-      if (/^(name|id)$/.test(attr.name)) tag[attr.value] = dom
-    })
+    if (dom.nodeType == 1) {
+      each(dom.attributes, function(attr) {
+        if (/^(name|id)$/.test(attr.name)) tag[attr.value] = dom
+      })
+    }
   })
 }
 
@@ -467,25 +469,23 @@ function parseLayout(root, tag, expressions) {
     var attr = dom.getAttribute('each')
     if (attr) { _each(dom, tag, attr); return false }
 
-    // attributes
+    // attribute expressions
     each(dom.attributes, function(attr) {
       var name = attr.name,
-          value = attr.value
+          bool = name.split('__')[1]
 
-      // expressions
-      var bool = name.split('__')[1]
-      addExpr(dom, value, { attr: bool || name, bool: bool })
-
-      if (bool) {
-        remAttr(dom, name)
-        return false
-      }
+      addExpr(dom, attr.value, { attr: bool || name, bool: bool })
+      if (bool) { remAttr(dom, name); return false }
 
     })
 
-    // child tag
+    // custom child tag
     var impl = tag_impl[dom.tagName.toLowerCase()]
-    if (impl) impl = new Tag(impl, { root: dom, parent: tag })
+
+    if (impl) {
+      impl = new Tag(impl, { root: dom, parent: tag })
+      return false
+    }
 
   })
 
@@ -498,14 +498,12 @@ function Tag(impl, conf) {
       parent = conf.parent,
       is_loop = conf.loop,
       root = conf.root,
-      opts = inherit(conf.opts),
+      opts = inherit(conf.opts) || {},
       item = conf.item
 
   // cannot initialize twice on the same root element
   if (!is_loop && root.riot) return
   root.riot = 1
-
-  opts = opts || {}
 
   extend(this, { parent: parent, root: root, opts: opts })
   extend(this, item)
@@ -538,14 +536,12 @@ function Tag(impl, conf) {
   var dom = mkdom(impl.tmpl),
       loop_dom
 
-  // named elements
-  parseNamedElements(dom, this)
 
   this.update = function(data, init) {
     extend(self, data)
     extend(self, item)
-    self.trigger('update', item)
     updateOpts()
+    self.trigger('update', item)
     update(expressions, self, item)
     self.trigger('updated')
   }
@@ -564,6 +560,9 @@ function Tag(impl, conf) {
 
   function mount() {
 
+    // internal use only, fixes #403
+    self.trigger('premount')
+
     if (is_loop) {
       loop_dom = dom.firstChild
       root.insertBefore(loop_dom, conf.before || null) // null needed for IE8
@@ -574,17 +573,19 @@ function Tag(impl, conf) {
 
     if (root.stub) self.root = root = parent.root
 
-    self.trigger('mount')
-
     // one way data flow: propagate updates and unmounts downwards from parent to children
     parent && parent.on('update', self.update).one('unmount', self.unmount)
 
+    self.trigger('mount')
   }
 
-  // initialize
+  // named elements available for fn
+  parseNamedElements(dom, this)
+
+  // fn (initialiation)
   if (impl.fn) impl.fn.call(this, opts)
 
-  // layout
+  // parse layout after init. fn may calculate args for nested custom tags
   parseLayout(dom, this, expressions)
 
   this.update()
@@ -628,6 +629,7 @@ function insertTo(root, node, before) {
 function update(expressions, tag, item) {
 
   each(expressions, function(expr) {
+
     var dom = expr.dom,
         attr_name = expr.attr,
         value = tmpl(expr.expr, tag)
@@ -672,8 +674,9 @@ function update(expressions, tag, item) {
       dom.value = value
 
     // <img src="{ expr }">
-    } else if (attr_name == 'riot-src') {
-      value ? dom.setAttribute('src', value) : remAttr(dom, 'src')
+    } else if (attr_name.slice(0, 4) == 'riot') {
+      attr_name = attr_name.slice(5)
+      value ? dom.setAttribute(attr_name, value) : remAttr(dom, attr_name)
 
     } else {
       if (expr.bool) {
@@ -828,7 +831,7 @@ riot.update = function() {
 
   var LINE_TAG = /^<([\w\-]+)>(.*)<\/\1>/gim,
       QUOTE = /=({[^}]+})([\s\/\>])/g,
-      BOOLEAN = /([\w\-]+)=["']({[^}]+})["']/g,
+      SET_ATTR = /([\w\-]+)=["']([^"']+)["']/g,
       EXPR = /{\s*([^}]+)\s*}/g,
       // (tagname) (html) (javascript) endtag
       CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\/}]>$)?([^\x00]*?)^<\/\1>/gim,
@@ -855,24 +858,26 @@ riot.update = function() {
     html = html.replace(brackets(QUOTE), '="$1"$2')
 
     // alter special attribute names
-    html = html.replace(brackets(BOOLEAN), function(full, name, expr) {
-      name = name.toLowerCase()
+    html = html.replace(SET_ATTR, function(full, name, expr) {
+      if (expr.indexOf(brackets(0)) >= 0) {
+        name = name.toLowerCase()
 
-      // <img src> --> <img riot-src>
-      if (name == 'src') name = 'riot-' + name
+        // <img src> --> <img riot-src>
+        if (/style|src/.test(name)) name = 'riot-' + name
 
-      // IE8 looses boolean attr values: `checked={ expr }` --> `__checked={ expr }`
-      else if (BOOL_ATTR.indexOf(name) >= 0) name = '__' + name
+        // IE8 looses boolean attr values: `checked={ expr }` --> `__checked={ expr }`
+        else if (BOOL_ATTR.indexOf(name) >= 0) name = '__' + name
+      }
 
       return name + '="' + expr + '"'
     })
 
-    // run trough parser
+    // run expressions trough parser
     if (opts.expr) {
       html = html.replace(brackets(EXPR), function(_, expr) {
         var ret = compileJS(expr, opts, type).trim().replace(/\r?\n|\r/g, '').trim()
         if (ret.slice(-1) == ';') ret = ret.slice(0, -1)
-        return B[0] + ret + B[1]
+        return brackets(0) + ret + brackets(1)
       })
     }
 
@@ -887,7 +892,6 @@ riot.update = function() {
 
     // escape single quotes
     html = html.replace(/'/g, "\\'")
-
 
     // \{ jotain \} --> \\{ jotain \\}
     html = html.replace(brackets(/\\{|\\}/g), '\\$&')
@@ -1005,7 +1009,7 @@ riot.update = function() {
     if (opts.template) src = compileTemplate(opts.template, src)
 
     src = src.replace(LINE_TAG, function(_, tagName, html) {
-      return mktag(tagName, compileHTML(html, opts), '')
+      return mktag(tagName, compileHTML(html, opts), '', '')
     })
 
     return src.replace(CUSTOM_TAG, function(_, tagName, html, js) {
