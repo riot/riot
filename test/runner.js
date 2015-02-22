@@ -1,7 +1,7 @@
 
 var isNode = typeof window === 'undefined'
 
-describe('Riotjs tests',function() {
+describe('Riotjs tests', function() {
   if (isNode) {
 
     global.document = require('jsdom').jsdom('<!doctype html><html><body></body></html>')
