@@ -103,7 +103,7 @@ One of the design goals was to introduce a powerful tag syntax with as little bo
 - Power shortcuts: `class={ enabled: is_enabled, hidden: hasErrors() }`.
 - No extra brain load such as `render`, `state`, `constructor` or `shouldComponentUpdate`
 - Interpolation: `Add #{ items.length + 1 }` or `class="item { selected: flag }"`
-- `<script>` tag to enclose the logic is optional
+- The `script` tag to enclose the logic is optional
 - Compact ES6 method syntax
 
 

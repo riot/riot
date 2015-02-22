@@ -1,0 +1,62 @@
+<!doctype html>
+
+<html>
+  <head>
+    <title>Todo performance</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="../../demo/todo.css">
+  </head>
+
+  <body>
+
+    <script type="riot/tag">
+      <todo>
+
+        <h3>{ opts.title }</h3>
+
+        <ul>
+          <li each={ items }>
+            <label class={ completed: done }>
+              <input type="checkbox" checked={ done } onclick={ parent.toggle }> { title }
+            </label>
+          </li>
+        </ul>
+
+        <form onsubmit={ add }>
+          <input name="input" onkeyup={ edit }>
+          <button disabled={ !text }>Add #{ items.length + 1 }</button>
+        </form>
+
+        this.items = opts.items
+
+        edit(e) {
+          this.text = e.target.value
+        }
+
+        add(e) {
+          if (this.text) {
+            this.items.push({ title: this.text })
+            this.text = this.input.value = ''
+          }
+        }
+
+
+        toggle(e) {
+          var item = e.item
+          item.done = !item.done
+          return true
+        }
+
+      </todo>
+    </script>
+
+    <todo></todo>
+
+    <script src="../../dist/riot/riot.js"></script>
+    <script src="../../dist/riot/compiler.js"></script>
+    <script>riot.mount('todo', { title: 'TODO', items: [] })</script>
+    <script src="todo-test.js"></script>
+
+  </body>
+
+</html>

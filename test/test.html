@@ -16,9 +16,13 @@
 
   <script type="riot/tag">
     <test>
-      <div style='color: {color}'>TEST</div>
-      this.color = 'red'
+      <child name="foo"></child>
+
+      console.info(this.foo)
     </test>
+    <child>
+      <p>child 1</p>
+    </child>
   </script>
 
   <test></test>

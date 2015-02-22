@@ -131,7 +131,8 @@ See [pre processors](/riotjs/compiler.html#pre-processors) for more details.
 
 ### Tag styling
 
-You can put `<style>` tag inside. Riot.js automatically take it out and inject it into `<head>`.
+You can put   // named elements
+`style` tag inside. Riot.js automatically take it out and inject it into `<head>`.
 
 ```html
 <todo>
@@ -139,7 +140,7 @@ You can put `<style>` tag inside. Riot.js automatically take it out and inject i
   <!-- layout -->
   <h3>{ opts.title }</h3>
 
-  <style>
+  &lt;style>
     todo { display: block }
     todo h3 { font-size: 120% }
     /** other awesome stylings **/
@@ -364,7 +365,8 @@ When using [pre-compiler](compiler.html#pre-compilation) you'll have to set `bra
 
 ### Etc
 
-Expressions inside `<style>` tags are ignored.
+Expressions inside   // named elements
+`style` tags are ignored.
 
 
 ### Render unescaped HTML
@@ -446,7 +448,7 @@ Here is an example of a custom tag with nested HTML on the page:
   </my-tag>
 </body>
 
-<script>
+&lt;script>
 riot.mount('my-tag')
 </script>
 ```

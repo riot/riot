@@ -39,7 +39,8 @@ The equality operator is good when you know how it works. We do this for example
 This causes `0` and `false` to be printed but `null` and `undefined` are printed as an empty string. Exactly what we want!
 
 
-### Can I use `<style>` tags in a .tag file?
+### Can I use   // named elements
+`style` tags in a .tag file?
 Yes. You can use CSS normally inside a tag. The web component standard also has a mechanism of encapsulating of CSS. However, it's unlikely that this improves the overall manageability of your CSS.
 
 
