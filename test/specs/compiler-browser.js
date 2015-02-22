@@ -1,33 +1,67 @@
 describe('Compiler Browser', function() {
 
   var html = [
-        '<script type=\"riot\/tag\" id=\"tag_src\">',
-         '  <foo>',
-         '     <p>{ opts.baz } { bar }<\/p>',
 
-         '     this.bar = \"romutus\"',
+          // compiles test
+          '<script type=\"riot\/tag\" id=\"tag_src\">',
+          '  <foo>',
+          '     <p>{ opts.baz } { bar }<\/p>',
 
-         '  <\/foo>',
-         '  <timetable>',
-         '     <timer start={ time } each={ time, i in times }><\/timer>',
-         '     <foo barz=\"899\" baz=\"90\"><\/foo>',
-         '     <p>{ kama }<\/p>',
+          '     this.bar = \"romutus\"',
 
-         '     this.times = [ 1, 3, 5 ]',
-         '     this.kama = \"jooo\"',
+          '  <\/foo>',
+          '  <timetable>',
+          '     <timer start={ time } each={ time, i in times }><\/timer>',
+          '     <foo barz=\"899\" baz=\"90\"><\/foo>',
+          '     <p>{ kama }<\/p>',
 
-         '  <\/timetable>',
-         '<\/script>',
-         '<script type=\"riot\/tag\" src=\"tag\/timer.tag\"><\/script>',
-         '<timetable><\/timetable>',
+          '     this.times = [ 1, 3, 5 ]',
+          '     this.kama = \"jooo\"',
 
-         '<script type=\"riot\/tag\">',
-           '<test><p>Val: { opts.val }<\/p><\/test>',
-         '<\/script>',
+          '  <\/timetable>',
+          '<\/script>',
+          '<script type=\"riot\/tag\" src=\"tag\/timer.tag\"><\/script>',
+          '<timetable><\/timetable>',
 
-         '<test id="test-tag"><\/test>',
-         '<div id=\"foo\"><\/div>',
-         '<div id=\"bar\"><\/div>'
+          // mount and unmount
+
+          '<script type=\"riot\/tag\">',
+          '  <test><p>Val: { opts.val }<\/p><\/test>',
+          '<\/script>',
+
+          '<test id="test-tag"><\/test>',
+          '<div id=\"foo\"><\/div>',
+          '<div id=\"bar\"><\/div>',
+
+          // brackets
+
+          '<test-a><\/test-a>',
+          '<test-b><\/test-b>',
+          '<test-c><\/test-c>',
+          '<test-d><\/test-d>',
+          '<test-e><\/test-e>',
+          '<test-f><\/test-f>',
+          '<test-g><\/test-g>',
+
+          '<script type=\"riot\/tag\">',
+
+          '  <test-e>',
+          '    <p>[ x ]<\/p>',
+          '    this.x = \"ok\"',
+          '  <\/test-e>',
+
+          '  <test-f>',
+          '    <p>${ x }<\/p>',
+          '    this.x = \"ok\"',
+          '  <\/test-f>',
+
+          '  <test-g>',
+          '    <p>{ x }<\/p>',
+          '    this.x = \"ok\"',
+          '  <\/test-g>',
+
+          '<\/script>'
+
         ].join('\n'),
       tags = [],
       div = document.createElement('div')
@@ -105,6 +139,58 @@ describe('Compiler Browser', function() {
       tags.push(tag3)
 
     })
+  })
+
+  it('brackets', function() {
+
+    var tag
+
+    riot.settings.brackets = '[ ]'
+    riot.tag('test-a', '<p>[ x ]</p>', function() { this.x = 'ok'})
+    tag = riot.mount('test-a')[0]
+    tags.push(tag)
+
+    expect(tag.root.innerHTML).to.be('<p>ok</p>')
+
+    riot.settings.brackets = '<% %>'
+    riot.tag('test-b', '<p><% x %></p>', function() { this.x = 'ok' })
+    tag = riot.mount('test-b')[0]
+    tags.push(tag)
+
+    expect(tag.root.innerHTML).to.be('<p>ok</p>')
+
+    riot.settings.brackets = '${ }'
+    riot.tag('test-c', '<p>${ x }</p>', function() { this.x = 'ok' })
+    tag = riot.mount('test-c')[0]
+    tags.push(tag)
+
+    expect(tag.root.innerHTML).to.be('<p>ok</p>')
+
+    riot.settings.brackets = null
+    riot.tag('test-d', '<p>{ x }</p>', function() { this.x = 'ok' })
+    tag = riot.mount('test-d')[0]
+    tags.push(tag)
+
+    expect(tag.root.innerHTML).to.be('<p>ok</p>')
+
+    riot.settings.brackets = '[ ]'
+    tag = riot.mount('test-e')[0]
+    tags.push(tag)
+
+    expect(tag.root.innerHTML).to.be('<p>ok</p>')
+
+    riot.settings.brackets = '${ }'
+    tag = riot.mount('test-f')[0]
+    tags.push(tag)
+
+    expect(tag.root.innerHTML).to.be('<p>ok</p>')
+
+    riot.settings.brackets = null
+    tag = riot.mount('test-g')[0]
+    tags.push(tag)
+
+    expect(tag.root.innerHTML).to.be('<p>ok</p>')
+
   })
 
 })
