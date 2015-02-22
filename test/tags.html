@@ -53,14 +53,14 @@
     <loop-reorder></loop-reorder>
     <loop-manip></loop-manip>
     <pass-expr></pass-expr>
-    <tag-nesting></tag-nesting>
     <!--
     -->
+    <tag-nesting></tag-nesting>
 
   </div>
 
   <script src="../dist/riot/riot.js"></script>
   <script src="../dist/tags.js"></script>
-  <script>var tags = riot.mount('*')</script>
+  <script>var tags = riot.mount('*', { test: { zap: 100 }})</script>
 
 </body>
