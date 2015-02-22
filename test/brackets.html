@@ -18,7 +18,7 @@
 
   <!-- Custom brackets with riot.tag() -->
 
-  <script src="../dist/riot/riot.js"></script>
+  <script src="../riot.js"></script>
 
   <test-a></test-a>
   <test-b></test-b>
@@ -26,7 +26,7 @@
   <test-d></test-d>
 
   <script>
-      
+
     riot.settings.brackets = '[ ]'
     riot.tag('test-a', '<p>[ x ]</p>', function() { this.x = 'ok' })
     riot.mount('test-a')
@@ -55,17 +55,17 @@
   <test-g></test-g>
 
   <script type="riot/tag">
-    
+
     <test-e>
       <p>[ x ]</p>
       this.x = 'ok'
     </test-e>
-    
+
     <test-f>
       <p>${ x }</p>
       this.x = 'ok'
     </test-f>
-    
+
     <test-g>
       <p>{ x }</p>
       this.x = 'ok'
@@ -85,6 +85,6 @@
     riot.mount('test-g')
 
   </script>
-  
+
 
 </body>

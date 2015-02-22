@@ -3,9 +3,9 @@ var RiotControl = {
   addStore: function(store) {
     this._stores.push(store)
   }
-}
+};
 
-['on','one','off','trigger'].forEach(function(api) {
+['on', 'one', 'off', 'trigger'].forEach(function(api) {
   RiotControl[api] = function() {
     var args = [].slice.call(arguments)
     this._stores.forEach(function(el) {
@@ -14,4 +14,4 @@ var RiotControl = {
   }
 })
 
-if (typeof(module) !== 'undefined') module.exports = RiotControl
+if (typeof module !== 'undefined') module.exports = RiotControl
