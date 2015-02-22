@@ -6,6 +6,11 @@ body_id: riot-releases
 
 ====
 
+### 2.0.11 *Feb __, 2015*
+
+- Bug fixes mostly
+- Test suite v1. Expect this to grow in size and functionality. Thanks to [@GianlucaGuarini](https://github.com/GianlucaGuarini)
+
 ### 2.0.10 *Feb 19, 2015*
 
 - [Todo MVC example](https://github.com/txchen/feplay/tree/gh-pages/riot_todo)
