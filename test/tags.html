@@ -28,15 +28,13 @@
 
   <div id="tags">
 
-    <loop-object></loop-object>
     <if-test></if-test>
-
+    <loop-object></loop-object>
     <img-test></img-test>
     <inner-html>
       <h3>World!</h3>
       <p>This content is specified on the page inside the custom tag.</p>
     </inner-html>
-
     <shared-opts val="1"></shared-opts>
     <shared-opts val="2"></shared-opts>
     <loop-replace></loop-replace>
@@ -49,7 +47,6 @@
     <timetable></timetable>
     <loop-strings></loop-strings>
     <loop-position></loop-position>
-    <tag-nesting></tag-nesting>
     <loop-nested></loop-nested>
     <treeview></treeview>
     <loop-equalitems></loop-equalitems>
@@ -58,11 +55,12 @@
     <pass-expr></pass-expr>
     <!--
     -->
+    <tag-nesting></tag-nesting>
 
   </div>
 
   <script src="../dist/riot/riot.js"></script>
   <script src="../dist/tags.js"></script>
-  <script>var tags = riot.mount('*')</script>
+  <script>var tags = riot.mount('*', { test: { zap: 100 }})</script>
 
 </body>

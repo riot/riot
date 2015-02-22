@@ -5,9 +5,14 @@ nogen: true
 
 # Custom tags
 
-### riot.mount(selector, [opts]) | #mount
+### riot.mount(selector, [tagName], [opts]) | #mount
 
-Mounts (constructs) all custom tags on the document specified by `selector`. Optional `opts` object is passed to the tags for consumption. Examples:
+Where
+
+- `selector` selects the DOM nodes from the page to be mounted. This can also be a DOM node.
+- `tagName` specifies the custom tag name. If this is not given the name equals to the name of the selected DOM node
+- `opts` optional object is passed for the tags to consume
+
 
 ``` js
 // mount all <plans> and <pricing> tags on the page
@@ -18,6 +23,12 @@ var tags = riot.mount('.customer')
 
 // mount <account> tag and pass an API object as options
 var tags = riot.mount('account', api)
+
+// mounts custom tag "my-tag" to div#main
+var tags = riot.mount('div#main', 'my-tag')
+
+// mounts "my-tag" to given DOM node
+var tags = riot.mount(document.getElementById('bar'), 'my-tag')
 ```
 
 The passed options can be anything, ranging from a simple object to a full application API. Or it can be a Flux- store. Really depends on how you want to structure your client-side applications.
@@ -33,13 +44,7 @@ riot.mount('*')
 
 ### riot.mountTo(domNode, tagName, [opts]) | #mount-to
 
-Mount a custom tag named `tagName` on a given `domNode` passing optional data with `opts`. For example:
-
-``` js
-riot.mountTo(document.getElementById('slide'), 'users', api)
-```
-
-This is helpful in the case in which you find you often need to install a different tag on the same DOM node (ie. slideshows, dialogs, alert boxes) or when you want to enrich existing DOM nodes with Riot tags but you can't place custom tags in the markup because it's out of your control.
+This method is depreciated since *v2.0.11*. This is the same as `riot.mount(domNode, tagName, [opts])
 
 
 ## Tag instance

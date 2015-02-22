@@ -1,11 +1,6 @@
 
 <if-child>
-  <p>A child</p>
-  <h3>And some more</h3>
-
-  this.on('mount unmount', function(e) {
-    // console.info(this, e)
-  })
+  <h3>Child tag</h3>
 </if-child>
 
 <if-test>
@@ -17,7 +12,9 @@
 
   <p each={ num, i in nums} if={ num == parent.flag }>{ num }</p>
 
-  <if-child show={ flag } />
+  <p>
+    <if-child show={ flag } />
+  </p>
 
   // this.flag = true
   var self = this

@@ -6,6 +6,14 @@ body_id: riot-releases
 
 ====
 
+### 2.0.11 *Feb __, 2015*
+
+- `riot.mount` now accepts the same parameters as `riot.mountTo`, which is now depreciated
+- New `riot.mount(selector, tagName, opts)` allows you to mount a certain tag to any HTML element
+- `riot.unmount` followed with `riot.mount` now correcly replaces the earlier tag
+- Test suite v1. Expect this to grow in size and functionality. Thanks to [@GianlucaGuarini](https://github.com/GianlucaGuarini)
+
+
 ### 2.0.10 *Feb 19, 2015*
 
 - [Todo MVC example](https://github.com/txchen/feplay/tree/gh-pages/riot_todo)
