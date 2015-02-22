@@ -182,7 +182,7 @@ describe('Observable', function() {
 
   it('multi off', function() {
     var el = riot.observable(),
-        fn = function() { counter++ }
+        fn = function() { counter++ }
 
     el.on('foo', fn).on('bar', fn)
     el.off('foo bar', fn)

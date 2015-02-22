@@ -46,7 +46,7 @@ describe('Compiler Browser', function() {
     riot.update()
     // grab source code for performance tests
 
-    var src = tag_src.innerHTML
+    var src = document.getElementById('tag_src').innerHTML
 
     // compile timer 1000 times and see how long it takes
     var begin = +new Date()
