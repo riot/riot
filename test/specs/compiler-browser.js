@@ -19,29 +19,44 @@ describe('Compiler Browser', function() {
          '  <\/timetable>',
          '<\/script>',
          '<script type=\"riot\/tag\" src=\"tag\/timer.tag\"><\/script>',
-         '<timetable><\/timetable>'
+         '<timetable><\/timetable>',
+
+         '<script type=\"riot\/tag\">',
+           '<test><p>Val: { opts.val }<\/p><\/test>',
+         '<\/script>',
+
+         '<test id="test-tag"><\/test>',
+         '<div id=\"foo\"><\/div>',
+         '<div id=\"bar\"><\/div>'
         ].join('\n'),
-      tags,
+      tags = [],
       div = document.createElement('div')
 
-  before(function() {
+  before(function(next) {
 
     div.innerHTML = html
     document.body.appendChild(div)
+    riot.compile(next)
 
   })
 
   after(function() {
-
-    document.body.removeChild(div)
+    var unmount = function (el) {
+      if (el.length) {
+        el.forEach(unmount)
+      } else {
+        el.unmount()
+      }
+    }
+    unmount(tags)
+    //document.body.removeChild(div)
 
   })
 
-  it('compiles', function() {
+  it('compiles', function(done) {
 
-    riot.compile(function() {
-      tags = riot.mount('timetable', { start: 0 })
-    })
+    tags.push(riot.mount('timetable', { start: 0 }))[0]
+    expect(document.getElementsByTagName('timer').length).to.be(3)
 
     riot.update()
     // grab source code for performance tests
@@ -57,6 +72,39 @@ describe('Compiler Browser', function() {
 
     expect(+new Date() - begin).to.be.below(100)
 
+    done()
+
+  })
+
+  it('mount and unmount', function() {
+
+    riot.compile(function() {
+
+      var tag = riot.mount('test', { val: 10 })[0],
+          tag2 = riot.mount('#foo', 'test', { val: 30 })[0],
+          tag3 = riot.mount(document.getElementById('bar'), 'test', { val: 50 })[0]
+
+      expect(tag.root.innerHTML).to.be('<p>Val: 10</p>')
+      expect(tag2.root.innerHTML).to.be('<p>Val: 30</p>')
+      expect(tag3.root.innerHTML).to.be('<p>Val: 50</p>')
+
+      tag.unmount()
+      tag2.unmount()
+      tag3.unmount()
+
+      tag = riot.mount('test', { val: 110 })[0]
+      tag2 = riot.mount('#foo', 'test', { val: 140 })[0]
+      tag3 = riot.mount(bar, 'test', { val: 150 })[0]
+
+      expect(tag.root.innerHTML).to.be('<p>Val: 110</p>')
+      expect(tag2.root.innerHTML).to.be('<p>Val: 140</p>')
+      expect(tag3.root.innerHTML).to.be('<p>Val: 150</p>')
+
+      tags.push(tag)
+      tags.push(tag2)
+      tags.push(tag3)
+
+    })
   })
 
 })

@@ -1,4 +1,4 @@
-describe('route', function() {
+describe('Route', function() {
 
   var counter = 0
 
