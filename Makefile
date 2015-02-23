@@ -12,7 +12,7 @@ WATCH = "\
 test:
 	@ make eslint
 	# run the mocha tests
-	@ ./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha -- test/runner.js -R spec
+	@ RIOT=../dist/riot/riot.js ./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha -- test/runner.js -R spec
 
 
 eslint:
