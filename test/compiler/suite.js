@@ -37,11 +37,10 @@ function testHTML() {
   test('<a id={ a }/>', '<a id="{ a }"></a>')
   test('<a><b/></a>', '<a><b></b></a>')
 
-  test('<a loop={ a } defer="{ b }" visible>', '<a __loop="{ a }" __defer="{ b }" visible>')
-
   test('{ a }<!-- c -->', '{ a }')
   test('<!-- c -->{ a }', '{ a }')
   test('<!-- c -->{ a }<!-- c --><p/><!-- c -->', '{ a }<p></p>')
+  test('<a loop={ a } defer="{ b }" visible>', '<a __loop="{ a }" __defer="{ b }" visible>')
 
   test('{ "a" }', '{ \"a\" }')
   test('\\{ a \\}', '\\\\{ a \\\\}')
