@@ -27,7 +27,7 @@ Riot brings custom tags to all browsers starting from IE8.
   </form>
 
   <!-- logic -->
-  &lt;script>
+  <script>
     this.items = []
 
     add(e) {
@@ -60,7 +60,7 @@ Custom tags let you build complex views with HTML. Your application might look s
 
   <forum-footer/>
 
-  &lt;script>riot.mount('*', { api: forum_api })</script>
+  <script>riot.mount('*', { api: forum_api })</script>
 </body>
 ```
 
@@ -103,7 +103,7 @@ One of the design goals was to introduce a powerful tag syntax with as little bo
 - Power shortcuts: `class={ enabled: is_enabled, hidden: hasErrors() }`.
 - No extra brain load such as `render`, `state`, `constructor` or `shouldComponentUpdate`
 - Interpolation: `Add #{ items.length + 1 }` or `class="item { selected: flag }"`
-- The `script` tag to enclose the logic is optional
+- The `<script>` tag to enclose the logic is optional
 - Compact ES6 method syntax
 
 

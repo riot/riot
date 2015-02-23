@@ -50,7 +50,7 @@ Compiles and executes the given `tag`. For example:
   </my-tag>
 </template>
 
-&lt;script>
+<script>
 riot.compile(my_tag.innerHTML)
 </script>
 ```

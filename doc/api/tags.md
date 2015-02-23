@@ -16,7 +16,7 @@ Where
 
 ``` js
 // mount all <plans> and <pricing> tags on the page
-var tags = riot.mount('plans pricing')
+var tags = riot.mount('plans, pricing')
 
 // mount all custom tags with a class name .customer
 var tags = riot.mount('.customer')
@@ -222,15 +222,15 @@ See [timer demo](http://jsfiddle.net/gnumanth/h9kuozp5/) and [riot.tag](/riotjs/
 6. `style="color: { color }"` must be written as `riot-style="color: { color }"` so that style attribute expressions work in IE.
 
 
-You can take advantage of `template` or `script` tags as follows:
+You can take advantage of `<template>` or `<script>` tags as follows:
 
 ```
-&lt;script type="tmpl" id="my_tmpl">
+<script type="tmpl" id="my_tmpl">
   <h3>{ opts.hello }</h3>
   <p>And a paragraph</p>
 </script>
 
-&lt;script>
+<script>
 riot.tag('tag-name', my_tmpl.innerHTML, function(opts) {
 
 })

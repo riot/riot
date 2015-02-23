@@ -97,7 +97,7 @@ And this is how the above tag is mounted on a page:
 ```
 <todo></todo>
 
-&lt;script>riot.mount('todo')</script>
+<script>riot.mount('todo')</script>
 ```
 
 ### Same, but different

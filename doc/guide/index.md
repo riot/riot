@@ -28,7 +28,7 @@ Riot custom tags are the building blocks for user interfaces. They make the "vie
     <button disabled={ !text }>Add #{ items.length + 1 }</button>
   </form>
 
-  &lt;script>
+  <script>
     this.disabled = true
 
     this.items = opts.items
@@ -64,8 +64,8 @@ See [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https:
 
 Riot tag is a combination of layout (HTML) and logic (JavaScript). Here are the basic rules:
 
-* HTML is defined first and the logic is enclosed inside optional `script` tag.
-* Without `script` tag the JavaScript starts where the last HTML tag ends.
+* HTML is defined first and the logic is enclosed inside optional `<script>` tag.
+* Without `<script>` tag the JavaScript starts where the last HTML tag ends.
 * Custom tags can be empty, HTML only or JavaScript only
 * Quotes are optional: `<foo bar={ baz }>` becomes `<foo bar="{ baz }">`.
 * ES6 method syntax is supported: `methodName()` becomes `this.methodName = function()` and `this` variable always points to the current tag instance.
@@ -97,7 +97,7 @@ Tag definition always starts on the beginning of the line:
 
 ### No script tag
 
-You can leave out the `script` tag:
+You can leave out the `<script>` tag:
 
 ```
 <todo>
@@ -140,7 +140,7 @@ You can put   // named elements
   <!-- layout -->
   <h3>{ opts.title }</h3>
 
-  &lt;style>
+  <style>
     todo { display: block }
     todo h3 { font-size: 120% }
     /** other awesome stylings **/
@@ -163,13 +163,13 @@ Once a tag is created you can mount it on the page as follows:
   <todo></todo>
 
   <!-- include riot.js -->
-  &lt;script src="riot.min.js"></script>
+  <script src="riot.min.js"></script>
 
   <!-- include the tag -->
-  &lt;script src="todo.js" type="riot/tag"></script>
+  <script src="todo.js" type="riot/tag"></script>
 
   <!-- mount the tag -->
-  &lt;script>riot.mount('todo')</script>
+  <script>riot.mount('todo')</script>
 
 </body>
 ```
@@ -198,7 +198,7 @@ Document can contain multiple instances of the same tag.
 You can pass options for tags in the second argument
 
 ```
-&lt;script>
+<script>
 riot.mount('todo', { title: 'My TODO app', items: [ ... ] })
 </script>
 ```
@@ -428,7 +428,7 @@ Then we mount the `account` tag to the page with a `plan` configuration option:
   <account></account>
 </body>
 
-&lt;script>
+<script>
 riot.mount('account', { plan: { name: 'small', term: 'monthly' } })
 </script>
 ```
@@ -448,7 +448,7 @@ Here is an example of a custom tag with nested HTML on the page:
   </my-tag>
 </body>
 
-&lt;script>
+<script>
 riot.mount('my-tag')
 </script>
 ```
@@ -787,7 +787,7 @@ And here we mount the application
 ```
 <body>
   <login></login>
-  &lt;script>riot.mount('login', auth)</script>
+  <script>riot.mount('login', auth)</script>
 </body>
 ```
 

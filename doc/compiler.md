@@ -15,7 +15,7 @@ Custom tags need to be transformed to JavaScript before the browser can execute 
 <my-tag></my-tag>
 
 <!-- inlined tag definition -->
-&lt;script type="riot/tag">
+<script type="riot/tag">
   <my-tag>
     <h3>Tag layout</h3>
     <inner-tag />
@@ -30,7 +30,7 @@ Custom tags need to be transformed to JavaScript before the browser can execute 
 
 
 <!-- mount normally -->
-&lt;script>
+<script>
 riot.mount('*')
 </script>
 ```
@@ -87,7 +87,7 @@ With pre-compilation your HTML is something like this:
 <script src="path/to/javascript/with-tags.js"></script>
 
 <!-- mount the same way -->
-&lt;script>
+<script>
 riot.mount('*')
 </script>
 ```

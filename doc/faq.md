@@ -55,7 +55,5 @@ It's not evil, it only looks bad. To have JS and HTML under the same module is m
 
 Yes:
 
-1. Browser based compilation
-2. Server side HTML generation and "isomorphic" applications
-3. Bigger test suite with server side tests
-4. Tag option validation using HTML attributes
+1. Server side HTML generation and "isomorphic" applications
+2. Tag option validation using HTML attributes
