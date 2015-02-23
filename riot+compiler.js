@@ -1,8 +1,8 @@
-/* Riot v2.0.10, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v2.0.11, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function() {
 
-  var riot = { version: 'v2.0.10', settings: {} }
+  var riot = { version: 'v2.0.11', settings: {} }
 
   'use strict'
 
@@ -15,7 +15,7 @@ riot.observable = function(el) {
 
   el.on = function(events, fn) {
     if (typeof fn == 'function') {
-      fn._id = _id++
+      fn._id = typeof fn._id == 'undefined' ? _id++ : fn._id
 
       events.replace(/\S+/g, function(name, pos) {
         (callbacks[name] = callbacks[name] || []).push(fn)
@@ -27,14 +27,16 @@ riot.observable = function(el) {
 
   el.off = function(events, fn) {
     if (events == '*') callbacks = {}
-    else if (fn) {
-      var arr = callbacks[events]
-      for (var i = 0, cb; (cb = arr && arr[i]); ++i) {
-        if (cb._id == fn._id) { arr.splice(i, 1); i-- }
-      }
-    } else {
+    else {
       events.replace(/\S+/g, function(name) {
-        callbacks[name] = []
+        if (fn) {
+          var arr = callbacks[name]
+          for (var i = 0, cb; (cb = arr && arr[i]); ++i) {
+            if (cb._id == fn._id) { arr.splice(i, 1); i-- }
+          }
+        } else {
+          callbacks[name] = []
+        }
       })
     }
     return el
@@ -244,7 +246,7 @@ var tmpl = (function() {
       .replace(/\uFFF0/g, brackets(0))
       .replace(/\uFFF1/g, brackets(1))
 
-    )
+    + ';')
 
   }
 
@@ -345,7 +347,7 @@ function _each(dom, parent, expr) {
   parent.one('update', function() {
     root.removeChild(dom)
 
-  }).one('mount', function() {
+  }).one('premount', function() {
     if (root.stub) root = parent.root
 
   }).on('update', function() {
@@ -436,11 +438,11 @@ function _each(dom, parent, expr) {
 
 function parseNamedElements(root, tag, expressions) {
   walk(root, function(dom) {
-    if (dom.nodeType != 1) return
-
-    each(dom.attributes, function(attr) {
-      if (/^(name|id)$/.test(attr.name)) tag[attr.value] = dom
-    })
+    if (dom.nodeType == 1) {
+      each(dom.attributes, function(attr) {
+        if (/^(name|id)$/.test(attr.name)) tag[attr.value] = dom
+      })
+    }
   })
 }
 
@@ -454,7 +456,6 @@ function parseLayout(root, tag, expressions) {
   }
 
   walk(root, function(dom) {
-
     var type = dom.nodeType
 
     // text node
@@ -467,85 +468,58 @@ function parseLayout(root, tag, expressions) {
     var attr = dom.getAttribute('each')
     if (attr) { _each(dom, tag, attr); return false }
 
-    // attributes
+    // attribute expressions
     each(dom.attributes, function(attr) {
       var name = attr.name,
-          value = attr.value
+          bool = name.split('__')[1]
 
-      // expressions
-      var bool = name.split('__')[1]
-      addExpr(dom, value, { attr: bool || name, bool: bool })
-
-      if (bool) {
-        remAttr(dom, name)
-        return false
-      }
+      addExpr(dom, attr.value, { attr: bool || name, bool: bool })
+      if (bool) { remAttr(dom, name); return false }
 
     })
 
-    // child tag
+    // custom child tag
     var impl = tag_impl[dom.tagName.toLowerCase()]
-    if (impl) impl = new Tag(impl, { root: dom, parent: tag })
+
+    if (impl) {
+      impl = new Tag(impl, { root: dom, parent: tag })
+      return false
+    }
 
   })
-
 }
+
 function Tag(impl, conf) {
 
   var self = riot.observable(this),
-      expressions = [],
-      attributes = {},
+      opts = inherit(conf.opts) || {},
+      dom = mkdom(impl.tmpl),
       parent = conf.parent,
       is_loop = conf.loop,
+      expressions = [],
       root = conf.root,
-      opts = inherit(conf.opts),
-      item = conf.item
+      item = conf.item,
+      attr = {},
+      loop_dom
 
-  // cannot initialize twice on the same root element
-  if (!is_loop && root.riot) return
-  root.riot = 1
+  extend(this, { parent: parent, root: root, opts: opts }, item)
 
-  opts = opts || {}
-
-  extend(this, { parent: parent, root: root, opts: opts })
-  extend(this, item)
-
-
-  // attributes
-  each(root.attributes, function(attr) {
-    var name = attr.name,
-        val = attr.value
-
-    attributes[name] = val
-
-    // remove dynamic attributes from node
-    if (val.indexOf(brackets(0)) >= 0) {
-      remAttr(root, name)
-      return false
-    }
+  // grab attributes
+  each(root.attributes, function(el) {
+    attr[el.name] = el.value
   })
 
   // options
-  function updateOpts() {
-    each(Object.keys(attributes), function(name) {
-      opts[name] = tmpl(attributes[name], parent || self)
+  function updateOpts(rem_attr) {
+    each(Object.keys(attr), function(name) {
+      opts[name] = tmpl(attr[name], parent || self)
     })
   }
 
-  updateOpts()
-
-  // child
-  var dom = mkdom(impl.tmpl),
-      loop_dom
-
-  // named elements
-  parseNamedElements(dom, this)
-
   this.update = function(data, init) {
-    extend(self, data)
-    extend(self, item)
-    self.trigger('update', item)
+    extend(self, data, item)
     updateOpts()
+    self.trigger('update', item)
     update(expressions, self, item)
     self.trigger('updated')
   }
@@ -555,14 +529,19 @@ function Tag(impl, conf) {
         p = el.parentNode
 
     if (p) {
-      p.removeChild(el)
+      if (parent) p.removeChild(el)
+      else while (root.firstChild) root.removeChild(root.firstChild)
       self.trigger('unmount')
       parent && parent.off('update', self.update).off('unmount', self.unmount)
       self.off('*')
     }
+
   }
 
   function mount() {
+
+    // internal use only, fixes #403
+    self.trigger('premount')
 
     if (is_loop) {
       loop_dom = dom.firstChild
@@ -574,17 +553,21 @@ function Tag(impl, conf) {
 
     if (root.stub) self.root = root = parent.root
 
-    self.trigger('mount')
-
     // one way data flow: propagate updates and unmounts downwards from parent to children
     parent && parent.on('update', self.update).one('unmount', self.unmount)
 
+    self.trigger('mount')
   }
 
-  // initialize
+  updateOpts()
+
+  // named elements available for fn
+  parseNamedElements(dom, this)
+
+  // fn (initialiation)
   if (impl.fn) impl.fn.call(this, opts)
 
-  // layout
+  // parse layout after init. fn may calculate args for nested custom tags
   parseLayout(dom, this, expressions)
 
   this.update()
@@ -628,6 +611,7 @@ function insertTo(root, node, before) {
 function update(expressions, tag, item) {
 
   each(expressions, function(expr) {
+
     var dom = expr.dom,
         attr_name = expr.attr,
         value = tmpl(expr.expr, tag)
@@ -672,8 +656,9 @@ function update(expressions, tag, item) {
       dom.value = value
 
     // <img src="{ expr }">
-    } else if (attr_name == 'riot-src') {
-      value ? dom.setAttribute('src', value) : remAttr(dom, 'src')
+    } else if (attr_name.slice(0, 4) == 'riot') {
+      attr_name = attr_name.slice(5)
+      value ? dom.setAttribute(attr_name, value) : remAttr(dom, attr_name)
 
     } else {
       if (expr.bool) {
@@ -682,7 +667,7 @@ function update(expressions, tag, item) {
         value = attr_name
       }
 
-      dom.setAttribute(attr_name, value)
+      if (typeof value != 'object') dom.setAttribute(attr_name, value)
 
     }
 
@@ -695,17 +680,19 @@ function each(els, fn) {
     // return false -> reomve current item during loop
     if (el != null && fn(el, i) === false) i--
   }
+  return els
 }
 
 function remAttr(dom, name) {
   dom.removeAttribute(name)
 }
 
-function extend(obj, from) {
+// max 2 from objects allowed
+function extend(obj, from, from2) {
   from && each(Object.keys(from), function(key) {
     obj[key] = from[key]
   })
-  return obj
+  return from2 ? extend(obj, from2) : obj
 }
 
 function mkdom(template) {
@@ -719,11 +706,16 @@ function mkdom(template) {
 }
 
 function walk(dom, fn) {
-  dom = fn(dom) === false ? dom.nextSibling : dom.firstChild
+  if (dom) {
+    if (fn(dom) === false) walk(dom.nextSibling, fn)
+    else {
+      dom = dom.firstChild
 
-  while (dom) {
-    walk(dom, fn)
-    dom = dom.nextSibling
+      while (dom) {
+        walk(dom, fn)
+        dom = dom.nextSibling
+      }
+    }
   }
 }
 
@@ -754,21 +746,11 @@ function injectStyle(css) {
   document.head.appendChild(node)
 }
 
-riot.tag = function(name, html, css, fn) {
-  if (typeof css == 'function') fn = css
-  else if (css) injectStyle(css)
-  tag_impl[name] = { name: name, tmpl: html, fn: fn }
-}
+function mountTo(root, tagName, opts) {
+  var tag = tag_impl[tagName]
 
-var mountTo = riot.mountTo = function(root, tagName, opts) {
-  var impl = tag_impl[tagName], tag
-
-  if (impl && root) {
-    root.riot = 0 // mountTo can override previous instance
-    tag = new Tag(impl, { root: root, opts: opts })
-  }
-
-  if (tag) {
+  if (tag && root) {
+    tag = new Tag(tag, { root: root, opts: opts })
     virtual_dom.push(tag)
     return tag.on('unmount', function() {
       virtual_dom.splice(virtual_dom.indexOf(tag), 1)
@@ -776,30 +758,48 @@ var mountTo = riot.mountTo = function(root, tagName, opts) {
   }
 }
 
-riot.mount = function(selector, opts) {
+riot.tag = function(name, html, css, fn) {
+  if (typeof css == 'function') fn = css
+  else if (css) injectStyle(css)
+  tag_impl[name] = { name: name, tmpl: html, fn: fn }
+}
+
+riot.mount = function(selector, tagName, opts) {
   if (selector == '*') selector = Object.keys(tag_impl).join(', ')
+  if (typeof tagName == 'object') { opts = tagName; tagName = 0 }
 
   var tags = []
 
-  each(document.querySelectorAll(selector), function(root) {
-    if (root.riot) return
-
-    var tagName = root.tagName.toLowerCase(),
-        tag = mountTo(root, tagName, opts)
+  function push(root) {
+    var name = tagName || root.tagName.toLowerCase(),
+        tag = mountTo(root, name, opts)
 
     if (tag) tags.push(tag)
-  })
+  }
 
-  return tags
+  // DOM node
+  if (selector.tagName) {
+    push(selector)
+    return tags[0]
+
+  // selector
+  } else {
+    each(document.querySelectorAll(selector), push)
+    return tags
+  }
+
 }
 
 // update everything
 riot.update = function() {
-  each(virtual_dom, function(tag) {
+  return each(virtual_dom, function(tag) {
     tag.update()
   })
-  return virtual_dom
 }
+
+// @depreciated
+riot.mountTo = riot.mount
+
 
 
 ;(function(is_server) {
@@ -828,7 +828,7 @@ riot.update = function() {
 
   var LINE_TAG = /^<([\w\-]+)>(.*)<\/\1>/gim,
       QUOTE = /=({[^}]+})([\s\/\>])/g,
-      BOOLEAN = /([\w\-]+)=["']({[^}]+})["']/g,
+      SET_ATTR = /([\w\-]+)=(["'])([^\2]+?)\2/g,
       EXPR = /{\s*([^}]+)\s*}/g,
       // (tagname) (html) (javascript) endtag
       CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\/}]>$)?([^\x00]*?)^<\/\1>/gim,
@@ -855,24 +855,26 @@ riot.update = function() {
     html = html.replace(brackets(QUOTE), '="$1"$2')
 
     // alter special attribute names
-    html = html.replace(brackets(BOOLEAN), function(full, name, expr) {
-      name = name.toLowerCase()
+    html = html.replace(SET_ATTR, function(full, name, _, expr) {
+      if (expr.indexOf(brackets(0)) >= 0) {
+        name = name.toLowerCase()
 
-      // <img src> --> <img riot-src>
-      if (name == 'src') name = 'riot-' + name
+        // <img src> --> <img riot-src>
+        if (/style|src/.test(name)) name = 'riot-' + name
 
-      // IE8 looses boolean attr values: `checked={ expr }` --> `__checked={ expr }`
-      else if (BOOL_ATTR.indexOf(name) >= 0) name = '__' + name
+        // IE8 looses boolean attr values: `checked={ expr }` --> `__checked={ expr }`
+        else if (BOOL_ATTR.indexOf(name) >= 0) name = '__' + name
+      }
 
       return name + '="' + expr + '"'
     })
 
-    // run trough parser
+    // run expressions trough parser
     if (opts.expr) {
       html = html.replace(brackets(EXPR), function(_, expr) {
         var ret = compileJS(expr, opts, type).trim().replace(/\r?\n|\r/g, '').trim()
         if (ret.slice(-1) == ';') ret = ret.slice(0, -1)
-        return B[0] + ret + B[1]
+        return brackets(0) + ret + brackets(1)
       })
     }
 
@@ -887,7 +889,6 @@ riot.update = function() {
 
     // escape single quotes
     html = html.replace(/'/g, "\\'")
-
 
     // \{ jotain \} --> \\{ jotain \\}
     html = html.replace(brackets(/\\{|\\}/g), '\\$&')
@@ -1005,7 +1006,7 @@ riot.update = function() {
     if (opts.template) src = compileTemplate(opts.template, src)
 
     src = src.replace(LINE_TAG, function(_, tagName, html) {
-      return mktag(tagName, compileHTML(html, opts), '')
+      return mktag(tagName, compileHTML(html, opts), '', '')
     })
 
     return src.replace(CUSTOM_TAG, function(_, tagName, html, js) {
@@ -1147,20 +1148,16 @@ riot.update = function() {
   }
 
   // reassign mount methods
-  var mount = riot.mount,
-      mountTo = riot.mountTo
+  var mount = riot.mount
 
-  riot.mount = function(a, b) {
+  riot.mount = function(a, b, c) {
     var ret
-    riot.compile(function() { ret = mount(a, b) })
+    riot.compile(function() { ret = mount(a, b, c) })
     return ret
   }
 
-  riot.mountTo = function(a, b, c) {
-    var ret
-    riot.compile(function() { ret = mountTo(a, b, c) })
-    return ret
-  }
+  // @depreciated
+  riot.mountTo = riot.mount
 
 })(!this.top)
   
