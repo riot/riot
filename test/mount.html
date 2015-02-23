@@ -1,0 +1,50 @@
+<!doctype html>
+
+<head>
+  <title>Mount tests</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!--[if lt IE 9]>
+    <script src="ie8/es5-shim.js"></script>
+    <script src="ie8/html5-shiv.js"></script>
+    <script>
+    html5.addElements('test')
+    </script>
+  <![endif]-->
+</head>
+
+<body>
+
+  <script type="riot/tag">
+    <test><p>Val: { opts.val }</p></test>
+  </script>
+
+  <test></test>
+  <div id="foo"></div>
+  <div id="bar"></div>
+  <div id="baz"></div>
+
+  <script src="../dist/riot/riot+compiler.js"></script>
+
+  <!--
+  <script src="../lib/compiler.js"></script>
+  -->
+
+  <script>
+  riot.tag('test2', '<p>NORMAL</p>')
+
+  var tag = riot.mount('test', { val: 10 })[0]
+  riot.mount('#foo', 'test', { val: 20 })
+  var tag2 = riot.mount(bar, 'test', { val: 30 })[0]
+
+  setTimeout(function() {
+    tag.unmount()
+    tag2.unmount()
+    riot.mount('test', { val: 110 })
+    riot.mount(bar, 'test', { val: 140 })
+
+  }, 400)
+
+  riot.mount(baz, 'test2')
+  </script>
+
+</body>

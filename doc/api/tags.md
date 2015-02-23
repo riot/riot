@@ -9,7 +9,7 @@ nogen: true
 
 Where
 
-- `selector` selects the DOM nodes from the page to be mounted. This can also be a DOM node.
+- `selector` selects the DOM nodes from the page to be mounted.
 - `tagName` specifies the custom tag name. If this is not given the name equals to the name of the selected DOM node
 - `opts` optional object is passed for the tags to consume
 
@@ -26,9 +26,6 @@ var tags = riot.mount('account', api)
 
 // mounts custom tag "my-tag" to div#main
 var tags = riot.mount('div#main', 'my-tag')
-
-// mounts "my-tag" to given DOM node
-var tags = riot.mount(document.getElementById('bar'), 'my-tag')
 ```
 
 The passed options can be anything, ranging from a simple object to a full application API. Or it can be a Flux- store. Really depends on how you want to structure your client-side applications.
@@ -39,7 +36,19 @@ Internally the selector is passed to `document.querySelectorAll(selector)`. A sp
 riot.mount('*')
 ```
 
-@returns: an array of [tag instances](#tag-instance)
+@returns: an array of the mounted [tag instances](#tag-instance)
+
+
+### riot.mount(domNode, tagName, [opts]) | #mount-dom
+
+Mount a custom tag named tagName on a given domNode passing optional data with opts. For example:
+
+```
+// mounts "my-tag" to given DOM node
+riot.mountTo(document.getElementById('slide'), 'users', api)
+```
+
+@returns: mounted [tag instance](#tag-instance)
 
 
 ### riot.mountTo(domNode, tagName, [opts]) | #mount-to
