@@ -3,6 +3,12 @@
 
 ## A React- like, 3.5KB UI lib
 
+[![Build Status][travis-image]][travis-url]
+[![NPM version][npm-version-image]][npm-url]
+[![NPM downloads][npm-downloads-image]][npm-url]
+
+[![MIT License][license-image]][license-url]
+
 ### Custom tags • Concise syntax • Virtual DOM • Full stack • IE8
 
 Riot brings custom tags to all browsers, including IE8. Think React + Polymer but with ejoyable syntax and a small learning curve.
@@ -109,4 +115,15 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot Snake Game](http://cdn.rawgit.com/atian25/blog/master/assets/riot-snake.html)
 
 https://muut.com/riotjs/
+
+
+[travis-url]:https://travis-ci.org/muut/riotjs
+[travis-image]: https://img.shields.io/travis/muut/riotjs.svg?style=flat-square
+
+[license-url]: LICENSE.txt
+[license-image]: http://img.shields.io/badge/license-MIT-000000.svg?style=flat-square
+
+[npm-url]: https://npmjs.org/package/riot
+[npm-version-image]: http://img.shields.io/npm/v/riot.svg?style=flat-square
+[npm-downloads-image]: http://img.shields.io/npm/dm/riot.svg?style=flat-square
 
