@@ -1,13 +1,13 @@
 {
   "name": "riot",
-  "version": "2.0.10",
+  "version": "2.0.11",
   "description": "A React- like, 3.5K user interface library",
   "homepage": "https://muut.com/riotjs/",
   "repository": "muut/riotjs",
   "author": "Muut, Inc. and other contributors",
   "license": "MIT",
   "scripts": {
-    "test": "make test"
+    "test": "make riot"
   },
   "keywords": [
     "custom tags",
@@ -60,7 +60,7 @@
   "bin": {
     "riot": "lib/cli.js"
   },
-  "main": "lib/compiler.js",
+  "main": "lib/node.js",
   "browser": "riot.js",
   "spm": {
     "main": "riot.js",

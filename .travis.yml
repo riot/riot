@@ -1,0 +1,11 @@
+language: node_js
+node_js:
+   - "0.10.32"
+
+branches:
+  only:
+    - master
+    - dev
+
+notifications:
+    email: false
