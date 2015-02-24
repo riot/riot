@@ -7,7 +7,7 @@
   "author": "Muut, Inc. and other contributors",
   "license": "MIT",
   "scripts": {
-    "test": "make test"
+    "test": "make riot"
   },
   "keywords": [
     "custom tags",
