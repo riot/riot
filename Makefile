@@ -14,6 +14,8 @@ test:
 	# run the mocha tests
 	@ RIOT=../dist/riot/riot.js ./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha -- test/runner.js -R spec
 
+testnode: eslint raw
+	@ RIOT=../dist/riot/riot.js ./node_modules/mocha/bin/mocha test/node.js
 
 eslint:
 	# check code style

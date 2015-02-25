@@ -4,6 +4,7 @@ var isNode = typeof window === 'undefined'
 describe('Riotjs tests', function() {
   if (isNode) {
 
+    global.isNode = isNode
     global.document = require('jsdom').jsdom('<!doctype html><html><body></body></html>')
     global.window = document.parentWindow
     global.location = window.location
