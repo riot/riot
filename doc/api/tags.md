@@ -5,35 +5,50 @@ nogen: true
 
 # Custom tags
 
-### riot.mount(selector, [tagName], [opts]) | #mount
+### riot.mount(customTagSelector, [opts]) | #mount
 
 Where
 
-- `selector` selects the DOM nodes from the page to be mounted.
-- `tagName` specifies the custom tag name. If this is not given the name equals to the name of the selected DOM node
-- `opts` optional object is passed for the tags to consume
+- `customTagSelector` selects elements from the page and mounts them with a custom tag. The selected elements' name must match the custom tag name.
+- `opts` optional object is passed for the tags to consume. This can be anything, ranging from a simple object to a full application API. Or it can be a Flux- store. Really depends on how you want to structure your client-side applications. Read more about [modular Riot applications](/riotjs/guide/#modularity).
 
 
 ``` js
-// mount all <plans> and <pricing> tags on the page
-var tags = riot.mount('plans, pricing')
+// selects and mounts all <pricing> tags on the page
+var tags = riot.mount('pricing')
 
 // mount all custom tags with a class name .customer
 var tags = riot.mount('.customer')
 
 // mount <account> tag and pass an API object as options
 var tags = riot.mount('account', api)
-
-// mounts custom tag "my-tag" to div#main
-var tags = riot.mount('div#main', 'my-tag')
 ```
 
-The passed options can be anything, ranging from a simple object to a full application API. Or it can be a Flux- store. Really depends on how you want to structure your client-side applications.
+@returns: an array of the mounted [tag instances](#tag-instance)
 
-Internally the selector is passed to `document.querySelectorAll(selector)`. A special Riot specific selector "*" can be used to mount all custom tags on the page:
+### riot.mount('*', [opts]) | #mount-star.
+
+A special Riot specific selector "*" can be used to mount all custom tags on the page:
 
 ``` js
 riot.mount('*')
+```
+
+@returns: an array of the mounted [tag instances](#tag-instance)
+
+
+### riot.mount(selector, tagName, [opts]) | #mount-tag
+
+Where
+
+- `selector` selects any DOM nodes from the page to be mounted
+- `tagName` specifies the custom tag name to be used
+- `opts` optional object is passed for the tags to consume
+
+
+``` js
+// mounts custom tag "my-tag" to div#main and pass api as options
+var tags = riot.mount('div#main', 'my-tag', api)
 ```
 
 @returns: an array of the mounted [tag instances](#tag-instance)
@@ -53,7 +68,7 @@ riot.mountTo(document.getElementById('slide'), 'users', api)
 
 ### riot.mountTo(domNode, tagName, [opts]) | #mount-to
 
-This method is depreciated since *v2.0.11*. This is the same as `riot.mount(domNode, tagName, [opts])
+This method is depreciated since *v2.0.11*. This is the same as `riot.mount(domNode, tagName, [opts])`.
 
 
 ## Tag instance
