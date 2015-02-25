@@ -101,7 +101,7 @@ describe('Tmpl', function() {
 
     window.globalVar = 5
     expect(render('{ globalVar }')).to.equal(window.globalVar)
-    expect(render('{ location.href.split(".").pop() }')).to.equal('html')
+    expect(['about:blank','html']).to.contain(render('{ location.href.split(".").pop() }'))
 
     data.esc = '\'\n\\'
     expect(render('{ esc }')).to.equal(data.esc)
