@@ -7,21 +7,22 @@ describe('Route', function() {
       window.history.replaceState(null, '', window.location.pathname)
     }
   })
-
+  // TODO: refactor these tests
+  // all the undefined must be removed
   it('it detecs the hash params', function() {
 
     riot.route(function(first, second, params) {
       counter++
-      expect(~['mummypowder', '!'].indexOf(first)).to.not.be(false)
-      expect(~['logo-and-key', 'user'].indexOf(second)).to.not.be(false)
-      expect(~[undefined, 'activation?token=xyz'].indexOf(params)).to.not.be(false)
+      expect(['mummypowder', '!']).to.contain(first)
+      expect(['logo-and-key', 'user']).to.contain(second)
+      expect([undefined, 'activation?token=xyz']).to.contain(params)
     })
 
     riot.route.exec(function(first, second, params) {
       counter++
-      expect(~['', '!'].indexOf(first)).to.not.be(false)
-      expect(~[undefined, 'user'].indexOf(second)).to.not.be(false)
-      expect(~[undefined, 'activation?token=xyz'].indexOf(params)).to.not.be(false)
+      expect(['', '!']).to.contain(first)
+      expect([undefined, 'user']).to.contain(second)
+      expect([undefined, 'activation?token=xyz']).to.contain(params)
     })
 
     riot.route('mummypowder/logo-and-key')

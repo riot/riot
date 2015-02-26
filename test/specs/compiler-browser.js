@@ -83,7 +83,6 @@ describe('Compiler Browser', function() {
       }
     }
     unmount(tags)
-    //document.body.removeChild(div)
 
   })
 
