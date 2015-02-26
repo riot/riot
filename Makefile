@@ -11,8 +11,10 @@ WATCH = "\
 
 test:
 	@ make eslint
-	# run the mocha tests
-	@ RIOT=../dist/riot/riot.js node --harmony ./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha -- test/runner.js -R spec
+	# test the node compiler
+	@ ./node_modules/mocha/bin/_mocha test/runner.js -R spec
+	# test riot
+	@ ./node_modules/karma/bin/karma start test/karma.conf.js
 
 
 eslint:
