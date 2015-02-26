@@ -37,13 +37,12 @@
       JS_COMMENT = /\/\*[^\x00]*?\*\//gm
 
 
-
   function compileHTML(html, opts, type) {
 
     var brackets = riot.util.brackets
 
     // whitespace
-    html = html.replace(/\s+/g, ' ')
+    // html = html.replace(/\s+/g, ' ')
 
     // strip comments
     html = html.trim().replace(HTML_COMMENT, '')
