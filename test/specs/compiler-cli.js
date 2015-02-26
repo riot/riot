@@ -11,10 +11,6 @@ describe('Compiler Cli', function() {
     expect(compiler.html(str, { parser: parser, expr: true })).to.equal(resStr)
   }
 
-  beforeEach(function() {
-    riot.settings.brackets = '{ }'
-  })
-
   it('strings', function() {
 
     expect(render('<p/>')).to.equal('<p></p>')
