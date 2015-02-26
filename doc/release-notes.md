@@ -6,6 +6,11 @@ body_id: riot-releases
 
 ====
 
+### 2.0.12 *Feb __, 2015*
+
+- `--whitespace` compiler option to preserve newlines and whitespace on the generated output. Good with nested `pre` and `textarea` elements.
+
+
 ### 2.0.11 *Feb 23, 2015*
 
 - `riot.mount` now accepts the same parameters as `riot.mountTo`, which is now *depreciated*
