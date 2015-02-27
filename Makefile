@@ -19,7 +19,7 @@ test:
 
 eslint:
 	# check code style
-	@ ./node_modules/eslint/bin/eslint.js -c ./.eslintrc lib
+	@ ./node_modules/eslint/bin/eslint.js -c ./.eslintrc lib test
 
 raw:
 	@ mkdir -p $(DIST)
@@ -37,7 +37,7 @@ min: riot
 
 perf: riot
 	# run the performance tests
-	@ node --expose-gc test/performance/mem
+	@ node --harmony --expose-gc test/performance/mem
 
 watch:
 	# watch and rebuild riot and its tests

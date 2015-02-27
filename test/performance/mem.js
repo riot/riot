@@ -20,13 +20,13 @@ var jsdom = require('jsdom'),
 
 /**
  * Check the memory usage analizing the heap
- * @param  { function } fun
+ * @param  { function } fn
  * @return { array } memory used + duration
  */
 
-function measure(fun) {
+function measure(fn) {
   var startTime = Date.now()
-  fun()
+  fn()
   return [process.memoryUsage().heapUsed, Date.now() - startTime]
 }
 
@@ -105,11 +105,9 @@ function test () {
  * Pepare the DOM and mount the riot components
  */
 
-jsdom.env({
-  html: '<!doctype html><html><head></head><body><' + myComponent + ' /></body></html>',
-  done: function (errors, window) {
-    global.document = window.document
-    setTags()
-    test()
-  }
+jsdom.env('<' + myComponent +'/>', function (errors, window) {
+  global.document = window.document
+  console.log(document.body.innerHTML) // <my-component></my-component>
+  setTags()
+  test()
 })
