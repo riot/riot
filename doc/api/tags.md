@@ -68,7 +68,7 @@ riot.mountTo(document.getElementById('slide'), 'users', api)
 
 ### riot.mountTo(domNode, tagName, [opts]) | #mount-to
 
-This method is depreciated since *v2.0.11*. This is the same as `riot.mount(domNode, tagName, [opts])`.
+This method is deprecated since *v2.0.11*. This is the same as `riot.mount(domNode, tagName, [opts])`.
 
 
 ## Tag instance
@@ -252,7 +252,7 @@ riot.tag('tag-name', my_tmpl.innerHTML, function(opts) {
 </script>
 ```
 
-This method is on the edge of being depreciated.
+This method is on the edge of being deprecated.
 
 
 ### riot.update() | #update
