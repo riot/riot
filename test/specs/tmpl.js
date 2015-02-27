@@ -102,6 +102,8 @@ describe('Tmpl', function() {
     window.globalVar = 5
     expect(render('{ globalVar }')).to.equal(window.globalVar)
 
+    expect(render('{ !text }')).to.equal(true)
+
     data.esc = '\'\n\\'
     expect(render('{ esc }')).to.equal(data.esc)
 

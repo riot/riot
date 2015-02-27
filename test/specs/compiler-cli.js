@@ -1,4 +1,4 @@
-describe('Compiler Cli', function() {
+describe('Compiler CLI', function() {
 
   function parser(str) {
     return '@' + str
