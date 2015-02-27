@@ -19,6 +19,7 @@ describe('Riotjs tests', function() {
     require('./specs/tmpl')
     require('./specs/observable')
     require('./specs/route')
+    require('./specs/scoped-css')
 
   } else {
     mocha.run()
