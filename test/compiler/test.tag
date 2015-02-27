@@ -4,6 +4,8 @@
     Foobar
   </textarea>
 
-  this.items = []
-  setTimeout(this.update,0)
+  <script type="text/cs">
+    @items = []
+    setTimeout(this.update,0)
+  </script>
 </test-component>

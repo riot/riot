@@ -92,6 +92,17 @@ riot.mount('*')
 </script>
 ```
 
+If you are loading tags with `script src` and want to get access to the mounted tags you need to wrap the call with `riot.compile` as follows:
+
+```
+<script>
+riot.compile(function() {
+  // here tags are compiled and riot.mount works synchronously
+  var tags = riot.mount('*')
+})
+</script>
+```
+
 
 ### Using
 
@@ -160,10 +171,20 @@ The compile function takes a string and returns a string.
 
 This is the main fruit of pre- compilation. You can use your favourite pre- processor to create custom tags. Both HTML and JavaScript processor can be customized.
 
+The source language is specified with `--type` or `-t` argument on the command line or you can define the language on the script tag as follows:
+
+```
+<my-tag>
+  <h3>My layout</h3>
+
+  <script type="coffeescript">
+    @hello = 'world'
+  </script>
+</my-tag>
+```
+
 
 ### CoffeeScript
-
-The source language is specified with `--type` or `-t` argument:
 
 ``` sh
 # use coffeescript pre-processor
