@@ -14,6 +14,7 @@ describe('Compiler Cli', function() {
   it('strings', function() {
 
     expect(render('<p/>')).to.equal('<p></p>')
+    expect(render('<img src={ a }>')).to.equal('<img riot-src="{ a }">')
     expect(render('<a a={ a }>')).to.equal('<a a="{ a }">')
     expect(render("<a a='{ a }'>")).to.equal('<a a="{ a }">')
     expect(render('<a a={ a } b={ b }>')).to.equal('<a a="{ a }" b="{ b }">')
