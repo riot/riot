@@ -5,6 +5,7 @@
 
   this.foo = { value: 10 }
   this.bar = { value: 20 }
+  this.inner1.echo()
 
   setTimeout(function() {
     this.foo.value = 30
@@ -13,12 +14,19 @@
 
   }.bind(this), 300)
 
+
 </tag-nesting>
 
 <inner1>
   <p>Inner1 foo: { opts.foo.value }</p>
   <p>Inner1 bar: { opts.bar.value }</p>
   <inner2 bar={ opts.bar } />
+  <p name="test"></p>
+
+  echo() {
+    this.test.innerHTML = 'ECHOED'
+  }
+
 </inner1>
 
 <inner2>
