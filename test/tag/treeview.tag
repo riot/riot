@@ -48,7 +48,7 @@
   <!-- TODO: now if is implemented as CSS display, so show must use isFolder as well, which should be removed -->
 
   <ul if={ isFolder() } show={ isFolder() && open }>
-    <li each={ child, i in nodes }>
+    <li _each={ child, i in nodes }>
       <treeitem data={child}></treeitem>
     </li>
     <li onclick={ addChild }>+</li>

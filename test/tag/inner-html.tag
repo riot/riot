@@ -1,7 +1,11 @@
 
 <inner-content>
   var p = this.parent.root
-  while (p.firstChild) this.root.appendChild(p.firstChild)
+
+  while (p.firstChild) {
+    if (this.root == p.firstChild) return
+    this.root.appendChild(p.firstChild)
+  }
 </inner-content>
 
 <inner-html>
