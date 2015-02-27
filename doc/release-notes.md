@@ -13,7 +13,7 @@ body_id: riot-releases
 
 ### 2.0.11 *Feb 23, 2015*
 
-- `riot.mount` now accepts the same parameters as `riot.mountTo`, which is now *depreciated*
+- `riot.mount` now accepts the same parameters as `riot.mountTo`, which is now *deprecated*
 - New `riot.mount(selector, tagName, opts)` allows you to mount a certain tag to any selection of HTML elements
 - `riot.unmount` followed with `riot.mount` now correcly replaces the earlier tag
 - Test suite v1. Expect this to grow in size and functionality. Thanks to [@GianlucaGuarini](https://github.com/GianlucaGuarini)
