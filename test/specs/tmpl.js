@@ -26,7 +26,7 @@ describe('Tmpl', function() {
     expect(render('{ y: 4 > 2 }')).to.equal('y')
     expect(render('{ y: fn() }')).to.equal('y')
     expect(render('{ y: str == "x" }')).to.equal('y')
-    expect(render("{ y: new Date() }")).to.equal('y')
+    expect(render('{ y: new Date() }')).to.equal('y')
 
     expect(render('{ true ? "a b c" : "foo" }')).to.equal('a b c')
     expect(render('{ true ? "a \\"b\\" c" : "foo" }')).to.equal('a "b" c')
@@ -47,7 +47,6 @@ describe('Tmpl', function() {
     expect(render('\\{ 1 }')).to.equal('{ 1 }')
     expect(render('{ "\\}" }')).to.equal('}')
     expect(render('{ "\\{" }')).to.equal('{')
-
 
     expect(render('{ /* comment */ }')).to.be(undefined)
     expect(render(' { /* comment */ }')).to.equal(' ')
