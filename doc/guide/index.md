@@ -142,13 +142,15 @@ You can put `style` tag inside. Riot.js automatically take it out and inject it 
   <style>
     todo { display: block }
     todo h3 { font-size: 120% }
-    /** other awesome stylings **/
+    /** other tag specific styles **/
   </style>
 
 </todo>
 ```
 
-**Scoped CSS** is also available. The example below is equivalent to the first one.
+### Scoped CSS
+
+[Scoped CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/:scope) is also available. The example below is equivalent to the first one.
 
 ```html
 <todo>
@@ -159,7 +161,7 @@ You can put `style` tag inside. Riot.js automatically take it out and inject it 
   <style scoped>
     :scope { display: block }
     h3 { font-size: 120% }
-    /** other awesome stylings **/
+    /** other tag specific styles **/
   </style>
 
 </todo>
