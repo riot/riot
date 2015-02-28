@@ -283,15 +283,15 @@
   }
 
   function compileScripts(fn) {
-    var scripts = doc.querySelectorAll('script[type="riot/tag"]')
+    var scripts = doc.querySelectorAll('script[type="riot/tag"]'), i = 0
 
-    ;[].map.call(scripts, function(script, i) {
+    ;[].map.call(scripts, function(script) {
       var url = script.getAttribute('src')
 
       function compileTag(source) {
         globalEval(source)
 
-        if (i + 1 == scripts.length) {
+        if (++i == scripts.length) {
           promise.trigger('ready')
           ready = true
           fn && fn()
