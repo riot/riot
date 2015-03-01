@@ -7,6 +7,8 @@ describe('Tmpl', function() {
         obj: {val: 2},
         arr: [2],
         x: 2,
+        $a: 0,
+        $b: 1,
         fn: function(s) { return ['hi', s].join(' ') }
       },
       render = function (str) {
@@ -109,6 +111,9 @@ describe('Tmpl', function() {
 
     expect(render('{ x }')).to.equal(2)
     expect(render('{ y: x }')).to.equal('y')
+
+    expect(render('{ $a }')).to.equal(0)
+    expect(render('{ $a + $b }')).to.equal(1)
 
     // maybe / later:
     //expect(render('{ JSON.stringify({ x: 5 }) }')).to.equal('{"x":5}')
