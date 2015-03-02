@@ -71,7 +71,7 @@ riot.observable = function(el) {
 ;(function(riot, evt) {
 
   // browsers only
-  if (!this.top) return
+  if (typeof this == 'undefined' || ! this.top) return
 
   var loc = location,
       fns = riot.observable(),
