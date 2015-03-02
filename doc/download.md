@@ -1,12 +1,10 @@
 
-title: Download Riot
-subtitle: Get Riot
+title: Get Riot
 description: none
 minify: false
 
 base: https://raw.githubusercontent.com/muut/riotjs/master
 cdnjs: https://cdnjs.cloudflare.com/ajax/libs/riot
-version: 2.0
 
 ====
 

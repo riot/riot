@@ -10,6 +10,7 @@
 
 <looped-child>
 
+  <h3>{ opts.el.name }</h3>
   <button onclick={ hit }>{ opts.el.name }</button>
 
   hit(e) {
