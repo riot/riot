@@ -1,8 +1,8 @@
-/* Riot v2.0.11, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v2.0.12, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function() {
 
-  var riot = { version: 'v2.0.11', settings: {} }
+  var riot = { version: 'v2.0.12', settings: {} }
 
   'use strict'
 
@@ -181,8 +181,7 @@ var brackets = (function(orig, s, b) {
 var tmpl = (function() {
 
   var cache = {},
-      re_expr = /({[\s\S]*?})/,
-      re_vars = /(['"\/]).*?[^\\]\1|\.\w*|\w*:|\b(?:(?:new|typeof|in|instanceof) |(?:this|true|false|null|undefined)\b|function *\()|([a-z_]\w*)/gi
+      re_vars = /(['"\/]).*?[^\\]\1|\.\w*|\w*:|\b(?:(?:new|typeof|in|instanceof) |(?:this|true|false|null|undefined)\b|function *\()|([a-z_$]\w*)/gi
               // [ 1               ][ 2  ][ 3 ][ 4                                                                                  ][ 5       ]
               // find variable names:
               // 1. skip quoted strings and regexps: "a b", 'a b', 'a \'b\'', /a b/
@@ -202,14 +201,14 @@ var tmpl = (function() {
   function tmpl(s, p) {
 
     // default template string to {}
-    p = (s || (brackets(0) + brackets(1)))
+    s = (s || (brackets(0) + brackets(1)))
 
       // temporarily convert \{ and \} to a non-character
-      .replace(brackets(/\\{/), '\uFFF0')
-      .replace(brackets(/\\}/), '\uFFF1')
+      .replace(brackets(/\\{/g), '\uFFF0')
+      .replace(brackets(/\\}/g), '\uFFF1')
 
-      // split string to expression and non-expresion parts
-      .split(brackets(re_expr))
+    // split string to expression and non-expresion parts
+    p = split(s, brackets(/{[\s\S]*?}/g))
 
     return new Function('d', 'return ' + (
 
@@ -226,7 +225,7 @@ var tmpl = (function() {
           return i % 2
 
               // evaluate the expressions
-              ? expr(s, 1)
+              ? expr(s, true)
 
               // process string parts of the template:
               : '"' + s
@@ -271,7 +270,7 @@ var tmpl = (function() {
 
         return v.replace(/[^&|=!><]+/g, wrap) + '?"' + k.trim() + '":"",'
 
-      }) + '].join(" ")'
+      }) + '].join(" ").trim()'
 
       // if js expression, evaluate as javascript
       : wrap(s, n)
@@ -294,12 +293,28 @@ var tmpl = (function() {
       + '}finally{return '
 
         // default to empty string for falsy values except zero
-        + (nonull ? '!v&&v!==0?"":v' : 'v')
+        + (nonull === true ? '!v&&v!==0?"":v' : 'v')
 
       + '}}).call(d)'
   }
 
+
+  // a substitute for str.split(re) for IE8
+  // because IE8 doesn't support capturing parenthesis in it
+
+  function split(s, re) {
+    var parts = [], last = 0
+    s.replace(re, function(m, i) {
+      // push matched expression and part before it
+      parts.push(s.slice(last, i), m)
+      last = i + m.length
+    })
+    // push the remaining part
+    return parts.concat(s.slice(last))
+  }
+
 })()
+
 // { key, i in items} -> { key, i, items }
 function loopKeys(expr) {
   var ret = { val: expr },
@@ -342,8 +357,7 @@ function _each(dom, parent, expr) {
     tags.splice(pos, 0, tag)
   }
 
-
-  // clean template code after update (and let walk finish it's parse)
+  // clean template code
   parent.one('update', function() {
     root.removeChild(dom)
 
@@ -407,9 +421,10 @@ function _each(dom, parent, expr) {
           before: nodes[prev_index + 1 + pos],
           parent: parent,
           root: root,
-          loop: true,
           item: item
         })
+
+        tag.mount()
 
         return add(pos, item, tag)
       }
@@ -436,17 +451,31 @@ function _each(dom, parent, expr) {
 
 }
 
-function parseNamedElements(root, tag, expressions) {
+
+function parseNamedElements(root, parent, child_tags) {
+
   walk(root, function(dom) {
     if (dom.nodeType == 1) {
+
+      // custom child tag
+      var child = getTag(dom)
+
+      if (child && !dom.getAttribute('each')) {
+        var tag = new Tag(child, { root: dom, parent: parent })
+        parent.tags[dom.getAttribute('name') || child.name] = tag
+        child_tags.push(tag)
+      }
+
       each(dom.attributes, function(attr) {
-        if (/^(name|id)$/.test(attr.name)) tag[attr.value] = dom
+        if (/^(name|id)$/.test(attr.name)) parent[attr.value] = dom
       })
     }
+
   })
+
 }
 
-function parseLayout(root, tag, expressions) {
+function parseExpressions(root, tag, expressions) {
 
   function addExpr(dom, val, extra) {
     if (val.indexOf(brackets(0)) >= 0) {
@@ -478,15 +507,11 @@ function parseLayout(root, tag, expressions) {
 
     })
 
-    // custom child tag
-    var impl = tag_impl[dom.tagName.toLowerCase()]
-
-    if (impl) {
-      impl = new Tag(impl, { root: dom, parent: tag })
-      return false
-    }
+    // skip custom tags
+    if (getTag(dom)) return false
 
   })
+
 }
 
 function Tag(impl, conf) {
@@ -495,14 +520,18 @@ function Tag(impl, conf) {
       opts = inherit(conf.opts) || {},
       dom = mkdom(impl.tmpl),
       parent = conf.parent,
-      is_loop = conf.loop,
       expressions = [],
+      child_tags = [],
       root = conf.root,
       item = conf.item,
+      fn = impl.fn,
       attr = {},
       loop_dom
 
-  extend(this, { parent: parent, root: root, opts: opts }, item)
+  if (fn && root.riot) return
+  root.riot = true
+
+  extend(this, { parent: parent, root: root, opts: opts, tags: {} }, item)
 
   // grab attributes
   each(root.attributes, function(el) {
@@ -524,54 +553,67 @@ function Tag(impl, conf) {
     self.trigger('updated')
   }
 
+  this.mount = function() {
+
+    updateOpts()
+
+    // initialiation
+    fn && fn.call(self, opts)
+
+    toggle(true)
+
+    // parse layout after init. fn may calculate args for nested custom tags
+    parseExpressions(dom, self, expressions)
+
+    self.update()
+
+    // internal use only, fixes #403
+    self.trigger('premount')
+
+    if (fn) {
+      while (dom.firstChild) root.appendChild(dom.firstChild)
+
+    } else {
+      loop_dom = dom.firstChild
+      root.insertBefore(loop_dom, conf.before || null) // null needed for IE8
+    }
+
+    if (root.stub) self.root = root = parent.root
+    self.trigger('mount')
+
+  }
+
+
   this.unmount = function() {
-    var el = is_loop ? loop_dom : root,
+    var el = fn ? root : loop_dom,
         p = el.parentNode
 
     if (p) {
       if (parent) p.removeChild(el)
       else while (root.firstChild) root.removeChild(root.firstChild)
+      toggle()
       self.trigger('unmount')
-      parent && parent.off('update', self.update).off('unmount', self.unmount)
       self.off('*')
+      delete root.riot
     }
 
   }
 
-  function mount() {
+  function toggle(is_mount) {
 
-    // internal use only, fixes #403
-    self.trigger('premount')
+    // mount/unmount children
+    each(child_tags, function(child) { child[is_mount ? 'mount' : 'unmount']() })
 
-    if (is_loop) {
-      loop_dom = dom.firstChild
-      root.insertBefore(loop_dom, conf.before || null) // null needed for IE8
-
-    } else {
-      while (dom.firstChild) root.appendChild(dom.firstChild)
+    // listen/unlisten parent (events flow one way from parent to children)
+    if (parent) {
+      var evt = is_mount ? 'on' : 'off'
+      parent[evt]('update', self.update)[evt]('unmount', self.unmount)
     }
-
-    if (root.stub) self.root = root = parent.root
-
-    // one way data flow: propagate updates and unmounts downwards from parent to children
-    parent && parent.on('update', self.update).one('unmount', self.unmount)
-
-    self.trigger('mount')
   }
-
-  updateOpts()
 
   // named elements available for fn
-  parseNamedElements(dom, this)
+  parseNamedElements(dom, this, child_tags)
 
-  // fn (initialiation)
-  if (impl.fn) impl.fn.call(this, opts)
-
-  // parse layout after init. fn may calculate args for nested custom tags
-  parseLayout(dom, this, expressions)
-
-  this.update()
-  mount()
 
 }
 
@@ -614,9 +656,13 @@ function update(expressions, tag, item) {
 
     var dom = expr.dom,
         attr_name = expr.attr,
-        value = tmpl(expr.expr, tag)
+        value = tmpl(expr.expr, tag),
+        parent = expr.dom.parentNode
 
     if (value == null) value = ''
+
+    // leave out riot- prefixes from strings inside textarea
+    if (parent && parent.tagName == 'TEXTAREA') value = value.replace(/riot-/g, '')
 
     // no change
     if (expr.value === value) return
@@ -656,7 +702,7 @@ function update(expressions, tag, item) {
       dom.value = value
 
     // <img src="{ expr }">
-    } else if (attr_name.slice(0, 4) == 'riot') {
+    } else if (attr_name.slice(0, 5) == 'riot-') {
       attr_name = attr_name.slice(5)
       value ? dom.setAttribute(attr_name, value) : remAttr(dom, attr_name)
 
@@ -732,6 +778,7 @@ function inherit(parent) {
 }
 
 
+
 /*
  Virtual dom is an array of custom tags on the document.
  Updates and unmounts propagate downwards from parent to children.
@@ -739,6 +786,11 @@ function inherit(parent) {
 
 var virtual_dom = [],
     tag_impl = {}
+
+
+function getTag(dom) {
+  return tag_impl[dom.tagName.toLowerCase()]
+}
 
 function injectStyle(css) {
   var node = document.createElement('style')
@@ -749,13 +801,16 @@ function injectStyle(css) {
 function mountTo(root, tagName, opts) {
   var tag = tag_impl[tagName]
 
-  if (tag && root) {
-    tag = new Tag(tag, { root: root, opts: opts })
+  if (tag && root) tag = new Tag(tag, { root: root, opts: opts })
+
+  if (tag && tag.mount) {
+    tag.mount()
     virtual_dom.push(tag)
     return tag.on('unmount', function() {
       virtual_dom.splice(virtual_dom.indexOf(tag), 1)
     })
   }
+
 }
 
 riot.tag = function(name, html, css, fn) {
@@ -797,7 +852,7 @@ riot.update = function() {
   })
 }
 
-// @depreciated
+// @deprecated
 riot.mountTo = riot.mount
 
 
@@ -810,7 +865,17 @@ riot.mountTo = riot.mount
     'pauseonexit,readonly,required,reversed,scoped,seamless,selected,sortable,spellcheck,translate,truespeed,'+
     'typemustmatch,visible').split(',')
 
+  // these cannot be auto-closed
   var VOID_TAGS = 'area,base,br,col,command,embed,hr,img,input,keygen,link,meta,param,source,track,wbr'.split(',')
+
+
+  /*
+    Following attributes give error when parsed on browser with { exrp_values }
+
+    'd' describes the SVG <path>, Chrome gives error if the value is not valid format
+    https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d
+  */
+  var PREFIX_ATTR = ['style', 'src', 'd']
 
   var HTML_PARSERS = {
     jade: jade
@@ -833,20 +898,20 @@ riot.mountTo = riot.mount
       // (tagname) (html) (javascript) endtag
       CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\/}]>$)?([^\x00]*?)^<\/\1>/gim,
       SCRIPT = /<script(\s+type=['"]?([^>'"]+)['"]?)?>([^\x00]*?)<\/script>/gm,
-      STYLE = /<style(\s+type=['"]?([^>'"]+)['"]?)?>([^\x00]*?)<\/style>/gm,
+      STYLE = /<style(\s+type=['"]?([^>'"]+)['"]?|\s+scoped)?>([^\x00]*?)<\/style>/gm,
+      CSS_SELECTOR = /(^|\}|\{)\s*([^\{\}]+)\s*(?=\{)/g,
+      CSS_COMMENT = /\/\*[^\x00]*?\*\//gm,
       HTML_COMMENT = /<!--.*?-->/g,
       CLOSED_TAG = /<([\w\-]+)([^>]*)\/\s*>/g,
       LINE_COMMENT = /^\s*\/\/.*$/gm,
       JS_COMMENT = /\/\*[^\x00]*?\*\//gm
-
-
 
   function compileHTML(html, opts, type) {
 
     var brackets = riot.util.brackets
 
     // whitespace
-    html = html.replace(/\s+/g, ' ')
+    html = opts.whitespace ? html.replace(/\n/g, '\\n') : html.replace(/\s+/g, ' ')
 
     // strip comments
     html = html.trim().replace(HTML_COMMENT, '')
@@ -859,8 +924,7 @@ riot.mountTo = riot.mount
       if (expr.indexOf(brackets(0)) >= 0) {
         name = name.toLowerCase()
 
-        // <img src> --> <img riot-src>
-        if (/style|src/.test(name)) name = 'riot-' + name
+        if (PREFIX_ATTR.indexOf(name) >= 0) name = 'riot-' + name
 
         // IE8 looses boolean attr values: `checked={ expr }` --> `__checked={ expr }`
         else if (BOOL_ATTR.indexOf(name) >= 0) name = '__' + name
@@ -967,6 +1031,13 @@ riot.mountTo = riot.mount
 
   }
 
+  function scopedCSS (tag, style) {
+    return style.replace(CSS_COMMENT, '').replace(CSS_SELECTOR, function (m, p1, p2) {
+      return p1 + ' ' + p2.split(/\s*,\s*/g).map(function(sel) {
+        return sel[0] == '@' ? sel : tag + ' ' + sel.replace(/:scope\s*/, '')
+      }).join(',')
+    }).trim()
+  }
 
   function compileJS(js, opts, type) {
     var parser = opts.parser || (type ? JS_PARSERS[type] : riotjs)
@@ -980,13 +1051,9 @@ riot.mountTo = riot.mount
     return parser(html)
   }
 
-  function compileCSS(style, styleType) {
-    //TODO: compile LESS, Sass, ...etc.
-
-    style = style.replace(/\s+/g, ' ')
-    style = style.trim()
-    style = style.replace(/'/g, "\\'")
-    return style
+  function compileCSS(style, tag, type) {
+    if (type == 'scoped-css') style = scopedCSS(tag, style)
+    return style.replace(/\s+/g, ' ').replace(/\\/g, '\\\\').replace(/'/g, "\\'").trim()
   }
 
   function mktag(name, html, css, js) {
@@ -1029,7 +1096,8 @@ riot.mountTo = riot.mount
       var styleType = 'css'
 
       html = html.replace(STYLE, function(_, fullType, _type, _style) {
-        if (_type) styleType = _type.replace('text/', '')
+        if (fullType && 'scoped' == fullType.trim()) styleType = 'scoped-css'
+          else if (_type) styleType = _type.replace('text/', '')
         style = _style
         return ''
       })
@@ -1037,7 +1105,7 @@ riot.mountTo = riot.mount
       return mktag(
         tagName,
         compileHTML(html, opts, type),
-        compileCSS(style, styleType),
+        compileCSS(style, tagName, styleType),
         compileJS(js, opts, type)
       )
 
@@ -1051,7 +1119,8 @@ riot.mountTo = riot.mount
     this.riot = require(process.env.RIOT || '../riot')
     return module.exports = {
       html: compileHTML,
-      compile: compile
+      compile: compile,
+      style: compileCSS
     }
   }
 
@@ -1156,11 +1225,10 @@ riot.mountTo = riot.mount
     return ret
   }
 
-  // @depreciated
+  // @deprecated
   riot.mountTo = riot.mount
 
-})(!this.top)
-  
+})(!this.top)  
   // share methods for other riot parts, e.g. compiler
   riot.util = { brackets: brackets, tmpl: tmpl }
 

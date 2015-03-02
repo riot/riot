@@ -7,7 +7,17 @@
     'pauseonexit,readonly,required,reversed,scoped,seamless,selected,sortable,spellcheck,translate,truespeed,'+
     'typemustmatch,visible').split(',')
 
+  // these cannot be auto-closed
   var VOID_TAGS = 'area,base,br,col,command,embed,hr,img,input,keygen,link,meta,param,source,track,wbr'.split(',')
+
+
+  /*
+    Following attributes give error when parsed on browser with { exrp_values }
+
+    'd' describes the SVG <path>, Chrome gives error if the value is not valid format
+    https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d
+  */
+  var PREFIX_ATTR = ['style', 'src', 'd']
 
   var HTML_PARSERS = {
     jade: jade
@@ -30,19 +40,20 @@
       // (tagname) (html) (javascript) endtag
       CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\/}]>$)?([^\x00]*?)^<\/\1>/gim,
       SCRIPT = /<script(\s+type=['"]?([^>'"]+)['"]?)?>([^\x00]*?)<\/script>/gm,
-      STYLE = /<style(\s+type=['"]?([^>'"]+)['"]?)?>([^\x00]*?)<\/style>/gm,
+      STYLE = /<style(\s+type=['"]?([^>'"]+)['"]?|\s+scoped)?>([^\x00]*?)<\/style>/gm,
+      CSS_SELECTOR = /(^|\}|\{)\s*([^\{\}]+)\s*(?=\{)/g,
+      CSS_COMMENT = /\/\*[^\x00]*?\*\//gm,
       HTML_COMMENT = /<!--.*?-->/g,
       CLOSED_TAG = /<([\w\-]+)([^>]*)\/\s*>/g,
       LINE_COMMENT = /^\s*\/\/.*$/gm,
       JS_COMMENT = /\/\*[^\x00]*?\*\//gm
-
 
   function compileHTML(html, opts, type) {
 
     var brackets = riot.util.brackets
 
     // whitespace
-    // html = html.replace(/\s+/g, ' ')
+    html = opts.whitespace ? html.replace(/\n/g, '\\n') : html.replace(/\s+/g, ' ')
 
     // strip comments
     html = html.trim().replace(HTML_COMMENT, '')
@@ -55,8 +66,7 @@
       if (expr.indexOf(brackets(0)) >= 0) {
         name = name.toLowerCase()
 
-        // <img src> --> <img riot-src>
-        if (/style|src/.test(name)) name = 'riot-' + name
+        if (PREFIX_ATTR.indexOf(name) >= 0) name = 'riot-' + name
 
         // IE8 looses boolean attr values: `checked={ expr }` --> `__checked={ expr }`
         else if (BOOL_ATTR.indexOf(name) >= 0) name = '__' + name
@@ -163,6 +173,13 @@
 
   }
 
+  function scopedCSS (tag, style) {
+    return style.replace(CSS_COMMENT, '').replace(CSS_SELECTOR, function (m, p1, p2) {
+      return p1 + ' ' + p2.split(/\s*,\s*/g).map(function(sel) {
+        return sel[0] == '@' ? sel : tag + ' ' + sel.replace(/:scope\s*/, '')
+      }).join(',')
+    }).trim()
+  }
 
   function compileJS(js, opts, type) {
     var parser = opts.parser || (type ? JS_PARSERS[type] : riotjs)
@@ -176,13 +193,9 @@
     return parser(html)
   }
 
-  function compileCSS(style, styleType) {
-    //TODO: compile LESS, Sass, ...etc.
-
-    style = style.replace(/\s+/g, ' ')
-    style = style.trim()
-    style = style.replace(/'/g, "\\'")
-    return style
+  function compileCSS(style, tag, type) {
+    if (type == 'scoped-css') style = scopedCSS(tag, style)
+    return style.replace(/\s+/g, ' ').replace(/\\/g, '\\\\').replace(/'/g, "\\'").trim()
   }
 
   function mktag(name, html, css, js) {
@@ -225,7 +238,8 @@
       var styleType = 'css'
 
       html = html.replace(STYLE, function(_, fullType, _type, _style) {
-        if (_type) styleType = _type.replace('text/', '')
+        if (fullType && 'scoped' == fullType.trim()) styleType = 'scoped-css'
+          else if (_type) styleType = _type.replace('text/', '')
         style = _style
         return ''
       })
@@ -233,7 +247,7 @@
       return mktag(
         tagName,
         compileHTML(html, opts, type),
-        compileCSS(style, styleType),
+        compileCSS(style, tagName, styleType),
         compileJS(js, opts, type)
       )
 
@@ -247,7 +261,8 @@
     this.riot = require(process.env.RIOT || '../riot')
     return module.exports = {
       html: compileHTML,
-      compile: compile
+      compile: compile,
+      style: compileCSS
     }
   }
 
@@ -283,15 +298,15 @@
   }
 
   function compileScripts(fn) {
-    var scripts = doc.querySelectorAll('script[type="riot/tag"]'), i = 0
+    var scripts = doc.querySelectorAll('script[type="riot/tag"]')
 
-    ;[].map.call(scripts, function(script) {
+    ;[].map.call(scripts, function(script, i) {
       var url = script.getAttribute('src')
 
       function compileTag(source) {
         globalEval(source)
 
-        if (++i == scripts.length) {
+        if (i + 1 == scripts.length) {
           promise.trigger('ready')
           ready = true
           fn && fn()
@@ -352,7 +367,7 @@
     return ret
   }
 
-  // @depreciated
+  // @deprecated
   riot.mountTo = riot.mount
 
 })(!this.top)

@@ -1,6 +1,6 @@
 {
   "name": "riot",
-  "version": "2.0.11",
+  "version": "2.0.12",
   "description": "A React- like, 3.5K user interface library",
   "repository": "muut/riotjs",
   "license": "MIT",
