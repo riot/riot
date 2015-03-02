@@ -78,6 +78,8 @@ Following properties are set for each tag instance:
 - `opts` - the options object
 - `parent` - the parent tag if any
 - `root` - root DOM node
+- `tags` - nested custom tags
+
 
 You can use these references in both the HTML and JavaScript code. For example:
 
@@ -97,6 +99,49 @@ You can freely set any data to the instance (aka "context") and they are availab
   <h3>{ title }</h3>
 
   this.title = opts.title
+</my-tag>
+```
+
+### Nested tags
+
+You have access to nested tag instances via `tags` variable:
+
+``` html
+<my-tag>
+
+  <child></child>
+
+  // access to child tag
+  var child = this.tags.child
+
+</my-tag>
+```
+
+You can also use the `name` attribute to give another name for the nested tag.
+
+``` html
+<my-tag>
+
+  <child name="my_nested_tag"></child>
+
+  // access to child tag
+  var child = this.tags.my_nested_tag
+
+</my-tag>
+```
+
+The child tags are initialized after the parent tag so the methods and properties are available on the "mount" event.
+
+``` html
+<my-tag>
+
+  <child name="my_nested_tag"></child>
+
+  // access to child tag methods
+  this.on('mount', function() {
+    this.tags.my_nested_tag.someMethod()
+  })
+
 </my-tag>
 ```
 
