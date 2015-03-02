@@ -241,9 +241,10 @@ Inside the tag the options can be referenced with the `opts` variable as follows
 
 Tag is created in following sequence:
 
-1. Tag's JavaScript logic is executed
-2. HTML expressions are calculated and "update" event is fired
-3. Tag is mounted on the page and "mount" event is fired
+1. Tag is constructed
+2. Tag's JavaScript logic is executed
+3. HTML expressions are calculated and "update" event is fired
+4. Tag is mounted on the page and "mount" event is fired
 
 After the tag is mounted the expressions are updated as follows:
 
