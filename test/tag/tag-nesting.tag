@@ -1,11 +1,11 @@
 
 <tag-nesting>
 
-  <inner1 bar="{ bar }" foo={ foo } />
+  <inner1 name="my_name" bar="{ bar }" foo={ foo } />
 
   this.foo = { value: 10 }
   this.bar = { value: 20 }
-  this.inner1.echo()
+  this.tags.my_name.echo()
 
   setTimeout(function() {
     this.foo.value = 30
@@ -24,7 +24,7 @@
   <p name="test"></p>
 
   echo() {
-    this.test.innerHTML = 'ECHOED'
+    this.test.innerHTML = '+ECHOED+'
   }
 
 </inner1>

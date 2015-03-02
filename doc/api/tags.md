@@ -60,7 +60,7 @@ Mount a custom tag named tagName on a given domNode passing optional data with o
 
 ```
 // mounts "my-tag" to given DOM node
-riot.mountTo(document.getElementById('slide'), 'users', api)
+riot.mount(document.getElementById('slide'), 'users', api)
 ```
 
 @returns: mounted [tag instance](#tag-instance)
