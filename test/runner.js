@@ -2,7 +2,6 @@ var isNode = typeof window === 'undefined'
 
 describe('Riot Tests', function() {
   if (isNode) {
-    global.window = global
     global.riot = require('../lib/node')
     global.compiler = require('../lib/compiler')
     global.expect = require('expect.js')
