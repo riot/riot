@@ -6,10 +6,15 @@ body_id: riot-releases
 
 ====
 
-### 2.0.12 *Feb __, 2015*
+### 2.0.12 *Mar 2, 2015*
 
+- Support for [Scoped CSS](/riotjs/guide/#scoped-css)
+- Direct access to nested tags and their API via `tags` variable. For example: `tags.my_timer.clear()`
+- The custom tags are now constructed on parse time and initialized on mount time. This is preliminary work for the upcoming [plugin system](https://github.com/muut/riotjs/issues/416) and allows plugins to do their thing before initialization as well.
 - `--whitespace` compiler option to preserve newlines and whitespace on the generated output. Good with nested `pre` and `textarea` elements.
+- Using [Karma](http://karma-runner.github.io/0.12/index.html) for cross browser testing
 - *WARNING* the deprecated `riot.mountTo` will be removed on the next release
+
 
 ### 2.0.11 *Feb 23, 2015*
 
