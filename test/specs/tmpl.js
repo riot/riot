@@ -22,7 +22,7 @@ describe('Tmpl', function() {
   it('compiles specs', function() {
 
     expect(render('{ a: !no, b: yes }')).to.equal('a b')
-    expect(render("{ 'a b': yes }")).to.equal('a b')
+    expect(render('{ "a b": yes }')).to.equal('a b')
     expect(render('{ "a_b-c3": yes }')).to.equal('a_b-c3')
     expect(render('{ y: false || null || !no && yes }')).to.equal('y')
     expect(render('{ y: 4 > 2 }')).to.equal('y')
@@ -100,8 +100,8 @@ describe('Tmpl', function() {
     expect(render('{ nonExistingVar ? "yes" : "no" }')).to.equal('no')
     expect(render('{ !nonExistingVar ? "yes" : "no" }')).to.equal('yes')
 
-    window.globalVar = 5
-    expect(render('{ globalVar }')).to.equal(window.globalVar)
+    globalVar = 5
+    expect(render('{ globalVar }')).to.equal(globalVar)
 
     expect(render('{ !text }')).to.equal(true)
 
