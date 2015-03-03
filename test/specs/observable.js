@@ -126,6 +126,50 @@ describe('Observable', function() {
 
   })
 
+  it('listen all the events', function() {
+
+    function func() {
+      if (!counter) {
+        expect(arguments[0]).to.be('a')
+        expect(arguments[1]).to.be('foo')
+        expect(arguments[2]).to.be('bar')
+      } else {
+        expect(['b', 'c']).to.contain(arguments[0])
+      }
+      counter++
+    }
+
+    el.on('all', func)
+
+    el.trigger('a', 'foo', 'bar')
+    el.trigger('b')
+    el.trigger('c')
+
+    expect(counter).to.be(3)
+
+  })
+
+  it('listen all the events only once', function() {
+
+    function func() {
+      if (!counter) {
+        expect(arguments[0]).to.be('a')
+        expect(arguments[1]).to.be('foo')
+        expect(arguments[2]).to.be('bar')
+      }
+      counter++
+    }
+
+    el.one('all', func)
+
+    el.trigger('a', 'foo', 'bar')
+    el.trigger('b')
+    el.trigger('c')
+
+    expect(counter).to.be(1)
+
+  })
+
   it('Multiple arguments', function() {
 
     el.on('j', function(a, b) {
