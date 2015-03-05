@@ -38,6 +38,8 @@ $ make riot
 
   We use [Github Issues](https://github.com/muut/riotjs/issues) as the Riot.js bug tracker. The best way to get your bug fixed is to provide a reduced test case. jsFiddle, jsBin, and other sites provide a way to give live examples.
 
+- [Riot.js Bug Report Template](http://jsfiddle.net/cognitom/wf7bkvur/) on jsFiddle
+
 ### Adding a new Demo
 
   Please just add a link to the bottom of the README.md file
