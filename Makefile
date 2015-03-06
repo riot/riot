@@ -37,7 +37,7 @@ min: riot
 
 perf: riot
 	# run the performance tests
-	@ iojs --expose-gc test/performance/mem
+	@ node --harmony --expose-gc test/performance/mem
 
 watch:
 	# watch and rebuild riot and its tests

@@ -4,19 +4,38 @@
  *
  */
 
-var jsdom = require('jsdom'),
-  riot = require('../../dist/riot/riot'),
+var riot = require('../../dist/riot/riot'),
+  jsdom = require('jsdom').jsdom,
   myComponent = 'my-component',
   myComponentHTML = [
     '<h1>{ opts.title }</h1>',
     '<p>{ opts.description }</p>',
-    '<my-list-item each="{ opts.items }">'
+      '<my-list-item each="{ opts.items }">'
   ].join(''),
   myListItem = 'my-list-item',
   myListItemHTML = [
     '<input type="checkbox" onchange="{ onChange }">',
-    '<span if="{ opts.isActive }">I am active</span>'
+    '<span if="{ opts.isActive }">I am active</span>',
   ].join('')
+
+
+/**
+ * Helper function to generate custom array
+ * @param  { int } amount amount of entries in the array
+ * @param  { * } data
+ * @return array
+ */
+
+
+function generateItems (amount) {
+  var items = []
+  while (--amount) {
+    items.push({
+      isActive: false
+    })
+  }
+  return items
+}
 
 /**
  * Check the memory usage analizing the heap
@@ -36,7 +55,7 @@ function measure(fn) {
  *
  */
 
-function setTags() {
+function setupTags() {
   riot.tag(myComponent, myComponentHTML, function(opts) {
     var self = this
     function loop () {
@@ -75,39 +94,12 @@ function mount() {
   })
 }
 
-/**
- * Helper function to generate custom array
- * @param  { int } amount amount of entries in the array
- * @param  { * } data
- * @return array
- */
 
-function generateItems(amount, data) {
-  var items = []
-  while (--amount) {
-    items.push(data)
-  }
-  return items
-}
+// Initialize the test
+var doc = jsdom('<' + myComponent + '/>')
+global.window = doc.defaultView
+global.document = window.document
+global.gc()
+setupTags()
+mount()
 
-/**
- *
- * Start the tests
- *
- */
-
-function test () {
-  global.gc()
-  mount()
-}
-
-/**
- * Pepare the DOM and mount the riot components
- */
-
-jsdom.env('<' + myComponent +'/>', function (errors, window) {
-  global.document = window.document
-  console.log(document.body.innerHTML) // <my-component></my-component>
-  setTags()
-  test()
-})

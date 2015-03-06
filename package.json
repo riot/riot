@@ -42,7 +42,7 @@
   "devDependencies": {
     "eslint": "^0.15.0",
     "expect.js": "^0.3.1",
-    "glob": "^4.4.1",
+    "glob": "^5.0.0",
     "jsdom": "^4.0.1",
     "karma": "^0.12.31",
     "karma-coverage": "^0.2.7",
