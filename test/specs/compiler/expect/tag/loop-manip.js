@@ -1,19 +1,18 @@
 
-riot.tag('loop-manip', '<li each="{ item in items }"> { item.title } <a onclick="{ parent.remove }">remove</a> </li> <button onclick="{ top }">Top</button> <button onclick="{ bottom }">Bottom</button>', function(opts) {
+riot.tag('loop-manip', '<li each="{ item, i in items }"> { item } <a onclick="{ parent.remove }">remove</a> </li> <button onclick="{ top }">Top</button> <button onclick="{ bottom }">Bottom</button>', function(opts) {
 
-  this.items = [{ title: 'First' }, { title: 'Second' }]
+  this.items = [0,1,2,3,4,5]
 
   this.bottom = function(e) {
-    this.items.push({ title: Math.random() })
+    this.items.push(100)
   }.bind(this);
 
   this.top = function() {
-    this.items.unshift({ title: Math.random() })
+    this.items.unshift(100)
   }.bind(this);
 
   this.remove = function(e) {
-    var i = this.items.indexOf(e.item.item)
-    this.items.splice(i, 1)
+    this.items.splice(e.item.i, 1)
   }.bind(this);
 
 
