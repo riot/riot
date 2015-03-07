@@ -15,7 +15,7 @@ var riot = require('../../dist/riot/riot'),
   myListItem = 'my-list-item',
   myListItemHTML = [
     '<input type="checkbox" onchange="{ onChange }">',
-    '<span if="{ opts.isActive }">I am active</span>',
+    '<span if="{ opts.isActive }">I am active</span>'
   ].join('')
 
 
