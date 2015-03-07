@@ -7,7 +7,7 @@ describe('Riot Tests', function() {
     global.expect = require('expect.js')
     require('./specs/node')
     require('./specs/tmpl')
-    require('./specs/compiler-cli') // TODO: fix some tests
+    require('./specs/compiler-cli')
   } else {
     mocha.run()
   }
