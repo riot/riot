@@ -8,10 +8,18 @@ module.exports = function(config) {
           'karma-coverage',
           'karma-phantomjs-launcher'
       ],
+      proxies: {
+        '/tag/': '/base/tag/'
+      },
       files: [
           '../node_modules/mocha/mocha.js',
           '../node_modules/expect.js/index.js',
           '../dist/riot/riot+compiler.js',
+          {
+            pattern: 'tag/*.tag',
+            served: true,
+            included: false
+          },
           'specs/compiler-browser.js',
           'specs/observable.js',
           'specs/route.js',
