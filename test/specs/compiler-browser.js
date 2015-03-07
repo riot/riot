@@ -86,7 +86,7 @@ describe('Compiler Browser', function() {
 
   })
 
-  it('compiles', function(done) {
+  it('compiles', function() {
 
     tags.push(riot.mount('timetable', { start: 0 }))[0]
     expect(document.getElementsByTagName('timer').length).to.be(3)
@@ -104,8 +104,6 @@ describe('Compiler Browser', function() {
     }
 
     expect(+new Date() - begin).to.be.below(100)
-
-    done()
 
   })
 
