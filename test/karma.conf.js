@@ -14,9 +14,9 @@ module.exports = function(config) {
           '../dist/riot/riot+compiler.js',
           'specs/compiler-browser.js',
           'specs/observable.js',
+          'specs/route.js',
           'specs/tmpl.js',
-          'specs/speed.js',
-          'specs/route.js'
+          'specs/speed.js'
       ],
       browsers: ['PhantomJS'],
 
