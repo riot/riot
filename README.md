@@ -95,12 +95,10 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
 - [Another flux demo caparable to React ones](http://txchen.github.io/feplay/riot_flux)
 - [Various experiments](http://richardbondi.net/programming/riot)
-- [Hackernews reader](http://git.io/riot-hn)
-- [Riotjs TodoMvc](https://github.com/txchen/feplay/tree/gh-pages/riot_todo)
-
 
 ### Tutorials
 - [Building Apps with Riot, ES6 and Webpack](http://blog.srackham.com/posts/riot-es6-webpack-apps/)
+- [Building Apps with Riot, Babel and Browserify](https://github.com/txchen/feplay/tree/gh-pages/riot_babel)
 - [Building tabs with Riot](http://www.robertwpearce.com/blog/riotjs-example/)
 - [The "React tutorial" for Riot](https://juriansluiman.nl/article/154/the-react-tutorial-for-riot)
 - [How to package "tag libraries" in Riot](https://github.com/ivan-saorin/riot-tutorial-tags-pack-app)
@@ -126,4 +124,3 @@ https://muut.com/riotjs/
 [npm-url]: https://npmjs.org/package/riot
 [npm-version-image]: http://img.shields.io/npm/v/riot.svg?style=flat-square
 [npm-downloads-image]: http://img.shields.io/npm/dm/riot.svg?style=flat-square
-
