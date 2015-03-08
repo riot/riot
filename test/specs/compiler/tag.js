@@ -11,6 +11,13 @@ describe('Compile Tag', function() {
     return fs.readFileSync(path.join(__dirname, dir, filename)).toString()
   }
 
+  it('changes brackets', function() {
+    riot.settings.brackets = '${ }' // set custom brackets
+    var file = 'brackets.tag'
+    expect(render(cat('fixtures', file))).to.equal(cat('expect', file.replace(/\.tag$/, '.js')))
+    riot.settings.brackets = '' // set back to default
+  })
+
   describe('compiles all files in `test/tag` dir', function() {
     var tagDir = path.join(__dirname, '..', '..', 'tag')
     fs.readdirSync(tagDir).map(function(filename) {
