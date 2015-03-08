@@ -18,6 +18,13 @@ describe('Compile Tag', function() {
     riot.settings.brackets = '' // set back to default
   })
 
+  it('allows single line custom tag', function() {
+    expect(render('<my-tag><p>TEST</p></my-tag>'))
+        .to.equal('riot.tag(\'my-tag\', \'<p>TEST</p>\', function(opts) {\n});')
+    expect(render('<my-tag>TEST</my-tag>'))
+        .to.equal('riot.tag(\'my-tag\', \'TEST\', function(opts) {\n});')
+  })
+
   describe('compiles all files in `test/tag` dir', function() {
     var tagDir = path.join(__dirname, '..', '..', 'tag')
     fs.readdirSync(tagDir).map(function(filename) {
