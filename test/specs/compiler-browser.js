@@ -43,7 +43,7 @@ describe('Compiler Browser', function() {
 
           '<inner>',
           ' <p>',
-          '   { value }',
+          '   { opts.value }',
           ' <\/p>',
           '<\/inner>',
 
@@ -52,7 +52,10 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\">',
 
           '<outer>',
-          '<inner each="{ opts.data }"><\/inner>',
+          '   <div each="{ data, i in opts.data }">',
+          '     <span>{ i }<\/span>',
+          '     <inner value="{ data.value }"><\/inner>',
+          '   <\/div>',
           '<\/outer>',
 
           '<\/script>',
@@ -176,6 +179,7 @@ describe('Compiler Browser', function() {
       }
 
       tag = riot.mount(tagId, {data: data})[0]
+      // comment the following line to check the rendered html
       tags.push(tag)
 
     }
@@ -185,10 +189,13 @@ describe('Compiler Browser', function() {
     mountTag('#outer3')
 
     expect(outer1.getElementsByTagName('inner').length).to.be(4)
+    expect(outer1.getElementsByTagName('span').length).to.be(4)
     expect(outer1.getElementsByTagName('p').length).to.be(4)
     expect(outer2.getElementsByTagName('inner').length).to.be(4)
+    expect(outer2.getElementsByTagName('span').length).to.be(4)
     expect(outer2.getElementsByTagName('p').length).to.be(4)
     expect(outer3.getElementsByTagName('inner').length).to.be(4)
+    expect(outer3.getElementsByTagName('span').length).to.be(4)
     expect(outer3.getElementsByTagName('p').length).to.be(4)
 
   })
