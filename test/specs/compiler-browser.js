@@ -52,8 +52,7 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\">',
 
           '<outer>',
-          '<inner each="{ opts.data }">',
-          '<inner>',
+          '<inner each="{ opts.data }"><\/inner>',
           '<\/outer>',
 
           '<\/script>',
@@ -177,7 +176,6 @@ describe('Compiler Browser', function() {
       }
 
       tag = riot.mount(tagId, {data: data})[0]
-      // comment the following line to see the bug
       tags.push(tag)
 
     }
