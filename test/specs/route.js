@@ -14,7 +14,7 @@ describe('Route', function() {
     riot.route(function(first, second, params) {
       counter++
       expect(['mummypowder', '!']).to.contain(first)
-      expect(['logo-and-key', 'user']).to.contain(second)
+      expect(['logo-and-key', 'user', 'http%3A%2F%2Fxxx.yyy']).to.contain(second)
       expect([undefined, 'activation?token=xyz']).to.contain(params)
     })
 
@@ -46,7 +46,9 @@ describe('Route', function() {
 
     riot.route('!/user/activation?token=xyz')
 
-    expect(counter).to.be(3)
+    riot.route('mummypowder/http%3A%2F%2Fxxx.yyy')
+
+    expect(counter).to.be(4)
 
   })
 })
