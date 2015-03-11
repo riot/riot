@@ -52,14 +52,14 @@
 
     var brackets = riot.util.brackets
 
+    // foo={ bar } --> foo="{ bar }"
+    html = html.replace(brackets(QUOTE), '="$1"$2')
+
     // whitespace
     html = opts.whitespace ? html.replace(/\n/g, '\\n') : html.replace(/\s+/g, ' ')
 
     // strip comments
     html = html.trim().replace(HTML_COMMENT, '')
-
-    // foo={ bar } --> foo="{ bar }"
-    html = html.replace(brackets(QUOTE), '="$1"$2')
 
     // alter special attribute names
     html = html.replace(SET_ATTR, function(full, name, _, expr) {
@@ -260,9 +260,10 @@
   if (is_server) {
     this.riot = require(process.env.RIOT || '../riot')
     return module.exports = {
-      html: compileHTML,
       compile: compile,
-      style: compileCSS
+      html: compileHTML,
+      style: compileCSS,
+      js: compileJS
     }
   }
 

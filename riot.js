@@ -1,8 +1,8 @@
-/* Riot v2.0.12, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v2.0.13, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function() {
 
-  var riot = { version: 'v2.0.12', settings: {} }
+  var riot = { version: 'v2.0.13', settings: {} }
 
   'use strict'
 
@@ -62,6 +62,10 @@ riot.observable = function(el) {
       }
     }
 
+    if (callbacks.all && name != 'all') {
+      el.trigger.apply(el, ['all', name].concat(args))
+    }
+
     return el
   }
 
@@ -79,7 +83,7 @@ riot.observable = function(el) {
       current
 
   function hash() {
-    return loc.hash.slice(1)
+    return loc.href.split('#')[1] || ''
   }
 
   function parser(path) {
@@ -165,13 +169,14 @@ var brackets = (function(orig, s, b) {
     if (b != s) b = s.split(' ')
 
     // if regexp given, rewrite it with current brackets (only if differ from default)
-    // else, get brackets
     return x && x.test
       ? s == orig
         ? x : RegExp(x.source
                       .replace(/\{/g, b[0].replace(/(?=.)/g, '\\'))
                       .replace(/\}/g, b[1].replace(/(?=.)/g, '\\')),
                     x.global ? 'g' : '')
+
+      // else, get specific bracket
       : b[x]
 
   }
@@ -208,7 +213,7 @@ var tmpl = (function() {
       .replace(brackets(/\\}/g), '\uFFF1')
 
     // split string to expression and non-expresion parts
-    p = split(s, brackets(/{[\s\S]*?}/g))
+    p = split(s, extract(s, brackets(/{/), brackets(/}/)))
 
     return new Function('d', 'return ' + (
 
@@ -258,7 +263,7 @@ var tmpl = (function() {
       // convert new lines to spaces
       .replace(/\n/g, ' ')
 
-      // trim whitespace, curly brackets, strip comments
+      // trim whitespace, brackets, strip comments
       .replace(brackets(/^[{ ]+|[ }]+$|\/\*.+?\*\//g), '')
 
     // is it an object literal? i.e. { key : value }
@@ -266,11 +271,29 @@ var tmpl = (function() {
 
       // if object literal, return trueish keys
       // e.g.: { show: isOpen(), done: item.done } -> "show done"
-      ? '[' + s.replace(/\W*([\w- ]+)\W*:([^,]+)/g, function(_, k, v) {
+      ? '[' +
 
-        return v.replace(/[^&|=!><]+/g, wrap) + '?"' + k.trim() + '":"",'
+          // extract key:val pairs, ignoring any nested objects
+          extract(s,
 
-      }) + '].join(" ").trim()'
+              // name part: name:, "name":, 'name':, name :
+              /["' ]*[\w- ]+["' ]*:/,
+
+              // expression part: everything upto a comma followed by a name (see above) or end of line
+              /,(?=["' ]*[\w- ]+["' ]*:)|}|$/
+              ).map(function(pair) {
+
+                // get key, val parts
+                return pair.replace(/^[ "']*(.+?)[ "']*: *(.+?),? *$/, function(_, k, v) {
+
+                  // wrap all conditional parts to ignore errors
+                  return v.replace(/[^&|=!><]+/g, wrap) + '?"' + k + '":"",'
+
+                })
+
+              }).join('')
+
+        + '].join(" ").trim()'
 
       // if js expression, evaluate as javascript
       : wrap(s, n)
@@ -285,7 +308,7 @@ var tmpl = (function() {
     return !s ? '' : '(function(v){try{v='
 
         // prefix vars (name => data.name)
-        + (s.replace(re_vars, function(s, _, v) { return v ? '(d.'+v+'===undefined?window.'+v+':d.'+v+')' : s })
+        + (s.replace(re_vars, function(s, _, v) { return v ? '(d.'+v+'===undefined?'+(typeof window == 'undefined' ? 'global.' : 'window.')+v+':d.'+v+')' : s })
 
           // break the expression if its empty (resulting in undefined value)
           || 'x')
@@ -299,18 +322,46 @@ var tmpl = (function() {
   }
 
 
-  // a substitute for str.split(re) for IE8
-  // because IE8 doesn't support capturing parenthesis in it
+  // split string by an array of substrings
 
-  function split(s, re) {
-    var parts = [], last = 0
-    s.replace(re, function(m, i) {
+  function split(str, substrings) {
+    var parts = []
+    substrings.map(function(sub, i) {
+
       // push matched expression and part before it
-      parts.push(s.slice(last, i), m)
-      last = i + m.length
+      i = str.indexOf(sub)
+      parts.push(str.slice(0, i), sub)
+      str = str.slice(i + sub.length)
     })
+
     // push the remaining part
-    return parts.concat(s.slice(last))
+    return parts.concat(str)
+  }
+
+
+  // match strings between opening and closing regexp, skipping any inner/nested matches
+
+  function extract(str, open, close) {
+
+    var start,
+        level = 0,
+        matches = [],
+        re = new RegExp('('+open.source+')|('+close.source+')', 'g')
+
+    str.replace(re, function(_, open, close, pos) {
+
+      // if outer inner bracket, mark position
+      if(!level && open) start = pos
+
+      // in(de)crease bracket level
+      level += open ? 1 : -1
+
+      // if outer closing bracket, grab the match
+      if(!level && close != null) matches.push(str.slice(start, pos+close.length))
+
+    })
+
+    return matches
   }
 
 })()
@@ -387,7 +438,22 @@ function _each(dom, parent, expr) {
     }
 
     // unmount redundant
-    each(arrDiff(rendered, items), function(item) {
+    each(rendered, function(item) {
+      if (item instanceof Object) {
+        // skip existing items
+        if (items.indexOf(item) > -1) {
+          return
+        }
+      } else {
+        // find all non-objects
+        var newItems = arrFindEquals(items, item),
+            oldItems = arrFindEquals(rendered, item)
+
+        // if more or equal amount, no need to remove
+        if (newItems.length >= oldItems.length) {
+          return
+        }
+      }
       var pos = rendered.indexOf(item),
           tag = tags[pos]
 
@@ -400,8 +466,8 @@ function _each(dom, parent, expr) {
     })
 
     // mount new / reorder
-    var nodes = root.childNodes,
-        prev_index = [].indexOf.call(nodes, prev)
+    var nodes = [].slice.call(root.childNodes),
+        prev_index = nodes.indexOf(prev)
 
     each(items, function(item, i) {
 
@@ -413,8 +479,20 @@ function _each(dom, parent, expr) {
       pos < 0 && (pos = items.lastIndexOf(item, i))
       oldPos < 0 && (oldPos = rendered.lastIndexOf(item, i))
 
+      if (!(item instanceof Object)) {
+        // find all non-objects
+        var newItems = arrFindEquals(items, item),
+            oldItems = arrFindEquals(rendered, item)
+
+        // if more, should mount one new
+        if (newItems.length > oldItems.length) {
+          oldPos = -1
+        }
+      }
+
       // mount new
       if (oldPos < 0) {
+        rendered.push(item)
         if (!checksum && expr.key) item = mkitem(expr, item, pos)
 
         var tag = new Tag({ tmpl: template }, {
@@ -463,6 +541,9 @@ function parseNamedElements(root, parent, child_tags) {
       if (child && !dom.getAttribute('each')) {
         var tag = new Tag(child, { root: dom, parent: parent })
         parent.tags[dom.getAttribute('name') || child.name] = tag
+        // empty the child node once we got its template
+        // to avoid that its children get compiled multiple times
+        dom.innerHTML = ''
         child_tags.push(tag)
       }
 
@@ -771,13 +852,17 @@ function arrDiff(arr1, arr2) {
   })
 }
 
+function arrFindEquals(arr, el) {
+  return arr.filter(function (_el) {
+    return _el === el
+  })
+}
+
 function inherit(parent) {
   function Child() {}
   Child.prototype = parent
   return new Child()
 }
-
-
 
 /*
  Virtual dom is an array of custom tags on the document.
