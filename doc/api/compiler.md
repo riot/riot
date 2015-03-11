@@ -25,7 +25,7 @@ You can leave out the `riot.compile` call and write just:
 var tags = riot.mount('*')
 ```
 
-but you don't get to know when external recourses are loaded and compiled and the return value is an empty array if you have external scripts. If all scripts are defined on the page then riot.compile step can be left out.
+but you don't get to know when external resources are loaded and compiled and the return value is an empty array if you have external scripts. If all scripts are defined on the page then riot.compile step can be left out.
 
 For more details, read the compiler [general introduction](/riotjs/compiler.html).
 
