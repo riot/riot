@@ -740,13 +740,13 @@ Once the core and events are carefully designed the team members are enabled to 
 
 ## Routing
 
-Riot router is a generic tool to take care of the URL and the back button. It's the smallest implementation you can find and it works on all browsers including IE8. It can do the following:
+Router is a generic tool to take care of the URL and the back button. It's the smallest implementation you can find and it works on all browsers including IE8. It can do the following:
 
-1. change the hash part of the URL,
-2. notify when the hash changes and
-3. study the current hash.
+1. Change the hash part of the URL
+2. Notify when the hash changes
+3. Study the current hash
 
-You can place routing logic everywhere; in custom tags or non-UI modules. Some application frameworks make router a central element that dispatches work to the other pieces of the application. Some take a milder approach where URL events are like keyboard events, not affecting the overall architecture.
+You can place routing logic everywhere; in custom tags or non-UI modules. Some application frameworks make the router a central element that dispatches work to the other pieces of the application. Some take a milder approach where URL events are like keyboard events, not affecting the overall architecture.
 
 Every browser application needs routing since there is always an URL in the location bar.
 
@@ -755,11 +755,11 @@ Every browser application needs routing since there is always an URL in the loca
 
 ## Modularity
 
-Riot tags make the view part of your application. On modular application these tags should not be aware of each other and they shou be isolated. Ideally you can use the same tag on across projects regardless of the outer HTML layout.
+Custom tags make the view part of your application. In modular application these tags should not be aware of each other and they should be isolated. Ideally you can use the same tag on across projects regardless of the outer HTML layout.
 
 If two tags know about each other they become depdendent and a "tight coupling" is introduced. These tags cannot be freely moved around without breaking the system.
 
-To reduce coupling the idea is that the tags listen to events rather than call each other directly. What you need is a publish/subscribe system built with `riot.observable` or similar.
+To reduce coupling, have the tags listen for events rather than call each other directly. What you need is a publish/subscribe system built with `riot.observable` or similar.
 
 This event emitting system can range from a simple API to a larger architectural choice like Facebook Flux.
 
