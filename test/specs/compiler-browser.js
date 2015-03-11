@@ -33,6 +33,34 @@ describe('Compiler Browser', function() {
           '<div id=\"foo\"><\/div>',
           '<div id=\"bar\"><\/div>',
 
+          // duplicated tags in loops
+
+          '<outer id="outer1"><\/outer>',
+          '<outer id="outer2"><\/outer>',
+          '<outer id="outer3"><\/outer>',
+
+          '<script type=\"riot\/tag\">',
+
+          '<inner>',
+          ' <p>',
+          '   { opts.value }',
+          ' <\/p>',
+          '<\/inner>',
+
+          '<\/script>',
+
+          '<script type=\"riot\/tag\">',
+
+          '<outer>',
+          '   <div each="{ data, i in opts.data }">',
+          '     <span>{ i }<\/span>',
+          '     <inner value="{ data.value }"><\/inner>',
+          '   <\/div>',
+          '<\/outer>',
+
+          '<\/script>',
+
+
           // brackets
 
           '<test-a><\/test-a>',
@@ -61,8 +89,7 @@ describe('Compiler Browser', function() {
           '  <\/test-g>',
 
           '<\/script>'
-
-        ].join('\n'),
+        ].join('\r'),
       tags = [],
       div = document.createElement('div')
 
@@ -136,6 +163,41 @@ describe('Compiler Browser', function() {
       tags.push(tag3)
 
     })
+  })
+
+  it('avoid to duplicate tags in multiple foreach loop', function() {
+
+    var mountTag = function(tagId) {
+      var data = [],
+          tag,
+          itemsCount = 5
+
+      while (--itemsCount) {
+        data.push({
+          value: 'item #' + itemsCount
+        })
+      }
+
+      tag = riot.mount(tagId, {data: data})[0]
+      // comment the following line to check the rendered html
+      tags.push(tag)
+
+    }
+
+    mountTag('#outer1')
+    mountTag('#outer2')
+    mountTag('#outer3')
+
+    expect(outer1.getElementsByTagName('inner').length).to.be(4)
+    expect(outer1.getElementsByTagName('span').length).to.be(4)
+    expect(outer1.getElementsByTagName('p').length).to.be(4)
+    expect(outer2.getElementsByTagName('inner').length).to.be(4)
+    expect(outer2.getElementsByTagName('span').length).to.be(4)
+    expect(outer2.getElementsByTagName('p').length).to.be(4)
+    expect(outer3.getElementsByTagName('inner').length).to.be(4)
+    expect(outer3.getElementsByTagName('span').length).to.be(4)
+    expect(outer3.getElementsByTagName('p').length).to.be(4)
+
   })
 
   it('brackets', function() {
