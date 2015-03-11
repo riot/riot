@@ -540,7 +540,19 @@ function parseNamedElements(root, parent, child_tags) {
 
       if (child && !dom.getAttribute('each')) {
         var tag = new Tag(child, { root: dom, parent: parent })
-        parent.tags[dom.getAttribute('name') || child.name] = tag
+        // Turn paren.tags to array if nested tag already met
+        if(parent.tags[dom.getAttribute('name') || child.name]!=undefined) {
+            if(!(parent.tags[dom.getAttribute('name')  || child.name] instanceof Array)) {
+                var c = parent.tags[dom.getAttribute('name')  || child.name];
+                parent.tags[dom.getAttribute('name')  || child.name] = [];
+                parent.tags[dom.getAttribute('name')  || child.name].push(c);
+                parent.tags[dom.getAttribute('name')  || child.name].push(tag);
+            }else {
+                parent.tags[dom.getAttribute('name')  || child.name].push(tag);
+            }
+        }else {
+            parent.tags[dom.getAttribute('name') || child.name] = tag
+        }
         // empty the child node once we got its template
         // to avoid that its children get compiled multiple times
         dom.innerHTML = ''
