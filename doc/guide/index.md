@@ -609,7 +609,7 @@ The element with the `each` attribute will be repeated for all items in the arra
 
 ### Context
 
-For each item a new context is created and the parent can be accessed with `parent.` prefix. For example:
+A new context is created for each item and the parent can be accessed through the `parent` variable. For example:
 
 
 ```
@@ -719,22 +719,22 @@ Riot comes bundled with custom tags, an event emitter (observable) and router. W
 2. Events for modularity and
 3. Router for URL and the back button.
 
-Riot tries not to give strict rules, but rather the basic tools that you can creatively use. This flexible approach leaves the bigger architectural decisions for the developer.
+Riot tries not to enforce strict rules, but rather provide basic tools for you to use creatively. This flexible approach leaves the bigger architectural decisions up to the developer.
 
-We also think that the basic blocks should be minimal. In terms of file size and API size. Elementary stuff should be simple. This eases your mind.
+We also think that these building blocks should be minimal. In terms of file size and API size. Elementary stuff should be simple so there's minimal cognitive load.
 
 
 ## Observable
 
 Observable is a generic tool to send and receive events. It's a common pattern to isolate modules without forming a dependency or "coupling". By using events a large program can be broken into smaller and simpler units. Modules can be added/removed/modified without affecting the other parts of the application
 
-A common practice is to split the application into a single core and multiple extensions. The core sends events any time something remarkable happens: new item is being added, existing item being removed or something is loaded from the server.
+A common practice is to split the application into a single core and multiple extensions. The core sends events any time something remarkable happens: a new item is being added, an existing item is being removed or something is loaded from the server.
 
 By using the observable the extensions can listen to these events and react to them. They extend the core so that the core is not aware of these modules. This is called "loose coupling".
 
 These extensions can be custom tags (UI components) or non-UI modules.
 
-Once core and the events are carefully designed the team members are enabled to develop the system on their own without disturbing others.
+Once the core and events are carefully designed the team members are enabled to develop the system on their own without disturbing others.
 
 [Observable API](/riotjs/api/#observable)
 
