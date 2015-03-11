@@ -6,6 +6,11 @@ body_id: riot-releases
 
 ====
 
+### 2.0.13 *Mar 11, 2015*
+
+- A large bug fix release consisting of [pull requests](https://github.com/muut/riotjs/compare/v2.0.12...v2.0.13) from the community only. Thank you!
+- Larger [test suite](https://github.com/muut/riotjs/tree/master/test)
+
 ### 2.0.12 *Mar 2, 2015*
 
 - Support for [Scoped CSS](/riotjs/guide/#scoped-css)
