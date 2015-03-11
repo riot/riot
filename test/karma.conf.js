@@ -23,7 +23,8 @@ module.exports = function(config) {
           'specs/compiler-browser.js',
           'specs/observable.js',
           'specs/route.js',
-          'specs/tmpl.js'
+          'specs/tmpl.js',
+          'specs/speed.js'
       ],
       browsers: ['PhantomJS'],
 
