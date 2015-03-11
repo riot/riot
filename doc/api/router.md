@@ -5,7 +5,7 @@ nogen: true
 
 # Router
 
-Riot router is the most minimal router implementation you can find and it works consistently on all browsers including IE8. It only listen to changes on the URL hash (the part after the `#` character). Most single page applications deal with the hash only but if you really care about full URL changes you should use a different router implementation.
+The Riot Router is the most minimal router implementation you can find and it works consistently on all browsers including IE8. It only listens to changes on the URL hash (the part after the `#` character). Most single page applications deal with the hash only but if you really care about full URL changes you should use a different router implementation.
 
 The Riot router is best in routing schemes in which the route's hierarchical parts, after the "#", are separated with the "/" character. In that case Riot gives you direct access to these parts.
 
