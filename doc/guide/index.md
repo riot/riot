@@ -514,7 +514,7 @@ Elements with `name` or `id` attribute are automatically bound to the context so
 </login>
 ```
 
-Of course these named elements can be referred in HTML as well. `<div>{ username.value }</div>`
+Of course these named elements can be referred to in HTML as well: `<div>{ username.value }</div>`
 
 
 ## Event handlers
