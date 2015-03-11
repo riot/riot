@@ -39,6 +39,20 @@ The script tag and the external file can contain multiple tags definitions combi
 
 Riot automatically takes inlined and external tags and compiles them before the tags are rendered with the `riot.mount()` call.
 
+### Access tag instances
+If you are loading tags with `script src` and want to get access to the mounted tags you need to wrap the call with `riot.compile` as follows:
+
+```
+<script>
+riot.compile(function() {
+  // here tags are compiled and riot.mount works synchronously
+  var tags = riot.mount('*')
+})
+</script>
+```
+
+### Compiler performance
+
 Compilation phase is basically free and takes no time at all. Compiling a [timer tag](https://github.com/muut/riotjs/blob/master/test/tag/timer.tag) 30 times takes 2 milliseconds on a regular laptop. If you have a crazy page with 1000 different timer-sized tags, the compilation takes around 35ms.
 
 The compiler weights only 3.2KB (1.7K gzipped) so you can safely perform client side compilation on production without download or performance or issues.
@@ -91,18 +105,6 @@ With pre-compilation your HTML is something like this:
 riot.mount('*')
 </script>
 ```
-
-If you are loading tags with `script src` and want to get access to the mounted tags you need to wrap the call with `riot.compile` as follows:
-
-```
-<script>
-riot.compile(function() {
-  // here tags are compiled and riot.mount works synchronously
-  var tags = riot.mount('*')
-})
-</script>
-```
-
 
 ### Using
 
@@ -242,6 +244,8 @@ All ECMAScript 6 [features](https://github.com/lukehoban/es6features) can be use
 ``` sh
 npm install babel
 ```
+
+Here is a [bigger example](https://github.com/txchen/feplay/tree/gh-pages/riot_babel) on using Babel with Riot.
 
 ### TypeScript
 
