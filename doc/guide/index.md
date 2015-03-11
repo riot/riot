@@ -56,24 +56,24 @@ Riot custom tags are the building blocks for user interfaces. They make the "vie
 
 Custom tags are [compiled](compiler.html) to JavaScript.
 
-See [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/muut/riotjs/tree/gh-pages/demo), or download the [zip](https://github.com/muut/riotjs/archive/gh-pages.zip).
+See the [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/muut/riotjs/tree/gh-pages/demo), or download the [zip](https://github.com/muut/riotjs/archive/gh-pages.zip).
 
 
 
 ### Tag syntax
 
-Riot tag is a combination of layout (HTML) and logic (JavaScript). Here are the basic rules:
+A Riot tag is a combination of layout (HTML) and logic (JavaScript). Here are the basic rules:
 
-* HTML is defined first and the logic is enclosed inside optional `<script>` tag.
-* Without `<script>` tag the JavaScript starts where the last HTML tag ends.
+* HTML is defined first and the logic is enclosed inside an optional `<script>` tag.
+* Without the `<script>` tag the JavaScript starts where the last HTML tag ends.
 * Custom tags can be empty, HTML only or JavaScript only
 * Quotes are optional: `<foo bar={ baz }>` becomes `<foo bar="{ baz }">`.
 * ES6 method syntax is supported: `methodName()` becomes `this.methodName = function()` and `this` variable always points to the current tag instance.
-* A shorthand syntax for class names is available: `class={ completed: done }`.
+* A shorthand syntax for class names is available: `class={ completed: done }` renders to `class="completed"`when the value of `done` is a true value.
 * Boolean attributes (checked, selected etc..) are ignored when the expression value is falsy: `<input checked={ undefined }>` becomes `<input>`.
 * All attribute names must be *lowercase*.
 * Self-closing tags are supported: `<div/>` equals `<div></div>`. Well known "open tags" such as `<br>`, `<hr>`, `<img>` or `<input>` are never closed after the compilation.
-* Custom tags always needs to be closed (normally or self-closed).
+* Custom tags always need to be closed (normally or self-closed).
 * Standard HTML tags (`label`, `table`, `a` etc..) can also be customized, but not necessarily a wise thing to do.
 
 
@@ -131,7 +131,7 @@ See [pre processors](/riotjs/compiler.html#pre-processors) for more details.
 
 ### Tag styling
 
-You can put `style` tag inside. Riot.js automatically take it out and inject it into `<head>`.
+You can put a `style` tag inside. Riot.js automatically takes it out and injects it into `<head>`.
 
 ```html
 <todo>
@@ -208,7 +208,7 @@ riot.mount('#my-element')
 riot.mount('todo, forum, comments')
 ```
 
-Document can contain multiple instances of the same tag.
+A document can contain multiple instances of the same tag.
 
 
 ### Options
@@ -239,7 +239,7 @@ Inside the tag the options can be referenced with the `opts` variable as follows
 
 ### Tag lifecycle
 
-Tag is created in following sequence:
+A tag is created in following sequence:
 
 1. Tag is constructed
 2. Tag's JavaScript logic is executed
