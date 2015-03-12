@@ -56,24 +56,24 @@ Riot custom tags are the building blocks for user interfaces. They make the "vie
 
 Custom tags are [compiled](compiler.html) to JavaScript.
 
-See [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/muut/riotjs/tree/gh-pages/demo), or download the [zip](https://github.com/muut/riotjs/archive/gh-pages.zip).
+See the [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/muut/riotjs/tree/gh-pages/demo), or download the [zip](https://github.com/muut/riotjs/archive/gh-pages.zip).
 
 
 
 ### Tag syntax
 
-Riot tag is a combination of layout (HTML) and logic (JavaScript). Here are the basic rules:
+A Riot tag is a combination of layout (HTML) and logic (JavaScript). Here are the basic rules:
 
-* HTML is defined first and the logic is enclosed inside optional `<script>` tag.
-* Without `<script>` tag the JavaScript starts where the last HTML tag ends.
+* HTML is defined first and the logic is enclosed inside an optional `<script>` tag.
+* Without the `<script>` tag the JavaScript starts where the last HTML tag ends.
 * Custom tags can be empty, HTML only or JavaScript only
 * Quotes are optional: `<foo bar={ baz }>` becomes `<foo bar="{ baz }">`.
 * ES6 method syntax is supported: `methodName()` becomes `this.methodName = function()` and `this` variable always points to the current tag instance.
-* A shorthand syntax for class names is available: `class={ completed: done }`.
+* A shorthand syntax for class names is available: `class={ completed: done }` renders to `class="completed"`when the value of `done` is a true value.
 * Boolean attributes (checked, selected etc..) are ignored when the expression value is falsy: `<input checked={ undefined }>` becomes `<input>`.
 * All attribute names must be *lowercase*.
 * Self-closing tags are supported: `<div/>` equals `<div></div>`. Well known "open tags" such as `<br>`, `<hr>`, `<img>` or `<input>` are never closed after the compilation.
-* Custom tags always needs to be closed (normally or self-closed).
+* Custom tags always need to be closed (normally or self-closed).
 * Standard HTML tags (`label`, `table`, `a` etc..) can also be customized, but not necessarily a wise thing to do.
 
 
@@ -131,7 +131,7 @@ See [pre processors](/riotjs/compiler.html#pre-processors) for more details.
 
 ### Tag styling
 
-You can put `style` tag inside. Riot.js automatically take it out and inject it into `<head>`.
+You can put a `style` tag inside. Riot.js automatically takes it out and injects it into `<head>`.
 
 ```html
 <todo>
@@ -208,7 +208,7 @@ riot.mount('#my-element')
 riot.mount('todo, forum, comments')
 ```
 
-Document can contain multiple instances of the same tag.
+A document can contain multiple instances of the same tag.
 
 
 ### Options
@@ -239,7 +239,7 @@ Inside the tag the options can be referenced with the `opts` variable as follows
 
 ### Tag lifecycle
 
-Tag is created in following sequence:
+A tag is created in following sequence:
 
 1. Tag is constructed
 2. Tag's JavaScript logic is executed
@@ -514,7 +514,7 @@ Elements with `name` or `id` attribute are automatically bound to the context so
 </login>
 ```
 
-Of course these named elements can be referred in HTML as well. `<div>{ username.value }</div>`
+Of course these named elements can be referred to in HTML as well: `<div>{ username.value }</div>`
 
 
 ## Event handlers
@@ -609,7 +609,7 @@ The element with the `each` attribute will be repeated for all items in the arra
 
 ### Context
 
-For each item a new context is created and the parent can be accessed with `parent.` prefix. For example:
+A new context is created for each item and the parent can be accessed through the `parent` variable. For example:
 
 
 ```
@@ -719,35 +719,35 @@ Riot comes bundled with custom tags, an event emitter (observable) and router. W
 2. Events for modularity and
 3. Router for URL and the back button.
 
-Riot tries not to give strict rules, but rather the basic tools that you can creatively use. This flexible approach leaves the bigger architectural decisions for the developer.
+Riot tries not to enforce strict rules, but rather provide basic tools for you to use creatively. This flexible approach leaves the bigger architectural decisions up to the developer.
 
-We also think that the basic blocks should be minimal. In terms of file size and API size. Elementary stuff should be simple. This eases your mind.
+We also think that these building blocks should be minimal. In terms of file size and API size. Elementary stuff should be simple so there's minimal cognitive load.
 
 
 ## Observable
 
 Observable is a generic tool to send and receive events. It's a common pattern to isolate modules without forming a dependency or "coupling". By using events a large program can be broken into smaller and simpler units. Modules can be added/removed/modified without affecting the other parts of the application
 
-A common practice is to split the application into a single core and multiple extensions. The core sends events any time something remarkable happens: new item is being added, existing item being removed or something is loaded from the server.
+A common practice is to split the application into a single core and multiple extensions. The core sends events any time something remarkable happens: a new item is being added, an existing item is being removed or something is loaded from the server.
 
 By using the observable the extensions can listen to these events and react to them. They extend the core so that the core is not aware of these modules. This is called "loose coupling".
 
 These extensions can be custom tags (UI components) or non-UI modules.
 
-Once core and the events are carefully designed the team members are enabled to develop the system on their own without disturbing others.
+Once the core and events are carefully designed the team members are enabled to develop the system on their own without disturbing others.
 
 [Observable API](/riotjs/api/#observable)
 
 
 ## Routing
 
-Riot router is a generic tool to take care of the URL and the back button. It's the smallest implementation you can find and it works on all browsers including IE8. It can do the following:
+Router is a generic tool to take care of the URL and the back button. It's the smallest implementation you can find and it works on all browsers including IE8. It can do the following:
 
-1. change the hash part of the URL,
-2. notify when the hash changes and
-3. study the current hash.
+1. Change the hash part of the URL
+2. Notify when the hash changes
+3. Study the current hash
 
-You can place routing logic everywhere; in custom tags or non-UI modules. Some application frameworks make router a central element that dispatches work to the other pieces of the application. Some take a milder approach where URL events are like keyboard events, not affecting the overall architecture.
+You can place routing logic everywhere; in custom tags or non-UI modules. Some application frameworks make the router a central element that dispatches work to the other pieces of the application. Some take a milder approach where URL events are like keyboard events, not affecting the overall architecture.
 
 Every browser application needs routing since there is always an URL in the location bar.
 
@@ -756,11 +756,11 @@ Every browser application needs routing since there is always an URL in the loca
 
 ## Modularity
 
-Riot tags make the view part of your application. On modular application these tags should not be aware of each other and they shou be isolated. Ideally you can use the same tag on across projects regardless of the outer HTML layout.
+Custom tags make the view part of your application. In modular application these tags should not be aware of each other and they should be isolated. Ideally you can use the same tag on across projects regardless of the outer HTML layout.
 
 If two tags know about each other they become depdendent and a "tight coupling" is introduced. These tags cannot be freely moved around without breaking the system.
 
-To reduce coupling the idea is that the tags listen to events rather than call each other directly. What you need is a publish/subscribe system built with `riot.observable` or similar.
+To reduce coupling, have the tags listen for events rather than call each other directly. What you need is a publish/subscribe system built with `riot.observable` or similar.
 
 This event emitting system can range from a simple API to a larger architectural choice like Facebook Flux.
 
