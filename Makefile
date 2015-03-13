@@ -9,13 +9,11 @@ WATCH = "\
 			require('shelljs').exec(cmd) 										  \
 		})"
 
-test:
-	@ make eslint
-	# test the node compiler
-	@ RIOT=../dist/riot/riot.js ./node_modules/.bin/mocha test/runner.js -R spec
-	# test riot
-	@ ./node_modules/karma/bin/karma start test/karma.conf.js
+test-runner:
+	RIOT=../dist/riot/riot.js ./node_modules/.bin/mocha test/runner.js -R spec
 
+test: eslint test-runner
+	@ ./node_modules/karma/bin/karma start test/karma.conf.js
 
 eslint:
 	# check code style
