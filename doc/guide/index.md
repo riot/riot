@@ -543,7 +543,7 @@ Attributes beginning with "on" (`onclick`, `onsubmit`, `oninput` etc...) accept 
 
 In the function `this` refers to the current tag instance. After the handler is called `this.update()` is automatically called reflecting all the possible changes to the UI.
 
-The default event handler behavior is *automatically cancelled*. This means that `e.preventDefault()` is already called for you, because this is what you usually want (or forget to do). You can let the browser do the default thing by returning `true` on the handler.
+The default event handler behavior is *automatically cancelled* unless the element is a checkbox or radio button. This means that `e.preventDefault()` is already called for you, because this is what you usually want (or forget to do). You can let the browser do the default thing by returning `true` on the handler.
 
 For example, this submit handler will actually submit the form to the server:
 
