@@ -22,4 +22,10 @@ describe('Compile Tag', function() {
     })
   })
 
+  it('mixed JS and Tags', function() {
+    var src = cat('fixtures', 'mixed-js.tag'),
+        js = render(src)
+    expect(js).to.equal(cat('expect', 'mixed-js.js'))
+  })
+
 })
