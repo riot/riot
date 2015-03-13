@@ -156,7 +156,7 @@ Other than that riot does not update the UI automatically so you need to call th
 <my-tag>
 
   <input name="username" onblur={ validate }>
-  <span class="tooltip" show={ error }>{ error }</my-tag>
+  <span class="tooltip" show={ error }>{ error }</span>
 
   var self = this
 
