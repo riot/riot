@@ -540,7 +540,30 @@ function parseNamedElements(root, parent, child_tags) {
 
       if (child && !dom.getAttribute('each')) {
         var tag = new Tag(child, { root: dom, parent: parent })
-        parent.tags[dom.getAttribute('name') || child.name] = tag
+        /**
+         * If we add a few nested tags with same name then in this.tags they overwritten...
+         * Example
+         * <some-tag>
+         *    <some-nested-tag></some-nested-tag>
+         *    <some-nested-tag></some-nested-tag>
+         *    <some-nested-tag></some-nested-tag>
+         *    console.log(this.tags); // {'some-nested-tag': Tag} - last of ... 
+         *  </some-tag>
+         * 
+         */
+        var tagName = dom.getAttribute('name') || child.name;
+        if(parent.tags[tagName]!=undefined) {
+            if(!(parent.tags[tagName] instanceof Array)) {
+                var c = parent.tags[tagName];
+                parent.tags[tagName] = [];
+                parent.tags[tagName].push(c);
+                parent.tags[tagName].push(tag);
+            }else {
+                parent.tags[tagName].push(tag);
+            }
+        }else {
+            parent.tags[dom.getAttribute('name') || child.name] = tag
+        }
         // empty the child node once we got its template
         // to avoid that its children get compiled multiple times
         dom.innerHTML = ''
@@ -909,6 +932,21 @@ riot.mount = function(selector, tagName, opts) {
   if (typeof tagName == 'object') { opts = tagName; tagName = 0 }
 
   var tags = []
+  
+  /**
+   * After mounting like a 
+   *    var tags = riot.mount('*'); 
+   * We have a tags array. But how find specific tag? 
+   * tags[0] return a first mount tag. But if we add more tags before?
+   * 
+   */
+    tags.findTagByName = function(name){
+        var searchTag = null;
+        this.forEach(function(tag){
+            if(tag.root.tagName.toLowerCase()==name.toLowerCase()) searchTag = tag;
+        });
+        return searchTag;
+    }
 
   function push(root) {
     var name = tagName || root.tagName.toLowerCase(),
