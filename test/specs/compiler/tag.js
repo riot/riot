@@ -1,7 +1,7 @@
 var fs = require('fs'),
     path = require('path')
 
-describe('Compile Tag', function() {
+describe('Compile tags', function() {
 
   function render(str) {
     return compiler.compile(str, {})
@@ -19,24 +19,20 @@ describe('Compile Tag', function() {
     expect(js).to.equal(cat('expect', name + '.js'))
   }
 
-  describe('compiles all files in `test/tag` dir', function() {
-    var tagDir = path.join(__dirname, '..', '..', 'tag')
-    fs.readdirSync(tagDir).map(function(filename) {
-
-      it('tag/' + filename, function() {
-        var src = fs.readFileSync(path.join(tagDir, filename)).toString()
-        expect(render(src)).to.equal(cat('expect/tag', filename.replace(/\.tag$/, '.js')))
-      })
-    })
+  it('Timetable tag', function() {
+    testFile('timetable')
   })
-
 
   it('Mixed JS and Tags', function() {
     testFile('mixed-js')
   })
 
-  it.only('Tag definition and usage on same file', function() {
+  it('Tag definition and usage on same file', function() {
     testFile('same')
+  })
+
+  it('Quotes before ending HTML bracket', function() {
+    testFile('input-last')
   })
 
 })
