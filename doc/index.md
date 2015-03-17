@@ -39,7 +39,7 @@ Riot brings custom tags to all browsers starting from IE8.
 
 </todo>
 ```
-A custom tag glues relevant HTML and JavaScript together forming a reusable component. Think React + Polymer but with ejoyable syntax and a small learning curve.
+A custom tag glues relevant HTML and JavaScript together forming a reusable component. Think React + Polymer but with enjoyable syntax and a small learning curve.
 
 
 ### Human-readable
