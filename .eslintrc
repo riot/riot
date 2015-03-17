@@ -206,6 +206,7 @@ rules:
         [1, "single", "avoid-escape"]
     quote-props: 0                 # require quotes around object literal property names
     semi: [2, "never"]             # require or disallow use of semicolons instead of ASI
+    semi-spacing: 0
     sort-vars: 0                   # sort variables within the same declaration block
     space-after-keywords: "always" # require a space after certain keywords
     space-before-blocks: 2         # require or disallow space before blocks
