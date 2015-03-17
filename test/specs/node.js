@@ -11,4 +11,9 @@ describe('Node/io.js', function() {
     })
   })
 
+  it('render tag', function() {
+    var t = riot.render('timer', { start: 42 })
+    expect(t).to.be('<timer><p>Seconds Elapsed: 42</p></timer>')
+  })
+
 })
