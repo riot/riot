@@ -104,6 +104,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [How to package "tag libraries" in Riot](https://github.com/ivan-saorin/riot-tutorial-tags-pack-app)
 - [Another React tutorial with Riot](https://github.com/viliamjr/commentsTuto)
 - [Riot Custom Tag by Example](http://www.triplet.fi/blog/riot-custom-tag-by-example/)
+- [Riot Compiler Explained](http://www.triplet.fi/blog/riot-compiler-explained/)
 
 ### Resources
 - [Riot + Angular](https://github.com/lucasbrigida/angular-riot)
