@@ -228,7 +228,7 @@ describe('Compiler Browser', function() {
 
   })
 
-  it('the each loops update correctly the DOM nodes', function(done) {
+  it('the each loops update correctly the DOM nodes', function() {
     var tag = riot.mount('loop')[0],
         root = tag.root,
         button = root.getElementsByTagName('button')[0],
