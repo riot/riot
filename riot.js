@@ -909,6 +909,15 @@ riot.mount = function(selector, tagName, opts) {
   if (typeof tagName == 'object') { opts = tagName; tagName = 0 }
 
   var tags = []
+  
+  // Find riot tag by name
+  tags.findTagByName = function(name){
+      var searchTag = null;
+      this.forEach(function(tag){
+          if(tag.root.tagName.toLowerCase()==name.toLowerCase()) searchTag = tag;
+      });
+      return searchTag;
+  }
 
   function push(root) {
     var name = tagName || root.tagName.toLowerCase(),
