@@ -1,8 +1,8 @@
-/* Riot v2.0.13, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot WIP, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function() {
 
-  var riot = { version: 'v2.0.13', settings: {} }
+  var riot = { version: 'WIP', settings: {} }
 
   'use strict'
 
@@ -461,6 +461,8 @@ function _each(dom, parent, expr) {
         tag.unmount()
         rendered.splice(pos, 1)
         tags.splice(pos, 1)
+        // to let "each" know that this item is removed
+        return false
       }
 
     })
