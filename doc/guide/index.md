@@ -713,22 +713,22 @@ Object loops are not recommended since internally Riot detects changes on the ob
 
 ## Tools, not policy
 
-Riot comes bundled with custom tags, an event emitter (observable) and router. We believe that these are the fundamental building blocks for client- side applications:
+Riot comes bundled with custom tags, an event emitter (observable) and router. We believe that these are the fundamental building blocks for client-side applications:
 
 1. Custom tags for the user interface,
-2. Events for modularity and
+2. Events for modularity, and
 3. Router for URL and the back button.
 
 Riot tries not to enforce strict rules, but rather provide basic tools for you to use creatively. This flexible approach leaves the bigger architectural decisions up to the developer.
 
-We also think that these building blocks should be minimal. In terms of file size and API size. Elementary stuff should be simple so there's minimal cognitive load.
+We also think that these building blocks should be minimal in terms of file size and API size. Elementary stuff should be simple so there's minimal cognitive load.
 
 
 ## Observable
 
-Observable is a generic tool to send and receive events. It's a common pattern to isolate modules without forming a dependency or "coupling". By using events a large program can be broken into smaller and simpler units. Modules can be added/removed/modified without affecting the other parts of the application
+Observable is a generic tool to send and receive events. It's a common pattern to isolate modules without forming a dependency or "coupling". By using events a large program can be broken into smaller and simpler units. Modules can be added, removed, or modified without affecting the other parts of the application.
 
-A common practice is to split the application into a single core and multiple extensions. The core sends events any time something remarkable happens: a new item is being added, an existing item is being removed or something is loaded from the server.
+A common practice is to split the application into a single core and multiple extensions. The core sends events any time something remarkable happens: a new item is being added, an existing item is being removed, or something is loaded from the server.
 
 By using the observable the extensions can listen to these events and react to them. They extend the core so that the core is not aware of these modules. This is called "loose coupling".
 
@@ -756,7 +756,7 @@ Every browser application needs routing since there is always an URL in the loca
 
 ## Modularity
 
-Custom tags make the view part of your application. In modular application these tags should not be aware of each other and they should be isolated. Ideally you can use the same tag on across projects regardless of the outer HTML layout.
+Custom tags make the view part of your application. In modular application these tags should not be aware of each other and they should be isolated. Ideally you can use the same tag across projects regardless of the outer HTML layout.
 
 If two tags know about each other they become depdendent and a "tight coupling" is introduced. These tags cannot be freely moved around without breaking the system.
 

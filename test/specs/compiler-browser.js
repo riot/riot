@@ -60,6 +60,34 @@ describe('Compiler Browser', function() {
 
           '<\/script>',
 
+          // each loop
+
+          '<loop><\/loop>',
+
+          '<script type=\"riot\/tag\">',
+
+          '<loop>',
+          '<ul>',
+          '  <li each="{ item, i in items }">',
+          '    { i }',
+          '    { item.value }',
+          '  <\/li>',
+          '<\/ul>',
+          '<button onclick={ addSomeItems }>btn<\/button>',
+
+          'this.items = []',
+          ' ',
+          ' addSomeItems(e) {',
+          '    var amount = 5',
+          '    while(amount--){',
+          '      this.items.push({value: "item #" + this.items.length})',
+          '    }',
+          '  }',
+          ' ',
+          '<\/loop>',
+
+          '<\/script>',
+
 
           // brackets
 
@@ -165,14 +193,14 @@ describe('Compiler Browser', function() {
     })
   })
 
-  it('avoid to duplicate tags in multiple foreach loop', function() {
+  it('avoid to duplicate tags in multiple foreach loops', function() {
 
     var mountTag = function(tagId) {
       var data = [],
           tag,
           itemsCount = 5
 
-      while (--itemsCount) {
+      while (itemsCount--) {
         data.push({
           value: 'item #' + itemsCount
         })
@@ -188,15 +216,47 @@ describe('Compiler Browser', function() {
     mountTag('#outer2')
     mountTag('#outer3')
 
-    expect(outer1.getElementsByTagName('inner').length).to.be(4)
-    expect(outer1.getElementsByTagName('span').length).to.be(4)
-    expect(outer1.getElementsByTagName('p').length).to.be(4)
-    expect(outer2.getElementsByTagName('inner').length).to.be(4)
-    expect(outer2.getElementsByTagName('span').length).to.be(4)
-    expect(outer2.getElementsByTagName('p').length).to.be(4)
-    expect(outer3.getElementsByTagName('inner').length).to.be(4)
-    expect(outer3.getElementsByTagName('span').length).to.be(4)
-    expect(outer3.getElementsByTagName('p').length).to.be(4)
+    expect(outer1.getElementsByTagName('inner').length).to.be(5)
+    expect(outer1.getElementsByTagName('span').length).to.be(5)
+    expect(outer1.getElementsByTagName('p').length).to.be(5)
+    expect(outer2.getElementsByTagName('inner').length).to.be(5)
+    expect(outer2.getElementsByTagName('span').length).to.be(5)
+    expect(outer2.getElementsByTagName('p').length).to.be(5)
+    expect(outer3.getElementsByTagName('inner').length).to.be(5)
+    expect(outer3.getElementsByTagName('span').length).to.be(5)
+    expect(outer3.getElementsByTagName('p').length).to.be(5)
+
+  })
+
+  it('the each loops update correctly the DOM nodes', function() {
+    var tag = riot.mount('loop')[0],
+        root = tag.root,
+        button = root.getElementsByTagName('button')[0],
+        itemsCount = 5
+
+    tags.push(tag)
+
+    tag.items = []
+
+    while (itemsCount--) {
+      tag.items.push({
+        value: 'item #' + tag.items.length
+      })
+    }
+    tag.update()
+    expect(root.getElementsByTagName('li').length).to.be(5)
+
+    // no update is required here
+    button.onclick({})
+    expect(root.getElementsByTagName('li').length).to.be(10)
+    expect(root.getElementsByTagName('ul')[0].innerHTML.trim()).to.be('<li> 0 item #0 </li><li> 1 item #1 </li><li> 2 item #2 </li><li> 3 item #3 </li><li> 4 item #4 </li><li> 5 item #5 </li><li> 6 item #6 </li><li> 7 item #7 </li><li> 8 item #8 </li><li> 9 item #9 </li>'.trim())
+    tag.items.reverse()
+    tag.update()
+    expect(root.getElementsByTagName('li').length).to.be(10)
+    expect(root.getElementsByTagName('ul')[0].innerHTML.trim()).to.be('<li> 9 item #9 </li><li> 8 item #8 </li><li> 7 item #7 </li><li> 6 item #6 </li><li> 5 item #5 </li><li> 4 item #4 </li><li> 3 item #3 </li><li> 2 item #2 </li><li> 1 item #1 </li><li> 0 item #0 </li>'.trim())
+    tag.items = []
+    tag.update()
+    expect(root.getElementsByTagName('li').length).to.be(0)
 
   })
 
