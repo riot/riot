@@ -1,5 +1,5 @@
 lib/wrap
-test/ie8
+test/polyfills
 test/compiler/js
 test/specs/compiler/fixtures
 test/specs/compiler/expect

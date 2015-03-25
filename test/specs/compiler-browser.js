@@ -176,7 +176,7 @@ describe('Compiler Browser', function() {
     expect(+new Date() - begin).to.be.below(100)
 
     expect(tag.tags.foo).to.not.be('undefined')
-    tag.on('update', console.log.bind(console))
+
     tag.unmount()
 
     // no time neither for one tick
