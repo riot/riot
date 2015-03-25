@@ -20,6 +20,7 @@ describe('Compiler Browser', function() {
 
           '  <\/timetable>',
           '<\/script>',
+
           '<script type=\"riot\/tag\" src=\"tag\/timer.tag\"><\/script>',
           '<timetable><\/timetable>',
 
@@ -87,6 +88,11 @@ describe('Compiler Browser', function() {
           '<\/loop>',
 
           '<\/script>',
+
+          // loop context
+
+          '<loop-child><\/loop-child>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-child.tag\"><\/script>',
 
 
           // brackets
@@ -164,33 +170,30 @@ describe('Compiler Browser', function() {
 
   it('mount and unmount', function() {
 
-    riot.compile(function() {
+    var tag = riot.mount('test', { val: 10 })[0],
+        tag2 = riot.mount('#foo', 'test', { val: 30 })[0],
+        tag3 = riot.mount(document.getElementById('bar'), 'test', { val: 50 })
 
-      var tag = riot.mount('test', { val: 10 })[0],
-          tag2 = riot.mount('#foo', 'test', { val: 30 })[0],
-          tag3 = riot.mount(document.getElementById('bar'), 'test', { val: 50 })
+    expect(tag.root.innerHTML).to.be('<p>Val: 10</p>')
+    expect(tag2.root.innerHTML).to.be('<p>Val: 30</p>')
+    expect(tag3.root.innerHTML).to.be('<p>Val: 50</p>')
 
-      expect(tag.root.innerHTML).to.be('<p>Val: 10</p>')
-      expect(tag2.root.innerHTML).to.be('<p>Val: 30</p>')
-      expect(tag3.root.innerHTML).to.be('<p>Val: 50</p>')
+    tag.unmount()
+    tag2.unmount()
+    tag3.unmount()
 
-      tag.unmount()
-      tag2.unmount()
-      tag3.unmount()
+    tag = riot.mount('test', { val: 110 })[0]
+    tag2 = riot.mount('#foo', 'test', { val: 140 })[0]
+    tag3 = riot.mount(bar, 'test', { val: 150 })
 
-      tag = riot.mount('test', { val: 110 })[0]
-      tag2 = riot.mount('#foo', 'test', { val: 140 })[0]
-      tag3 = riot.mount(bar, 'test', { val: 150 })
+    expect(tag.root.innerHTML).to.be('<p>Val: 110</p>')
+    expect(tag2.root.innerHTML).to.be('<p>Val: 140</p>')
+    expect(tag3.root.innerHTML).to.be('<p>Val: 150</p>')
 
-      expect(tag.root.innerHTML).to.be('<p>Val: 110</p>')
-      expect(tag2.root.innerHTML).to.be('<p>Val: 140</p>')
-      expect(tag3.root.innerHTML).to.be('<p>Val: 150</p>')
+    tags.push(tag)
+    tags.push(tag2)
+    tags.push(tag3)
 
-      tags.push(tag)
-      tags.push(tag2)
-      tags.push(tag3)
-
-    })
   })
 
   it('avoid to duplicate tags in multiple foreach loops', function() {
@@ -265,6 +268,18 @@ describe('Compiler Browser', function() {
     tag.items = []
     tag.update()
     expect(root.getElementsByTagName('li').length).to.be(0)
+
+  })
+
+  it('each loop creates correctly a new context ', function() {
+
+    var tag = riot.mount('loop-child')[0],
+        root = tag.root,
+        children = root.getElementsByTagName('looped-child')
+
+    expect(children.length).to.be(2)
+
+    tags.push(tag)
 
   })
 

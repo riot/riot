@@ -1,17 +1,20 @@
 describe('Route', function() {
 
-  var counter = 0
+  var counter = 0,
+      ended = false
 
   after(function() {
     if (window.history && window.history.replaceState) {
       window.history.replaceState(null, '', window.location.pathname)
     }
+    ended = true
   })
   // TODO: refactor these tests
   // all the undefined must be removed
   it('it detecs the hash params', function() {
 
     riot.route(function(first, second, params) {
+      if (ended) return
       counter++
       expect(['mummypowder', '!']).to.contain(first)
       expect(['logo-and-key', 'user', 'http%3A%2F%2Fxxx.yyy']).to.contain(second)
@@ -19,6 +22,7 @@ describe('Route', function() {
     })
 
     riot.route.exec(function(first, second, params) {
+      if (ended) return
       counter++
       expect(['', '!']).to.contain(first)
       expect([undefined, 'user']).to.contain(second)
