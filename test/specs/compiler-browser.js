@@ -180,11 +180,11 @@ describe('Compiler Browser', function() {
     tag.unmount()
 
     // no time neither for one tick
-    // because the tag got unmounted to early
+    // because the tag got unmounted too early
     setTimeout(function() {
-       expect(ticks).to.be(0)
-       done()
-     }, 1200)
+      expect(ticks).to.be(0)
+      done()
+    }, 1200)
 
   })
 

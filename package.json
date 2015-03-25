@@ -40,10 +40,10 @@
     "shelljs": "~0.4.0"
   },
   "devDependencies": {
-    "eslint": "^0.17.0",
+    "eslint": "^0.17.1",
     "expect.js": "^0.3.1",
     "glob": "^5.0.3",
-    "jsdom": "^4.0.2",
+    "jsdom": "^4.0.5",
     "karma": "^0.12.31",
     "karma-coverage": "^0.2.7",
     "karma-mocha": "^0.1.10",
