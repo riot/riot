@@ -278,6 +278,8 @@ describe('Compiler Browser', function() {
         children = root.getElementsByTagName('looped-child')
 
     expect(children.length).to.be(2)
+    expect(children[0].innerHTML).to.be('<h3>one</h3> <button>one</button>')
+    expect(children[1].innerHTML).to.be('<h3>two</h3> <button>two</button>')
 
     tags.push(tag)
 
