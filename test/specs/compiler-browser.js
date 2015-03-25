@@ -11,7 +11,7 @@ describe('Compiler Browser', function() {
 
           '  <\/foo>',
           '  <timetable>',
-          '     <timer start={ time } each={ time, i in times }><\/timer>',
+          '     <timer ontick={ parent.opts.ontick } start={ time } each={ time, i in times }><\/timer>',
           '     <foo barz=\"899\" baz=\"90\"><\/foo>',
           '     <p>{ kama }<\/p>',
 
@@ -147,9 +147,18 @@ describe('Compiler Browser', function() {
 
   })
 
-  it('compiles', function() {
+  it('compiles and unmount the children tags', function(done) {
 
-    tags.push(riot.mount('timetable', { start: 0 }))[0]
+    this.timeout(3000)
+
+    var ticks = 0,
+        tag = riot.mount('timetable', {
+        start: 0,
+        ontick: function() {
+          ticks++
+        }
+      })[0]
+
     expect(document.getElementsByTagName('timer').length).to.be(3)
 
     riot.update()
@@ -165,6 +174,17 @@ describe('Compiler Browser', function() {
     }
 
     expect(+new Date() - begin).to.be.below(100)
+
+    expect(tag.tags.foo).to.not.be('undefined')
+    tag.on('update', console.log.bind(console))
+    tag.unmount()
+
+    // no time neither for one tick
+    // because the tag got unmounted to early
+    setTimeout(function() {
+       expect(ticks).to.be(0)
+       done()
+     }, 1200)
 
   })
 
