@@ -148,6 +148,21 @@ You can put a `style` tag inside. Riot.js automatically takes it out and injects
 </todo>
 ```
 
+### CSS pre-processor
+
+You can specify a CSS pre-processor with `type` attribute. For example:
+
+```
+<style type="less">
+  # your style is here
+</style>
+````
+
+Currently available options are "less", "sass", "stylus" and "none". You can also prefix the language with "text/", such as "text/stylus".
+
+See [css pre processors](/riotjs/compiler.html#pre-processors) for more details.
+
+
 ### Scoped CSS
 
 [Scoped CSS](https://developer.mozilla.org/en-US/docs/Web/CSS/:scope) is also available. The example below is equivalent to the first one.
