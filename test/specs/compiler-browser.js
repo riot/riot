@@ -94,6 +94,10 @@ describe('Compiler Browser', function() {
           '<loop-child><\/loop-child>',
           '<script type=\"riot\/tag\" src=\"tag\/loop-child.tag\"><\/script>',
 
+          // loop order
+          '<loop-manip><\/loop-manip>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-manip.tag\"><\/script>',
+
 
           // brackets
 
@@ -291,7 +295,7 @@ describe('Compiler Browser', function() {
 
   })
 
-  it('each loop creates correctly a new context ', function() {
+  it('each loop creates correctly a new context', function() {
 
     var tag = riot.mount('loop-child')[0],
         root = tag.root,
@@ -302,6 +306,28 @@ describe('Compiler Browser', function() {
     expect(children[1].innerHTML).to.be('<h3>two</h3> <button>two</button>')
 
     tags.push(tag)
+
+  })
+
+  it('each loop adds and removes items in the right position (even if multiple items have the same html)', function() {
+
+    var tag = riot.mount('loop-manip')[0],
+        root = tag.root,
+        children = root.getElementsByTagName('loop-manip')
+
+    tags.push(tag)
+
+    tag.top()
+    tag.update()
+    tag.bottom()
+    tag.update()
+    tag.top()
+    tag.update()
+    tag.bottom()
+    tag.update()
+
+    expect(root.getElementsByTagName('ul')[0].innerHTML.trim()).to.be('<li> 100 <a>remove</a> </li><li> 100 <a>remove</a> </li><li> 0 <a>remove</a> </li><li> 1 <a>remove</a> </li><li> 2 <a>remove</a> </li><li> 3 <a>remove</a> </li><li> 4 <a>remove</a> </li><li> 5 <a>remove</a> </li><li> 100 <a>remove</a> </li><li> 100 <a>remove</a> </li>'.trim())
+
 
   })
 
