@@ -206,17 +206,9 @@ describe('Compiler Browser', function() {
     tag2.unmount()
     tag3.unmount()
 
-    tag = riot.mount('test', { val: 110 })[0]
-    tag2 = riot.mount('#foo', 'test', { val: 140 })[0]
-    tag3 = riot.mount(bar, 'test', { val: 150 })
-
-    expect(tag.root.innerHTML).to.be('<p>Val: 110</p>')
-    expect(tag2.root.innerHTML).to.be('<p>Val: 140</p>')
-    expect(tag3.root.innerHTML).to.be('<p>Val: 150</p>')
-
-    tags.push(tag)
-    tags.push(tag2)
-    tags.push(tag3)
+    expect(document.body.getElementsByTagName('test').length).to.be(0)
+    expect(document.getElementById('foo')).to.be(null)
+    expect(document.getElementById('bar')).to.be(null)
 
   })
 
