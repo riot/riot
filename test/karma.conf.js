@@ -12,6 +12,7 @@ module.exports = function(config) {
         '/tag/': '/base/tag/'
       },
       files: [
+          'polyfills/bind.js',
           '../node_modules/mocha/mocha.js',
           '../node_modules/expect.js/index.js',
           '../dist/riot/riot+compiler.js',

@@ -11,7 +11,7 @@ describe('Compiler Browser', function() {
 
           '  <\/foo>',
           '  <timetable>',
-          '     <timer start={ time } each={ time, i in times }><\/timer>',
+          '     <timer ontick={ parent.opts.ontick } start={ time } each={ time, i in times }><\/timer>',
           '     <foo barz=\"899\" baz=\"90\"><\/foo>',
           '     <p>{ kama }<\/p>',
 
@@ -20,6 +20,7 @@ describe('Compiler Browser', function() {
 
           '  <\/timetable>',
           '<\/script>',
+
           '<script type=\"riot\/tag\" src=\"tag\/timer.tag\"><\/script>',
           '<timetable><\/timetable>',
 
@@ -59,6 +60,43 @@ describe('Compiler Browser', function() {
           '<\/outer>',
 
           '<\/script>',
+
+          // each loop
+
+          '<loop><\/loop>',
+
+          '<script type=\"riot\/tag\">',
+
+          '<loop>',
+          '<ul>',
+          '  <li each="{ item, i in items }">',
+          '    { i }',
+          '    { item.value }',
+          '  <\/li>',
+          '<\/ul>',
+          '<button onclick={ addSomeItems }>btn<\/button>',
+
+          'this.items = []',
+          ' ',
+          ' addSomeItems(e) {',
+          '    var amount = 5',
+          '    while(amount--){',
+          '      this.items.push({value: "item #" + this.items.length})',
+          '    }',
+          '  }',
+          ' ',
+          '<\/loop>',
+
+          '<\/script>',
+
+          // loop context
+
+          '<loop-child><\/loop-child>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-child.tag\"><\/script>',
+
+          // loop order
+          '<loop-manip><\/loop-manip>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-manip.tag\"><\/script>',
 
 
           // brackets
@@ -113,9 +151,18 @@ describe('Compiler Browser', function() {
 
   })
 
-  it('compiles', function() {
+  it('compiles and unmount the children tags', function(done) {
 
-    tags.push(riot.mount('timetable', { start: 0 }))[0]
+    this.timeout(3000)
+
+    var ticks = 0,
+        tag = riot.mount('timetable', {
+        start: 0,
+        ontick: function() {
+          ticks++
+        }
+      })[0]
+
     expect(document.getElementsByTagName('timer').length).to.be(3)
 
     riot.update()
@@ -132,47 +179,47 @@ describe('Compiler Browser', function() {
 
     expect(+new Date() - begin).to.be.below(100)
 
+    expect(tag.tags.foo).to.not.be('undefined')
+
+    tag.unmount()
+
+    // no time neither for one tick
+    // because the tag got unmounted too early
+    setTimeout(function() {
+      expect(ticks).to.be(0)
+      done()
+    }, 1200)
+
   })
 
   it('mount and unmount', function() {
 
-    riot.compile(function() {
+    var tag = riot.mount('test', { val: 10 })[0],
+        tag2 = riot.mount('#foo', 'test', { val: 30 })[0],
+        tag3 = riot.mount(document.getElementById('bar'), 'test', { val: 50 })
 
-      var tag = riot.mount('test', { val: 10 })[0],
-          tag2 = riot.mount('#foo', 'test', { val: 30 })[0],
-          tag3 = riot.mount(document.getElementById('bar'), 'test', { val: 50 })
+    expect(tag.root.innerHTML).to.be('<p>Val: 10</p>')
+    expect(tag2.root.innerHTML).to.be('<p>Val: 30</p>')
+    expect(tag3.root.innerHTML).to.be('<p>Val: 50</p>')
 
-      expect(tag.root.innerHTML).to.be('<p>Val: 10</p>')
-      expect(tag2.root.innerHTML).to.be('<p>Val: 30</p>')
-      expect(tag3.root.innerHTML).to.be('<p>Val: 50</p>')
+    tag.unmount()
+    tag2.unmount()
+    tag3.unmount()
 
-      tag.unmount()
-      tag2.unmount()
-      tag3.unmount()
+    expect(document.body.getElementsByTagName('test').length).to.be(0)
+    expect(document.getElementById('foo')).to.be(null)
+    expect(document.getElementById('bar')).to.be(null)
 
-      tag = riot.mount('test', { val: 110 })[0]
-      tag2 = riot.mount('#foo', 'test', { val: 140 })[0]
-      tag3 = riot.mount(bar, 'test', { val: 150 })
-
-      expect(tag.root.innerHTML).to.be('<p>Val: 110</p>')
-      expect(tag2.root.innerHTML).to.be('<p>Val: 140</p>')
-      expect(tag3.root.innerHTML).to.be('<p>Val: 150</p>')
-
-      tags.push(tag)
-      tags.push(tag2)
-      tags.push(tag3)
-
-    })
   })
 
-  it('avoid to duplicate tags in multiple foreach loop', function() {
+  it('avoid to duplicate tags in multiple foreach loops', function() {
 
     var mountTag = function(tagId) {
       var data = [],
           tag,
           itemsCount = 5
 
-      while (--itemsCount) {
+      while (itemsCount--) {
         data.push({
           value: 'item #' + itemsCount
         })
@@ -188,15 +235,91 @@ describe('Compiler Browser', function() {
     mountTag('#outer2')
     mountTag('#outer3')
 
-    expect(outer1.getElementsByTagName('inner').length).to.be(4)
-    expect(outer1.getElementsByTagName('span').length).to.be(4)
-    expect(outer1.getElementsByTagName('p').length).to.be(4)
-    expect(outer2.getElementsByTagName('inner').length).to.be(4)
-    expect(outer2.getElementsByTagName('span').length).to.be(4)
-    expect(outer2.getElementsByTagName('p').length).to.be(4)
-    expect(outer3.getElementsByTagName('inner').length).to.be(4)
-    expect(outer3.getElementsByTagName('span').length).to.be(4)
-    expect(outer3.getElementsByTagName('p').length).to.be(4)
+    expect(outer1.getElementsByTagName('inner').length).to.be(5)
+    expect(outer1.getElementsByTagName('span').length).to.be(5)
+    expect(outer1.getElementsByTagName('p').length).to.be(5)
+    expect(outer2.getElementsByTagName('inner').length).to.be(5)
+    expect(outer2.getElementsByTagName('span').length).to.be(5)
+    expect(outer2.getElementsByTagName('p').length).to.be(5)
+    expect(outer3.getElementsByTagName('inner').length).to.be(5)
+    expect(outer3.getElementsByTagName('span').length).to.be(5)
+    expect(outer3.getElementsByTagName('p').length).to.be(5)
+
+  })
+
+  it('the each loops update correctly the DOM nodes', function() {
+    var tag = riot.mount('loop')[0],
+        root = tag.root,
+        button = root.getElementsByTagName('button')[0],
+        itemsCount = 5
+
+    tags.push(tag)
+
+    tag.items = []
+
+    while (itemsCount--) {
+      tag.items.push({
+        value: 'item #' + tag.items.length
+      })
+    }
+    tag.update()
+    expect(root.getElementsByTagName('li').length).to.be(5)
+
+    // no update is required here
+    button.onclick({})
+    expect(root.getElementsByTagName('li').length).to.be(10)
+    expect(root.getElementsByTagName('ul')[0].innerHTML.trim()).to.be('<li> 0 item #0 </li><li> 1 item #1 </li><li> 2 item #2 </li><li> 3 item #3 </li><li> 4 item #4 </li><li> 5 item #5 </li><li> 6 item #6 </li><li> 7 item #7 </li><li> 8 item #8 </li><li> 9 item #9 </li>'.trim())
+
+    tag.items.reverse()
+    tag.update()
+    expect(root.getElementsByTagName('li').length).to.be(10)
+    expect(root.getElementsByTagName('ul')[0].innerHTML.trim()).to.be('<li> 0 item #9 </li><li> 1 item #8 </li><li> 2 item #7 </li><li> 3 item #6 </li><li> 4 item #5 </li><li> 5 item #4 </li><li> 6 item #3 </li><li> 7 item #2 </li><li> 8 item #1 </li><li> 9 item #0 </li>'.trim())
+
+    var temp_item = tag.items[1]
+    tag.items[1] = tag.items[8]
+    tag.items[8] = temp_item
+    tag.update()
+    expect(root.getElementsByTagName('ul')[0].innerHTML.trim()).to.be('<li> 0 item #9 </li><li> 1 item #1 </li><li> 2 item #7 </li><li> 3 item #6 </li><li> 4 item #5 </li><li> 5 item #4 </li><li> 6 item #3 </li><li> 7 item #2 </li><li> 8 item #8 </li><li> 9 item #0 </li>'.trim())
+
+    tag.items = []
+    tag.update()
+    expect(root.getElementsByTagName('li').length).to.be(0)
+
+  })
+
+  it('each loop creates correctly a new context', function() {
+
+    var tag = riot.mount('loop-child')[0],
+        root = tag.root,
+        children = root.getElementsByTagName('looped-child')
+
+    expect(children.length).to.be(2)
+    expect(children[0].innerHTML).to.be('<h3>one</h3> <button>one</button>')
+    expect(children[1].innerHTML).to.be('<h3>two</h3> <button>two</button>')
+
+    tags.push(tag)
+
+  })
+
+  it('each loop adds and removes items in the right position (even if multiple items have the same html)', function() {
+
+    var tag = riot.mount('loop-manip')[0],
+        root = tag.root,
+        children = root.getElementsByTagName('loop-manip')
+
+    tags.push(tag)
+
+    tag.top()
+    tag.update()
+    tag.bottom()
+    tag.update()
+    tag.top()
+    tag.update()
+    tag.bottom()
+    tag.update()
+
+    expect(root.getElementsByTagName('ul')[0].innerHTML.trim()).to.be('<li> 100 <a>remove</a> </li><li> 100 <a>remove</a> </li><li> 0 <a>remove</a> </li><li> 1 <a>remove</a> </li><li> 2 <a>remove</a> </li><li> 3 <a>remove</a> </li><li> 4 <a>remove</a> </li><li> 5 <a>remove</a> </li><li> 100 <a>remove</a> </li><li> 100 <a>remove</a> </li>'.trim())
+
 
   })
 

@@ -15,9 +15,11 @@
     <script src="ie8/html5-shiv.js"></script>
     <script>
       html5.addElements(
-        'timetable timer loop-manip loop-child looped-child loop-context loop-strings img-test ' +
-        'loop-replace loop-position tag-nesting inner1 inner2 inner-html inner-content loop-object ' +
-        'loop-multi loop-nested table-data if-test if-child treeview lazy-if treeitem expr-parent expr-child'
+        'timetable timer loop-manip loop-child looped-child loop-context ' +
+        'loop-strings img-test loop-replace loop-position tag-nesting ' +
+        'inner1 inner2 inner-html inner-content loop-object loop-multi ' +
+        'loop-nested table-data if-test if-child treeview lazy-if ' +
+        'treeitem expr-parent expr-child form-controls'
       )
     </script>
   <![endif]-->
@@ -30,6 +32,8 @@
 
     <!--
     -->
+    <form-controls></form-controls>
+
     <if-test></if-test>
     <loop-object></loop-object>
     <img-test></img-test>
@@ -50,11 +54,12 @@
     <loop-equalitems></loop-equalitems>
     <loop-reorder></loop-reorder>
     <expr-parent></expr-parent>
-    <loop-manip></loop-manip>
 
     <tag-nesting></tag-nesting>
 
     <loop-child></loop-child>
+    <loop-manip></loop-manip>
+
     <!--
     <inner-html>
       <h3>World!</h3>

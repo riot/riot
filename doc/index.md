@@ -1,5 +1,5 @@
 
-title: Riot 2.0 | A React- like UI library
+title: Riot 2.0 | A React-like UI library
 subtitle: Why Riot?
 description: And why we need a new UI library
 body_id: riot-home
@@ -39,7 +39,7 @@ Riot brings custom tags to all browsers starting from IE8.
 
 </todo>
 ```
-A custom tag glues relevant HTML and JavaScript together forming a reusable component. Think React + Polymer but with ejoyable syntax and a small learning curve.
+A custom tag glues relevant HTML and JavaScript together forming a reusable component. Think React + Polymer but with enjoyable syntax and a small learning curve.
 
 
 ### Human-readable
@@ -147,7 +147,7 @@ Riot is an "open stack". It's meant for developers who want to avoid framework s
 
 Today I have used #riotjs 2.0 for the first time and I could admit that It will be a long term relationship #js highly recommended. [@gianlucaguarini](https://twitter.com/gianlucaguarini/status/559756081862574080)
 
-I am not a fan of the custom tags and DOM events binding but I've tested riotjs and it is damn fast/performant #impressed. [‏@gianlucaguarini](https://twitter.com/gianlucaguarini/status/559429908179714049)
+I’m loving riot.js! So much power packed into 3.5kb. [@ncthis](https://twitter.com/ncthis/status/575204037877833728)
 
 looking at RiotJS https://muut.com/riotjs/  - blown away by its simplicity. [@defeated](https://twitter.com/defeated/status/559215403541757952)
 
