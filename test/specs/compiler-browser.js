@@ -102,6 +102,11 @@ describe('Compiler Browser', function() {
           '<nested-child><\/nested-child>',
           '<script type=\"riot\/tag\" src=\"tag\/nested-child.tag\"><\/script>',
 
+          // multiple mount at same time
+          '<multi-mount value="1"><\/multi-mount>',
+          '<multi-mount value="2"><\/multi-mount>',
+          '<multi-mount value="3"><\/multi-mount>',
+          '<multi-mount value="4"><\/multi-mount>',
 
           // brackets
 
@@ -302,6 +307,25 @@ describe('Compiler Browser', function() {
     expect(children[1].innerHTML).to.be('<h3>two</h3> <button>two</button>')
 
     tags.push(tag)
+
+  })
+
+  it('the mount method could be triggered also on several tags using a NodeList instance', function() {
+
+    riot.tag('multi-mount', '{ opts.value }')
+
+    var multipleTags = riot.mount(document.querySelectorAll('multi-mount'))
+
+    expect(multipleTags[0].root.innerHTML).to.be('1')
+    expect(multipleTags[1].root.innerHTML).to.be('2')
+    expect(multipleTags[2].root.innerHTML).to.be('3')
+    expect(multipleTags[3].root.innerHTML).to.be('4')
+
+    var i = multipleTags.length
+
+    while(i--) {
+      tags.push(multipleTags[i])
+    }
 
   })
 
