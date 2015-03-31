@@ -98,6 +98,10 @@ describe('Compiler Browser', function() {
           '<loop-manip><\/loop-manip>',
           '<script type=\"riot\/tag\" src=\"tag\/loop-manip.tag\"><\/script>',
 
+          // looped child
+          '<nested-child><\/nested-child>',
+          '<script type=\"riot\/tag\" src=\"tag\/nested-child.tag\"><\/script>',
+
 
           // brackets
 
@@ -320,6 +324,22 @@ describe('Compiler Browser', function() {
 
     expect(root.getElementsByTagName('ul')[0].innerHTML.trim()).to.be('<li> 100 <a>remove</a> </li><li> 100 <a>remove</a> </li><li> 0 <a>remove</a> </li><li> 1 <a>remove</a> </li><li> 2 <a>remove</a> </li><li> 3 <a>remove</a> </li><li> 4 <a>remove</a> </li><li> 5 <a>remove</a> </li><li> 100 <a>remove</a> </li><li> 100 <a>remove</a> </li>'.trim())
 
+
+  })
+
+  it('all the nested tags will are correctly pushed to the parent.tags property', function() {
+
+    var tag = riot.mount('nested-child')[0],
+        root = tag.root
+
+    tags.push(tag)
+
+    expect(tag.tags.child.length).to.be(6)
+    expect(tag.tags['another-nested-child']).to.be.an('object')
+    tag.tags.child[0].unmount()
+    expect(tag.tags.child.length).to.be(5)
+    tag.tags['another-nested-child'].unmount()
+    expect(tag.tags['another-nested-child']).to.be(undefined)
 
   })
 
