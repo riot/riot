@@ -922,9 +922,14 @@ riot.mount = function(selector, tagName, opts) {
     push(selector)
     return tags[0]
 
-  // selector
+  // selector or NodeList
   } else {
-    each(document.querySelectorAll(selector), push)
+    selector = typeof selector.length === 'number'
+      && typeof selector.item !== 'undefined'
+      ? selector
+      : document.querySelectorAll(selector);
+
+    each(selector, push)
     return tags
   }
 
