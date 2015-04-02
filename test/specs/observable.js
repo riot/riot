@@ -55,6 +55,26 @@ describe('Observable', function() {
 
   })
 
+  it('one & on sharing the same handler', function() {
+    var handler1 = function() { counter++ },
+        handler2 = function() { counter++ }
+
+    el.one('foo', handler1)
+      .on('foo', handler2)
+      .one('foo2', handler2)
+      .on('foo2', handler1)
+
+    el
+      .trigger('foo')
+      .trigger('foo')
+      .trigger('foo')
+      .trigger('foo2')
+      .trigger('foo2')
+
+    expect(counter).to.be(7)
+
+  })
+
   it('Remove listeners', function() {
 
     function r() {
