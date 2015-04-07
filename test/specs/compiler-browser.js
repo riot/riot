@@ -135,7 +135,16 @@ describe('Compiler Browser', function() {
           '    this.x = \"ok\"',
           '  <\/test-g>',
 
-          '<\/script>'
+          '<\/script>',
+
+          // riot-tag attribute
+
+          '<script type=\"riot\/tag\">',
+          '  <rtag><p>Val: { opts.val }<\/p><\/rtag>',
+          '<\/script>',
+
+          '<div id="rtag" riot-tag="rtag"><\/div>'
+
         ].join('\r'),
       tags = [],
       div = document.createElement('div')
@@ -418,5 +427,16 @@ describe('Compiler Browser', function() {
     expect(tag.root.innerHTML).to.be('<p>ok</p>')
 
   })
+
+  it('riot-tag attribute', function() {
+
+    var tag = riot.mount('rtag', { val: 10 })[0]
+    expect(tag.root.innerHTML).to.be('<p>Val: 10</p>')
+
+    tag.unmount()
+    expect(document.body.getElementsByTagName('rtag').length).to.be(0)
+
+  })
+
 
 })
