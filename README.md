@@ -96,6 +96,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
 - [Another flux demo caparable to React ones](http://txchen.github.io/feplay/riot_flux)
 - [Various experiments](http://richardbondi.net/programming/riot)
+- [Isomorphic application](https://github.com/ListnPlay/riot-isomorphic)
 
 ### Tutorials
 - [Building Apps with Riot, ES6 and Webpack](http://blog.srackham.com/posts/riot-es6-webpack-apps/)

@@ -71,6 +71,19 @@ riot.mount(document.getElementById('slide'), 'users', api)
 This method is deprecated since *v2.0.11*. This is the same as `riot.mount(domNode, tagName, [opts])`.
 
 
+### riot.render(tagName, [opts]) | #render
+
+Rendering a tag to html. This method is only available on *server-side* (Node/io.js). For example:
+
+```
+// render "my-tag" to html
+var mytag = require('my-tag')
+riot.render(mytag, { foo: 'bar' })
+```
+
+@returns: tags render as html
+
+
 ## Tag instance
 
 Following properties are set for each tag instance:
