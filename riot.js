@@ -1,10 +1,11 @@
-/* Riot v2.0.13, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v2.0.14, @license MIT, (c) 2015 Muut Inc. + contributors */
 
-;(function() {
+;(function(window) {
+  // 'use strict' does not allow us to override the events properties https://github.com/muut/riotjs/blob/dev/lib/tag/update.js#L7-L10
+  // it leads to the following error on firefox "setting a property that has only a getter"
+  //'use strict'
 
-  var riot = { version: 'v2.0.13', settings: {} }
-
-  'use strict'
+  var riot = { version: 'v2.0.14', settings: {} }
 
 riot.observable = function(el) {
 
@@ -44,8 +45,11 @@ riot.observable = function(el) {
 
   // only single event supported
   el.one = function(name, fn) {
-    if (fn) fn.one = 1
-    return el.on(name, fn)
+    function on() {
+      el.off(name, on)
+      fn.apply(el, arguments)
+    }
+    return el.on(name, on)
   }
 
   el.trigger = function(name) {
@@ -56,8 +60,7 @@ riot.observable = function(el) {
       if (!fn.busy) {
         fn.busy = 1
         fn.apply(el, fn.typed ? [name].concat(args) : args)
-        if (fn.one) { fns.splice(i, 1); i-- }
-         else if (fns[i] !== fn) { i-- } // Makes self-removal possible during iteration
+        if (fns[i] !== fn) { i-- }
         fn.busy = 0
       }
     }
@@ -72,12 +75,12 @@ riot.observable = function(el) {
   return el
 
 }
-;(function(riot, evt) {
+;(function(riot, evt, window) {
 
   // browsers only
-  if (!this.top) return
+  if (!window) return
 
-  var loc = location,
+  var loc = window.location,
       fns = riot.observable(),
       win = window,
       current
@@ -121,7 +124,7 @@ riot.observable = function(el) {
 
   win.addEventListener ? win.addEventListener(evt, emit, false) : win.attachEvent('on' + evt, emit)
 
-})(riot, 'hashchange')
+})(riot, 'hashchange', window)
 /*
 
 //// How it works?
@@ -461,14 +464,14 @@ function _each(dom, parent, expr) {
         tag.unmount()
         rendered.splice(pos, 1)
         tags.splice(pos, 1)
+        // to let "each" know that this item is removed
+        return false
       }
 
     })
 
     // mount new / reorder
-    var nodes = [].slice.call(root.childNodes),
-        prev_index = nodes.indexOf(prev)
-
+    var prev_base = [].indexOf.call(root.childNodes, prev) + 1
     each(items, function(item, i) {
 
       // start index search from position based on the current i
@@ -491,20 +494,21 @@ function _each(dom, parent, expr) {
       }
 
       // mount new
+      var nodes = root.childNodes
       if (oldPos < 0) {
-        rendered.push(item)
-        if (!checksum && expr.key) item = mkitem(expr, item, pos)
+        if (!checksum && expr.key) var _item = mkitem(expr, item, pos)
 
         var tag = new Tag({ tmpl: template }, {
-          before: nodes[prev_index + 1 + pos],
+          before: nodes[prev_base + pos],
           parent: parent,
           root: root,
-          item: item
+          item: _item || item
         })
 
         tag.mount()
 
-        return add(pos, item, tag)
+        add(pos, item, tag)
+        return true
       }
 
       // change pos value
@@ -517,7 +521,7 @@ function _each(dom, parent, expr) {
 
       // reorder
       if (pos != oldPos) {
-        root.insertBefore(nodes[prev_index + oldPos + 1], nodes[prev_index + pos + 1])
+        root.insertBefore(nodes[prev_base + oldPos], nodes[prev_base + (pos > oldPos ? pos + 1 : pos)])
         return add(pos, rendered.splice(oldPos, 1)[0], tags.splice(oldPos, 1)[0])
       }
 
@@ -539,8 +543,22 @@ function parseNamedElements(root, parent, child_tags) {
       var child = getTag(dom)
 
       if (child && !dom.getAttribute('each')) {
-        var tag = new Tag(child, { root: dom, parent: parent })
-        parent.tags[dom.getAttribute('name') || child.name] = tag
+        var tag = new Tag(child, { root: dom, parent: parent }),
+            tagName = dom.getAttribute('name') || child.name,
+            cachedTag = parent.tags[tagName]
+
+        // if there are multiple children tags having the same name
+        if (cachedTag) {
+          // if the parent tags property is not yet an array
+          // create it adding the first cached tag
+          if (!Array.isArray(cachedTag))
+            parent.tags[tagName] = [cachedTag]
+          // add the new nested tag to the array
+          parent.tags[tagName].push(tag)
+        } else {
+          parent.tags[tagName] = tag
+        }
+
         // empty the child node once we got its template
         // to avoid that its children get compiled multiple times
         dom.innerHTML = ''
@@ -594,7 +612,6 @@ function parseExpressions(root, tag, expressions) {
   })
 
 }
-
 function Tag(impl, conf) {
 
   var self = riot.observable(this),
@@ -611,6 +628,10 @@ function Tag(impl, conf) {
 
   if (fn && root.riot) return
   root.riot = true
+
+  // create a unique id to this tag
+  // it could be handy to use it also to improve the virtual dom rendering speed
+  this._id = ~~(new Date().getTime() * Math.random())
 
   extend(this, { parent: parent, root: root, opts: opts, tags: {} }, item)
 
@@ -667,16 +688,37 @@ function Tag(impl, conf) {
 
   this.unmount = function() {
     var el = fn ? root : loop_dom,
-        p = el.parentNode
+        p = el.parentNode,
+        // detect the tag name
+        tagName = root.tagName.toLowerCase()
 
     if (p) {
-      if (parent) p.removeChild(el)
-      else while (root.firstChild) root.removeChild(root.firstChild)
-      toggle()
-      self.trigger('unmount')
-      self.off('*')
-      delete root.riot
+
+      if (parent) {
+        // remove this tag from the parent tags object
+        // if there are multiple nested tags with same name..
+        // remove this element form the array
+        if (Array.isArray(parent.tags[tagName])) {
+          each(parent.tags[tagName], function(tag, i) {
+            if (tag._id == self._id)
+              parent.tags[tagName].splice(i, 1)
+          })
+        } else
+          // otherwise just delete the tag instance
+          delete parent.tags[tagName]
+
+        p.removeChild(el)
+      } else {
+        while (el.firstChild) el.removeChild(el.firstChild)
+        p.removeChild(el)
+      }
+
     }
+
+    self.trigger('unmount')
+    toggle()
+    self.off('*')
+    delete root.riot
 
   }
 
@@ -710,7 +752,7 @@ function setEventHandler(name, handler, dom, tag, item) {
     e.item = item
 
     // prevent default behaviour (by default)
-    if (handler.call(tag, e) !== true) {
+    if (handler.call(tag, e) !== true && !/radio|check/.test(dom.type)) {
       e.preventDefault && e.preventDefault()
       e.returnValue = false
     }
@@ -804,7 +846,7 @@ function update(expressions, tag, item) {
 function each(els, fn) {
   for (var i = 0, len = (els || []).length, el; i < len; i++) {
     el = els[i]
-    // return false -> reomve current item during loop
+    // return false -> remove current item during loop
     if (el != null && fn(el, i) === false) i--
   }
   return els
@@ -902,6 +944,7 @@ riot.tag = function(name, html, css, fn) {
   if (typeof css == 'function') fn = css
   else if (css) injectStyle(css)
   tag_impl[name] = { name: name, tmpl: html, fn: fn }
+  return name
 }
 
 riot.mount = function(selector, tagName, opts) {
@@ -924,12 +967,7 @@ riot.mount = function(selector, tagName, opts) {
 
   // selector or NodeList
   } else {
-    selector = typeof selector.length === 'number'
-      && typeof selector.item !== 'undefined'
-      ? selector
-      : document.querySelectorAll(selector);
-
-    each(selector, push)
+    each(typeof selector == 'string' ? document.querySelectorAll(selector) : selector, push)
     return tags
   }
 
@@ -946,20 +984,16 @@ riot.update = function() {
 riot.mountTo = riot.mount
 
 
-  
+
   // share methods for other riot parts, e.g. compiler
   riot.util = { brackets: brackets, tmpl: tmpl }
 
-  // support CommonJS
+  // support CommonJS, AMD & browser
   if (typeof exports === 'object')
     module.exports = riot
-
-  // support AMD
   else if (typeof define === 'function' && define.amd)
     define(function() { return riot })
-
-  // support browser
   else
-    this.riot = riot
+    window.riot = riot
 
-})();
+})(typeof window != 'undefined' ? window : undefined);
