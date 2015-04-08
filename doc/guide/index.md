@@ -708,6 +708,20 @@ Plain objects can also be looped. For example:
 Object loops are not recommended since internally Riot detects changes on the object with `JSON.stringify`. The *whole* object is studied and when there is a change the whole loop is re-rendered. This can be slow. Normal arrays are much faster and only the changes are drawn on the page.
 
 
+## Server-side rendering | #server-side
+
+Riot supports server-side rendering, with Node/io.js you can simple require tags and render to html:
+
+```
+var riot = require('riot')
+var timer = require('timer.tag')
+
+var html = riot.render(timer, { start: 42 })
+
+console.log(html) // <timer><p>Seconds Elapsed: 42</p></timer>
+```
+
+
 # Application design
 
 
