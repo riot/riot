@@ -6,6 +6,7 @@
 [![Build Status][travis-image]][travis-url]
 [![NPM version][npm-version-image]][npm-url]
 [![NPM downloads][npm-downloads-image]][npm-url]
+[![Riot Forum][riot-forum-image]][riot-forum-url]
 
 [![MIT License][license-image]][license-url]
 
@@ -126,3 +127,6 @@ https://muut.com/riotjs/
 [npm-url]: https://npmjs.org/package/riot
 [npm-version-image]: http://img.shields.io/npm/v/riot.svg?style=flat-square
 [npm-downloads-image]: http://img.shields.io/npm/dm/riot.svg?style=flat-square
+
+[riot-forum-url]: https://muut.com/riotjs/forum/
+[riot-forum-image]: doc/logo/join-chat.svg
