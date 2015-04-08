@@ -37,7 +37,9 @@
   "dependencies": {
     "chokidar": "~1.0.0-rc4",
     "minimist": "~1.1.1",
-    "shelljs": "~0.4.0"
+    "shelljs": "~0.4.0",
+    "simple-dom": "^0.2.2",
+    "simple-html-tokenizer": "^0.1.1"
   },
   "devDependencies": {
     "eslint": "^0.17.1",
