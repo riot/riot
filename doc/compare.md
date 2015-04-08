@@ -194,7 +194,7 @@ Polymer (v0.5.2) is 22x bigger than Riot
 <small><em>riot.min.js</em> – 6.7KB</small>
 <span class="bar blue" style="width: 4.5%"></span>
 
-Web components are said to be the [King of all polyfilling challenges](http://developer.telerik.com/featured/web-components-arent-ready-production-yet/) and this is why Polymer requires such a large amount of code.
+Web components are said to be the [king of all polyfilling challenges](http://developer.telerik.com/featured/web-components-arent-ready-production-yet/) and this is why Polymer requires such a large amount of code.
 
 
 ### Experimental

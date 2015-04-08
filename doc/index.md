@@ -74,6 +74,7 @@ HTML syntax is the *de facto* language of the web and it's designed for building
 - One way data flow: updates and unmounts are propagated downwards from parent to children.
 - Expressions are pre-compiled and cached for high performance.
 - Lifecycle events for more control.
+- Server-side rendering of custom tags
 
 
 ### Close to standards
@@ -146,6 +147,9 @@ Riot is an "open stack". It's meant for developers who want to avoid framework s
 ==== .tweets.section
 
 Today I have used #riotjs 2.0 for the first time and I could admit that It will be a long term relationship #js highly recommended. [@gianlucaguarini](https://twitter.com/gianlucaguarini/status/559756081862574080)
+
+I liked the idea of #reactjs with #flux but I like #riotjs with #riotcontrol even better!
+[@tscok](https://twitter.com/tscok/status/580509124598829056)
 
 I’m loving riot.js! So much power packed into 3.5kb. [@ncthis](https://twitter.com/ncthis/status/575204037877833728)
 

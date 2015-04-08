@@ -52,7 +52,6 @@ cdnjs: https://cdnjs.cloudflare.com/ajax/libs/riot
 `{{ cdnjs }}/{{ riot_version }}/riot.min.js`
 
 
-
 ### Package managers
 
 #### [Bower](http://bower.io/search/?q=riot.js)
