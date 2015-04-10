@@ -98,6 +98,10 @@ describe('Compiler Browser', function() {
           '<loop-manip><\/loop-manip>',
           '<script type=\"riot\/tag\" src=\"tag\/loop-manip.tag\"><\/script>',
 
+          // loop table
+          '<loop-table><\/loop-table>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-table.tag\"><\/script>',
+
           // looped child
           '<nested-child><\/nested-child>',
           '<script type=\"riot\/tag\" src=\"tag\/nested-child.tag\"><\/script>',
@@ -365,6 +369,12 @@ describe('Compiler Browser', function() {
     tag.tags['another-nested-child'].unmount()
     expect(tag.tags['another-nested-child']).to.be(undefined)
 
+  })
+
+  it('loop table item correct', function() {
+    var tag = riot.mount('loop-table')[0],
+        root = tag.root
+    expect(root.innerHTML).to.be('<table> <tbody><tr> <td>1</td> <td>Peter</td> </tr><tr> <td>2</td> <td>Sherman</td> </tr><tr> <td>3</td> <td>Laura</td> </tr> </tbody></table>')
   })
 
   it('brackets', function() {
