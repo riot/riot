@@ -1,5 +1,5 @@
 
-;(function(is_server) {
+;(function(window) {
 
   var BOOL_ATTR = ('allowfullscreen,async,autofocus,autoplay,checked,compact,controls,declare,default,'+
     'defaultchecked,defaultmuted,defaultselected,defer,disabled,draggable,enabled,formnovalidate,hidden,'+
@@ -38,7 +38,7 @@
       SET_ATTR = /([\w\-]+)=(["'])([^\2]+?)\2/g,
       EXPR = /{\s*([^}]+)\s*}/g,
       // (tagname) (html) (javascript) endtag
-      CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\/}]>$)?([^\x00]*?)^<\/\1>/gim,
+      CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\/}"']>$)?([^\x00]*?)^<\/\1>/gim,
       SCRIPT = /<script(\s+type=['"]?([^>'"]+)['"]?)?>([^\x00]*?)<\/script>/gm,
       STYLE = /<style(\s+type=['"]?([^>'"]+)['"]?|\s+scoped)?>([^\x00]*?)<\/style>/gm,
       CSS_SELECTOR = /(^|\}|\{)\s*([^\{\}]+)\s*(?=\{)/g,
@@ -107,10 +107,16 @@
   }
 
   function coffee(js) {
+    if (typeof exports === 'undefined') {
+      return CoffeeScript.compile(js, { bare: true })
+    }
     return require('coffee-script').compile(js, { bare: true })
   }
 
   function es6(js) {
+    if (typeof exports === 'undefined') {
+      return babel.transform(js, { blacklist: ['useStrict'] }).code
+    }
     return require('babel').transform(js, { blacklist: ['useStrict'] }).code
   }
 
@@ -234,8 +240,8 @@
       }
 
       // styles in <style> tag
-      var style = ''
-      var styleType = 'css'
+      var styleType = 'css',
+          style = ''
 
       html = html.replace(STYLE, function(_, fullType, _type, _style) {
         if (fullType && 'scoped' == fullType.trim()) styleType = 'scoped-css'
@@ -257,7 +263,7 @@
 
 
   // io.js (node)
-  if (is_server) {
+  if (!window) {
     this.riot = require(process.env.RIOT || '../riot')
     return module.exports = {
       compile: compile,
@@ -268,7 +274,7 @@
   }
 
   // browsers
-  var doc = document,
+  var doc = window.document,
       promise,
       ready
 
@@ -299,15 +305,16 @@
   }
 
   function compileScripts(fn) {
-    var scripts = doc.querySelectorAll('script[type="riot/tag"]')
+    var scripts = doc.querySelectorAll('script[type="riot/tag"]'),
+        scriptsAmount = scripts.length
 
-    ;[].map.call(scripts, function(script, i) {
+    ;[].map.call(scripts, function(script) {
       var url = script.getAttribute('src')
 
       function compileTag(source) {
         globalEval(source)
-
-        if (i + 1 == scripts.length) {
+        scriptsAmount--
+        if (!scriptsAmount) {
           promise.trigger('ready')
           ready = true
           fn && fn()
@@ -371,4 +378,4 @@
   // @deprecated
   riot.mountTo = riot.mount
 
-})(!this.top)
+})(typeof window != 'undefined' ? window : undefined)

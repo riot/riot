@@ -48,14 +48,14 @@ Riot reduces the need for jQuery. You no longer need selectors, traversing, even
 
 
 ### Isn't `onclick` evil?
-It's not evil, it only looks bad. To have JS and HTML under the same module is more important than aesthetics. The minimal Riot syntax makes event handlers look decent.
+It's not evil, it just looks "old". To have JS and HTML under the same module is more important than aesthetics. The minimal Riot syntax makes event handlers look decent.
 
 ### Any future plans?
 
 Yes:
 
-1. Server side HTML generation and "isomorphic" applications
-2. Full modules with CSS support
-3. Plugin system
-4. Tag option validation using HTML attributes
+1. Performance improvements ( especially looping )
+2. Plugin system
+3. Tag option validation using HTML attributes
+
 
