@@ -12,7 +12,10 @@ describe('Speed', function() {
 
   it('it must render a list of 2000 items in less than a second', function() {
     var time,
-        renderingTime = 1000 // this must be a looooot faster
+        renderingTime = 2000 // this must be a looooot faster
+
+    this.timeout(5000)
+
     // this is going to be slow
     riot.tag('my-tag', '<div> <h1><button onclick="{ clicked }">reverse list</button></h1> <h2 each="{ item, i in opts.items }" id="{ first-item: i === 0 }">{ item.value }</h2> </div>', function(opts) {
       var self = this

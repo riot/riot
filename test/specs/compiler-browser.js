@@ -135,7 +135,17 @@ describe('Compiler Browser', function() {
           '    this.x = \"ok\"',
           '  <\/test-g>',
 
-          '<\/script>'
+          '<\/script>',
+
+          // mount the same tag multiple times
+          '<div id=\"multi-mount-container-1\"><\/div>',
+
+          // multple mount using *
+          '<div id=\"multi-mount-container-2\">',
+          '    <test-i><\/test-i>',
+          '    <test-l><\/test-l>',
+          '    <test-m><\/test-m>',
+          '<\/div>'
         ].join('\r'),
       tags = [],
       div = document.createElement('div')
@@ -213,13 +223,45 @@ describe('Compiler Browser', function() {
 
     tag.unmount()
     tag2.unmount()
-    tag3.unmount()
+    tag3.unmount(true)
 
     expect(document.body.getElementsByTagName('test').length).to.be(0)
     expect(document.getElementById('foo')).to.be(null)
-    expect(document.getElementById('bar')).to.be(null)
+    expect(document.getElementById('bar')).to.not.be(null)
+
+    expect(tag.root._tag).to.be(undefined)
+    expect(tag2.root._tag).to.be(undefined)
+    expect(tag3.root._tag).to.be(undefined)
 
   })
+
+  it('mount a tag mutiple times', function() {
+    var tag = riot.mount('#multi-mount-container-1', 'test', { val: 300 })[0]
+
+    expect(tag.root.innerHTML).to.be('<p>Val: 300</p>')
+
+    riot.tag('test-h', '<p>{ x }</p>', function() { this.x = 'ok'})
+
+    tag = riot.mount('#multi-mount-container-1', 'test-h')[0]
+
+    expect(tag.root.innerHTML).to.be('<p>ok</p>')
+
+  })
+
+/*  it('mount a tag mutiple times using "*"', function() {
+
+
+    riot.tag('test-i', '<p>{ x }</p>', function() { this.x = 'ok'})
+    riot.tag('test-l', '<p>{ x }</p>', function() { this.x = 'ok'})
+    riot.tag('test-m', '<p>{ x }</p>', function() { this.x = 'ok'})
+
+    var tag = riot.mount('#multi-mount-container-2', '*')[0]
+
+    expect(tag.tags['test-i']).to.not.be(undefined)
+    expect(tag.tags['test-l']).to.not.be(undefined)
+    expect(tag.tags['test-m']).to.not.be(undefined)
+
+  })*/
 
   it('avoid to duplicate tags in multiple foreach loops', function() {
 
@@ -329,7 +371,7 @@ describe('Compiler Browser', function() {
 
   })
 
-  it('each loop adds and removes items in the right position (even if multiple items have the same html)', function() {
+  it('each loop adds and removes items in the right position (when multiple items share the same html)', function() {
 
     var tag = riot.mount('loop-manip')[0],
         root = tag.root,
