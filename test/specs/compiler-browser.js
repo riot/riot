@@ -205,7 +205,7 @@ describe('Compiler Browser', function() {
 
     var tag = riot.mount('test', { val: 10 })[0],
         tag2 = riot.mount('#foo', 'test', { val: 30 })[0],
-        tag3 = riot.mount(document.getElementById('bar'), 'test', { val: 50 })
+        tag3 = riot.mount(document.getElementById('bar'), 'test', { val: 50 })[0]
 
     expect(tag.root.innerHTML).to.be('<p>Val: 10</p>')
     expect(tag2.root.innerHTML).to.be('<p>Val: 30</p>')
