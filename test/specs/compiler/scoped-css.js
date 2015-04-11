@@ -1,7 +1,7 @@
 describe('Scoped CSS', function() {
 
   function render(str) {
-    return compiler.style(str, 'my-tag', 'scoped-css')
+    return compiler.style(str, {}, 'my-tag', 'css', true)
   }
 
   it('add my-tag to the simple selector', function() {

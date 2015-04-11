@@ -171,9 +171,11 @@ The compile function takes a string and returns a string.
 
 ## Pre-processors
 
-This is the main fruit of pre- compilation. You can use your favourite pre- processor to create custom tags. Both HTML and JavaScript processor can be customized.
+This is the main fruit of pre- compilation. You can use your favourite pre- processor to create custom tags. HTML, CSS and JavaScript processor can be customized.
 
-The source language is specified with `--type` or `-t` argument on the command line or you can define the language on the script tag as follows:
+The source language is specified with `--type` or `-t` argument on the command line or you can define the language on the script tag.
+
+The same applies to CSS preprocessors. They can be specified on the command line with `--styletype` or `-s` or directly on the style element. For example:
 
 ```
 <my-tag>
@@ -182,6 +184,20 @@ The source language is specified with `--type` or `-t` argument on the command l
   <script type="coffeescript">
     @hello = 'world'
   </script>
+
+  <style type="less">
+    @nice-blue: #5B83AD;
+    @light-blue: @nice-blue + #111;
+
+    my-tag {
+      color: @light-blue;
+
+      h3 {
+        color: @nice-blue;
+      }
+    }
+  </style>
+
 </my-tag>
 ```
 
@@ -332,7 +348,14 @@ As you notice, you can define the script type on the template as well. Above we 
 npm install jade
 ```
 
+### SASS, LESS and Stylus
 
+Style blocks can be processed with the `styletype` configuration option. For example:
+
+``` sh
+# use Stylus CSS pre-processor
+riot --styletype stylus source.tag
+```
 
 ### Any language
 
