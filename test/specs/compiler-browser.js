@@ -145,8 +145,13 @@ describe('Compiler Browser', function() {
           '    <test-i><\/test-i>',
           '    <test-l><\/test-l>',
           '    <test-m><\/test-m>',
-          '<\/div>'
-        ].join('\r'),
+          '<\/div>',
+
+          // tags property in loop
+          '<ploop-tag><\/ploop-tag>',
+          '<script type=\"riot\/tag\" src=\"tag\/ploop-tag.tag\"><\/script>'
+
+      ].join('\r'),
       tags = [],
       div = document.createElement('div')
 
@@ -458,6 +463,21 @@ describe('Compiler Browser', function() {
     tags.push(tag)
 
     expect(tag.root.innerHTML).to.be('<p>ok</p>')
+
+  })
+
+  it('tags property in loop', function() {
+    var tag = riot.mount('ploop-tag', {
+      elements: [{
+        foo: 'foo',
+        id: 0
+      }, {
+        foo: 'bar',
+        id: 1
+      }]
+    })[0]
+
+    expect(tag.tags['ploop-child'].length).to.be(3)
 
   })
 
