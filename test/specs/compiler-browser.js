@@ -326,9 +326,9 @@ describe('Compiler Browser', function() {
     expect(root.getElementsByTagName('li').length).to.be(10)
     expect(root.getElementsByTagName('ul')[0].innerHTML.trim()).to.be('<li> 0 item #9 </li><li> 1 item #8 </li><li> 2 item #7 </li><li> 3 item #6 </li><li> 4 item #5 </li><li> 5 item #4 </li><li> 6 item #3 </li><li> 7 item #2 </li><li> 8 item #1 </li><li> 9 item #0 </li>'.trim())
 
-    var temp_item = tag.items[1]
+    var tempItem = tag.items[1]
     tag.items[1] = tag.items[8]
-    tag.items[8] = temp_item
+    tag.items[8] = tempItem
     tag.update()
     expect(root.getElementsByTagName('ul')[0].innerHTML.trim()).to.be('<li> 0 item #9 </li><li> 1 item #1 </li><li> 2 item #7 </li><li> 3 item #6 </li><li> 4 item #5 </li><li> 5 item #4 </li><li> 6 item #3 </li><li> 7 item #2 </li><li> 8 item #8 </li><li> 9 item #0 </li>'.trim())
 
