@@ -241,9 +241,9 @@ describe('Compiler Browser', function() {
     expect(document.getElementById('foo')).to.be(null)
     expect(document.getElementById('bar')).to.not.be(null)
 
-    expect(tag.root._tag).to.be(undefined)
-    expect(tag2.root._tag).to.be(undefined)
-    expect(tag3.root._tag).to.be(undefined)
+    expect(tag.root._tag).to.be(null)
+    expect(tag2.root._tag).to.be(null)
+    expect(tag3.root._tag).to.be(null)
 
   })
 
