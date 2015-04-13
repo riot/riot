@@ -477,7 +477,7 @@ describe('Compiler Browser', function() {
       }]
     })[0]
 
-    expect(tag.tags['ploop-child'].length).to.be(3)
+    expect(tag.tags['ploop-child'].length).to.be(2)
 
   })
 
