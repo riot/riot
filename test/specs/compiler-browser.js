@@ -106,6 +106,10 @@ describe('Compiler Browser', function() {
           '<loop-option><\/loop-option>',
           '<script type=\"riot\/tag\" src=\"tag\/loop-option.tag\"><\/script>',
 
+          // loop option
+          '<loop-option-selected><\/loop-option-selected>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-option-selected.tag\"><\/script>',
+
           // multiple mount at same time
           '<multi-mount value="1"><\/multi-mount>',
           '<multi-mount value="2"><\/multi-mount>',
@@ -375,6 +379,12 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('loop-option')[0],
         root = tag.root
     expect(root.innerHTML).to.be('<select> <option value="1">Peter</option><option value="2">Sherman</option><option value="3">Laura</option> </select>')
+  })
+
+  it('loop option tag with selected', function() {
+    var tag = riot.mount('loop-option-selected')[0],
+        root = tag.root
+    expect(root.innerHTML).to.be('<select> <option value="1" selected="selected">Peter</option><option value="2">Sherman</option><option value="3">Laura</option> </select>')
   })
 
   it('brackets', function() {
