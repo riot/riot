@@ -161,7 +161,7 @@ describe('Compiler Browser', function() {
           // riot-tag attribute
 
           '<script type=\"riot\/tag\">',
-          '  <rtag><p>Val: { opts.val }<\/p><\/rtag>',
+          '  <rtag><p>val: { opts.val }<\/p><\/rtag>',
           '<\/script>',
 
           '<div id="rtag" riot-tag="rtag"><\/div>'
@@ -509,8 +509,8 @@ describe('Compiler Browser', function() {
 
   it('riot-tag attribute', function() {
 
-    var tag = riot.mount('rtag', { val: 10 })[0]
-    expect(tag.root.innerHTML).to.be('<p>Val: 10</p>')
+    var tag = riot.mount('#rtag', { val: 10 })[0]
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>val: 10</p>')
 
     tag.unmount()
     expect(document.body.getElementsByTagName('rtag').length).to.be(0)
