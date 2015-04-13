@@ -109,6 +109,10 @@ describe('Compiler Browser', function() {
           '<nested-child><\/nested-child>',
           '<script type=\"riot\/tag\" src=\"tag\/nested-child.tag\"><\/script>',
 
+          // loop option
+          '<loop-option><\/loop-option>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-option.tag\"><\/script>',
+
           // multiple mount at same time
           '<multi-mount value="1"><\/multi-mount>',
           '<multi-mount value="2"><\/multi-mount>',
@@ -421,6 +425,12 @@ describe('Compiler Browser', function() {
     tag.tags['another-nested-child'].unmount()
     expect(tag.tags['another-nested-child']).to.be(undefined)
 
+  })
+
+  it('loop option tag', function() {
+    var tag = riot.mount('loop-option')[0],
+        root = tag.root
+    expect(root.innerHTML).to.be('<select> <option value="1">Peter</option><option value="2">Sherman</option><option value="3">Laura</option> </select>')
   })
 
   it('brackets', function() {
