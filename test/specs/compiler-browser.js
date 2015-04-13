@@ -262,10 +262,6 @@ describe('Compiler Browser', function() {
 
   })
 
-  /*
-
-  FIXME: hopefully we could fix it before the next riot release
-
   it('mount a tag mutiple times using "*"', function() {
 
 
@@ -273,13 +269,17 @@ describe('Compiler Browser', function() {
     riot.tag('test-l', '<p>{ x }</p>', function() { this.x = 'ok'})
     riot.tag('test-m', '<p>{ x }</p>', function() { this.x = 'ok'})
 
-    var tag = riot.mount('#multi-mount-container-2', '*')[0]
+    var subTags = riot.mount('#multi-mount-container-2', '*')
 
-    expect(tag.tags['test-i']).to.not.be(undefined)
-    expect(tag.tags['test-l']).to.not.be(undefined)
-    expect(tag.tags['test-m']).to.not.be(undefined)
+    expect(subTags.length).to.be(3)
 
-  })*/
+    subTags = riot.mount(document.getElementById('multi-mount-container-2'), '*')
+
+    expect(subTags.length).to.be(3)
+
+    tags.push(subTags)
+
+  })
 
   it('avoid to duplicate tags in multiple foreach loops', function() {
 
