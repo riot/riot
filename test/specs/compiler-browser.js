@@ -545,7 +545,7 @@ describe('Compiler Browser', function() {
   })
 
 
-  it('allowing the innerHtml transclusion via @yield', function() {
+  it('allowing the innerHtml transclusion via <yield> tag', function() {
     var tag = riot.mount('inner-html')[0]
 
     expect(normalizeHTML(tag.root.innerHTML)).to.be('<h1>Hello,   World  <inner value="ciao mondo"><p> ciao mondo </p></inner></h1>')
