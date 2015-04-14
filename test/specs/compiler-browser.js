@@ -169,7 +169,14 @@ describe('Compiler Browser', function() {
           '  <div riot-tag="rtag"><\/div>',
           '  <div riot-tag="rtag"><\/div>',
           '  <div riot-tag="rtag"><\/div>',
-          '<\/div>'
+          '<\/div>',
+
+          // transclusion of the innerHtml
+          '<script type=\"riot\/tag\" src=\"tag\/inner-html.tag\"><\/script>',
+
+          '<inner-html>',
+          '  <h1>{ greeting }<\/h1>',
+          '<\/inner-html>'
 
         ].join('\r'),
       tags = [],
@@ -534,6 +541,11 @@ describe('Compiler Browser', function() {
 
     tags.push(subTags)
 
+  })
+
+
+  it('allowing the innerHtml transclusion via @yield', function() {
+    riot.mount('inner-html')
   })
 
 
