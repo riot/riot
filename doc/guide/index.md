@@ -707,6 +707,21 @@ Plain objects can also be looped. For example:
 
 Object loops are not recommended since internally Riot detects changes on the object with `JSON.stringify`. The *whole* object is studied and when there is a change the whole loop is re-rendered. This can be slow. Normal arrays are much faster and only the changes are drawn on the page.
 
+### Standard HTML Elements as tags
+
+Standard HTML elements can be used as riot tags in the page body with the addition of the `riot-tag` attribute.
+
+```
+<ul riot-tag="my-tag"></ul>
+```
+
+This provides users with an alternative that can provide greater compatibility with css frameworks.  The tags are treated like any other custom tag.
+
+```
+riot.mount('my-tag')
+```
+
+will mount the `ul` element shown above as if it were `<my-tag></my-tag>`
 
 ## Server-side rendering | #server-side
 
