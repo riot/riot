@@ -175,7 +175,8 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/inner-html.tag\"><\/script>',
 
           '<inner-html>',
-          '  <h1>{ greeting }<\/h1>',
+          '  { greeting }',
+          '  <inner value="ciao mondo"><\/inner>',
           '<\/inner-html>'
 
         ].join('\r'),
@@ -545,7 +546,11 @@ describe('Compiler Browser', function() {
 
 
   it('allowing the innerHtml transclusion via @yield', function() {
-    riot.mount('inner-html')
+    var tag = riot.mount('inner-html')[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<h1>Hello,   World  <inner value="ciao mondo"><p> ciao mondo </p></inner></h1>')
+
+    tags.push(tag)
   })
 
 

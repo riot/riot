@@ -1,6 +1,5 @@
 <inner-html>
-  <h1>Hello,</h1>
-  <yield/>
+  <h1>Hello, <yield/></h1>
 
   this.greeting = 'World'
 </inner-html>
