@@ -164,7 +164,12 @@ describe('Compiler Browser', function() {
           '  <rtag><p>val: { opts.val }<\/p><\/rtag>',
           '<\/script>',
 
-          '<div id="rtag" riot-tag="rtag"><\/div>'
+          '<div id="rtag" riot-tag="rtag"><\/div>',
+          '<div id="rtag-nested">',
+          '  <div riot-tag="rtag"><\/div>',
+          '  <div riot-tag="rtag"><\/div>',
+          '  <div riot-tag="rtag"><\/div>',
+          '<\/div>'
 
         ].join('\r'),
       tags = [],
@@ -514,6 +519,20 @@ describe('Compiler Browser', function() {
 
     tag.unmount()
     expect(document.body.getElementsByTagName('rtag').length).to.be(0)
+
+  })
+
+  it('riot-tag attribute using the "*" selector', function() {
+
+    var subTags = riot.mount('#rtag-nested', '*', { val: 10 })
+
+    expect(subTags.length).to.be(3)
+
+    expect(normalizeHTML(subTags[0].root.innerHTML)).to.be('<p>val: 10</p>')
+    expect(normalizeHTML(subTags[1].root.innerHTML)).to.be('<p>val: 10</p>')
+    expect(normalizeHTML(subTags[2].root.innerHTML)).to.be('<p>val: 10</p>')
+
+    tags.push(subTags)
 
   })
 
