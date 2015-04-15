@@ -1,6 +1,6 @@
 <ploop-tag>
   <div each="{ opts.elements }">
-    <ploop-child foo="{ foo }" name="child-{ this.id }"></ploop-child>
+    <div><ploop-child foo="{ foo }" name="child-{ this.id }"></ploop-child></div>
   </div>
 </ploop-tag>
 
