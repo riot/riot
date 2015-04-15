@@ -204,9 +204,22 @@ self.update({ error: error_message })
 which is shorter and cleaner.
 
 
-### this.unmount() | #tag-unmount
+### this.unmount(keepTheParent) | #tag-unmount
 
 Detaches the tag and it's children from the page. An "unmount" event is fired.
+If you want to unmount a tag without removing the parent tag you need to pass `true` to the unmount method
+
+Remove the tag from the DOM:
+
+``` js
+mytag.unmount()
+```
+
+Remove the tag children and keep only the parent tag:
+
+``` js
+mytag.unmount(true)
+```
 
 
 #### Events
