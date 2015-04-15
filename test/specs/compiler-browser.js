@@ -553,7 +553,7 @@ describe('Compiler Browser', function() {
     })[0]
 
     expect(tag.tags['ploop-child'].length).to.be(2)
-
+    tag.unmount()
   })
 
 })
