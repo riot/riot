@@ -173,6 +173,9 @@ describe('Compiler Browser', function() {
 
           // tags property in loop
           '<ploop-tag><\/ploop-tag>',
+          '<ploop1-tag><\/ploop1-tag>',
+          '<ploop2-tag><\/ploop2-tag>',
+          '<ploop3-tag><\/ploop3-tag>',
           '<script type=\"riot\/tag\" src=\"tag\/ploop-tag.tag\"><\/script>'
 
 
@@ -541,8 +544,8 @@ describe('Compiler Browser', function() {
 
   })
 
-  it('tags property in loop', function() {
-    var tag = riot.mount('ploop-tag', {
+  it('tags property in loop, varying levels of nesting', function() {
+    var tag = riot.mount('ploop-tag, ploop1-tag, ploop2-tag, ploop3-tag', {
       elements: [{
         foo: 'foo',
         id: 0
@@ -550,10 +553,13 @@ describe('Compiler Browser', function() {
         foo: 'bar',
         id: 1
       }]
-    })[0]
+    })
 
-    expect(tag.tags['ploop-child'].length).to.be(2)
-    tag.unmount()
+    expect(tag[0].tags['ploop-child'].length).to.be(2)
+    expect(tag[1].tags['ploop-child'].length).to.be(2)
+    expect(tag[2].tags['ploop-child'].length).to.be(2)
+    expect(tag[3].tags['ploop-child'].length).to.be(2)
+    tag.map(function(t) {t.unmount()})
   })
 
 })
