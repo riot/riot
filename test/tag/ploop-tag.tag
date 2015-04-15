@@ -8,6 +8,7 @@
     <ploop-child foo="{ foo }" name="child-{ this.id }"></ploop-child>
   </div>
   <ploop-another foo="test"></ploop-another>
+  <ploop-another foo="test"></ploop-another>
 </ploop1-tag>
 
 <ploop2-tag>

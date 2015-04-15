@@ -558,7 +558,7 @@ describe('Compiler Browser', function() {
     expect(tag[0].tags['ploop-child'].length).to.be(2)
     expect(tag[0].tags['ploop-another']).to.be.an('object')
     expect(tag[1].tags['ploop-child'].length).to.be(2)
-    expect(tag[1].tags['ploop-another']).to.be.an('object')
+    expect(tag[1].tags['ploop-another'].length).to.be(2)
     expect(tag[2].tags['ploop-child'].length).to.be(2)
     expect(tag[2].tags['ploop-another']).to.be.an('object')
     expect(tag[3].tags['ploop-child'].length).to.be(2)
