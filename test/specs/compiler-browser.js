@@ -171,13 +171,13 @@ describe('Compiler Browser', function() {
           '  <div riot-tag="rtag"><\/div>',
           '<\/div>',
 
-          // transclusion of the innerHtml
-          '<script type=\"riot\/tag\" src=\"tag\/inner-html.tag\"><\/script>',
+          // tags property in loop
+          '<ploop-tag><\/ploop-tag>',
+          '<ploop1-tag><\/ploop1-tag>',
+          '<ploop2-tag><\/ploop2-tag>',
+          '<ploop3-tag><\/ploop3-tag>',
+          '<script type=\"riot\/tag\" src=\"tag\/ploop-tag.tag\"><\/script>'
 
-          '<inner-html>',
-          '  { greeting }',
-          '  <inner value="ciao mondo"><\/inner>',
-          '<\/inner-html>'
 
         ].join('\r'),
       tags = [],
@@ -544,14 +544,22 @@ describe('Compiler Browser', function() {
 
   })
 
+  it('tags property in loop, varying levels of nesting', function() {
+    var tag = riot.mount('ploop-tag, ploop1-tag, ploop2-tag, ploop3-tag', {
+      elements: [{
+        foo: 'foo',
+        id: 0
+      }, {
+        foo: 'bar',
+        id: 1
+      }]
+    })
 
-  it('allowing the innerHtml transclusion via <yield> tag', function() {
-    var tag = riot.mount('inner-html')[0]
-
-    expect(normalizeHTML(tag.root.innerHTML)).to.be('<h1>Hello,   World  <inner value="ciao mondo"><p> ciao mondo </p></inner></h1>')
-
-    tags.push(tag)
+    expect(tag[0].tags['ploop-child'].length).to.be(2)
+    expect(tag[1].tags['ploop-child'].length).to.be(2)
+    expect(tag[2].tags['ploop-child'].length).to.be(2)
+    expect(tag[3].tags['ploop-child'].length).to.be(2)
+    tag.map(function(t) {t.unmount()})
   })
-
 
 })
