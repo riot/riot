@@ -169,7 +169,12 @@ describe('Compiler Browser', function() {
           '  <div riot-tag="rtag"><\/div>',
           '  <div riot-tag="rtag"><\/div>',
           '  <div riot-tag="rtag"><\/div>',
-          '<\/div>'
+          '<\/div>',
+
+          // tags property in loop
+          '<ploop-tag><\/ploop-tag>',
+          '<script type=\"riot\/tag\" src=\"tag\/ploop-tag.tag\"><\/script>'
+
 
         ].join('\r'),
       tags = [],
@@ -536,5 +541,19 @@ describe('Compiler Browser', function() {
 
   })
 
+  it('tags property in loop', function() {
+    var tag = riot.mount('ploop-tag', {
+      elements: [{
+        foo: 'foo',
+        id: 0
+      }, {
+        foo: 'bar',
+        id: 1
+      }]
+    })[0]
+
+    expect(tag.tags['ploop-child'].length).to.be(2)
+
+  })
 
 })
