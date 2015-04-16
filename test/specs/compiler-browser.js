@@ -176,7 +176,14 @@ describe('Compiler Browser', function() {
           '<ploop1-tag><\/ploop1-tag>',
           '<ploop2-tag><\/ploop2-tag>',
           '<ploop3-tag><\/ploop3-tag>',
-          '<script type=\"riot\/tag\" src=\"tag\/ploop-tag.tag\"><\/script>'
+          '<script type=\"riot\/tag\" src=\"tag\/ploop-tag.tag\"><\/script>',
+
+          '<script type=\"riot\/tag\" src=\"tag\/inner-html.tag\"><\/script>',
+
+          '<inner-html>',
+          '  { greeting }',
+          '  <inner value="ciao mondo"><\/inner>',
+          '<\/inner-html>'
 
 
         ].join('\r'),
@@ -564,6 +571,15 @@ describe('Compiler Browser', function() {
     expect(tag[3].tags['ploop-child'].length).to.be(2)
     expect(tag[3].tags['ploop-another']).to.be.an('object')
     tag.map(function(t) {t.unmount()})
+  })
+
+  it('allowing the innerHtml transclusion via <yield> tag', function() {
+
+    var tag = riot.mount('inner-html')[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<h1>Hello,   World  <inner value="ciao mondo"><p> ciao mondo </p></inner></h1>')
+    tags.push(tag)
+
   })
 
 })
