@@ -1,6 +1,6 @@
 <loop-option>
   <select>
-    <option each={ data } value="{ this.id }">{ this.name }</option></option>
+    <option each={ data } value="{ this.id }">{ this.name }</option>
   </select>
 
   this.data = [
