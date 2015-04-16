@@ -464,7 +464,7 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('loop-option')[0],
         root = tag.root
 
-    expect(normalizeHTML(root.innerHTML)).to.be('<select> <option value="1">Peter</option><option selected="selected" value="2">Sherman</option><option value="3">Laura</option> </select>')
+    expect(normalizeHTML(root.innerHTML)).to.match(/<select> <option value="1">Peter<\/option><option selected="(selected|true)" value="2">Sherman<\/option><option value="3">Laura<\/option> <\/select>/)
 
     tags.push(tag)
 
