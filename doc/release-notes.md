@@ -20,8 +20,8 @@ body_id: riot-releases
 
 - Support for [Scoped CSS](/riotjs/guide/#scoped-css)
 - Direct [access to nested tags](/riotjs/api/#nested-tags) and their API via `tags` variable. For example: `tags.my_timer.clear()`
-- The custom tags are now constructed on parse time and initialized on mount time. This is preliminary work for the upcoming [plugin system](https://github.com/muut/riotjs/issues/416) and allows plugins to do their thing before initialization as well.
-- `--whitespace` compiler option to preserve newlines and whitespace on the generated output. Good with nested `pre` and `textarea` elements.
+- The custom tags are now constructed on parse time and initialized on mount time. This is preliminary work for the upcoming [plugin system](https://github.com/muut/riotjs/issues/416) and allows plugins to do their thing before initialization as well
+- `--whitespace` compiler option to preserve newlines and whitespace on the generated output. Good with nested `pre` and `textarea` elements
 - Using [Karma](http://karma-runner.github.io/0.12/index.html) for cross browser testing
 - *WARNING* the deprecated `riot.mountTo` will be removed on the next release
 
@@ -52,7 +52,7 @@ body_id: riot-releases
 - LiveScript support
 - Ability to set `if`, `show` and `hide` attributes for a custom tag
 - Multiple class shortcut: `{ 'foo bar': baz }`
-- Took away `children` property, which was designed for theoretical need mostly.
+- Took away `children` property, which was designed for theoretical need mostly
 - A memory leak fix on `riot.observable`. Thanks to [@GianlucaGuarini](https://github.com/GianlucaGuarini) for the hard debug work and everyone else on this [pull request](https://github.com/muut/riotjs/issues/248)
 
 
@@ -76,9 +76,9 @@ body_id: riot-releases
 - Built-in [Typescript support](compiler.html#typescript)
 - Ability to plug in a HTML pre-processor (along with JS processor)
 - Built-in [Jade support](compiler.html#jade)
-- Ability to define [custom parsers](api/#route-parser) for router.
+- Ability to define [custom parsers](api/#route-parser) for router
 - Markup can be written with valid XML and HTML5 void tags are not self-closed
-- Allow definition of empty placeholder tags. Good on development phase.
+- Allow definition of empty placeholder tags. Good on development phase
 - `riot.observable()` now returns a new observable when called without the argument
 - Compiler is now called like this:
 
