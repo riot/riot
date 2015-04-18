@@ -179,6 +179,10 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/ploop-tag.tag\"><\/script>',
 
           '<script type=\"riot\/tag\" src=\"tag\/inner-html.tag\"><\/script>',
+          // yield tests
+
+          '<script type=\"riot\/tag\" src=\"tag\/yield-nested.tag\"><\/script>',
+          '<yield-parent>{ greeting }<\/yield-parent>',
 
           '<inner-html>',
           '  { greeting }',
@@ -578,6 +582,26 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('inner-html')[0]
 
     expect(normalizeHTML(tag.root.innerHTML)).to.be('<h1>Hello,   World  <inner value="ciao mondo"><p> ciao mondo </p></inner></h1>')
+    tags.push(tag)
+
+  })
+
+  it('<yield> contents get compiled on the parent level', function(done) {
+
+    var tag = riot.mount('yield-parent', {
+      saySomething: done
+    })[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<h1>Hello, from the parent</h1> <yield-child><h1>Greeting, <i>from the parent</i><div class=""> <b>wooha</b> </div></h1></yield-child>')
+
+    tag.update({
+      isSelected: true
+    })
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<h1>Hello, from the parent</h1> <yield-child><h1>Greeting, <i>from the parent</i><div class="selected"> <b>wooha</b> </div></h1></yield-child>')
+
+    tag.root.getElementsByTagName('i')[0].onclick({})
+
     tags.push(tag)
 
   })
