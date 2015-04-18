@@ -1,8 +1,8 @@
 <yield-parent>
-  <h1>Hello, <yield></h1>
+  <h1>Hello, <yield/></h1>
 
   <yield-child>
-    <i onclick={ saySomething } >{ greeting }</i>
+    <i onclick={ saySomething } ><yield/></i>
     <div class={ selected: isSelected }>
       <b>wooha</b>
     </div>
@@ -21,7 +21,8 @@
 
 <yield-child>
 
-  <h1>Greeting, <yield></h1>
+  <h1>Greeting</h1>
+  <yield>
   this.greeting = 'from the child'
 
 

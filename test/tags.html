@@ -68,6 +68,7 @@
     </inner-html>
     <yield-parent>
       { greeting }
+      <div>Something else</div>
     </yield-parent>
     <!--
 
@@ -78,6 +79,6 @@
 
   <script src="../dist/riot/riot.js"></script>
   <script src="../dist/tags.js"></script>
-  <script>var tags = riot.mount('*', { test: { zap: 100 }})</script>
+  <script>var tags = riot.mount('yield-parent', { test: { zap: 100 }})</script>
 
 </body>
