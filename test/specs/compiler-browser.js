@@ -592,7 +592,7 @@ describe('Compiler Browser', function() {
       saySomething: done
     })[0]
 
-    expect(normalizeHTML(tag.root.innerHTML)).to.be('<h1>Hello, from the parent</h1> <yield-child><h1>Greeting</h1> <i>from the parent</i><div class=""> <b>wooha</b> </div></yield-child>')
+    expect(normalizeHTML(tag.root.innerHTML)).to.match(/<h1>Hello, from the parent<\/h1> <yield-child><h1>Greeting<\/h1> <i>from the parent<\/i><div(.+|)> <b>wooha<\/b> <\/div><\/yield-child>/)
 
     tag.update({
       isSelected: true
