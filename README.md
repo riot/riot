@@ -107,6 +107,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Another React tutorial with Riot](https://github.com/viliamjr/commentsTuto)
 - [Riot Custom Tag by Example](http://www.triplet.fi/blog/riot-custom-tag-by-example/)
 - [Riot Compiler Explained](http://www.triplet.fi/blog/riot-compiler-explained/)
+- [Adding compiled Riot tags to your Gulp + Browserify build](http://www.triplet.fi/blog/adding_compiled_riot_tags_to_your_gulp_browserify_build/)
 
 ### Resources
 - [Riot + Angular](https://github.com/lucasbrigida/angular-riot)

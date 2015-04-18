@@ -26,6 +26,10 @@ Please follow the coding style established in the rest of the codebase.
   **Bitwise Operations**:<br>
   Prefer classic conditionals `i < 0` over bitwise operators `!~pos`
 
+### Create a test
+
+Create a test for your specific contribution and submit it with your pull request to ensure the future stability of Riotjs
+
 ### Run the tests
 
 Before any pull request please run the following command from your terminal to be sure your changes will not break Riotjs:

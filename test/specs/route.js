@@ -1,37 +1,41 @@
 describe('Route', function() {
 
-  var counter = 0,
-      ended = false
+  var counter = 0
 
   after(function() {
     if (window.history && window.history.replaceState) {
       window.history.replaceState(null, '', window.location.pathname)
     }
-    ended = true
   })
-  // TODO: refactor these tests
-  // all the undefined must be removed
+  afterEach(function() {
+    counter = 0
+    riot.route.stop()
+  })
+
   it('it detecs the hash params', function() {
 
-    riot.route(function(first, second, params) {
-      if (ended) return
+    riot.route(function(first, second) {
       counter++
-      expect(['mummypowder', '!']).to.contain(first)
-      expect(['logo-and-key', 'user', 'http%3A%2F%2Fxxx.yyy']).to.contain(second)
-      expect([undefined, 'activation?token=xyz']).to.contain(params)
-    })
-
-    riot.route.exec(function(first, second, params) {
-      if (ended) return
-      counter++
-      expect(['', '!']).to.contain(first)
-      expect([undefined, 'user']).to.contain(second)
-      expect([undefined, 'activation?token=xyz']).to.contain(params)
+      expect(first).to.be('mummypowder')
+      expect(['logo-and-key', 'http%3A%2F%2Fxxx.yyy']).to.contain(second)
     })
 
     riot.route('mummypowder/logo-and-key')
+    riot.route('mummypowder/http%3A%2F%2Fxxx.yyy')
 
-    false && riot.route.parser(function(path) {
+    riot.route.exec(function(first, second) {
+      counter++
+      expect(first).to.be('mummypowder')
+      expect(second).to.be('http%3A%2F%2Fxxx.yyy')
+    })
+
+    expect(counter).to.be(3)
+
+  })
+
+  it('custom parser', function() {
+
+    riot.route.parser(function(path) {
       var raw = path.slice(2).split('?'),
           uri = raw[0].split('/'),
           qs = raw[1],
@@ -48,11 +52,16 @@ describe('Route', function() {
       return uri
     })
 
+    riot.route(function(first, second, params) {
+      counter++
+      expect(first).to.be('user')
+      expect(second).to.be('activation')
+      expect(JSON.stringify(params)).to.be(JSON.stringify({ token: 'xyz' }))
+    })
+
     riot.route('!/user/activation?token=xyz')
 
-    riot.route('mummypowder/http%3A%2F%2Fxxx.yyy')
-
-    expect(counter).to.be(4)
+    expect(counter).to.be(1)
 
   })
 })

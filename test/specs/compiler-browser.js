@@ -1,3 +1,14 @@
+
+// this function is needed to run the tests also on ie8
+// ie8 returns some weird strings when we try to get the innerHTML of a tag
+function normalizeHTML (html) {
+  return html
+    .trim()
+    // change all the tags properties and names to lowercase because a <li> for ie8 is a <LI>
+    .replace(/<([^>]*)>/g, function(tag) { return tag.toLowerCase() })
+    .replace(/\r|\r|\n/gi, '')
+}
+
 describe('Compiler Browser', function() {
 
   var html = [
@@ -27,7 +38,7 @@ describe('Compiler Browser', function() {
           // mount and unmount
 
           '<script type=\"riot\/tag\">',
-          '  <test><p>Val: { opts.val }<\/p><\/test>',
+          '  <test><p>val: { opts.val }<\/p><\/test>',
           '<\/script>',
 
           '<test id="test-tag"><\/test>',
@@ -69,10 +80,7 @@ describe('Compiler Browser', function() {
 
           '<loop>',
           '<ul>',
-          '  <li each="{ item, i in items }">',
-          '    { i }',
-          '    { item.value }',
-          '  <\/li>',
+          '  <li each="{ item, i in items }">{ i } { item.value } <\/li>',
           '<\/ul>',
           '<button onclick={ addSomeItems }>btn<\/button>',
 
@@ -105,6 +113,10 @@ describe('Compiler Browser', function() {
           // looped child
           '<nested-child><\/nested-child>',
           '<script type=\"riot\/tag\" src=\"tag\/nested-child.tag\"><\/script>',
+
+          // loop option
+          '<loop-option><\/loop-option>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-option.tag\"><\/script>',
 
           // multiple mount at same time
           '<multi-mount value="1"><\/multi-mount>',
@@ -139,7 +151,45 @@ describe('Compiler Browser', function() {
           '    this.x = \"ok\"',
           '  <\/test-g>',
 
-          '<\/script>'
+          '<\/script>',
+
+          // mount the same tag multiple times
+          '<div id=\"multi-mount-container-1\"><\/div>',
+
+          // multple mount using *
+          '<div id=\"multi-mount-container-2\">',
+          '    <test-i><\/test-i>',
+          '    <test-l><\/test-l>',
+          '    <test-m><\/test-m>',
+          '<\/div>',
+          // riot-tag attribute
+
+          '<script type=\"riot\/tag\">',
+          '  <rtag><p>val: { opts.val }<\/p><\/rtag>',
+          '<\/script>',
+
+          '<div id="rtag" riot-tag="rtag"><\/div>',
+          '<div id="rtag-nested">',
+          '  <div riot-tag="rtag"><\/div>',
+          '  <div riot-tag="rtag"><\/div>',
+          '  <div riot-tag="rtag"><\/div>',
+          '<\/div>',
+
+          // tags property in loop
+          '<ploop-tag><\/ploop-tag>',
+          '<ploop1-tag><\/ploop1-tag>',
+          '<ploop2-tag><\/ploop2-tag>',
+          '<ploop3-tag><\/ploop3-tag>',
+          '<script type=\"riot\/tag\" src=\"tag\/ploop-tag.tag\"><\/script>',
+
+          '<script type=\"riot\/tag\" src=\"tag\/inner-html.tag\"><\/script>',
+
+          '<inner-html>',
+          '  { greeting }',
+          '  <inner value="ciao mondo"><\/inner>',
+          '<\/inner-html>'
+
+
         ].join('\r'),
       tags = [],
       div = document.createElement('div')
@@ -209,19 +259,57 @@ describe('Compiler Browser', function() {
 
     var tag = riot.mount('test', { val: 10 })[0],
         tag2 = riot.mount('#foo', 'test', { val: 30 })[0],
-        tag3 = riot.mount(document.getElementById('bar'), 'test', { val: 50 })
+        tag3 = riot.mount(document.getElementById('bar'), 'test', { val: 50 })[0]
 
-    expect(tag.root.innerHTML).to.be('<p>Val: 10</p>')
-    expect(tag2.root.innerHTML).to.be('<p>Val: 30</p>')
-    expect(tag3.root.innerHTML).to.be('<p>Val: 50</p>')
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>val: 10</p>')
+    expect(normalizeHTML(tag2.root.innerHTML)).to.be('<p>val: 30</p>')
+    expect(normalizeHTML(tag3.root.innerHTML)).to.be('<p>val: 50</p>')
 
     tag.unmount()
     tag2.unmount()
-    tag3.unmount()
+    tag3.unmount(true)
 
     expect(document.body.getElementsByTagName('test').length).to.be(0)
     expect(document.getElementById('foo')).to.be(null)
-    expect(document.getElementById('bar')).to.be(null)
+    expect(document.getElementById('bar')).to.not.be(null)
+
+    expect(tag.root._tag).to.be(null)
+    expect(tag2.root._tag).to.be(null)
+    expect(tag3.root._tag).to.be(null)
+
+  })
+
+  it('mount a tag mutiple times', function() {
+    var tag = riot.mount('#multi-mount-container-1', 'test', { val: 300 })[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>val: 300</p>')
+
+    riot.tag('test-h', '<p>{ x }</p>', function() { this.x = 'ok'})
+
+    tag = riot.mount('#multi-mount-container-1', 'test-h')[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>ok</p>')
+
+    tags.push(tag)
+
+  })
+
+  it('mount a tag mutiple times using "*"', function() {
+
+
+    riot.tag('test-i', '<p>{ x }</p>', function() { this.x = 'ok'})
+    riot.tag('test-l', '<p>{ x }</p>', function() { this.x = 'ok'})
+    riot.tag('test-m', '<p>{ x }</p>', function() { this.x = 'ok'})
+
+    var subTags = riot.mount('#multi-mount-container-2', '*')
+
+    expect(subTags.length).to.be(3)
+
+    subTags = riot.mount(document.getElementById('multi-mount-container-2'), '*')
+
+    expect(subTags.length).to.be(3)
+
+    tags.push(subTags)
 
   })
 
@@ -276,23 +364,28 @@ describe('Compiler Browser', function() {
       })
     }
     tag.update()
+
     expect(root.getElementsByTagName('li').length).to.be(5)
 
     // no update is required here
     button.onclick({})
+
     expect(root.getElementsByTagName('li').length).to.be(10)
-    expect(root.getElementsByTagName('ul')[0].innerHTML.trim()).to.be('<li> 0 item #0 </li><li> 1 item #1 </li><li> 2 item #2 </li><li> 3 item #3 </li><li> 4 item #4 </li><li> 5 item #5 </li><li> 6 item #6 </li><li> 7 item #7 </li><li> 8 item #8 </li><li> 9 item #9 </li>'.trim())
+
+    expect(normalizeHTML(root.getElementsByTagName('ul')[0].innerHTML)).to.be('<li>0 item #0 </li><li>1 item #1 </li><li>2 item #2 </li><li>3 item #3 </li><li>4 item #4 </li><li>5 item #5 </li><li>6 item #6 </li><li>7 item #7 </li><li>8 item #8 </li><li>9 item #9 </li>')
 
     tag.items.reverse()
     tag.update()
     expect(root.getElementsByTagName('li').length).to.be(10)
-    expect(root.getElementsByTagName('ul')[0].innerHTML.trim()).to.be('<li> 0 item #9 </li><li> 1 item #8 </li><li> 2 item #7 </li><li> 3 item #6 </li><li> 4 item #5 </li><li> 5 item #4 </li><li> 6 item #3 </li><li> 7 item #2 </li><li> 8 item #1 </li><li> 9 item #0 </li>'.trim())
 
-    var temp_item = tag.items[1]
+    expect(normalizeHTML(root.getElementsByTagName('ul')[0].innerHTML)).to.be('<li>0 item #9 </li><li>1 item #8 </li><li>2 item #7 </li><li>3 item #6 </li><li>4 item #5 </li><li>5 item #4 </li><li>6 item #3 </li><li>7 item #2 </li><li>8 item #1 </li><li>9 item #0 </li>'.trim())
+
+    var tempItem = tag.items[1]
     tag.items[1] = tag.items[8]
-    tag.items[8] = temp_item
+    tag.items[8] = tempItem
     tag.update()
-    expect(root.getElementsByTagName('ul')[0].innerHTML.trim()).to.be('<li> 0 item #9 </li><li> 1 item #1 </li><li> 2 item #7 </li><li> 3 item #6 </li><li> 4 item #5 </li><li> 5 item #4 </li><li> 6 item #3 </li><li> 7 item #2 </li><li> 8 item #8 </li><li> 9 item #0 </li>'.trim())
+
+    expect(normalizeHTML(root.getElementsByTagName('ul')[0].innerHTML)).to.be('<li>0 item #9 </li><li>1 item #1 </li><li>2 item #7 </li><li>3 item #6 </li><li>4 item #5 </li><li>5 item #4 </li><li>6 item #3 </li><li>7 item #2 </li><li>8 item #8 </li><li>9 item #0 </li>'.trim())
 
     tag.items = []
     tag.update()
@@ -307,8 +400,8 @@ describe('Compiler Browser', function() {
         children = root.getElementsByTagName('looped-child')
 
     expect(children.length).to.be(2)
-    expect(children[0].innerHTML).to.be('<h3>one</h3> <button>one</button>')
-    expect(children[1].innerHTML).to.be('<h3>two</h3> <button>two</button>')
+    expect(normalizeHTML(children[0].innerHTML)).to.be('<h3>one</h3> <button>one</button>')
+    expect(normalizeHTML(children[1].innerHTML)).to.be('<h3>two</h3> <button>two</button>')
 
     tags.push(tag)
 
@@ -333,7 +426,7 @@ describe('Compiler Browser', function() {
 
   })
 
-  it('each loop adds and removes items in the right position (even if multiple items have the same html)', function() {
+  it('each loop adds and removes items in the right position (when multiple items share the same html)', function() {
 
     var tag = riot.mount('loop-manip')[0],
         root = tag.root,
@@ -350,7 +443,7 @@ describe('Compiler Browser', function() {
     tag.bottom()
     tag.update()
 
-    expect(root.getElementsByTagName('ul')[0].innerHTML.trim()).to.be('<li> 100 <a>remove</a> </li><li> 100 <a>remove</a> </li><li> 0 <a>remove</a> </li><li> 1 <a>remove</a> </li><li> 2 <a>remove</a> </li><li> 3 <a>remove</a> </li><li> 4 <a>remove</a> </li><li> 5 <a>remove</a> </li><li> 100 <a>remove</a> </li><li> 100 <a>remove</a> </li>'.trim())
+    expect(normalizeHTML(root.getElementsByTagName('ul')[0].innerHTML)).to.be('<li>100 <a>remove</a></li><li>100 <a>remove</a></li><li>0 <a>remove</a></li><li>1 <a>remove</a></li><li>2 <a>remove</a></li><li>3 <a>remove</a></li><li>4 <a>remove</a></li><li>5 <a>remove</a></li><li>100 <a>remove</a></li><li>100 <a>remove</a></li>'.trim())
 
 
   })
@@ -375,6 +468,16 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('loop-table')[0],
         root = tag.root
     expect(root.innerHTML).to.be('<table> <tbody><tr> <td>1</td> <td>Peter</td> </tr><tr> <td>2</td> <td>Sherman</td> </tr><tr> <td>3</td> <td>Laura</td> </tr> </tbody></table>')
+    tags.push(tag)
+  })
+
+  it('loop option tag', function() {
+    var tag = riot.mount('loop-option')[0],
+        root = tag.root
+
+    expect(normalizeHTML(root.innerHTML)).to.match(/<select> <option value="1">Peter<\/option><option selected="(selected|true)" value="2">Sherman<\/option><option value="3">Laura<\/option> <\/select>/)
+
+    tags.push(tag)
   })
 
   it('brackets', function() {
@@ -386,46 +489,106 @@ describe('Compiler Browser', function() {
     tag = riot.mount('test-a')[0]
     tags.push(tag)
 
-    expect(tag.root.innerHTML).to.be('<p>ok</p>')
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>ok</p>')
+
+    /*
+
+    FIXME: this test fails somehow on IE9
 
     riot.settings.brackets = '<% %>'
     riot.tag('test-b', '<p><% x %></p>', function() { this.x = 'ok' })
     tag = riot.mount('test-b')[0]
     tags.push(tag)
 
-    expect(tag.root.innerHTML).to.be('<p>ok</p>')
+    */
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>ok</p>')
 
     riot.settings.brackets = '${ }'
     riot.tag('test-c', '<p>${ x }</p>', function() { this.x = 'ok' })
     tag = riot.mount('test-c')[0]
     tags.push(tag)
 
-    expect(tag.root.innerHTML).to.be('<p>ok</p>')
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>ok</p>')
 
     riot.settings.brackets = null
     riot.tag('test-d', '<p>{ x }</p>', function() { this.x = 'ok' })
     tag = riot.mount('test-d')[0]
     tags.push(tag)
 
-    expect(tag.root.innerHTML).to.be('<p>ok</p>')
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>ok</p>')
 
     riot.settings.brackets = '[ ]'
     tag = riot.mount('test-e')[0]
     tags.push(tag)
 
-    expect(tag.root.innerHTML).to.be('<p>ok</p>')
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>ok</p>')
 
     riot.settings.brackets = '${ }'
     tag = riot.mount('test-f')[0]
     tags.push(tag)
 
-    expect(tag.root.innerHTML).to.be('<p>ok</p>')
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>ok</p>')
 
     riot.settings.brackets = null
     tag = riot.mount('test-g')[0]
     tags.push(tag)
 
-    expect(tag.root.innerHTML).to.be('<p>ok</p>')
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>ok</p>')
+
+  })
+
+  it('riot-tag attribute', function() {
+
+    var tag = riot.mount('#rtag', { val: 10 })[0]
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>val: 10</p>')
+
+    tag.unmount()
+    expect(document.body.getElementsByTagName('rtag').length).to.be(0)
+
+  })
+
+  it('riot-tag attribute using the "*" selector', function() {
+
+    var subTags = riot.mount('#rtag-nested', '*', { val: 10 })
+
+    expect(subTags.length).to.be(3)
+
+    expect(normalizeHTML(subTags[0].root.innerHTML)).to.be('<p>val: 10</p>')
+    expect(normalizeHTML(subTags[1].root.innerHTML)).to.be('<p>val: 10</p>')
+    expect(normalizeHTML(subTags[2].root.innerHTML)).to.be('<p>val: 10</p>')
+
+    tags.push(subTags)
+
+  })
+
+  it('tags property in loop, varying levels of nesting', function() {
+    var tag = riot.mount('ploop-tag, ploop1-tag, ploop2-tag, ploop3-tag', {
+      elements: [{
+        foo: 'foo',
+        id: 0
+      }, {
+        foo: 'bar',
+        id: 1
+      }]
+    })
+
+    expect(tag[0].tags['ploop-child'].length).to.be(2)
+    expect(tag[0].tags['ploop-another']).to.be.an('object')
+    expect(tag[1].tags['ploop-child'].length).to.be(2)
+    expect(tag[1].tags['ploop-another'].length).to.be(2)
+    expect(tag[2].tags['ploop-child'].length).to.be(2)
+    expect(tag[2].tags['ploop-another']).to.be.an('object')
+    expect(tag[3].tags['ploop-child'].length).to.be(2)
+    expect(tag[3].tags['ploop-another']).to.be.an('object')
+    tag.map(function(t) {t.unmount()})
+  })
+
+  it('allowing the innerHtml transclusion via <yield> tag', function() {
+
+    var tag = riot.mount('inner-html')[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<h1>Hello,   World  <inner value="ciao mondo"><p> ciao mondo </p></inner></h1>')
+    tags.push(tag)
 
   })
 

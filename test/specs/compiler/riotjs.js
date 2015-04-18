@@ -23,5 +23,9 @@ describe('riotjs', function() {
     var file = 'riotjs.single-line-method.js'
     expect(render(cat('fixtures', file))).to.equal(cat('expect', file))
   })
+  it('preserves the default object structure', function() {
+    var file = 'riotjs.object.js'
+    expect(render(cat('fixtures', file))).to.equal(cat('expect', file))
+  })
 
 })

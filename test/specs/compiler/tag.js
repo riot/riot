@@ -35,4 +35,8 @@ describe('Compile tags', function() {
     testFile('input-last')
   })
 
+  it('Preserves the object inside the tags', function() {
+    testFile('box')
+  })
+
 })

@@ -11,13 +11,13 @@
   </style>
 
   <!--[if lt IE 9]>
-    <script src="ie8/es5-shim.js"></script>
-    <script src="ie8/html5-shiv.js"></script>
+    <script src="polyfills/es5-shim.js"></script>
+    <script src="polyfills/html5-shiv.js"></script>
     <script>
       html5.addElements(
         'timetable timer loop-manip loop-child looped-child loop-context ' +
         'loop-strings img-test loop-replace loop-position tag-nesting ' +
-        'inner1 inner2 inner-html inner-content loop-object loop-multi ' +
+        'inner1 inner2 loop-option inner-html inner-content loop-object loop-multi ' +
         'loop-nested table-data if-test if-child treeview lazy-if ' +
         'treeitem expr-parent expr-child form-controls'
       )
@@ -46,8 +46,10 @@
     <lazy-if></lazy-if>
     <loop-multi></loop-multi>
     <loop-context></loop-context>
+    <loop-option></loop-option>
     <table-data></table-data>
     <timetable></timetable>
+    <div riot-tag="table-data"></div>
     <loop-strings></loop-strings>
     <loop-position></loop-position>
     <loop-nested></loop-nested>
@@ -60,11 +62,11 @@
     <loop-child></loop-child>
     <loop-manip></loop-manip>
 
-    <!--
+
     <inner-html>
-      <h3>World!</h3>
-      <p>This content is specified on the page inside the custom tag.</p>
+      { greeting }
     </inner-html>
+    <!--
 
     <treeview></treeview>
     -->

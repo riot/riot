@@ -176,7 +176,7 @@ rules:
 
     indent: [2, 2]                 # Set a specific tab width
     brace-style: 0                 # enforce one true brace style
-    camelcase: 0                   # require camel case names
+    camelcase: [2, always]         # require camel case names
     comma-spacing: 2               # enforce spacing before and after comma
     comma-style: 2                 # enforce one true comma style
     consistent-this: 0             # enforces consistent naming when capturing the current execution context
