@@ -64,7 +64,7 @@ See the [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](ht
 
 A Riot tag is a combination of layout (HTML) and logic (JavaScript). Here are the basic rules:
 
-* HTML is defined first and the logic is enclosed inside an optional `<script>` tag.
+* HTML is defined first and the logic is enclosed inside an optional `<script>` tag. *note: the script tag can not be used when including tag definitions in the document body, only in external tag files*
 * Without the `<script>` tag the JavaScript starts where the last HTML tag ends.
 * Custom tags can be empty, HTML only or JavaScript only
 * Quotes are optional: `<foo bar={ baz }>` becomes `<foo bar="{ baz }">`.
@@ -78,7 +78,7 @@ A Riot tag is a combination of layout (HTML) and logic (JavaScript). Here are th
 
 
 
-Tag definition always starts on the beginning of the line:
+Tag definition in tag files always starts on the beginning of the line:
 
 ```
 <!-- works -->
@@ -94,6 +94,8 @@ Tag definition always starts on the beginning of the line:
 
   </my-tag>
 ```
+
+Inline tag definitions(in document body) must be properly indented, with all custom tags equally indented at the lowest indent level, mixing of tabs and spaces is discouraged.
 
 ### No script tag
 
