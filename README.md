@@ -97,6 +97,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Another flux demo caparable to React ones](http://txchen.github.io/feplay/riot_flux)
 - [Various experiments](http://richardbondi.net/programming/riot)
 - [Isomorphic application](https://github.com/ListnPlay/riot-isomorphic)
+- [flux-riot todo](http://mingliangfeng.me/flux-riot)
 
 ### Tutorials
 - [Building Apps with Riot, ES6 and Webpack](http://blog.srackham.com/posts/riot-es6-webpack-apps/)
@@ -116,6 +117,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot + Meteor]( https://atmospherejs.com/xaiki/riotjs)
 - [Riot on CodeClimate](https://codeclimate.com/github/muut/riotjs/code)
 - [Riot Snake Game](http://cdn.rawgit.com/atian25/blog/master/assets/riot-snake.html)
+- [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
 
 https://muut.com/riotjs/
 
