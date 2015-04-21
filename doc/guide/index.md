@@ -710,7 +710,7 @@ Object loops are not recommended since internally Riot detects changes on the ob
 
 ## Server-side rendering | #server-side
 
-Riot supports server-side rendering, with Node/io.js you can simple require tags and render to html:
+Riot supports server-side rendering, with Node/io.js you can simply require tags and render to html:
 
 ```
 var riot = require('riot')
@@ -826,4 +826,4 @@ And here we mount the application
 
 On the above setup the other tags on the system do not need to know about each other since they can simply listen to the "login" event and do what they please.
 
-Observable is a classic building block for a decoupled (modular) appliction.
+Observable is a classic building block for a decoupled (modular) application.
