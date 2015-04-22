@@ -2,8 +2,8 @@
   <h1>Hello, <yield/></h1>
 
   <yield-child>
-    <i onclick={ saySomething } ><yield/></i>
-    <div class={ selected: isSelected }>
+    <i onclick={ this.parent.saySomething } >{ greeting }</i>
+    <div class={ selected: this.parent.isSelected }>
       <b>wooha</b>
     </div>
   </yield-child>
@@ -11,10 +11,15 @@
   this.greeting = 'from the parent'
 
   saySomething() {
+
     this.greeting = 'I am alive!'
+
     if (opts.saySomething)
       opts.saySomething()
-  }
+
+    this.update()
+
+  }.bind(this)
 
 </yield-parent>
 
@@ -22,8 +27,8 @@
   <h1>Hello, <yield/></h1>
 
   <yield-child-2 each={ items } subtitle={ name }>
-    <i onclick={ saySomething } ><yield/></i>
-    <div class={ selected: isSelected }>
+    <i onclick={ this.parent.saySomething } >{ greeting }</i>
+    <div class={ selected: this.parent.isSelected }>
       <b>wooha</b>
     </div>
   </yield-child-2>
@@ -38,10 +43,15 @@
   ]
 
   saySomething() {
+
     this.greeting = 'I am alive!'
+
     if (opts.saySomething)
       opts.saySomething()
-  }
+
+    this.update()
+
+  }.bind(this)
 
 </yield-loop>
 
@@ -56,7 +66,7 @@
 
 <yield-child-2>
 
-  <h1>Greeting</h1>
+  <h1>Greeting { this.parent.greeting }</h1>
   <h2>{ opts.subtitle }</h2>
   <yield>
   this.greeting = 'from the child'
