@@ -35,22 +35,22 @@
     "riot.js"
   ],
   "dependencies": {
-    "chokidar": "~1.0.0-rc4",
+    "chokidar": "~1.0.1",
     "minimist": "~1.1.1",
     "shelljs": "~0.4.0",
     "simple-dom": "^0.2.2",
     "simple-html-tokenizer": "^0.1.1"
   },
   "devDependencies": {
-    "eslint": "^0.17.1",
+    "eslint": "^0.19.0",
     "expect.js": "^0.3.1",
-    "glob": "^5.0.3",
-    "jsdom": "^4.0.5",
+    "glob": "^5.0.5",
+    "jsdom": "^5.0.1",
     "karma": "^0.12.31",
-    "karma-coverage": "^0.2.7",
+    "karma-coverage": "^0.3.1",
     "karma-mocha": "^0.1.10",
     "karma-phantomjs-launcher": "^0.1.4",
-    "mocha": "^2.2.1",
+    "mocha": "^2.2.4",
     "uglify-js": "latest"
   },
   "preferGlobal": true,

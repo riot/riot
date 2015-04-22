@@ -332,4 +332,102 @@ Updates all the mounted tags and their expressions on the page.
 
 @returns: an array of [tag instances](#tag-instance) that are mounted on the page.
 
+### Html transclusion using the `<yield>` tag | yield
+
+The `<yield>` tag it's a special riot core feature that allows you to inject and compile the content of any custom tag inside its template in runtime
+This technique allows you to extend your tags templates with html contents rendered eventually from the server
+
+For example using the following riot tag `my-post`
+
+``` html
+<my-post>
+  <h1>{ opts.title }</h1>
+  <yield/>
+  this.id = 666
+</my-post>
+```
+
+anytime you will include the `<my-post>` tag in your app
+
+``` html
+<my-post title="What a great title">
+  <p id="my-content-{ id }">My beautiful post is just awesome</p>
+</my-post>
+```
+
+once mounted `riot.mount('my-post')` it will be rendered in this way:
+
+``` html
+<my-post>
+  <h1>What a great title</h1>
+  <p id="my-content-666">My beautiful post is just awesome</p>
+</my-post>
+```
+
+#### Loops and children using `<yield>` | yield-loops-children
+
+The `<yield>` tag could be used also in a loop or in a child tag but you should be aware that __it will be always parsed and compiled using the child data__
+
+The following `blog.tag` riot component
+
+``` html
+
+<blog>
+  <h1>{ title }</h1>
+  <my-post each={ posts }>
+    <a href={ this.parent.backToHome }>Back to home</a>
+    <div onclick={ this.parent.deleteAllPosts }>Delete all the posts</div>
+  </my-post>
+
+  this.backToHome = '/homepage'
+  this.title = 'my blog title'
+
+  this.posts = [
+    { title: "post 1", description: 'my post description' },
+    { title: "post 2", description: 'my post description' }
+  ]
+
+  // the bind is needed in this case to keep the parent context
+  // also in the child tags
+  deleteAllPosts() {
+    this.posts = []
+
+    // we need to trigger manually the update function
+    // because this function gets triggered from a child tag
+    // and it does not bubble up automatically
+    this.update()
+  }.bind(this)
+
+</blog>
+
+<my-post>
+  <h2>{ title }</h2>
+  <p>{ description }</p>
+  <yield/>
+</my-post>
+
+```
+
+will be compiled in this way:
+
+``` html
+
+<blog>
+  <h1>my blog title</h1>
+  <my-post>
+      <h2>post 1</h2>
+      <p>my post description</p>
+      <a href="/homepage">Back to home</a>
+      <div>Delete all the posts</div>
+  </my-post>
+  <my-post>
+      <h2>post 2</h2>
+      <p>my post description</p>
+      <a href="/homepage">Back to home</a>
+      <div>Delete all the posts</div>
+  </my-post>
+</blog>
+
+```
+
 

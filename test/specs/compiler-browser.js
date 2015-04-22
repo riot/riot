@@ -179,11 +179,20 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/ploop-tag.tag\"><\/script>',
 
           '<script type=\"riot\/tag\" src=\"tag\/inner-html.tag\"><\/script>',
+          // yield tests
+
+          '<script type=\"riot\/tag\" src=\"tag\/yield-nested.tag\"><\/script>',
+          '<yield-parent>{ greeting }<\/yield-parent>',
 
           '<inner-html>',
           '  { greeting }',
           '  <inner value="ciao mondo"><\/inner>',
-          '<\/inner-html>'
+          '<\/inner-html>',
+
+          '<yield-loop>',
+          '  { greeting }',
+          '  <div>Something else<\/div>',
+          '<\/yield-loop>'
 
 
         ].join('\r'),
@@ -573,11 +582,49 @@ describe('Compiler Browser', function() {
     tag.map(function(t) {t.unmount()})
   })
 
-  it('allowing the innerHtml transclusion via <yield> tag', function() {
+  it('simple html transclusion via <yield> tag', function() {
 
     var tag = riot.mount('inner-html')[0]
 
     expect(normalizeHTML(tag.root.innerHTML)).to.be('<h1>Hello,   World  <inner value="ciao mondo"><p> ciao mondo </p></inner></h1>')
+    tags.push(tag)
+
+  })
+
+  it('<yield> contents in a child get always compiled using its parent data', function(done) {
+
+    var tag = riot.mount('yield-parent', {
+      saySomething: done
+    })[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.match(/<h1>Hello, from the parent<\/h1> <yield-child><h1>Greeting<\/h1>\s+<i>from the child<\/i> <div(.+|)> <b>wooha<\/b> <\/div> <\/yield-child>/)
+
+    tag.update({
+      isSelected: true
+    })
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<h1>Hello, from the parent</h1> <yield-child><h1>Greeting</h1>  <i>from the child</i> <div class="selected"> <b>wooha</b> </div> </yield-child>')
+
+    tag.root.getElementsByTagName('i')[0].onclick({})
+
+    tags.push(tag)
+
+  })
+
+  it('<yield> contents in a loop get always compiled using its parent data', function(done) {
+
+    var tag = riot.mount('yield-loop', {
+      saySomething: done
+    })[0],
+      child3
+
+    expect(tag.tags['yield-child-2'].length).to.be(5)
+
+    child3 = tag.tags['yield-child-2'][3]
+    expect(child3.root.getElementsByTagName('h2')[0].innerHTML.trim()).to.be('subtitle4')
+
+    child3.root.getElementsByTagName('i')[0].onclick({})
+
     tags.push(tag)
 
   })
