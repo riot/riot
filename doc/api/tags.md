@@ -335,9 +335,9 @@ Updates all the mounted tags and their expressions on the page.
 ### Html transclusion using the `<yield>` tag | yield
 
 The `<yield>` tag it's a special riot core feature that allows you to inject and compile the content of any custom tag inside its template in runtime
-This technique allows you to extend your tags templates with html content rendered eventually from the server
+This technique allows you to extend your tags templates with html contents rendered eventually from the server
 
-For example using the following riot tag `my-post.tag`
+For example using the following riot tag `my-post`
 
 ``` html
 <my-post>
@@ -366,15 +366,17 @@ once mounted `riot.mount('my-post')` it will be rendered in this way:
 
 #### Loops and children using `<yield>` | yield-loops-children
 
-The `<yield>` tag could be used also in a loop or in a child tag but you should be aware that __it will be compiled always using the child's parent data__
+The `<yield>` tag could be used also in a loop or in a child tag but you should be aware that __it will be always parsed and compiled using the child data__
 
 The following `blog.tag` riot component
+
 ``` html
 
 <blog>
   <h1>{ title }</h1>
   <my-post each={ posts }>
-    <a href={ backToHome }>Back to home</a>
+    <a href={ this.parent.backToHome }>Back to home</a>
+    <div onclick={ this.parent.deleteAllPosts }>Delete all the posts</div>
   </my-post>
 
   this.backToHome = '/homepage'
@@ -384,6 +386,17 @@ The following `blog.tag` riot component
     { title: "post 1", description: 'my post description' },
     { title: "post 2", description: 'my post description' }
   ]
+
+  // the bind is needed in this case to keep the parent context
+  // also in the child tags
+  deleteAllPosts() {
+    this.posts = []
+
+    // we need to trigger manually the update function
+    // because this function gets triggered from a child tag
+    // and it does not bubble up automatically
+    this.update()
+  }.bind(this)
 
 </blog>
 
@@ -405,11 +418,13 @@ will be compiled in this way:
       <h2>post 1</h2>
       <p>my post description</p>
       <a href="/homepage">Back to home</a>
+      <div>Delete all the posts</div>
   </my-post>
   <my-post>
       <h2>post 2</h2>
       <p>my post description</p>
       <a href="/homepage">Back to home</a>
+      <div>Delete all the posts</div>
   </my-post>
 </blog>
 
