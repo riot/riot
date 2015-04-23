@@ -6,6 +6,17 @@ body_id: riot-releases
 
 ====
 
+### 2.0.15 *Apr 23, 2015*
+
+- A new `<yield>` core tag allowing [html tansclusion](/riotjs/guide/#html-transclusion)
+- A new [riot-tag](/riotjs/guide/#riot-tag) attribute to use standard HTML elements as mount nodes.
+- `tag.unmount(flag)` to decide whether the parent should be removed or not from the DOM
+- `riot.route.start()` and `riot.route.stop()` methods to start and stop the Riot router. These methods allow the use of a different router on your appliaction.
+- The server side compiiler now supports AMD and CommonJS modules with `--modular` or `-m` command line option.
+- Numerous [buug fixes](https://github.com/muut/riotjs/issues/584).
+- Special thanks to *[@GianlucaGuarini](https://github.com/GianlucaGuarini)* for this release.
+
+
 ### 2.0.14 *Apr 8, 2015*
 
 - [Server side rendering](/riotjs/guide/#server-side)

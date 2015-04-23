@@ -495,6 +495,40 @@ Here is the `inner-html` source code:
 The above tag will be part of Riot "core tags" to be introduced later.
 
 
+## HTML transclusion
+
+Transclusion is a way to process the inner HTML on the page. This is achieved with a build-in `<yield>` tag. Example:
+
+
+### Tag definition
+
+```html
+<my-tag>
+  <p>Hello <yield/></p>
+  this.text = 'world'
+</my-tag>
+```
+
+### Usage
+
+Custom tag is placed on a page with nested HTML
+
+```html
+<my-tag>
+  <b>{ text }</b>
+</my-tag>
+```
+
+### Result
+
+```html
+<my-tag>
+  <p>Hello <b>world</b><p>
+</my-tag>
+```
+
+See [API docs](/riotjs/api/#yield) for `yield`.
+
 ## Named elements
 
 Elements with `name` or `id` attribute are automatically bound to the context so you'll have an easy access to them with JavaScript:
@@ -709,7 +743,8 @@ Plain objects can also be looped. For example:
 
 Object loops are not recommended since internally Riot detects changes on the object with `JSON.stringify`. The *whole* object is studied and when there is a change the whole loop is re-rendered. This can be slow. Normal arrays are much faster and only the changes are drawn on the page.
 
-## Standard HTML Elements as tags
+
+## Standard HTML Elements as tags | #riot-tag
 
 Standard HTML elements can be used as riot tags in the page body with the addition of the `riot-tag` attribute.
 
