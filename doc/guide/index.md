@@ -459,45 +459,7 @@ Parent tag options are passed with the `riot.mount` method and child tag options
 
 ### Nested HTML
 
-Here is an example of a custom tag with nested HTML on the page:
-
-```
-<body>
-  <my-tag>
-    <h3>Hello world!</h3>
-  </my-tag>
-</body>
-
-<script>
-riot.mount('my-tag')
-</script>
-```
-
-We can access the inner HTML in a cute way by making a custom `inner-html` tag:
-
-```
-<my-tag>
-  <p>Some tag specific markup</p>
-  <!-- here comes the inner HTML defined on the page -->
-  <inner-html/>
-</my-tag>
-```
-
-Here is the `inner-html` source code:
-
-```
-<inner-html>
-  var p = this.parent.root
-  while (p.firstChild) this.root.appendChild(p.firstChild)
-</inner-html>
-```
-
-The above tag will be part of Riot "core tags" to be introduced later.
-
-
-## HTML transclusion
-
-Transclusion is a way to process the inner HTML on the page. This is achieved with a build-in `<yield>` tag. Example:
+"HTML transclusion" is a way to process the inner HTML on the page. This is achieved with a build-in `<yield>` tag. Example:
 
 
 ### Tag definition

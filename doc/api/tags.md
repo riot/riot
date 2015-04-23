@@ -332,7 +332,7 @@ Updates all the mounted tags and their expressions on the page.
 
 @returns: an array of [tag instances](#tag-instance) that are mounted on the page.
 
-### Html transclusion using the `<yield>` tag | yield
+### Html transclusion using the `<yield>` tag | #yield
 
 The `<yield>` tag it's a special riot core feature that allows you to inject and compile the content of any custom tag inside its template in runtime
 This technique allows you to extend your tags templates with html contents rendered eventually from the server
