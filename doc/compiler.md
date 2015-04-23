@@ -364,4 +364,14 @@ By default Riot uses a build-in transpiler that simply enables shorter ES6- styl
 riot --type none --expr source.tag
 ```
 
+### AMD and CommonJS
+
+Riot tags can be compiled with `AMD` (Asynchronous Module Definition) and `CommonJS` support. This allows them to be lazy-loaded with an AMD loader such as `RequireJS` or a CommonJS loader such as `Browserify` if the riot.js library is loaded using either of these patterns.
+
+``` sh
+# modular
+riot -m
+```
+
+
 If you make something great, please [share it](https://github.com/muut/riotjs/issues/58) !
