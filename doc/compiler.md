@@ -366,11 +366,31 @@ riot --type none --expr source.tag
 
 ### AMD and CommonJS
 
-Riot tags can be compiled with `AMD` (Asynchronous Module Definition) and `CommonJS` support. This allows them to be lazy-loaded with an AMD loader such as `RequireJS` or a CommonJS loader such as `Browserify` if the riot.js library is loaded using either of these patterns.
+Riot tags can be compiled with `AMD` (Asynchronous Module Definition) and `CommonJS` support. This configuration option is necessary if Riot is used with an AMD loader such as [RequireJS](http://requirejs.org/) or a CommonJS loader such as [Browserify](http://browserify.org/).
+
+The Riot library must be defined / required as `riot` in both cases.
 
 ``` sh
-# modular
-riot -m
+# enable AMD and CommonJS
+riot --m
+```
+
+Example AMD:
+
+```js
+
+define(['riot', 'tags'], function (riot) {
+  riot.mount('*');
+});
+```
+
+Example CommonJS:
+
+```js
+var riot = require('riot');
+var tags = require('tags');
+
+riot.mount('*');
 ```
 
 
