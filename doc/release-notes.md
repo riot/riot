@@ -8,7 +8,7 @@ body_id: riot-releases
 
 ### 2.0.15 *Apr 23, 2015*
 
-- A new `<yield>` core tag allowing [html tansclusion](/riotjs/guide/#nested-html)
+- A new `<yield>` core tag allowing [html transclusion](/riotjs/guide/#nested-html)
 - A new [riot-tag](/riotjs/guide/#riot-tag) attribute to use standard HTML elements as mount nodes
 - `tag.unmount(flag)` to decide whether the parent should be removed or not from the DOM
 - `riot.route.start()` and `riot.route.stop()` methods to start and stop the Riot router. These methods allow the use of a different router on your appliaction.

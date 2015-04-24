@@ -249,7 +249,7 @@ Here is a [bigger example](https://github.com/txchen/feplay/tree/gh-pages/riot_b
 
 ### TypeScript
 
-TypeScript adds type to JavaScript. Use `--type typescript` to enable it:
+TypeScript adds optional static typing to JavaScript. Use `--type typescript` to enable it:
 
 ``` sh
 # use TypeScript pre-processor
