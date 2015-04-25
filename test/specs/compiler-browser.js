@@ -544,6 +544,12 @@ describe('Compiler Browser', function() {
     tag.unmount()
     expect(document.body.getElementsByTagName('rtag').length).to.be(0)
 
+    tag = riot.mount('rtag', { val: 10 })[0] // now just tag name
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>val: 10</p>')
+
+    tag.unmount()
+    expect(document.body.getElementsByTagName('rtag').length).to.be(0)
+
   })
 
   it('riot-tag attribute using the "*" selector', function() {
