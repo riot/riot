@@ -38,6 +38,16 @@ describe('Node/io.js', function() {
     expect(h3s[1].firstChild.nodeValue).to.be('two')
   })
 
+  it('render tag: loop-replace', function() {
+    var lpr = riot.render('loop-replace')
+    var doc = sdom.parse(lpr)
+    var els = querySelectorAll(doc, 'strong')
+    expect(els.length).to.be(3)
+    expect(els[0].firstChild.nodeValue).to.be('a')
+    expect(els[1].firstChild.nodeValue).to.be('9')
+    expect(els[2].firstChild.nodeValue).to.be('3')
+  })
+
 })
 
 // support functions
