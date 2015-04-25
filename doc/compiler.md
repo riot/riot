@@ -80,7 +80,7 @@ Pre- compilation on the server gives you following benefits:
 - "Isomorphic apps" and the ability to pre- render tags on the server (released soon).
 
 
-Pre-compilation happens with a `riot` executable, which can be installed with with NPM as follows:
+Pre-compilation happens with a `riot` executable, which can be installed with NPM as follows:
 
 ``` sh
 npm install riot -g
