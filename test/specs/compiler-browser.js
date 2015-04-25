@@ -171,6 +171,14 @@ describe('Compiler Browser', function() {
           '  <div riot-tag="rtag"><\/div>',
           '<\/div>',
 
+          // riot-tag attribute by tag name
+
+          '<script type=\"riot\/tag\">',
+          '  <rtag2><p>val: { opts.val }<\/p><\/rtag2>',
+          '<\/script>',
+
+          '<div riot-tag="rtag2"><\/div>',
+
           // tags property in loop
           '<ploop-tag><\/ploop-tag>',
           '<ploop1-tag><\/ploop1-tag>',
@@ -543,6 +551,16 @@ describe('Compiler Browser', function() {
 
     tag.unmount()
     expect(document.body.getElementsByTagName('rtag').length).to.be(0)
+
+  })
+
+  it('riot-tag attribute by tag name', function() {
+
+    tag = riot.mount('rtag2', { val: 10 })[0]
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>val: 10</p>')
+
+    tag.unmount()
+    expect(document.body.querySelectorAll('rtag2').length).to.be(0)
 
   })
 
