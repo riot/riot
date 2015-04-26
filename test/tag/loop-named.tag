@@ -5,4 +5,4 @@
   </p>
 
   this.list = [ 'first', 'two' ];
-</loopo-named>
+</loop-named>

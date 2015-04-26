@@ -202,6 +202,8 @@ describe('Compiler Browser', function() {
           '  <div>Something else<\/div>',
           '<\/yield-loop>',
 
+          // dynamically named elements in a loop
+
           '<script type=\"riot\/tag\" src=\"tag\/loop-named.tag\"><\/script>',
           '<loop-named><\/loop-named>'
 
@@ -653,8 +655,12 @@ describe('Compiler Browser', function() {
 
   it('dynamically named elements in a loop', function() {
     var tag = riot.mount('loop-named')[0]
-    expect(tag.first).name.to.be('first')
-    expect(tag.two).name.to.be('two')
+    tag.on('mount', function () {
+      expect(tag.first).name.to.be('first')
+      expect(tag.two).name.to.be('two')
+    })
+    tags.push(tag)
   })
+
 
 })
