@@ -51,6 +51,7 @@
     "karma-mocha": "^0.1.10",
     "karma-phantomjs-launcher": "^0.1.4",
     "mocha": "^2.2.4",
+    "smash": "0.0.14",
     "uglify-js": "latest"
   },
   "preferGlobal": true,
