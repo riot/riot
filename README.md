@@ -137,10 +137,6 @@ https://muut.com/riotjs/
 [riot-forum-url]: https://muut.com/riotjs/forum/
 [riot-forum-image]: doc/logo/join-chat.svg
 
-<<<<<<< HEAD
 [coverage-image]: https://coveralls.io/repos/muut/riotjs/badge.svg?branch=dev
 [coverage-url]: https://coveralls.io/r/muut/riotjs?branch=dev
-=======
-[coverage-image]: https://coveralls.io/repos/muut/riotjs/badge.svg
-[coverage-url]: https://coveralls.io/r/muut/riotjs
->>>>>>> feature/coveralls
+
