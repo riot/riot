@@ -20,7 +20,7 @@ eslint:
 	@ ./node_modules/eslint/bin/eslint.js -c ./.eslintrc lib test
 
 test-coveralls:
-	@ COVERALLS_SERVICE_NAME= cat ./coverage/lcov.info ./coverage/browsers/report-lcov/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+	@ RIOTJS_COVERAGE=1= cat ./coverage/lcov.info ./coverage/browsers/report-lcov/lcov.info | ./node_modules/coveralls/bin/coveralls.js
 
 
 raw:
