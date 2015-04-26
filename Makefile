@@ -21,6 +21,7 @@ eslint:
 
 raw:
 	# build riot
+	@ mkdir -p $(DIST)
 	@ ./node_modules/.bin/smash lib/compiler.js > $(DIST)compiler.js
 	@ ./node_modules/.bin/smash lib/riot.js > $(DIST)riot.js
 	@ ./node_modules/.bin/smash lib/riot+compiler.js > $(DIST)riot+compiler.js
