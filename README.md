@@ -10,6 +10,8 @@
 
 [![MIT License][license-image]][license-url]
 
+[![Coverage Status][coverage-image]][coverage-url]
+
 ### Custom tags • Concise syntax • Virtual DOM • Full stack • IE8
 
 Riot brings custom tags to all browsers, including IE8. Think React + Polymer but with enjoyable syntax and a small learning curve.
@@ -134,3 +136,6 @@ https://muut.com/riotjs/
 
 [riot-forum-url]: https://muut.com/riotjs/forum/
 [riot-forum-image]: doc/logo/join-chat.svg
+
+[coverage-image]: https://coveralls.io/repos/muut/riotjs/badge.svg
+[coverage-url]: https://coveralls.io/r/muut/riotjs

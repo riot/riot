@@ -19,6 +19,9 @@ eslint:
 	# check code style
 	@ ./node_modules/eslint/bin/eslint.js -c ./.eslintrc lib test
 
+test-coveralls:
+	@ COVERALLS_SERVICE_NAME= cat ./coverage/report-lcov/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+
 raw:
 	@ mkdir -p $(DIST)
 	@ cat lib/compiler.js > $(DIST)compiler.js

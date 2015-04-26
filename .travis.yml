@@ -6,6 +6,8 @@ branches:
   only:
     - master
     - dev
+after_success:
+  make test-coveralls
 
 notifications:
     email: false
