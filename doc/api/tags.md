@@ -228,6 +228,7 @@ Each tag instance is an [observable](#observable) so you can use `on` and `one` 
 
 
 - "update" – right before the tag is updated. allows recalculation of context data before the UI expressions are updated.
+- "updated" – right after the tag is updated. allows do some work with updated DOM
 - "mount" – right after tag is mounted on the page
 - "unmount" – after the tag is removed from the page
 
@@ -429,5 +430,3 @@ will be compiled in this way:
 </blog>
 
 ```
-
-
