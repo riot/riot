@@ -35,7 +35,7 @@ module.exports = function(config) {
       },
 
       coverageReporter: {
-          dir: '../coverage/',
+          dir: '../coverage/browser',
           reporters: [{
             type: 'lcov',
             subdir: 'report-lcov'
