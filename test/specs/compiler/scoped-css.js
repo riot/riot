@@ -25,8 +25,8 @@ describe('Scoped CSS', function() {
         .to.equal('my-tag i[class=twitter] { background: #55ACEE }')
   })
   it('add my-tag to the selector with a backslash', function() {
-    expect(render('a:after { content: "\25BA" }'))
-        .to.equal('my-tag a:after { content: "\25BA" }')
+    expect(render('a:after { content: "*" }'))
+        .to.equal('my-tag a:after { content: "*" }')
   })
   it('add my-tag to the selector with multi-line definitions', function() {
     expect(render('header {\n  text-align: center;\n  background: rgba(0,0,0,.2);\n}'))

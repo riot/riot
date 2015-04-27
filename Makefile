@@ -24,12 +24,11 @@ test-coveralls:
 
 
 raw:
+	# build riot
 	@ mkdir -p $(DIST)
-	@ cat lib/compiler.js > $(DIST)compiler.js
-	@ cat lib/wrap/prefix.js > $(DIST)riot.js
-	@ cat lib/observable.js lib/router.js lib/tmpl.js lib/tag/*.js >> $(DIST)riot.js
-	@ cat $(DIST)riot.js $(DIST)compiler.js > $(DIST)riot+compiler.js
-	@ cat lib/wrap/suffix.js | tee -a $(DIST)riot.js $(DIST)riot+compiler.js > /dev/null
+	@ ./node_modules/.bin/smash lib/compiler.js > $(DIST)compiler.js
+	@ ./node_modules/.bin/smash lib/riot.js > $(DIST)riot.js
+	@ ./node_modules/.bin/smash lib/riot+compiler.js > $(DIST)riot+compiler.js
 
 riot: raw test
 
