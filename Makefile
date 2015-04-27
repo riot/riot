@@ -33,7 +33,7 @@ test-karma:
 	@ $(KARMA) start test/karma.conf.js
 
 test-coveralls:
-	@ RIOTJS_COVERAGE=1 cat ./coverage/lcov.info ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
+	@ RIOTJS_COV=1 cat ./coverage/lcov.info ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
 
 test-sauce:
 	@ $(shell \
