@@ -1,6 +1,16 @@
+# Command line paths
+KARMA = ./node_modules/karma/bin/karma
+ISTANBUL = ./node_modules/karma-coverage/node_modules/.bin/istanbul
+ESLINT = ./node_modules/eslint/bin/eslint.js
+MOCHA = ./node_modules/.bin/_mocha
+SMASH = ./node_modules/.bin/smash
+UGLIFY = ./node_modules/uglify-js/bin/uglifyjs
+COVERALLS = ./node_modules/coveralls/bin/coveralls.js
 
+# folders
 DIST = "dist/riot/"
 
+# utils
 WATCH = "\
 	var arg = process.argv, path = arg[1], cmd = arg[2];  \
 	require('chokidar') 																  \
@@ -9,32 +19,41 @@ WATCH = "\
 			require('shelljs').exec(cmd) 										  \
 		})"
 
-test-runner:
-	RIOT=../dist/riot/riot.js ./node_modules/karma-coverage/node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- test/runner.js -R spec
 
-test: eslint test-runner
-	@ ./node_modules/karma/bin/karma start test/karma.conf.js
+test: eslint test-mocha test-karma
 
 eslint:
 	# check code style
-	@ ./node_modules/eslint/bin/eslint.js -c ./.eslintrc lib test
+	@ $(ESLINT) -c ./.eslintrc lib test
+
+test-mocha:
+	RIOT=../dist/riot/riot.js $(ISTANBUL) cover $(MOCHA) -- test/runner.js -R spec
+
+test-karma:
+	@ $(KARMA) start test/karma.conf.js
 
 test-coveralls:
-	@ RIOTJS_COVERAGE=1 cat ./coverage/lcov.info ./coverage/browsers/report-lcov/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+	@ RIOTJS_COVERAGE=1 cat ./coverage/lcov.info ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
 
+test-sauce:
+	@ $(shell \
+    SAUCE_USERNAME=riotjs \
+    SAUCE_ACCESS_KEY=124f5640-fd66-4848-acdb-98c1d601d04d \
+    SAUCELABS=1 \
+    make test-karma)
 
 raw:
 	# build riot
 	@ mkdir -p $(DIST)
-	@ ./node_modules/.bin/smash lib/compiler.js > $(DIST)compiler.js
-	@ ./node_modules/.bin/smash lib/riot.js > $(DIST)riot.js
-	@ ./node_modules/.bin/smash lib/riot+compiler.js > $(DIST)riot+compiler.js
+	@ $(SMASH) lib/compiler.js > $(DIST)compiler.js
+	@ $(SMASH) lib/riot.js > $(DIST)riot.js
+	@ $(SMASH) lib/riot+compiler.js > $(DIST)riot+compiler.js
 
 riot: raw test
 
 min: riot
 	# minify riot
-	@ for f in riot compiler riot+compiler; do ./node_modules/uglify-js/bin/uglifyjs $(DIST)$$f.js --comments --mangle -o $(DIST)$$f.min.js; done
+	@ for f in riot compiler riot+compiler; do $(UGLIFY) $(DIST)$$f.js --comments --mangle -o $(DIST)$$f.min.js; done
 
 perf: riot
 	# run the performance tests

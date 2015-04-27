@@ -1,4 +1,13 @@
 module.exports = function(config) {
+
+  var saucelabsBrowsers = require('./saucelabs-browsers.json').browsers,
+      browsers = ['PhantomJS']
+
+  // run the tests only on the saucelabs browsers
+  if (process.env.SAUCELABS) {
+    browsers = Object.keys(saucelabsBrowsers)
+  }
+
   config.set({
       basePath: '',
       autoWatch: true,
@@ -6,7 +15,8 @@ module.exports = function(config) {
       plugins: [
           'karma-mocha',
           'karma-coverage',
-          'karma-phantomjs-launcher'
+          'karma-phantomjs-launcher',
+          'karma-sauce-launcher'
       ],
       proxies: {
         '/tag/': '/base/tag/'
@@ -15,7 +25,8 @@ module.exports = function(config) {
           'polyfills/bind.js',
           '../node_modules/mocha/mocha.js',
           '../node_modules/expect.js/index.js',
-          '../dist/riot/riot+compiler.js',
+          '../dist/riot/riot.js',
+          '../lib/compiler.js',
           {
             pattern: 'tag/*.tag',
             served: true,
@@ -27,11 +38,17 @@ module.exports = function(config) {
           'specs/tmpl.js',
           'specs/speed.js'
       ],
-      browsers: ['PhantomJS'],
+      sauceLabs: {
+        build: process.env.TRAVIS_JOB_ID,
+        testName: 'riotjs'
+      },
+      browserNoActivityTimeout: 120000,
+      customLaunchers: saucelabsBrowsers,
+      browsers: browsers,
 
-      reporters: ['progress', 'coverage'],
+      reporters: ['progress', 'saucelabs', 'coverage'],
       preprocessors: {
-          '../dist/riot/riot+compiler.js': ['coverage']
+          '../dist/riot/*.js': ['coverage']
       },
 
       coverageReporter: {
