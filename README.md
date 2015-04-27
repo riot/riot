@@ -95,7 +95,6 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Flux-like ES6 Todo](https://github.com/srackham/riot-todo)
 - [Simple TODO](https://muut.com/riotjs/dist/demo/)
 - [Timer](http://jsfiddle.net/gnumanth/h9kuozp5/)
-- [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
 - [Another flux demo caparable to React ones](http://txchen.github.io/feplay/riot_flux)
 - [Various experiments](http://richardbondi.net/programming/riot)
 - [Isomorphic application](https://github.com/ListnPlay/riot-isomorphic)
@@ -112,6 +111,13 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot Compiler Explained](http://www.triplet.fi/blog/riot-compiler-explained/)
 - [Adding compiled Riot tags to your Gulp + Browserify build](http://www.triplet.fi/blog/adding_compiled_riot_tags_to_your_gulp_browserify_build/)
 
+### Libraries
+- [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
+- [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
+
+### Components
+- [Riot Bootstrap](http://cognitom.github.io/riot-bootstrap/)
+
 ### Resources
 - [Riot + Angular](https://github.com/lucasbrigida/angular-riot)
 - [Module loader for WebPack](https://www.npmjs.com/package/riotjs-loader)
@@ -119,7 +125,6 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot + Meteor]( https://atmospherejs.com/xaiki/riotjs)
 - [Riot on CodeClimate](https://codeclimate.com/github/muut/riotjs/code)
 - [Riot Snake Game](http://cdn.rawgit.com/atian25/blog/master/assets/riot-snake.html)
-- [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
 
 https://muut.com/riotjs/
 
@@ -139,4 +144,3 @@ https://muut.com/riotjs/
 
 [coverage-image]: https://coveralls.io/repos/muut/riotjs/badge.svg?branch=dev
 [coverage-url]: https://coveralls.io/r/muut/riotjs?branch=dev
-
