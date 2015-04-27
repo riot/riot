@@ -48,6 +48,15 @@ describe('Node/io.js', function() {
     expect(els[2].firstChild.nodeValue).to.be('3')
   })
 
+  it('render tag: blog (using yield)', function() {
+    var blg = riot.render('blog')
+    var doc = sdom.parse(blg)
+    var els = querySelectorAll(doc, 'h2')
+    expect(els.length).to.be(2)
+    expect(els[0].firstChild.nodeValue).to.be('post 1')
+    expect(els[1].firstChild.nodeValue).to.be('post 2')
+  })
+
 })
 
 // support functions
