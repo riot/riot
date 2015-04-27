@@ -12,6 +12,9 @@
 
 [![Coverage Status][coverage-image]][coverage-url]
 
+[![Sauce Test Status][saucelabs-image]][saucelabs-url]
+
+
 ### Custom tags • Concise syntax • Virtual DOM • Full stack • IE8
 
 Riot brings custom tags to all browsers, including IE8. Think React + Polymer but with enjoyable syntax and a small learning curve.
@@ -129,18 +132,23 @@ HTML syntax is the de facto language on the web and it's designed for building u
 https://muut.com/riotjs/
 
 
-[travis-url]:https://travis-ci.org/muut/riotjs
 [travis-image]: https://img.shields.io/travis/muut/riotjs.svg?style=flat-square
+[travis-url]:https://travis-ci.org/muut/riotjs
 
-[license-url]: LICENSE.txt
 [license-image]: http://img.shields.io/badge/license-MIT-000000.svg?style=flat-square
+[license-url]: LICENSE.txt
 
-[npm-url]: https://npmjs.org/package/riot
 [npm-version-image]: http://img.shields.io/npm/v/riot.svg?style=flat-square
 [npm-downloads-image]: http://img.shields.io/npm/dm/riot.svg?style=flat-square
+[npm-url]: https://npmjs.org/package/riot
 
-[riot-forum-url]: https://muut.com/riotjs/forum/
 [riot-forum-image]: doc/logo/join-chat.svg
+[riot-forum-url]: https://muut.com/riotjs/forum/
 
 [coverage-image]: https://coveralls.io/repos/muut/riotjs/badge.svg?branch=dev
 [coverage-url]: https://coveralls.io/r/muut/riotjs?branch=dev
+
+
+[saucelabs-image]: https://saucelabs.com/browser-matrix/riotjs.svg
+[saucelabs-url]: https://saucelabs.com/u/riotjs
+

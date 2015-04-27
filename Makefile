@@ -36,11 +36,7 @@ test-coveralls:
 	@ RIOTJS_COV=1 cat ./coverage/lcov.info ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
 
 test-sauce:
-	@ $(shell \
-    SAUCE_USERNAME=riotjs \
-    SAUCE_ACCESS_KEY=124f5640-fd66-4848-acdb-98c1d601d04d \
-    SAUCELABS=1 \
-    make test-karma)
+	@ SAUCE_USERNAME=riotjs SAUCE_ACCESS_KEY=124f5640-fd66-4848-acdb-98c1d601d04d SAUCELABS=1 make test-karma
 
 raw:
 	# build riot
