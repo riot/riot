@@ -38,6 +38,11 @@ test-coveralls:
 test-sauce:
 	@ SAUCE_USERNAME=riotjs SAUCE_ACCESS_KEY=124f5640-fd66-4848-acdb-98c1d601d04d SAUCELABS=1 make test-karma
 
+compare:
+	# compare the current release with the previous one
+	du -h riot.js compiler.js
+	du -h dist/riot/riot.js dist/riot/compiler.js
+
 raw:
 	# build riot
 	@ mkdir -p $(DIST)
