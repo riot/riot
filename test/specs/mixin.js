@@ -82,11 +82,11 @@ describe('Mixin', function() {
   it('Will mount a parent tag with a mixin and a sub-tag wtih a mixin', function() {
     var mix = document.createElement('my-mixin')
     document.body.appendChild(mix)
-    
+
     riot.tag('my-mixin', '<span>some tag</span><sub-mixin></sub-mixin>', function(opts) {
       this.mixin(IdMixin, OptsMixin)
     })
-    
+
     riot.tag('sub-mixin', '<span>sub mixin</span>', function(opts) {
       this.mixin(IdMixin)
     })
