@@ -200,10 +200,16 @@ describe('Compiler Browser', function() {
           '<yield-loop>',
           '  { greeting }',
           '  <div>Something else<\/div>',
-          '<\/yield-loop>'
+          '<\/yield-loop>',
+
+          // dynamically named elements in a loop
+
+          '<script type=\"riot\/tag\" src=\"tag\/loop-named.tag\"><\/script>',
+          '<loop-named><\/loop-named>'
 
 
-        ].join('\r'),
+
+    ].join('\r'),
       tags = [],
       div = document.createElement('div')
 
@@ -646,5 +652,15 @@ describe('Compiler Browser', function() {
     tags.push(tag)
 
   })
+
+  it('dynamically named elements in a loop', function() {
+    var tag = riot.mount('loop-named')[0]
+    tag.on('mount', function () {
+      expect(tag.first).name.to.be('first')
+      expect(tag.two).name.to.be('two')
+    })
+    tags.push(tag)
+  })
+
 
 })
