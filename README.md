@@ -132,23 +132,22 @@ HTML syntax is the de facto language on the web and it's designed for building u
 https://muut.com/riotjs/
 
 
-[travis-image]: https://img.shields.io/travis/muut/riotjs.svg?style=flat-square
+[travis-image]:https://img.shields.io/travis/muut/riotjs.svg?style=flat-square
 [travis-url]:https://travis-ci.org/muut/riotjs
 
-[license-image]: http://img.shields.io/badge/license-MIT-000000.svg?style=flat-square
-[license-url]: LICENSE.txt
+[license-image]:http://img.shields.io/badge/license-MIT-000000.svg?style=flat-square
+[license-url]:LICENSE.txt
 
-[npm-version-image]: http://img.shields.io/npm/v/riot.svg?style=flat-square
-[npm-downloads-image]: http://img.shields.io/npm/dm/riot.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/riot
+[npm-version-image]:http://img.shields.io/npm/v/riot.svg?style=flat-square
+[npm-downloads-image]:http://img.shields.io/npm/dm/riot.svg?style=flat-square
+[npm-url]:https://npmjs.org/package/riot
 
-[riot-forum-image]: doc/logo/join-chat.svg
-[riot-forum-url]: https://muut.com/riotjs/forum/
+[riot-forum-image]:doc/logo/join-chat.svg
+[riot-forum-url]:https://muut.com/riotjs/forum/
 
-[coverage-image]: https://coveralls.io/repos/muut/riotjs/badge.svg?branch=dev
-[coverage-url]: https://coveralls.io/r/muut/riotjs?branch=dev
+[coverage-image]:https://img.shields.io/coveralls/muut/riotjs/dev.svg?style=flat-square
+[coverage-url]:https://coveralls.io/r/muut/riotjs?branch=dev
 
-
-[saucelabs-image]: https://saucelabs.com/browser-matrix/riotjs.svg
-[saucelabs-url]: https://saucelabs.com/u/riotjs
+[saucelabs-image]:https://saucelabs.com/browser-matrix/riotjs.svg
+[saucelabs-url]:https://saucelabs.com/u/riotjs
 
