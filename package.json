@@ -54,6 +54,7 @@
     "karma-sauce-launcher": "^0.2.10",
     "mocha": "^2.2.4",
     "smash": "0.0.14",
+    "modularize": "^0.1.1",
     "uglify-js": "latest"
   },
   "preferGlobal": true,
