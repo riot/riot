@@ -1,5 +1,5 @@
 var glob = require('glob')
-var sdom = require('../../lib/sdom')
+var sdom = require('../../lib/node/sdom')
 
 describe('Node/io.js', function() {
 

@@ -1,4 +1,4 @@
-lib/wrap
+lib/browser/wrap
 test/polyfills
 test/compiler/js
 test/specs/compiler/fixtures
