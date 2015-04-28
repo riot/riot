@@ -35,11 +35,11 @@ module.exports = function(config) {
       'specs/compiler-browser.js',
       'specs/observable.js',
       'specs/route.js',
-      'specs/tmpl.js',
-      'specs/speed.js'
+      'specs/tmpl.js'
     ],
     sauceLabs: {
       build: process.env.TRAVIS_JOB_ID,
+
       testName: 'riotjs'
     },
     browserNoActivityTimeout: 120000,
