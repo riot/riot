@@ -27,7 +27,7 @@ eslint:
 	@ $(ESLINT) -c ./.eslintrc lib test
 
 test-mocha:
-	RIOT=../dist/riot/riot.js $(ISTANBUL) cover $(MOCHA) -- test/runner.js -R spec
+	RIOT=../../dist/riot/riot.js $(ISTANBUL) cover $(MOCHA) -- test/runner.js -R spec
 
 test-karma:
 	@ $(KARMA) start test/karma.conf.js
@@ -46,7 +46,7 @@ compare:
 raw:
 	# build riot
 	@ mkdir -p $(DIST)
-	@ $(SMASH) lib/browser/compiler.js > $(DIST)compiler.js
+	@ $(SMASH) lib/browser/compiler/index.js > $(DIST)compiler.js
 	@ $(SMASH) lib/riot.js > $(DIST)riot.js
 	@ $(SMASH) lib/riot+compiler.js > $(DIST)riot+compiler.js
 

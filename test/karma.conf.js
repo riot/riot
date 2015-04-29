@@ -26,7 +26,7 @@ module.exports = function(config) {
       '../node_modules/mocha/mocha.js',
       '../node_modules/expect.js/index.js',
       '../dist/riot/riot.js',
-      '../dist/compiler.js',
+      '../dist/riot/compiler.js',
       {
       pattern: 'tag/*.tag',
       served: true,

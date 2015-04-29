@@ -68,9 +68,9 @@
     "riot+compiler.min.js"
   ],
   "bin": {
-    "riot": "lib/cli.js"
+    "riot": "lib/node/cli.js"
   },
-  "main": "lib/node.js",
+  "main": "lib/node/index.js",
   "browser": "riot.js",
   "spm": {
     "main": "riot.js",
