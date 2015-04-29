@@ -36,6 +36,28 @@ describe('Mixin', function() {
     tag.unmount()
   })
 
+  it('Will mount a tag and provide mixed-in methods from an function constructor instance', function() {
+    var mix = document.createElement('my-mixin')
+    document.body.appendChild(mix)
+
+    function RootMixin() {
+      this.getRoot = function() {
+        return this.root
+      }
+    }
+
+    var rootmixin = new RootMixin()
+
+    riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
+      this.mixin(rootmixin)
+    })
+
+    var tag = riot.mount('my-mixin')[0]
+
+    expect(tag.root).to.be(tag.getRoot())
+    tag.unmount()
+  })
+
   it('Will mount two tags, each having separate mix-in methods', function() {
     var one = document.createElement('my-mixin2'),
         two = document.createElement('my-mixin2')
