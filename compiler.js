@@ -308,28 +308,22 @@
     var scripts = doc.querySelectorAll('script[type="riot/tag"]'),
         scriptsAmount = scripts.length
 
-    function done() {
-      promise.trigger('ready')
-      ready = true
-      fn && fn()
-    }
+    ;[].map.call(scripts, function(script) {
+      var url = script.getAttribute('src')
 
-    if(!scriptsAmount) {
-      done()
-    } else {
-      ;[].map.call(scripts, function(script) {
-        var url = script.getAttribute('src')
-
-        function compileTag(source) {
-          globalEval(source)
-          scriptsAmount--
-          if (!scriptsAmount) {
-            done()
-          }
+      function compileTag(source) {
+        globalEval(source)
+        scriptsAmount--
+        if (!scriptsAmount) {
+          promise.trigger('ready')
+          ready = true
+          fn && fn()
         }
-        return url ? GET(url, compileTag) : compileTag(unindent(script.innerHTML))
-      })
-    }
+      }
+
+      return url ? GET(url, compileTag) : compileTag(unindent(script.innerHTML))
+    })
+
   }
 
 
