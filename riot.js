@@ -1006,8 +1006,14 @@ function getTag(dom) {
 
 function injectStyle(css) {
   var node = document.createElement('style')
-  node.innerHTML = css
-  document.head.appendChild(node)
+  node.setAttribute("type", "text/css");
+  if(node.styleSheet){
+    node.styleSheet.cssText=css;
+    document.body.appendChild(node);
+  }else{
+    node.innerHTML=css;
+    document.head.appendChild(node);
+  }
 }
 
 function mountTo(root, tagName, opts) {
