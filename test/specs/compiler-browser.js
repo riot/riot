@@ -207,6 +207,8 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/loop-named.tag\"><\/script>',
           '<loop-named><\/loop-named>',
 
+          //style injection to single style tag
+
           '<script type=\"riot\/tag\">',
           '  <style-tag>',
           '    <style scoped>',
@@ -678,7 +680,7 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
-  it('style injection', function() {
+  it('style injection to single style tag', function() {
     var stag = document.querySelector('head style:last-child')
     var styles =  stag.innerHTML
     expect(styles).to.contain('style-tag p {color: blue;}')
