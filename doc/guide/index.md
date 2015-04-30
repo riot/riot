@@ -589,8 +589,8 @@ Loops are implemented with `each` attribute as follows:
 ```
 <todo>
   <ul>
-    <li each={ items } class={ completed: done }>
-      <input type="checkbox" checked={ done }> { title }
+    <li each="{ items }" class="{ completed: done }">
+      <input type="checkbox" checked="{ done }"> { title }
     </li>
   </ul>
 
