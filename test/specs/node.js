@@ -1,5 +1,5 @@
 var glob = require('glob')
-var sdom = require('../../lib/sdom')
+var jsdom = require('jsdom')
 
 describe('Node/io.js', function() {
 
@@ -19,8 +19,8 @@ describe('Node/io.js', function() {
 
   it('render tag: if-test', function() {
     var ift = riot.render('if-test')
-    var doc = sdom.parse(ift)
-    var els = querySelectorAll(doc, 'if-child')
+    var doc = jsdom.jsdom(ift)
+    var els = doc.querySelectorAll('if-child')
     expect(els.length).to.be(1)
     expect(els[0].attributes.length).to.be(1)
     expect(els[0].attributes[0].name).to.be('style')
@@ -29,10 +29,10 @@ describe('Node/io.js', function() {
 
   it('render tag: loop-child', function() {
     var lpc = riot.render('loop-child')
-    var doc = sdom.parse(lpc)
-    var els = querySelectorAll(doc, 'looped-child')
+    var doc = jsdom.jsdom(lpc)
+    var els = doc.querySelectorAll('looped-child')
     expect(els.length).to.be(2)
-    var h3s = querySelectorAll(doc, 'h3')
+    var h3s = doc.querySelectorAll('h3')
     expect(h3s.length).to.be(2)
     expect(h3s[0].firstChild.nodeValue).to.be('one')
     expect(h3s[1].firstChild.nodeValue).to.be('two')
@@ -40,8 +40,8 @@ describe('Node/io.js', function() {
 
   it('render tag: loop-replace', function() {
     var lpr = riot.render('loop-replace')
-    var doc = sdom.parse(lpr)
-    var els = querySelectorAll(doc, 'strong')
+    var doc = jsdom.jsdom(lpr)
+    var els = doc.querySelectorAll('strong')
     expect(els.length).to.be(3)
     expect(els[0].firstChild.nodeValue).to.be('a')
     expect(els[1].firstChild.nodeValue).to.be('9')
@@ -50,39 +50,11 @@ describe('Node/io.js', function() {
 
   it('render tag: blog (using yield)', function() {
     var blg = riot.render('blog')
-    var doc = sdom.parse(blg)
-    var els = querySelectorAll(doc, 'h2')
+    var doc = jsdom.jsdom(blg)
+    var els = doc.querySelectorAll('h2')
     expect(els.length).to.be(2)
     expect(els[0].firstChild.nodeValue).to.be('post 1')
     expect(els[1].firstChild.nodeValue).to.be('post 2')
   })
 
 })
-
-// support functions
-//
-function querySelectorAll(dom, selector) {
-  var nodes = []
-  walk(dom, function(node) {
-    if (node && node.tagName) {
-      var tagName = node.tagName.toLowerCase()
-      if (selector.indexOf(tagName) != -1) {
-        nodes.push(node)
-      }
-    }
-  })
-  return nodes
-}
-// `riot.util.walk`
-function walk(dom, fn) {
-  if (dom) {
-    if (fn(dom) === false) walk(dom.nextSibling, fn)
-    else {
-      dom = dom.firstChild
-      while (dom) {
-        walk(dom, fn)
-        dom = dom.nextSibling
-      }
-    }
-  }
-}
