@@ -224,7 +224,14 @@ describe('Compiler Browser', function() {
           '<\/script>',
 
           '<style-tag><\/style-tag>',
-          '<style-tag2><\/style-tag2>'
+          '<style-tag2><\/style-tag2>',
+
+          // scoped css and riot-tag, mount(selector, tagname)
+
+          '<script type=\"riot\/tag\" src=\"tag\/scoped.tag\"><\/script>',
+          '<scoped-tag><\/scoped-tag>',
+          '<div riot-tag="scoped-tag"><\/div>',
+          '<div id="scopedtag"><\/div>'
 
 
     ].join('\r'),
@@ -683,8 +690,30 @@ describe('Compiler Browser', function() {
   it('style injection to single style tag', function() {
     var stag = document.querySelector('head style:last-child')
     var styles =  stag.innerHTML
-    expect(styles).to.contain('style-tag p {color: blue;}')
-    expect(styles).to.contain('style-tag2 div {color: red;}')
+    expect(styles).to.match(/style-tag p[^{]+\{color: blue;\}/)
+    expect(styles).to.match(/style-tag2 div[^{]+\{color: red;\}/)
+  })
+
+  it('scoped css and riot-tag, mount(selector, tagname)', function() {
+    function checkBorder(t) {
+      var e = t.root.firstElementChild
+      var s = (e.currentStyle || window.getComputedStyle(e, null)).borderTopWidth
+      expect(s.substr(0, 3)).to.be('1px')
+
+    }
+    var stags = riot.mount('scoped-tag')
+
+    var tag = stags[0]
+    checkBorder(tag)
+
+    var rtag = stags[1]
+    checkBorder(rtag)
+
+    var divtag = riot.mount('#scopedtag', 'scoped-tag')[0]
+    checkBorder(divtag)
+    tags.push(divtag)
+    tags.push(rtag)
+    tags.push(tag)
   })
 
 })
