@@ -205,8 +205,24 @@ describe('Compiler Browser', function() {
           // dynamically named elements in a loop
 
           '<script type=\"riot\/tag\" src=\"tag\/loop-named.tag\"><\/script>',
-          '<loop-named><\/loop-named>'
+          '<loop-named><\/loop-named>',
 
+          '<script type=\"riot\/tag\">',
+          '  <style-tag>',
+          '    <style scoped>',
+          '      p {color: blue;}',
+          '    <\/style>',
+          '  <\/style-tag>',
+
+          '  <style-tag2>',
+          '    <style scoped>',
+          '      div {color: red;}',
+          '    <\/style>',
+          '  <\/style-tag2>',
+          '<\/script>',
+
+          '<style-tag><\/style-tag>',
+          '<style-tag2><\/style-tag2>'
 
 
     ].join('\r'),
@@ -662,5 +678,11 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('style injection', function() {
+    var stag = document.querySelector('head style:last-child')
+    var styles =  stag.innerHTML
+    expect(styles).to.contain('style-tag p {color: blue;}')
+    expect(styles).to.contain('style-tag2 div {color: red;}')
+  })
 
 })
