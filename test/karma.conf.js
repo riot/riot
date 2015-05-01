@@ -39,7 +39,8 @@ module.exports = function(config) {
     ],
     sauceLabs: {
       build: process.env.TRAVIS_JOB_ID,
-
+      recordVideo: false,
+      recordScreenshots: false,
       testName: 'riotjs'
     },
     browserNoActivityTimeout: 120000,
