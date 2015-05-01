@@ -690,8 +690,8 @@ describe('Compiler Browser', function() {
   it('style injection to single style tag', function() {
     var stag = document.querySelector('head style:last-child')
     var styles =  stag.innerHTML
-    expect(styles).to.match(/style-tag p[^{]+\{color: blue;\}/)
-    expect(styles).to.match(/style-tag2 div[^{]+\{color: red;\}/)
+    expect(styles).to.contain('style-tag p , [riot-tag="style-tag"] p {color: blue;}')
+    expect(styles).to.contain('style-tag2 div , [riot-tag="style-tag2"] div {color: red;}')
   })
 
   it('scoped css and riot-tag, mount(selector, tagname)', function() {
