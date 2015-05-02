@@ -42,6 +42,7 @@
     "simple-html-tokenizer": "^0.1.1"
   },
   "devDependencies": {
+    "cheerio": "^0.19.0",
     "coveralls": "^2.11.2",
     "eslint": "^0.20.0",
     "expect.js": "^0.3.1",
@@ -53,8 +54,8 @@
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-sauce-launcher": "^0.2.10",
     "mocha": "^2.2.4",
-    "smash": "0.0.14",
     "modularize": "^0.1.1",
+    "smash": "0.0.14",
     "uglify-js": "latest"
   },
   "preferGlobal": true,
