@@ -26,7 +26,7 @@ module.exports = function(config) {
       '../node_modules/mocha/mocha.js',
       '../node_modules/expect.js/index.js',
       '../dist/riot/riot.js',
-      '../dist/riot/compiler.js',
+      '../lib/compiler.js',
       {
       pattern: 'tag/*.tag',
       served: true,
@@ -39,11 +39,11 @@ module.exports = function(config) {
     ],
     sauceLabs: {
       build: process.env.TRAVIS_JOB_ID,
-      recordVideo: false,
-      recordScreenshots: false,
       testName: 'riotjs'
     },
-    browserNoActivityTimeout: 120000,
+    browserDisconnectTimeout: 15 * 1000,
+    browserDisconnectTolerance: 2,
+    browserNoActivityTimeout: 30000,
     customLaunchers: saucelabsBrowsers,
     browsers: browsers,
 
