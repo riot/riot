@@ -39,10 +39,11 @@ module.exports = function(config) {
     ],
     sauceLabs: {
       build: process.env.TRAVIS_JOB_ID,
-
       testName: 'riotjs'
     },
-    browserNoActivityTimeout: 120000,
+    browserDisconnectTimeout: 15 * 1000,
+    browserDisconnectTolerance: 2,
+    browserNoActivityTimeout: 30000,
     customLaunchers: saucelabsBrowsers,
     browsers: browsers,
 

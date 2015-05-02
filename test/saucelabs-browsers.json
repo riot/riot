@@ -16,13 +16,13 @@
     "sl_IE_9": {
       "base": "SauceLabs",
       "browserName": "internet explorer",
-      "platform": "Windows 2008",
+      "platform": "Windows 7",
       "version": "9"
     },
     "sl_IE_10": {
       "base": "SauceLabs",
       "browserName": "internet explorer",
-      "platform": "Windows 2012",
+      "platform": "Windows 8",
       "version": "10"
     },
     "sl_IE_11": {
@@ -31,11 +31,25 @@
       "platform": "Windows 8.1",
       "version": "11"
     },
-    "sl_iOS": {
+    "sl_iphone": {
       "base": "SauceLabs",
       "browserName": "iphone",
-      "platform": "OS X 10.10",
-      "version": "8.1"
+      "version": "8.2"
+    },
+    "sl_ipad": {
+      "base": "SauceLabs",
+      "browserName": "ipad",
+      "version": "8.2"
+    },
+    "sl_android_5": {
+      "base": "SauceLabs",
+      "browserName": "android",
+      "version": "5.1"
+    },
+    "sl_android_4": {
+      "base": "SauceLabs",
+      "browserName": "android",
+      "version": "4.0"
     }
   }
 }
