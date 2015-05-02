@@ -1,14 +1,15 @@
-var glob = require('glob')
-var cheerio = require('cheerio')
+var glob = require('glob'),
+    cheerio = require('cheerio')
 
 describe('Node/io.js', function() {
 
-  it('require tags', function() {
+  it('require tags', function(done) {
     glob('../tag/*.tag', { cwd: __dirname }, function (err, tags) {
       expect(err).to.be(null)
       tags.forEach(function(tag) {
         expect(require(tag)).to.be.ok()
       })
+      done()
     })
   })
 
