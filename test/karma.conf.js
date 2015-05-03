@@ -38,12 +38,14 @@ module.exports = function(config) {
       'specs/tmpl.js'
     ],
     sauceLabs: {
-      build: process.env.TRAVIS_JOB_ID,
-      testName: 'riotjs'
+      build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
+      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
+      testName: 'riotjs',
+      startConnect: process.env.TRAVIS ? false : true
     },
     browserDisconnectTimeout: 15 * 1000,
-    browserDisconnectTolerance: 2,
-    browserNoActivityTimeout: 30000,
+    browserDisconnectTolerance: 5,
+    browserNoActivityTimeout: 120000,
     customLaunchers: saucelabsBrowsers,
     browsers: browsers,
 
