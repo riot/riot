@@ -697,8 +697,8 @@ describe('Compiler Browser', function() {
   it('scoped css and riot-tag, mount(selector, tagname)', function() {
     function checkBorder(t) {
       var e = t.root.firstElementChild
-      var s = (e.currentStyle || window.getComputedStyle(e, null)).borderTopWidth
-      expect(s.substr(0, 3)).to.be('1px')
+      var s = window.getComputedStyle(e, null).borderTopWidth
+      expect(s).to.be('1px')
 
     }
     var stags = riot.mount('scoped-tag')
