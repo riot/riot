@@ -106,6 +106,10 @@ describe('Compiler Browser', function() {
           '<loop-manip><\/loop-manip>',
           '<script type=\"riot\/tag\" src=\"tag\/loop-manip.tag\"><\/script>',
 
+          // loop table
+          '<loop-table><\/loop-table>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-table.tag\"><\/script>',
+
           // looped child
           '<nested-child><\/nested-child>',
           '<script type=\"riot\/tag\" src=\"tag\/nested-child.tag\"><\/script>',
@@ -514,6 +518,13 @@ describe('Compiler Browser', function() {
 
   })
 
+  it('loop table item correct', function() {
+    var tag = riot.mount('loop-table')[0],
+        root = tag.root
+    expect(root.innerHTML).to.be('<table> <tbody><tr> <td>1</td> <td>Peter</td> </tr><tr> <td>2</td> <td>Sherman</td> </tr><tr> <td>3</td> <td>Laura</td> </tr> </tbody></table>')
+    tags.push(tag)
+  })
+
   it('loop option tag', function() {
     var tag = riot.mount('loop-option')[0],
         root = tag.root
@@ -521,7 +532,6 @@ describe('Compiler Browser', function() {
     expect(normalizeHTML(root.innerHTML)).to.match(/<select> <option value="1">Peter<\/option><option selected="(selected|true)" value="2">Sherman<\/option><option value="3">Laura<\/option> <\/select>/)
 
     tags.push(tag)
-
   })
 
   it('brackets', function() {
