@@ -6,7 +6,7 @@ function normalizeHTML (html) {
     .trim()
     // change all the tags properties and names to lowercase because a <li> for ie8 is a <LI>
     .replace(/<([^>]*)>/g, function(tag) { return tag.toLowerCase() })
-    .replace(/\r|\r|\n/gi, '')
+    .replace(/\r|\r|\n|\t/gi, '')
 }
 
 describe('Compiler Browser', function() {
@@ -694,10 +694,11 @@ describe('Compiler Browser', function() {
   })
 
   it('style injection to single style tag', function() {
-    var stag = document.querySelector('head style:last-child')
-    var styles =  stag.innerHTML
-    expect(styles).to.contain('style-tag p , [riot-tag="style-tag"] p {color: blue;}')
-    expect(styles).to.contain('style-tag2 div , [riot-tag="style-tag2"] div {color: red;}')
+    var stag = document.querySelector('style'),
+      styles =  normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
+
+    expect(styles).to.match(/p {color: blue;}/)
+    expect(styles).to.match(/div {color: red;}/)
   })
 
   it('scoped css and riot-tag, mount(selector, tagname)', function() {
