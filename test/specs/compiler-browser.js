@@ -231,7 +231,13 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/scoped.tag\"><\/script>',
           '<scoped-tag><\/scoped-tag>',
           '<div riot-tag="scoped-tag"><\/div>',
-          '<div id="scopedtag"><\/div>'
+          '<div id="scopedtag"><\/div>',
+
+          // preserve attributes from tag definition
+
+          '<script type=\"riot\/tag\" src=\"tag\/preserve-attr.tag\"><\/script>',
+          '<preserve-attr><\/preserve-attr>',
+          '<div riot-tag="preserve-attr2"><\/div>'
 
 
     ].join('\r'),
@@ -697,8 +703,8 @@ describe('Compiler Browser', function() {
   it('scoped css and riot-tag, mount(selector, tagname)', function() {
     function checkBorder(t) {
       var e = t.root.firstElementChild
-      var s = (e.currentStyle || window.getComputedStyle(e, null)).borderTopWidth
-      expect(s.substr(0, 3)).to.be('1px')
+      var s = window.getComputedStyle(e, null).borderTopWidth
+      expect(s).to.be('1px')
 
     }
     var stags = riot.mount('scoped-tag')
@@ -714,6 +720,15 @@ describe('Compiler Browser', function() {
     tags.push(divtag)
     tags.push(rtag)
     tags.push(tag)
+  })
+
+  it('preserve attributes from tag definition', function() {
+    var tag = riot.mount('preserve-attr')[0]
+    expect(tag.root.className).to.be('single-quote')
+    var tag2 = riot.mount('preserve-attr2')[0]
+    expect(tag2.root.className).to.be('double-quote')
+    tags.push(tag)
+    tags.push(tag2)
   })
 
 })
