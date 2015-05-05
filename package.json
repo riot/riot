@@ -47,6 +47,7 @@
     "eslint": "^0.20.0",
     "expect.js": "^0.3.1",
     "glob": "^5.0.5",
+    "jsdom": "^5.3.0",
     "karma": "^0.12.31",
     "karma-coverage": "^0.3.1",
     "karma-mocha": "^0.1.10",
