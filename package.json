@@ -53,7 +53,6 @@
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-sauce-launcher": "^0.2.10",
     "mocha": "^2.2.4",
-    "modularize": "^0.1.1",
     "smash": "0.0.14",
     "uglify-js": "latest"
   },
