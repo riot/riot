@@ -34,7 +34,7 @@ For more details, read the compiler [general introduction](/riotjs/compiler.html
 Loads the given URL and compiles all tags after which the `callback` is called. For example:
 
 ``` javascript
-riot.compile('my/tags.js', function() {
+riot.compile('my/tags.tag', function() {
   // the loaded tags are ready to be used
 })
 ```
