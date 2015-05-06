@@ -280,7 +280,6 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/prevent-update.tag\"><\/script>',
           '<prevent-update><\/prevent-update>'
 
-
     ].join('\r'),
       tags = [],
       div = document.createElement('div')
