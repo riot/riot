@@ -237,7 +237,12 @@ describe('Compiler Browser', function() {
 
           '<script type=\"riot\/tag\" src=\"tag\/preserve-attr.tag\"><\/script>',
           '<preserve-attr><\/preserve-attr>',
-          '<div riot-tag="preserve-attr2"><\/div>'
+          '<div riot-tag="preserve-attr2"><\/div>',
+
+          // precompiled tag compatibility
+
+          '<precompiled><\/precompiled>'
+
 
 
     ].join('\r'),
@@ -730,6 +735,17 @@ describe('Compiler Browser', function() {
     expect(tag2.root.className).to.be('double-quote')
     tags.push(tag)
     tags.push(tag2)
+  })
+
+  it('precompiled tag compatibility', function() {
+    riot.tag('precompiled', 'HELLO!', 'precompiled, [riot-tag="precompiled"]  { color: red }', function(opts) {
+      this.nothing = opts.nothing
+    })
+
+    var tag = riot.mount('precompiled')[0]
+    expect(window.getComputedStyle(tag.root, null).color).to.be('rgb(255, 0, 0)')
+    tags.push(tag)
+
   })
 
 })
