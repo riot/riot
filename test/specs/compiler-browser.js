@@ -271,7 +271,7 @@ describe('Compiler Browser', function() {
 
   it('compiles and unmount the children tags', function(done) {
 
-    this.timeout(3000)
+    this.timeout(5000)
 
     var ticks = 0,
         tag = riot.mount('timetable', {
@@ -295,7 +295,7 @@ describe('Compiler Browser', function() {
       riot.compile(src, true)
     }
 
-    expect(+new Date() - begin).to.be.below(100)
+    expect(+new Date() - begin).to.be.below(1000)
 
     expect(tag.tags.foo).to.not.be('undefined')
 

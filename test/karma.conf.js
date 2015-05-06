@@ -41,10 +41,15 @@ module.exports = function(config) {
       build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
       testName: 'riotjs',
-      startConnect: true
+      startConnect: process.env.TRAVIS ? false : true,
+      recordScreenshots: true,
+      options: {
+        'selenium-version': '2.41.0'
+      }
     },
-    browserDisconnectTimeout: 15 * 1000,
-    browserDisconnectTolerance: 5,
+    captureTimeout: 0,
+    browserDisconnectTimeout: 10000,
+    browserDisconnectTolerance: 2,
     browserNoActivityTimeout: 120000,
     customLaunchers: saucelabsBrowsers,
     browsers: browsers,
