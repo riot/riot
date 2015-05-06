@@ -270,7 +270,7 @@ Creates a new custom tag "manually" without the compiler.
 - `tagName` the tag name
 - `html` is the layout with [expressions](/riotjs/guide/#expressions)
 - `css` is the style for the tag (optional)
-- `attrs` string of attributes for the tag (optional).  If used without the `css` option, include empty css parameter
+- `attrs` string of attributes for the tag (optional).
 - `constructor` is the initialization function being called before the tag expressions are calculated and before the tag is mounted
 
 
