@@ -5,6 +5,9 @@ module.exports = function(config) {
 
   // run the tests only on the saucelabs browsers
   if (process.env.SAUCELABS) {
+    for (var browser in saucelabsBrowsers) {
+      if (saucelabsBrowsers[browser].group != process.env.GROUP) delete saucelabsBrowsers[browser]
+    }
     browsers = Object.keys(saucelabsBrowsers)
   }
 
@@ -28,9 +31,9 @@ module.exports = function(config) {
       '../dist/riot/riot.js',
       '../dist/riot/compiler.js',
       {
-      pattern: 'tag/*.tag',
-      served: true,
-      included: false
+        pattern: 'tag/*.tag',
+        served: true,
+        included: false
       },
       'specs/compiler-browser.js',
       'specs/observable.js',
