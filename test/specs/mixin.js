@@ -122,4 +122,19 @@ describe('Mixin', function() {
     tag.unmount()
   })
 
+  it('register a mixin to Riot and load mixin to a tag', function() {
+    var mix = document.createElement('my-mixin')
+    document.body.appendChild(mix)
+
+    riot.mixin('idMixin', IdMixin) // register mixin
+    riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
+      this.mixin('idMixin') // load mixin
+    })
+
+    var tag = riot.mount('my-mixin')[0]
+
+    expect(tag._id).to.be(tag.getId())
+    tag.unmount()
+  })
+
 })
