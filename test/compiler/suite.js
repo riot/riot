@@ -5,7 +5,7 @@ require('shelljs/global')
 
 // global.riot = {settings: { brackets: '{ }' } }
 
-var compiler = require('../../lib/compiler')
+var compiler = require('../../lib/node/compiler')
 
 function assert(str, resStr) {
   if (str === resStr) console.info('OK', str.replace(/\n/g, '').trim())

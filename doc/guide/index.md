@@ -239,6 +239,84 @@ Inside the tag the options can be referenced with the `opts` variable as follows
 </my-tag>
 ```
 
+
+### Mixins
+
+Mixins provide an easy way to share functionality across tags. When a tag is compiled by riot, any defined mixins are added and available to use in the tag.
+
+```
+var OptsMixin = {
+    'getOpts': function() {
+        return this.opts
+    },
+
+    'setOpts': function(opts, update) {
+        this.opts = opts
+
+        if(!update) {
+            this.update()
+        }
+
+        return this
+    }
+}
+
+<my-tag>
+    <h1>{ opts.title }</h1>
+
+    this.mixin(OptsMixin)
+</my-tag>
+```
+
+In this example you are giving any instance of the `my-tag` Tag the `OptsMixin` which provides `getOpts` and `setOpts` methods.
+
+```
+var my_tag_instance = riot.mount('my-tag')[0]
+
+console.log(my_tag_instance.getOpts()) //will log out any opts that the tag has
+```
+
+Tags will accept any object -- `{'key': 'val'}` `var mix = new function(...)` -- and will error out when any other type is passed to it.
+
+The `my-tag` definition now has a `getId` method added to it along with anything defined in the `OptsMixin`.
+
+```
+function IdMixin() {
+    this.getId = function() {
+        return this._id
+    }
+}
+
+var id_mixin_instance = new IdMixin()
+
+<my-tag>
+    <h1>{ opts.title }</h1>
+
+    this.mixin(OptsMixin, id_mixin_instance)
+</my-tag>
+```
+
+By being defined on the tag level, mixins not only extend the functionality of your tag, but also allows for a repeatable interface. Every time a tag is mounted, even sub-tags, the instance will have the mixed-in code.
+
+### Sharing mixin
+
+To share the mixins over files or projects, `riot.mixin` API is provided. You can register your mixin globally like this:
+
+```javascript
+riot.mixin('mixinName', mixinObject)
+```
+
+To load the mixin to the tag, use `mixin()` method with the key.
+
+```
+<my-tag>
+    <h1>{ opts.title }</h1>
+
+    this.mixin('mixinName')
+</my-tag>
+```
+
+
 ### Tag lifecycle
 
 A tag is created in following sequence:
@@ -724,7 +802,7 @@ will mount the `ul` element shown above as if it were `<my-tag></my-tag>`
 
 ## Server-side rendering | #server-side
 
-Riot supports server-side rendering, with Node/io.js you can simple require tags and render to html:
+Riot supports server-side rendering, with Node/io.js you can simply require tags and render to html:
 
 ```
 var riot = require('riot')
@@ -840,4 +918,4 @@ And here we mount the application
 
 On the above setup the other tags on the system do not need to know about each other since they can simply listen to the "login" event and do what they please.
 
-Observable is a classic building block for a decoupled (modular) appliction.
+Observable is a classic building block for a decoupled (modular) application.

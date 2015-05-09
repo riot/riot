@@ -6,7 +6,7 @@ function normalizeHTML (html) {
     .trim()
     // change all the tags properties and names to lowercase because a <li> for ie8 is a <LI>
     .replace(/<([^>]*)>/g, function(tag) { return tag.toLowerCase() })
-    .replace(/\r|\r|\n/gi, '')
+    .replace(/\r|\r|\n|\t/gi, '')
 }
 
 describe('Compiler Browser', function() {
@@ -200,10 +200,52 @@ describe('Compiler Browser', function() {
           '<yield-loop>',
           '  { greeting }',
           '  <div>Something else<\/div>',
-          '<\/yield-loop>'
+          '<\/yield-loop>',
+
+          // dynamically named elements in a loop
+
+          '<script type=\"riot\/tag\" src=\"tag\/loop-named.tag\"><\/script>',
+          '<loop-named><\/loop-named>',
+
+          //style injection to single style tag
+
+          '<script type=\"riot\/tag\">',
+          '  <style-tag>',
+          '    <style scoped>',
+          '      p {color: blue;}',
+          '    <\/style>',
+          '  <\/style-tag>',
+
+          '  <style-tag2>',
+          '    <style scoped>',
+          '      div {color: red;}',
+          '    <\/style>',
+          '  <\/style-tag2>',
+          '<\/script>',
+
+          '<style-tag><\/style-tag>',
+          '<style-tag2><\/style-tag2>',
+
+          // scoped css and riot-tag, mount(selector, tagname)
+
+          '<script type=\"riot\/tag\" src=\"tag\/scoped.tag\"><\/script>',
+          '<scoped-tag><\/scoped-tag>',
+          '<div riot-tag="scoped-tag"><\/div>',
+          '<div id="scopedtag"><\/div>',
+
+          // preserve attributes from tag definition
+
+          '<script type=\"riot\/tag\" src=\"tag\/preserve-attr.tag\"><\/script>',
+          '<preserve-attr><\/preserve-attr>',
+          '<div riot-tag="preserve-attr2"><\/div>',
+
+          // precompiled tag compatibility
+
+          '<precompiled><\/precompiled>'
 
 
-        ].join('\r'),
+
+    ].join('\r'),
       tags = [],
       div = document.createElement('div')
 
@@ -229,7 +271,7 @@ describe('Compiler Browser', function() {
 
   it('compiles and unmount the children tags', function(done) {
 
-    this.timeout(3000)
+    this.timeout(5000)
 
     var ticks = 0,
         tag = riot.mount('timetable', {
@@ -253,7 +295,7 @@ describe('Compiler Browser', function() {
       riot.compile(src, true)
     }
 
-    expect(+new Date() - begin).to.be.below(100)
+    expect(+new Date() - begin).to.be.below(1000)
 
     expect(tag.tags.foo).to.not.be('undefined')
 
@@ -643,6 +685,65 @@ describe('Compiler Browser', function() {
 
     child3.root.getElementsByTagName('i')[0].onclick({})
 
+    tags.push(tag)
+
+  })
+
+  it('dynamically named elements in a loop', function() {
+    var tag = riot.mount('loop-named')[0]
+    tag.on('mount', function () {
+      expect(tag.first).name.to.be('first')
+      expect(tag.two).name.to.be('two')
+    })
+    tags.push(tag)
+  })
+
+  it('style injection to single style tag', function() {
+    var stag = document.querySelector('style'),
+      styles =  normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
+
+    expect(styles).to.match(/p {color: blue;}/)
+    expect(styles).to.match(/div {color: red;}/)
+  })
+
+  it('scoped css and riot-tag, mount(selector, tagname)', function() {
+    function checkBorder(t) {
+      var e = t.root.firstElementChild
+      var s = window.getComputedStyle(e, null).borderTopWidth
+      expect(s).to.be('1px')
+
+    }
+    var stags = riot.mount('scoped-tag')
+
+    var tag = stags[0]
+    checkBorder(tag)
+
+    var rtag = stags[1]
+    checkBorder(rtag)
+
+    var divtag = riot.mount('#scopedtag', 'scoped-tag')[0]
+    checkBorder(divtag)
+    tags.push(divtag)
+    tags.push(rtag)
+    tags.push(tag)
+  })
+
+  it('preserve attributes from tag definition', function() {
+    var tag = riot.mount('preserve-attr')[0]
+    expect(tag.root.className).to.be('single-quote')
+    var tag2 = riot.mount('preserve-attr2')[0]
+    expect(tag2.root.className).to.be('double-quote')
+    tags.push(tag)
+    tags.push(tag2)
+  })
+
+  it('precompiled tag compatibility', function() {
+    riot.tag('precompiled', 'HELLO!', 'precompiled, [riot-tag="precompiled"]  { color: red }', function(opts) {
+      this.nothing = opts.nothing
+    })
+
+    var tag = riot.mount('precompiled')[0]
+    expect(window.getComputedStyle(tag.root, null).color).to.be('rgb(255, 0, 0)')
     tags.push(tag)
 
   })
