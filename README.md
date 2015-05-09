@@ -10,6 +10,11 @@
 
 [![MIT License][license-image]][license-url]
 
+[![Coverage Status][coverage-image]][coverage-url]
+
+[![Sauce Test Status][saucelabs-image]][saucelabs-url]
+
+
 ### Custom tags • Concise syntax • Virtual DOM • Full stack • IE8
 
 Riot brings custom tags to all browsers, including IE8. Think React + Polymer but with enjoyable syntax and a small learning curve.
@@ -85,7 +90,6 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - Interpolation: `Add #{ items.length + 1 }` or `class="item { selected: flag }"`
 - Compact ES6 method syntax.
 
-
 ### Demos
 - [Riot Todo MVC](https://github.com/txchen/feplay/tree/gh-pages/riot_todo)
 - [Hackernews reader](http://git.io/riot-hn)
@@ -93,7 +97,6 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Flux-like ES6 Todo](https://github.com/srackham/riot-todo)
 - [Simple TODO](https://muut.com/riotjs/dist/demo/)
 - [Timer](http://jsfiddle.net/gnumanth/h9kuozp5/)
-- [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
 - [Another flux demo caparable to React ones](http://txchen.github.io/feplay/riot_flux)
 - [Various experiments](http://richardbondi.net/programming/riot)
 - [Isomorphic application](https://github.com/ListnPlay/riot-isomorphic)
@@ -110,6 +113,13 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot Compiler Explained](http://www.triplet.fi/blog/riot-compiler-explained/)
 - [Adding compiled Riot tags to your Gulp + Browserify build](http://www.triplet.fi/blog/adding_compiled_riot_tags_to_your_gulp_browserify_build/)
 
+### Libraries
+- [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
+- [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
+
+### Components
+- [Riot Bootstrap](http://cognitom.github.io/riot-bootstrap/)
+
 ### Resources
 - [Riot + Angular](https://github.com/lucasbrigida/angular-riot)
 - [Module loader for WebPack](https://www.npmjs.com/package/riotjs-loader)
@@ -117,20 +127,126 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot + Meteor]( https://atmospherejs.com/xaiki/riotjs)
 - [Riot on CodeClimate](https://codeclimate.com/github/muut/riotjs/code)
 - [Riot Snake Game](http://cdn.rawgit.com/atian25/blog/master/assets/riot-snake.html)
-- [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
+
+
+### Credits
+
+Riot is made with :heart: by many smart guys. Thanks to all the contributors
+
+```
+ project  : riotjs
+ repo age : 1 year, 7 months
+ active   : 227 days
+ commits  : 993
+ files    : 152
+ authors  :
+   375  Tero Piirainen          37.8%
+   184  Gianluca Guarini        18.5%
+   150  Aurimas                 15.1%
+    27  Marcelo Eden            2.7%
+    24  Tsutomu Kawamura        2.4%
+    18  Juha Lindstedt          1.8%
+    17  rsbondi                 1.7%
+    16  Kalman Speier           1.6%
+    14  andynemzek              1.4%
+    11  Hrvoje Šimić          1.1%
+    10  Andy VanEe              1.0%
+     7  Tianxiang Chen          0.7%
+     6  Jens Anders Bakke       0.6%
+     6  hemanth.hm              0.6%
+     5  midinastasurazz         0.5%
+     5  jigsaw                  0.5%
+     4  Eric Baer               0.4%
+     4  Giovanni Cappellotto    0.4%
+     4  blissland               0.4%
+     3  Tatu Tamminen           0.3%
+     3  Márcio Coelho          0.3%
+     3  Magnus Wolffelt         0.3%
+     3  Anton Heryanto          0.3%
+     3  Alan R. Soares          0.3%
+     3  Artem Medeusheyev       0.3%
+     3  Ashley Brener           0.3%
+     3  korige                  0.3%
+     3  Jim Sparkman            0.3%
+     3  Richard Bondi           0.3%
+     2  Žiga                   0.2%
+     2  Alexis THOMAS           0.2%
+     2  Andreas Heintze         0.2%
+     2  Andrew Feng             0.2%
+     2  Andrew Luetgers         0.2%
+     2  Antoine Goutagny        0.2%
+     2  Markus A. Stone         0.2%
+     2  Moot Inc                0.2%
+     2  Philippe CHARRIERE      0.2%
+     2  Sergey Martynov         0.2%
+     2  Simon JAILLET           0.2%
+     2  Steve Clay              0.2%
+     2  Tim Kindberg            0.2%
+     2  Tobias Baunbæk         0.2%
+     2  crazy2be                0.2%
+     2  jmas                    0.2%
+     2  luffs                   0.2%
+     2  yibuyisheng             0.2%
+     1  Jonny Buchanan          0.1%
+     1  Constantin Rack         0.1%
+     1  Quim Calpe              0.1%
+     1  Riccardo Gueli Alletti  0.1%
+     1  Jonathan Dumaine        0.1%
+     1  Ryan O’Hara           0.1%
+     1  Sam Morgan              0.1%
+     1  typicode                0.1%
+     1  Boris Huai              0.1%
+     1  Simone Vittori          0.1%
+     1  Steel Brain             0.1%
+     1  kylobite                0.1%
+     1  Steven Koch             0.1%
+     1  TZ | 天猪             0.1%
+     1  Joel Thornton           0.1%
+     1  Tenor Biel              0.1%
+     1  Ivan Saorin             0.1%
+     1  Ian Walter              0.1%
+     1  Ari Makela              0.1%
+     1  Benoit Hirbec           0.1%
+     1  Trent Ogren             0.1%
+     1  Fernando Correia        0.1%
+     1  Umut Sirin              0.1%
+     1  Zach Aysan              0.1%
+     1  afc163                  0.1%
+     1  Eliseo Arias            0.1%
+     1  Danil Semelenov         0.1%
+     1  borishuai               0.1%
+     1  Juwan Yoo               0.1%
+     1  Liu Jin                 0.1%
+     1  Justin Dorfman          0.1%
+     1  Jorrit Schippers        0.1%
+     1  Marcin Jekot            0.1%
+     1  Mark Henderson          0.1%
+     1  Barkóczi Dávid        0.1%
+     1  Matthew McCullough      0.1%
+     1  Maxence Dalmais         0.1%
+     1  Mike Breen              0.1%
+     1  Courtney Couch          0.1%
+     1  Patrik Buckau           0.1%
+```
 
 https://muut.com/riotjs/
 
 
+[travis-image]:https://img.shields.io/travis/muut/riotjs.svg?style=flat-square
 [travis-url]:https://travis-ci.org/muut/riotjs
-[travis-image]: https://img.shields.io/travis/muut/riotjs.svg?style=flat-square
 
-[license-url]: LICENSE.txt
-[license-image]: http://img.shields.io/badge/license-MIT-000000.svg?style=flat-square
+[license-image]:http://img.shields.io/badge/license-MIT-000000.svg?style=flat-square
+[license-url]:LICENSE.txt
 
-[npm-url]: https://npmjs.org/package/riot
-[npm-version-image]: http://img.shields.io/npm/v/riot.svg?style=flat-square
-[npm-downloads-image]: http://img.shields.io/npm/dm/riot.svg?style=flat-square
+[npm-version-image]:http://img.shields.io/npm/v/riot.svg?style=flat-square
+[npm-downloads-image]:http://img.shields.io/npm/dm/riot.svg?style=flat-square
+[npm-url]:https://npmjs.org/package/riot
 
-[riot-forum-url]: https://muut.com/riotjs/forum/
-[riot-forum-image]: doc/logo/join-chat.svg
+[riot-forum-image]:doc/logo/join-chat.svg
+[riot-forum-url]:https://muut.com/riotjs/forum/
+
+[coverage-image]:https://img.shields.io/coveralls/muut/riotjs/dev.svg?style=flat-square
+[coverage-url]:https://coveralls.io/r/muut/riotjs?branch=dev
+
+[saucelabs-image]:https://saucelabs.com/browser-matrix/riotjs.svg
+[saucelabs-url]:https://saucelabs.com/u/riotjs

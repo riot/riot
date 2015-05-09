@@ -21,7 +21,7 @@ describe('Tmpl', function() {
 
   it('compiles specs', function() {
 
-
+    this.timeout(5000)
     //// return values
 
     // expressions always return a raw value

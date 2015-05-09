@@ -228,6 +228,7 @@ Each tag instance is an [observable](#observable) so you can use `on` and `one` 
 
 
 - "update" – right before the tag is updated. allows recalculation of context data before the UI expressions are updated.
+- "updated" – right after the tag is updated. allows do some work with updated DOM
 - "mount" – right after tag is mounted on the page
 - "unmount" – after the tag is removed from the page
 
@@ -262,13 +263,14 @@ The above method and property names are reserved words for Riot tags. Don't use 
 ```
 
 
-### riot.tag(tagName, html, [css], [constructor]) | #tag
+### riot.tag(tagName, html, [css], [attrs], [constructor]) | #tag
 
 Creates a new custom tag "manually" without the compiler.
 
 - `tagName` the tag name
 - `html` is the layout with [expressions](/riotjs/guide/#expressions)
 - `css` is the style for the tag (optional)
+- `attrs` string of attributes for the tag (optional).
 - `constructor` is the initialization function being called before the tag expressions are calculated and before the tag is mounted
 
 
@@ -278,6 +280,7 @@ Creates a new custom tag "manually" without the compiler.
 riot.tag('timer',
   '<p>Seconds Elapsed: { time }</p>',
   'timer { display: block; border: 2px }',
+  'class="tic-toc"'
   function (opts) {
     var self = this
     this.time = opts.start || 0
@@ -322,9 +325,6 @@ riot.tag('tag-name', my_tmpl.innerHTML, function(opts) {
 })
 </script>
 ```
-
-This method is on the edge of being deprecated.
-
 
 ### riot.update() | #update
 
@@ -429,5 +429,3 @@ will be compiled in this way:
 </blog>
 
 ```
-
-

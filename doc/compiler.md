@@ -80,7 +80,7 @@ Pre- compilation on the server gives you following benefits:
 - "Isomorphic apps" and the ability to pre- render tags on the server (released soon).
 
 
-Pre-compilation happens with a `riot` executable, which can be installed with with NPM as follows:
+Pre-compilation happens with a `riot` executable, which can be installed with NPM as follows:
 
 ``` sh
 npm install riot -g
@@ -249,7 +249,7 @@ Here is a [bigger example](https://github.com/txchen/feplay/tree/gh-pages/riot_b
 
 ### TypeScript
 
-TypeScript adds type to JavaScript. Use `--type typescript` to enable it:
+TypeScript adds optional static typing to JavaScript. Use `--type typescript` to enable it:
 
 ``` sh
 # use TypeScript pre-processor
@@ -363,5 +363,35 @@ By default Riot uses a build-in transpiler that simply enables shorter ES6- styl
 # no pre-processor
 riot --type none --expr source.tag
 ```
+
+### AMD and CommonJS
+
+Riot tags can be compiled with `AMD` (Asynchronous Module Definition) and `CommonJS` support. This configuration option is necessary if Riot is used with an AMD loader such as [RequireJS](http://requirejs.org/) or a CommonJS loader such as [Browserify](http://browserify.org/).
+
+The Riot library must be defined / required as `riot` in both cases.
+
+``` sh
+# enable AMD and CommonJS
+riot --m
+```
+
+Example AMD:
+
+```js
+
+define(['riot', 'tags'], function (riot) {
+  riot.mount('*');
+});
+```
+
+Example CommonJS:
+
+```js
+var riot = require('riot');
+var tags = require('tags');
+
+riot.mount('*');
+```
+
 
 If you make something great, please [share it](https://github.com/muut/riotjs/issues/58) !
