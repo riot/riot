@@ -242,7 +242,7 @@ https://muut.com/riotjs/
 [npm-downloads-image]:http://img.shields.io/npm/dm/riot.svg?style=flat-square
 [npm-url]:https://npmjs.org/package/riot
 
-[riot-forum-image]:doc/logo/join-chat.svg
+[riot-forum-image]:https://img.shields.io/badge/muut-JOIN_CHAT%E2%86%92-ff0044.svg?style=flat-square
 [riot-forum-url]:https://muut.com/riotjs/forum/
 
 [coverage-image]:https://img.shields.io/coveralls/muut/riotjs/dev.svg?style=flat-square
