@@ -8,6 +8,8 @@ var riot = require('riot')
   this.message = 'I am hungry...'
 </valid-tag>
 
+<line-tag>Hello { opts.message }!</line-tag>
+
 <tag-with-style>
   <p>Hi!</p>
   <style scoped>
