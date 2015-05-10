@@ -328,7 +328,7 @@ A tag is created in following sequence:
 
 After the tag is mounted the expressions are updated as follows:
 
-1. Automatically after an event handler is called. For example the `toggle` method in the above example.
+1. Automatically after an event handler is called.  (unless riot.settings.autoUpdate is set to false) For example the `toggle` method in the above example.
 2. When `this.update()` is called on the current tag instance
 3. When `this.update()` is called on a parent tag, or any parent upwards. Updates flow uni-directionally from parent to child.
 4. When `riot.update()` is called, which globally updates all expressions on the page.
@@ -735,7 +735,7 @@ Event handlers can access individual items in a collection with `event.item`. No
 </todo>
 ```
 
-After the event handler is executed the current tag instance is updated using `this.update()` which causes all the looped items to execute as well. The parent notices that an item has been removed from the collection and removes the corresponding DOM node from the document.
+After the event handler is executed the current tag instance is updated using `this.update()` (unless riot.settings.autoUpdate is set to false) which causes all the looped items to execute as well. The parent notices that an item has been removed from the collection and removes the corresponding DOM node from the document.
 
 
 ### Looping custom tags
