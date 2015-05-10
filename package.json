@@ -35,6 +35,7 @@
     "riot.js"
   ],
   "dependencies": {
+    "chalk": "^1.0.0",
     "chokidar": "~1.0.1",
     "minimist": "~1.1.1",
     "shelljs": "~0.4.0",
