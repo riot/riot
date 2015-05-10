@@ -26,5 +26,11 @@ describe('Syntax checker', function() {
     expect(results[1].error).to.equal('Indentation needed within tag definition')
     expect(results[2].error).to.equal('Indentation needed within tag definition')
   })
+  it('returns an error if there are invalid tag flagments', function() {
+    var results = analyzer(cat('invalid.tag'))
+    expect(results[5].error).to.equal('Indentation needed within tag definition')
+    expect(results[10].error).to.equal('Invalid tag flagment')
+    expect(results[16].error).to.equal('Invalid tag flagment')
+  })
 
 })
