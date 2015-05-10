@@ -8,6 +8,7 @@ describe('Riot Tests', function() {
     require('./specs/node')
     require('./specs/tmpl')
     require('./specs/compiler-cli')
+    require('./specs/analyzer')
   } else {
     mocha.run()
   }
