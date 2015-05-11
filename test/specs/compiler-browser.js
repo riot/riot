@@ -241,7 +241,12 @@ describe('Compiler Browser', function() {
 
           // precompiled tag compatibility
 
-          '<precompiled><\/precompiled>'
+          '<precompiled><\/precompiled>',
+
+          // static named tag
+
+          '<script type=\"riot\/tag\" src=\"tag\/named-child.tag\"><\/script>',
+          '<named-child-parent><\/named-child-parent>'
 
 
 
@@ -746,6 +751,11 @@ describe('Compiler Browser', function() {
     expect(window.getComputedStyle(tag.root, null).color).to.be('rgb(255, 0, 0)')
     tags.push(tag)
 
+  })
+
+  it('static named tag for tags property', function() {
+    var tag = riot.mount('named-child-parent')[0]
+    expect(tag.tags['tags-child'].root.innerHTML).to.be('I have a name')
   })
 
 })
