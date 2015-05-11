@@ -268,12 +268,6 @@ describe('Compiler Browser', function() {
           '<precompiled><\/precompiled>',
 
           // static named tag
-<<<<<<< HEAD
-=======
-
-          '<script type=\"riot\/tag\" src=\"tag\/named-child.tag\"><\/script>',
-          '<named-child-parent><\/named-child-parent>'
->>>>>>> use name attribute in tags property for statically named child tags
 
           '<script type=\"riot\/tag\" src=\"tag\/named-child.tag\"><\/script>',
           '<named-child-parent><\/named-child-parent>',
