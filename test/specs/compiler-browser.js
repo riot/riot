@@ -268,6 +268,12 @@ describe('Compiler Browser', function() {
           '<precompiled><\/precompiled>',
 
           // static named tag
+<<<<<<< HEAD
+=======
+
+          '<script type=\"riot\/tag\" src=\"tag\/named-child.tag\"><\/script>',
+          '<named-child-parent><\/named-child-parent>'
+>>>>>>> use name attribute in tags property for statically named child tags
 
           '<script type=\"riot\/tag\" src=\"tag\/named-child.tag\"><\/script>',
           '<named-child-parent><\/named-child-parent>',
@@ -819,6 +825,7 @@ describe('Compiler Browser', function() {
   it('static named tag for tags property', function() {
     var tag = riot.mount('named-child-parent')[0]
     expect(tag.tags['tags-child'].root.innerHTML).to.be('I have a name')
+
     tags.push(tag)
   })
 
