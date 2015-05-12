@@ -23,15 +23,6 @@ riot.settings.brackets = '{{ }}'
 let's you write expressions `<p>{{ like_this }}</p>`. The start and end is separated with a space character.
 
 
-### riot.settings.autoUpdate | #autoUpdate
-
-A global Riot setting you can use if you want to turn off automatic updating after an event handler is called.
-
-``` js
-riot.settings.autoUpdate = false
-```
-
-
 <include tags.md />
 <include compiler.md />
 <include observable.md />
