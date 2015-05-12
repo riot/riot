@@ -114,6 +114,10 @@ describe('Compiler Browser', function() {
           '<loop-option><\/loop-option>',
           '<script type=\"riot\/tag\" src=\"tag\/loop-option.tag\"><\/script>',
 
+          // table
+          '<table-data><\/table-data>',
+          '<script type=\"riot\/tag\" src=\"tag\/table-data.tag\"><\/script>',
+
           // multiple mount at same time
           '<multi-mount value="1"><\/multi-mount>',
           '<multi-mount value="2"><\/multi-mount>',
@@ -529,6 +533,16 @@ describe('Compiler Browser', function() {
         root = tag.root
 
     expect(normalizeHTML(root.innerHTML)).to.match(/<select> <option value="1">Peter<\/option><option selected="(selected|true)" value="2">Sherman<\/option><option value="3">Laura<\/option> <\/select>/)
+
+    tags.push(tag)
+
+  })
+
+  it('loop tr table tag', function() {
+    var tag = riot.mount('table-data')[0],
+        root = tag.root
+
+    expect(normalizeHTML(root.innerHTML)).to.match(/<h3>Cells<\/h3> <table border="1"> <tbody><tr><th>One<\/th><th>Two<\/th><th>Three<\/th><\/tr> <tr><td>One<\/td><td>Two<\/td><td>Three<\/td><\/tr> <\/tbody><\/table> <h3>Rows<\/h3> <table border="1"> <tbody><tr> <td>One<\/td> <td>One another<\/td> <\/tr><tr> <td>Two<\/td> <td>Two another<\/td> <\/tr><tr> <td>Three<\/td> <td>Three another<\/td> <\/tr> <\/tbody><\/table>/)
 
     tags.push(tag)
 
