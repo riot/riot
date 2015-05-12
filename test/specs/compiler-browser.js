@@ -246,7 +246,12 @@ describe('Compiler Browser', function() {
           // static named tag
 
           '<script type=\"riot\/tag\" src=\"tag\/named-child.tag\"><\/script>',
-          '<named-child-parent><\/named-child-parent>'
+          '<named-child-parent><\/named-child-parent>',
+
+          // reserved keywords and named elements
+
+          '<script type=\"riot\/tag\" src=\"tag\/reserved-names.tag\"><\/script>',
+          '<reserved-names><\/reserved-names>'
 
 
 
@@ -756,6 +761,15 @@ describe('Compiler Browser', function() {
   it('static named tag for tags property', function() {
     var tag = riot.mount('named-child-parent')[0]
     expect(tag.tags['tags-child'].root.innerHTML).to.be('I have a name')
+    tags.push(tag)
+  })
+
+  it('reserved keywords and named elements', function() {
+    var tag = riot.mount('reserved-names')[0]
+    expect(tag.update).to.be.a('function')
+    expect(tag.mount).to.be.a('function')
+    expect(tag['not-reserved']).to.be.an('object')
+    tags.push(tag)
   })
 
 })
