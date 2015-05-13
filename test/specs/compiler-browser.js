@@ -32,6 +32,12 @@ describe('Compiler Browser', function() {
           '  <\/timetable>',
           '<\/script>',
 
+          // check the custom parsers
+
+          '<script type=\"riot\/tag\" src=\"tag\/custom-parsers.tag\"><\/script>',
+
+          '<custom-parsers><\/custom-parsers>',
+
           '<script type=\"riot\/tag\" src=\"tag\/timer.tag\"><\/script>',
           '<timetable><\/timetable>',
 
@@ -258,6 +264,16 @@ describe('Compiler Browser', function() {
       tags = [],
       div = document.createElement('div')
 
+  // adding some custom riot parsers
+  // css
+  riot.parsers.css.myparser = function(tag, css) {
+    return css.replace(/@tag/, tag)
+  }
+  // js
+  riot.parsers.js.myparser = function(js) {
+    return js.replace(/@version/, '1.0.0')
+  }
+
   before(function(next) {
 
     div.innerHTML = html
@@ -316,6 +332,19 @@ describe('Compiler Browser', function() {
       expect(ticks).to.be(0)
       done()
     }, 1200)
+
+  })
+
+  it('compile a custom tag using custom css and js parsers', function() {
+    var tag = riot.mount('custom-parsers')[0],
+      stag = document.querySelector('style'),
+      styles =  normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
+
+    expect(tag).to.be.an('object')
+    expect(tag.version).to.be('1.0.0')
+    expect(styles).to.contain('custom-parsers {color: red;}')
+
+    tags.push(tag)
 
   })
 
@@ -770,6 +799,7 @@ describe('Compiler Browser', function() {
   it('static named tag for tags property', function() {
     var tag = riot.mount('named-child-parent')[0]
     expect(tag.tags['tags-child'].root.innerHTML).to.be('I have a name')
+    tags.push(tag)
   })
 
 })

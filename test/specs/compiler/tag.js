@@ -3,6 +3,16 @@ var fs = require('fs'),
 
 describe('Compile tags', function() {
 
+  // adding some custom riot parsers
+  // css
+  riot.parsers.css.myparser = function(tag, css) {
+    return css.replace(/@tag/, tag)
+  }
+  // js
+  riot.parsers.js.myparser = function(js) {
+    return js.replace(/@version/, '1.0.0')
+  }
+
   function render(str) {
     return compiler.compile(str, {})
   }

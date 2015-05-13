@@ -1,7 +1,7 @@
 describe('Scoped CSS', function() {
 
-  function render(str) {
-    return compiler.style(str, 'my-tag', 'scoped-css')
+  function render(str, parser) {
+    return compiler.style(str, 'my-tag', parser || 'scoped-css')
   }
 
   it('add my-tag to the simple selector', function() {
@@ -47,4 +47,14 @@ describe('Scoped CSS', function() {
   it('not add my-tag to @media, and add it to the selector inside', function() {
     expect(render('@media (min-width: 500px) {\n  header {\n    text-align: left;\n  }\n}'))
         .to.equal('@media (min-width: 500px) { my-tag header , [riot-tag="my-tag"] header { text-align: left; } }')
-  })})
+  })
+
+  it('use a custom css parser to render the css', function() {
+    riot.parsers.css.myParser = function(tag, css) {
+      return css.replace(/@tag/, tag)
+    }
+    expect(render('@tag { color: red }', 'myParser'))
+        .to.equal('my-tag { color: red }')
+  })
+
+})
