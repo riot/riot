@@ -135,40 +135,42 @@ Riot is made with :heart: by many smart guys. Thanks to all the contributors
 
 ```
  project  : riotjs
- repo age : 1 year, 7 months
- active   : 227 days
- commits  : 993
- files    : 152
+ repo age : 1 year, 8 months
+ active   : 247 days
+ commits  : 1073
+ files    : 171
  authors  :
-   375  Tero Piirainen          37.8%
-   184  Gianluca Guarini        18.5%
-   150  Aurimas                 15.1%
-    27  Marcelo Eden            2.7%
-    24  Tsutomu Kawamura        2.4%
-    18  Juha Lindstedt          1.8%
-    17  rsbondi                 1.7%
-    16  Kalman Speier           1.6%
-    14  andynemzek              1.4%
-    11  Hrvoje Šimić          1.1%
-    10  Andy VanEe              1.0%
+   376  Tero Piirainen          35.0%
+   229  Gianluca Guarini        21.3%
+   150  Aurimas                 14.0%
+    30  Tsutomu Kawamura        2.8%
+    27  Marcelo Eden            2.5%
+    26  rsbondi                 2.4%
+    18  Juha Lindstedt          1.7%
+    18  Kalman Speier           1.7%
+    14  andynemzek              1.3%
+    11  Hrvoje Šimić          1.0%
+    10  Andy VanEe              0.9%
+     8  Mark Henderson          0.7%
+     7  Ashley Brener           0.7%
      7  Tianxiang Chen          0.7%
-     6  Jens Anders Bakke       0.6%
      6  hemanth.hm              0.6%
-     5  midinastasurazz         0.5%
+     6  Jens Anders Bakke       0.6%
      5  jigsaw                  0.5%
+     5  midinastasurazz         0.5%
+     4  Márcio Coelho          0.4%
+     4  blissland               0.4%
      4  Eric Baer               0.4%
      4  Giovanni Cappellotto    0.4%
-     4  blissland               0.4%
+     4  Richard Bondi           0.4%
      3  Tatu Tamminen           0.3%
-     3  Márcio Coelho          0.3%
-     3  Magnus Wolffelt         0.3%
-     3  Anton Heryanto          0.3%
-     3  Alan R. Soares          0.3%
      3  Artem Medeusheyev       0.3%
-     3  Ashley Brener           0.3%
-     3  korige                  0.3%
+     3  Alan R. Soares          0.3%
+     3  Anton Heryanto          0.3%
      3  Jim Sparkman            0.3%
-     3  Richard Bondi           0.3%
+     3  Magnus Wolffelt         0.3%
+     3  korige                  0.3%
+     3  marciojcoelho           0.3%
      2  Žiga                   0.2%
      2  Alexis THOMAS           0.2%
      2  Andreas Heintze         0.2%
@@ -187,46 +189,46 @@ Riot is made with :heart: by many smart guys. Thanks to all the contributors
      2  jmas                    0.2%
      2  luffs                   0.2%
      2  yibuyisheng             0.2%
-     1  Jonny Buchanan          0.1%
      1  Constantin Rack         0.1%
-     1  Quim Calpe              0.1%
      1  Riccardo Gueli Alletti  0.1%
-     1  Jonathan Dumaine        0.1%
+     1  Jonny Buchanan          0.1%
      1  Ryan O’Hara           0.1%
      1  Sam Morgan              0.1%
-     1  typicode                0.1%
-     1  Boris Huai              0.1%
+     1  kylobite                0.1%
+     1  Ari Makela              0.1%
      1  Simone Vittori          0.1%
      1  Steel Brain             0.1%
-     1  kylobite                0.1%
+     1  Boris Huai              0.1%
      1  Steven Koch             0.1%
      1  TZ | 天猪             0.1%
-     1  Joel Thornton           0.1%
+     1  Jonathan Dumaine        0.1%
      1  Tenor Biel              0.1%
+     1  Joel Thornton           0.1%
      1  Ivan Saorin             0.1%
-     1  Ian Walter              0.1%
-     1  Ari Makela              0.1%
      1  Benoit Hirbec           0.1%
+     1  Barkóczi Dávid        0.1%
      1  Trent Ogren             0.1%
-     1  Fernando Correia        0.1%
+     1  Ian Walter              0.1%
      1  Umut Sirin              0.1%
      1  Zach Aysan              0.1%
      1  afc163                  0.1%
+     1  Fernando Correia        0.1%
      1  Eliseo Arias            0.1%
-     1  Danil Semelenov         0.1%
      1  borishuai               0.1%
-     1  Juwan Yoo               0.1%
+     1  typicode                0.1%
+     1  Danil Semelenov         0.1%
      1  Liu Jin                 0.1%
-     1  Justin Dorfman          0.1%
-     1  Jorrit Schippers        0.1%
+     1  Juwan Yoo               0.1%
      1  Marcin Jekot            0.1%
-     1  Mark Henderson          0.1%
-     1  Barkóczi Dávid        0.1%
+     1  Justin Dorfman          0.1%
+     1  Courtney Couch          0.1%
      1  Matthew McCullough      0.1%
      1  Maxence Dalmais         0.1%
      1  Mike Breen              0.1%
-     1  Courtney Couch          0.1%
+     1  xieyu03                 0.1%
+     1  Jorrit Schippers        0.1%
      1  Patrik Buckau           0.1%
+     1  Quim Calpe              0.1%
 ```
 
 https://muut.com/riotjs/
