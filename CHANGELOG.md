@@ -22,6 +22,7 @@
   - include the components mixins in the core [#536](/../../issues/536)
   - add saucelabs tests hooks for crossbrowser testing
   - add coveralls coverage hooks to check the code coverage on any pull request
+  - add the riot.parsers property [css, js, html]
 
 ## 2.0.15
 
