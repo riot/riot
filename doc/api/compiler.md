@@ -80,3 +80,69 @@ var js = riot.compile(tag)
 ```
 
 The compile function takes the tag definition (string) and returns JavaScript (string).
+
+### riot.parsers.css [tagName, css]
+
+Custom parsers that could be used to compile your tags css. For example:
+
+```js
+riot.parsers.css.myparser = function(tag, css) {
+  return css.replace(/@tag/, tag)
+}
+```
+
+```html
+<custom-parsers>
+  <p>hi</p>
+  <style type="text/myparser">
+    @tag {color: red;}
+  </style>
+</custom-parsers>
+```
+
+will be compiled to:
+
+```html
+<custom-parsers>
+  <p>hi</p>
+  <style type="text/myparser">
+    custom-parsers {color: red;}
+  </style>
+</custom-parsers>
+```
+
+### riot.parsers.js [js, options]
+
+Custom parsers that could be used to compile your tags javascript. For example
+
+```js
+riot.parsers.js.myparser = function(js) {
+  return js.replace(/@version/, '1.0.0')
+}
+```
+
+```html
+<custom-parsers>
+  <p>hi</p>
+  <script type="text/myparser">
+    this.version = "@version"
+  </script>
+</custom-parsers>
+```
+
+will be compiled to:
+
+```html
+<custom-parsers>
+  <p>hi</p>
+  <script type="text/myparser">
+    this.version = "1.0.0"
+  </script>
+</custom-parsers>
+```
+
+### riot.parsers.html [html]
+
+Custom parsers that could be used to compile your tags html
+
+
