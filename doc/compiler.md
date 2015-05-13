@@ -354,6 +354,36 @@ var js = riot.compile(source_string, { parser: myParser, expr: true })
 
 Set `expr: true` if you want the expressions to be parsed as well.
 
+#### riot.parsers on the browser and the server
+
+You can also create your custom riot parsers adding them to the `riot.parsers` property and share them across the browsers and server. For example
+
+```js
+riot.parsers.js.myJsParser = function(js, options) {
+  return doYourThing(js, options)
+}
+
+riot.parsers.css.myCssParser = function(tagName, css) {
+  return doYourThing(tagName, css)
+}
+```
+
+Once you have created your own `riot.parsers` you will be able to compile your tags using them in the following way
+
+```html
+<custom-parsers>
+  <p>hi</p>
+  <style type="text/myJsParser">
+    @tag {color: red;}
+  </style>
+  <script type="text/myCssParser">
+    this.version = "@version"
+  </script>
+</custom-parsers>
+```
+
+
+
 
 ### No transformation
 
