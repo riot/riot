@@ -16,13 +16,13 @@
 
 ### Features
 
-  - set the parent attributes also in the tag template [#289](/../../issues/289)
-  - split the node compiler from the browser compiler
-  - simplify the build script using probably [smash](https://github.com/mbostock/smash) to compile riot
-  - include the components mixins in the core [#536](/../../issues/536)
-  - add saucelabs tests hooks for crossbrowser testing
-  - add coveralls coverage hooks to check the code coverage on any pull request
-  - add the riot.parsers property [css, js, html]
+  - added the possibility to set the parent attributes also in the tag template [#289](/../../issues/289)
+  - added saucelabs tests hooks for crossbrowser testing
+  - added coveralls coverage hooks to check the code coverage on any pull request
+  - added the riot.parsers property [css, js, html]
+  - added the components mixins in the core [#536](/../../issues/536)
+  - updated the node compiler from the browser compiler
+  - updated the build script using [smash](https://github.com/mbostock/smash) to compile riot
 
 ## 2.0.15
 
@@ -40,7 +40,7 @@
   - [#295](/../../issues/295) [#304](/../../issues/304)
 
 ### features
-  - add the `<yield/>` core tag allowing html tansclusion to [#300](/../../issues/300) [#524](/../../issues/524) (fixed with https://github.com/muut/riotjs/pull/617 pull request pending) [ __documentation to update!__ ]
-  - introduced the new `riot-tag` attribute that could be used on any DOM element
-  - `tag.unmount(flag)` to decide whether the parent should be removed or not from the DOM
+  - added the `<yield/>` core tag allowing html tansclusion to [#300](/../../issues/300) [#524](/../../issues/524) (fixed with https://github.com/muut/riotjs/pull/617 pull request pending)
   - added new `riot.route.start()` `riot.route.stop()` methods
+  - added the new `riot-tag` attribute that could be used on any DOM element
+  - changed `tag.unmount(flag)` to decide whether the parent should be removed or not from the DOM
