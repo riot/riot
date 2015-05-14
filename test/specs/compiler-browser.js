@@ -34,7 +34,7 @@ describe('Compiler Browser', function() {
 
           // check the custom parsers
 
-          '<script type=\"riot\/tag\" src=\"tag\/custom-parsers.tag\"><\/script>',
+          '<script type=\"riot\/tag\" src=\"tag\/\~custom-parsers.tag\"><\/script>',
 
           '<custom-parsers><\/custom-parsers>',
 
