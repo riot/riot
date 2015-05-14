@@ -1,3 +1,21 @@
+<yield-child>
+
+  <h1>Greeting</h1>
+  <yield/>
+  this.greeting = 'from the child'
+
+</yield-child>
+
+<yield-child-2>
+
+  <h1>Greeting { this.parent.greeting }</h1>
+  <h2>{ opts.subtitle }</h2>
+  <yield/>
+  this.greeting = 'from the child'
+
+</yield-child-2>
+
+
 <yield-parent>
   <h1>Hello, <yield/></h1>
 
@@ -54,23 +72,5 @@
   }.bind(this)
 
 </yield-loop>
-
-
-<yield-child>
-
-  <h1>Greeting</h1>
-  <yield>
-  this.greeting = 'from the child'
-
-</yield-child>
-
-<yield-child-2>
-
-  <h1>Greeting { this.parent.greeting }</h1>
-  <h2>{ opts.subtitle }</h2>
-  <yield>
-  this.greeting = 'from the child'
-
-</yield-child-2>
 
 
