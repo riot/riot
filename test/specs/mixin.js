@@ -22,6 +22,13 @@ describe('Mixin', function() {
     }
   }
 
+  var MixinWithInit = {
+    init: function() {
+      this.message = 'initialized'
+    },
+    message: 'not yet'
+  }
+
   it('Will mount a tag and provide mixed-in methods', function() {
     var mix = document.createElement('my-mixin')
     document.body.appendChild(mix)
@@ -133,6 +140,20 @@ describe('Mixin', function() {
     var tag = riot.mount('my-mixin')[0]
 
     expect(tag.root.innerHTML).to.be('<span>some tag ' + tag._id + '</span>')
+    tag.unmount()
+  })
+
+  it('initializes the mixin', function() {
+    var mix = document.createElement('my-mixin')
+    document.body.appendChild(mix)
+
+    riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
+      this.mixin(MixinWithInit)
+    })
+
+    var tag = riot.mount('my-mixin')[0]
+
+    expect(tag.message).to.be('initialized')
     tag.unmount()
   })
 
