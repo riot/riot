@@ -21,6 +21,7 @@
   - added saucelabs tests hooks for crossbrowser testing
   - added coveralls coverage hooks to check the code coverage on any pull request
   - added the riot.parsers property [css, js, html]
+  - added the preventUpdate flag to avoid to trigger the auto update callbacks [#699](/../../issues/699)
   - added the components mixins in the core [#536](/../../issues/536)
   - updated the node compiler from the browser compiler
   - updated the build script using [smash](https://github.com/mbostock/smash) to compile riot
