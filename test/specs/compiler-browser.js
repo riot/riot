@@ -274,8 +274,11 @@ describe('Compiler Browser', function() {
 
           // mount order
           '<script type=\"riot\/tag\" src=\"tag\/deferred-mount.tag\"><\/script>',
-          '<deferred-mount><\/deferred-mount>'
+          '<deferred-mount><\/deferred-mount>',
 
+          // test the preventUpdate feature on the DOM events
+          '<script type=\"riot\/tag\" src=\"tag\/prevent-update.tag\"><\/script>',
+          '<prevent-update><\/prevent-update>'
 
 
     ].join('\r'),
@@ -841,6 +844,18 @@ describe('Compiler Browser', function() {
       tag = riot.mount('deferred-mount', { onmount: cb })[0]
 
     expect(mountingOrder.join()).to.be(correctMountingOrder.join())
+
+    tags.push(tag)
+  })
+
+  it('no update should be triggered if the preventUpdate flag is set', function() {
+    var tag = riot.mount('prevent-update')[0]
+
+    expect(tag['fancy-name'].innerHTML).to.be('john')
+
+    tag.root.getElementsByTagName('p')[0].onclick({})
+
+    expect(tag['fancy-name'].innerHTML).to.be('john')
 
     tags.push(tag)
   })
