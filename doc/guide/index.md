@@ -246,11 +246,15 @@ Mixins provide an easy way to share functionality across tags. When a tag is com
 
 ```
 var OptsMixin = {
-    'getOpts': function() {
+    init: function() {
+      this.on('updated', function() { console.log('Updated!') })
+    }
+
+    getOpts: function() {
         return this.opts
     },
 
-    'setOpts': function(opts, update) {
+    setOpts: function(opts, update) {
         this.opts = opts
 
         if(!update) {
@@ -268,7 +272,7 @@ var OptsMixin = {
 </my-tag>
 ```
 
-In this example you are giving any instance of the `my-tag` Tag the `OptsMixin` which provides `getOpts` and `setOpts` methods.
+In this example you are giving any instance of the `my-tag` Tag the `OptsMixin` which provides `getOpts` and `setOpts` methods. `init` method is special one which can initialize the mixin when it's loaded to the tag. (`init` method is not accessible from other method)
 
 ```
 var my_tag_instance = riot.mount('my-tag')[0]
