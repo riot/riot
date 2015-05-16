@@ -6,6 +6,6 @@
 
 <expr-child>
   <pre>{ opts.code } == foo \{ bar \}</pre>
-
-  console.info(opts)
+  if (console)
+    console.info(opts)
 </expr-child>
