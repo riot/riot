@@ -659,6 +659,15 @@ Again, the expression can be just a simple property or a full JavaScript express
 
 The equality operator is `==` and not `===`. For example: `'a string' == true`.
 
+Note!
+Any expressions on the inside of the if-conditional does not get updated if the conditional turns out to be false. So because of this we do recommend placing any if-conditionals first on the tag. In the example below this is not done so if is_premium is false, the expressions { foo: true } as well as { is_premium } will get updated, but { myClickHandler } and { new Date() } will not.
+
+``` html
+<div class={ foo: true } if={ is_premium } onclick={ myClickHandler }>
+  <p>This is for premium users only</p>
+  <p>Date: { new Date() }</p>
+</div>
+```
 
 ## Loops
 
