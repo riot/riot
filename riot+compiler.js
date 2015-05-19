@@ -1,4 +1,4 @@
-/* Riot v2.0.15, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v2.1.0, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window) {
   // 'use strict' does not allow us to override the events properties https://github.com/muut/riotjs/blob/dev/lib/tag/update.js#L7-L10
@@ -6,7 +6,7 @@
   //'use strict'
 
 
-  var riot = { version: 'v2.0.15', settings: {} }
+  var riot = { version: 'v2.1.0', settings: {} }
 
 
 riot.observable = function(el) {
