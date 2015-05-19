@@ -3,6 +3,8 @@
 
 ## A React- like, 3.5KB UI lib
 
+[![Join the chat at https://gitter.im/muut/riotjs](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/muut/riotjs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status][travis-image]][travis-url]
 [![NPM version][npm-version-image]][npm-url]
 [![NPM downloads][npm-downloads-image]][npm-url]
@@ -137,44 +139,44 @@ Riot is made with :heart: by many smart guys. Thanks to all the contributors
 ```
  project  : riotjs
  repo age : 1 year, 8 months
- active   : 247 days
- commits  : 1073
- files    : 171
+ active   : 256 days
+ commits  : 1110
+ files    : 177
  authors  :
-   376  Tero Piirainen          35.0%
-   229  Gianluca Guarini        21.3%
-   150  Aurimas                 14.0%
-    30  Tsutomu Kawamura        2.8%
-    27  Marcelo Eden            2.5%
-    26  rsbondi                 2.4%
-    18  Juha Lindstedt          1.7%
-    18  Kalman Speier           1.7%
+   376  Tero Piirainen          33.9%
+   252  Gianluca Guarini        22.7%
+   150  Aurimas                 13.5%
+    36  Tsutomu Kawamura        3.2%
+    27  Marcelo Eden            2.4%
+    26  rsbondi                 2.3%
+    18  Juha Lindstedt          1.6%
+    18  Kalman Speier           1.6%
     14  andynemzek              1.3%
     11  Hrvoje Šimić          1.0%
     10  Andy VanEe              0.9%
      8  Mark Henderson          0.7%
-     7  Ashley Brener           0.7%
-     7  Tianxiang Chen          0.7%
-     6  hemanth.hm              0.6%
-     6  Jens Anders Bakke       0.6%
+     7  Ashley Brener           0.6%
+     7  Tianxiang Chen          0.6%
+     6  Márcio Coelho          0.5%
+     6  Andreas Heintze         0.5%
+     6  hemanth.hm              0.5%
+     6  Jens Anders Bakke       0.5%
+     5  marciojcoelho           0.5%
      5  jigsaw                  0.5%
      5  midinastasurazz         0.5%
-     4  Márcio Coelho          0.4%
      4  blissland               0.4%
      4  Eric Baer               0.4%
      4  Giovanni Cappellotto    0.4%
      4  Richard Bondi           0.4%
-     3  Tatu Tamminen           0.3%
-     3  Artem Medeusheyev       0.3%
-     3  Alan R. Soares          0.3%
      3  Anton Heryanto          0.3%
-     3  Jim Sparkman            0.3%
      3  Magnus Wolffelt         0.3%
+     3  Jim Sparkman            0.3%
+     3  Alan R. Soares          0.3%
+     3  Tatu Tamminen           0.3%
      3  korige                  0.3%
-     3  marciojcoelho           0.3%
+     3  Artem Medeusheyev       0.3%
      2  Žiga                   0.2%
      2  Alexis THOMAS           0.2%
-     2  Andreas Heintze         0.2%
      2  Andrew Feng             0.2%
      2  Andrew Luetgers         0.2%
      2  Antoine Goutagny        0.2%
@@ -230,6 +232,7 @@ Riot is made with :heart: by many smart guys. Thanks to all the contributors
      1  Jorrit Schippers        0.1%
      1  Patrik Buckau           0.1%
      1  Quim Calpe              0.1%
+
 ```
 
 https://muut.com/riotjs/
