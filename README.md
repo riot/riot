@@ -120,6 +120,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot on CodeClimate](https://codeclimate.com/github/muut/riotjs/code)
 - [Riot Snake Game](http://cdn.rawgit.com/atian25/blog/master/assets/riot-snake.html)
 - [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
+- [Riot 文档中译版](https://github.com/Centaur/riotjs_doc_cn) :cn:
 
 https://muut.com/riotjs/
 
