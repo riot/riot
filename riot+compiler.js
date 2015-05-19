@@ -5,8 +5,9 @@
   // it leads to the following error on firefox "setting a property that has only a getter"
   //'use strict'
 
-  var riot = { version: 'v2.0.15', settings: {} },
-      ieVersion = checkIE()
+
+  var riot = { version: 'v2.0.15', settings: {} }
+
 
 riot.observable = function(el) {
 
@@ -76,6 +77,14 @@ riot.observable = function(el) {
   return el
 
 }
+riot.mixin = (function() {
+  var registeredMixins = {}
+  return function(name, mixin) {
+    if (!mixin) return registeredMixins[name]
+      else registeredMixins[name] = mixin
+  }
+})()
+
 ;(function(riot, evt, window) {
 
   // browsers only
@@ -331,7 +340,7 @@ var tmpl = (function() {
 
           // break the expression if its empty (resulting in undefined value)
           || 'x')
-
+      + '}catch(e){'
       + '}finally{return '
 
         // default to empty string for falsy values except zero
@@ -442,6 +451,7 @@ function _each(dom, parent, expr) {
     // object loop. any changes cause full redraw
     if (!Array.isArray(items)) {
       var testsum = JSON.stringify(items)
+
       if (testsum == checksum) return
       checksum = testsum
 
@@ -545,6 +555,12 @@ function _each(dom, parent, expr) {
 
     rendered = items.slice()
 
+  }).one('updated', function() {
+    walk(root, function(dom) {
+      each(dom.attributes, function(attr) {
+        if (/^(name|id)$/.test(attr.name)) parent[attr.value] = dom
+      })
+    })
   })
 
 }
@@ -554,6 +570,7 @@ function parseNamedElements(root, parent, childTags) {
 
   walk(root, function(dom) {
     if (dom.nodeType == 1) {
+      dom.isLoop = 0
       if(dom.parentNode && dom.parentNode.isLoop) dom.isLoop = 1
       if(dom.getAttribute('each')) dom.isLoop = 1
       // custom child tag
@@ -561,9 +578,10 @@ function parseNamedElements(root, parent, childTags) {
 
       if (child && !dom.isLoop) {
         var tag = new Tag(child, { root: dom, parent: parent }, dom.innerHTML),
-          tagName = child.name,
-          ptag = parent,
-          cachedTag
+            namedTag = dom.getAttribute('name'),
+            tagName = namedTag && namedTag.indexOf(brackets(0)) < 0 ? namedTag : child.name,
+            ptag = parent,
+            cachedTag
 
         while(!getTag(ptag.root)) {
           if(!ptag.parent) break
@@ -592,9 +610,10 @@ function parseNamedElements(root, parent, childTags) {
         childTags.push(tag)
       }
 
-      each(dom.attributes, function(attr) {
-        if (/^(name|id)$/.test(attr.name)) parent[attr.value] = dom
-      })
+      if(!dom.isLoop)
+        each(dom.attributes, function(attr) {
+          if (/^(name|id)$/.test(attr.name)) parent[attr.value] = dom
+        })
     }
 
   })
@@ -652,10 +671,21 @@ function Tag(impl, conf, innerHTML) {
       fn = impl.fn,
       tagName = root.tagName.toLowerCase(),
       attr = {},
-      loopDom
+      loopDom,
+      TAG_ATTRIBUTES = /([\w\-]+)\s?=\s?['"]([^'"]+)["']/gim
 
   if (fn && root._tag) {
     root._tag.unmount(true)
+  }
+
+  if(impl.attrs) {
+    var attrs = impl.attrs.match(TAG_ATTRIBUTES)
+
+    each(attrs, function(a) {
+      var kv = a.split(/\s?=\s?/)
+      root.setAttribute(kv[0], kv[1].replace(/['"]/g, ''))
+    })
+
   }
   // keep a reference to the tag just created
   // so we will be able to mount this tag multiple times
@@ -663,7 +693,7 @@ function Tag(impl, conf, innerHTML) {
 
   // create a unique id to this tag
   // it could be handy to use it also to improve the virtual dom rendering speed
-  this._id = ~~(new Date().getTime() * Math.random())
+  this._id = fastAbs(~~(new Date().getTime() * Math.random()))
 
   extend(this, { parent: parent, root: root, opts: opts, tags: {} }, item)
 
@@ -673,7 +703,7 @@ function Tag(impl, conf, innerHTML) {
   })
 
 
-  if (dom.innerHTML && !/select/.test(tagName))
+  if (dom.innerHTML && !/select/.test(tagName) && !/tbody/.test(tagName) && !/tr/.test(tagName))
     // replace all the yield tags with the tag inner html
     dom.innerHTML = replaceYield(dom.innerHTML, innerHTML)
 
@@ -691,6 +721,19 @@ function Tag(impl, conf, innerHTML) {
     self.trigger('update', item)
     update(expressions, self, item)
     self.trigger('updated')
+  }
+
+  this.mixin = function() {
+    each(arguments, function(mix) {
+      mix = 'string' == typeof mix ? riot.mixin(mix) : mix
+      each(Object.keys(mix), function(key) {
+        // bind methods to self
+        if ('init' != key)
+          self[key] = 'function' == typeof mix[key] ? mix[key].bind(self) : mix[key]
+      })
+      // init method will be called automatically
+      if (mix.init) mix.init.bind(self)()
+    })
   }
 
   this.mount = function() {
@@ -719,8 +762,11 @@ function Tag(impl, conf, innerHTML) {
     }
 
     if (root.stub) self.root = root = parent.root
-    self.trigger('mount')
 
+    // if it's not a child tag we can trigger its mount event
+    if (!self.parent) self.trigger('mount')
+    // otherwise we need to wait that the parent event gets triggered
+    else self.parent.one('mount', function() { self.trigger('mount') })
   }
 
 
@@ -741,7 +787,7 @@ function Tag(impl, conf, innerHTML) {
           })
         } else
           // otherwise just delete the tag instance
-          delete parent.tags[tagName]
+          parent.tags[tagName] = undefined
       } else {
         while (el.firstChild) el.removeChild(el.firstChild)
       }
@@ -795,8 +841,10 @@ function setEventHandler(name, handler, dom, tag, item) {
       e.returnValue = false
     }
 
-    var el = item ? tag.parent : tag
-    el.update()
+    if (!e.preventUpdate) {
+      var el = item ? tag.parent : tag
+      el.update()
+    }
 
   }
 
@@ -830,7 +878,7 @@ function update(expressions, tag, item) {
     expr.value = value
 
     // text node
-    if (!attrName) return dom.nodeValue = value
+    if (!attrName) return dom.nodeValue = value.toString()
 
     // remove original attribute
     remAttr(dom, attrName)
@@ -881,6 +929,7 @@ function update(expressions, tag, item) {
   })
 
 }
+
 function each(els, fn) {
   for (var i = 0, len = (els || []).length, el; i < len; i++) {
     el = els[i]
@@ -892,6 +941,10 @@ function each(els, fn) {
 
 function remAttr(dom, name) {
   dom.removeAttribute(name)
+}
+
+function fastAbs(nr) {
+  return (nr ^ (nr >> 31)) - (nr >> 31)
 }
 
 // max 2 from objects allowed
@@ -935,18 +988,31 @@ function optionInnerHTML(el, html) {
   el.appendChild(opt)
 }
 
+function tbodyInnerHTML(el, html, tagName) {
+  var div = document.createElement('div')
+  div.innerHTML = '<table>' + html + '</table>'
+
+  if (/td|th/.test(tagName)) {
+    el.appendChild(div.firstChild.firstChild.firstChild.firstChild)
+  } else {
+    el.appendChild(div.firstChild.firstChild.firstChild)
+  }
+}
+
 function mkdom(template) {
   var tagName = template.trim().slice(1, 3).toLowerCase(),
       rootTag = /td|th/.test(tagName) ? 'tr' : tagName == 'tr' ? 'tbody' : 'div',
-      el = document.createElement(rootTag)
+      el = mkEl(rootTag)
 
   el.stub = true
 
   if (tagName === 'op' && ieVersion && ieVersion < 10) {
     optionInnerHTML(el, template)
-  } else {
+  } else if ((rootTag === 'tbody' || rootTag === 'tr') && ieVersion && ieVersion < 10) {
+    tbodyInnerHTML(el, template, tagName)
+  } else
     el.innerHTML = template
-  }
+
   return el
 }
 
@@ -962,6 +1028,10 @@ function walk(dom, fn) {
       }
     }
   }
+}
+
+function mkEl(name) {
+  return document.createElement(name)
 }
 
 function replaceYield (tmpl, innerHTML) {
@@ -990,6 +1060,62 @@ function inherit(parent) {
   Child.prototype = parent
   return new Child()
 }
+/**
+ *
+ * Hacks needed for the old internet explorer versions [lower than IE10]
+ *
+ */
+
+var ieVersion = checkIE()
+
+function checkIE() {
+  if (window) {
+    var ua = navigator.userAgent
+    var msie = ua.indexOf('MSIE ')
+    if (msie > 0) {
+      return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10)
+    }
+    else {
+      return 0
+    }
+  }
+}
+
+function tbodyInnerHTML(el, html, tagName) {
+  var div = mkEl('div'),
+      loops = /td|th/.test(tagName) ? 3 : 2,
+      child
+
+  div.innerHTML = '<table>' + html + '</table>'
+  child = div.firstChild
+
+  while(loops--) {
+    child = child.firstChild
+  }
+
+  el.appendChild(child)
+
+}
+
+function optionInnerHTML(el, html) {
+  var opt = mkEl('option'),
+      valRegx = /value=[\"'](.+?)[\"']/,
+      selRegx = /selected=[\"'](.+?)[\"']/,
+      valuesMatch = html.match(valRegx),
+      selectedMatch = html.match(selRegx)
+
+  opt.innerHTML = html
+
+  if (valuesMatch) {
+    opt.value = valuesMatch[1]
+  }
+
+  if (selectedMatch) {
+    opt.setAttribute('riot-selected', selectedMatch[1])
+  }
+
+  el.appendChild(opt)
+}
 
 /*
  Virtual dom is an array of custom tags on the document.
@@ -997,7 +1123,8 @@ function inherit(parent) {
 */
 
 var virtualDom = [],
-    tagImpl = {}
+    tagImpl = {},
+    styleNode
 
 
 function getTag(dom) {
@@ -1005,9 +1132,24 @@ function getTag(dom) {
 }
 
 function injectStyle(css) {
-  var node = document.createElement('style')
-  node.innerHTML = css
-  document.head.appendChild(node)
+
+  styleNode = styleNode || mkEl('style')
+
+  if (!document.head) return
+
+  if(styleNode.styleSheet)
+    styleNode.styleSheet.cssText += css
+  else
+    styleNode.innerHTML += css
+
+  if (!styleNode._rendered)
+    if (styleNode.styleSheet)
+      document.body.appendChild(styleNode)
+    else
+      document.head.appendChild(styleNode)
+
+  styleNode._rendered = true
+
 }
 
 function mountTo(root, tagName, opts) {
@@ -1029,23 +1171,29 @@ function mountTo(root, tagName, opts) {
 
 }
 
-riot.tag = function(name, html, css, fn) {
+riot.tag = function(name, html, css, attrs, fn) {
+  if (typeof attrs == 'function') {
+    fn = attrs
+    if(/^[\w\-]+\s?=/.test(css)) {attrs = css; css = ''} else attrs = ''
+  }
   if (typeof css == 'function') fn = css
   else if (css) injectStyle(css)
-  tagImpl[name] = { name: name, tmpl: html, fn: fn }
+  tagImpl[name] = { name: name, tmpl: html, attrs: attrs, fn: fn }
   return name
 }
 
 riot.mount = function(selector, tagName, opts) {
 
   var el,
-      selctAllTags = function(sel) {
-        sel = Object.keys(tagImpl).join(', ')
-        sel.split(',').map(function(t) {
-          sel += ', *[riot-tag="'+ t.trim() + '"]'
+      selctAllTags = function() {
+        var keys = Object.keys(tagImpl)
+        var list = keys.join(', ')
+        each(keys, function(t) {
+          list += ', *[riot-tag="'+ t.trim() + '"]'
         })
-        return sel
+        return list
       },
+      allTags,
       tags = []
 
   if (typeof tagName == 'object') { opts = tagName; tagName = 0 }
@@ -1055,7 +1203,12 @@ riot.mount = function(selector, tagName, opts) {
     if (selector == '*') {
       // select all the tags registered
       // and also the tags found with the riot-tag attribute set
-      selector = selctAllTags(selector)
+      selector = allTags = selctAllTags()
+    } else {
+      selector.split(',').map(function(t) {
+        selector += ', *[riot-tag="'+ t.trim() + '"]'
+      })
+
     }
     // or just the ones named like the selector
     el = $$(selector)
@@ -1067,7 +1220,7 @@ riot.mount = function(selector, tagName, opts) {
   // select all the registered and mount them inside their root elements
   if (tagName == '*') {
     // get all custom tags
-    tagName = selctAllTags(selector)
+    tagName = allTags || selctAllTags()
     // if the root el it's just a single tag
     if (el.tagName) {
       el = $$(tagName, el)
@@ -1084,6 +1237,8 @@ riot.mount = function(selector, tagName, opts) {
   }
 
   function push(root) {
+    if(tagName && !root.getAttribute('riot-tag')) root.setAttribute('riot-tag', tagName)
+
     var name = tagName || root.getAttribute('riot-tag') || root.tagName.toLowerCase(),
         tag = mountTo(root, name, opts)
 
@@ -1112,388 +1267,6 @@ riot.update = function() {
 riot.mountTo = riot.mount
 
 
-
-;(function(window) {
-
-  var BOOL_ATTR = ('allowfullscreen,async,autofocus,autoplay,checked,compact,controls,declare,default,'+
-    'defaultchecked,defaultmuted,defaultselected,defer,disabled,draggable,enabled,formnovalidate,hidden,'+
-    'indeterminate,inert,ismap,itemscope,loop,multiple,muted,nohref,noresize,noshade,novalidate,nowrap,open,'+
-    'pauseonexit,readonly,required,reversed,scoped,seamless,selected,sortable,spellcheck,translate,truespeed,'+
-    'typemustmatch,visible').split(',')
-
-  // these cannot be auto-closed
-  var VOID_TAGS = 'area,base,br,col,command,embed,hr,img,input,keygen,link,meta,param,source,track,wbr'.split(',')
-
-
-  /*
-    Following attributes give error when parsed on browser with { exrp_values }
-
-    'd' describes the SVG <path>, Chrome gives error if the value is not valid format
-    https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d
-  */
-  var PREFIX_ATTR = ['style', 'src', 'd']
-
-  var HTML_PARSERS = {
-    jade: jade
-  }
-
-  var JS_PARSERS = {
-    coffeescript: coffee,
-    none: plainjs,
-    cs: coffee,
-    es6: es6,
-    typescript: typescript,
-    livescript: livescript,
-    ls: livescript
-  }
-
-  var LINE_TAG = /^<([\w\-]+)>(.*)<\/\1>/gim,
-      QUOTE = /=({[^}]+})([\s\/\>])/g,
-      SET_ATTR = /([\w\-]+)=(["'])([^\2]+?)\2/g,
-      EXPR = /{\s*([^}]+)\s*}/g,
-      // (tagname) (html) (javascript) endtag
-      CUSTOM_TAG = /^<([\w\-]+)>([^\x00]*[\w\/}"']>$)?([^\x00]*?)^<\/\1>/gim,
-      SCRIPT = /<script(\s+type=['"]?([^>'"]+)['"]?)?>([^\x00]*?)<\/script>/gm,
-      STYLE = /<style(\s+type=['"]?([^>'"]+)['"]?|\s+scoped)?>([^\x00]*?)<\/style>/gm,
-      CSS_SELECTOR = /(^|\}|\{)\s*([^\{\}]+)\s*(?=\{)/g,
-      CSS_COMMENT = /\/\*[^\x00]*?\*\//gm,
-      HTML_COMMENT = /<!--.*?-->/g,
-      CLOSED_TAG = /<([\w\-]+)([^>]*)\/\s*>/g,
-      LINE_COMMENT = /^\s*\/\/.*$/gm,
-      JS_COMMENT = /\/\*[^\x00]*?\*\//gm
-
-  function compileHTML(html, opts, type) {
-
-    var brackets = riot.util.brackets
-
-    // foo={ bar } --> foo="{ bar }"
-    html = html.replace(brackets(QUOTE), '="$1"$2')
-
-    // whitespace
-    html = opts.whitespace ? html.replace(/\n/g, '\\n') : html.replace(/\s+/g, ' ')
-
-    // strip comments
-    html = html.trim().replace(HTML_COMMENT, '')
-
-    // alter special attribute names
-    html = html.replace(SET_ATTR, function(full, name, _, expr) {
-      if (expr.indexOf(brackets(0)) >= 0) {
-        name = name.toLowerCase()
-
-        if (PREFIX_ATTR.indexOf(name) >= 0) name = 'riot-' + name
-
-        // IE8 looses boolean attr values: `checked={ expr }` --> `__checked={ expr }`
-        else if (BOOL_ATTR.indexOf(name) >= 0) name = '__' + name
-      }
-
-      return name + '="' + expr + '"'
-    })
-
-    // run expressions trough parser
-    if (opts.expr) {
-      html = html.replace(brackets(EXPR), function(_, expr) {
-        var ret = compileJS(expr, opts, type).trim().replace(/\r?\n|\r/g, '').trim()
-        if (ret.slice(-1) == ';') ret = ret.slice(0, -1)
-        return brackets(0) + ret + brackets(1)
-      })
-    }
-
-    // <foo/> -> <foo></foo>
-    html = html.replace(CLOSED_TAG, function(_, name, attr) {
-      var tag = '<' + name + (attr ? ' ' + attr.trim() : '') + '>'
-
-      // Do not self-close HTML5 void tags
-      if (VOID_TAGS.indexOf(name.toLowerCase()) == -1) tag += '</' + name + '>'
-      return tag
-    })
-
-    // escape single quotes
-    html = html.replace(/'/g, "\\'")
-
-    // \{ jotain \} --> \\{ jotain \\}
-    html = html.replace(brackets(/\\{|\\}/g), '\\$&')
-
-    // compact: no whitespace between tags
-    if (opts.compact) html = html.replace(/> </g, '><')
-
-    return html
-
-  }
-
-  function coffee(js) {
-    if (typeof exports === 'undefined') {
-      return CoffeeScript.compile(js, { bare: true })
-    }
-    return require('coffee-script').compile(js, { bare: true })
-  }
-
-  function es6(js) {
-    if (typeof exports === 'undefined') {
-      return babel.transform(js, { blacklist: ['useStrict'] }).code
-    }
-    return require('babel').transform(js, { blacklist: ['useStrict'] }).code
-  }
-
-  function typescript(js) {
-    return require('typescript-simple')(js)
-  }
-
-  function livescript(js) {
-    return require('LiveScript').compile(js, { bare: true, header: false })
-  }
-
-  function plainjs(js) {
-    return js
-  }
-
-  function jade(html) {
-    return require('jade').render(html, {pretty: true})
-  }
-
-  function riotjs(js) {
-
-    // strip comments
-    js = js.replace(LINE_COMMENT, '').replace(JS_COMMENT, '')
-
-    // ES6 method signatures
-    var lines = js.split('\n'),
-        es6Ident = ''
-
-    lines.forEach(function(line, i) {
-      var l = line.trim()
-
-      // method start
-      if (l[0] != '}' && l.indexOf('(') > 0 && l.indexOf('function') == -1) {
-        var end = /[{}]/.exec(l.slice(-1)),
-            m = end && /(\s+)([\w]+)\s*\(([\w,\s]*)\)\s*\{/.exec(line)
-
-        if (m && !/^(if|while|switch|for)$/.test(m[2])) {
-          lines[i] = m[1] + 'this.' + m[2] + ' = function(' + m[3] + ') {'
-
-          // foo() { }
-          if (end[0] == '}') {
-            lines[i] += ' ' + l.slice(m[0].length - 1, -1) + '}.bind(this)'
-
-          } else {
-            es6Ident = m[1]
-          }
-        }
-
-      }
-
-      // method end
-      if (line.slice(0, es6Ident.length + 1) == es6Ident + '}') {
-        lines[i] = es6Ident + '}.bind(this);'
-        es6Ident = ''
-      }
-
-    })
-
-    return lines.join('\n')
-
-  }
-
-  function scopedCSS (tag, style) {
-    return style.replace(CSS_COMMENT, '').replace(CSS_SELECTOR, function (m, p1, p2) {
-      return p1 + ' ' + p2.split(/\s*,\s*/g).map(function(sel) {
-        return sel[0] == '@' ? sel : tag + ' ' + sel.replace(/:scope\s*/, '')
-      }).join(',')
-    }).trim()
-  }
-
-  function compileJS(js, opts, type) {
-    var parser = opts.parser || (type ? JS_PARSERS[type] : riotjs)
-    if (!parser) throw new Error('Parser not found "' + type + '"')
-    return parser(js, opts)
-  }
-
-  function compileTemplate(lang, html) {
-    var parser = HTML_PARSERS[lang]
-    if (!parser) throw new Error('Template parser not found "' + lang + '"')
-    return parser(html)
-  }
-
-  function compileCSS(style, tag, type) {
-    if (type == 'scoped-css') style = scopedCSS(tag, style)
-    return style.replace(/\s+/g, ' ').replace(/\\/g, '\\\\').replace(/'/g, "\\'").trim()
-  }
-
-  function mktag(name, html, css, js) {
-    return 'riot.tag(\''
-      + name + '\', \''
-      + html + '\''
-      + (css ? ', \'' + css + '\'' : '')
-      + ', function(opts) {' + js + '\n});'
-  }
-
-  function compile(src, opts) {
-
-    opts = opts || {}
-
-    if (opts.brackets) riot.settings.brackets = opts.brackets
-
-    if (opts.template) src = compileTemplate(opts.template, src)
-
-    src = src.replace(LINE_TAG, function(_, tagName, html) {
-      return mktag(tagName, compileHTML(html, opts), '', '')
-    })
-
-    return src.replace(CUSTOM_TAG, function(_, tagName, html, js) {
-
-      html = html || ''
-
-      // js wrapped inside <script> tag
-      var type = opts.type
-
-      if (!js.trim()) {
-        html = html.replace(SCRIPT, function(_, fullType, _type, script) {
-          if (_type) type = _type.replace('text/', '')
-          js = script
-          return ''
-        })
-      }
-
-      // styles in <style> tag
-      var styleType = 'css',
-          style = ''
-
-      html = html.replace(STYLE, function(_, fullType, _type, _style) {
-        if (fullType && 'scoped' == fullType.trim()) styleType = 'scoped-css'
-          else if (_type) styleType = _type.replace('text/', '')
-        style = _style
-        return ''
-      })
-
-      return mktag(
-        tagName,
-        compileHTML(html, opts, type),
-        compileCSS(style, tagName, styleType),
-        compileJS(js, opts, type)
-      )
-
-    })
-
-  }
-
-
-  // io.js (node)
-  if (!window) {
-    this.riot = require(process.env.RIOT || '../riot')
-    return module.exports = {
-      compile: compile,
-      html: compileHTML,
-      style: compileCSS,
-      js: compileJS
-    }
-  }
-
-  // browsers
-  var doc = window.document,
-      promise,
-      ready
-
-
-  function GET(url, fn) {
-    var req = new XMLHttpRequest()
-
-    req.onreadystatechange = function() {
-      if (req.readyState == 4 && req.status == 200) fn(req.responseText)
-    }
-    req.open('GET', url, true)
-    req.send('')
-  }
-
-  function unindent(src) {
-    var ident = /[ \t]+/.exec(src)
-    if (ident) src = src.replace(new RegExp('^' + ident[0], 'gm'), '')
-    return src
-  }
-
-  function globalEval(js) {
-    var node = doc.createElement('script'),
-        root = doc.documentElement
-
-    node.text = compile(js)
-    root.appendChild(node)
-    root.removeChild(node)
-  }
-
-  function compileScripts(fn) {
-    var scripts = doc.querySelectorAll('script[type="riot/tag"]'),
-        scriptsAmount = scripts.length
-
-    ;[].map.call(scripts, function(script) {
-      var url = script.getAttribute('src')
-
-      function compileTag(source) {
-        globalEval(source)
-        scriptsAmount--
-        if (!scriptsAmount) {
-          promise.trigger('ready')
-          ready = true
-          fn && fn()
-        }
-      }
-
-      return url ? GET(url, compileTag) : compileTag(unindent(script.innerHTML))
-    })
-
-  }
-
-
-  riot.compile = function(arg, fn) {
-
-    // string
-    if (typeof arg == 'string') {
-
-      // compile & return
-      if (arg.trim()[0] == '<') {
-        var js = unindent(compile(arg))
-        if (!fn) globalEval(js)
-        return js
-
-      // URL
-      } else {
-        return GET(arg, function(str) {
-          var js = unindent(compile(str))
-          globalEval(js)
-          fn && fn(js, str)
-        })
-      }
-    }
-
-    // must be a function
-    if (typeof arg != 'function') arg = undefined
-
-    // all compiled
-    if (ready) return arg && arg()
-
-    // add to queue
-    if (promise) {
-      arg && promise.on('ready', arg)
-
-    // grab riot/tag elements + load & execute them
-    } else {
-      promise = riot.observable()
-      compileScripts(arg)
-    }
-
-  }
-
-  // reassign mount methods
-  var mount = riot.mount
-
-  riot.mount = function(a, b, c) {
-    var ret
-    riot.compile(function() { ret = mount(a, b, c) })
-    return ret
-  }
-
-  // @deprecated
-  riot.mountTo = riot.mount
-
-})(typeof window != 'undefined' ? window : undefined)
-
   // share methods for other riot parts, e.g. compiler
   riot.util = { brackets: brackets, tmpl: tmpl }
 
@@ -1506,3 +1279,349 @@ riot.mountTo = riot.mount
     window.riot = riot
 
 })(typeof window != 'undefined' ? window : undefined);
+;(function(window) {
+riot.parsers = {
+  html: {},
+  css: {},
+  js: {
+    coffee: function(js) {
+      return CoffeeScript.compile(js, { bare: true })
+    },
+    es6: function(js) {
+      return babel.transform(js, { blacklist: ['useStrict'] }).code
+    },
+    none: function(js) {
+      return js
+    }
+  }
+}
+
+
+var BOOL_ATTR = ('allowfullscreen,async,autofocus,autoplay,checked,compact,controls,declare,default,'+
+  'defaultchecked,defaultmuted,defaultselected,defer,disabled,draggable,enabled,formnovalidate,hidden,'+
+  'indeterminate,inert,ismap,itemscope,loop,multiple,muted,nohref,noresize,noshade,novalidate,nowrap,open,'+
+  'pauseonexit,readonly,required,reversed,scoped,seamless,selected,sortable,spellcheck,translate,truespeed,'+
+  'typemustmatch,visible').split(','),
+  // these cannot be auto-closed
+  VOID_TAGS = 'area,base,br,col,command,embed,hr,img,input,keygen,link,meta,param,source,track,wbr'.split(','),
+  /*
+    Following attributes give error when parsed on browser with { exrp_values }
+
+    'd' describes the SVG <path>, Chrome gives error if the value is not valid format
+    https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/d
+  */
+  PREFIX_ATTR = ['style', 'src', 'd'],
+
+  LINE_TAG = /^<([\w\-]+)>(.*)<\/\1>/gim,
+  QUOTE = /=({[^}]+})([\s\/\>])/g,
+  SET_ATTR = /([\w\-]+)=(["'])([^\2]+?)\2/g,
+  EXPR = /{\s*([^}]+)\s*}/g,
+  // (tagname) (html) (javascript) endtag
+  CUSTOM_TAG = /^<([\w\-]+)\s?([^>]*)>([^\x00]*[\w\/}"']>$)?([^\x00]*?)^<\/\1>/gim,
+  SCRIPT = /<script(\s+type=['"]?([^>'"]+)['"]?)?>([^\x00]*?)<\/script>/gm,
+  STYLE = /<style(\s+type=['"]?([^>'"]+)['"]?|\s+scoped)?>([^\x00]*?)<\/style>/gm,
+  CSS_SELECTOR = /(^|\}|\{)\s*([^\{\}]+)\s*(?=\{)/g,
+  CSS_COMMENT = /\/\*[^\x00]*?\*\//gm,
+  HTML_COMMENT = /<!--.*?-->/g,
+  CLOSED_TAG = /<([\w\-]+)([^>]*)\/\s*>/g,
+  LINE_COMMENT = /^\s*\/\/.*$/gm,
+  JS_COMMENT = /\/\*[^\x00]*?\*\//gm
+
+function mktag(name, html, css, attrs, js) {
+  return 'riot.tag(\''
+    + name + '\', \''
+    + html + '\''
+    + (css ? ', \'' + css + '\'' : '')
+    + (attrs ? ', \'' + attrs.replace(/'/g, "\\'") + '\'' : '')
+    + ', function(opts) {' + js + '\n});'
+}
+
+function compileHTML(html, opts, type) {
+
+  var brackets = riot.util.brackets
+
+  // foo={ bar } --> foo="{ bar }"
+  html = html.replace(brackets(QUOTE), '="$1"$2')
+
+  // whitespace
+  html = opts.whitespace ? html.replace(/\n/g, '\\n') : html.replace(/\s+/g, ' ')
+
+  // strip comments
+  html = html.trim().replace(HTML_COMMENT, '')
+
+  // alter special attribute names
+  html = html.replace(SET_ATTR, function(full, name, _, expr) {
+    if (expr.indexOf(brackets(0)) >= 0) {
+      name = name.toLowerCase()
+
+      if (PREFIX_ATTR.indexOf(name) >= 0) name = 'riot-' + name
+
+      // IE8 looses boolean attr values: `checked={ expr }` --> `__checked={ expr }`
+      else if (BOOL_ATTR.indexOf(name) >= 0) name = '__' + name
+    }
+
+    return name + '="' + expr + '"'
+  })
+
+  // run expressions trough parser
+  if (opts.expr) {
+    html = html.replace(brackets(EXPR), function(_, expr) {
+      var ret = compileJS(expr, opts, type).trim().replace(/\r?\n|\r/g, '').trim()
+      if (ret.slice(-1) == ';') ret = ret.slice(0, -1)
+      return brackets(0) + ret + brackets(1)
+    })
+  }
+
+  // <foo/> -> <foo></foo>
+  html = html.replace(CLOSED_TAG, function(_, name, attr) {
+    var tag = '<' + name + (attr ? ' ' + attr.trim() : '') + '>'
+
+    // Do not self-close HTML5 void tags
+    if (VOID_TAGS.indexOf(name.toLowerCase()) == -1) tag += '</' + name + '>'
+    return tag
+  })
+
+  // escape single quotes
+  html = html.replace(/'/g, "\\'")
+
+  // \{ jotain \} --> \\{ jotain \\}
+  html = html.replace(brackets(/\\{|\\}/g), '\\$&')
+
+  // compact: no whitespace between tags
+  if (opts.compact) html = html.replace(/> </g, '><')
+
+  return html
+
+}
+
+
+function riotjs(js) {
+
+  // strip comments
+  js = js.replace(LINE_COMMENT, '').replace(JS_COMMENT, '')
+
+  // ES6 method signatures
+  var lines = js.split('\n'),
+      es6Ident = ''
+
+  lines.forEach(function(line, i) {
+    var l = line.trim()
+
+    // method start
+    if (l[0] != '}' && l.indexOf('(') > 0 && l.indexOf('function') == -1) {
+      var end = /[{}]/.exec(l.slice(-1)),
+          m = end && /(\s+)([\w]+)\s*\(([\w,\s]*)\)\s*\{/.exec(line)
+
+      if (m && !/^(if|while|switch|for)$/.test(m[2])) {
+        lines[i] = m[1] + 'this.' + m[2] + ' = function(' + m[3] + ') {'
+
+        // foo() { }
+        if (end[0] == '}') {
+          lines[i] += ' ' + l.slice(m[0].length - 1, -1) + '}.bind(this)'
+
+        } else {
+          es6Ident = m[1]
+        }
+      }
+
+    }
+
+    // method end
+    if (line.slice(0, es6Ident.length + 1) == es6Ident + '}') {
+      lines[i] = es6Ident + '}.bind(this);'
+      es6Ident = ''
+    }
+
+  })
+
+  return lines.join('\n')
+
+}
+
+function scopedCSS (tag, style, type) {
+  return style.replace(CSS_COMMENT, '').replace(CSS_SELECTOR, function (m, p1, p2) {
+    return p1 + ' ' + p2.split(/\s*,\s*/g).map(function(sel) {
+      var s = sel.replace(/:scope\s*/, '')
+      return sel[0] == '@' ? sel : tag + ' ' + s +', [riot-tag="'+tag+'"] ' + s
+    }).join(',')
+  }).trim()
+}
+
+function compileJS(js, opts, type) {
+  var parser = opts.parser || (type ? riot.parsers.js[type] : riotjs)
+  if (!parser) throw new Error('Parser not found "' + type + '"')
+  return parser(js, opts)
+}
+
+function compileTemplate(lang, html) {
+  var parser = riot.parsers.html[lang]
+  if (!parser) throw new Error('Template parser not found "' + lang + '"')
+  return parser(html)
+}
+
+function compileCSS(style, tag, type) {
+  if (type == 'scoped-css') style = scopedCSS(tag, style)
+  else if (riot.parsers.css[type]) style = riot.parsers.css[type](tag, style)
+  return style.replace(/\s+/g, ' ').replace(/\\/g, '\\\\').replace(/'/g, "\\'").trim()
+}
+
+function compile(src, opts) {
+
+  opts = opts || {}
+
+  if (opts.brackets) riot.settings.brackets = opts.brackets
+
+  if (opts.template) src = compileTemplate(opts.template, src)
+
+  src = src.replace(LINE_TAG, function(_, tagName, html) {
+    return mktag(tagName, compileHTML(html, opts), '', '', '')
+  })
+
+  return src.replace(CUSTOM_TAG, function(_, tagName, attrs, html, js) {
+
+    html = html || ''
+
+    // js wrapped inside <script> tag
+    var type = opts.type
+
+    if (!js.trim()) {
+      html = html.replace(SCRIPT, function(_, fullType, _type, script) {
+        if (_type) type = _type.replace('text/', '')
+        js = script
+        return ''
+      })
+    }
+
+    // styles in <style> tag
+    var styleType = 'css',
+        style = ''
+
+    html = html.replace(STYLE, function(_, fullType, _type, _style) {
+      if (fullType && 'scoped' == fullType.trim()) styleType = 'scoped-css'
+        else if (_type) styleType = _type.replace('text/', '')
+      style = _style
+      return ''
+    })
+
+    return mktag(
+      tagName,
+      compileHTML(html, opts, type),
+      compileCSS(style, tagName, styleType),
+      attrs,
+      compileJS(js, opts, type)
+    )
+
+  })
+
+}
+var doc = window.document,
+    promise,
+    ready
+
+
+function GET(url, fn) {
+  var req = new XMLHttpRequest()
+
+  req.onreadystatechange = function() {
+    if (req.readyState == 4 && req.status == 200) fn(req.responseText)
+  }
+  req.open('GET', url, true)
+  req.send('')
+}
+
+function unindent(src) {
+  var ident = /[ \t]+/.exec(src)
+  if (ident) src = src.replace(new RegExp('^' + ident[0], 'gm'), '')
+  return src
+}
+
+function globalEval(js) {
+  var node = doc.createElement('script'),
+      root = doc.documentElement
+
+  node.text = compile(js)
+  root.appendChild(node)
+  root.removeChild(node)
+}
+
+function compileScripts(fn) {
+  var scripts = doc.querySelectorAll('script[type="riot/tag"]'),
+      scriptsAmount = scripts.length
+
+  function done() {
+    promise.trigger('ready')
+    ready = true
+    fn && fn()
+  }
+
+  if(!scriptsAmount) {
+    done()
+  } else {
+    ;[].map.call(scripts, function(script) {
+      var url = script.getAttribute('src')
+
+      function compileTag(source) {
+        globalEval(source)
+        scriptsAmount--
+        if (!scriptsAmount) {
+          done()
+        }
+      }
+
+      return url ? GET(url, compileTag) : compileTag(unindent(script.innerHTML))
+    })
+  }
+}
+
+
+riot.compile = function(arg, fn) {
+
+  // string
+  if (typeof arg == 'string') {
+
+    // compile & return
+    if (arg.trim()[0] == '<') {
+      var js = unindent(compile(arg))
+      if (!fn) globalEval(js)
+      return js
+
+    // URL
+    } else {
+      return GET(arg, function(str) {
+        var js = unindent(compile(str))
+        globalEval(js)
+        fn && fn(js, str)
+      })
+    }
+  }
+
+  // must be a function
+  if (typeof arg != 'function') arg = undefined
+
+  // all compiled
+  if (ready) return arg && arg()
+
+  // add to queue
+  if (promise) {
+    arg && promise.on('ready', arg)
+
+  // grab riot/tag elements + load & execute them
+  } else {
+    promise = riot.observable()
+    compileScripts(arg)
+  }
+
+}
+
+// reassign mount methods
+var mount = riot.mount
+
+riot.mount = function(a, b, c) {
+  var ret
+  riot.compile(function() { ret = mount(a, b, c) })
+  return ret
+}
+
+// @deprecated
+riot.mountTo = riot.mount
+})(this)
