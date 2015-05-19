@@ -3,15 +3,13 @@
 
 ## A React- like, 3.5KB UI lib
 
-[![Join the chat at https://gitter.im/muut/riotjs](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/muut/riotjs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 [![Build Status][travis-image]][travis-url]
+[![Riot Forum][riot-forum-image]][riot-forum-url]
+[![Join the chat at https://gitter.im/muut/riotjs][gitter-image]][gitter-url]
+
 [![NPM version][npm-version-image]][npm-url]
 [![NPM downloads][npm-downloads-image]][npm-url]
-[![Riot Forum][riot-forum-image]][riot-forum-url]
-
 [![MIT License][license-image]][license-url]
-
 [![Coverage Status][coverage-image]][coverage-url]
 
 [![Sauce Test Status][saucelabs-image]][saucelabs-url]
@@ -256,3 +254,6 @@ https://muut.com/riotjs/
 
 [saucelabs-image]:https://saucelabs.com/browser-matrix/riotjs.svg
 [saucelabs-url]:https://saucelabs.com/u/riotjs
+
+[gitter-image]:https://img.shields.io/badge/GITTER-JOIN_CHAT_%E2%86%92-1dce73.svg?style=flat-square
+[gitter-url]:https://gitter.im/muut/riotjs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge

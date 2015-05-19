@@ -40,13 +40,13 @@
     "sl_iphone": {
       "base": "SauceLabs",
       "browserName": "iphone",
-      "version": "8.2",
+      "version": "8.0",
       "group": 2
     },
     "sl_ipad": {
       "base": "SauceLabs",
       "browserName": "ipad",
-      "version": "8.2",
+      "version": "8.0",
       "group": 2
     },
     "sl_android_5": {
