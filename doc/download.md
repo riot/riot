@@ -31,9 +31,9 @@ cdnjs: https://cdnjs.cloudflare.com/ajax/libs/riot
 
 #### [jsdelivr](http://www.jsdelivr.com/#!riot)
 
-`https://cdn.jsdelivr.net/g/riot@2.0(riot.min.js+compiler.min.js)` <small>(latest 2.0.X)</small>
+`https://cdn.jsdelivr.net/g/riot@2.1(riot.min.js+compiler.min.js)` <small>(latest 2.1.X)</small>
 
-`https://cdn.jsdelivr.net/riot/2.0/riot.min.js` <small>(latest 2.0.X)</small>
+`https://cdn.jsdelivr.net/riot/2.1/riot.min.js` <small>(latest 2.1.X)</small>
 
 `https://cdn.jsdelivr.net/g/riot@{{ riot_version }}(riot.min.js+compiler.min.js)`
 
