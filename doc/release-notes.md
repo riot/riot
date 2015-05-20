@@ -6,6 +6,17 @@ body_id: riot-releases
 
 ====
 
+### 2.1.0 *May 20, 2015*
+
+- [Mixins](/riotjs/guide/#mixins)
+- Ability to define attributes for the root element on the tag definition
+- Split the node compiler from the browser compiler
+- Simplify the build script using [smash](https://github.com/mbostock/smash)
+- Add Saucelabs tests hooks for crossbrowser testing
+- Add Coveralls coverage hooks to check the code coverage on any pull request
+
+List of bug fixes and details can be found [here](https://github.com/muut/riotjs/issues/648)
+
 ### 2.0.15 *Apr 23, 2015*
 
 - A new `<yield>` core tag allowing [html transclusion](/riotjs/guide/#nested-html)
