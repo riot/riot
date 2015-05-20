@@ -129,6 +129,8 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot Snake Game](http://cdn.rawgit.com/atian25/blog/master/assets/riot-snake.html)
 - [Riot Tag Syntax Checker](http://cognitom.github.io/riot-checker/)
 
+### Miscellaneous
+- [Q&A with RiotJS author Tero Piirainen](http://www.triplet.fi/blog/q-and-a-with-riotjs-author-tero-piirainen/)
 
 ### Credits
 
