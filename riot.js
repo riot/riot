@@ -1,12 +1,13 @@
-/* Riot v2.0.15, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v2.1.0, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window) {
   // 'use strict' does not allow us to override the events properties https://github.com/muut/riotjs/blob/dev/lib/tag/update.js#L7-L10
   // it leads to the following error on firefox "setting a property that has only a getter"
   //'use strict'
 
-  var riot = { version: 'v2.0.15', settings: {} },
-      ieVersion = checkIE()
+
+  var riot = { version: 'v2.1.0', settings: {} }
+
 
 riot.observable = function(el) {
 
@@ -76,6 +77,14 @@ riot.observable = function(el) {
   return el
 
 }
+riot.mixin = (function() {
+  var registeredMixins = {}
+  return function(name, mixin) {
+    if (!mixin) return registeredMixins[name]
+      else registeredMixins[name] = mixin
+  }
+})()
+
 ;(function(riot, evt, window) {
 
   // browsers only
@@ -331,7 +340,7 @@ var tmpl = (function() {
 
           // break the expression if its empty (resulting in undefined value)
           || 'x')
-
+      + '}catch(e){'
       + '}finally{return '
 
         // default to empty string for falsy values except zero
@@ -442,6 +451,7 @@ function _each(dom, parent, expr) {
     // object loop. any changes cause full redraw
     if (!Array.isArray(items)) {
       var testsum = JSON.stringify(items)
+
       if (testsum == checksum) return
       checksum = testsum
 
@@ -545,6 +555,12 @@ function _each(dom, parent, expr) {
 
     rendered = items.slice()
 
+  }).one('updated', function() {
+    walk(root, function(dom) {
+      each(dom.attributes, function(attr) {
+        if (/^(name|id)$/.test(attr.name)) parent[attr.value] = dom
+      })
+    })
   })
 
 }
@@ -554,6 +570,7 @@ function parseNamedElements(root, parent, childTags) {
 
   walk(root, function(dom) {
     if (dom.nodeType == 1) {
+      dom.isLoop = 0
       if(dom.parentNode && dom.parentNode.isLoop) dom.isLoop = 1
       if(dom.getAttribute('each')) dom.isLoop = 1
       // custom child tag
@@ -561,9 +578,10 @@ function parseNamedElements(root, parent, childTags) {
 
       if (child && !dom.isLoop) {
         var tag = new Tag(child, { root: dom, parent: parent }, dom.innerHTML),
-          tagName = child.name,
-          ptag = parent,
-          cachedTag
+            namedTag = dom.getAttribute('name'),
+            tagName = namedTag && namedTag.indexOf(brackets(0)) < 0 ? namedTag : child.name,
+            ptag = parent,
+            cachedTag
 
         while(!getTag(ptag.root)) {
           if(!ptag.parent) break
@@ -592,9 +610,10 @@ function parseNamedElements(root, parent, childTags) {
         childTags.push(tag)
       }
 
-      each(dom.attributes, function(attr) {
-        if (/^(name|id)$/.test(attr.name)) parent[attr.value] = dom
-      })
+      if(!dom.isLoop)
+        each(dom.attributes, function(attr) {
+          if (/^(name|id)$/.test(attr.name)) parent[attr.value] = dom
+        })
     }
 
   })
@@ -652,10 +671,21 @@ function Tag(impl, conf, innerHTML) {
       fn = impl.fn,
       tagName = root.tagName.toLowerCase(),
       attr = {},
-      loopDom
+      loopDom,
+      TAG_ATTRIBUTES = /([\w\-]+)\s?=\s?['"]([^'"]+)["']/gim
 
   if (fn && root._tag) {
     root._tag.unmount(true)
+  }
+
+  if(impl.attrs) {
+    var attrs = impl.attrs.match(TAG_ATTRIBUTES)
+
+    each(attrs, function(a) {
+      var kv = a.split(/\s?=\s?/)
+      root.setAttribute(kv[0], kv[1].replace(/['"]/g, ''))
+    })
+
   }
   // keep a reference to the tag just created
   // so we will be able to mount this tag multiple times
@@ -663,7 +693,7 @@ function Tag(impl, conf, innerHTML) {
 
   // create a unique id to this tag
   // it could be handy to use it also to improve the virtual dom rendering speed
-  this._id = ~~(new Date().getTime() * Math.random())
+  this._id = fastAbs(~~(new Date().getTime() * Math.random()))
 
   extend(this, { parent: parent, root: root, opts: opts, tags: {} }, item)
 
@@ -673,7 +703,7 @@ function Tag(impl, conf, innerHTML) {
   })
 
 
-  if (dom.innerHTML && !/select/.test(tagName))
+  if (dom.innerHTML && !/select/.test(tagName) && !/tbody/.test(tagName) && !/tr/.test(tagName))
     // replace all the yield tags with the tag inner html
     dom.innerHTML = replaceYield(dom.innerHTML, innerHTML)
 
@@ -691,6 +721,19 @@ function Tag(impl, conf, innerHTML) {
     self.trigger('update', item)
     update(expressions, self, item)
     self.trigger('updated')
+  }
+
+  this.mixin = function() {
+    each(arguments, function(mix) {
+      mix = 'string' == typeof mix ? riot.mixin(mix) : mix
+      each(Object.keys(mix), function(key) {
+        // bind methods to self
+        if ('init' != key)
+          self[key] = 'function' == typeof mix[key] ? mix[key].bind(self) : mix[key]
+      })
+      // init method will be called automatically
+      if (mix.init) mix.init.bind(self)()
+    })
   }
 
   this.mount = function() {
@@ -719,8 +762,11 @@ function Tag(impl, conf, innerHTML) {
     }
 
     if (root.stub) self.root = root = parent.root
-    self.trigger('mount')
 
+    // if it's not a child tag we can trigger its mount event
+    if (!self.parent) self.trigger('mount')
+    // otherwise we need to wait that the parent event gets triggered
+    else self.parent.one('mount', function() { self.trigger('mount') })
   }
 
 
@@ -741,7 +787,7 @@ function Tag(impl, conf, innerHTML) {
           })
         } else
           // otherwise just delete the tag instance
-          delete parent.tags[tagName]
+          parent.tags[tagName] = undefined
       } else {
         while (el.firstChild) el.removeChild(el.firstChild)
       }
@@ -795,8 +841,10 @@ function setEventHandler(name, handler, dom, tag, item) {
       e.returnValue = false
     }
 
-    var el = item ? tag.parent : tag
-    el.update()
+    if (!e.preventUpdate) {
+      var el = item ? tag.parent : tag
+      el.update()
+    }
 
   }
 
@@ -830,7 +878,7 @@ function update(expressions, tag, item) {
     expr.value = value
 
     // text node
-    if (!attrName) return dom.nodeValue = value
+    if (!attrName) return dom.nodeValue = value.toString()
 
     // remove original attribute
     remAttr(dom, attrName)
@@ -881,6 +929,7 @@ function update(expressions, tag, item) {
   })
 
 }
+
 function each(els, fn) {
   for (var i = 0, len = (els || []).length, el; i < len; i++) {
     el = els[i]
@@ -892,6 +941,10 @@ function each(els, fn) {
 
 function remAttr(dom, name) {
   dom.removeAttribute(name)
+}
+
+function fastAbs(nr) {
+  return (nr ^ (nr >> 31)) - (nr >> 31)
 }
 
 // max 2 from objects allowed
@@ -935,18 +988,31 @@ function optionInnerHTML(el, html) {
   el.appendChild(opt)
 }
 
+function tbodyInnerHTML(el, html, tagName) {
+  var div = document.createElement('div')
+  div.innerHTML = '<table>' + html + '</table>'
+
+  if (/td|th/.test(tagName)) {
+    el.appendChild(div.firstChild.firstChild.firstChild.firstChild)
+  } else {
+    el.appendChild(div.firstChild.firstChild.firstChild)
+  }
+}
+
 function mkdom(template) {
   var tagName = template.trim().slice(1, 3).toLowerCase(),
       rootTag = /td|th/.test(tagName) ? 'tr' : tagName == 'tr' ? 'tbody' : 'div',
-      el = document.createElement(rootTag)
+      el = mkEl(rootTag)
 
   el.stub = true
 
   if (tagName === 'op' && ieVersion && ieVersion < 10) {
     optionInnerHTML(el, template)
-  } else {
+  } else if ((rootTag === 'tbody' || rootTag === 'tr') && ieVersion && ieVersion < 10) {
+    tbodyInnerHTML(el, template, tagName)
+  } else
     el.innerHTML = template
-  }
+
   return el
 }
 
@@ -962,6 +1028,10 @@ function walk(dom, fn) {
       }
     }
   }
+}
+
+function mkEl(name) {
+  return document.createElement(name)
 }
 
 function replaceYield (tmpl, innerHTML) {
@@ -990,6 +1060,62 @@ function inherit(parent) {
   Child.prototype = parent
   return new Child()
 }
+/**
+ *
+ * Hacks needed for the old internet explorer versions [lower than IE10]
+ *
+ */
+
+var ieVersion = checkIE()
+
+function checkIE() {
+  if (window) {
+    var ua = navigator.userAgent
+    var msie = ua.indexOf('MSIE ')
+    if (msie > 0) {
+      return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10)
+    }
+    else {
+      return 0
+    }
+  }
+}
+
+function tbodyInnerHTML(el, html, tagName) {
+  var div = mkEl('div'),
+      loops = /td|th/.test(tagName) ? 3 : 2,
+      child
+
+  div.innerHTML = '<table>' + html + '</table>'
+  child = div.firstChild
+
+  while(loops--) {
+    child = child.firstChild
+  }
+
+  el.appendChild(child)
+
+}
+
+function optionInnerHTML(el, html) {
+  var opt = mkEl('option'),
+      valRegx = /value=[\"'](.+?)[\"']/,
+      selRegx = /selected=[\"'](.+?)[\"']/,
+      valuesMatch = html.match(valRegx),
+      selectedMatch = html.match(selRegx)
+
+  opt.innerHTML = html
+
+  if (valuesMatch) {
+    opt.value = valuesMatch[1]
+  }
+
+  if (selectedMatch) {
+    opt.setAttribute('riot-selected', selectedMatch[1])
+  }
+
+  el.appendChild(opt)
+}
 
 /*
  Virtual dom is an array of custom tags on the document.
@@ -997,7 +1123,8 @@ function inherit(parent) {
 */
 
 var virtualDom = [],
-    tagImpl = {}
+    tagImpl = {},
+    styleNode
 
 
 function getTag(dom) {
@@ -1005,9 +1132,24 @@ function getTag(dom) {
 }
 
 function injectStyle(css) {
-  var node = document.createElement('style')
-  node.innerHTML = css
-  document.head.appendChild(node)
+
+  styleNode = styleNode || mkEl('style')
+
+  if (!document.head) return
+
+  if(styleNode.styleSheet)
+    styleNode.styleSheet.cssText += css
+  else
+    styleNode.innerHTML += css
+
+  if (!styleNode._rendered)
+    if (styleNode.styleSheet)
+      document.body.appendChild(styleNode)
+    else
+      document.head.appendChild(styleNode)
+
+  styleNode._rendered = true
+
 }
 
 function mountTo(root, tagName, opts) {
@@ -1029,23 +1171,29 @@ function mountTo(root, tagName, opts) {
 
 }
 
-riot.tag = function(name, html, css, fn) {
+riot.tag = function(name, html, css, attrs, fn) {
+  if (typeof attrs == 'function') {
+    fn = attrs
+    if(/^[\w\-]+\s?=/.test(css)) {attrs = css; css = ''} else attrs = ''
+  }
   if (typeof css == 'function') fn = css
   else if (css) injectStyle(css)
-  tagImpl[name] = { name: name, tmpl: html, fn: fn }
+  tagImpl[name] = { name: name, tmpl: html, attrs: attrs, fn: fn }
   return name
 }
 
 riot.mount = function(selector, tagName, opts) {
 
   var el,
-      selctAllTags = function(sel) {
-        sel = Object.keys(tagImpl).join(', ')
-        sel.split(',').map(function(t) {
-          sel += ', *[riot-tag="'+ t.trim() + '"]'
+      selctAllTags = function() {
+        var keys = Object.keys(tagImpl)
+        var list = keys.join(', ')
+        each(keys, function(t) {
+          list += ', *[riot-tag="'+ t.trim() + '"]'
         })
-        return sel
+        return list
       },
+      allTags,
       tags = []
 
   if (typeof tagName == 'object') { opts = tagName; tagName = 0 }
@@ -1055,7 +1203,12 @@ riot.mount = function(selector, tagName, opts) {
     if (selector == '*') {
       // select all the tags registered
       // and also the tags found with the riot-tag attribute set
-      selector = selctAllTags(selector)
+      selector = allTags = selctAllTags()
+    } else {
+      selector.split(',').map(function(t) {
+        selector += ', *[riot-tag="'+ t.trim() + '"]'
+      })
+
     }
     // or just the ones named like the selector
     el = $$(selector)
@@ -1067,7 +1220,7 @@ riot.mount = function(selector, tagName, opts) {
   // select all the registered and mount them inside their root elements
   if (tagName == '*') {
     // get all custom tags
-    tagName = selctAllTags(selector)
+    tagName = allTags || selctAllTags()
     // if the root el it's just a single tag
     if (el.tagName) {
       el = $$(tagName, el)
@@ -1084,6 +1237,8 @@ riot.mount = function(selector, tagName, opts) {
   }
 
   function push(root) {
+    if(tagName && !root.getAttribute('riot-tag')) root.setAttribute('riot-tag', tagName)
+
     var name = tagName || root.getAttribute('riot-tag') || root.tagName.toLowerCase(),
         tag = mountTo(root, name, opts)
 
@@ -1110,7 +1265,6 @@ riot.update = function() {
 
 // @deprecated
 riot.mountTo = riot.mount
-
 
 
   // share methods for other riot parts, e.g. compiler

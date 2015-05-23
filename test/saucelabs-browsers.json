@@ -40,12 +40,18 @@
     "sl_iphone": {
       "base": "SauceLabs",
       "browserName": "iphone",
+      "deviceName": "iPhone Simulator",
+      "device-orientation": "portrait",
+      "platform": "OS X 10.10",
       "version": "8.2",
       "group": 2
     },
     "sl_ipad": {
       "base": "SauceLabs",
       "browserName": "ipad",
+      "deviceName": "iPad Simulator",
+      "device-orientation": "portrait",
+      "platform": "OS X 10.10",
       "version": "8.2",
       "group": 2
     },

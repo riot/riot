@@ -26,7 +26,7 @@ Custom tags need to be transformed to JavaScript before the browser can execute 
 <script src="path/to/javascript/with-tags.js" type="riot/tag"></script>
 
 <!-- include riot.js and the compiler -->
-<script src="//cdn.jsdelivr.net/g/riot@2.0(riot.min.js+compiler.min.js)"></script>
+<script src="//cdn.jsdelivr.net/g/riot@2.1(riot.min.js+compiler.min.js)"></script>
 
 
 <!-- mount normally -->
@@ -95,7 +95,7 @@ With pre-compilation your HTML is something like this:
 <my-tag></my-tag>
 
 <!-- include riot.js only -->
-<script src="//cdn.jsdelivr.net/riot/2.0/riot.min.js"></script>
+<script src="//cdn.jsdelivr.net/riot/2.1/riot.min.js"></script>
 
 <!-- include pre-compiled tags (normal javascript) -->
 <script src="path/to/javascript/with-tags.js"></script>

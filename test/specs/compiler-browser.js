@@ -23,6 +23,20 @@ document.contains = Element.prototype.contains = function contains(node) {
   return false
 }
 
+// small polyfill
+// normalize the document.contains method
+document.contains = Element.prototype.contains = function contains(node) {
+  if (!(0 in arguments)) {
+    throw new TypeError('1 argument is required')
+  }
+  do {
+    if (this === node) {
+      return true
+    }
+  } while (node = node && node.parentNode)
+  return false
+}
+
 describe('Compiler Browser', function() {
 
   var html = [
@@ -279,7 +293,6 @@ describe('Compiler Browser', function() {
           // test the preventUpdate feature on the DOM events
           '<script type=\"riot\/tag\" src=\"tag\/prevent-update.tag\"><\/script>',
           '<prevent-update><\/prevent-update>'
-
 
     ].join('\r'),
       tags = [],
@@ -820,6 +833,7 @@ describe('Compiler Browser', function() {
   it('static named tag for tags property', function() {
     var tag = riot.mount('named-child-parent')[0]
     expect(tag.tags['tags-child'].root.innerHTML).to.be('I have a name')
+
     tags.push(tag)
   })
 
@@ -856,6 +870,31 @@ describe('Compiler Browser', function() {
     tag.root.getElementsByTagName('p')[0].onclick({})
 
     expect(tag['fancy-name'].innerHTML).to.be('john')
+
+    tags.push(tag)
+  })
+
+  it('preserve the mount order, first the parent and then all the children', function() {
+    var correctMountingOrder = [
+        'deferred-mount',
+        'deferred-child-1',
+        'deferred-child-2',
+        'deferred-loop',
+        'deferred-loop',
+        'deferred-loop',
+        'deferred-loop',
+        'deferred-loop'
+      ],
+      mountingOrder = [],
+      cb = function(tagName, childTag) {
+        // make sure the mount event gets triggered when all the children tags
+        // are in the DOM
+        expect(document.contains(childTag.root)).to.be(true)
+        mountingOrder.push(tagName)
+      },
+      tag = riot.mount('deferred-mount', { onmount: cb })[0]
+
+    expect(mountingOrder.join()).to.be(correctMountingOrder.join())
 
     tags.push(tag)
   })
