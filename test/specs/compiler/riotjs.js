@@ -27,5 +27,9 @@ describe('riotjs', function() {
     var file = 'riotjs.object.js'
     expect(render(cat('fixtures', file))).to.equal(cat('expect', file))
   })
+  it('keeps try/catch as is #768', function() {
+    var file = 'riotjs.try-catch.js'
+    expect(render(cat('fixtures', file))).to.equal(cat('expect', file))
+  })
 
 })
