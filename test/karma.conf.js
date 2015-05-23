@@ -35,6 +35,7 @@ module.exports = function(config) {
         served: true,
         included: false
       },
+<<<<<<< HEAD
       files: [
           'polyfills/bind.js',
           '../node_modules/mocha/mocha.js',
@@ -53,6 +54,26 @@ module.exports = function(config) {
           'specs/tag.js'
       ],
       browsers: ['PhantomJS'],
+=======
+      'specs/compiler-browser.js',
+      'specs/observable.js',
+      'specs/route.js',
+      'specs/tag.js',
+      'specs/tmpl.js'
+    ],
+    sauceLabs: {
+      build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
+      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
+      testName: 'riotjs',
+      startConnect: true,
+      recordScreenshots: true
+    },
+    browserDisconnectTimeout: 10000,
+    browserDisconnectTolerance: 2,
+    browserNoActivityTimeout: 120000,
+    customLaunchers: saucelabsBrowsers,
+    browsers: browsers,
+>>>>>>> added the tag tests
 
     reporters: ['progress', 'saucelabs', 'coverage'],
     preprocessors: {
