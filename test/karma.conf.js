@@ -25,7 +25,8 @@ module.exports = function(config) {
           'specs/observable.js',
           'specs/route.js',
           'specs/tmpl.js',
-          'specs/speed.js'
+          'specs/speed.js',
+          'specs/tag.js'
       ],
       browsers: ['PhantomJS'],
 
