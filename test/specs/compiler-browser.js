@@ -148,6 +148,10 @@ describe('Compiler Browser', function() {
           '<loop-option><\/loop-option>',
           '<script type=\"riot\/tag\" src=\"tag\/loop-option.tag\"><\/script>',
 
+          // loop optgroup
+          '<loop-optgroup><\/loop-optgroup>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-optgroup.tag\"><\/script>',
+
           // table
           '<table-data><\/table-data>',
           '<script type=\"riot\/tag\" src=\"tag\/table-data.tag\"><\/script>',
@@ -596,6 +600,16 @@ describe('Compiler Browser', function() {
         root = tag.root
 
     expect(normalizeHTML(root.innerHTML)).to.match(/<select> <option value="1">Peter<\/option><option selected="(selected|true)" value="2">Sherman<\/option><option value="3">Laura<\/option> <\/select>/)
+
+    tags.push(tag)
+
+  })
+
+  it('loop optgroup tag', function() {
+    var tag = riot.mount('loop-optgroup')[0],
+        root = tag.root
+
+    expect(normalizeHTML(root.innerHTML)).to.match(/<select> <optgroup label="group 1"> <option value="1">Option 1.1<\/option><option value="2">Option 1.2<\/option><\/optgroup><optgroup label="group 2"> <option value="3">Option 2.1<\/option><option value="4" selected="(selected|true)">Option 2.2<\/option><\/optgroup> <\/select>/)
 
     tags.push(tag)
 
