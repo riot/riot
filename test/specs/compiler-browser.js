@@ -798,8 +798,8 @@ describe('Compiler Browser', function() {
     var stag = document.querySelector('style'),
       styles =  normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
 
-    expect(styles).to.match(/p {color: blue;}/)
-    expect(styles).to.match(/div {color: red;}/)
+    expect(styles).to.match(/p{color: blue;}/)
+    expect(styles).to.match(/div{color: red;}/)
   })
 
   it('scoped css and riot-tag, mount(selector, tagname)', function() {
