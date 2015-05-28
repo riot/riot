@@ -35,26 +35,6 @@ module.exports = function(config) {
         served: true,
         included: false
       },
-<<<<<<< HEAD
-      files: [
-          'polyfills/bind.js',
-          '../node_modules/mocha/mocha.js',
-          '../node_modules/expect.js/index.js',
-          '../dist/riot/riot+compiler.js',
-          {
-            pattern: 'tag/*.tag',
-            served: true,
-            included: false
-          },
-          'specs/compiler-browser.js',
-          'specs/observable.js',
-          'specs/route.js',
-          'specs/tmpl.js',
-          'specs/speed.js',
-          'specs/tag.js'
-      ],
-      browsers: ['PhantomJS'],
-=======
       'specs/compiler-browser.js',
       'specs/observable.js',
       'specs/route.js',
@@ -73,7 +53,6 @@ module.exports = function(config) {
     browserNoActivityTimeout: 120000,
     customLaunchers: saucelabsBrowsers,
     browsers: browsers,
->>>>>>> added the tag tests
 
     reporters: ['progress', 'saucelabs', 'coverage'],
     preprocessors: {
