@@ -52,6 +52,10 @@ describe('Scoped CSS', function() {
     expect(render('@keyframes fade { from { opacity: 1; } to { opacity: 0; } }'))
         .to.equal('@keyframes fade{ from{ opacity: 1; } to{ opacity: 0; } }')
   })
+  it('not add my-tag to parsentage values in @keyframes', function() {
+    expect(render('@keyframes fade { 10% { opacity: 1; } 85% { opacity: 0; } }'))
+        .to.equal('@keyframes fade{ 10%{ opacity: 1; } 85%{ opacity: 0; } }')
+  })
 
   it('use a custom css parser to render the css', function() {
     riot.parsers.css.myParser = function(tag, css) {
