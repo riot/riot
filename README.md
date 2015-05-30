@@ -119,6 +119,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Components
 - [Riot Bootstrap](http://cognitom.github.io/riot-bootstrap/)
+- [iToolkit](https://github.com/BE-FE/iToolkit)
 
 ### Resources
 - [Riot + Angular](https://github.com/lucasbrigida/angular-riot)
