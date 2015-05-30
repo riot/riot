@@ -290,9 +290,14 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/deferred-mount.tag\"><\/script>',
           '<deferred-mount><\/deferred-mount>',
 
+          // multi named elements to an array
+          '<script type=\"riot\/tag\" src=\"tag\/multi-named.tag\"><\/script>',
+          '<multi-named><\/multi-named>',
+
           // test the preventUpdate feature on the DOM events
           '<script type=\"riot\/tag\" src=\"tag\/prevent-update.tag\"><\/script>',
           '<prevent-update><\/prevent-update>'
+
 
     ].join('\r'),
       tags = [],
@@ -897,6 +902,20 @@ describe('Compiler Browser', function() {
     expect(mountingOrder.join()).to.be(correctMountingOrder.join())
 
     tags.push(tag)
+  })
+
+  it('multi named elements to an array', function() {
+    var tag = riot.mount('multi-named')[0]
+    tag.on('mount', function() {
+      expect(tag.rad[0].value).to.be('1')
+      expect(tag.rad[1].value).to.be('2')
+      expect(tag.rad[2].value).to.be('3')
+      expect(tag.child.value).to.be('child')
+      expect(tag.checks[0].value).to.be('one')
+      expect(tag.checks[1].value).to.be('two')
+      expect(tag.checks[2].value).to.be('three')
+      tag.unmount()
+    })
   })
 
 })
