@@ -38,6 +38,7 @@ module.exports = function(config) {
       'specs/compiler-browser.js',
       'specs/observable.js',
       'specs/route.js',
+      'specs/tag.js',
       'specs/tmpl.js'
     ],
     sauceLabs: {
