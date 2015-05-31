@@ -7,6 +7,7 @@ function normalizeHTML (html) {
     // change all the tags properties and names to lowercase because a <li> for ie8 is a <LI>
     .replace(/<([^>]*)>/g, function(tag) { return tag.toLowerCase() })
     .replace(/\r|\r|\n|\t/gi, '')
+    .replace(/\>\s+\</g, '><')
 }
 
 // small polyfill
@@ -536,8 +537,8 @@ describe('Compiler Browser', function() {
         children = root.getElementsByTagName('looped-child')
 
     expect(children.length).to.be(2)
-    expect(normalizeHTML(children[0].innerHTML)).to.be('<h3>one</h3> <button>one</button>')
-    expect(normalizeHTML(children[1].innerHTML)).to.be('<h3>two</h3> <button>two</button>')
+    expect(normalizeHTML(children[0].innerHTML)).to.be('<h3>one</h3><button>one</button>')
+    expect(normalizeHTML(children[1].innerHTML)).to.be('<h3>two</h3><button>two</button>')
 
     tags.push(tag)
 
@@ -604,7 +605,7 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('loop-option')[0],
         root = tag.root
 
-    expect(normalizeHTML(root.innerHTML)).to.match(/<select> <option value="1">Peter<\/option><option selected="(selected|true)" value="2">Sherman<\/option><option value="3">Laura<\/option> <\/select>/)
+    expect(normalizeHTML(root.innerHTML)).to.match(/<select><option value="1">Peter<\/option><option selected="(selected|true)" value="2">Sherman<\/option><option value="3">Laura<\/option><\/select>/)
 
     tags.push(tag)
 
@@ -624,7 +625,7 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('table-data')[0],
         root = tag.root
 
-    expect(normalizeHTML(root.innerHTML)).to.match(/<h3>Cells<\/h3> <table border="1"> <tbody><tr><th>One<\/th><th>Two<\/th><th>Three<\/th><\/tr> <tr><td>One<\/td><td>Two<\/td><td>Three<\/td><\/tr> <\/tbody><\/table> <h3>Rows<\/h3> <table border="1"> <tbody><tr> <td>One<\/td> <td>One another<\/td> <\/tr><tr> <td>Two<\/td> <td>Two another<\/td> <\/tr><tr> <td>Three<\/td> <td>Three another<\/td> <\/tr> <\/tbody><\/table>/)
+    expect(normalizeHTML(root.innerHTML)).to.match(/<h3>Cells<\/h3><table border="1"><tbody><tr><th>One<\/th><th>Two<\/th><th>Three<\/th><\/tr><tr><td>One<\/td><td>Two<\/td><td>Three<\/td><\/tr><\/tbody><\/table><h3>Rows<\/h3><table border="1"><tbody><tr><td>One<\/td><td>One another<\/td><\/tr><tr><td>Two<\/td><td>Two another<\/td><\/tr><tr><td>Three<\/td><td>Three another<\/td><\/tr><\/tbody><\/table>/)
 
     tags.push(tag)
 
