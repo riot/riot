@@ -179,7 +179,7 @@ The source language is specified with `--type` or `-t` argument on the command l
 <my-tag>
   <h3>My layout</h3>
 
-  <script type="coffeescript">
+  <script type="coffee">
     @hello = 'world'
   </script>
 </my-tag>
@@ -190,10 +190,10 @@ The source language is specified with `--type` or `-t` argument on the command l
 
 ``` sh
 # use coffeescript pre-processor
-riot --type coffeescript --expr source.tag
+riot --type coffee --expr source.tag
 ```
 
-The `--expr` argument specifies that all the expressions are also processed as well. You can also use "cs" as an alias to "coffeescript". Here is a sample tag written in CoffeeScript:
+The `--expr` argument specifies that all the expressions are also processed as well. You can also use "cs" as an alias to "coffee". Here is a sample tag written in CoffeeScript:
 
 ```
 <kids>
@@ -322,11 +322,11 @@ A Jade sample:
 ```
 sample
   p test { value }
-  script(type='text/coffeescript').
+  script(type='text/coffee').
     @value = 'sample'
 ```
 
-As you notice, you can define the script type on the template as well. Above we use coffeescript. [jade](https://github.com/jadejs/jade) is used for the transformation:
+As you notice, you can define the script type on the template as well. Above we use coffee. [jade](https://github.com/jadejs/jade) is used for the transformation:
 
 ``` sh
 npm install jade
