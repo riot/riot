@@ -121,12 +121,12 @@ In which case the logic starts after the last HTML tag. This "open syntax" is mo
 You can specify a pre-processor with `type` attribute. For example:
 
 ```
-<script type="coffeescript">
-  # your logic is here
+<script type="coffee">
+  # your coffeescript logic goes here
 </script>
 ````
 
-Currently available options are "coffeescript", "typescript", "es6" and "none". You can also prefix the language with "text/", such as "text/coffeescript".
+Currently available options are "coffee", "typescript", "es6" and "none". You can also prefix the language with "text/", such as "text/coffee".
 
 See [pre processors](/riotjs/compiler.html#pre-processors) for more details.
 
