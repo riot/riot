@@ -8,6 +8,7 @@ function normalizeHTML (html) {
     .replace(/<([^>]*)>/g, function(tag) { return tag.toLowerCase() })
     .replace(/\r|\r|\n|\t/gi, '')
     .replace(/\>\s+\</g, '><')
+    .replace(/<!--riot placeholder-->/gi, '')
 }
 
 // small polyfill
