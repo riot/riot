@@ -1,7 +1,7 @@
 <loop-optgroup>
   <select>
     <optgroup each="{ group in data }" label="{ group.name }">
-        <option each="{ option in group.options }" value="{ option.value }" selected="{ option.selected }">{ option.name }</option>
+        <option each="{ option in group.options }" selected="{ option.selected }" value="{ option.value }">{ option.name }</option>
     </optgroup>
   </select>
 
