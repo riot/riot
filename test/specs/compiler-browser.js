@@ -11,6 +11,22 @@ function normalizeHTML (html) {
     .replace(/<!--riot placeholder-->/gi, '')
 }
 
+function getPreviousSibling(n) {
+  var x = n.previousSibling
+  while (x.nodeType!=1) {
+    x = x.previousSibling
+  }
+  return x
+}
+
+function getNextSibling(n) {
+  var x = n.previousSibling
+  while (x.nodeType!=1) {
+    x = x.previousSibling
+  }
+  return x
+}
+
 // small polyfill
 // normalize the document.contains method
 document.contains = Element.prototype.contains = function contains(node) {
@@ -153,6 +169,10 @@ describe('Compiler Browser', function() {
           // loop optgroup
           '<loop-optgroup><\/loop-optgroup>',
           '<script type=\"riot\/tag\" src=\"tag\/loop-optgroup.tag\"><\/script>',
+
+          // loop position
+          '<loop-position><\/loop-position>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-position.tag\"><\/script>',
 
           // table
           '<table-data><\/table-data>',
@@ -448,6 +468,17 @@ describe('Compiler Browser', function() {
     expect(subTags.length).to.be(3)
 
     tags.push(subTags)
+
+  })
+
+  it('the loop elements keep their position in the DOM', function() {
+    var  tag = riot.mount('loop-position')[0],
+          h3 = tag.root.getElementsByTagName('h3')[0]
+
+    expect(getPreviousSibling(h3).tagName.toLowerCase()).to.be('p')
+    expect(getNextSibling(h3).tagName.toLowerCase()).to.be('p')
+
+    tags.push(tag)
 
   })
 
