@@ -615,7 +615,7 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('loop-optgroup')[0],
         root = tag.root
 
-    expect(normalizeHTML(root.innerHTML)).to.match(/<select> <optgroup label="group 1"> <option value="1">Option 1.1<\/option><option value="2">Option 1.2<\/option><\/optgroup><optgroup label="group 2"> <option value="3">Option 2.1<\/option><option value="4" selected="(selected|true)">Option 2.2<\/option><\/optgroup> <\/select>/)
+    expect(normalizeHTML(root.innerHTML)).to.match(/<select><optgroup label="group 1"><option value="1">Option 1.1<\/option><option value="2">Option 1.2<\/option><\/optgroup><optgroup label="group 2"><option value="3">Option 2.1<\/option><option selected="(selected|true)" value="4">Option 2.2<\/option><\/optgroup><\/select>/)
 
     tags.push(tag)
 
