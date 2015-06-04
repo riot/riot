@@ -22,6 +22,13 @@ describe('Mixin', function() {
     }
   }
 
+  var MixinWithInit = {
+    init: function() {
+      this.message = 'initialized'
+    },
+    message: 'not yet'
+  }
+
   it('Will mount a tag and provide mixed-in methods', function() {
     var mix = document.createElement('my-mixin')
     document.body.appendChild(mix)
@@ -119,6 +126,49 @@ describe('Mixin', function() {
     expect(tag.tags['sub-mixin']).not.to.be('undefined')
     expect(tag.tags['sub-mixin']._id).to.be(tag.tags['sub-mixin'].getId())
     expect(tag.getId()).not.to.be(tag.tags['sub-mixin'].getId())
+    tag.unmount()
+  })
+
+  it('binds this-reference to the tag object', function() {
+    var mix = document.createElement('my-mixin')
+    document.body.appendChild(mix)
+
+    riot.tag('my-mixin', '<span>some tag { getId() }</span>', function(opts) {
+      this.mixin(IdMixin)
+    })
+
+    var tag = riot.mount('my-mixin')[0]
+
+    expect(tag.root.innerHTML).to.be('<span>some tag ' + tag._id + '</span>')
+    tag.unmount()
+  })
+
+  it('initializes the mixin', function() {
+    var mix = document.createElement('my-mixin')
+    document.body.appendChild(mix)
+
+    riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
+      this.mixin(MixinWithInit)
+    })
+
+    var tag = riot.mount('my-mixin')[0]
+
+    expect(tag.message).to.be('initialized')
+    tag.unmount()
+  })
+
+  it('register a mixin to Riot and load mixin to a tag', function() {
+    var mix = document.createElement('my-mixin')
+    document.body.appendChild(mix)
+
+    riot.mixin('idMixin', IdMixin) // register mixin
+    riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
+      this.mixin('idMixin') // load mixin
+    })
+
+    var tag = riot.mount('my-mixin')[0]
+
+    expect(tag._id).to.be(tag.getId())
     tag.unmount()
   })
 

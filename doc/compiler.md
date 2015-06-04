@@ -26,7 +26,7 @@ Custom tags need to be transformed to JavaScript before the browser can execute 
 <script src="path/to/javascript/with-tags.js" type="riot/tag"></script>
 
 <!-- include riot.js and the compiler -->
-<script src="//cdn.jsdelivr.net/g/riot@2.0(riot.min.js+compiler.min.js)"></script>
+<script src="//cdn.jsdelivr.net/g/riot@2.1(riot.min.js+compiler.min.js)"></script>
 
 
 <!-- mount normally -->
@@ -95,7 +95,7 @@ With pre-compilation your HTML is something like this:
 <my-tag></my-tag>
 
 <!-- include riot.js only -->
-<script src="//cdn.jsdelivr.net/riot/2.0/riot.min.js"></script>
+<script src="//cdn.jsdelivr.net/riot/2.1/riot.min.js"></script>
 
 <!-- include pre-compiled tags (normal javascript) -->
 <script src="path/to/javascript/with-tags.js"></script>
@@ -179,7 +179,7 @@ The source language is specified with `--type` or `-t` argument on the command l
 <my-tag>
   <h3>My layout</h3>
 
-  <script type="coffeescript">
+  <script type="coffee">
     @hello = 'world'
   </script>
 </my-tag>
@@ -190,10 +190,10 @@ The source language is specified with `--type` or `-t` argument on the command l
 
 ``` sh
 # use coffeescript pre-processor
-riot --type coffeescript --expr source.tag
+riot --type coffee --expr source.tag
 ```
 
-The `--expr` argument specifies that all the expressions are also processed as well. You can also use "cs" as an alias to "coffeescript". Here is a sample tag written in CoffeeScript:
+The `--expr` argument specifies that all the expressions are also processed as well. You can also use "cs" as an alias to "coffee". Here is a sample tag written in CoffeeScript:
 
 ```
 <kids>
@@ -322,11 +322,11 @@ A Jade sample:
 ```
 sample
   p test { value }
-  script(type='text/coffeescript').
+  script(type='text/coffee').
     @value = 'sample'
 ```
 
-As you notice, you can define the script type on the template as well. Above we use coffeescript. [jade](https://github.com/jadejs/jade) is used for the transformation:
+As you notice, you can define the script type on the template as well. Above we use coffee. [jade](https://github.com/jadejs/jade) is used for the transformation:
 
 ``` sh
 npm install jade
@@ -353,6 +353,36 @@ var js = riot.compile(source_string, { parser: myParser, expr: true })
 ```
 
 Set `expr: true` if you want the expressions to be parsed as well.
+
+#### riot.parsers on the browser and the server
+
+You can also create your custom riot parsers adding them to the `riot.parsers` property and share them across the browsers and server. For example
+
+```js
+riot.parsers.js.myJsParser = function(js, options) {
+  return doYourThing(js, options)
+}
+
+riot.parsers.css.myCssParser = function(tagName, css) {
+  return doYourThing(tagName, css)
+}
+```
+
+Once you have created your own `riot.parsers` you will be able to compile your tags using them in the following way
+
+```html
+<custom-parsers>
+  <p>hi</p>
+  <style type="text/myJsParser">
+    @tag {color: red;}
+  </style>
+  <script type="text/myCssParser">
+    this.version = "@version"
+  </script>
+</custom-parsers>
+```
+
+
 
 
 ### No transformation

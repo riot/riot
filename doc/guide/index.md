@@ -121,12 +121,12 @@ In which case the logic starts after the last HTML tag. This "open syntax" is mo
 You can specify a pre-processor with `type` attribute. For example:
 
 ```
-<script type="coffeescript">
-  # your logic is here
+<script type="coffee">
+  # your coffeescript logic goes here
 </script>
 ````
 
-Currently available options are "coffeescript", "typescript", "es6" and "none". You can also prefix the language with "text/", such as "text/coffeescript".
+Currently available options are "coffee", "typescript", "es6" and "none". You can also prefix the language with "text/", such as "text/coffee".
 
 See [pre processors](/riotjs/compiler.html#pre-processors) for more details.
 
@@ -242,33 +242,37 @@ Inside the tag the options can be referenced with the `opts` variable as follows
 
 ### Mixins
 
-Mixins provide an easy way to share functionality across tags. When a tag is compiled by riot, any defined mixins are added and available to use in the tag. 
+Mixins provide an easy way to share functionality across tags. When a tag is compiled by riot, any defined mixins are added and available to use in the tag.
 
 ```
 var OptsMixin = {
-    'getOpts': function() {
+    init: function() {
+      this.on('updated', function() { console.log('Updated!') })
+    }
+
+    getOpts: function() {
         return this.opts
     },
-    
-    'setOpts': function(opts, update) {
+
+    setOpts: function(opts, update) {
         this.opts = opts
-        
+
         if(!update) {
             this.update()
         }
-        
+
         return this
     }
 }
 
 <my-tag>
     <h1>{ opts.title }</h1>
-    
+
     this.mixin(OptsMixin)
 </my-tag>
 ```
 
-In this example you are giving any instance of the `my-tag` Tag the `OptsMixin` which provides `getOpts` and `setOpts` methods.
+In this example you are giving any instance of the `my-tag` Tag the `OptsMixin` which provides `getOpts` and `setOpts` methods. `init` method is special one which can initialize the mixin when it's loaded to the tag. (`init` method is not accessible from other method)
 
 ```
 var my_tag_instance = riot.mount('my-tag')[0]
@@ -291,12 +295,30 @@ var id_mixin_instance = new IdMixin()
 
 <my-tag>
     <h1>{ opts.title }</h1>
-    
+
     this.mixin(OptsMixin, id_mixin_instance)
 </my-tag>
 ```
 
 By being defined on the tag level, mixins not only extend the functionality of your tag, but also allows for a repeatable interface. Every time a tag is mounted, even sub-tags, the instance will have the mixed-in code.
+
+### Sharing mixin
+
+To share the mixins over files or projects, `riot.mixin` API is provided. You can register your mixin globally like this:
+
+```javascript
+riot.mixin('mixinName', mixinObject)
+```
+
+To load the mixin to the tag, use `mixin()` method with the key.
+
+```
+<my-tag>
+    <h1>{ opts.title }</h1>
+
+    this.mixin('mixinName')
+</my-tag>
+```
 
 
 ### Tag lifecycle
@@ -310,7 +332,7 @@ A tag is created in following sequence:
 
 After the tag is mounted the expressions are updated as follows:
 
-1. Automatically after an event handler is called. For example the `toggle` method in the above example.
+1. Automatically after an event handler is called. (unless you set e.preventUpdate to true in your event handler) For example the `toggle` method in the above example.
 2. When `this.update()` is called on the current tag instance
 3. When `this.update()` is called on a parent tag, or any parent upwards. Updates flow uni-directionally from parent to child.
 4. When `riot.update()` is called, which globally updates all expressions on the page.
@@ -717,7 +739,7 @@ Event handlers can access individual items in a collection with `event.item`. No
 </todo>
 ```
 
-After the event handler is executed the current tag instance is updated using `this.update()` which causes all the looped items to execute as well. The parent notices that an item has been removed from the collection and removes the corresponding DOM node from the document.
+After the event handler is executed the current tag instance is updated using `this.update()` (unless you set e.preventUpdate to true in your event handler) which causes all the looped items to execute as well. The parent notices that an item has been removed from the collection and removes the corresponding DOM node from the document.
 
 
 ### Looping custom tags

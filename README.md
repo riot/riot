@@ -4,12 +4,12 @@
 ## A React- like, 3.5KB UI lib
 
 [![Build Status][travis-image]][travis-url]
+[![Riot Forum][riot-forum-image]][riot-forum-url]
+[![Join the chat at https://gitter.im/muut/riotjs][gitter-image]][gitter-url]
+
 [![NPM version][npm-version-image]][npm-url]
 [![NPM downloads][npm-downloads-image]][npm-url]
-[![Riot Forum][riot-forum-image]][riot-forum-url]
-
 [![MIT License][license-image]][license-url]
-
 [![Coverage Status][coverage-image]][coverage-url]
 
 [![Sauce Test Status][saucelabs-image]][saucelabs-url]
@@ -119,6 +119,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Components
 - [Riot Bootstrap](http://cognitom.github.io/riot-bootstrap/)
+- [iToolkit](https://github.com/BE-FE/iToolkit)
 
 ### Resources
 - [Riot + Angular](https://github.com/lucasbrigida/angular-riot)
@@ -127,6 +128,8 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot + Meteor]( https://atmospherejs.com/xaiki/riotjs)
 - [Riot on CodeClimate](https://codeclimate.com/github/muut/riotjs/code)
 - [Riot Snake Game](http://cdn.rawgit.com/atian25/blog/master/assets/riot-snake.html)
+- [Riot Tag Syntax Checker](http://cognitom.github.io/riot-checker/)
+- [Riot 文档中译版](https://github.com/Centaur/riotjs_doc_cn) :cn:
 
 
 ### Credits
@@ -135,43 +138,45 @@ Riot is made with :heart: by many smart guys. Thanks to all the contributors
 
 ```
  project  : riotjs
- repo age : 1 year, 7 months
- active   : 227 days
- commits  : 993
- files    : 152
+ repo age : 1 year, 8 months
+ active   : 256 days
+ commits  : 1110
+ files    : 177
  authors  :
-   375  Tero Piirainen          37.8%
-   184  Gianluca Guarini        18.5%
-   150  Aurimas                 15.1%
-    27  Marcelo Eden            2.7%
-    24  Tsutomu Kawamura        2.4%
-    18  Juha Lindstedt          1.8%
-    17  rsbondi                 1.7%
-    16  Kalman Speier           1.6%
-    14  andynemzek              1.4%
-    11  Hrvoje Šimić          1.1%
-    10  Andy VanEe              1.0%
-     7  Tianxiang Chen          0.7%
-     6  Jens Anders Bakke       0.6%
-     6  hemanth.hm              0.6%
-     5  midinastasurazz         0.5%
+   376  Tero Piirainen          33.9%
+   252  Gianluca Guarini        22.7%
+   150  Aurimas                 13.5%
+    36  Tsutomu Kawamura        3.2%
+    27  Marcelo Eden            2.4%
+    26  rsbondi                 2.3%
+    18  Juha Lindstedt          1.6%
+    18  Kalman Speier           1.6%
+    14  andynemzek              1.3%
+    11  Hrvoje Šimić          1.0%
+    10  Andy VanEe              0.9%
+     8  Mark Henderson          0.7%
+     7  Ashley Brener           0.6%
+     7  Tianxiang Chen          0.6%
+     6  Márcio Coelho          0.5%
+     6  Andreas Heintze         0.5%
+     6  hemanth.hm              0.5%
+     6  Jens Anders Bakke       0.5%
+     5  marciojcoelho           0.5%
      5  jigsaw                  0.5%
+     5  midinastasurazz         0.5%
+     4  blissland               0.4%
      4  Eric Baer               0.4%
      4  Giovanni Cappellotto    0.4%
-     4  blissland               0.4%
-     3  Tatu Tamminen           0.3%
-     3  Márcio Coelho          0.3%
-     3  Magnus Wolffelt         0.3%
+     4  Richard Bondi           0.4%
      3  Anton Heryanto          0.3%
-     3  Alan R. Soares          0.3%
-     3  Artem Medeusheyev       0.3%
-     3  Ashley Brener           0.3%
-     3  korige                  0.3%
+     3  Magnus Wolffelt         0.3%
      3  Jim Sparkman            0.3%
-     3  Richard Bondi           0.3%
+     3  Alan R. Soares          0.3%
+     3  Tatu Tamminen           0.3%
+     3  korige                  0.3%
+     3  Artem Medeusheyev       0.3%
      2  Žiga                   0.2%
      2  Alexis THOMAS           0.2%
-     2  Andreas Heintze         0.2%
      2  Andrew Feng             0.2%
      2  Andrew Luetgers         0.2%
      2  Antoine Goutagny        0.2%
@@ -187,46 +192,47 @@ Riot is made with :heart: by many smart guys. Thanks to all the contributors
      2  jmas                    0.2%
      2  luffs                   0.2%
      2  yibuyisheng             0.2%
-     1  Jonny Buchanan          0.1%
      1  Constantin Rack         0.1%
-     1  Quim Calpe              0.1%
      1  Riccardo Gueli Alletti  0.1%
-     1  Jonathan Dumaine        0.1%
+     1  Jonny Buchanan          0.1%
      1  Ryan O’Hara           0.1%
      1  Sam Morgan              0.1%
-     1  typicode                0.1%
-     1  Boris Huai              0.1%
+     1  kylobite                0.1%
+     1  Ari Makela              0.1%
      1  Simone Vittori          0.1%
      1  Steel Brain             0.1%
-     1  kylobite                0.1%
+     1  Boris Huai              0.1%
      1  Steven Koch             0.1%
      1  TZ | 天猪             0.1%
-     1  Joel Thornton           0.1%
+     1  Jonathan Dumaine        0.1%
      1  Tenor Biel              0.1%
+     1  Joel Thornton           0.1%
      1  Ivan Saorin             0.1%
-     1  Ian Walter              0.1%
-     1  Ari Makela              0.1%
      1  Benoit Hirbec           0.1%
+     1  Barkóczi Dávid        0.1%
      1  Trent Ogren             0.1%
-     1  Fernando Correia        0.1%
+     1  Ian Walter              0.1%
      1  Umut Sirin              0.1%
      1  Zach Aysan              0.1%
      1  afc163                  0.1%
+     1  Fernando Correia        0.1%
      1  Eliseo Arias            0.1%
-     1  Danil Semelenov         0.1%
      1  borishuai               0.1%
-     1  Juwan Yoo               0.1%
+     1  typicode                0.1%
+     1  Danil Semelenov         0.1%
      1  Liu Jin                 0.1%
-     1  Justin Dorfman          0.1%
-     1  Jorrit Schippers        0.1%
+     1  Juwan Yoo               0.1%
      1  Marcin Jekot            0.1%
-     1  Mark Henderson          0.1%
-     1  Barkóczi Dávid        0.1%
+     1  Justin Dorfman          0.1%
+     1  Courtney Couch          0.1%
      1  Matthew McCullough      0.1%
      1  Maxence Dalmais         0.1%
      1  Mike Breen              0.1%
-     1  Courtney Couch          0.1%
+     1  xieyu03                 0.1%
+     1  Jorrit Schippers        0.1%
      1  Patrik Buckau           0.1%
+     1  Quim Calpe              0.1%
+
 ```
 
 https://muut.com/riotjs/
@@ -242,7 +248,7 @@ https://muut.com/riotjs/
 [npm-downloads-image]:http://img.shields.io/npm/dm/riot.svg?style=flat-square
 [npm-url]:https://npmjs.org/package/riot
 
-[riot-forum-image]:doc/logo/join-chat.svg
+[riot-forum-image]:https://img.shields.io/badge/muut-JOIN_CHAT%E2%86%92-ff0044.svg?style=flat-square
 [riot-forum-url]:https://muut.com/riotjs/forum/
 
 [coverage-image]:https://img.shields.io/coveralls/muut/riotjs/dev.svg?style=flat-square
@@ -250,3 +256,6 @@ https://muut.com/riotjs/
 
 [saucelabs-image]:https://saucelabs.com/browser-matrix/riotjs.svg
 [saucelabs-url]:https://saucelabs.com/u/riotjs
+
+[gitter-image]:https://img.shields.io/badge/GITTER-JOIN_CHAT_%E2%86%92-1dce73.svg?style=flat-square
+[gitter-url]:https://gitter.im/muut/riotjs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge

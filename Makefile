@@ -27,7 +27,7 @@ eslint:
 	@ $(ESLINT) -c ./.eslintrc lib test
 
 test-mocha:
-	RIOT=../dist/riot/riot.js $(ISTANBUL) cover $(MOCHA) -- test/runner.js -R spec
+	RIOT=../../dist/riot/riot.js $(ISTANBUL) cover $(MOCHA) -- test/runner.js -R spec
 
 test-karma:
 	@ $(KARMA) start test/karma.conf.js
@@ -36,7 +36,8 @@ test-coveralls:
 	@ RIOTJS_COV=1 cat ./coverage/lcov.info ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
 
 test-sauce:
-	@ SAUCE_USERNAME=riotjs SAUCE_ACCESS_KEY=124f5640-fd66-4848-acdb-98c1d601d04d SAUCELABS=1 make test-karma
+	# run the saucelabs in separate chunks
+	@ for group in 0 1 2 3; do GROUP=$$group SAUCE_USERNAME=riotjs SAUCE_ACCESS_KEY=124f5640-fd66-4848-acdb-98c1d601d04d SAUCELABS=1 make test-karma; done
 
 compare:
 	# compare the current release with the previous one
@@ -46,7 +47,7 @@ compare:
 raw:
 	# build riot
 	@ mkdir -p $(DIST)
-	@ $(SMASH) lib/compiler.js > $(DIST)compiler.js
+	@ $(SMASH) lib/browser/compiler/index.js > $(DIST)compiler.js
 	@ $(SMASH) lib/riot.js > $(DIST)riot.js
 	@ $(SMASH) lib/riot+compiler.js > $(DIST)riot+compiler.js
 
@@ -64,7 +65,7 @@ watch:
 	# watch and rebuild riot and its tests
 	@ $(shell \
 		node -e $(WATCH) "lib/**/*.js" "make raw" & \
-		export RIOT="../dist/riot/riot" && node ./lib/cli.js --watch test/tag dist/tags.js)
+		export RIOT="../../dist/riot/riot" && node ./lib/server/cli.js --watch test/tag dist/tags.js)
 
 .PHONY: test min
 

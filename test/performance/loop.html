@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+</head>
+<body>
+  <my-tag></my-tag>
+
+  <script src="../../dist/riot/riot+compiler.js"></script>
+
+  <script>
+
+  riot.tag('my-tag', '<div> <h1>Riot <button onclick="{ clicked }">reverse list</button> <span id="timestamp"></span></h1> <h2 each="{ opts.items }">Line #{ value }</h2> </div>', function(opts) {
+
+    var self = this,
+        x = new Date().getTime()
+
+    this.items = opts.items
+
+    this.clicked = function() {
+
+      x = new Date().getTime()
+      self.items = this.items.reverse()
+
+    }
+
+    this.on('updated', function(){
+      self.timestamp.innerHTML = ' - Reversing took ' + ( new Date().getTime() - x ) + 'ms'
+    })
+
+  })
+
+  var items = []
+  for ( var i = 0; i < 10000; i++ ) {
+    items.push( { value: i } )
+  }
+  riot.mount('*', { items: items } )
+
+  </script>
+
+</body>
+</html>
