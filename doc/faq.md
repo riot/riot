@@ -21,7 +21,7 @@ Riot is free, open source and licensed under the MIT License. Free from [Additio
 
 
 ### Can I use Riot in production?
-We think so. We do that extensively under muut.com website: on registrations, forum settings and on account page. But not all scenarios are thoroughly tested, since Riot 2 is a big rewrite and not widely used yet. Please report issues [here](https://github.com/muut/riotjs/issues).
+We think so. We do that extensively under muut.com website: on registrations, forum settings and on account page. But not all scenarios are thoroughly tested, since Riot 2 is a big rewrite and not widely used yet. Please report issues [here](https://github.com/riot/riot/issues).
 
 
 ### Should I use dash on the tag name?

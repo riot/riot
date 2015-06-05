@@ -53,7 +53,7 @@ riot.compile(function() {
 
 ### Compiler performance
 
-Compilation phase is basically free and takes no time at all. Compiling a [timer tag](https://github.com/muut/riotjs/blob/master/test/tag/timer.tag) 30 times takes 2 milliseconds on a regular laptop. If you have a crazy page with 1000 different timer-sized tags, the compilation takes around 35ms.
+Compilation phase is basically free and takes no time at all. Compiling a [timer tag](https://github.com/riot/riot/blob/master/test/tag/timer.tag) 30 times takes 2 milliseconds on a regular laptop. If you have a crazy page with 1000 different timer-sized tags, the compilation takes around 35ms.
 
 The compiler weights only 3.2KB (1.7K gzipped) so you can safely perform client side compilation on production without download or performance or issues.
 
@@ -66,8 +66,8 @@ Read the [compiler API](/riotjs/api/#compiler) for more details.
 
 - [In-browser compiled](http://muut.github.io/riotjs/demo/)
 - [Pre-compiled](http://muut.github.io/riotjs/demo/)
-- [Source code](https://github.com/muut/riotjs/tree/gh-pages/demo)
-- Download the demo as a [zip file](https://github.com/muut/riotjs/archive/gh-pages.zip)
+- [Source code](https://github.com/riot/riot/tree/gh-pages/demo)
+- Download the demo as a [zip file](https://github.com/riot/riot/archive/gh-pages.zip)
 
 
 
@@ -424,4 +424,4 @@ riot.mount('*');
 ```
 
 
-If you make something great, please [share it](https://github.com/muut/riotjs/issues/58) !
+If you make something great, please [share it](https://github.com/riot/riot/issues/58) !

@@ -15,7 +15,7 @@ body_id: riot-releases
 - Add Saucelabs tests hooks for crossbrowser testing
 - Add Coveralls coverage hooks to check the code coverage on any pull request
 
-List of bug fixes and details can be found [here](https://github.com/muut/riotjs/issues/648)
+List of bug fixes and details can be found [here](https://github.com/riot/riot/issues/648)
 
 ### 2.0.15 *Apr 23, 2015*
 
@@ -24,25 +24,25 @@ List of bug fixes and details can be found [here](https://github.com/muut/riotjs
 - `tag.unmount(flag)` to decide whether the parent should be removed or not from the DOM
 - `riot.route.start()` and `riot.route.stop()` methods to start and stop the Riot router. These methods allow the use of a different router on your appliaction.
 - The server side compiiler now supports AMD and CommonJS modules with `--modular` or `-m` command line option
-- Numerous [bug fixes](https://github.com/muut/riotjs/issues/584)
+- Numerous [bug fixes](https://github.com/riot/riot/issues/584)
 - Special thanks to *[@GianlucaGuarini](https://github.com/GianlucaGuarini)* for this release
 
 
 ### 2.0.14 *Apr 8, 2015*
 
 - [Server side rendering](/riotjs/guide/#server-side)
-- [Bug fixes](https://github.com/muut/riotjs/compare/v2.0.13...v2.0.14)
+- [Bug fixes](https://github.com/riot/riot/compare/v2.0.13...v2.0.14)
 
 ### 2.0.13 *Mar 11, 2015*
 
-- A large bug fix release consisting of [pull requests](https://github.com/muut/riotjs/compare/v2.0.12...v2.0.13) from the community only. Thank you!
-- Larger [test suite](https://github.com/muut/riotjs/tree/master/test)
+- A large bug fix release consisting of [pull requests](https://github.com/riot/riot/compare/v2.0.12...v2.0.13) from the community only. Thank you!
+- Larger [test suite](https://github.com/riot/riot/tree/master/test)
 
 ### 2.0.12 *Mar 2, 2015*
 
 - Support for [Scoped CSS](/riotjs/guide/#scoped-css)
 - Direct [access to nested tags](/riotjs/api/#nested-tags) and their API via `tags` variable. For example: `tags.my_timer.clear()`
-- The custom tags are now constructed on parse time and initialized on mount time. This is preliminary work for the upcoming [plugin system](https://github.com/muut/riotjs/issues/416) and allows plugins to do their thing before initialization as well.
+- The custom tags are now constructed on parse time and initialized on mount time. This is preliminary work for the upcoming [plugin system](https://github.com/riot/riot/issues/416) and allows plugins to do their thing before initialization as well.
 - `--whitespace` compiler option to preserve newlines and whitespace on the generated output. Good with nested `pre` and `textarea` elements.
 - Using [Karma](http://karma-runner.github.io/0.12/index.html) for cross browser testing
 - *WARNING* the deprecated `riot.mountTo` will be removed on the next release
@@ -66,7 +66,8 @@ List of bug fixes and details can be found [here](https://github.com/muut/riotjs
 - No illegal server requests with images: `<img src={ src }>`
 - Fix compiler to support custom brackets
 - `this.update()` is no longer needed when defining tags manually with `riot.tag`. This method is now automatically called after an event handler is executed
-- [Contributing guidelines](https://github.com/muut/riotjs/blob/master/CONTRIBUTING.md)
+- [Contributing guidelines](https://github.com/riot/riot
+`script`/blob/master/CONTRIBUTING.md)
 
 
 ### 2.0.9 *Feb 13, 2015*
@@ -75,7 +76,8 @@ List of bug fixes and details can be found [here](https://github.com/muut/riotjs
 - Ability to set `if`, `show` and `hide` attributes for a custom tag
 - Multiple class shortcut: `{ 'foo bar': baz }`
 - Took away `children` property, which was designed for theoretical need mostly.
-- A memory leak fix on `riot.observable`. Thanks to [@GianlucaGuarini](https://github.com/GianlucaGuarini) for the hard debug work and everyone else on this [pull request](https://github.com/muut/riotjs/issues/248)
+- A memory leak fix on `riot.observable`. Thanks to [@GianlucaGuarini](https://github.com/GianlucaGuarini) for the hard debug work and everyone else on this [pull request](https://github.com/riot/riot
+`script`/issues/248)
 
 
 ### 2.0.8 *Feb 9, 2015*
@@ -89,7 +91,8 @@ List of bug fixes and details can be found [here](https://github.com/muut/riotjs
 - [Customizable brackets](/riotjs/api/#brackets), e.g. `riot.settings.brackets = '${ }'`
 - Ability to print the current version with: `riot --version`
 - The semi-hidden `riot._tmpl()` is now completely hidden and not part of the global `riot` object
-- Reorganized source code. The former big `view.js` is now split into [multiple files](https://github.com/muut/riotjs/tree/master/lib/tag)
+- Reorganized source code. The former big `view.js` is now split into [multiple files](https://github.com/riot/riot
+`script`/tree/master/lib/tag)
 
 
 ### 2.0.7 *Jan 29, 2015*
