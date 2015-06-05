@@ -56,7 +56,7 @@ Riot custom tags are the building blocks for user interfaces. They make the "vie
 
 Custom tags are [compiled](compiler.html) to JavaScript.
 
-See the [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/muut/riotjs/tree/gh-pages/demo), or download the [zip](https://github.com/muut/riotjs/archive/gh-pages.zip).
+See the [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/riot/riot/tree/gh-pages/demo), or download the [zip](https://github.com/riot/riot/archive/gh-pages.zip).
 
 
 

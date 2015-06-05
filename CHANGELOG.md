@@ -42,7 +42,7 @@
   - [#295](/../../issues/295) [#304](/../../issues/304)
 
 ### features
-  - added the `<yield/>` core tag allowing html tansclusion to [#300](/../../issues/300) [#524](/../../issues/524) (fixed with https://github.com/muut/riotjs/pull/617 pull request pending)
+  - added the `<yield/>` core tag allowing html tansclusion to [#300](/../../issues/300) [#524](/../../issues/524) (fixed with https://github.com/riot/riot/pull/617 pull request pending)
   - added new `riot.route.start()` `riot.route.stop()` methods
   - added the new `riot-tag` attribute that could be used on any DOM element
   - changed `tag.unmount(flag)` to decide whether the parent should be removed or not from the DOM
