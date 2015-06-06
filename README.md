@@ -3,6 +3,8 @@
 
 ## A React- like, 3.5KB UI lib
 
+[![Join the chat at https://gitter.im/riot/riot](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/riot/riot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status][travis-image]][travis-url]
 [![Riot Forum][riot-forum-image]][riot-forum-url]
 [![Join the chat at https://gitter.im/muut/riotjs][gitter-image]][gitter-url]
