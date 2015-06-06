@@ -81,7 +81,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 ### Use your dearest language and tools
 - Create tags with CoffeeScript, Jade, LiveScript, Typescript, ES6 or [any pre-processor](https://muut.com/riotjs/compiler.html#pre-processors) you want.
 - Integrate with NPM, CommonJS, AMD, Bower or Component
-- Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot) or [Browserify](https://github.com/jhthorsen/riotify) plugins
+- Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot), [Browserify](https://github.com/jhthorsen/riotify), or [Wintersmith](https://github.com/collingreen/wintersmith-riot) plugins
 
 
 ### Concise syntax
@@ -130,6 +130,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot Snake Game](http://cdn.rawgit.com/atian25/blog/master/assets/riot-snake.html)
 - [Riot Tag Syntax Checker](http://cognitom.github.io/riot-checker/)
 - [Riot 文档中译版](https://github.com/Centaur/riotjs_doc_cn) :cn:
+- [Riot + Wintersmith](https://github.com/collingreen/wintersmith-riot)
 
 
 ### Credits
