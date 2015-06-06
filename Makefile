@@ -2,7 +2,7 @@
 KARMA = ./node_modules/karma/bin/karma
 ISTANBUL = ./node_modules/karma-coverage/node_modules/.bin/istanbul
 ESLINT = ./node_modules/eslint/bin/eslint.js
-MOCHA = ./node_modules/.bin/_mocha
+MOCHA = ./node_modules/mocha/bin/_mocha
 SMASH = ./node_modules/.bin/smash
 UGLIFY = ./node_modules/uglify-js/bin/uglifyjs
 COVERALLS = ./node_modules/coveralls/bin/coveralls.js
