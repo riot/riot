@@ -576,8 +576,8 @@ describe('Compiler Browser', function() {
     tag.items = [ {name: 'one'}, {name: 'two'}, {name: 'three'} ]
     tag.update()
     expect(root.getElementsByTagName('looped-child').length).to.be(3)
-    /*expect(tag.tags['looped-child'][2].mounted).to.be(true)
-    expect(tag.tags['looped-child'].length).to.be(3)*/
+    expect(tag.tags['looped-child'][2].mounted).to.be(true)
+    expect(tag.tags['looped-child'].length).to.be(3)
 
     tags.push(tag)
 
@@ -823,6 +823,7 @@ describe('Compiler Browser', function() {
     expect(tag.tags['yield-child-2'].length).to.be(5)
 
     child3 = tag.tags['yield-child-2'][3]
+
     expect(child3.root.getElementsByTagName('h2')[0].innerHTML.trim()).to.be('subtitle4')
 
     child3.root.getElementsByTagName('i')[0].onclick({})
