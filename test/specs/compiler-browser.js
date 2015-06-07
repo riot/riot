@@ -569,8 +569,15 @@ describe('Compiler Browser', function() {
         children = root.getElementsByTagName('looped-child')
 
     expect(children.length).to.be(2)
+    expect(tag.tags['looped-child'].length).to.be(2)
     expect(normalizeHTML(children[0].innerHTML)).to.be('<h3>one</h3><button>one</button>')
     expect(normalizeHTML(children[1].innerHTML)).to.be('<h3>two</h3><button>two</button>')
+
+    tag.items = [ {name: 'one'}, {name: 'two'}, {name: 'three'} ]
+    tag.update()
+    expect(root.getElementsByTagName('looped-child').length).to.be(3)
+    /*expect(tag.tags['looped-child'][2].mounted).to.be(true)
+    expect(tag.tags['looped-child'].length).to.be(3)*/
 
     tags.push(tag)
 
@@ -773,7 +780,8 @@ describe('Compiler Browser', function() {
     expect(tag[2].tags['ploop-another']).to.be.an('object')
     expect(tag[3].tags['ploop-child'].length).to.be(2)
     expect(tag[3].tags['ploop-another']).to.be.an('object')
-    tag.map(function(t) {t.unmount()})
+
+    tags.push(tag)
   })
 
   it('simple html transclusion via <yield> tag', function() {
