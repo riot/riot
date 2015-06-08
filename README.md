@@ -118,6 +118,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
 
 ### Components
+- [RiotGear](https://riotgear.github.io)
 - [Riot Bootstrap](http://cognitom.github.io/riot-bootstrap/)
 
 ### Resources
