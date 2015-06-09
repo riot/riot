@@ -6,7 +6,6 @@
 [![Build Status][travis-image]][travis-url]
 [![Riot Forum][riot-forum-image]][riot-forum-url]
 [![Join the chat at https://gitter.im/riot/riot][gitter-image]][gitter-url]
-[![js.org][js-org-image]][js-org-url]
 
 [![NPM version][npm-version-image]][npm-url]
 [![NPM downloads][npm-downloads-image]][npm-url]
@@ -259,9 +258,6 @@ https://muut.com/riotjs/
 
 [saucelabs-image]:https://saucelabs.com/browser-matrix/riotjs.svg
 [saucelabs-url]:https://saucelabs.com/u/riotjs
-
-[js-org-url]:http://js.org
-[js-org-image]:https://img.shields.io/badge/js.org-riot-ffb400.svg?style=flat-square
 
 [gitter-image]:https://img.shields.io/badge/GITTER-JOIN_CHAT_%E2%86%92-1dce73.svg?style=flat-square
 [gitter-url]:https://gitter.im/riot/riot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
