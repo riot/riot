@@ -1,0 +1,58 @@
+<html>
+<head>
+  <link rel="stylesheet" href="bootstrap.min.css">
+  <link rel="stylesheet" href="style.css">
+
+  <!--[if lt IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.0.5/es5-shim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+  <script>html5.addElements('todo')</script>
+  <![endif]-->
+
+</head>
+<body>
+
+<div id="link">
+  You're looking at a RiotJS
+  version of DBMonster.<br>
+  <a href="https://github.com/simonvizzini/riotjs-dbmonster">See it on GitHub</a><br><br>
+  Other versions:<br>
+  <a href="http://run.plnkr.co/plunks/Wwgjjpl9NHMO5Nd1TUyN/">React</a>,
+  <a href="https://dbmonster.firebaseapp.com/">Ember</a>,
+  <a href="http://jashkenas.github.io/dbmonster/">Underscore/Backbone</a>,
+  <a href="http://www.rich-harris.co.uk/ractive-dbmonster/">Ractive</a>,
+  <a href="http://paperclip-dbmonster.herokuapp.com/">Paperclip</a>
+</div>
+
+<dbmonster></dbmonster>
+
+<script src="../../../dist/riot/riot+compiler.js"></script>
+<script src="underscore-min.js"></script>
+<script src="junkola-copied-from-ember.js"></script>
+
+<script src="https://cdn.rawgit.com/paulirish/memory-stats.js/master/memory-stats.js"></script>
+<script>
+var stats = new MemoryStats();
+stats.domElement.style.position = 'fixed';
+stats.domElement.style.right        = '0px';
+stats.domElement.style.bottom       = '0px';
+document.body.appendChild( stats.domElement );
+requestAnimationFrame(function rAFloop(){
+    stats.update();
+    requestAnimationFrame(rAFloop);
+});
+</script>
+
+<script src="dbmonster.tag" type="riot/tag"></script>
+
+<script type="text/javascript">
+  var ROWS = 100;
+  var TIMEOUT = 0;
+
+  riot.mount('dbmonster', {
+    dbs: getDatabases()
+  });
+</script>
+
+</body>
+</html>
