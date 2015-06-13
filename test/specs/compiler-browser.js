@@ -941,7 +941,16 @@ describe('Compiler Browser', function() {
   it('mount event should only be triggered when the conditional tags are in the DOM', function() {
     var tag = riot.mount('if-mount')[0]
 
-    expect(tag.test).to.be(true)
+    expect(tag.tags['if-mount2'].mounted).to.be(false)
+    expect(tag.tags['if-mount2'].tags['conditional-tag'].mounted).to.be(false)
+
+    tag.toggleCondition()
+    expect(tag.tags['if-mount2'].mounted).to.be(true)
+    expect(tag.tags['if-mount2'].tags['conditional-tag'].mounted).to.be(false)
+
+    tag.tags['if-mount2'].toggleCondition()
+    expect(tag.tags['if-mount2'].mounted).to.be(true)
+    expect(tag.tags['if-mount2'].tags['conditional-tag'].mounted).to.be(true)
   })
   it('preserve the mount order, first the parent and then all the children', function() {
     var correctMountingOrder = [
