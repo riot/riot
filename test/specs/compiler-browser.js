@@ -941,16 +941,16 @@ describe('Compiler Browser', function() {
   it('mount event should only be triggered when the conditional tags are in the DOM', function() {
     var tag = riot.mount('if-mount')[0]
 
-    expect(tag.tags['if-mount2'].mounted).to.be(false)
-    expect(tag.tags['if-mount2'].tags['conditional-tag'].mounted).to.be(false)
+    expect(tag.tags.ff.tags['if-level2'].tags['conditional-tag'].mounted).to.be(false)
+    expect(tag.tags.ft.tags['if-level2'].tags['conditional-tag'].mounted).to.be(false)
+    expect(tag.tags.tf.tags['if-level2'].tags['conditional-tag'].mounted).to.be(false)
+    expect(tag.tags.tt.tags['if-level2'].tags['conditional-tag'].mounted).to.be(true)
 
-    tag.toggleCondition()
-    expect(tag.tags['if-mount2'].mounted).to.be(true)
-    expect(tag.tags['if-mount2'].tags['conditional-tag'].mounted).to.be(false)
+    tag.tags.tf.tags['if-level2'].toggleCondition()
+    expect(tag.tags.tf.tags['if-level2'].tags['conditional-tag'].mounted).to.be(true)
 
-    tag.tags['if-mount2'].toggleCondition()
-    expect(tag.tags['if-mount2'].mounted).to.be(true)
-    expect(tag.tags['if-mount2'].tags['conditional-tag'].mounted).to.be(true)
+    tag.tags.ff.toggleCondition()
+    expect(tag.tags.ff.tags['if-level2'].tags['conditional-tag'].mounted).to.be(false)
   })
   it('preserve the mount order, first the parent and then all the children', function() {
     var correctMountingOrder = [
