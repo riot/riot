@@ -322,8 +322,11 @@ describe('Compiler Browser', function() {
 
           // test the preventUpdate feature on the DOM events
           '<script type=\"riot\/tag\" src=\"tag\/prevent-update.tag\"><\/script>',
-          '<prevent-update><\/prevent-update>'
+          '<prevent-update><\/prevent-update>',
 
+          // Don't trigger mount for conditional tags
+          '<script type=\"riot\/tag\" src=\"tag\/if-mount.tag\"><\/script>',
+          '<if-mount><\/if-mount>'
 
     ].join('\r'),
       tags = [],
@@ -935,6 +938,26 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('mount event should only be triggered when the conditional tags are in the DOM', function() {
+    var tag = riot.mount('if-mount')[0]
+
+    expect(tag.tags.ff.tags['if-level2'].tags['conditional-tag'].mounted).to.be(false)
+    expect(tag.tags.ft.tags['if-level2'].tags['conditional-tag'].mounted).to.be(false)
+    expect(tag.tags.tf.tags['if-level2'].tags['conditional-tag'].mounted).to.be(false)
+    expect(tag.tags.tt.tags['if-level2'].tags['conditional-tag'].mounted).to.be(true)
+
+    tag.tags.tf.tags['if-level2'].toggleCondition()
+    expect(tag.tags.tf.tags['if-level2'].tags['conditional-tag'].mounted).to.be(true)
+
+    tag.tags.ft.toggleCondition()
+    expect(tag.tags.tf.tags['if-level2'].tags['conditional-tag'].mounted).to.be(true)
+
+    tag.tags.ff.tags['if-level2'].toggleCondition()
+    expect(tag.tags.ff.tags['if-level2'].tags['conditional-tag'].mounted).to.be(false)
+
+    tag.tags.ff.toggleCondition()
+    expect(tag.tags.ff.tags['if-level2'].tags['conditional-tag'].mounted).to.be(true)
+  })
   it('preserve the mount order, first the parent and then all the children', function() {
     var correctMountingOrder = [
         'deferred-mount',
