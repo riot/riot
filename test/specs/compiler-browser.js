@@ -957,6 +957,8 @@ describe('Compiler Browser', function() {
 
     tag.tags.ff.toggleCondition()
     expect(tag.tags.ff.tags['if-level2'].tags['conditional-tag'].mounted).to.be(true)
+
+    tags.push(tag)
   })
   it('preserve the mount order, first the parent and then all the children', function() {
     var correctMountingOrder = [
@@ -993,8 +995,9 @@ describe('Compiler Browser', function() {
       expect(tag.checks[0].value).to.be('one')
       expect(tag.checks[1].value).to.be('two')
       expect(tag.checks[2].value).to.be('three')
-      tag.unmount()
     })
+
+    tags.push(tag)
   })
 
 })
