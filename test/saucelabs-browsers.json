@@ -1,13 +1,21 @@
 {
   "browsers": {
-    "sl_chrome": {
+    "sl_iphone": {
       "base": "SauceLabs",
-      "browserName": "chrome",
+      "browserName": "iphone",
+      "deviceName": "iPhone Simulator",
+      "deviceOrientation": "portrait",
+      "platform": "OS X 10.10",
+      "version": "8.2",
       "group": 0
     },
-    "sl_firefox": {
+    "sl_ipad": {
       "base": "SauceLabs",
-      "browserName": "firefox",
+      "browserName": "ipad",
+      "deviceName": "iPad Simulator",
+      "deviceOrientation": "portrait",
+      "platform": "OS X 10.10",
+      "version": "8.2",
       "group": 0
     },
     "sl_safari": {
@@ -37,28 +45,21 @@
       "version": "11",
       "group": 1
     },
-    "sl_iphone": {
-      "base": "SauceLabs",
-      "browserName": "iphone",
-      "deviceName": "iPhone Simulator",
-      "device-orientation": "portrait",
-      "platform": "OS X 10.10",
-      "version": "8.2",
-      "group": 2
-    },
-    "sl_ipad": {
-      "base": "SauceLabs",
-      "browserName": "ipad",
-      "deviceName": "iPad Simulator",
-      "device-orientation": "portrait",
-      "platform": "OS X 10.10",
-      "version": "8.2",
-      "group": 2
-    },
+
     "sl_android_5": {
       "base": "SauceLabs",
       "browserName": "android",
       "version": "5.1",
+      "group": 2
+    },
+    "sl_chrome": {
+      "base": "SauceLabs",
+      "browserName": "chrome",
+      "group": 2
+    },
+    "sl_firefox": {
+      "base": "SauceLabs",
+      "browserName": "firefox",
       "group": 2
     },
     "sl_android_4": {
