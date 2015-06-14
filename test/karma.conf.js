@@ -46,6 +46,7 @@ module.exports = function(config) {
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
       testName: 'riotjs',
       startConnect: true,
+      recordVideo: true,
       recordScreenshots: true
     },
     browserDisconnectTimeout: 10000,
