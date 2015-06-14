@@ -50,7 +50,7 @@
     "glob": "^5.0.10",
     "jsdom": "^5.4.3",
     "karma": "^0.12.36",
-    "karma-coverage": "^0.3.1",
+    "karma-coverage": "^0.4.2",
     "karma-mocha": "^0.1.10",
     "karma-phantomjs-launcher": "^0.2.0",
     "karma-sauce-launcher": "^0.2.11",
