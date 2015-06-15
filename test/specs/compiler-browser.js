@@ -991,6 +991,7 @@ describe('Compiler Browser', function() {
       expect(tag.rad[0].value).to.be('1')
       expect(tag.rad[1].value).to.be('2')
       expect(tag.rad[2].value).to.be('3')
+      expect(tag.t.value).to.be('1')
       expect(tag.child.value).to.be('child')
       expect(tag.checks[0].value).to.be('one')
       expect(tag.checks[1].value).to.be('two')
