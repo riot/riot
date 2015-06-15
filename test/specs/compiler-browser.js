@@ -78,6 +78,8 @@ describe('Compiler Browser', function() {
           '  <\/timetable>',
           '<\/script>',
 
+          '<top-level-attr value=\"initial\"><\/top-level-attr>',
+
           // check the custom parsers
 
           '<script type=\"riot\/tag\" src=\"tag\/\~custom-parsers.tag\"><\/script>',
@@ -344,6 +346,7 @@ describe('Compiler Browser', function() {
 
   before(function(next) {
 
+    this.timeout(10000)
     div.innerHTML = html
     document.body.appendChild(div)
     riot.compile(next)
@@ -832,6 +835,31 @@ describe('Compiler Browser', function() {
     child3.root.getElementsByTagName('i')[0].onclick({})
 
     tags.push(tag)
+
+  })
+
+  it('top level attr manipulation', function() {
+
+    riot.tag('top-level-attr', '{opts.value}')
+
+    var tag = riot.mount('top-level-attr')[0]
+
+    tag.root.setAttribute('value', 'changed')
+    tag.update()
+
+    expect(tag.root.innerHTML).to.be('changed')
+  })
+
+  it('top level attr manipulation having expression', function() {
+
+    riot.tag('top-level-attr', '{opts.value}')
+
+    var tag = riot.mount('top-level-attr')[0]
+
+    tag.root.setAttribute('value', '{1+1}')
+    tag.update()
+
+    expect(tag.root.innerHTML).to.be('2')
 
   })
 
