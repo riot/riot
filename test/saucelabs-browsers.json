@@ -3,12 +3,14 @@
     "sl_iphone": {
       "base": "SauceLabs",
       "browserName": "iphone",
+      "platform": "iOS",
       "version": "8.2",
       "group": 0
     },
     "sl_ipad": {
       "base": "SauceLabs",
       "browserName": "ipad",
+      "platform": "iOS",
       "version": "8.2",
       "group": 0
     },
