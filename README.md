@@ -116,6 +116,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 ### Libraries
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
 - [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
+- [chinese flux-riot framework](https://github.com/cheft/cheftjs)
 
 ### Components
 - [RiotGear](https://riotgear.github.io)
