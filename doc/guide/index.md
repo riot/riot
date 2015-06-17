@@ -54,7 +54,7 @@ Riot custom tags are the building blocks for user interfaces. They make the "vie
 </todo>
 ```
 
-Custom tags are [compiled](compiler.html) to JavaScript.
+Custom tags are [compiled](/riotjs/compiler.html) to JavaScript.
 
 See the [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/riot/riot/tree/gh-pages/demo), or download the [zip](https://github.com/riot/riot/archive/gh-pages.zip).
 
@@ -462,7 +462,7 @@ riot.settings.brackets = '\{\{ }}'
 
 The start and end is separated with a space character.
 
-When using [pre-compiler](compiler.html#pre-compilation) you'll have to set `brackets` option there as well.
+When using [pre-compiler](/riotjs/compiler.html#pre-compilation) you'll have to set `brackets` option there as well.
 
 
 
