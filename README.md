@@ -120,6 +120,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Cheftjs - chinese framework for Riot](https://github.com/cheft/cheftjs)
 
 ### Components
+- [RiotGear](https://riotgear.github.io)
 - [Riot Bootstrap](http://cognitom.github.io/riot-bootstrap/)
 - [iToolkit](https://github.com/BE-FE/iToolkit)
 
@@ -137,7 +138,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Credits
 
-Riot is made with :heart: by many smart guys. Thanks to all the contributors
+Riot is made with :heart: by many smart people. Thanks to all the contributors
 
 ```
  project  : riotjs
