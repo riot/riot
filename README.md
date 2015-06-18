@@ -5,12 +5,13 @@
 
 [![Build Status][travis-image]][travis-url]
 [![Riot Forum][riot-forum-image]][riot-forum-url]
-[![Join the chat at https://gitter.im/muut/riotjs][gitter-image]][gitter-url]
+[![Join the chat at https://gitter.im/riot/riot][gitter-image]][gitter-url]
 
 [![NPM version][npm-version-image]][npm-url]
 [![NPM downloads][npm-downloads-image]][npm-url]
 [![MIT License][license-image]][license-url]
 [![Coverage Status][coverage-image]][coverage-url]
+
 
 [![Sauce Test Status][saucelabs-image]][saucelabs-url]
 
@@ -81,7 +82,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 ### Use your dearest language and tools
 - Create tags with CoffeeScript, Jade, LiveScript, Typescript, ES6 or [any pre-processor](https://muut.com/riotjs/compiler.html#pre-processors) you want.
 - Integrate with NPM, CommonJS, AMD, Bower or Component
-- Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot) or [Browserify](https://github.com/jhthorsen/riotify) plugins
+- Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot), [Browserify](https://github.com/jhthorsen/riotify), or [Wintersmith](https://github.com/collingreen/wintersmith-riot) plugins
 
 
 ### Concise syntax
@@ -120,6 +121,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 ### Components
 - [RiotGear](https://riotgear.github.io)
 - [Riot Bootstrap](http://cognitom.github.io/riot-bootstrap/)
+- [iToolkit](https://github.com/BE-FE/iToolkit)
 
 ### Resources
 - [Riot + Angular](https://github.com/lucasbrigida/angular-riot)
@@ -129,6 +131,8 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot on CodeClimate](https://codeclimate.com/github/muut/riotjs/code)
 - [Riot Snake Game](http://cdn.rawgit.com/atian25/blog/master/assets/riot-snake.html)
 - [Riot Tag Syntax Checker](http://cognitom.github.io/riot-checker/)
+- [Riot 文档中译版](https://github.com/Centaur/riotjs_doc_cn) :cn:
+- [Riot + Wintersmith](https://github.com/collingreen/wintersmith-riot)
 
 
 ### Credits
@@ -236,9 +240,8 @@ Riot is made with :heart: by many smart guys. Thanks to all the contributors
 
 https://muut.com/riotjs/
 
-
-[travis-image]:https://img.shields.io/travis/muut/riotjs.svg?style=flat-square
-[travis-url]:https://travis-ci.org/muut/riotjs
+[travis-image]:https://img.shields.io/travis/riot/riot.svg?style=flat-square
+[travis-url]:https://travis-ci.org/riot/riot
 
 [license-image]:http://img.shields.io/badge/license-MIT-000000.svg?style=flat-square
 [license-url]:LICENSE.txt
@@ -250,11 +253,11 @@ https://muut.com/riotjs/
 [riot-forum-image]:https://img.shields.io/badge/muut-JOIN_CHAT%E2%86%92-ff0044.svg?style=flat-square
 [riot-forum-url]:https://muut.com/riotjs/forum/
 
-[coverage-image]:https://img.shields.io/coveralls/muut/riotjs/dev.svg?style=flat-square
-[coverage-url]:https://coveralls.io/r/muut/riotjs?branch=dev
+[coverage-image]:https://img.shields.io/coveralls/riot/riot/dev.svg?style=flat-square
+[coverage-url]:https://coveralls.io/r/riot/riot?branch=dev
 
 [saucelabs-image]:https://saucelabs.com/browser-matrix/riotjs.svg
 [saucelabs-url]:https://saucelabs.com/u/riotjs
 
 [gitter-image]:https://img.shields.io/badge/GITTER-JOIN_CHAT_%E2%86%92-1dce73.svg?style=flat-square
-[gitter-url]:https://gitter.im/muut/riotjs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+[gitter-url]:https://gitter.im/riot/riot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge

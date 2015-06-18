@@ -4,3 +4,4 @@ test/polyfills
 test/compiler/js
 test/specs/compiler/fixtures
 test/specs/compiler/expect
+test/performance/db-monster

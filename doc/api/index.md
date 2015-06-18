@@ -17,10 +17,10 @@ A global Riot setting to customize the start and end tokens of the expressions. 
 
 
 ``` js
-riot.settings.brackets = '{{ }}'
+riot.settings.brackets = '{% %}'
 ```
 
-let's you write expressions `<p>{{ like_this }}</p>`. The start and end is separated with a space character.
+let's you write expressions `<p>{% like_this %}</p>`. The start and end is separated with a space character.
 
 
 <include tags.md />

@@ -7,7 +7,7 @@ description: How Riot differs from React and Polymer
 
 # React
 
-Riot 2.0 is inspired by React and from the idea of "cohesion". According to Facebook developers:
+Riot 2 is inspired by React and from the idea of "cohesion". According to Facebook developers:
 
 > "Templates separate technologies, not concerns."
 

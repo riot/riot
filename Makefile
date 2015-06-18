@@ -2,7 +2,7 @@
 KARMA = ./node_modules/karma/bin/karma
 ISTANBUL = ./node_modules/karma-coverage/node_modules/.bin/istanbul
 ESLINT = ./node_modules/eslint/bin/eslint.js
-MOCHA = ./node_modules/.bin/_mocha
+MOCHA = ./node_modules/mocha/bin/_mocha
 SMASH = ./node_modules/.bin/smash
 UGLIFY = ./node_modules/uglify-js/bin/uglifyjs
 COVERALLS = ./node_modules/coveralls/bin/coveralls.js
@@ -33,7 +33,7 @@ test-karma:
 	@ $(KARMA) start test/karma.conf.js
 
 test-coveralls:
-	@ RIOTJS_COV=1 cat ./coverage/lcov.info ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
+	@ RIOT_COV=1 cat ./coverage/lcov.info ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
 
 test-sauce:
 	# run the saucelabs in separate chunks
@@ -59,7 +59,7 @@ min: riot
 
 perf: riot
 	# run the performance tests
-	@ node --harmony --expose-gc test/performance/mem
+	@ iojs --harmony --expose-gc test/performance/mem
 
 watch:
 	# watch and rebuild riot and its tests
