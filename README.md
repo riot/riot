@@ -239,7 +239,6 @@ Riot is made with :heart: by many smart guys. Thanks to all the contributors
 
 https://muut.com/riotjs/
 
-
 [travis-image]:https://img.shields.io/travis/riot/riot.svg?style=flat-square
 [travis-url]:https://travis-ci.org/riot/riot
 
