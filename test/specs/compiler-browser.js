@@ -888,6 +888,19 @@ describe('Compiler Browser', function() {
     expect(styles).to.match(/div(.+)?{color: red;}/)
   })
 
+  it('style injection removes type riot style tag', function() {
+    var stag = document.querySelector('style[type=riot]')
+    expect(stag).to.be(null)
+  })
+
+  it('style tag sits in between title and link to stylesheet', function() {
+    var stag = document.querySelector('style')
+    var prevE = stag.previousElementSibling
+    var nextE = stag.nextElementSibling
+    expect(prevE.tagName).to.be('TITLE')
+    expect(nextE.tagName).to.be('LINK')
+  })
+
   it('scoped css and riot-tag, mount(selector, tagname)', function() {
     function checkBorder(t) {
       var e = t.root.firstElementChild
