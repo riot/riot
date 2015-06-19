@@ -854,13 +854,15 @@ describe('Compiler Browser', function() {
     expect(stag).to.be(null)
   })
 
-  it('style tag sits in between title and link to stylesheet', function() {
-    var stag = document.querySelector('style')
-    var prevE = stag.previousElementSibling
-    var nextE = stag.nextElementSibling
-    expect(prevE.tagName).to.be('TITLE')
-    expect(nextE.tagName).to.be('LINK')
-  })
+  if (typeof window.__karma__ === 'undefined') {
+    it('style tag sits in between title and link to stylesheet', function () {
+      var stag = document.querySelector('style')
+      var prevE = stag.previousElementSibling
+      var nextE = stag.nextElementSibling
+      expect(prevE.tagName).to.be('TITLE')
+      expect(nextE.tagName).to.be('LINK')
+    })
+  }
 
   it('scoped css and riot-tag, mount(selector, tagname)', function() {
     function checkBorder(t) {
