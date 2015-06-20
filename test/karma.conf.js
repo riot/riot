@@ -1,6 +1,6 @@
 module.exports = function(config) {
 
-  var saucelabsBrowsers = require('./saucelabs-browsers.json').browsers,
+  var saucelabsBrowsers = require('./saucelabs-browsers').browsers,
     browsers = ['PhantomJS']
 
   // run the tests only on the saucelabs browsers
