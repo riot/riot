@@ -1185,7 +1185,7 @@ riot.tag = function(name, html, css, attrs, fn) {
 riot.mount = function(selector, tagName, opts) {
 
   var el,
-      selctAllTags = function() {
+      selectAllTags = function() {
         var keys = Object.keys(tagImpl)
         var list = keys.join(', ')
         each(keys, function(t) {
@@ -1203,7 +1203,7 @@ riot.mount = function(selector, tagName, opts) {
     if (selector == '*') {
       // select all the tags registered
       // and also the tags found with the riot-tag attribute set
-      selector = allTags = selctAllTags()
+      selector = allTags = selectAllTags()
     } else {
       selector.split(',').map(function(t) {
         selector += ', *[riot-tag="'+ t.trim() + '"]'
@@ -1220,7 +1220,7 @@ riot.mount = function(selector, tagName, opts) {
   // select all the registered and mount them inside their root elements
   if (tagName == '*') {
     // get all custom tags
-    tagName = allTags || selctAllTags()
+    tagName = allTags || selectAllTags()
     // if the root el it's just a single tag
     if (el.tagName) {
       el = $$(tagName, el)
