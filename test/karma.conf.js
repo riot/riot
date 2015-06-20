@@ -37,6 +37,7 @@ module.exports = function(config) {
       },
       'specs/compiler-browser.js',
       'specs/observable.js',
+      'specs/mixin.js',
       'specs/route.js',
       'specs/tmpl.js'
     ],
