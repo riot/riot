@@ -134,7 +134,7 @@ describe('Compiler Browser', function() {
 
           '<loop>',
           '<ul>',
-          '  <li each="{ item, i in items }">{ i } { item.value } <\/li>',
+          '  <li each="{ item, i in items }" onclick="{ parent.opts.onItemClick }">{ i } { item.value } <\/li>',
           '<\/ul>',
           '<button onclick={ addSomeItems }>btn<\/button>',
 
@@ -532,9 +532,14 @@ describe('Compiler Browser', function() {
   })
 
   it('the each loops update correctly the DOM nodes', function() {
-    var tag = riot.mount('loop')[0],
+    var onItemClick = function(e) {
+          var elIndex = Array.prototype.slice.call(children).indexOf(e.currentTarget)
+          expect(tag.items[elIndex]).to.be.equal(e.item)
+        },
+        tag = riot.mount('loop', { onItemClick: onItemClick })[0],
         root = tag.root,
         button = root.getElementsByTagName('button')[0],
+        children,
         itemsCount = 5
 
     tags.push(tag)
@@ -548,18 +553,30 @@ describe('Compiler Browser', function() {
     }
     tag.update()
 
-    expect(root.getElementsByTagName('li').length).to.be(5)
+    children = root.getElementsByTagName('li')
+    Array.prototype.forEach.call(children, function(child) {
+      child.onclick({})
+    })
+    expect(children.length).to.be(5)
 
     // no update is required here
     button.onclick({})
+    children = root.getElementsByTagName('li')
+    expect(children.length).to.be(10)
 
-    expect(root.getElementsByTagName('li').length).to.be(10)
+    Array.prototype.forEach.call(children, function(child) {
+      child.onclick({})
+    })
 
     expect(normalizeHTML(root.getElementsByTagName('ul')[0].innerHTML)).to.be('<li>0 item #0 </li><li>1 item #1 </li><li>2 item #2 </li><li>3 item #3 </li><li>4 item #4 </li><li>5 item #5 </li><li>6 item #6 </li><li>7 item #7 </li><li>8 item #8 </li><li>9 item #9 </li>')
 
     tag.items.reverse()
     tag.update()
-    expect(root.getElementsByTagName('li').length).to.be(10)
+    children = root.getElementsByTagName('li')
+    expect(children.length).to.be(10)
+    Array.prototype.forEach.call(children, function(child) {
+      child.onclick({})
+    })
 
     expect(normalizeHTML(root.getElementsByTagName('ul')[0].innerHTML)).to.be('<li>0 item #9 </li><li>1 item #8 </li><li>2 item #7 </li><li>3 item #6 </li><li>4 item #5 </li><li>5 item #4 </li><li>6 item #3 </li><li>7 item #2 </li><li>8 item #1 </li><li>9 item #0 </li>'.trim())
 
@@ -567,7 +584,10 @@ describe('Compiler Browser', function() {
     tag.items[1] = tag.items[8]
     tag.items[8] = tempItem
     tag.update()
-
+ /*   Array.prototype.forEach.call(children, function(child) {
+      child.onclick({})
+    })
+*/
     expect(normalizeHTML(root.getElementsByTagName('ul')[0].innerHTML)).to.be('<li>0 item #9 </li><li>1 item #1 </li><li>2 item #7 </li><li>3 item #6 </li><li>4 item #5 </li><li>5 item #4 </li><li>6 item #3 </li><li>7 item #2 </li><li>8 item #8 </li><li>9 item #0 </li>'.trim())
 
     tag.items = null
