@@ -133,6 +133,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot Tag Syntax Checker](http://cognitom.github.io/riot-checker/)
 - [Riot 文档中译版](https://github.com/Centaur/riotjs_doc_cn) :cn:
 - [Riot + Wintersmith](https://github.com/collingreen/wintersmith-riot)
+- [Riot precompiler plugin for lineman](https://github.com/Power-Inside/lineman-riot)
 
 
 ### Credits
