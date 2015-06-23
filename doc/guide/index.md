@@ -171,13 +171,13 @@ You can put a `style` tag inside. Riot.js automatically takes it out and injects
 
 This happens once, no matter how many times the tag is initialized.
 
-To make it easier to override the CSS you can to specify where in the `<head>` Riot should inject tag styles:
+To make it easier to override the CSS you can specify where in the `<head>` Riot should inject tag styles:
 
 ```html
 <style type="riot"></style>
 ```
 
-Example use case would be to insert tag styles from a component library after normalize.css but before your website's themed CSS so you can override the library's default styling.
+Example use case would be to insert tag styles from a component library after normalize.css but before your website's theme CSS allowing you to override the library's default styling.
 
 ## Mounting
 
