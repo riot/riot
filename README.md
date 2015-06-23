@@ -137,7 +137,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Credits
 
-Riot is made with :heart: by many smart guys. Thanks to all the contributors
+Riot is made with :heart: by many smart people. Thanks to all the contributors
 
 ```
  project  : riotjs
