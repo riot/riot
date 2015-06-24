@@ -144,101 +144,115 @@ HTML syntax is the de facto language on the web and it's designed for building u
 Riot is made with :heart: by many smart people. Thanks to all the contributors
 
 ```
- project  : riotjs
- repo age : 1 year, 8 months
- active   : 256 days
- commits  : 1110
- files    : 177
+ project  : riot
+ repo age : 1 year, 9 months
+ active   : 300 days
+ commits  : 1262
+ files    : 189
  authors  :
-   376  Tero Piirainen          33.9%
-   252  Gianluca Guarini        22.7%
-   150  Aurimas                 13.5%
-    36  Tsutomu Kawamura        3.2%
-    27  Marcelo Eden            2.4%
-    26  rsbondi                 2.3%
-    18  Juha Lindstedt          1.6%
-    18  Kalman Speier           1.6%
-    14  andynemzek              1.3%
-    11  Hrvoje Šimić          1.0%
-    10  Andy VanEe              0.9%
-     8  Mark Henderson          0.7%
+   383  Tero Piirainen          30.3%
+   336  Gianluca Guarini        26.6%
+   150  Aurimas                 11.9%
+    40  Tsutomu Kawamura        3.2%
+    35  rsbondi                 2.8%
+    27  Marcelo Eden            2.1%
+    18  Juha Lindstedt          1.4%
+    18  Kalman Speier           1.4%
+    14  andynemzek              1.1%
+    12  Márcio Coelho           1.0%
+    11  Hrvoje Šimić            0.9%
+    10  Andy VanEe              0.8%
+     8  Mark Henderson          0.6%
+     8  Andreas Heintze         0.6%
+     8  Alberto Martínez        0.6%
      7  Ashley Brener           0.6%
+     7  marciojcoelho           0.6%
      7  Tianxiang Chen          0.6%
-     6  Márcio Coelho          0.5%
-     6  Andreas Heintze         0.5%
-     6  hemanth.hm              0.5%
      6  Jens Anders Bakke       0.5%
-     5  marciojcoelho           0.5%
-     5  jigsaw                  0.5%
-     5  midinastasurazz         0.5%
-     4  blissland               0.4%
-     4  Eric Baer               0.4%
-     4  Giovanni Cappellotto    0.4%
-     4  Richard Bondi           0.4%
-     3  Anton Heryanto          0.3%
-     3  Magnus Wolffelt         0.3%
-     3  Jim Sparkman            0.3%
-     3  Alan R. Soares          0.3%
-     3  Tatu Tamminen           0.3%
-     3  korige                  0.3%
-     3  Artem Medeusheyev       0.3%
-     2  Žiga                   0.2%
-     2  Alexis THOMAS           0.2%
-     2  Andrew Feng             0.2%
+     6  hemanth.hm              0.5%
+     6  Greg                    0.5%
+     5  Avner Peled             0.4%
+     5  midinastasurazz         0.4%
+     5  Anton Heryanto          0.4%
+     5  jigsaw                  0.4%
+     4  Giovanni Cappellotto    0.3%
+     4  blissland               0.3%
+     4  Eric Baer               0.3%
+     4  Richard Bondi           0.3%
+     4  Avnerus                 0.3%
+     3  Tatu Tamminen           0.2%
+     3  korige                  0.2%
+     3  Magnus Wolffelt         0.2%
+     3  sethyuan                0.2%
+     3  Alan R. Soares          0.2%
+     3  Artem Medeusheyev       0.2%
+     3  Jim Sparkman            0.2%
+     2  luffs                   0.2%
      2  Andrew Luetgers         0.2%
-     2  Antoine Goutagny        0.2%
-     2  Markus A. Stone         0.2%
-     2  Moot Inc                0.2%
      2  Philippe CHARRIERE      0.2%
-     2  Sergey Martynov         0.2%
-     2  Simon JAILLET           0.2%
+     2  Tobias Baunbæk          0.2%
      2  Steve Clay              0.2%
      2  Tim Kindberg            0.2%
-     2  Tobias Baunbæk         0.2%
-     2  crazy2be                0.2%
-     2  jmas                    0.2%
-     2  luffs                   0.2%
+     2  Alexis THOMAS           0.2%
+     2  xieyu33333              0.2%
      2  yibuyisheng             0.2%
-     1  Constantin Rack         0.1%
-     1  Riccardo Gueli Alletti  0.1%
-     1  Jonny Buchanan          0.1%
-     1  Ryan O’Hara           0.1%
-     1  Sam Morgan              0.1%
-     1  kylobite                0.1%
+     2  Žiga                    0.2%
+     2  Andrew Feng             0.2%
+     2  Moot Inc                0.2%
+     2  crazy2be                0.2%
+     2  Sergey Martynov         0.2%
+     2  jmas                    0.2%
+     2  Markus A. Stone         0.2%
+     2  Antoine Goutagny        0.2%
+     2  Simon JAILLET           0.2%
+     1  陈海峰                   0.1%
+     1  Andrew Kiellor          0.1%
      1  Ari Makela              0.1%
-     1  Simone Vittori          0.1%
-     1  Steel Brain             0.1%
-     1  Boris Huai              0.1%
-     1  Steven Koch             0.1%
-     1  TZ | 天猪             0.1%
-     1  Jonathan Dumaine        0.1%
-     1  Tenor Biel              0.1%
-     1  Joel Thornton           0.1%
-     1  Ivan Saorin             0.1%
+     1  Barkóczi Dávid          0.1%
      1  Benoit Hirbec           0.1%
-     1  Barkóczi Dávid        0.1%
-     1  Trent Ogren             0.1%
-     1  Ian Walter              0.1%
-     1  Umut Sirin              0.1%
-     1  Zach Aysan              0.1%
-     1  afc163                  0.1%
-     1  Fernando Correia        0.1%
-     1  Eliseo Arias            0.1%
-     1  borishuai               0.1%
-     1  typicode                0.1%
-     1  Danil Semelenov         0.1%
-     1  Liu Jin                 0.1%
-     1  Juwan Yoo               0.1%
-     1  Marcin Jekot            0.1%
-     1  Justin Dorfman          0.1%
+     1  Boris Huai              0.1%
+     1  Collin Green            0.1%
+     1  Constantin Rack         0.1%
      1  Courtney Couch          0.1%
+     1  Danil Semelenov         0.1%
+     1  David Salazar           0.1%
+     1  Eliseo Arias            0.1%
+     1  Eric Capps              0.1%
+     1  Fernando Correia        0.1%
+     1  Ian Walter              0.1%
+     1  Ivan Saorin             0.1%
+     1  Joel Thornton           0.1%
+     1  Jonathan Dumaine        0.1%
+     1  Jonny Buchanan          0.1%
+     1  Jorrit Schippers        0.1%
+     1  Justin Dorfman          0.1%
+     1  Juwan Yoo               0.1%
+     1  Liu Jin                 0.1%
+     1  Marcin Jekot            0.1%
      1  Matthew McCullough      0.1%
      1  Maxence Dalmais         0.1%
      1  Mike Breen              0.1%
-     1  xieyu03                 0.1%
-     1  Jorrit Schippers        0.1%
+     1  Mohammed Irfan          0.1%
      1  Patrik Buckau           0.1%
      1  Quim Calpe              0.1%
+     1  Riccardo Gueli Alletti  0.1%
+     1  Ryan O’Hara             0.1%
+     1  Sam Morgan              0.1%
+     1  Simone Vittori          0.1%
+     1  Steel Brain             0.1%
+     1  Steven Koch             0.1%
+     1  TZ | 天猪               0.1%
+     1  Tenor Biel              0.1%
+     1  The Gitter Badger       0.1%
+     1  Trent Ogren             0.1%
+     1  Umut Sirin              0.1%
+     1  Zach Aysan              0.1%
+     1  afc163                  0.1%
+     1  borishuai               0.1%
+     1  kylobite                0.1%
+     1  oldpig                  0.1%
+     1  typicode                0.1%
+     1  xieyu03                 0.1%
 
 ```
 
