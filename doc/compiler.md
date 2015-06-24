@@ -26,7 +26,7 @@ Custom tags need to be transformed to JavaScript before the browser can execute 
 <script src="path/to/javascript/with-tags.js" type="riot/tag"></script>
 
 <!-- include riot.js and the compiler -->
-<script src="//cdn.jsdelivr.net/g/riot@2.0(riot.min.js+compiler.min.js)"></script>
+<script src="//cdn.jsdelivr.net/g/riot@2.1(riot.min.js+compiler.min.js)"></script>
 
 
 <!-- mount normally -->
@@ -53,7 +53,7 @@ riot.compile(function() {
 
 ### Compiler performance
 
-Compilation phase is basically free and takes no time at all. Compiling a [timer tag](https://github.com/muut/riotjs/blob/master/test/tag/timer.tag) 30 times takes 2 milliseconds on a regular laptop. If you have a crazy page with 1000 different timer-sized tags, the compilation takes around 35ms.
+Compilation phase is basically free and takes no time at all. Compiling a [timer tag](https://github.com/riot/riot/blob/master/test/tag/timer.tag) 30 times takes 2 milliseconds on a regular laptop. If you have a crazy page with 1000 different timer-sized tags, the compilation takes around 35ms.
 
 The compiler weights only 3.2KB (1.7K gzipped) so you can safely perform client side compilation on production without download or performance or issues.
 
@@ -66,8 +66,8 @@ Read the [compiler API](/riotjs/api/#compiler) for more details.
 
 - [In-browser compiled](http://muut.github.io/riotjs/demo/)
 - [Pre-compiled](http://muut.github.io/riotjs/demo/)
-- [Source code](https://github.com/muut/riotjs/tree/gh-pages/demo)
-- Download the demo as a [zip file](https://github.com/muut/riotjs/archive/gh-pages.zip)
+- [Source code](https://github.com/riot/riot/tree/gh-pages/demo)
+- Download the demo as a [zip file](https://github.com/riot/riot/archive/gh-pages.zip)
 
 
 
@@ -95,7 +95,7 @@ With pre-compilation your HTML is something like this:
 <my-tag></my-tag>
 
 <!-- include riot.js only -->
-<script src="//cdn.jsdelivr.net/riot/2.0/riot.min.js"></script>
+<script src="//cdn.jsdelivr.net/riot/2.1/riot.min.js"></script>
 
 <!-- include pre-compiled tags (normal javascript) -->
 <script src="path/to/javascript/with-tags.js"></script>
@@ -179,7 +179,7 @@ The source language is specified with `--type` or `-t` argument on the command l
 <my-tag>
   <h3>My layout</h3>
 
-  <script type="coffeescript">
+  <script type="coffee">
     @hello = 'world'
   </script>
 </my-tag>
@@ -190,10 +190,10 @@ The source language is specified with `--type` or `-t` argument on the command l
 
 ``` sh
 # use coffeescript pre-processor
-riot --type coffeescript --expr source.tag
+riot --type coffee --expr source.tag
 ```
 
-The `--expr` argument specifies that all the expressions are also processed as well. You can also use "cs" as an alias to "coffeescript". Here is a sample tag written in CoffeeScript:
+The `--expr` argument specifies that all the expressions are also processed as well. You can also use "cs" as an alias to "coffee". Here is a sample tag written in CoffeeScript:
 
 ```
 <kids>
@@ -322,11 +322,11 @@ A Jade sample:
 ```
 sample
   p test { value }
-  script(type='text/coffeescript').
+  script(type='text/coffee').
     @value = 'sample'
 ```
 
-As you notice, you can define the script type on the template as well. Above we use coffeescript. [jade](https://github.com/jadejs/jade) is used for the transformation:
+As you notice, you can define the script type on the template as well. Above we use coffee. [jade](https://github.com/jadejs/jade) is used for the transformation:
 
 ``` sh
 npm install jade
@@ -424,4 +424,4 @@ riot.mount('*');
 ```
 
 
-If you make something great, please [share it](https://github.com/muut/riotjs/issues/58) !
+If you make something great, please [share it](https://github.com/riot/riot/issues/58) !

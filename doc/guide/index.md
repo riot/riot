@@ -54,9 +54,9 @@ Riot custom tags are the building blocks for user interfaces. They make the "vie
 </todo>
 ```
 
-Custom tags are [compiled](compiler.html) to JavaScript.
+Custom tags are [compiled](/riotjs/compiler.html) to JavaScript.
 
-See the [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/muut/riotjs/tree/gh-pages/demo), or download the [zip](https://github.com/muut/riotjs/archive/gh-pages.zip).
+See the [live demo](http://muut.github.io/riotjs/demo/), browse the [sources](https://github.com/riot/riot/tree/gh-pages/demo), or download the [zip](https://github.com/riot/riot/archive/gh-pages.zip).
 
 
 
@@ -121,12 +121,12 @@ In which case the logic starts after the last HTML tag. This "open syntax" is mo
 You can specify a pre-processor with `type` attribute. For example:
 
 ```
-<script type="coffeescript">
-  # your logic is here
+<script type="coffee">
+  # your coffeescript logic goes here
 </script>
 ````
 
-Currently available options are "coffeescript", "typescript", "es6" and "none". You can also prefix the language with "text/", such as "text/coffeescript".
+Currently available options are "coffee", "typescript", "es6" and "none". You can also prefix the language with "text/", such as "text/coffee".
 
 See [pre processors](/riotjs/compiler.html#pre-processors) for more details.
 
@@ -170,6 +170,14 @@ You can put a `style` tag inside. Riot.js automatically takes it out and injects
 ```
 
 This happens once, no matter how many times the tag is initialized.
+
+To make it easier to override the CSS you can specify where in the `<head>` Riot should inject tag styles:
+
+```html
+<style type="riot"></style>
+```
+
+Example use case would be to insert tag styles from a component library after normalize.css but before your website's theme CSS allowing you to override the library's default styling.
 
 ## Mounting
 
@@ -462,7 +470,7 @@ riot.settings.brackets = '\{\{ }}'
 
 The start and end is separated with a space character.
 
-When using [pre-compiler](compiler.html#pre-compilation) you'll have to set `brackets` option there as well.
+When using [pre-compiler](/riotjs/compiler.html#pre-compilation) you'll have to set `brackets` option there as well.
 
 
 

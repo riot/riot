@@ -17,7 +17,7 @@
       html5.addElements(
         'yield timetable timer loop-manip loop-child looped-child loop-context yield-child yield-child-2 yield-parent yield-loop' +
         'loop-strings img-test loop-replace loop-position tag-nesting ' +
-        'inner1 inner2 loop-option inner-html yield-parent inner-content loop-object loop-multi ' +
+        'inner1 inner2 loop-option loop-optgroup inner-html yield-parent inner-content loop-object loop-multi ' +
         'loop-nested table-data if-test if-child treeview lazy-if ' +
         'treeitem expr-parent expr-child form-controls isloop-test plans plan'
       )
@@ -48,6 +48,7 @@
     <loop-multi></loop-multi>
     <loop-context></loop-context>
     <loop-option></loop-option>
+    <loop-optgroup></loop-optgroup>
     <table-data></table-data>
     <timetable></timetable>
     <div riot-tag="table-data"></div>
@@ -75,10 +76,11 @@
       { greeting }
       <div>Something else</div>
     </yield-loop>
-    <!--
+
 
     <treeview></treeview>
-    -->
+
+    <if-mount></if-mount>
 
   </div>
 

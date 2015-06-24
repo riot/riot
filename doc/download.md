@@ -3,7 +3,7 @@ title: Get Riot
 description: none
 minify: false
 
-base: https://raw.githubusercontent.com/muut/riotjs/master
+base: https://raw.githubusercontent.com/riot/riot/master
 cdnjs: https://cdnjs.cloudflare.com/ajax/libs/riot
 
 ====
@@ -31,9 +31,9 @@ cdnjs: https://cdnjs.cloudflare.com/ajax/libs/riot
 
 #### [jsdelivr](http://www.jsdelivr.com/#!riot)
 
-`https://cdn.jsdelivr.net/g/riot@2.0(riot.min.js+compiler.min.js)` <small>(latest 2.0.X)</small>
+`https://cdn.jsdelivr.net/g/riot@2.1(riot.min.js+compiler.min.js)` <small>(latest 2.1.X)</small>
 
-`https://cdn.jsdelivr.net/riot/2.0/riot.min.js` <small>(latest 2.0.X)</small>
+`https://cdn.jsdelivr.net/riot/2.1/riot.min.js` <small>(latest 2.1.X)</small>
 
 `https://cdn.jsdelivr.net/g/riot@{{ riot_version }}(riot.min.js+compiler.min.js)`
 
@@ -60,7 +60,7 @@ cdnjs: https://cdnjs.cloudflare.com/ajax/libs/riot
 
 #### [Component](http://component.github.io/?q=riot)
 
-`component install muut/riotjs`
+`component install riot/riot`
 
 #### [NPM](https://www.npmjs.com/package/riot)
 
@@ -69,9 +69,9 @@ cdnjs: https://cdnjs.cloudflare.com/ajax/libs/riot
 
 ### GitHub
 
-#### [muut/riotjs](https://github.com/muut/riotjs)
+#### [riot/riot](https://github.com/riot/riot)
 
-`git clone git@github.com:muut/riotjs.git`
+`git clone git@github.com:riot/riot.git`
 
 
 

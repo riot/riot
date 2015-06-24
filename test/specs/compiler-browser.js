@@ -7,6 +7,24 @@ function normalizeHTML (html) {
     // change all the tags properties and names to lowercase because a <li> for ie8 is a <LI>
     .replace(/<([^>]*)>/g, function(tag) { return tag.toLowerCase() })
     .replace(/\r|\r|\n|\t/gi, '')
+    .replace(/\>\s+\</g, '><')
+    .replace(/<!--riot placeholder-->/gi, '')
+}
+
+function getPreviousSibling(n) {
+  var x = n.previousSibling
+  while (x.nodeType!=1) {
+    x = x.previousSibling
+  }
+  return x
+}
+
+function getNextSibling(n) {
+  var x = n.previousSibling
+  while (x.nodeType!=1) {
+    x = x.previousSibling
+  }
+  return x
 }
 
 // small polyfill
@@ -59,6 +77,8 @@ describe('Compiler Browser', function() {
 
           '  <\/timetable>',
           '<\/script>',
+
+          '<top-level-attr value=\"initial\"><\/top-level-attr>',
 
           // check the custom parsers
 
@@ -114,7 +134,7 @@ describe('Compiler Browser', function() {
 
           '<loop>',
           '<ul>',
-          '  <li each="{ item, i in items }">{ i } { item.value } <\/li>',
+          '  <li each="{ item, i in items }" onclick="{ parent.opts.onItemClick }">{ i } { item.value } <\/li>',
           '<\/ul>',
           '<button onclick={ addSomeItems }>btn<\/button>',
 
@@ -147,6 +167,14 @@ describe('Compiler Browser', function() {
           // loop option
           '<loop-option><\/loop-option>',
           '<script type=\"riot\/tag\" src=\"tag\/loop-option.tag\"><\/script>',
+
+          // loop optgroup
+          '<loop-optgroup><\/loop-optgroup>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-optgroup.tag\"><\/script>',
+
+          // loop position
+          '<loop-position><\/loop-position>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-position.tag\"><\/script>',
 
           // table
           '<table-data><\/table-data>',
@@ -290,9 +318,25 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/deferred-mount.tag\"><\/script>',
           '<deferred-mount><\/deferred-mount>',
 
+          // multi named elements to an array
+          '<script type=\"riot\/tag\" src=\"tag\/multi-named.tag\"><\/script>',
+          '<multi-named><\/multi-named>',
+
           // test the preventUpdate feature on the DOM events
           '<script type=\"riot\/tag\" src=\"tag\/prevent-update.tag\"><\/script>',
-          '<prevent-update><\/prevent-update>'
+          '<prevent-update><\/prevent-update>',
+
+          // Don't trigger mount for conditional tags
+          '<script type=\"riot\/tag\" src=\"tag\/if-mount.tag\"><\/script>',
+          '<if-mount><\/if-mount>',
+
+          // input type=number
+          '<script type=\"riot\/tag\" src=\"tag\/input-number.tag\"><\/script>',
+          '<input-number><\/input-number>',
+
+          // input type=number
+          '<script type=\"riot\/tag\" src=\"tag\/nested-riot.tag\"><\/script>',
+          '<container-riot><\/container-riot>'
 
     ].join('\r'),
       tags = [],
@@ -310,6 +354,7 @@ describe('Compiler Browser', function() {
 
   before(function(next) {
 
+    this.timeout(10000)
     div.innerHTML = html
     document.body.appendChild(div)
     riot.compile(next)
@@ -361,7 +406,7 @@ describe('Compiler Browser', function() {
     tag.unmount()
 
     // no time neither for one tick
-    // because the tag got unmounted too early
+    // because the tag got unisMounted too early
     setTimeout(function() {
       expect(ticks).to.be(0)
       done()
@@ -440,6 +485,17 @@ describe('Compiler Browser', function() {
 
   })
 
+  it('the loop elements keep their position in the DOM', function() {
+    var  tag = riot.mount('loop-position')[0],
+          h3 = tag.root.getElementsByTagName('h3')[0]
+
+    expect(getPreviousSibling(h3).tagName.toLowerCase()).to.be('p')
+    expect(getNextSibling(h3).tagName.toLowerCase()).to.be('p')
+
+    tags.push(tag)
+
+  })
+
   it('avoid to duplicate tags in multiple foreach loops', function() {
 
     var mountTag = function(tagId) {
@@ -476,9 +532,14 @@ describe('Compiler Browser', function() {
   })
 
   it('the each loops update correctly the DOM nodes', function() {
-    var tag = riot.mount('loop')[0],
+    var onItemClick = function(e) {
+          var elIndex = Array.prototype.slice.call(children).indexOf(e.currentTarget)
+          expect(tag.items[elIndex]).to.be.equal(e.item)
+        },
+        tag = riot.mount('loop', { onItemClick: onItemClick })[0],
         root = tag.root,
         button = root.getElementsByTagName('button')[0],
+        children,
         itemsCount = 5
 
     tags.push(tag)
@@ -492,18 +553,30 @@ describe('Compiler Browser', function() {
     }
     tag.update()
 
-    expect(root.getElementsByTagName('li').length).to.be(5)
+    children = root.getElementsByTagName('li')
+    Array.prototype.forEach.call(children, function(child) {
+      child.onclick({})
+    })
+    expect(children.length).to.be(5)
 
     // no update is required here
     button.onclick({})
+    children = root.getElementsByTagName('li')
+    expect(children.length).to.be(10)
 
-    expect(root.getElementsByTagName('li').length).to.be(10)
+    Array.prototype.forEach.call(children, function(child) {
+      child.onclick({})
+    })
 
     expect(normalizeHTML(root.getElementsByTagName('ul')[0].innerHTML)).to.be('<li>0 item #0 </li><li>1 item #1 </li><li>2 item #2 </li><li>3 item #3 </li><li>4 item #4 </li><li>5 item #5 </li><li>6 item #6 </li><li>7 item #7 </li><li>8 item #8 </li><li>9 item #9 </li>')
 
     tag.items.reverse()
     tag.update()
-    expect(root.getElementsByTagName('li').length).to.be(10)
+    children = root.getElementsByTagName('li')
+    expect(children.length).to.be(10)
+    Array.prototype.forEach.call(children, function(child) {
+      child.onclick({})
+    })
 
     expect(normalizeHTML(root.getElementsByTagName('ul')[0].innerHTML)).to.be('<li>0 item #9 </li><li>1 item #8 </li><li>2 item #7 </li><li>3 item #6 </li><li>4 item #5 </li><li>5 item #4 </li><li>6 item #3 </li><li>7 item #2 </li><li>8 item #1 </li><li>9 item #0 </li>'.trim())
 
@@ -512,9 +585,13 @@ describe('Compiler Browser', function() {
     tag.items[8] = tempItem
     tag.update()
 
+    Array.prototype.forEach.call(children, function(child) {
+      child.onclick({})
+    })
+
     expect(normalizeHTML(root.getElementsByTagName('ul')[0].innerHTML)).to.be('<li>0 item #9 </li><li>1 item #1 </li><li>2 item #7 </li><li>3 item #6 </li><li>4 item #5 </li><li>5 item #4 </li><li>6 item #3 </li><li>7 item #2 </li><li>8 item #8 </li><li>9 item #0 </li>'.trim())
 
-    tag.items = []
+    tag.items = null
     tag.update()
     expect(root.getElementsByTagName('li').length).to.be(0)
 
@@ -527,8 +604,15 @@ describe('Compiler Browser', function() {
         children = root.getElementsByTagName('looped-child')
 
     expect(children.length).to.be(2)
-    expect(normalizeHTML(children[0].innerHTML)).to.be('<h3>one</h3> <button>one</button>')
-    expect(normalizeHTML(children[1].innerHTML)).to.be('<h3>two</h3> <button>two</button>')
+    expect(tag.tags['looped-child'].length).to.be(2)
+    expect(normalizeHTML(children[0].innerHTML)).to.be('<h3>one</h3><button>one</button>')
+    expect(normalizeHTML(children[1].innerHTML)).to.be('<h3>two</h3><button>two</button>')
+
+    tag.items = [ {name: 'one'}, {name: 'two'}, {name: 'three'} ]
+    tag.update()
+    expect(root.getElementsByTagName('looped-child').length).to.be(3)
+    expect(tag.tags['looped-child'][2].isMounted).to.be(true)
+    expect(tag.tags['looped-child'].length).to.be(3)
 
     tags.push(tag)
 
@@ -595,7 +679,17 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('loop-option')[0],
         root = tag.root
 
-    expect(normalizeHTML(root.innerHTML)).to.match(/<select> <option value="1">Peter<\/option><option selected="(selected|true)" value="2">Sherman<\/option><option value="3">Laura<\/option> <\/select>/)
+    expect(normalizeHTML(root.innerHTML)).to.match(/<select><option value="1">Peter<\/option><option selected="(selected|true)" value="2">Sherman<\/option><option value="3">Laura<\/option><\/select>/)
+
+    tags.push(tag)
+
+  })
+
+  it('loop optgroup tag', function() {
+    var tag = riot.mount('loop-optgroup')[0],
+        root = tag.root
+
+    expect(normalizeHTML(root.innerHTML)).to.match(/<select><optgroup label="group 1"><option value="1">Option 1.1<\/option><option value="2">Option 1.2<\/option><\/optgroup><optgroup label="group 2"><option value="3">Option 2.1<\/option><option selected="(selected|true)" value="4">Option 2.2<\/option><\/optgroup><\/select>/)
 
     tags.push(tag)
 
@@ -605,7 +699,7 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('table-data')[0],
         root = tag.root
 
-    expect(normalizeHTML(root.innerHTML)).to.match(/<h3>Cells<\/h3> <table border="1"> <tbody><tr><th>One<\/th><th>Two<\/th><th>Three<\/th><\/tr> <tr><td>One<\/td><td>Two<\/td><td>Three<\/td><\/tr> <\/tbody><\/table> <h3>Rows<\/h3> <table border="1"> <tbody><tr> <td>One<\/td> <td>One another<\/td> <\/tr><tr> <td>Two<\/td> <td>Two another<\/td> <\/tr><tr> <td>Three<\/td> <td>Three another<\/td> <\/tr> <\/tbody><\/table>/)
+    expect(normalizeHTML(root.innerHTML)).to.match(/<h3>Cells<\/h3><table border="1"><tbody><tr><th>One<\/th><th>Two<\/th><th>Three<\/th><\/tr><tr><td>One<\/td><td>Two<\/td><td>Three<\/td><\/tr><\/tbody><\/table><h3>Rows<\/h3><table border="1"><tbody><tr><td>One<\/td><td>One another<\/td><\/tr><tr><td>Two<\/td><td>Two another<\/td><\/tr><tr><td>Three<\/td><td>Three another<\/td><\/tr><\/tbody><\/table>/)
 
     tags.push(tag)
 
@@ -721,12 +815,26 @@ describe('Compiler Browser', function() {
     expect(tag[2].tags['ploop-another']).to.be.an('object')
     expect(tag[3].tags['ploop-child'].length).to.be(2)
     expect(tag[3].tags['ploop-another']).to.be.an('object')
-    tag.map(function(t) {t.unmount()})
+
+    tags.push(tag)
   })
 
   it('simple html transclusion via <yield> tag', function() {
 
     var tag = riot.mount('inner-html')[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<h1>Hello,   World  <inner value="ciao mondo"><p> ciao mondo </p></inner></h1>')
+    tags.push(tag)
+
+  })
+
+  it('multiple mount <yield> tag', function() {
+
+    riot.mount('inner-html')
+    riot.mount('inner-html')
+    riot.mount('inner-html')
+    riot.mount('inner-html')
+    tag = riot.mount('inner-html')[0]
 
     expect(normalizeHTML(tag.root.innerHTML)).to.be('<h1>Hello,   World  <inner value="ciao mondo"><p> ciao mondo </p></inner></h1>')
     tags.push(tag)
@@ -739,13 +847,13 @@ describe('Compiler Browser', function() {
       saySomething: done
     })[0]
 
-    expect(normalizeHTML(tag.root.innerHTML)).to.match(/<h1>Hello, from the parent<\/h1> <yield-child><h1>Greeting<\/h1>\s+<i>from the child<\/i> <div(.+|)> <b>wooha<\/b> <\/div> <\/yield-child>/)
+    expect(normalizeHTML(tag.root.innerHTML)).to.match(/<h1>Hello, from the parent<\/h1><yield-child><h1>Greeting<\/h1><i>from the child<\/i><div(.+|)><b>wooha<\/b><\/div><\/yield-child>/)
 
     tag.update({
       isSelected: true
     })
 
-    expect(normalizeHTML(tag.root.innerHTML)).to.be('<h1>Hello, from the parent</h1> <yield-child><h1>Greeting</h1>  <i>from the child</i> <div class="selected"> <b>wooha</b> </div> </yield-child>')
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<h1>Hello, from the parent</h1><yield-child><h1>Greeting</h1><i>from the child</i><div class="selected"><b>wooha</b></div></yield-child>')
 
     tag.root.getElementsByTagName('i')[0].onclick({})
 
@@ -763,11 +871,37 @@ describe('Compiler Browser', function() {
     expect(tag.tags['yield-child-2'].length).to.be(5)
 
     child3 = tag.tags['yield-child-2'][3]
+
     expect(child3.root.getElementsByTagName('h2')[0].innerHTML.trim()).to.be('subtitle4')
 
     child3.root.getElementsByTagName('i')[0].onclick({})
 
     tags.push(tag)
+
+  })
+
+  it('top level attr manipulation', function() {
+
+    riot.tag('top-level-attr', '{opts.value}')
+
+    var tag = riot.mount('top-level-attr')[0]
+
+    tag.root.setAttribute('value', 'changed')
+    tag.update()
+
+    expect(tag.root.innerHTML).to.be('changed')
+  })
+
+  it('top level attr manipulation having expression', function() {
+
+    riot.tag('top-level-attr', '{opts.value}')
+
+    var tag = riot.mount('top-level-attr')[0]
+
+    tag.root.setAttribute('value', '{1+1}')
+    tag.update()
+
+    expect(tag.root.innerHTML).to.be('2')
 
   })
 
@@ -784,9 +918,24 @@ describe('Compiler Browser', function() {
     var stag = document.querySelector('style'),
       styles =  normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
 
-    expect(styles).to.match(/p {color: blue;}/)
-    expect(styles).to.match(/div {color: red;}/)
+    expect(styles).to.match(/p(.+)?{color: blue;}/)
+    expect(styles).to.match(/div(.+)?{color: red;}/)
   })
+
+  it('style injection removes type riot style tag', function() {
+    var stag = document.querySelector('style[type=riot]')
+    expect(stag).to.be(null)
+  })
+
+  if (typeof window.__karma__ === 'undefined') {
+    it('style tag sits in between title and link to stylesheet', function () {
+      var stag = document.querySelector('style')
+      var prevE = stag.previousElementSibling
+      var nextE = stag.nextElementSibling
+      expect(prevE.tagName).to.be('TITLE')
+      expect(nextE.tagName).to.be('LINK')
+    })
+  }
 
   it('scoped css and riot-tag, mount(selector, tagname)', function() {
     function checkBorder(t) {
@@ -874,6 +1023,28 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('mount event should only be triggered when the conditional tags are in the DOM', function() {
+    var tag = riot.mount('if-mount')[0]
+
+    expect(tag.tags.ff.tags['if-level2'].tags['conditional-tag'].isMounted).to.be(false)
+    expect(tag.tags.ft.tags['if-level2'].tags['conditional-tag'].isMounted).to.be(false)
+    expect(tag.tags.tf.tags['if-level2'].tags['conditional-tag'].isMounted).to.be(false)
+    expect(tag.tags.tt.tags['if-level2'].tags['conditional-tag'].isMounted).to.be(true)
+
+    tag.tags.tf.tags['if-level2'].toggleCondition()
+    expect(tag.tags.tf.tags['if-level2'].tags['conditional-tag'].isMounted).to.be(true)
+
+    tag.tags.ft.toggleCondition()
+    expect(tag.tags.tf.tags['if-level2'].tags['conditional-tag'].isMounted).to.be(true)
+
+    tag.tags.ff.tags['if-level2'].toggleCondition()
+    expect(tag.tags.ff.tags['if-level2'].tags['conditional-tag'].isMounted).to.be(false)
+
+    tag.tags.ff.toggleCondition()
+    expect(tag.tags.ff.tags['if-level2'].tags['conditional-tag'].isMounted).to.be(true)
+
+    tags.push(tag)
+  })
   it('preserve the mount order, first the parent and then all the children', function() {
     var correctMountingOrder = [
         'deferred-mount',
@@ -896,6 +1067,37 @@ describe('Compiler Browser', function() {
 
     expect(mountingOrder.join()).to.be(correctMountingOrder.join())
 
+    tags.push(tag)
+  })
+
+  it('multi named elements to an array', function() {
+    var tag = riot.mount('multi-named')[0]
+    tag.on('mount', function() {
+      expect(tag.rad[0].value).to.be('1')
+      expect(tag.rad[1].value).to.be('2')
+      expect(tag.rad[2].value).to.be('3')
+      expect(tag.t.value).to.be('1')
+      expect(tag.child.value).to.be('child')
+      expect(tag.checks[0].value).to.be('one')
+      expect(tag.checks[1].value).to.be('two')
+      expect(tag.checks[2].value).to.be('three')
+    })
+
+    tags.push(tag)
+  })
+
+  it('input type=number', function() {
+    var tag = riot.mount('input-number', {num: 123})[0]
+    var inp = tag.root.getElementsByTagName('input')[0]
+    expect(inp.getAttribute('type')).to.be('number')
+    expect(inp.value).to.be('123')
+    tags.push(tag)
+  })
+
+  it('riot-tag as expression', function() {
+    var tag = riot.mount('container-riot')[0]
+    var div = tag.root.getElementsByTagName('div')[0]
+    expect(div.getAttribute('riot-tag')).to.be('nested-riot')
     tags.push(tag)
   })
 

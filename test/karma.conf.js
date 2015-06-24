@@ -1,6 +1,6 @@
 module.exports = function(config) {
 
-  var saucelabsBrowsers = require('./saucelabs-browsers.json').browsers,
+  var saucelabsBrowsers = require('./saucelabs-browsers').browsers,
     browsers = ['PhantomJS']
 
   // run the tests only on the saucelabs browsers
@@ -37,6 +37,7 @@ module.exports = function(config) {
       },
       'specs/compiler-browser.js',
       'specs/observable.js',
+      'specs/mixin.js',
       'specs/route.js',
       'specs/tmpl.js'
     ],
@@ -45,6 +46,7 @@ module.exports = function(config) {
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
       testName: 'riotjs',
       startConnect: true,
+      recordVideo: true,
       recordScreenshots: true
     },
     browserDisconnectTimeout: 10000,
