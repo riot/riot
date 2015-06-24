@@ -101,6 +101,9 @@ describe('Tmpl', function() {
     expect(render('{ 1 /* comment */ + 1 }')).to.equal(2)
     expect(render('{ 1 /* comment */ + 1 } ')).to.equal('2 ')
 
+    // FIX for /**/ comment and comments as whitespace
+    expect(render('{ /**/ }')).to.be(undefined)                     // @amc
+    expect(render('{ typeof/**/str === "string" }')).to.be(true)    // @amc
 
     //// templates
 
@@ -113,6 +116,10 @@ describe('Tmpl', function() {
     // both templates and expressions are new-line-friendly
     expect(render('\n  { yes \n ? 2 \n : 4} \n')).to.equal('\n  2 \n')
 
+    // win eols are normalized in templates and expressions
+    expect(render('\r\n\n { yes \r\n ? 2 \n : 4} \r\n')).to.equal('\n\n 2 \n')      // @amc
+    expect(render('\r\n { "y\ne\r\ns\\n no" } \r\n')).to.equal('\n y e s\n no \n')  // @amc
+    expect(render('{ "\r\ny\\ne\\r\\ns\n" }\r\n')).to.equal(' y\ne\r\ns \n')        // @amc
 
     //// class shorthand
 
@@ -143,6 +150,10 @@ describe('Tmpl', function() {
     expect(render('{ ok: fn([1, 2]) }')).to.equal('ok')
     expect(render('{ ok: fn({a: 1, b: 1}) }')).to.equal('ok')
 
+    // now, inner brackets don't need to be escaped
+    expect(render('{{ str: "s", num:0, dat :null} }')).to.eql({ str: 's', num: 0, dat: null })  // @amc
+    expect(render(' {{ str:"s" }+{}}')).to.equal(' [object Object][object Object]')  // @amc
+    expect(render('{ typeof function(){} }')).to.equal('function')  // @amc
 
     //// custom brackets
 
@@ -150,6 +161,7 @@ describe('Tmpl', function() {
     riot.settings.brackets = '[ ]'
     expect(render('[ x ]')).to.equal(2)
     expect(render('[ str\\[0\\] ]')).to.equal('x')
+    expect(render('[ str[0] ]')).to.equal('x')          // @amc unescaped
 
     // multi character brackets
     riot.settings.brackets = '<% %>'
@@ -158,6 +170,10 @@ describe('Tmpl', function() {
     // asymmetric brackets
     riot.settings.brackets = '${ }'
     expect(render('${ x }')).to.equal(2)
+
+    // default literal { } as default
+    riot.settings.brackets = '{ }'
+    expect(render('{ x }')).to.equal(2)
 
     // default to { } if setting is empty
     riot.settings.brackets = null
@@ -181,8 +197,17 @@ describe('Tmpl', function() {
     riot.settings.brackets = '[ ]'
     expect(render('a[ "b[c]d" ]e [ "[f[f]]" ] g')).to.equal('ab[c]de [f[f]] g')
 
+    expect(render('a,[ ["b", "c"]],d')).to.equal('a,b,c,d')       // @amc unescaped
+    expect(render('[["b", "c"]]')).to.be.an('array')              // @amc unescaped
+
     riot.settings.brackets = '{{ }}'
     expect(render('a{{ "b{{c}}d" }}e {{ "{f{{f}}}" }} g')).to.equal('ab{{c}}de {f{{f}}} g')
+
+    // can't shift the match of right brackets, need escape
+    // TODO: This don't work
+    //expect(render('obj={{{}}}')).to.equal('obj=[object Object]')  // @amc unescaped
+    // or this form
+    expect(render('obj={{{} }}')).to.equal('obj=[object Object]')  // @amc unescaped
 
     riot.settings.brackets = '<% %>'
     expect(render('a<% "b<%c%>d" %>e <% "<%f<%f%>%>" %> g')).to.equal('ab<%c%>de <%f<%f%>%> g')
@@ -199,6 +224,41 @@ describe('Tmpl', function() {
     expect(render('a${ "b{c\\}d" }e')).to.equal('ab{c}de')
     riot.settings.brackets = null
 
+    // brackets RegEx generation and info, discards /im, escape each char in regexp
+    !(function testBrackets(brfn) {
+        var vals = [
+          ['<% %>',   /\<\% \%\>/g  ],
+          ['·ʃ< ]]',  /\·\ʃ\< \]\]/g],
+          ['{$ $}',   /\{\$ \$\}/g  ],
+          ['${ }',    /\$\{ \}/g    ],
+          ['_( )_',   /\_\( \)\_/g  ],
+          ['_\/ \\_', /\_\/ \\\_/g  ]
+        ]
+        var rs = /{ }/gi,    // default brackets
+            bb,
+            i
+
+        riot.settings.brackets = undefined  // use default brackets
+        for (i = 0; i < 2; i++) {
+          expect(brfn(rs)).to.be(rs)
+          expect(brfn(0)).to.equal('{')
+          expect(brfn(1)).to.equal('}')
+          expect(brfn(2)).to.equal('\\{')
+          expect(brfn(3)).to.equal('\\}')
+          expect(brfn(4)).to.be(undefined)
+          riot.settings.brackets = '{ }'    // same as defaults
+        }
+        for (i = 0; i < vals.length; i++) {
+          // set another brackets
+          bb = (riot.settings.brackets = vals[i][0]).split(' ')
+          rs = vals[i][1]
+          expect(brfn(/{ }/gim).source).to.equal(rs.source)
+          expect(brfn(0)).to.equal(bb[0])
+          expect(brfn(1)).to.equal(bb[1])
+        }
+        riot.settings.brackets = null
+      }
+    )(riot.util.brackets)
   })
 
 })
