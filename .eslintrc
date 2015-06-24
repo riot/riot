@@ -126,7 +126,7 @@ rules:
     radix: 2                  # require use of the second argument for parseInt()
     vars-on-top: 0            # requires to declare all vars on top of their containing scope
     wrap-iife: [2, "inside"]  # require immediate function invocation to be wrapped in parentheses
-    yoda: "never"             # require or disallow Yoda conditions
+    yoda: [2, "never"]             # require or disallow Yoda conditions
 
     ###########################################################################
     #                                                                         #
@@ -180,7 +180,7 @@ rules:
 
     indent: [2, 2]                 # Set a specific tab width
     brace-style: 0                 # enforce one true brace style
-    camelcase: [2, always]         # require camel case names
+    camelcase: [2, properties: "always" ]       # require camel case names
     comma-spacing: 2               # enforce spacing before and after comma
     comma-style: 2                 # enforce one true comma style
     consistent-this: 0             # enforces consistent naming when capturing the current execution context
@@ -212,7 +212,7 @@ rules:
     semi: [2, "never"]             # require or disallow use of semicolons instead of ASI
     semi-spacing: 0
     sort-vars: 0                   # sort variables within the same declaration block
-    space-after-keywords: "always" # require a space after certain keywords
+    space-after-keywords: [2, "always"] # require a space after certain keywords
     space-before-blocks: 2         # require or disallow space before blocks
     space-in-brackets: 0           # require or disallow spaces inside brackets
     space-in-parens: 0             # require or disallow spaces inside parentheses

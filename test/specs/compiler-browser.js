@@ -652,7 +652,7 @@ describe('Compiler Browser', function() {
 
     var i = multipleTags.length
 
-    while(i--) {
+    while (i--) {
       tags.push(multipleTags[i])
     }
 

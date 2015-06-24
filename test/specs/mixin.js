@@ -14,7 +14,7 @@ describe('Mixin', function() {
     setOpts: function(options, update) {
       this.opts = options
 
-      if(!update) {
+      if (!update) {
         this.update()
       }
 
