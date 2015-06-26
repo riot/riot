@@ -1094,7 +1094,6 @@ describe('Compiler Browser', function() {
   it('multi named elements to an array', function() {
     var mount = function() {
       var tag = this
-      console.log('multi named mounted', tag.t_1, tag.t_2, tag.child)
       expect(tag.rad[0].value).to.be('1')
       expect(tag.rad[1].value).to.be('2')
       expect(tag.rad[2].value).to.be('3')
@@ -1106,7 +1105,6 @@ describe('Compiler Browser', function() {
     },
     mountChild = function() {
       var tag = this
-      console.log('multi child mounted', Object.keys(tag))
       expect(tag.child.value).to.be('child')
       expect(tag.check[0].value).to.be('one')
       expect(tag.check[1].value).to.be('two')
