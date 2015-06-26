@@ -316,7 +316,7 @@ To load the mixin to the tag, use `mixin()` method with the key.
 <my-tag>
     <h1>{ opts.title }</h1>
 
-    this.mixin('mixinName')
+    riot.mixin('mixinName')
 </my-tag>
 ```
 
