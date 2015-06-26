@@ -113,6 +113,10 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot Compiler Explained](http://www.triplet.fi/blog/riot-compiler-explained/)
 - [Adding compiled Riot tags to your Gulp + Browserify build](http://www.triplet.fi/blog/adding_compiled_riot_tags_to_your_gulp_browserify_build/)
 
+### Video Tutorials
+- [Introduction](https://www.youtube.com/watch?v=al87U6NgRTc)
+- [Loops, Events and Callbacks](https://www.youtube.com/watch?v=T-ZV9dv93sw)
+
 ### Libraries
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
 - [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
