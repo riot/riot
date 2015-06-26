@@ -135,7 +135,6 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot Tag Syntax Checker](http://cognitom.github.io/riot-checker/)
 
 
-
 ### Credits
 
 Riot is made with :heart: by many smart guys. Thanks to all the contributors
