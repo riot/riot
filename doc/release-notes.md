@@ -9,11 +9,12 @@ body_id: riot-releases
 ### 2.2.0 *June 27, 2015*
 
 - New super fast loop logic ( the DOM nodes will be no longer reordered [more details here](https://github.com/riot/riot/issues/484) )
-- Re-enabled the `use strict` mode
-- Re-enabled the `coffescript` mode for the nostalgics
-- Fixed inconsistencies using loop with empty or null arrays
-- Fixed the `mount` in the loop children
-- Increased the code coverage
+- Re-enable the `use strict` mode
+- Re-enable the `coffescript` mode for the nostalgics
+- Fix inconsistencies using loop with empty or null arrays
+- Fix the `mount` in the loop children
+- Increase the code coverage
+- Add the possibility to specify where riot will inject the custom tags [css in the DOM](/riotjs/guide/#scoped-css)
 
 List of bug fixes and details can be found [here](https://github.com/riot/riot/issues/773)
 
