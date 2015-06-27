@@ -1092,17 +1092,25 @@ describe('Compiler Browser', function() {
   })
 
   it('multi named elements to an array', function() {
-    var tag = riot.mount('multi-named')[0]
-    tag.on('mount', function() {
+    var mount = function() {
+      var tag = this
       expect(tag.rad[0].value).to.be('1')
       expect(tag.rad[1].value).to.be('2')
       expect(tag.rad[2].value).to.be('3')
       expect(tag.t.value).to.be('1')
+      expect(tag.t_1.value).to.be('1')
+      expect(tag.t_2.value).to.be('2')
+      expect(tag.c[0].value).to.be('1')
+      expect(tag.c[1].value).to.be('2')
+    },
+    mountChild = function() {
+      var tag = this
       expect(tag.child.value).to.be('child')
-      expect(tag.checks[0].value).to.be('one')
-      expect(tag.checks[1].value).to.be('two')
-      expect(tag.checks[2].value).to.be('three')
-    })
+      expect(tag.check[0].value).to.be('one')
+      expect(tag.check[1].value).to.be('two')
+      expect(tag.check[2].value).to.be('three')
+    }
+    var tag = riot.mount('multi-named', { mount: mount, mountChild: mountChild })[0]
 
     tags.push(tag)
   })
