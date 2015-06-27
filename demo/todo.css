@@ -12,21 +12,21 @@ todo {
 }
 
 form input {
-  font-size: 100%;
-  padding: .6em;
+  font-size: 85%;
+  padding: .4em;
   border: 1px solid #ccc;
-  border-radius: 3px;
+  border-radius: 2px;
 }
 
 button {
   background-color: #1FADC5;
   border: 1px solid rgba(0,0,0,.2);
-  font-size: 100%;
+  font-size: 75%;
   color: #fff;
-  padding: .6em 1.2em;
-  border-radius: 3em;
+  padding: .4em 1.2em;
+  border-radius: 2em;
   cursor: pointer;
-  margin: 0 .3em;
+  margin: 0 .23em;
   outline: none;
 }
 
