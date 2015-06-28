@@ -1,8 +1,8 @@
-/* Riot v2.2.0, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v2.2.1, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window) {
   'use strict'
-  var riot = { version: 'v2.2.0', settings: {} }
+  var riot = { version: 'v2.2.1', settings: {} }
 
   // This globals 'const' helps code size reduction
 
@@ -487,7 +487,8 @@ function _each(dom, parent, expr) {
           (tags[i] = new Tag({ tmpl: template }, {
               parent: parent,
               isLoop: true,
-              root: root
+              root: root,
+              item: _item
             })
           ).mount()
 
@@ -613,6 +614,7 @@ function Tag(impl, conf, innerHTML) {
       dom = mkdom(impl.tmpl),
       parent = conf.parent,
       isLoop = conf.isLoop,
+      item = conf.item,
       expressions = [],
       childTags = [],
       root = conf.root,
@@ -648,7 +650,7 @@ function Tag(impl, conf, innerHTML) {
   // it could be handy to use it also to improve the virtual dom rendering speed
   this._id = fastAbs(~~(new Date().getTime() * Math.random()))
 
-  extend(this, { parent: parent, root: root, opts: opts, tags: {} })
+  extend(this, { parent: parent, root: root, opts: opts, tags: {} }, item)
 
   // grab attributes
   each(root.attributes, function(el) {
