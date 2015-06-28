@@ -74,7 +74,7 @@ HTML syntax is the *de facto* language of the web and it's designed for building
 - One way data flow: updates and unmounts are propagated downwards from parent to children.
 - Expressions are pre-compiled and cached for high performance.
 - Lifecycle events for more control.
-- Server-side rendering of custom tags
+- Server-side rendering of custom tags for isomorphic applications.
 
 
 ### Close to standards
