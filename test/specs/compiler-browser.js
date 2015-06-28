@@ -339,7 +339,10 @@ describe('Compiler Browser', function() {
 
           // input type=number
           '<script type=\"riot\/tag\" src=\"tag\/nested-riot.tag\"><\/script>',
-          '<container-riot><\/container-riot>'
+          '<container-riot><\/container-riot>',
+
+          '<script type=\"riot\/tag\" src=\"tag\/treeview.tag\"><\/script>',
+          '<treeview><\/treeview>'
 
     ].join('\r'),
       tags = [],
@@ -911,6 +914,8 @@ describe('Compiler Browser', function() {
     tag.update()
 
     expect(tag.root.innerHTML).to.be('changed')
+
+    tags.push(tag)
   })
 
   it('top level attr manipulation having expression', function() {
@@ -1127,6 +1132,14 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('container-riot')[0]
     var div = tag.root.getElementsByTagName('div')[0]
     expect(div.getAttribute('riot-tag')).to.be('nested-riot')
+    tags.push(tag)
+  })
+
+  it('recursive structure and options passed correctly to the children in nested loops', function() {
+    var tag = riot.mount('treeview')[0]
+    expect(tag).to.be.an('object')
+    expect(tag.isMounted).to.be(true)
+    // TODO: check if really the options get passed correctly
     tags.push(tag)
   })
 
