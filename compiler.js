@@ -14,6 +14,8 @@ riot.parsers = {
     }
   }
 }
+// 4 the nostalgics
+riot.parsers.js.coffeescript = riot.parsers.js.coffee
 
 
 var BOOL_ATTR = ('allowfullscreen,async,autofocus,autoplay,checked,compact,controls,declare,default,'+
@@ -44,7 +46,8 @@ var BOOL_ATTR = ('allowfullscreen,async,autofocus,autoplay,checked,compact,contr
   HTML_COMMENT = /<!--.*?-->/g,
   CLOSED_TAG = /<([\w\-]+)([^>]*)\/\s*>/g,
   LINE_COMMENT = /^\s*\/\/.*$/gm,
-  JS_COMMENT = /\/\*[^\x00]*?\*\//gm
+  JS_COMMENT = /\/\*[^\x00]*?\*\//gm,
+  INPUT_NUMBER = /(<input\s[^>]*?)type=['"]number['"]/gm
 
 function mktag(name, html, css, attrs, js) {
   return 'riot.tag(\''
@@ -67,6 +70,9 @@ function compileHTML(html, opts, type) {
 
   // strip comments
   html = html.trim().replace(HTML_COMMENT, '')
+
+  // input type=numbr
+  html = html.replace(INPUT_NUMBER, '$1riot-type='+brackets(0)+'"number"'+brackets(1)) // fake expression
 
   // alter special attribute names
   html = html.replace(SET_ATTR, function(full, name, _, expr) {
@@ -131,7 +137,7 @@ function riotjs(js) {
       var end = /[{}]/.exec(l.slice(-1)),
           m = end && /(\s+)([\w]+)\s*\(([\w,\s]*)\)\s*\{/.exec(line)
 
-      if (m && !/^(if|while|switch|for)$/.test(m[2])) {
+      if (m && !/^(if|while|switch|for|catch)$/.test(m[2])) {
         lines[i] = m[1] + 'this.' + m[2] + ' = function(' + m[3] + ') {'
 
         // foo() { }
@@ -160,8 +166,9 @@ function riotjs(js) {
 function scopedCSS (tag, style, type) {
   return style.replace(CSS_COMMENT, '').replace(CSS_SELECTOR, function (m, p1, p2) {
     return p1 + ' ' + p2.split(/\s*,\s*/g).map(function(sel) {
-      var s = sel.replace(/:scope\s*/, '')
-      return sel[0] == '@' ? sel : tag + ' ' + s +', [riot-tag="'+tag+'"] ' + s
+      var s = sel.trim().replace(/:scope\s*/, '')
+      return s[0] == '@' || s == 'from' || s == 'to' || /%$/.test(s) ? s :
+        tag + ' ' + s + ', [riot-tag="' + tag + '"] ' + s
     }).join(',')
   }).trim()
 }
@@ -216,7 +223,7 @@ function compile(src, opts) {
         style = ''
 
     html = html.replace(STYLE, function(_, fullType, _type, _style) {
-      if (fullType && 'scoped' == fullType.trim()) styleType = 'scoped-css'
+      if (fullType && fullType.trim() == 'scoped') styleType = 'scoped-css'
         else if (_type) styleType = _type.replace('text/', '')
       style = _style
       return ''
@@ -273,7 +280,7 @@ function compileScripts(fn) {
     fn && fn()
   }
 
-  if(!scriptsAmount) {
+  if (!scriptsAmount) {
     done()
   } else {
     ;[].map.call(scripts, function(script) {
