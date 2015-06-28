@@ -6,6 +6,10 @@ body_id: riot-releases
 
 ====
 
+### 2.2.1 *June 28, 2015*
+
+- Fix the options are not correctly passed to the children in a loop [more details here](https://github.com/riot/riot/issues/884)
+
 ### 2.2.0 *June 27, 2015*
 
 - New super fast loop logic ( the DOM nodes will be no longer reordered [more details here](https://github.com/riot/riot/issues/484) )
