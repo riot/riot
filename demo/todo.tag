@@ -26,7 +26,7 @@
 
     add(e) {
       if (this.text) {
-        this.items.push({ title: this.text })
+        this.items.push({ title: this.text, done: false, hidden: false })
         this.text = this.input.value = ''
       }
     }
