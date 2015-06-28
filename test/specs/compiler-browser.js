@@ -341,8 +341,14 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/nested-riot.tag\"><\/script>',
           '<container-riot><\/container-riot>',
 
+          // recursive tags
           '<script type=\"riot\/tag\" src=\"tag\/treeview.tag\"><\/script>',
-          '<treeview><\/treeview>'
+          '<treeview><\/treeview>',
+
+          // sync the loop options
+          '<script type=\"riot\/tag\" src=\"tag\/loop-sync-options.tag\"><\/script>',
+          '<loop-sync-options><\/loop-sync-options>'
+
 
     ].join('\r'),
       tags = [],
@@ -1135,11 +1141,48 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
-  it('recursive structure and options passed correctly to the children in nested loops', function() {
+  it('recursive structure', function() {
     var tag = riot.mount('treeview')[0]
     expect(tag).to.be.an('object')
     expect(tag.isMounted).to.be(true)
-    // TODO: check if really the options get passed correctly
+    tags.push(tag)
+  })
+
+  it('the loops children sync correctly their internal data with their options', function() {
+    var tag = riot.mount('loop-sync-options')[0]
+    expect(tag.tags['loop-sync-options-child'][0].val).to.be('foo')
+    expect(tag.tags['loop-sync-options-child'][1].val).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][2].val).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][0].num).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][1].num).to.be(3)
+    expect(tag.tags['loop-sync-options-child'][2].num).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][0].bool).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][1].bool).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][2].bool).to.be(false)
+    tag.update({
+      children: tag.children.reverse()
+    })
+    expect(tag.tags['loop-sync-options-child'][0].val).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][1].val).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][2].val).to.be('foo')
+    expect(tag.tags['loop-sync-options-child'][0].num).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][1].num).to.be(3)
+    expect(tag.tags['loop-sync-options-child'][2].num).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][0].bool).to.be(false)
+    expect(tag.tags['loop-sync-options-child'][1].bool).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][2].bool).to.be(undefined)
+    tag.update({
+      children: tag.children.reverse()
+    })
+    expect(tag.tags['loop-sync-options-child'][0].val).to.be('foo')
+    expect(tag.tags['loop-sync-options-child'][1].val).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][2].val).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][0].num).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][1].num).to.be(3)
+    expect(tag.tags['loop-sync-options-child'][2].num).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][0].bool).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][1].bool).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][2].bool).to.be(false)
     tags.push(tag)
   })
 
