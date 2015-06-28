@@ -1,5 +1,5 @@
 
-title: Riot 2.1 | A React-like UI library
+title: Riot 2.2 | A React-like UI library
 subtitle: Why Riot?
 description: And why we need a new UI library
 body_id: riot-home

@@ -18,7 +18,7 @@ body_id: riot-releases
 
 List of bug fixes and details can be found [here](https://github.com/riot/riot/issues/773)
 
-### 2.1.0 *May 20, 2015*
+### 2.2.0 *May 20, 2015*
 
 - [Mixins](/riotjs/guide/#mixins)
 - Ability to define attributes for the root element on the tag definition
