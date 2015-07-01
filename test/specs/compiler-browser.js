@@ -163,6 +163,10 @@ describe('Compiler Browser', function() {
           '<loop-manip><\/loop-manip>',
           '<script type=\"riot\/tag\" src=\"tag\/loop-manip.tag\"><\/script>',
 
+          // loop object
+          '<loop-object><\/loop-object>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-object.tag\"><\/script>',
+
           // looped child
           '<nested-child><\/nested-child>',
           '<script type=\"riot\/tag\" src=\"tag\/nested-child.tag\"><\/script>',
@@ -686,6 +690,24 @@ describe('Compiler Browser', function() {
 
     expect(normalizeHTML(root.getElementsByTagName('ul')[0].innerHTML)).to.be('<li>100 <a>remove</a></li><li>100 <a>remove</a></li><li>0 <a>remove</a></li><li>1 <a>remove</a></li><li>2 <a>remove</a></li><li>3 <a>remove</a></li><li>4 <a>remove</a></li><li>5 <a>remove</a></li><li>100 <a>remove</a></li><li>100 <a>remove</a></li>'.trim())
 
+
+  })
+
+  it('iterate over an object, then modify the property and update itself', function() {
+
+    var tag = riot.mount('loop-object')[0]
+    var root = tag.root
+
+    tags.push(tag)
+
+    expect(normalizeHTML(root.getElementsByTagName('div')[0].innerHTML))
+      .to.be('<p>zero = 0</p><p>one = 1</p><p>two = 2</p><p>three = 3</p>')
+
+    for (key in tag.obj)
+      tag.obj[key] = tag.obj[key] * 2
+    tag.update()
+    expect(normalizeHTML(root.getElementsByTagName('div')[0].innerHTML))
+      .to.be('<p>zero = 0</p><p>one = 2</p><p>two = 4</p><p>three = 6</p>')
 
   })
 
