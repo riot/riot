@@ -63,7 +63,7 @@ Mount a custom tag named tagName on a given domNode passing optional data with o
 riot.mount(document.getElementById('slide'), 'users', api)
 ```
 
-@returns: mounted [tag instance](#tag-instance)
+@returns: an array of the mounted [tag instances](#tag-instance)
 
 
 ### riot.mountTo(domNode, tagName, [opts]) | #mount-to
