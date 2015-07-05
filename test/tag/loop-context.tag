@@ -2,8 +2,8 @@
 <loop-context>
 
   <li each={ items }>
-    <a onclick={ parent.toggle }>{ title }</a>
-    <a onclick={ parent.remove }>remove</a>
+    <a onclick={ toggle }>{ title }</a>
+    <a onclick={ remove }>remove</a>
     <a onclick={ fn }>fn</a>
     <span if={ done }>{ parent.rand }</span>
   </li>
