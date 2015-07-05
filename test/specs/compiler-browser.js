@@ -1267,8 +1267,13 @@ describe('Compiler Browser', function() {
   it('custom children items in a nested loop are always in sync with the parent tag', function() {
     var tag = riot.mount('loop-inherit')[0]
     expect(tag.tags['loop-inherit-item'].length).to.be(3)
-    expect(tag.tags['loop-inherit-item'][0])
-
+    expect(tag.tags['loop-inherit-item'][0].opts.name).to.be(tag.items[0])
+    expect(tag.tags['loop-inherit-item'][1].opts.name).to.be(tag.items[1])
+    expect(tag.tags['loop-inherit-item'][2].opts.name).to.be(tag.items[2])
+    tag.items.splice(1, 1)
+    tag.update()
+    expect(tag.tags['loop-inherit-item'][0].opts.name).to.be(tag.items[0])
+    expect(tag.tags['loop-inherit-item'][1].opts.name).to.be(tag.items[1])
   })
 
 })
