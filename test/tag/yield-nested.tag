@@ -20,8 +20,8 @@
   <h1>Hello, <yield/></h1>
 
   <yield-child>
-    <i onclick={ this.parent.saySomething } >{ greeting }</i>
-    <div class={ selected: this.parent.isSelected }>
+    <i onclick={ parent.saySomething } >{ greeting }</i>
+    <div class={ selected: parent.isSelected }>
       <b>wooha</b>
     </div>
   </yield-child>
@@ -45,8 +45,8 @@
   <h1>Hello, <yield/></h1>
 
   <yield-child-2 each={ items } subtitle={ name }>
-    <i onclick={ this.parent.saySomething } >{ greeting }</i>
-    <div class={ selected: this.parent.isSelected }>
+    <i onclick={ parent.saySomething } >{ greeting }</i>
+    <div class={ selected: parent.isSelected }>
       <b>wooha</b>
     </div>
   </yield-child-2>
