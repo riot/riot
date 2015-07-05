@@ -1261,6 +1261,10 @@ describe('Compiler Browser', function() {
   it('children in a loop inherit properties from the parent', function() {
     var tag = riot.mount('loop-inherit')[0]
     expect(tag.tags['loop-inherit-item'][0].opts.nice).to.be(tag.isFun)
+    tag.isFun = false
+    tag.update()
+    expect(tag.tags['loop-inherit-item'][0].opts.nice).to.be(tag.isFun)
+    expect(tag.tags['loop-inherit-item'][0].tags).to.be.empty()
     tags.push(tag)
   })
 
