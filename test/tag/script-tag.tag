@@ -1,8 +1,7 @@
 <script-tag>
-  <p>Hello there</p>
+  <p>{ foo }</p>
 
   <script type="text/javascript">
-    console.log('hello')
-    var foo = 'bar'
+    this.foo = 'bar'
   </script>
 </script-tag>

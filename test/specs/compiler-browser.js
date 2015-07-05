@@ -353,6 +353,10 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/loop-sync-options.tag\"><\/script>',
           '<loop-sync-options><\/loop-sync-options>',
 
+          // sync the loop options in nested tags
+          '<script type=\"riot\/tag\" src=\"tag\/loop-sync-options-nested.tag\"><\/script>',
+          '<loop-sync-options-nested><\/loop-sync-options-nested>',
+
           // inherit properties from the parent
           '<script type=\"riot\/tag\" src=\"tag\/loop-inherit.tag\"><\/script>',
           '<loop-inherit><\/ loop-inherit>'
@@ -1212,10 +1216,59 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('the loops children sync correctly their internal data even when they are nested', function() {
+    var tag = riot.mount('loop-sync-options-nested')[0]
+
+    expect(tag.tags['loop-sync-options-nested-child'][0].val).to.be('foo')
+    expect(tag.tags['loop-sync-options-nested-child'][1].val).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][2].val).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][0].num).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][1].num).to.be(3)
+    expect(tag.tags['loop-sync-options-nested-child'][2].num).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][0].bool).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][1].bool).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][2].bool).to.be(false)
+    tag.update({
+      children: tag.children.reverse()
+    })
+    tag.update()
+    expect(tag.tags['loop-sync-options-nested-child'][0].val).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][1].val).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][2].val).to.be('foo')
+    expect(tag.tags['loop-sync-options-nested-child'][0].num).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][1].num).to.be(3)
+    expect(tag.tags['loop-sync-options-nested-child'][2].num).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][0].bool).to.be(false)
+    expect(tag.tags['loop-sync-options-nested-child'][1].bool).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][2].bool).to.be(undefined)
+    tag.update({
+      children: tag.children.reverse()
+    })
+    tag.update()
+    expect(tag.tags['loop-sync-options-nested-child'][0].val).to.be('foo')
+    expect(tag.tags['loop-sync-options-nested-child'][1].val).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][2].val).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][0].num).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][1].num).to.be(3)
+    expect(tag.tags['loop-sync-options-nested-child'][2].num).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][0].bool).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][1].bool).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][2].bool).to.be(false)
+
+    tags.push(tag)
+  })
+
   it('children in a loop inherit properties from the parent', function() {
     var tag = riot.mount('loop-inherit')[0]
     expect(tag.tags['loop-inherit-item'][0].opts.nice).to.be(tag.isFun)
     tags.push(tag)
+  })
+
+  it('custom children items in a nested loop are always in sync with the parent tag', function() {
+    var tag = riot.mount('loop-inherit')[0]
+    expect(tag.tags['loop-inherit-item'].length).to.be(3)
+    expect(tag.tags['loop-inherit-item'][0])
+
   })
 
 })
