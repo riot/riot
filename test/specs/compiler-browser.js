@@ -351,7 +351,11 @@ describe('Compiler Browser', function() {
 
           // sync the loop options
           '<script type=\"riot\/tag\" src=\"tag\/loop-sync-options.tag\"><\/script>',
-          '<loop-sync-options><\/loop-sync-options>'
+          '<loop-sync-options><\/loop-sync-options>',
+
+          // inherit properties from the parent
+          '<script type=\"riot\/tag\" src=\"tag\/loop-inherit.tag\"><\/script>',
+          '<loop-inherit><\/ loop-inherit>'
 
 
     ].join('\r'),
@@ -1205,6 +1209,12 @@ describe('Compiler Browser', function() {
     expect(tag.tags['loop-sync-options-child'][0].bool).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][1].bool).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][2].bool).to.be(false)
+    tags.push(tag)
+  })
+
+  it('children in a loop inherit properties from the parent', function() {
+    var tag = riot.mount('loop-inherit')[0]
+    expect(tag.tags['loop-inherit-item'][0].opts.nice).to.be(tag.isFun)
     tags.push(tag)
   })
 
