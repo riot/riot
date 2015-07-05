@@ -1,8 +1,8 @@
-/* Riot v2.2.1, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v2.2.2-beta, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window) {
   'use strict'
-  var riot = { version: 'v2.2.1', settings: {} }
+  var riot = { version: 'v2.2.2-beta', settings: {} }
 
   // This globals 'const' helps code size reduction
 
@@ -419,7 +419,7 @@ var tmpl = (function() {
 // { key, i in items} -> { key, i, items }
 function loopKeys(expr) {
   var b0 = brackets(0),
-      els = expr.slice(b0.length).match(/\s*(\S+?)\s*(?:,\s*(\S)+)?\s+in\s+(.+)/)
+      els = expr.slice(b0.length).match(/^\s*(\S+?)\s*(?:,\s*(\S+))?\s+in\s+(.+)$/)
   return els ? { key: els[1], pos: els[2], val: b0 + els[3] } : { val: expr }
 }
 
@@ -460,9 +460,8 @@ function _each(dom, parent, expr) {
 
       // object loop. any changes cause full redraw
       if (!isArray(items)) {
-        test = checksum
+
         checksum = items ? JSON.stringify(items) : ''
-        if (checksum === test) return
 
         items = !items ? [] :
           Object.keys(items).map(function (key) {
@@ -493,9 +492,12 @@ function _each(dom, parent, expr) {
           ).mount()
 
           frag.appendChild(tags[i].root)
+        } else {
+          tags[i].update(_item)
         }
+
         tags[i]._item = _item
-        tags[i].update(_item)
+
       }
 
       root.insertBefore(frag, placeholder)
@@ -621,6 +623,7 @@ function Tag(impl, conf, innerHTML) {
       fn = impl.fn,
       tagName = root.tagName.toLowerCase(),
       attr = {},
+      propsInSyncWithParent = [],
       loopDom,
       TAG_ATTRIBUTES = /([\w\-]+)\s?=\s?['"]([^'"]+)["']/gim
 
@@ -675,7 +678,35 @@ function Tag(impl, conf, innerHTML) {
     })
   }
 
+  function normalizeData(data) {
+    for (var key in item) {
+      if (typeof self[key] != 'undefined')
+        self[key] = data[key]
+    }
+  }
+
+  function inheritFromParent () {
+    if (!self.parent || !isLoop) return
+    each(Object.keys(self.parent), function(k) {
+      // some properties must be always in sync with the parent tag
+      var mustSync = ~propsInSyncWithParent.indexOf(k)
+      if (typeof self[k] == 'undefined' || mustSync) {
+        // track the property to keep in sync
+        // so we can keep it updated
+        if (!mustSync) propsInSyncWithParent.push(k)
+        self[k] = self.parent[k]
+      }
+    })
+  }
+
   this.update = function(data) {
+    // inherit properties from the parent
+    inheritFromParent()
+    // normalize the tag properties in case an item object was initially passed
+    if (item && JSON.stringify(item) != JSON.stringify(data)) {
+      normalizeData(data)
+      item = data
+    }
     extend(self, data)
     updateOpts()
     self.trigger('update', data)
@@ -709,7 +740,7 @@ function Tag(impl, conf, innerHTML) {
     // parse layout after init. fn may calculate args for nested custom tags
     parseExpressions(dom, self, expressions)
 
-    if (!self.parent) self.update()
+    if (!self.parent || isLoop) self.update(item)
 
     // internal use only, fixes #403
     self.trigger('premount')
@@ -744,21 +775,20 @@ function Tag(impl, conf, innerHTML) {
 
     if (p) {
 
-      if (parent) {
+      if (parent)
         // remove this tag from the parent tags object
         // if there are multiple nested tags with same name..
         // remove this element form the array
-        if (isArray(parent.tags[tagName])) {
+        if (isArray(parent.tags[tagName]))
           each(parent.tags[tagName], function(tag, i) {
             if (tag._id == self._id)
               parent.tags[tagName].splice(i, 1)
           })
-        } else
+        else
           // otherwise just delete the tag instance
           parent.tags[tagName] = undefined
-      } else {
+      else
         while (el.firstChild) el.removeChild(el.firstChild)
-      }
 
       if (!keepRootTag)
         p.removeChild(el)
@@ -804,11 +834,10 @@ function setEventHandler(name, handler, dom, tag, item) {
     // cross browser event fix
     e = e || window.event
 
-    if (!e.which) e.which = e.charCode || e.keyCode
-    if (!e.target) e.target = e.srcElement
-
     // ignore error on some browsers
     try {
+      if (!e.which) e.which = e.charCode || e.keyCode
+      if (!e.target) e.target = e.srcElement
       e.currentTarget = dom
     } catch (ignored) { '' }
 
@@ -1054,9 +1083,7 @@ function tbodyInnerHTML(el, html, tagName) {
   div.innerHTML = '<table>' + html + '</table>'
   child = div.firstChild
 
-  while (loops--) {
-    child = child.firstChild
-  }
+  while (loops--) child = child.firstChild
 
   el.appendChild(child)
 
@@ -1075,27 +1102,13 @@ function optionInnerHTML(el, html) {
       eachMatch = html.match(eachRegx),
       ifMatch = html.match(ifRegx)
 
-  if (innerValue) {
-    opt.innerHTML = innerValue[1]
-  } else {
-    opt.innerHTML = html
-  }
+  if (innerValue) opt.innerHTML = innerValue[1]
+  else opt.innerHTML = html
 
-  if (valuesMatch) {
-    opt.value = valuesMatch[1]
-  }
-
-  if (selectedMatch) {
-    opt.setAttribute('riot-selected', selectedMatch[1])
-  }
-
-  if (eachMatch) {
-    opt.setAttribute('each', eachMatch[1])
-  }
-
-  if (ifMatch) {
-    opt.setAttribute('if', ifMatch[1])
-  }
+  if (valuesMatch) opt.value = valuesMatch[1]
+  if (selectedMatch) opt.setAttribute('riot-selected', selectedMatch[1])
+  if (eachMatch) opt.setAttribute('each', eachMatch[1])
+  if (ifMatch) opt.setAttribute('if', ifMatch[1])
 
   el.appendChild(opt)
 }
@@ -1115,9 +1128,7 @@ function optgroupInnerHTML(el, html) {
     innerContent = options
   }
 
-  if (labelMatch) {
-    opt.setAttribute('riot-label', labelMatch[1])
-  }
+  if (labelMatch) opt.setAttribute('riot-label', labelMatch[1])
 
   if (innerContent) {
     var innerOpt = mkEl('div')
@@ -1164,9 +1175,8 @@ function injectStyle(css) {
       if (rs) {
         rs.parentNode.insertBefore(styleNode, rs)
         rs.parentNode.removeChild(rs)
-      } else {
-        document.head.appendChild(styleNode)
-      }
+      } else document.head.appendChild(styleNode)
+
     }
 
   styleNode._rendered = true
@@ -1254,14 +1264,14 @@ riot.mount = function(selector, tagName, opts) {
 
   // crawl the DOM to find the tag
   if (typeof selector === T_STRING) {
-    if (selector === '*') {
+    if (selector === '*')
       // select all the tags registered
       // and also the tags found with the riot-tag attribute set
       selector = allTags = selectAllTags()
-    } else {
+    else
       // or just the ones named like the selector
       selector += addRiotTags(selector.split(','))
-    }
+
     els = $$(selector)
   }
   else
@@ -1273,9 +1283,9 @@ riot.mount = function(selector, tagName, opts) {
     // get all custom tags
     tagName = allTags || selectAllTags()
     // if the root els it's just a single tag
-    if (els.tagName) {
+    if (els.tagName)
       els = $$(tagName, els)
-    } else {
+    else {
       // select all the children for all the different root elements
       var nodeList = []
       each(els, function (_el) {
@@ -1313,7 +1323,7 @@ riot.mountTo = riot.mount
   if (typeof exports === 'object')
     module.exports = riot
   else if (typeof define === 'function' && define.amd)
-    define(function() { return riot })
+    define(function() { return window.riot = riot })
   else
     window.riot = riot
 

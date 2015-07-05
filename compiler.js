@@ -1,5 +1,11 @@
-;(function(window) {
-riot.parsers = {
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd)
+      define(['riot'], factory)
+    else if (typeof exports === 'object')
+      factory(require('riot'))
+    else factory(root.riot)
+}(this, function (riot) {
+var parsers = {
   html: {},
   css: {},
   js: {
@@ -14,8 +20,13 @@ riot.parsers = {
     }
   }
 }
+
+// fix 913
+parsers.js.javascript = parsers.js.none
 // 4 the nostalgics
-riot.parsers.js.coffeescript = riot.parsers.js.coffee
+parsers.js.coffeescript = parsers.js.coffee
+
+riot.parsers = parsers
 
 
 var BOOL_ATTR = ('allowfullscreen,async,autofocus,autoplay,checked,compact,controls,declare,default,'+
@@ -350,4 +361,4 @@ riot.mount = function(a, b, c) {
 
 // @deprecated
 riot.mountTo = riot.mount
-})(this)
+}));
