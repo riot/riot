@@ -35,7 +35,7 @@
     "riot.js"
   ],
   "dependencies": {
-    "chalk": "^1.0.0",
+    "chalk": "^1.1.0",
     "chokidar": "~1.0.3",
     "minimist": "~1.1.1",
     "shelljs": "~0.5.1",
@@ -47,13 +47,13 @@
     "coveralls": "^2.11.2",
     "eslint": "^0.24.0",
     "expect.js": "^0.3.1",
-    "glob": "^5.0.11",
-    "jsdom": "^5.4.3",
+    "glob": "^5.0.13",
+    "jsdom": "^5.5.0",
     "karma": "^0.12.37",
     "karma-coverage": "^0.4.2",
     "karma-mocha": "^0.2.0",
     "karma-phantomjs-launcher": "^0.2.0",
-    "karma-sauce-launcher": "^0.2.11",
+    "karma-sauce-launcher": "^0.2.14",
     "mocha": "^2.2.5",
     "smash": "0.0.14",
     "uglify-js": "latest"
