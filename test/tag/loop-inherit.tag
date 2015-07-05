@@ -38,4 +38,9 @@
   this.label = opts.name
   this.id = opts.id
 
+  this.on('update', function() {
+    this.label = opts.name
+    this.id = opts.id
+  })
+
 </loop-inherit-item>
