@@ -1,0 +1,27 @@
+<!doctype html>
+
+<head>
+  <title>Riot requirejs tests</title>
+
+</head>
+
+<body>
+
+  <app></app>
+
+  <script src="vendor/require.js"></script>
+  <script type="riot/tag">
+    <app>
+      <p>{ title }</p>
+      this.title = 'hello'
+    </app>
+  </script>
+  <script>
+    require(['../dist/riot/riot+compiler'], function(riot) {
+      riot.compile(function() {
+        riot.mount('app')
+      })
+    })
+  </script>
+
+</body>
