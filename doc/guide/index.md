@@ -71,7 +71,7 @@ A Riot tag is a combination of layout (HTML) and logic (JavaScript). Here are th
 * ES6 method syntax is supported: `methodName()` becomes `this.methodName = function()` and `this` variable always points to the current tag instance.
 * A shorthand syntax for class names is available: `class={ completed: done }` renders to `class="completed"`when the value of `done` is a true value.
 * Boolean attributes (checked, selected etc..) are ignored when the expression value is falsy: `<input checked={ undefined }>` becomes `<input>`.
-* All attribute names must be *lowercase*.
+* All attribute names *must be lowercase*. This is due to browser specification.
 * Self-closing tags are supported: `<div/>` equals `<div></div>`. Well known "open tags" such as `<br>`, `<hr>`, `<img>` or `<input>` are never closed after the compilation.
 * Custom tags always need to be closed (normally or self-closed).
 * Standard HTML tags (`label`, `table`, `a` etc..) can also be customized, but not necessarily a wise thing to do.
@@ -530,6 +530,8 @@ Let's define a parent tag `<account>` and with a nested tag `<subscription>`:
 
 </subscription>
 ```
+
+<span class="tag red">important</span> Note how we named the `show_details` attribute using an underscore instead of camel case, which due to browser specification would have been automatically converted to lowercase.
 
 Then we mount the `account` tag to the page with a `plan` configuration option:
 
