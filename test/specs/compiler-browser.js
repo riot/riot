@@ -1276,8 +1276,21 @@ describe('Compiler Browser', function() {
     expect(tag.tags['loop-inherit-item'][2].opts.name).to.be(tag.items[2])
     tag.items.splice(1, 1)
     tag.update()
+    expect(tag.root.getElementsByTagName('div').length).to.be(2)
+    tag.items.push('baz')
+    tag.update()
+    console.log(tag.root.getElementsByTagName('div').length)
+    expect(tag.root.getElementsByTagName('div').length).to.be(3)
+    expect(tag.root.getElementsByTagName('div')[2].innerHTML).to.contain('baz')
+    /*
+    TODO: keep in sync also the nested tags
     expect(tag.tags['loop-inherit-item'][0].opts.name).to.be(tag.items[0])
     expect(tag.tags['loop-inherit-item'][1].opts.name).to.be(tag.items[1])
+    expect(tag.tags['loop-inherit-item'].length).to.be(2)
+
+    expect(tag.tags['loop-inherit-item'].length).to.be(3)
+    expect(tag.tags['loop-inherit-item'][2].opts.name).to.be(tag.items[2])
+    */
   })
 
 })
