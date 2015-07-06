@@ -699,7 +699,9 @@ The element with the `each` attribute will be repeated for all items in the arra
 
 ### Context
 
-A new context is created for each item and the parent can be accessed through the `parent` variable. For example:
+A new context is created for each item. These are [tag instances](/riotjs/api/#tag-instance). When loops are nested, all the children tags in the loop inherit any of their parent loop's properties and methods they themselves have `undefined`. In this way, Riot avoids overriding things that should not be overridden by the parent tag.
+
+The parent can be explicitly accessed through the `parent` variable. For example:
 
 
 ```
