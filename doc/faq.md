@@ -13,8 +13,7 @@ Riot is against the current trend of boilerplate and unneeded complexity. We thi
 
 ### Why IE8?
 Because it's widely used. According to [Net Market Share](http://www.netmarketshare.com/) the global desktop market share is 19% and according to [StatCounter](http://statcounter.com/demo/browser/) the market share is 2.6%.
-
-Net Market Share stats count every user equally, while StatCounter gives extra weight to heavy web users.
+So Please consider [IE8 support](https://muut.com/riotjs/download.html#ie8-support) on your project.
 
 ### Is Riot free?
 Riot is free, open source and licensed under the MIT License. Free from [Additional Grant of Patent Rights](https://github.com/facebook/react/blob/master/PATENTS).
