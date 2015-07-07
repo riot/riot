@@ -359,7 +359,11 @@ describe('Compiler Browser', function() {
 
           // inherit properties from the parent
           '<script type=\"riot\/tag\" src=\"tag\/loop-inherit.tag\"><\/script>',
-          '<loop-inherit><\/ loop-inherit>'
+          '<loop-inherit><\/loop-inherit>',
+
+          // check if the events get triggered correctly
+          '<script type=\"riot\/tag\" src=\"tag\/events.tag\"><\/script>',
+          '<events><\/events>'
 
 
     ].join('\r'),
@@ -1291,6 +1295,36 @@ describe('Compiler Browser', function() {
     expect(tag.tags['loop-inherit-item'].length).to.be(3)
     expect(tag.tags['loop-inherit-item'][2].opts.name).to.be(tag.items[2])
     */
+  })
+
+  it('all the events get fired also in the loop tags, the e.item property gets preserved', function() {
+    var currentItem,
+      currentIndex,
+      callbackCalls = 0,
+      tag = riot.mount('events', {
+        cb: function(e) {
+          console.log(e)
+          expect(e.item.val).to.be(currentItem)
+          expect(e.item.index).to.be(currentIndex)
+          callbackCalls++
+        }
+      })[0],
+      divTags = tag.root.getElementsByTagName('div')
+
+
+
+    currentItem = tag.items[0]
+    currentIndex = 0
+    divTags[0].onclick({})
+    tag.items.reverse()
+    tag.update()
+    currentItem = tag.items[0]
+    currentIndex = 0
+    divTags[0].onclick({})
+
+    expect(callbackCalls).to.be(2)
+
+    tags.push(tag)
   })
 
 })
