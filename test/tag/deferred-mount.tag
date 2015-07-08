@@ -17,7 +17,7 @@
 <deferred-child-1>
   <p>I am the deferred-child-1</p>
   <deferred-child-2 onmount={ opts.onmount }></deferred-child-2>
-  <deferred-loop onmount={ opts.onmount } each={ items }></deferred-loop>
+  <deferred-loop onmount={ parent.opts.onmount } each={ items }></deferred-loop>
 
   this.items = [{},{},{},{},{}]
 
