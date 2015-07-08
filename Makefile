@@ -32,6 +32,9 @@ test-mocha:
 test-karma:
 	@ $(KARMA) start test/karma.conf.js
 
+test-compiler:
+	@ $(MOCHA) ./test/compiler/suite
+
 test-coveralls:
 	@ RIOT_COV=1 cat ./coverage/lcov.info ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
 

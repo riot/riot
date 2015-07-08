@@ -6,6 +6,12 @@ branches:
   only:
     - master
     - dev
+script:
+  make riot test-compiler
+
+before_install:
+  npm install babel && npm install jade && npm install coffee-script && npm install
+
 after_success:
   make test-sauce && make test-coveralls
 

@@ -13,6 +13,7 @@ var outer = 'js'
 
   foo() {
 
+    this.update()
   }
 </2nd>
 
