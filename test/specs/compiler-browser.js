@@ -442,14 +442,24 @@ describe('Compiler Browser', function() {
 
   })
 
-  it('compile a custom tag using custom css and js parsers', function() {
-    var tag = riot.mount('custom-parsers')[0],
-      stag = document.querySelector('style'),
-      styles =  normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
+  it('compile a custom tag using custom css and js parsers', function(done) {
+    var tag = riot.mount('custom-parsers')[0]
 
-    expect(tag).to.be.an('object')
-    expect(tag.version).to.be('1.0.0')
-    expect(styles).to.contain('custom-parsers {color: red;}')
+
+    setTimeout(function() {
+
+      // ie sucks!
+      var stag = document.querySelector('style'),
+          styles =  normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
+
+      expect(tag).to.be.an('object')
+      expect(tag.version).to.be('1.0.0')
+      expect(styles).to.contain('custom-parsers {color: red;}')
+
+      done()
+
+    }, 1000)
+
 
     tags.push(tag)
 
@@ -1228,6 +1238,7 @@ describe('Compiler Browser', function() {
   it('the loops children sync correctly their internal data even when they are nested', function() {
     var tag = riot.mount('loop-sync-options-nested')[0]
 
+    expect(tag.tags['loop-sync-options-nested-child'][0].parent.root.tagName.toLowerCase()).to.be('loop-sync-options-nested')
     expect(tag.tags['loop-sync-options-nested-child'][0].val).to.be('foo')
     expect(tag.tags['loop-sync-options-nested-child'][1].val).to.be(undefined)
     expect(tag.tags['loop-sync-options-nested-child'][2].val).to.be(undefined)
@@ -1250,6 +1261,7 @@ describe('Compiler Browser', function() {
     expect(tag.tags['loop-sync-options-nested-child'][0].bool).to.be(false)
     expect(tag.tags['loop-sync-options-nested-child'][1].bool).to.be(undefined)
     expect(tag.tags['loop-sync-options-nested-child'][2].bool).to.be(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][2].parent.root.tagName.toLowerCase()).to.be('loop-sync-options-nested')
     tag.update({
       children: tag.children.reverse()
     })
