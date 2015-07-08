@@ -130,6 +130,8 @@ You have access to nested tag instances via `tags` variable:
 </my-tag>
 ```
 
+If more than one of the same child tag is used, it is accessed as an array `this.tags.child[n]`
+
 You can also use the `name` attribute to give another name for the nested tag.
 
 ``` html
@@ -157,7 +159,6 @@ The child tags are initialized after the parent tag so the methods and propertie
 
 </my-tag>
 ```
-
 
 ### this.update() | #tag-update
 
