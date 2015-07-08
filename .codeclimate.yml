@@ -1,0 +1,12 @@
+engines:
+  eslint:
+    enabled: true
+
+ratings:
+  paths:
+  - "lib/**"
+
+exclude_paths:
+  - "*"
+  - "test/**"
+  - "demo/**"
