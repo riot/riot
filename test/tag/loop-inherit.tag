@@ -1,5 +1,5 @@
 <loop-inherit>
-  <div each={ item, index in items}>
+  <div each={ item, index in items} class={ active: item == 'active' }>
     <loop-inherit-item id={ index } name={ item } nice={ isFun }></loop-inherit-item>
   </div>
 

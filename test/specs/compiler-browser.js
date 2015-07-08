@@ -1298,10 +1298,11 @@ describe('Compiler Browser', function() {
     tag.items.splice(1, 1)
     tag.update()
     expect(tag.root.getElementsByTagName('div').length).to.be(2)
-    tag.items.push('baz')
+    tag.items.push('active')
     tag.update()
     expect(tag.root.getElementsByTagName('div').length).to.be(3)
-    expect(tag.root.getElementsByTagName('div')[2].innerHTML).to.contain('baz')
+    expect(tag.root.getElementsByTagName('div')[2].innerHTML).to.contain('active')
+    expect(tag.root.getElementsByTagName('div')[2].className).to.be('active')
 
     /*
     TODO: keep in sync also the nested custom tags in a loop
