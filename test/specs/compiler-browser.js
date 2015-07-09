@@ -1202,6 +1202,7 @@ describe('Compiler Browser', function() {
 
   it('the loops children sync correctly their internal data with their options', function() {
     var tag = riot.mount('loop-sync-options')[0]
+
     expect(tag.tags['loop-sync-options-child'][0].val).to.be('foo')
     expect(tag.tags['loop-sync-options-child'][1].val).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][2].val).to.be(undefined)
@@ -1223,6 +1224,7 @@ describe('Compiler Browser', function() {
     expect(tag.tags['loop-sync-options-child'][0].bool).to.be(false)
     expect(tag.tags['loop-sync-options-child'][1].bool).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][2].bool).to.be(undefined)
+
     tag.update({
       children: tag.children.reverse()
     })
