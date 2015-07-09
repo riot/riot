@@ -7,6 +7,6 @@ ratings:
   - "lib/**"
 
 exclude_paths:
-  - "*"
+  - "*.js"
   - "test/**"
   - "demo/**"
