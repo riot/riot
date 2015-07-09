@@ -367,7 +367,11 @@ describe('Compiler Browser', function() {
 
           // top most tag preserve attribute expressions
           '<script type=\"riot\/tag\" src=\"tag\/top-attributes.tag\"><\/script>',
-          '<top-attributes cls="classy"><\/top-attributes>'
+          '<top-attributes cls="classy"><\/top-attributes>',
+
+          // loop over tags instances
+          '<script type=\"riot\/tag\" src=\"tag\/loop-tag-instances.tag\"><\/script>',
+          '<loop-tag-instances><\/loop-tag-instances>'
 
     ].join('\r'),
       tags = [],
@@ -1318,6 +1322,16 @@ describe('Compiler Browser', function() {
     expect(tag.tags['loop-inherit-item'].length).to.be(3)
     expect(tag.tags['loop-inherit-item'][2].opts.name).to.be(tag.items[2])
     */
+  })
+
+  it('loops over other tag instances do not override their internal properties', function() {
+    var tag = riot.mount('loop-tag-instances')[0]
+
+    expect(tag.tags['loop-tag-instances-child'].length).to.be(5)
+    expect(tag.tags['loop-tag-instances-child'][0].root.tagName.toLowerCase()).to.be('loop-tag-instances-child')
+    tag.update()
+    expect(tag.tags['loop-tag-instances-child'][3].root.tagName.toLowerCase()).to.be('loop-tag-instances-child')
+
   })
 
   it('all the events get fired also in the loop tags, the e.item property gets preserved', function() {
