@@ -261,11 +261,11 @@ describe('Tmpl', function() {
     riot.settings.brackets = '${ }'
     expect(render('a${ "b${c}d" }e')).to.be('ab${c}de')
 
+    // silly brackets?
     riot.settings.brackets = '[ ]]'
     expect(render('a[ "[]]"]]b')).to.be('a[]]b')
     expect(render('[[[]]]]')).to.eql([[]])
 
-    // silly brackets?
     riot.settings.brackets = '( ))'
     expect(render('a( "b))" ))c')).to.be('ab))c')
     expect(render('a( (("bc))")) ))')).to.be('abc))')
@@ -305,7 +305,7 @@ describe('Tmpl', function() {
     expect(render('{ ok: 1 /*, no: 1*/ }')).to.be('ok')
     expect(render('{ ok/**/: 1 }')).to.be('ok')
 
-    // as in te template text, comments in strings are preserved
+    // nor in the template text, comments inside strings are preserved
     expect(render('{ "/* ok */" }')).to.be('/* ok */')
     expect(render('{ "/*/* *\/ /**/" }')).to.be('/*/* *\/ /**/')
     expect(render('{ "/* \\"comment\\" */" }')).to.be('/* "comment" */')
@@ -319,7 +319,7 @@ describe('Tmpl', function() {
     expect(render('{ (this["_ä"] = 1, _ä) }')).to.be(1)       // '-ä'' is not a var name
     expect(render('{ (this["ä"] = 1, ä) }')).to.be(1)
 
-    // but you can almost anything in quoted names
+    // but you can include almost anything in quoted names
     expect(render('{ "_\u221A": 1 }')).to.be('_\u221A')
     expect(render('{ (this["\u221A"] = 1, this["\u221A"]) }')).to.be(1)
 
@@ -329,18 +329,18 @@ describe('Tmpl', function() {
     expect(render('\r\n \n \r \n\r')).to.be('\n \n \n \n\n')
     expect(render('\r\n { 0 } \r\n')).to.be('\n 0 \n')
 
-    // ...even their quoted parts
+    // ...even in their quoted parts
     expect(render('style="\rtop:0\r\n"')).to.be('style="\ntop:0\n"')
 
-    // whitespace are compacted in expression (see generated code)
+    // whitespace are compacted in expressions (see generated code)
     expect(render(' { yes ?\n\t2 : 4} ')).to.be(' 2 ')
     expect(render('{ \t \nyes !== no\r\n }')).to.be(true)
 
-    // ...but all whiespace is preserved in js quoted strings
+    // ...but is preserved in js quoted strings
     expect(render('{ "\r\n \n \r" }')).to.be('\r\n \n \r')
     expect(render('{ ok: "\r\n".charCodeAt(0) === 13 }')).to.be('ok')
 
-    // but, in shorthand names, whitespace will be compacted.
+    // in shorthand names, whitespace will be compacted.
     expect(render('{ " \ta\n \r \r\nb\n ": yes }')).to.be('a b')
 
   //// Extra tests
