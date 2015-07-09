@@ -256,7 +256,7 @@ Mixins provide an easy way to share functionality across tags. When a tag is com
 var OptsMixin = {
     init: function() {
       this.on('updated', function() { console.log('Updated!') })
-    }
+    },
 
     getOpts: function() {
         return this.opts
