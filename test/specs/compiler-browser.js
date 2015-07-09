@@ -363,8 +363,11 @@ describe('Compiler Browser', function() {
 
           // check if the events get triggered correctly
           '<script type=\"riot\/tag\" src=\"tag\/events.tag\"><\/script>',
-          '<events><\/events>'
+          '<events><\/events>',
 
+          // top most tag preserve attribute expressions
+          '<script type=\"riot\/tag\" src=\"tag\/top-attributes.tag\"><\/script>',
+          '<top-attributes cls="classy"><\/top-attributes>'
 
     ].join('\r'),
       tags = [],
@@ -1341,6 +1344,12 @@ describe('Compiler Browser', function() {
 
     expect(callbackCalls).to.be(2)
 
+    tags.push(tag)
+  })
+
+  it('top most tag preserve attribute expressions', function() {
+    var tag = riot.mount('top-attributes')[0]
+    expect(tag.root.className).to.be('classy')
     tags.push(tag)
   })
 
