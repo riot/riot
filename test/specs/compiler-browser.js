@@ -449,23 +449,16 @@ describe('Compiler Browser', function() {
 
   })
 
-  it('compile a custom tag using custom css and js parsers', function(done) {
+  it('compile a custom tag using custom css and js parsers', function() {
     var tag = riot.mount('custom-parsers')[0]
 
+    // ie sucks!
+    var stag = document.querySelector('style'),
+        styles =  normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
 
-    setTimeout(function() {
-
-      // ie sucks!
-      var stag = document.querySelector('style'),
-          styles =  normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
-
-      expect(tag).to.be.an('object')
-      expect(tag.version).to.be('1.0.0')
-      expect(styles).to.contain('custom-parsers {color: red;}')
-
-      done()
-
-    }, 1000)
+    expect(tag).to.be.an('object')
+    expect(tag.version).to.be('1.0.0')
+    expect(styles).to.contain('custom-parsers {color: red;}')
 
 
     tags.push(tag)
