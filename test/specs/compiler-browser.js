@@ -733,7 +733,7 @@ describe('Compiler Browser', function() {
     expect(normalizeHTML(root.getElementsByTagName('div')[0].innerHTML))
       .to.be('<p>zero = 0</p><p>one = 1</p><p>two = 2</p><p>three = 3</p>')
 
-    for (key in tag.obj)
+    for (key in tag.obj)                              // eslint-disable-line guard-for-in
       tag.obj[key] = tag.obj[key] * 2
     tag.update()
     expect(normalizeHTML(root.getElementsByTagName('div')[0].innerHTML))
