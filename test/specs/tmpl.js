@@ -201,4 +201,213 @@ describe('Tmpl', function() {
 
   })
 
+  it('compiles specs - jul-2015 tmpl update', function() {
+
+    riot.settings.brackets = null
+
+  //// Fewer errors in recognizing complex expressions, even in class shorthands.
+
+    data.$a = 0
+    data.$b = 0
+    data.parent = { selectedId: 0 }
+
+    // FIX #784 - The shorthand syntax for class names doesn't support parentheses
+    expect(render('{ primary: (parent.selectedId === $a)  }')).to.be('primary')
+
+    // a bit more of complexity. note: using the comma operator requires parentheses
+    expect(render('{ ok: ($b++, ($a > 0) || ($b & 1)) }')).to.be('ok')
+
+  //// Unprotected keywords `void`, `window` and `global`, in addition to `this`.
+
+    globalVar = 5
+    data.$a = 5
+    expect(render('{' + (typeof window === 'object' ? 'window' : 'global') +'.globalVar }')).to.be(5)
+    expect(render('{ this.$a }')).to.be(5)
+    expect(render('{ void 0 }')).to.be(undefined)
+
+  //// Instantiation with the constructor's name in parentheses use the default context
+
+    data.Date = '?'
+    expect(render('{ +new (Date)() }')).to.be.a('number')   // of global or window
+
+  //// Better recognition of nested brackets, escaping is almost unnecessary.
+
+    // inner brackets don't need to be escaped
+    expect(render('{{ str: "s" }}')).to.eql({ str: 's' })
+    expect(render(' {{str: {}}}+{{}}')).to.be(' [object Object]+[object Object]')
+    expect(render('{ "{}}" }')).to.be('{}}')
+
+    // inner custom brackets
+    riot.settings.brackets = '[ ]'
+    expect(render('[ str[0] ]')).to.be('x')
+    expect(render('[ [1].pop() ]')).to.be(1)
+    expect(render('a,[["b", "c"]],d')).to.be('a,b,c,d')
+
+    riot.settings.brackets = '<% %>'
+    expect(render('<% "%><% %>" %>')).to.be('%><% %>')
+
+    // multi character brackets
+    riot.settings.brackets = '(( ))'
+    expect(render('((({})))')).to.eql({})
+    expect(render('(((("o"))))="o"')).to.be('o="o"')
+    expect(render('((( ("o") )))="o"')).to.be('o="o"')
+
+    // brackets inside strings, even unbalanced, are ignored
+    riot.settings.brackets = null
+    expect(render('a{ "b{cd" }e')).to.be('ab{cde')
+    expect(render('a{ "b}cd" }e')).to.be('ab}cde')
+
+    // asymmetric custom brackets
+    riot.settings.brackets = '${ }'
+    expect(render('a${ "b${c}d" }e')).to.be('ab${c}de')
+
+    riot.settings.brackets = '[ ]]'
+    expect(render('a[ "[]]"]]b')).to.be('a[]]b')
+    expect(render('[[[]]]]')).to.eql([[]])
+
+    // silly brackets?
+    riot.settings.brackets = '( ))'
+    expect(render('a( "b))" ))c')).to.be('ab))c')
+    expect(render('a( (("bc))")) ))')).to.be('abc))')
+    expect(render('a( ("(((b))") ))c')).to.be('a(((b))c')
+
+    riot.settings.brackets = null
+
+  //// Better recognition of literal regexps inside template and expressions.
+
+    expect(render('{ /{}\\/\\n/.source }')).to.be('{}\\/\\n')
+    expect(render('{ ok: /{}\\/\\n/.test("{}\\/\\n") }')).to.be('ok')
+
+    // in quoted text, left bracket and backslashes need to be escaped!
+    expect(render('str = "/\\{}\\\\/\\\\n/"')).to.be('str = "/{}\\/\\n/"')
+
+    // handling quotes in regexp is not so complicated :)
+    expect(render('{ /"\'/.source }')).to.be('"\'')
+    expect(render('{ ok: /"\'/.test("\\\"\'") }')).to.be('ok')
+    expect(render('str = "/\\\\\"\'/"')).to.be('str = "/\\\"\'/"')
+
+  //// Better recognition of comments, including empty ones.
+
+    // comments within expresions are converted to spaces, in concordance with js specs
+    expect(render('{ typeof/* */str === "string" }')).to.be(true)
+    expect(render('{ 1+/* */+2 }')).to.be(3)
+
+    // comments in template text is preserved
+    expect(render(' /*/* *\/ /**/ ')).to.be(' /*/* *\/ /**/ ')
+    expect(render('/*/* "note" /**/')).to.be('/*/* "note" /**/')
+
+    // riot parse correctamente empty and exotic comments
+    expect(render('{ /**/ }')).to.be(undefined)               // empty comment
+    expect(render('{ /*/* *\/ /**/ }')).to.be(undefined)      // nested comment sequences
+
+    // there's no problem in shorthands
+    expect(render('{ ok: 0+ /*{no: 1}*/ 1 }')).to.be('ok')
+    expect(render('{ ok: 1 /*, no: 1*/ }')).to.be('ok')
+    expect(render('{ ok/**/: 1 }')).to.be('ok')
+
+    // as in te template text, comments in strings are preserved
+    expect(render('{ "/* ok */" }')).to.be('/* ok */')
+    expect(render('{ "/*/* *\/ /**/" }')).to.be('/*/* *\/ /**/')
+    expect(render('{ "/* \\"comment\\" */" }')).to.be('/* "comment" */')
+
+  //// Support for full ISO-8859-1 charset in js var and class names
+
+    expect(render('{ neón: 1 }')).to.be('neón')
+    expect(render('{ -ä: 1 }')).to.be('-ä')                   // '-ä' is a valid class name
+    expect(render('{ ä: 1 }')).to.be('ä')
+    expect(render('{ (this["neón"] = 0, ++neón) }')).to.be(1)
+    expect(render('{ (this["_ä"] = 1, _ä) }')).to.be(1)       // '-ä'' is not a var name
+    expect(render('{ (this["ä"] = 1, ä) }')).to.be(1)
+
+    // but you can almost anything in quoted names
+    expect(render('{ "_\u221A": 1 }')).to.be('_\u221A')
+    expect(render('{ (this["\u221A"] = 1, this["\u221A"]) }')).to.be(1)
+
+  //// Mac/Win EOL's normalization avoids unexpected results with some editors.
+
+    // win eols are normalized in template text
+    expect(render('\r\n \n \r \n\r')).to.be('\n \n \n \n\n')
+    expect(render('\r\n { 0 } \r\n')).to.be('\n 0 \n')
+
+    // ...even their quoted parts
+    expect(render('style="\rtop:0\r\n"')).to.be('style="\ntop:0\n"')
+
+    // whitespace are compacted in expression (see generated code)
+    expect(render(' { yes ?\n\t2 : 4} ')).to.be(' 2 ')
+    expect(render('{ \t \nyes !== no\r\n }')).to.be(true)
+
+    // ...but all whiespace is preserved in js quoted strings
+    expect(render('{ "\r\n \n \r" }')).to.be('\r\n \n \r')
+    expect(render('{ ok: "\r\n".charCodeAt(0) === 13 }')).to.be('ok')
+
+    // but, in shorthand names, whitespace will be compacted.
+    expect(render('{ " \ta\n \r \r\nb\n ": yes }')).to.be('a b')
+
+  //// Extra tests
+
+    // correct handling of quotes
+    expect(render('{ "House \\"Atrides\\" wins" }')).to.be('House "Atrides" wins')
+    expect(render('{ "Leto\'s house" }')).to.be("Leto's house")
+    expect(render(" In '{ \"Leto\\\\\\\'s house\" }' ")).to.be(" In 'Leto\\\'s house' ")  // « In '{ "Leto\\\'s house" }' » --> In 'Leto\'s house'
+    expect(render(' In "{ "Leto\'s house" }" ')).to.be(' In "Leto\'s house" ')            // « In "{ "Leto's house" }"    » --> In "Leto's house"
+    expect(render(' In "{ \'Leto\\\'s house\' }" ')).to.be(' In "Leto\'s house" ')        // « In "{ 'Leto\'s house' }"   » --> In "Leto's house"
+
+  //// Consistency?
+
+    // the main inconsistence between expressions and class shorthands
+    expect(render('{ !nonExistingVar.foo ? "ok" : "" }')).to.equal(undefined) // ok
+    expect(render('{ !nonExistingVar.foo ? "ok" : "" } ')).to.equal(' ')      // ok
+    expect(render('{ ok: !nonExistingVar.foo }')).to.equal('ok')              // what?
+
+  //// Custom brackets
+
+    // brackets RegEx generation and info, discards /im, escape each char in regexp
+    !(function testBrackets(brfn) {
+
+      var vals = [
+      // source     brackets(2) + brackets(3)
+        ['<% %>',   '<% %>'    ],
+        ['[! !]',   '\\[! !]'  ],
+        ['·ʃ< ]]',  '·ʃ< ]]'   ],
+        ['{$ $}',   '{\\$ \\$}'],
+        ['${ }',    '\\${ }'   ],
+        ['_( )_',   '_\\( \\)_'],
+        ['_/ \\_',  '_/ \\\\_' ]
+      ]
+      var rs, bb, i
+
+      riot.settings.brackets = undefined  // use default brackets
+      for (i = 0; i < 2; i++) {
+        expect(brfn(rs)).to.be(rs)
+        expect(brfn(0)).to.equal('{')
+        expect(brfn(1)).to.equal('}')
+        expect(brfn(2)).to.equal('{')
+        expect(brfn(3)).to.equal('}')
+        expect(brfn(4) + '').to.be('' + /\\({|})/g)
+        expect(brfn(5) + '').to.be('' + /(\\?)(?=([{\[\(])|{|})(?:({)|(})|.)?/g)
+        riot.settings.brackets = '{ }'    // same as defaults
+      }
+      for (i = 0; i < vals.length; i++) {
+
+        // set another brackets
+        rs = vals[i]
+        bb = (riot.settings.brackets = rs[0]).split(' ')
+        rs = rs[1]
+
+        expect(brfn(/{ }/g).source).to.equal(rs)
+        expect(brfn(0)).to.equal(bb[0])
+        expect(brfn(1)).to.equal(bb[1]); bb = rs.split(' ')
+        expect(brfn(2)).to.equal(bb[0])
+        expect(brfn(3)).to.equal(bb[1])
+        expect(brfn(4).source).to.equal('\\\\(' + rs.replace(' ', '|') + ')')
+        expect(brfn(5).source).to.equal('(\\\\?)(?=([{\\[\\(])|' +
+          rs.replace(' ', '|') + ')(?:(' + rs.replace(' ', ')|(') + ')|.)?')
+      }
+
+      riot.settings.brackets = null
+
+    })(riot.util.brackets)
+
+  })
+
 })
