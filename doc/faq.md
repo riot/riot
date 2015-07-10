@@ -11,10 +11,6 @@ description: none
 Riot is against the current trend of boilerplate and unneeded complexity. We think that a small, powerful API and concise syntax are extremely important things on a client-side library.
 
 
-### Why IE8?
-Because it's widely used. According to [Net Market Share](http://www.netmarketshare.com/) the global desktop market share is 19% and according to [StatCounter](http://statcounter.com/demo/browser/) the market share is 2.6%.
-So Please consider [IE8 support](https://muut.com/riotjs/download.html#ie8-support) on your project.
-
 ### Is Riot free?
 Riot is free, open source and licensed under the MIT License. Free from [Additional Grant of Patent Rights](https://github.com/facebook/react/blob/master/PATENTS).
 
@@ -51,10 +47,5 @@ It's not evil, it just looks "old". To have JS and HTML under the same module is
 
 ### Any future plans?
 
-Yes:
-
-1. Performance improvements ( especially looping )
-2. Plugin system
-3. Tag option validation using HTML attributes
-
+Yes we do, we have a lots of ideas and we keep updating and enhancing the project thanks to the help of an active and democratic community on [github](https://github.com/riot). Please [follow us](https://github.com/riot/riot) to participate to our discussions and to keep yourself updated about latest features of riot
 

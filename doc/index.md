@@ -9,7 +9,7 @@ hero: true
 
 # 1. Custom tags
 
-Riot brings custom tags to all browsers starting from IE8.
+Riot brings custom tags to all modern browsers.
 
 ``` html
 <todo>
@@ -79,7 +79,7 @@ HTML syntax is the *de facto* language of the web and it's designed for building
 
 ### Close to standards
 - No proprietary event system.
-- Event normalization for IE8.
+- Event normalization.
 - The rendered DOM can be freely manipulated with other tools.
 - No extra HTML root elements or `data-` attributes.
 - Plays well with jQuery.
@@ -124,7 +124,7 @@ Riot has between 10 and 100 times fewer API methods than other UI libraries.
 <small><em>polymer.min.js</em> – 120KB</small>
 <span class="bar red" style="width: 94%"></span>
 
-<small><em>riot.min.js</em> – 6.7KB</small>
+<small><em>riot.min.js</em> – <span class="riot-size">3.5</span>KB</small>
 <span class="bar blue" style="width: 4.8%"></span>
 
 

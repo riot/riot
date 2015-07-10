@@ -23,9 +23,6 @@ Please follow the coding style established in the rest of the codebase.
   **Equality Checking**:<br>
   Prefer `==` over `===` unless it's a must.
 
-  **Bitwise Operations**:<br>
-  Prefer classic conditionals `i < 0` over bitwise operators `!~pos`
-
 ### Create a test
 
 Create a test for your specific contribution and submit it with your pull request to ensure the future stability of Riotjs
