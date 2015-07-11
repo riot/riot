@@ -47,5 +47,5 @@ It's not evil, it just looks "old". To have JS and HTML under the same module is
 
 ### Any future plans?
 
-Yes we do, we have a lots of ideas and we keep updating and enhancing the project thanks to the help of an active and democratic community on [github](https://github.com/riot). Please [follow us](https://github.com/riot/riot) to participate to our discussions and to keep yourself updated about latest features of riot
+Yes we do, we have a lot of ideas and we keep updating and enhancing the project thanks to the help of an active and democratic community on [github](https://github.com/riot). Please [follow us](https://github.com/riot/riot) to participate to our discussions and to keep yourself updated about latest features of riot
 
