@@ -1,7 +1,7 @@
 
 [![Riot logo](doc/logo/riot480x.png)](https://muut.com/riotjs/)
 
-## A React- like, <span class="riot-size">12.75</span>kb UI lib
+## A React- like, <span class="riot-size">12.75kb</span> UI lib
 
 [![Build Status][travis-image]][travis-url]
 [![Riot Forum][riot-forum-image]][riot-forum-url]
@@ -23,7 +23,7 @@
 | Angular                | 1.4.2      | 145.5kb       |
 | React                  | 0.13.3     | 121.7kb       |
 | Web Components Polyfill| 0.7.5      | 117.1kb       |
-| Riot                   | 2.2.2-beta | 12.75kb       |
+| Riot                   | 2.2.2-beta | <span class="riot-size">12.75kb</span> |
 
 
 ### Custom tags • Concise syntax • Virtual DOM • Full stack
