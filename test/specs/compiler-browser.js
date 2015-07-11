@@ -1358,7 +1358,9 @@ describe('Compiler Browser', function() {
 
   it('top most tag preserve attribute expressions', function() {
     var tag = riot.mount('top-attributes')[0]
-    expect(tag.root.className).to.be('classy')
+    expect(tag.root.className).to.be('classy') // qouted
+    expect(tag.root.getAttribute('data-noquote')).to.be('quotes') // not quoted
+    expect(tag.root.style.fontSize).to.be('2em') // TODO: how to test riot-prefix?
     tags.push(tag)
   })
 
