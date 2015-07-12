@@ -11,6 +11,7 @@
 [![NPM downloads][npm-downloads-image]][npm-url]
 [![MIT License][license-image]][license-url]
 [![Coverage Status][coverage-image]][coverage-url]
+[![Code Quality][codeclimate-image]][codeclimate-url]
 
 
 [![Sauce Test Status][saucelabs-image]][saucelabs-url]
@@ -132,7 +133,6 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot + AngularJS](https://github.com/lucasbrigida/angular-riot)
 - [Module loader for WebPack](https://www.npmjs.com/package/riotjs-loader)
 - [Riot + Meteor]( https://atmospherejs.com/xaiki/riotjs)
-- [Riot on CodeClimate](https://codeclimate.com/github/muut/riotjs/code)
 - [Riot Snake Game](http://cdn.rawgit.com/atian25/blog/master/assets/riot-snake.html)
 - [Riot Tag Syntax Checker](http://cognitom.github.io/riot-checker/)
 - [Riot 文档中译版](https://github.com/Centaur/riotjs_doc_cn) :cn:
@@ -289,3 +289,6 @@ https://muut.com/riotjs/
 
 [gitter-image]:https://img.shields.io/badge/GITTER-JOIN_CHAT_%E2%86%92-1dce73.svg?style=flat-square
 [gitter-url]:https://gitter.im/riot/riot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
+[codeclimate-image]:https://img.shields.io/codeclimate/github/riot/riot.svg?style=flat-square
+[codeclimate-url]:https://codeclimate.com/github/riot/riot
