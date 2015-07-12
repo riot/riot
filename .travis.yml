@@ -9,6 +9,8 @@ branches:
 script:
   make riot test-compiler
 
+sudo: false
+
 before_install:
   npm install babel && npm install jade && npm install coffee-script && npm install
 
