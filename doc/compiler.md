@@ -55,7 +55,7 @@ riot.compile(function() {
 
 Compilation phase is basically free and takes no time at all. Compiling a [timer tag](https://github.com/riot/riot/blob/master/test/tag/timer.tag) 30 times takes 2 milliseconds on a regular laptop. If you have a crazy page with 1000 different timer-sized tags, the compilation takes around 35ms.
 
-The compiler weights so you can safely perform client side compilation on production without download or performance or issues.
+The compiler is lightweight so you can safely perform client side compilation on production without download or performance or issues.
 
 Read the [compiler API](/riotjs/api/#compiler) for more details.
 
