@@ -1,7 +1,7 @@
 
 [![Riot logo](doc/logo/riot480x.png)](https://muut.com/riotjs/)
 
-## A React- like, 3.5KB UI lib
+## A React- like, <span class="riot-size">12.75kb</span> UI lib
 
 [![Build Status][travis-image]][travis-url]
 [![Riot Forum][riot-forum-image]][riot-forum-url]
@@ -16,10 +16,20 @@
 
 [![Sauce Test Status][saucelabs-image]][saucelabs-url]
 
+### Framework Size Comparison
 
-### Custom tags • Concise syntax • Virtual DOM • Full stack • IE8
+| Framework              | Version    | Minified Size |
+|------------------------|------------|---------------|
+| Ember                  | 1.13.3     | 493.3kb       |
+| Angular                | 1.4.2      | 145.5kb       |
+| React                  | 0.13.3     | 121.7kb       |
+| Web Components Polyfill| 0.7.5      | 117.1kb       |
+| Riot                   | 2.2.2-beta | <span class="riot-size">12.75kb</span> |
 
-Riot brings custom tags to all browsers, including IE8. Think React + Polymer but with enjoyable syntax and a small learning curve.
+
+### Custom tags • Concise syntax • Virtual DOM • Full stack
+
+Riot brings custom tags to all modern browsers. Think React + Polymer but with enjoyable syntax and a small learning curve.
 
 
 #### Tag definition
@@ -74,7 +84,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Close to standards
 - No proprietary event system.
-- Event normalization for IE8.
+- Event normalization.
 - The rendered DOM can be freely manipulated with other tools.
 - No extra HTML root elements or `data-` attributes.
 - Plays well with jQuery.
@@ -266,7 +276,7 @@ Riot is made with :heart: by many smart people. Thanks to all the contributors
      1  Boris Huai              0.1%
 ```
 
-https://muut.com/riotjs/
+[https://muut.com/riotjs/](https://muut.com/riotjs/)
 
 
 [travis-image]:https://img.shields.io/travis/riot/riot.svg?style=flat-square
