@@ -290,6 +290,15 @@ describe('Tmpl', function() {
     expect(render('{ ok: /"\'/.test("\\\"\'") }')).to.be('ok')
     expect(render('str = "/\\\\\"\'/"')).to.be('str = "/\\\"\'/"')
 
+    // no confusion with operators
+    data.x = 2
+    expect(render('{ 10 /x+10/ 1 }')).to.be(15)
+    expect(render('{ x /2+x/ 1 }')).to.be(3)
+    expect(render('{ x /2+"abc".search(/c/) }')).to.be(3)
+
+    // in expressions, there's no ASI support
+    expect(render('{ x\n /2+x/ 1 }')).to.be(3)
+
   //// Better recognition of comments, including empty ones.
 
     // comments within expresions are converted to spaces, in concordance with js specs
