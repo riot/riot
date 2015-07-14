@@ -4,7 +4,9 @@
     else if (typeof exports === 'object')
       factory(require('riot'))
     else factory(root.riot)
-}(this, function (riot) {
+}(this, function (riot, undefined) {
+
+  var T_STRING = 'string'
 var parsers = {
   html: {},
   css: {},
@@ -215,8 +217,8 @@ function compile(src, opts) {
   })
 
   return src.replace(CUSTOM_TAG, function(_, tagName, attrs, html, js) {
-
     html = html || ''
+    attrs = compileHTML(attrs, '', '')
 
     // js wrapped inside <script> tag
     var type = opts.type
@@ -294,7 +296,7 @@ function compileScripts(fn) {
   if (!scriptsAmount) {
     done()
   } else {
-    ;[].map.call(scripts, function(script) {
+    [].map.call(scripts, function(script) {
       var url = script.getAttribute('src')
 
       function compileTag(source) {
@@ -314,7 +316,7 @@ function compileScripts(fn) {
 riot.compile = function(arg, fn) {
 
   // string
-  if (typeof arg == 'string') {
+  if (typeof arg === T_STRING) {
 
     // compile & return
     if (arg.trim()[0] == '<') {
@@ -333,7 +335,7 @@ riot.compile = function(arg, fn) {
   }
 
   // must be a function
-  if (typeof arg != 'function') arg = undefined
+  if (typeof arg !== 'function') arg = undefined
 
   // all compiled
   if (ready) return arg && arg()
