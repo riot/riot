@@ -669,11 +669,13 @@ describe('Compiler Browser', function() {
     tag.update()
     expect(root.getElementsByTagName('looped-child').length).to.be(3)
 
-    /*
-
     expect(tag.tags['looped-child'][2].isMounted).to.be(true)
     expect(tag.tags['looped-child'].length).to.be(3)
-    */
+
+    expect(root.getElementsByTagName('looped-child')[0].style.color).to.be('red')
+    root.getElementsByTagName('looped-child')[0].getElementsByTagName('button')[0].onclick({})
+    expect(root.getElementsByTagName('looped-child')[0].style.color).to.be('blue')
+
 
     tags.push(tag)
 

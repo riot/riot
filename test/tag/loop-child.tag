@@ -8,13 +8,15 @@
 </loop-child>
 
 
-<looped-child>
+<looped-child style="color: { color };">
 
   <h3>{ opts.el.name }</h3>
   <button onclick={ hit }>{ opts.el.name }</button>
 
+  this.color = 'red'
+
   hit(e) {
-    console.info(e.target)
+    this.color = 'blue'
   }
 
 </looped-child>
