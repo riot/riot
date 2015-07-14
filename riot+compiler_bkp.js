@@ -12,7 +12,6 @@
       T_UNDEF  = 'undefined'
 
   // for IE8 and rest of the world
-  /* istanbul ignore next */
   var isArray = Array.isArray || (function () {
     var _ts = Object.prototype.toString
     return function (v) { return _ts.call(v) === '[object Array]' }
@@ -493,7 +492,7 @@ function _each(dom, parent, expr) {
               parent: parent,
               isLoop: true,
               hasImpl: hasImpl,
-              root: hasImpl ? dom.cloneNode() : root,
+              root: dom.cloneNode(),
               item: _item
             }, dom.innerHTML)
           ).mount()
@@ -687,6 +686,21 @@ function Tag(impl, conf, innerHTML) {
     })
   }
 
+  function cleanUpData(data) {
+    if (!data instanceof Tag) return data
+
+    var o = {},
+        blackList = ['update', 'root', 'mount', 'unmount', 'mixin', 'isMounted', 'isloop']
+
+    for (var key in data) {
+      if (!~blackList.indexOf(key))
+        o[key] = data[key]
+    }
+
+    return o
+
+  }
+
   function normalizeData(data) {
     for (var key in item) {
       if (typeof self[key] !== T_UNDEF)
@@ -709,15 +723,12 @@ function Tag(impl, conf, innerHTML) {
   }
 
   this.update = function(data) {
-    // make sure the data passed will not override
-    // the component core methods
     data = cleanUpData(data)
     // inherit properties from the parent
     inheritFromParent()
     // normalize the tag properties in case an item object was initially passed
     if (typeof item === T_OBJECT || isArray(item)) {
       normalizeData(data)
-      item = data
     }
     extend(self, data)
     updateOpts()
@@ -751,7 +762,7 @@ function Tag(impl, conf, innerHTML) {
 
     // parse layout after init. fn may calculate args for nested custom tags
     parseExpressions(dom, self, expressions)
-    if (!self.parent || hasImpl) parseExpressions(self.root, self, expressions) // top level before update, empty root
+    if (!self.parent) parseExpressions(self.root, self, expressions) // top level before update, empty root
 
     if (!self.parent || isLoop) self.update(item)
 
@@ -1015,19 +1026,6 @@ function extend(src) {
   return src
 }
 
-// with this function we avoid that the current Tag methods get overridden
-function cleanUpData(data) {
-  if (!(data instanceof Tag)) return data
-
-  var o = {},
-      blackList = ['update', 'root', 'mount', 'unmount', 'mixin', 'isMounted', 'isloop', 'tags', 'parent', 'opts']
-  for (var key in data) {
-    if (!~blackList.indexOf(key))
-      o[key] = data[key]
-  }
-  return o
-}
-
 function mkdom(template) {
   var checkie = ieVersion && ieVersion < 10,
       matches = /^\s*<([\w-]+)/.exec(template),
@@ -1118,7 +1116,7 @@ function setNamed(dom, parent, keys) {
  * Hacks needed for the old internet explorer versions [lower than IE10]
  *
  */
-/* istanbul ignore next */
+
 function tbodyInnerHTML(el, html, tagName) {
   var div = mkEl('div'),
       loops = /td|th/.test(tagName) ? 3 : 2,
@@ -1132,7 +1130,7 @@ function tbodyInnerHTML(el, html, tagName) {
   el.appendChild(child)
 
 }
-/* istanbul ignore next */
+
 function optionInnerHTML(el, html) {
   var opt = mkEl('option'),
       valRegx = /value=[\"'](.+?)[\"']/,
@@ -1156,7 +1154,7 @@ function optionInnerHTML(el, html) {
 
   el.appendChild(opt)
 }
-/* istanbul ignore next */
+
 function optgroupInnerHTML(el, html) {
   var opt = mkEl('optgroup'),
       labelRegx = /label=[\"'](.+?)[\"']/,
@@ -1565,8 +1563,8 @@ function compile(src, opts) {
   })
 
   return src.replace(CUSTOM_TAG, function(_, tagName, attrs, html, js) {
+
     html = html || ''
-    attrs = compileHTML(attrs, '', '')
 
     // js wrapped inside <script> tag
     var type = opts.type
@@ -1644,7 +1642,7 @@ function compileScripts(fn) {
   if (!scriptsAmount) {
     done()
   } else {
-    [].map.call(scripts, function(script) {
+    ;[].map.call(scripts, function(script) {
       var url = script.getAttribute('src')
 
       function compileTag(source) {
@@ -1716,7 +1714,6 @@ riot.mountTo = riot.mount
   riot.util = { brackets: brackets, tmpl: tmpl }
 
   // support CommonJS, AMD & browser
-  /* istanbul ignore next */
   if (typeof exports === T_OBJECT)
     module.exports = riot
   else if (typeof define === 'function' && define.amd)
