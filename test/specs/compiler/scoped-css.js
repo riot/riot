@@ -34,11 +34,19 @@ describe('Scoped CSS', function() {
   })
   it('add my-tag to the root selector', function() {
     expect(render(':scope { display: block }'))
-        .to.equal('my-tag , [riot-tag="my-tag"] { display: block }')
+        .to.equal('my-tag, [riot-tag="my-tag"]{ display: block }')
   })
   it('add my-tag to the nested root selector', function() {
     expect(render(':scope > ul { padding: 0 }'))
         .to.equal('my-tag > ul, [riot-tag="my-tag"] > ul{ padding: 0 }')
+  })
+  it('add my-tag to the root selector with attr', function() {
+    expect(render(':scope[disabled] { color: gray }'))
+        .to.equal('my-tag[disabled], [riot-tag="my-tag"][disabled]{ color: gray }')
+  })
+  it('add my-tag to the root selector with class', function() {
+    expect(render(':scope.great { color: gray }'))
+        .to.equal('my-tag.great, [riot-tag="my-tag"].great{ color: gray }')
   })
   it('not add my-tag to @font-face', function() {
     expect(render('@font-face { font-family: "FontAwesome" }'))
