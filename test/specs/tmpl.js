@@ -202,7 +202,7 @@ describe('Tmpl', function() {
 
   })
 
-  it('compiles specs - 2015-07-10 tmpl update', function() {
+  it('compiles specs - 2015-07-16 tmpl update', function() {
 
     riot.settings.brackets = null
 
@@ -324,14 +324,14 @@ describe('Tmpl', function() {
     expect(render('{ "/* \\"comment\\" */" }')).to.be('/* "comment" */')
 
   //// Support for full ISO-8859-1 charset in js var and class names
-
+  /*
     expect(render('{ neón: 1 }')).to.be('neón')
     expect(render('{ -ä: 1 }')).to.be('-ä')                   // '-ä' is a valid class name
     expect(render('{ ä: 1 }')).to.be('ä')
     expect(render('{ (this["neón"] = 0, ++neón) }')).to.be(1)
     expect(render('{ (this["_ä"] = 1, _ä) }')).to.be(1)       // '-ä'' is not a var name
     expect(render('{ (this["ä"] = 1, ä) }')).to.be(1)
-
+  */
     // but you can include almost anything in quoted names
     expect(render('{ "_\u221A": 1 }')).to.be('_\u221A')
     expect(render('{ (this["\u221A"] = 1, this["\u221A"]) }')).to.be(1)
@@ -396,8 +396,6 @@ describe('Tmpl', function() {
         expect(brfn(1)).to.equal('}')
         expect(brfn(2)).to.equal('{')
         expect(brfn(3)).to.equal('}')
-        expect(brfn(4) + '').to.be('' + /\\({|})/g)
-        expect(brfn(5) + '').to.be('' + /(\\?)(?=([{\[\(])|{|})(?:({)|(})|.)?/g)
         riot.settings.brackets = '{ }'    // same as defaults
       }
       for (i = 0; i < vals.length; i++) {
@@ -412,9 +410,6 @@ describe('Tmpl', function() {
         expect(brfn(1)).to.equal(bb[1]); bb = rs.split(' ')
         expect(brfn(2)).to.equal(bb[0])
         expect(brfn(3)).to.equal(bb[1])
-        expect(brfn(4).source).to.equal('\\\\(' + rs.replace(' ', '|') + ')')
-        expect(brfn(5).source).to.equal('(\\\\?)(?=([{\\[\\(])|' +
-          rs.replace(' ', '|') + ')(?:(' + rs.replace(' ', ')|(') + ')|.)?')
       }
 
       riot.settings.brackets = null
