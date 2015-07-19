@@ -383,7 +383,7 @@ You can have multiple event listeners for the same event. See [observable](/riot
 
 ## Expressions
 
-HTML can be mixed with expressions that are enclosed in brackets:
+HTML can be mixed with expressions that are enclosed in curly braces:
 
 ``` js
 { /* my_expression goes here */ }
@@ -454,14 +454,14 @@ evaluates to "foo baz zorro". Property names whose value is truthful are appende
 
 ### Printing brackets
 
-You can output an expression without evaluation by escaping the opening bracket:
+You can output an expression without evaluation by escaping the opening brace:
 
 `\\{ this is not evaluated \\}` outputs `{ this is not evaluated }`
 
 
-### Customizing brackets
+### Customizing curly braces
 
-You are free to customize the brackets to your liking. For example:
+You are free to customize the braces to your liking. For example:
 
 ``` js
 riot.settings.brackets = '${ }'

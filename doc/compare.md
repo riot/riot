@@ -104,7 +104,7 @@ And this is how the above tag is mounted on a page:
 
 In Riot HTML comes first and JavaScript second. Both are under the same component, but neatly separated from each other. The HTML can be mixed with JavaScript expressions.
 
-No proprietary stuff, except the notation of enclosing expressions inside curly brackets.
+No proprietary stuff, except the notation of enclosing expressions inside curly braces.
 
 You see less boilerplate. Less brackets, commas, system properties and method names. Strings can be interpolated: `"Hello {world}"` instead of `"Hello " + this.state.world` and methods can be defined with compact ES6 syntax. Just less everything.
 
