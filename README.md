@@ -30,9 +30,9 @@
 | React                  | 0.13.3     | 121.7kb       |
 | Web Components Polyfill| 0.7.5      | 117.1kb       |
 
-### Custom tags • Concise syntax • Virtual DOM • Full stack • IE8
+### Custom tags • Concise syntax • Virtual DOM • Full stack • IE9
 
-Riot brings custom tags to all browsers, including IE8. Think React + Polymer but with enjoyable syntax and a small learning curve.
+Riot brings custom tags to all browsers, including IE9. Think React + Polymer but with enjoyable syntax and a small learning curve.
 
 
 #### Tag definition
