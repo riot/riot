@@ -1,6 +1,6 @@
 
-title: Get Riot
-description: none
+title: Get Riot!
+description: Official List of Riot files: Direct download and Content delivery networks (CDN), all Files are Open-Source with MIT License.      
 minify: false
 
 base: https://raw.githubusercontent.com/riot/riot/master
