@@ -1,7 +1,7 @@
 
-title: Riot 2.2 | A React-like UI library
+title: Riot.js, A React-like user interface micro-library
+description: Riot lets you build user interfaces with custom tags using simple and enjoyable syntax. It uses a virtual DOM similar to React but faster. Riot is very tiny compared to industry standards. We think there is a clear need for another UI library.
 subtitle: Why Riot?
-description: And why we need a new UI library
 body_id: riot-home
 hero: true
 
