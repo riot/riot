@@ -1,7 +1,7 @@
 
 title: Riot FAQ
 subtitle: FAQ
-description: none
+description: Frequently Asked Questions (FAQ): listed Questions and Answers about Riot, User Interface (UI) Micro-Libary
 
 ====
 
