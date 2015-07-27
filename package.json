@@ -39,7 +39,7 @@
     "chokidar": "~1.0.3",
     "minimist": "~1.1.1",
     "shelljs": "~0.5.1",
-    "simple-dom": "^0.2.4",
+    "simple-dom": "0.2.4",
     "simple-html-tokenizer": "^0.1.1"
   },
   "devDependencies": {
