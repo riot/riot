@@ -153,6 +153,10 @@ HTML syntax is the de facto language on the web and it's designed for building u
 ### Miscellaneous
 - [Q&A with RiotJS author Tero Piirainen](http://www.triplet.fi/blog/q-and-a-with-riotjs-author-tero-piirainen/)
 
+### Yeoman generator for Riot
+- [generator-riot-mobile](https://www.npmjs.com/package/generator-riot-mobile)
+- [generator-riot-element](https://www.npmjs.com/package/generator-riot-element)
+
 ### Credits
 
 Riot is made with :heart: by many smart people. Thanks to all the contributors
