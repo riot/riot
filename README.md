@@ -150,6 +150,10 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot precompiler plugin for lineman](https://github.com/Power-Inside/lineman-riot)
 - [Riot Startkit - Flux inspired skeleton app + WebPack + PostCSS](https://github.com/wbkd/riotjs-startkit)
 
+### Yeoman generator for Riot
+- [generator-riot-mobile](https://www.npmjs.com/package/generator-riot-mobile)
+- [generator-riot-element](https://www.npmjs.com/package/generator-riot-element)
+
 ### Miscellaneous
 - [Q&A with RiotJS author Tero Piirainen](http://www.triplet.fi/blog/q-and-a-with-riotjs-author-tero-piirainen/)
 
