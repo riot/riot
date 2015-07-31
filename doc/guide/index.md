@@ -221,6 +221,72 @@ riot.mount('todo, forum, comments')
 A document can contain multiple instances of the same tag.
 
 
+### Accessing the DOM Directly ###
+Riot gives you access to elements that have `name` attributes directly under the `this` keyword, and plenty of shorthand property-methods like the `if="{...}"` attribute, but occasionally you need to reference and touch pieces of HTML which don't really fit inside those prebaked functions.
+
+#### How to use jQuery/Zepto/`querySelector`/etc... in Riot ###
+If you need to access the DOM inside Riot, you'll want to take a look at the [Tag Lifecycle](https://github.com/riot/riot/blob/dev/doc/guide/index.md#tag-lifecycle) and notice that the DOM elements are instaniated until the `update()` event first fires, meaning any attempt to select an element before then will fail.
+
+```html
+<example-tag>
+    <p id="findMe">Do I even Exist?</p>
+
+    <script>
+    var test1 = document.getElementById('findMe');
+    console.log('test1', test1);  // Fails
+
+    this.on('update', function(){
+        var test2 = document.getElementById('findMe');
+        console.log('test2', test2); // Succeeds
+    });
+    </script>
+</example-tag>
+```
+
+**However, you probably don't want to run whatever you're attempting to retrieve on every update.** Instead you'll most likely want to run on the `mount` event.
+
+```html
+<example-tag>
+    <p id="findMe">Do I even Exist?</p>
+
+    <script>
+    var test1 = document.getElementById('findMe');
+    console.log('test1', test1);  // Fails
+
+    this.on('update', function(){
+        var test2 = document.getElementById('findMe');
+        console.log('test2', test2); // Succeeds, fires on every update
+    });
+
+    this.on('mount', function(){
+        var test3 = document.getElementById('findMe');
+        console.log('test3', test3); // Succeeds, fires once (per mount)
+    });
+    </script>
+</example-tag>
+```
+
+#### Creating a Contexted DOM Query ####
+Now that we know how to get DOM elements by waiting for the `update` or `mount` events, we can make this useful by also adding a context to our element queries to the `root element` (the riot tag we're creating).
+
+```html
+<example-tag>
+    <p id="findMe">Do I even Exist?</p>
+    <p>Is this real life?</p>
+    <p>Or just fantasy?</p>
+
+    <script>
+    this.on('mount', function(){
+        // Contexted jQuery
+        $('p', this.root);
+
+        // Contexted Query Selector
+        this.root.querySelectorAll('p');
+    });
+    </script>
+</example-tag>
+```
+
 ### Options
 
 You can pass options for tags in the second argument
