@@ -22,9 +22,8 @@ describe('Node/io.js', function() {
     var ift = riot.render('if-test')
     var $ = cheerio.load(ift)
     var els = $('if-child')
-    console.log(ift)
-    //expect(els.length).to.be(1)
-    //expect(els.first().attr('style')).to.be('display: none;')
+    expect(els.length).to.be(1)
+    expect(els.first().attr('style')).to.be('display: none;')
   })
 
   it('render tag: loop-child', function() {
