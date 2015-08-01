@@ -1,6 +1,6 @@
 <loop-inherit>
   <div each={ item, index in items} class={ active: item == 'active' }>
-    <loop-inherit-item id={ index } name={ item } nice={ isFun }></loop-inherit-item>
+    <loop-inherit-item id={ index } name={ item } nice={ isFun } onmouseenter={ onMouseEnter }></loop-inherit-item>
   </div>
 
   <button onclick={ add }>
@@ -29,14 +29,24 @@
     this.items.splice(this.items.length - 2, 1)
   }
 
+  onMouseEnter() {
+    if(!this.wasHovered) this.add()
+    this.wasHovered = true
+  }
+
 </loop-inherit>
 
-<loop-inherit-item>
+<loop-inherit-item onclick={ onClick }>
 
   <p class={ nice: opts.nice }>{ label } #{ id }</p>
 
   this.label = opts.name
   this.id = opts.id
+
+  onClick() {
+    console.log('ciao')
+    this.wasClicked = true
+  }
 
   this.on('update', function() {
     this.label = opts.name

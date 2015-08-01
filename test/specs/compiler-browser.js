@@ -357,7 +357,11 @@ describe('Compiler Browser', function() {
 
           // loop over tags instances
           '<script type=\"riot\/tag\" src=\"tag\/loop-tag-instances.tag\"><\/script>',
-          '<loop-tag-instances><\/loop-tag-instances>'
+          '<loop-tag-instances><\/loop-tag-instances>',
+
+          // check the loop events update
+          '<script type=\"riot\/tag\" src=\"tag\/loop-numbers-nested.tag\"><\/script>',
+          '<loop-numbers-nested><\/loop-numbers-nested>'
 
     ].join('\r'),
       tags = [],
@@ -1305,6 +1309,15 @@ describe('Compiler Browser', function() {
     */
   })
 
+/*  it('the DOM events get executed in the right context', function() {
+    var tag = riot.mount('loop-inherit')[0]
+    tag.tags['loop-inherit-item'][0].root.onmouseenter({})
+    expect(tag.wasHovered).to.be(true)
+    expect(tag.root.getElementsByTagName('div').length).to.be(4)
+    tag.tags['loop-inherit-item'][0].root.click({})
+    expect(tag.tags['loop-inherit-item'][0].wasClicked).to.be(true)
+  })*/
+
   it('loops over other tag instances do not override their internal properties', function() {
     var tag = riot.mount('loop-tag-instances')[0]
 
@@ -1359,6 +1372,14 @@ describe('Compiler Browser', function() {
     expect(div.getAttribute('riot-tag')).to.be('timetable')
     riot.mount(div, 'test')
     expect(div.getAttribute('riot-tag')).to.be('test')
+  })
+
+  it('any DOM event in a loop updates the whole parent tag', function() {
+    var tag = riot.mount('loop-numbers-nested')[0]
+    expect(tag.root.getElementsByTagName('ul')[0].getElementsByTagName('li').length).to.be(4)
+    tag.root.getElementsByTagName('ul')[0].getElementsByTagName('li')[0].onclick({})
+    expect(tag.root.getElementsByTagName('ul')[0].getElementsByTagName('li').length).to.be(2)
+    tags.push(tag)
   })
 
 })
