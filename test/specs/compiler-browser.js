@@ -1353,4 +1353,12 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('the riot-tag attribute gets updated if a DOM node gets mounted using two or more different tags', function() {
+    var div = document.createElement('div')
+    riot.mount(div, 'timetable')
+    expect(div.getAttribute('riot-tag')).to.be('timetable')
+    riot.mount(div, 'test')
+    expect(div.getAttribute('riot-tag')).to.be('test')
+  })
+
 })
