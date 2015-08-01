@@ -31,5 +31,9 @@ describe('riotjs', function() {
     var file = 'riotjs.try-catch.js'
     expect(render(cat('fixtures', file))).to.equal(cat('expect', file))
   })
+  it('preserves non es6 methods #1043', function() {
+    var file = 'riotjs.getter-setter.js'
+    expect(render(cat('fixtures', file))).to.equal(cat('expect', file))
+  })
 
 })
