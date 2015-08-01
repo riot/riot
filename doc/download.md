@@ -3,6 +3,7 @@ title: Get Riot!
 description: Official List of Riot Files: Direct download and Content delivery networks (CDN), all Files are Open-Source with MIT License.
 minify: false
 
+desc2: Official downloadables and CDN endpoints.
 base: https://raw.githubusercontent.com/riot/riot/master
 cdnjs: https://cdnjs.cloudflare.com/ajax/libs/riot
 
