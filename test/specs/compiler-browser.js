@@ -1382,4 +1382,15 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('riot.observable instances could be also used in a loop', function() {
+    var tag = riot.mount('loop-child')[0]
+
+    tag.items = [riot.observable({name: 1}), {name: 2}]
+    tag.update()
+    tag.items = [{name: 2}]
+    tag.update()
+
+    tags.push(tag)
+  })
+
 })
