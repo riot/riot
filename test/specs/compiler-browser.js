@@ -1298,15 +1298,10 @@ describe('Compiler Browser', function() {
     expect(tag.root.getElementsByTagName('div')[2].innerHTML).to.contain('active')
     expect(tag.root.getElementsByTagName('div')[2].className).to.be('active')
 
-    /*
-    TODO: keep in sync also the nested custom tags in a loop
     expect(tag.tags['loop-inherit-item'][0].opts.name).to.be(tag.items[0])
     expect(tag.tags['loop-inherit-item'][1].opts.name).to.be(tag.items[1])
     expect(tag.tags['loop-inherit-item'].length).to.be(2)
 
-    expect(tag.tags['loop-inherit-item'].length).to.be(3)
-    expect(tag.tags['loop-inherit-item'][2].opts.name).to.be(tag.items[2])
-    */
   })
 
 /*  it('the DOM events get executed in the right context', function() {
