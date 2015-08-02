@@ -128,6 +128,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 ### Video Tutorials
 - [Introduction](https://www.youtube.com/watch?v=al87U6NgRTc)
 - [Loops, Events and Callbacks](https://www.youtube.com/watch?v=T-ZV9dv93sw)
+- [Server Rendering with Node & Express](http://youtu.be/6ww1UXGJzcs)
 
 ### Libraries
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
