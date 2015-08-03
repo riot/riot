@@ -3,9 +3,9 @@
   <h3>{ opts.title }</h3>
 
   <style type="text/stylus">
-    style-test
+    stylus-test
       display block
-      background lighten(black,20) 
+      border 2px
   </style>
 
   <script>
