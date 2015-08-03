@@ -1309,7 +1309,7 @@ describe('Compiler Browser', function() {
     tag.tags['loop-inherit-item'][0].root.onmouseenter({})
     expect(tag.wasHovered).to.be(true)
     expect(tag.root.getElementsByTagName('div').length).to.be(4)
-    tag.tags['loop-inherit-item'][0].root.click({})
+    tag.tags['loop-inherit-item'][0].root.onclick({})
     expect(tag.tags['loop-inherit-item'][0].wasClicked).to.be(true)
   })
 
