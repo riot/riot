@@ -3,6 +3,8 @@
     <loop-inherit-item id={ index } name={ item } nice={ isFun } onmouseenter={ onMouseEnter }></loop-inherit-item>
   </div>
 
+  <loop-inherit-item name="boh" onmouseenter={ onMouseEnter }></loop-inherit-item>
+
   <button onclick={ add }>
     add
   </button>
@@ -31,6 +33,7 @@
 
   onMouseEnter() {
     if(!this.wasHovered) this.add()
+    //console.log(this.root)
     this.wasHovered = true
   }
 

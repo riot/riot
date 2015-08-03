@@ -36,7 +36,7 @@ test-compiler:
 	@ $(ISTANBUL) cover $(MOCHA) --dir coverage/server -- ./test/compiler/suite -R spec
 
 test-coveralls:
-	@ RIOT_COV=1 cat ./coverage/lcov.info ./coverage/server/lcov.info ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
+	@ RIOT_COV=1 cat ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
 
 test-sauce:
 	# run the saucelabs in separate chunks
