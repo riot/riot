@@ -67,6 +67,7 @@ describe('All the tags get compiler as expected', function() {
     test('test.jade', { template: 'jade' })
     test('slide.jade', { template: 'jade' })
     test('style', {})
+    test('stylus', {})
     test('brackets', { brackets: '${ }' })
   })
 })

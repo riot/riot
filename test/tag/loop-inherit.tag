@@ -44,7 +44,6 @@
   this.id = opts.id
 
   onClick() {
-    console.log('ciao')
     this.wasClicked = true
   }
 

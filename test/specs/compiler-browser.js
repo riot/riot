@@ -1304,14 +1304,14 @@ describe('Compiler Browser', function() {
 
   })
 
-/*  it('the DOM events get executed in the right context', function() {
+  it('the DOM events get executed in the right context', function() {
     var tag = riot.mount('loop-inherit')[0]
     tag.tags['loop-inherit-item'][0].root.onmouseenter({})
     expect(tag.wasHovered).to.be(true)
     expect(tag.root.getElementsByTagName('div').length).to.be(4)
-    tag.tags['loop-inherit-item'][0].root.click({})
+    tag.tags['loop-inherit-item'][0].root.onclick({})
     expect(tag.tags['loop-inherit-item'][0].wasClicked).to.be(true)
-  })*/
+  })
 
   it('loops over other tag instances do not override their internal properties', function() {
     var tag = riot.mount('loop-tag-instances')[0]
