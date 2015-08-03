@@ -15,21 +15,24 @@
 
 
 [![Sauce Test Status][saucelabs-image]][saucelabs-url]
+### The Smallest Framework
 
-### Framework Size Comparison
+| Name              | Version    | Minified Size |
+|------------------------|------------|---------------|
+| ![Riot logo](doc/logo/riot60x.png) | 2.2.2      | <span class="riot-size">13.11kb</span> |
 
-| Framework              | Version    | Minified Size |
+### Other Framework Size Comparison
+
+| Name              | Version    | Minified Size |
 |------------------------|------------|---------------|
 | Ember                  | 1.13.3     | 493.3kb       |
 | Angular                | 1.4.2      | 145.5kb       |
 | React                  | 0.13.3     | 121.7kb       |
 | Web Components Polyfill| 0.7.5      | 117.1kb       |
-| Riot                   | 2.2.2      | <span class="riot-size">13.11kb</span> |
 
+### Custom tags • Concise syntax • Virtual DOM • Full stack • IE9
 
-### Custom tags • Concise syntax • Virtual DOM • Full stack • IE8
-
-Riot brings custom tags to all browsers, including IE8. Think React + Polymer but with enjoyable syntax and a small learning curve.
+Riot brings custom tags to all browsers, including IE9. Think React + Polymer but with enjoyable syntax and a small learning curve.
 
 
 #### Tag definition
