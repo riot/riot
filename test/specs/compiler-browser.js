@@ -165,6 +165,10 @@ describe('Compiler Browser', function() {
           '<loop-optgroup><\/loop-optgroup>',
           '<script type=\"riot\/tag\" src=\"tag\/loop-optgroup.tag\"><\/script>',
 
+          // loop optgroup, double option
+          '<loop-optgroup2><\/loop-optgroup2>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-optgroup2.tag\"><\/script>',
+
           // loop position
           '<loop-position><\/loop-position>',
           '<script type=\"riot\/tag\" src=\"tag\/loop-position.tag\"><\/script>',
@@ -361,7 +365,11 @@ describe('Compiler Browser', function() {
 
           // check the loop events update
           '<script type=\"riot\/tag\" src=\"tag\/loop-numbers-nested.tag\"><\/script>',
-          '<loop-numbers-nested><\/loop-numbers-nested>'
+          '<loop-numbers-nested><\/loop-numbers-nested>',
+
+          // table with multiple bodies and dynamic style
+          '<script type=\"riot\/tag\" src=\"tag\/table-multibody.tag\"><\/script>',
+          '<table-multibody><\/table-multibody>'
 
     ].join('\r'),
       tags = [],
@@ -761,6 +769,17 @@ describe('Compiler Browser', function() {
         root = tag.root
 
     expect(normalizeHTML(root.innerHTML)).to.match(/<select><optgroup label="group 1"><option value="1">Option 1.1<\/option><option value="2">Option 1.2<\/option><\/optgroup><optgroup label="group 2"><option value="3">Option 2.1<\/option><option selected="(selected|true)" value="4">Option 2.2<\/option><\/optgroup><\/select>/)
+
+    tags.push(tag)
+
+  })
+
+  it('loop optgroup tag (outer option, no closing tag)', function() {
+    var tag = riot.mount('loop-optgroup2')[0],
+        root = tag.root
+
+    expect(normalizeHTML(root.innerHTML)).to
+      .match(/<select><option selected="selected">&lt;Select Option&gt; ?(<\/option>)?<optgroup label="group 1"><option value="1">Option 1.1 ?(<\/option>)?<option (?:value="2"|disabled="disabled") (?:value="2"|disabled="disabled")>Option 1.2 ?(<\/option>)?<\/optgroup><optgroup label="group 2"><option value="3">Option 2.1 ?(<\/option>)?<option (?:value="4"|disabled="disabled") (?:value="4"|disabled="disabled")>Option 2.2 ?<\/option><\/optgroup><\/select>/)
 
     tags.push(tag)
 
@@ -1387,5 +1406,24 @@ describe('Compiler Browser', function() {
 
     tags.push(tag)
   })
+
+  it('Multiple bodies in table, dynamic styles', function() {
+
+    var tag = riot.mount('table-multibody')[0],
+        bodies = tag.root.getElementsByTagName('tbody')
+
+    expect(bodies.length).to.be(3)
+    for (var i = 0; i < bodies.length; ++i) {
+      expect(normalizeHTML(bodies[0].innerHTML))
+        .to.match(/<tr style="background-color: ?(?:white|lime);?"[^>]*>(?:<td[^>]*>\S\S<\/td>){3}<\/tr>/)
+    }
+
+    expect(bodies[0].getElementsByTagName('tr')[0].style.backgroundColor).to.be('white')
+    tag.root.getElementsByTagName('button')[0].onclick({})
+    expect(bodies[0].getElementsByTagName('tr')[0].style.backgroundColor).to.be('lime')
+
+    tags.push(tag)
+  })
+
 
 })
