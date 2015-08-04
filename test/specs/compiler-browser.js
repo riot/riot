@@ -367,7 +367,7 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/loop-numbers-nested.tag\"><\/script>',
           '<loop-numbers-nested><\/loop-numbers-nested>',
 
-          // table with multiple bodies and dinamic style
+          // table with multiple bodies and dynamic style
           '<script type=\"riot\/tag\" src=\"tag\/table-multibody.tag\"><\/script>',
           '<table-multibody><\/table-multibody>'
 
@@ -778,7 +778,8 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('loop-optgroup2')[0],
         root = tag.root
 
-    expect(normalizeHTML(root.innerHTML)).to.match(/<select><option selected="selected">&lt;Select Option&gt; ?(<\/option>)?<optgroup label="group 1"><option value="1">Option 1.1 ?(<\/option>)?<option value="2" disabled="disabled">Option 1.2 ?(<\/option>)?<\/optgroup><optgroup label="group 2"><option value="3">Option 2.1 ?(<\/option>)?<option value="4" disabled="disabled">Option 2.2 ?(<\/option>)?<\/optgroup><\/select>/)
+    expect(normalizeHTML(root.innerHTML)).to
+      .match(/<select><option selected="selected">&lt;Select Option&gt; ?(<\/option>)?<optgroup label="group 1"><option value="1">Option 1.1 ?(<\/option>)?<option (?:value="2"|disabled="disabled") (?:value="2"|disabled="disabled")>Option 1.2 ?(<\/option>)?<\/optgroup><optgroup label="group 2"><option value="3">Option 2.1 ?(<\/option>)?<option (?:value="4"|disabled="disabled") (?:value="4"|disabled="disabled")>Option 2.2 ?<\/option><\/optgroup><\/select>/)
 
     tags.push(tag)
 
