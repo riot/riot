@@ -1,4 +1,5 @@
 (function (root, factory) {
+    /* istanbul ignore next */
     if (typeof define === 'function' && define.amd)
       define(['riot'], factory)
     else if (typeof exports === 'object')
@@ -7,6 +8,7 @@
 }(this, function (riot, undefined) {
 
   var T_STRING = 'string'
+/* istanbul ignore next */
 var parsers = {
   html: {},
   css: {},
@@ -47,7 +49,7 @@ var BOOL_ATTR = ('allowfullscreen,async,autofocus,autoplay,checked,compact,contr
   PREFIX_ATTR = ['style', 'src', 'd'],
 
   LINE_TAG = /^<([\w\-]+)>(.*)<\/\1>/gim,
-  QUOTE = /=({[^}]+})([\s\/\>])/g,
+  QUOTE = /=({[^}]+})([\s\/\>]|$)/g,
   SET_ATTR = /([\w\-]+)=(["'])([^\2]+?)\2/g,
   EXPR = /{\s*([^}]+)\s*}/g,
   // (tagname) (html) (javascript) endtag
@@ -146,11 +148,11 @@ function riotjs(js) {
     var l = line.trim()
 
     // method start
-    if (l[0] != '}' && l.indexOf('(') > 0 && l.indexOf('function') == -1) {
-      var end = /[{}]/.exec(l.slice(-1)),
-          m = end && /(\s+)([\w]+)\s*\(([\w,\s]*)\)\s*\{/.exec(line)
+    if (l[0] != '}' && ~l.indexOf('(')) {
+      var end = l.match(/[{}]$/),
+          m = end && line.match(/^(\s+)([$\w]+)\s*\(([$\w,\s]*)\)\s*\{/)
 
-      if (m && !/^(if|while|switch|for|catch)$/.test(m[2])) {
+      if (m && !/^(if|while|switch|for|catch|function)$/.test(m[2])) {
         lines[i] = m[1] + 'this.' + m[2] + ' = function(' + m[3] + ') {'
 
         // foo() { }
@@ -177,11 +179,16 @@ function riotjs(js) {
 }
 
 function scopedCSS (tag, style, type) {
+  // 1. Remove CSS comments
+  // 2. Find selectors and separate them by conmma
+  // 3. keep special selectors as is
+  // 4. prepend tag and [riot-tag]
   return style.replace(CSS_COMMENT, '').replace(CSS_SELECTOR, function (m, p1, p2) {
     return p1 + ' ' + p2.split(/\s*,\s*/g).map(function(sel) {
-      var s = sel.trim().replace(/:scope\s*/, '')
+      var s = sel.trim()
+      var t = (/:scope/.test(s) ? '' : ' ') + s.replace(/:scope/, '')
       return s[0] == '@' || s == 'from' || s == 'to' || /%$/.test(s) ? s :
-        tag + ' ' + s + ', [riot-tag="' + tag + '"] ' + s
+        tag + t + ', [riot-tag="' + tag + '"]' + t
     }).join(',')
   }).trim()
 }
@@ -262,7 +269,8 @@ function GET(url, fn) {
   var req = new XMLHttpRequest()
 
   req.onreadystatechange = function() {
-    if (req.readyState == 4 && req.status == 200) fn(req.responseText)
+    if (req.readyState == 4 && (req.status == 200 || (!req.status && req.responseText.length)))
+      fn(req.responseText)
   }
   req.open('GET', url, true)
   req.send('')

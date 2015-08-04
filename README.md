@@ -24,7 +24,7 @@
 | Angular                | 1.4.2      | 145.5kb       |
 | React                  | 0.13.3     | 121.7kb       |
 | Web Components Polyfill| 0.7.5      | 117.1kb       |
-| Riot                   | 2.2.2      | <span class="riot-size">13.11kb</span> |
+| Riot                   | 2.2.3      | <span class="riot-size">13.21kb</span> |
 
 
 ### Custom tags • Concise syntax • Virtual DOM • Full stack • IE8
