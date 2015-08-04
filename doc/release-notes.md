@@ -6,6 +6,10 @@ body_id: riot-releases
 
 ====
 
+### 2.2.3 *August 4, 2015*
+
+- Fix many bugs [more details](https://github.com/riot/riot/issues/1063)
+
 ### 2.2.2 *July 5, 2015*
 
 - New child components will inherit properties from the parent also in a loop
