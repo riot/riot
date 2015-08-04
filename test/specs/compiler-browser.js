@@ -1415,7 +1415,7 @@ describe('Compiler Browser', function() {
     expect(bodies.length).to.be(3)
     for (var i = 0; i < bodies.length; ++i) {
       expect(normalizeHTML(bodies[0].innerHTML))
-        .to.match(/<tr style="background-color:(?:white|lime);?"[^>]*>(?:<td[^>]*>\S\S<\/td>){3}<\/tr>/)
+        .to.match(/<tr style="background-color: ?(?:white|lime);?"[^>]*>(?:<td[^>]*>\S\S<\/td>){3}<\/tr>/)
     }
 
     expect(bodies[0].getElementsByTagName('tr')[0].style.backgroundColor).to.be('white')
