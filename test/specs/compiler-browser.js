@@ -778,7 +778,7 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('loop-optgroup2')[0],
         root = tag.root
 
-    expect(normalizeHTML(root.innerHTML)).to.match(/<select><option selected="selected">&lt;Select Option&gt; <\/option><optgroup label="group 1"><option value="1">Option 1.1 <\/option><option value="2" disabled="disabled">Option 1.2 <\/option><\/optgroup><optgroup label="group 2"><option value="3">Option 2.1 <\/option><option value="4" disabled="disabled">Option 2.2 <\/option><\/optgroup><\/select>/)
+    expect(normalizeHTML(root.innerHTML)).to.match(/<select><option selected="selected">&lt;Select Option&gt; ?(<\/option>)?<optgroup label="group 1"><option value="1">Option 1.1 ?(<\/option>)?<option value="2" disabled="disabled">Option 1.2 ?(<\/option>)?<\/optgroup><optgroup label="group 2"><option value="3">Option 2.1 ?(<\/option>)?<option value="4" disabled="disabled">Option 2.2 ?(<\/option>)?<\/optgroup><\/select>/)
 
     tags.push(tag)
 
@@ -1414,7 +1414,7 @@ describe('Compiler Browser', function() {
     expect(bodies.length).to.be(3)
     for (var i = 0; i < bodies.length; ++i) {
       expect(normalizeHTML(bodies[0].innerHTML))
-        .to.match(/<tr style="background-color:(?:white|lime)"[^>]*>(?:<td[^>]*>\S\S<\/td>){3}<\/tr>/)
+        .to.match(/<tr style="background-color:(?:white|lime);?"[^>]*>(?:<td[^>]*>\S\S<\/td>){3}<\/tr>/)
     }
 
     expect(bodies[0].getElementsByTagName('tr')[0].style.backgroundColor).to.be('white')
