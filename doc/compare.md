@@ -181,7 +181,7 @@ Conceptually Riot is the same thing but there are differences:
 
 4. Polymer uses two-way data binding while riot uses one-way data binding.
 
-5. No ability to perform server side rendering, which will be part of Riot in an upcoming version.
+5. No ability to perform server side rendering.
 
 
 ### 22x bigger
