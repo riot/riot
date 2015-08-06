@@ -1510,20 +1510,14 @@ describe('Compiler Browser', function() {
   })
 
   it('yield options with select, except in IE8-IE9', function() {
-
     var iev = (window.document || {}).documentMode | 0
     if (iev < 1 || iev > 9) {
       var tag = riot.mount('yield-option')[0],
           ops
-
       tag.update()
       ops = tag.root.getElementsByTagName('select')[0]
-      if (!ops)
-        console.log(' - - - select element not found!')
-      else {
-        expect(ops.length).to.be(1)
-        expect(ops[0].text.trim()).to.be('bar')
-      }
+      expect(ops.length).to.be(1)
+      expect(ops[0].text.trim()).to.be('bar')
       tags.push(tag)
     }
   })
