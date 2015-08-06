@@ -165,6 +165,10 @@ describe('Compiler Browser', function() {
           '<loop-optgroup><\/loop-optgroup>',
           '<script type=\"riot\/tag\" src=\"tag\/loop-optgroup.tag\"><\/script>',
 
+          // loop optgroup, two option tags
+          '<loop-optgroup2><\/loop-optgroup2>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-optgroup2.tag\"><\/script>',
+
           // loop position
           '<loop-position><\/loop-position>',
           '<script type=\"riot\/tag\" src=\"tag\/loop-position.tag\"><\/script>',
@@ -383,9 +387,13 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/loop-numbers-nested.tag\"><\/script>',
           '<loop-numbers-nested><\/loop-numbers-nested>',
 
-          // check the loop events update
-          '<script type=\"riot\/tag\" src=\"tag\/loop-numbers-nested.tag\"><\/script>',
-          '<loop-numbers-nested><\/loop-numbers-nested>'
+          // table with multiple bodies and dynamic style
+          '<script type=\"riot\/tag\" src=\"tag\/table-multibody.tag\"><\/script>',
+          '<table-multibody><\/table-multibody>',
+
+          // table with caption and looped cols, ths and trs
+          '<script type=\"riot\/tag\" src=\"tag\/loop-cols.tag\"><\/script>',
+          '<loop-cols><\/loop-cols>'
 
     ].join('\r'),
       tags = [],
@@ -785,6 +793,17 @@ describe('Compiler Browser', function() {
         root = tag.root
 
     expect(normalizeHTML(root.innerHTML)).to.match(/<select><optgroup label="group 1"><option value="1">Option 1.1<\/option><option value="2">Option 1.2<\/option><\/optgroup><optgroup label="group 2"><option value="3">Option 2.1<\/option><option selected="(selected|true)" value="4">Option 2.2<\/option><\/optgroup><\/select>/)
+
+    tags.push(tag)
+
+  })
+
+  it('loop optgroup tag (outer option, no closing option tags)', function() {
+    var tag = riot.mount('loop-optgroup2')[0],
+        root = tag.root
+
+    expect(normalizeHTML(root.innerHTML)).to
+      .match(/<select><option selected="selected">&lt;Select Option&gt; ?(<\/option>)?<optgroup label="group 1"><option value="1">Option 1.1 ?(<\/option>)?<option (?:value="2"|disabled="disabled") (?:value="2"|disabled="disabled")>Option 1.2 ?(<\/option>)?<\/optgroup><optgroup label="group 2"><option value="3">Option 2.1 ?(<\/option>)?<option (?:value="4"|disabled="disabled") (?:value="4"|disabled="disabled")>Option 2.2 ?<\/option><\/optgroup><\/select>/)
 
     tags.push(tag)
 
@@ -1395,6 +1414,13 @@ describe('Compiler Browser', function() {
     expect(tag.root.getAttribute('data-noquote')).to.be('quotes') // not quoted
     expect(tag.root.getAttribute('data-nqlast')).to.be('quotes') // last attr with no quotes
     expect(tag.root.style.fontSize).to.be('2em') // TODO: how to test riot-prefix?
+
+    var opts = tag.root._tag.opts
+    if (opts)
+      expect(opts['riot-style']).to.match(/font-size:\s?2em/i)
+    else
+      console.log('top-attributes._tag.opts not found!')
+
     tags.push(tag)
   })
 
@@ -1423,6 +1449,87 @@ describe('Compiler Browser', function() {
     tag.update()
 
     tags.push(tag)
+  })
+
+  it('table with multiple bodies and dynamic styles #1052', function() {
+
+    var tag = riot.mount('table-multibody')[0],
+        bodies = tag.root.getElementsByTagName('tbody')
+
+    expect(bodies.length).to.be(3)
+    for (var i = 0; i < bodies.length; ++i) {
+      expect(normalizeHTML(bodies[0].innerHTML))
+        .to.match(/<tr style="background-color: ?(?:white|lime);?"[^>]*>(?:<td[^>]*>[A-C]\d<\/td>){3}<\/tr>/)
+    }
+
+    expect(bodies[0].getElementsByTagName('tr')[0].style.backgroundColor).to.be('white')
+    tag.root.getElementsByTagName('button')[0].onclick({})
+    expect(bodies[0].getElementsByTagName('tr')[0].style.backgroundColor).to.be('lime')
+
+    tags.push(tag)
+  })
+
+  it('table with caption and looped cols, ths, and trs #1067', function() {
+    var data = {
+      // copied from loop-cols.tag
+      headers: [
+        'Name',
+        'Number',
+        'Address',
+        'City',
+        'Contact'
+      ],
+      data: [
+        ['Abc', '10', 'A 4B', 'México', 'Juan'],
+        ['Def', '20', 'B 50', 'USA', 'Anna'],
+        ['Ghi', '30', 'D 60', 'Japan', ''],
+        ['Jkl', '40', 'E 1C', 'France', 'Balbina']
+      ]
+    }
+    var tag = riot.mount('loop-cols')[0],
+        el, i, k
+
+    tag.update()
+
+    el = getEls('caption')[0]
+    expect(el.innerHTML).to.be('Loop Cols')
+
+    el = getEls('colgroup')
+    expect(el.length).to.be(1)
+
+    el = getEls('col', el[0])
+    expect(el.length).to.be(5)
+
+    el = getEls('tr', getEls('thead')[0])
+    expect(el.length).to.be(1)
+
+    el = getEls('th', el[0])
+    expect(el.length).to.be(5)
+    for (i = 0; i < el.length; ++i) {
+      expect(el[i].tagName).to.be('TH')
+      expect(el[i].innerHTML.trim()).to.be(data.headers[i])
+    }
+
+    el = getEls('tr', getEls('tbody')[0])
+    expect(el.length).to.be(4)
+    //console.log(' - - - tbody.tr: ' + el[0].innerHTML)
+
+    for (i = 0; i < el.length; ++i) {
+      var cells = getEls('td', el[i])
+      expect(cells.length).to.be(5)
+      for (k = 0; k < cells.length; ++k) {
+        //console.log(' - - - getting data[' + i + ',' + k + ']')
+        expect(cells[k].tagName).to.be('TD')
+        expect(cells[k].innerHTML.trim()).to.be(data.data[i][k])
+      }
+    }
+
+    tags.push(tag)
+
+    function getEls(t, e) {
+      if (!e) e = tag.root
+      return e.getElementsByTagName(t)
+    }
   })
 
 })
