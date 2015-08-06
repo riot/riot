@@ -1514,8 +1514,10 @@ describe('Compiler Browser', function() {
     var iev = (window.document || {}).documentMode | 0
     if (iev < 1 || iev > 9) {
       var tag = riot.mount('yield-option')[0],
-          ops = tag.root.firstElementChild.options
+          ops
 
+      tag.update()
+      ops = tag.root.firstElementChild.options
       expect(ops.length).to.be(1)
       expect(ops(0).text.trim()).to.be('bar')
       tags.push(tag)
