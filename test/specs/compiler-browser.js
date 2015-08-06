@@ -1517,9 +1517,13 @@ describe('Compiler Browser', function() {
           ops
 
       tag.update()
-      ops = tag.root.firstElementChild.options
-      expect(ops.length).to.be(1)
-      expect(ops(0).text.trim()).to.be('bar')
+      ops = tag.root.getElementsByTagName('select')[0]
+      if (!ops)
+        console.log(' - - - select element not found!')
+      else {
+        expect(ops.length).to.be(1)
+        expect(ops[0].text.trim()).to.be('bar')
+      }
       tags.push(tag)
     }
   })
