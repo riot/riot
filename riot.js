@@ -1,8 +1,8 @@
-/* Riot v2.2.3, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot WIP, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window, undefined) {
   'use strict'
-  var riot = { version: 'v2.2.3', settings: {} },
+  var riot = { version: 'WIP', settings: {} },
       // counter to give a unique id to all the Tag instances
       __uid = 0
 
@@ -658,7 +658,7 @@ function Tag(impl, conf, innerHTML) {
     if (brackets(/\{.*\}/).test(val)) attr[el.name] = val
   })
 
-  if (dom.innerHTML && !/select|optgroup|tbody|tr/.test(tagName))
+  if (dom.innerHTML && !/^select$|^optgroup$|^tbody$|^tr$/.test(tagName))
     // replace all the yield tags with the tag inner html
     dom.innerHTML = replaceYield(dom.innerHTML, innerHTML)
 
