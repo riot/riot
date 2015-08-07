@@ -373,8 +373,18 @@ describe('Compiler Browser', function() {
 
           // table with caption and looped cols, ths and trs
           '<script type=\"riot\/tag\" src=\"tag\/loop-cols.tag\"><\/script>',
-          '<loop-cols><\/loop-cols>'
+          '<loop-cols><\/loop-cols>',
 
+          '<script type="riot/tag">',
+          '  <yield-option>',
+          '    <select><yield/></select>',
+          '  </yield-option>',
+          '</script>',
+          '<yield-option>',
+          '  <option>bar</option>',
+          '</yield-option>',
+
+          ''        // avoid edit previous line
     ].join('\r'),
       tags = [],
       div = document.createElement('div')
@@ -1496,6 +1506,19 @@ describe('Compiler Browser', function() {
     function getEls(t, e) {
       if (!e) e = tag.root
       return e.getElementsByTagName(t)
+    }
+  })
+
+  it('yield options with select, except in IE8-IE9', function() {
+    var iev = (window.document || {}).documentMode | 0
+    if (iev < 1 || iev > 9) {
+      var tag = riot.mount('yield-option')[0],
+          ops
+      tag.update()
+      ops = tag.root.getElementsByTagName('select')[0]
+      expect(ops.length).to.be(1)
+      expect(ops[0].text.trim()).to.be('bar')
+      tags.push(tag)
     }
   })
 
