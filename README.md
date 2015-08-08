@@ -113,6 +113,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Various experiments](http://richardbondi.net/programming/riot)
 - [Isomorphic application](https://github.com/ListnPlay/riot-isomorphic)
 - [flux-riot todo](http://mingliangfeng.me/flux-riot)
+- [Another Riot Todo MVC](http://nippur72.github.io/riotjs-todomvc/#/)
 
 ### Tutorials
 - [Building Apps with Riot, ES6 and Webpack](http://blog.srackham.com/posts/riot-es6-webpack-apps/)
@@ -152,7 +153,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot Startkit - Flux inspired skeleton app + WebPack + PostCSS](https://github.com/wbkd/riotjs-startkit)
 - [Yeoman generator - Generator riot mobile](https://www.npmjs.com/package/generator-riot-mobile)
 - [Yeoman generator - Generator riot element](https://www.npmjs.com/package/generator-riot-element)
-
+- [Riot for TypeScript](https://github.com/nippur72/RiotTS)
 
 ### Miscellaneous
 - [Q&A with RiotJS author Tero Piirainen](http://www.triplet.fi/blog/q-and-a-with-riotjs-author-tero-piirainen/)
