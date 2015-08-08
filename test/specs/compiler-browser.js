@@ -1253,6 +1253,7 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('loop-sync-options')[0]
 
     expect(tag.tags['loop-sync-options-child'][0].val).to.be('foo')
+    expect(tag.tags['loop-sync-options-child'][0].root.className).to.be('active')
     expect(tag.tags['loop-sync-options-child'][1].val).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][2].val).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][0].num).to.be(undefined)
@@ -1265,8 +1266,10 @@ describe('Compiler Browser', function() {
       children: tag.children.reverse()
     })
     expect(tag.tags['loop-sync-options-child'][0].val).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][0].root.className).to.be('')
     expect(tag.tags['loop-sync-options-child'][1].val).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][2].val).to.be('foo')
+    expect(tag.tags['loop-sync-options-child'][2].root.className).to.be('active')
     expect(tag.tags['loop-sync-options-child'][0].num).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][1].num).to.be(3)
     expect(tag.tags['loop-sync-options-child'][2].num).to.be(undefined)
@@ -1278,15 +1281,17 @@ describe('Compiler Browser', function() {
       children: tag.children.reverse()
     })
     expect(tag.tags['loop-sync-options-child'][0].val).to.be('foo')
+    expect(tag.tags['loop-sync-options-child'][0].root.className).to.be('active')
     expect(tag.tags['loop-sync-options-child'][1].val).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][2].val).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][2].root.className).to.be('')
     expect(tag.tags['loop-sync-options-child'][0].num).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][1].num).to.be(3)
     expect(tag.tags['loop-sync-options-child'][2].num).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][0].bool).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][1].bool).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][2].bool).to.be(false)
-    tags.push(tag)
+    //tags.push(tag)
   })
 
   it('the loops children sync correctly their internal data even when they are nested', function() {
