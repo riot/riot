@@ -1341,7 +1341,6 @@ describe('Compiler Browser', function() {
 
   it('the children tags are in sync also in multiple nested tags', function() {
     var tag = riot.mount('loop-sync-options-nested-wrapper')[0]
-    console.log(tag)
     expect(tag.tags['loop-sync-options-nested'].tags['loop-sync-options-nested-child'].length).to.be(3)
     tags.push(tag)
   })
