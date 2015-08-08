@@ -33,7 +33,6 @@
 
   onMouseEnter() {
     if(!this.wasHovered) this.add()
-    //console.log(this.root)
     this.wasHovered = true
   }
 

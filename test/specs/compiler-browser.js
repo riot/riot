@@ -366,6 +366,7 @@ describe('Compiler Browser', function() {
           // sync the loop options in nested tags
           '<script type=\"riot\/tag\" src=\"tag\/loop-sync-options-nested.tag\"><\/script>',
           '<loop-sync-options-nested><\/loop-sync-options-nested>',
+          '<loop-sync-options-nested-wrapper><\/loop-sync-options-nested-wrapper>',
 
           // inherit properties from the parent
           '<script type=\"riot\/tag\" src=\"tag\/loop-inherit.tag\"><\/script>',
@@ -1338,6 +1339,13 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('the children tags are in sync also in multiple nested tags', function() {
+    var tag = riot.mount('loop-sync-options-nested-wrapper')[0]
+    console.log(tag)
+    expect(tag.tags['loop-sync-options-nested'].tags['loop-sync-options-nested-child'].length).to.be(3)
+    tags.push(tag)
+  })
+
   it('children in a loop inherit properties from the parent', function() {
     var tag = riot.mount('loop-inherit')[0]
     expect(tag.tags['loop-inherit-item'][0].opts.nice).to.be(tag.isFun)
@@ -1350,6 +1358,7 @@ describe('Compiler Browser', function() {
 
   it('custom children items in a nested loop are always in sync with the parent tag', function() {
     var tag = riot.mount('loop-inherit')[0]
+
     expect(tag.tags['loop-inherit-item'].length).to.be(3)
     expect(tag.tags['loop-inherit-item'][0].opts.name).to.be(tag.items[0])
     expect(tag.tags['loop-inherit-item'][1].opts.name).to.be(tag.items[1])
@@ -1362,10 +1371,9 @@ describe('Compiler Browser', function() {
     expect(tag.root.getElementsByTagName('div').length).to.be(3)
     expect(tag.root.getElementsByTagName('div')[2].innerHTML).to.contain('active')
     expect(tag.root.getElementsByTagName('div')[2].className).to.be('active')
-
     expect(tag.tags['loop-inherit-item'][0].opts.name).to.be(tag.items[0])
     expect(tag.tags['loop-inherit-item'][1].opts.name).to.be(tag.items[1])
-    expect(tag.tags['loop-inherit-item'].length).to.be(2)
+    expect(tag.tags['loop-inherit-item'].length).to.be(3)
 
   })
 
