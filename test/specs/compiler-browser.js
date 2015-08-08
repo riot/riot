@@ -289,6 +289,26 @@ describe('Compiler Browser', function() {
           '<style-tag><\/style-tag>',
           '<style-tag2><\/style-tag2>',
 
+          '<script type=\"riot\/tag\">',
+          '  <style-tag3>',
+          '    <style scoped=\"scoped\">',
+          '      p {border: solid 3px black;}',
+          '    <\/style>',
+          '    <style>',
+          '      #style4 {border: solid 3px black;}',
+          '    <\/style>',
+          '    <p><\/p>',
+          '  <\/style-tag3>',
+          '<\/script>',
+          '<style-tag3><\/style-tag3>',
+
+          '<script type=\"riot\/tag\">',
+          '  <style-tag4>',
+          '    <p id=\"style4\"><\/p>',
+          '  <\/style-tag4>',
+          '<\/script>',
+          '<style-tag4><\/style-tag4>',
+
           // scoped css and riot-tag, mount(selector, tagname)
 
           '<script type=\"riot\/tag\" src=\"tag\/scoped.tag\"><\/script>',
@@ -1032,6 +1052,19 @@ describe('Compiler Browser', function() {
       expect(nextE.tagName).to.be('LINK')
     })
   }
+
+  it('scoped css tag supports htm5 syntax, multiple style tags', function () {
+
+    checkCSS(riot.mount('style-tag3')[0])
+    checkCSS(riot.mount('style-tag4')[0])
+
+    function checkCSS(t) {
+      var e = t.root.firstElementChild
+      expect(e.tagName).to.be('P')
+      expect(window.getComputedStyle(e, null).borderTopWidth).to.be('3px')
+      tags.push(t)
+    }
+  })
 
   it('scoped css and riot-tag, mount(selector, tagname)', function() {
     function checkBorder(t) {
