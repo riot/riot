@@ -393,7 +393,11 @@ describe('Compiler Browser', function() {
 
           // table with caption and looped cols, ths and trs
           '<script type=\"riot\/tag\" src=\"tag\/loop-cols.tag\"><\/script>',
-          '<loop-cols><\/loop-cols>'
+          '<loop-cols><\/loop-cols>',
+
+          // pass a riot observable as option
+          '<script type=\"riot\/tag\" src=\"tag\/observable-attr.tag\"><\/script>',
+          '<observable-attr><\/observable-attr>'
 
     ].join('\r'),
       tags = [],
@@ -1530,6 +1534,11 @@ describe('Compiler Browser', function() {
       if (!e) e = tag.root
       return e.getElementsByTagName(t)
     }
+  })
+
+  it('allow passing riot.observale instances to the children tags', function() {
+    var tag = riot.mount('observable-attr')[0]
+    expect(tag.tags['observable-attr-child'].wasTriggered).to.be(true)
   })
 
 })
