@@ -388,6 +388,10 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/loop-numbers-nested.tag\"><\/script>',
           '<loop-numbers-nested><\/loop-numbers-nested>',
 
+          // check nested loops using arrays of non objects
+          '<script type=\"riot\/tag\" src=\"tag\/loop-nested-strings-array.tag\"><\/script>',
+          '<loop-nested-strings-array><\/loop-nested-strings-array>',
+
           // table with multiple bodies and dynamic style
           '<script type=\"riot\/tag\" src=\"tag\/table-multibody.tag\"><\/script>',
           '<table-multibody><\/table-multibody>',
@@ -1024,6 +1028,8 @@ describe('Compiler Browser', function() {
 
     expect(tag.root.innerHTML).to.be('2')
 
+    tags.push(tag)
+
   })
 
   it('dynamically named elements in a loop', function() {
@@ -1043,6 +1049,7 @@ describe('Compiler Browser', function() {
     expect(styles).to.match(/div(.+)?{color: red;}/)
   })
 
+  // TODO: does this test make sense?!
   it('style injection removes type riot style tag', function() {
     var stag = document.querySelector('style[type=riot]')
     expect(stag).to.be(null)
@@ -1292,7 +1299,7 @@ describe('Compiler Browser', function() {
     expect(tag.tags['loop-sync-options-child'][0].bool).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][1].bool).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][2].bool).to.be(false)
-    //tags.push(tag)
+    tags.push(tag)
   })
 
   it('the loops children sync correctly their internal data even when they are nested', function() {
@@ -1374,6 +1381,8 @@ describe('Compiler Browser', function() {
     expect(tag.tags['loop-inherit-item'][1].opts.name).to.be(tag.items[1])
     expect(tag.tags['loop-inherit-item'].length).to.be(3)
 
+    tags.push(tag)
+
   })
 
   it('the DOM events get executed in the right context', function() {
@@ -1383,6 +1392,8 @@ describe('Compiler Browser', function() {
     expect(tag.root.getElementsByTagName('div').length).to.be(4)
     tag.tags['loop-inherit-item'][0].root.onclick({})
     expect(tag.tags['loop-inherit-item'][0].wasClicked).to.be(true)
+
+    tags.push(tag)
   })
 
   it('loops over other tag instances do not override their internal properties', function() {
@@ -1393,6 +1404,20 @@ describe('Compiler Browser', function() {
     tag.update()
     expect(tag.tags['loop-tag-instances-child'][3].root.tagName.toLowerCase()).to.be('loop-tag-instances-child')
 
+    tags.push(tag)
+
+  })
+
+  it('nested loops using non object data get correctly rendered', function() {
+    var tag = riot.mount('loop-nested-strings-array')[0],
+        children = tag.root.getElementsByTagName('loop-nested-strings-array-item')
+    expect(children.length).to.be(4)
+    children = tag.root.getElementsByTagName('loop-nested-strings-array-item')
+    children[0].onclick({})
+    expect(children.length).to.be(4)
+    expect(normalizeHTML(children[0].innerHTML)).to.be('<p>b</p>')
+    expect(normalizeHTML(children[1].innerHTML)).to.be('<p>a</p>')
+    tags.push(tag)
   })
 
   it('all the events get fired also in the loop tags, the e.item property gets preserved', function() {
@@ -1442,10 +1467,11 @@ describe('Compiler Browser', function() {
 
   it('the riot-tag attribute gets updated if a DOM node gets mounted using two or more different tags', function() {
     var div = document.createElement('div')
-    riot.mount(div, 'timetable')
+    tags.push(riot.mount(div, 'timetable')[0])
     expect(div.getAttribute('riot-tag')).to.be('timetable')
-    riot.mount(div, 'test')
+    tags.push(riot.mount(div, 'test')[0])
     expect(div.getAttribute('riot-tag')).to.be('test')
+
   })
 
   it('any DOM event in a loop updates the whole parent tag', function() {
@@ -1551,6 +1577,7 @@ describe('Compiler Browser', function() {
   it('allow passing riot.observale instances to the children tags', function() {
     var tag = riot.mount('observable-attr')[0]
     expect(tag.tags['observable-attr-child'].wasTriggered).to.be(true)
+    tags.push(tag)
   })
 
 })
