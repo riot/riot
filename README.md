@@ -153,6 +153,9 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Yeoman generator - Generator riot mobile](https://www.npmjs.com/package/generator-riot-mobile)
 - [Yeoman generator - Generator riot element](https://www.npmjs.com/package/generator-riot-element)
 
+### Performance
+- **Riot vs React performance:** [(Riot version)](https://github.com/kazzkiq/samples/tree/gh-pages/perf/dom-riot-vs-vanilla) vs [(React version)](https://github.com/kazzkiq/samples/tree/gh-pages/perf/dom-react-vs-vanilla)
+
 
 ### Miscellaneous
 - [Q&A with RiotJS author Tero Piirainen](http://www.triplet.fi/blog/q-and-a-with-riotjs-author-tero-piirainen/)
