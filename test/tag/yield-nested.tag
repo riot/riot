@@ -12,7 +12,6 @@
   <h2>{ opts.subtitle }</h2>
   <yield/>
   this.greeting = 'from the child'
-
 </yield-child-2>
 
 

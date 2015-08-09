@@ -1,4 +1,6 @@
 
+var defaultBrackets = riot.settings.brackets
+
 // this function is needed to run the tests also on ie8
 // ie8 returns some weird strings when we try to get the innerHTML of a tag
 function normalizeHTML (html) {
@@ -372,6 +374,9 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/loop-inherit.tag\"><\/script>',
           '<loop-inherit><\/loop-inherit>',
 
+          '<script type=\"riot\/tag\" src=\"tag\/loop-double-curly-brackets.tag\"><\/script>',
+          '<loop-double-curly-brackets><\/loop-double-curly-brackets>',
+
           // check if the events get triggered correctly
           '<script type=\"riot\/tag\" src=\"tag\/events.tag\"><\/script>',
           '<events><\/events>',
@@ -437,6 +442,11 @@ describe('Compiler Browser', function() {
     }
     unmount(tags)
 
+  })
+
+  afterEach(function() {
+    // restore the default brackets
+    riot.settings.brackets = defaultBrackets
   })
 
   it('compiles and unmount the children tags', function(done) {
@@ -1579,5 +1589,25 @@ describe('Compiler Browser', function() {
     expect(tag.tags['observable-attr-child'].wasTriggered).to.be(true)
     tags.push(tag)
   })
+
+/*
+  TODO: fix this test
+  it('loops get rendered correctly also when riot.brackets get changed', function() {
+
+    // change the brackets
+    riot.settings.brackets = '{{ }}'
+    var tag = riot.mount('loop-double-curly-brackets')[0],
+        ps = tag.root.getElementsByTagName('p')
+
+    expect(ps.length).to.be(2)
+    expect(ps[0].innerHTML).to.be(ps[1].innerHTML)
+    expect(ps[0].innerHTML).to.be('hello')
+    tag.change()
+    expect(ps.length).to.be(2)
+    expect(ps[0].innerHTML).to.be(ps[1].innerHTML)
+    expect(ps[0].innerHTML).to.be('hello world')
+
+  })
+*/
 
 })
