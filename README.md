@@ -24,6 +24,7 @@
 | Angular                | 1.4.2      | 145.5kb       |
 | React                  | 0.13.3     | 121.7kb       |
 | Web Components Polyfill| 0.7.5      | 117.1kb       |
+| Polymer                | 1.0.6      | 101.2kb       |
 | Riot                   | 2.2.3      | <span class="riot-size">13.21kb</span> |
 
 
