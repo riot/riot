@@ -3,9 +3,10 @@
 </conditional-tag>
 
 <if-level2>
-  <conditional-tag if="{condition}"></conditional-tag>
 
-  <a href="" onclick="{toggleCondition}">Toggle Condition</a>
+  <a href="" onclick="{toggleCondition}">Toggle Condition (Level 2)</a>
+
+  <conditional-tag if="{condition}"></conditional-tag>
 
   this.condition = (opts.condition == 'true');
   var self = this;
@@ -16,11 +17,13 @@
   }
 </if-level2>
 <if-level1>
+
+  <p><a href="" onclick="{toggleCondition}">Toggle Condition (Level 1)</a></p>
+
   <div if={ condition }>
     <if-level2 condition="{level2Condition}"></if-level2>
   </div>
 
-  <p><a href="" onclick="{toggleCondition}">Toggle Condition</a></p>
 
   this.condition = (opts.condition == 'true');
   this.level2Condition = opts.level2;

@@ -377,6 +377,10 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/loop-double-curly-brackets.tag\"><\/script>',
           '<loop-double-curly-brackets><\/loop-double-curly-brackets>',
 
+          // check the conditional on a loop item
+          '<script type=\"riot\/tag\" src=\"tag\/loop-conditional.tag\"><\/script>',
+          '<loop-conditional><\/loop-conditional>',
+
           // check if the events get triggered correctly
           '<script type=\"riot\/tag\" src=\"tag\/events.tag\"><\/script>',
           '<events><\/events>',
@@ -1370,6 +1374,23 @@ describe('Compiler Browser', function() {
     expect(tag.tags['loop-inherit-item'][0].opts.nice).to.be(tag.isFun)
     expect(tag.tags['loop-inherit-item'][0].tags).to.be.empty()
     tags.push(tag)
+  })
+
+  it('loop tags get rendered correctly also with conditional attributes', function() {
+    var tag = riot.mount('loop-conditional')[0]
+    expect(tag.root.getElementsByTagName('div').length).to.be(2)
+    expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(2)
+    expect(tag.tags['loop-conditional-item'].length).to.be(3)
+    tag.items = []
+    tag.update()
+    expect(tag.root.getElementsByTagName('div').length).to.be(0)
+    expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(0)
+    expect(tag.tags['loop-conditional-item'].length).to.be(0)
+    tag.items = [2, 2, 2]
+    tag.update()
+    expect(tag.root.getElementsByTagName('div').length).to.be(3)
+    expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(3)
+    expect(tag.tags['loop-conditional-item'].length).to.be(3)
   })
 
   it('custom children items in a nested loop are always in sync with the parent tag', function() {
