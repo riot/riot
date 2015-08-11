@@ -481,7 +481,7 @@ describe('Compiler Browser', function() {
 
     expect(+new Date() - begin).to.be.below(1000)
 
-    expect(tag.tags.foo).to.not.be('undefined')
+    expect(tag.tags.foo).to.not.be(undefined)
 
     tag.unmount()
 
@@ -1391,6 +1391,7 @@ describe('Compiler Browser', function() {
     expect(tag.root.getElementsByTagName('div').length).to.be(3)
     expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(3)
     expect(tag.tags['loop-conditional-item'].length).to.be(3)
+    tags.push(tag)
   })
 
   it('custom children items in a nested loop are always in sync with the parent tag', function() {
@@ -1400,9 +1401,11 @@ describe('Compiler Browser', function() {
     expect(tag.tags['loop-inherit-item'][0].opts.name).to.be(tag.items[0])
     expect(tag.tags['loop-inherit-item'][1].opts.name).to.be(tag.items[1])
     expect(tag.tags['loop-inherit-item'][2].opts.name).to.be(tag.items[2])
+
     tag.items.splice(1, 1)
     tag.update()
     expect(tag.root.getElementsByTagName('div').length).to.be(2)
+
     tag.items.push('active')
     tag.update()
     expect(tag.root.getElementsByTagName('div').length).to.be(3)
