@@ -293,11 +293,12 @@ describe('Compiler Browser', function() {
 
           '<script type=\"riot\/tag\">',
           '  <style-tag3>',
-          '    <style scoped=\"scoped\">',
+          '    <style scoped=\"scoped\" type="text/myparser">',
           '      p {border: solid 3px black;}',
           '    <\/style>',
           '    <style>',
-          '      #style4 {border: solid 3px black;}',
+          '      p {border: solid 1px black}',
+          '      #style4 {border: solid 2px black;}',
           '    <\/style>',
           '    <p><\/p>',
           '  <\/style-tag3>',
@@ -306,7 +307,7 @@ describe('Compiler Browser', function() {
 
           '<script type=\"riot\/tag\">',
           '  <style-tag4>',
-          '    <p id=\"style4\"><\/p>',
+          '    <p id=\"style4\"><\/p><p>x</p>',
           '  <\/style-tag4>',
           '<\/script>',
           '<style-tag4><\/style-tag4>',
@@ -420,7 +421,7 @@ describe('Compiler Browser', function() {
   // adding some custom riot parsers
   // css
   riot.parsers.css.myparser = function(tag, css) {
-    return css.replace(/@tag/, tag)
+    return css.replace(/@tag/, tag).replace(' 3px ', ' 4px ')
   }
   // js
   riot.parsers.js.myparser = function(js) {
@@ -1081,13 +1082,20 @@ describe('Compiler Browser', function() {
 
   it('scoped css tag supports htm5 syntax, multiple style tags', function () {
 
-    checkCSS(riot.mount('style-tag3')[0])
-    checkCSS(riot.mount('style-tag4')[0])
+    checkCSS(riot.mount('style-tag3')[0], '4px')
+    checkCSS(riot.mount('style-tag4')[0], '2px', 1)
+    delete riot.parsers.css.cssup
 
-    function checkCSS(t) {
+    function checkCSS(t, x, p2) {
+      t.update()
       var e = t.root.firstElementChild
       expect(e.tagName).to.be('P')
-      expect(window.getComputedStyle(e, null).borderTopWidth).to.be('3px')
+      expect(window.getComputedStyle(e, null).borderTopWidth).to.be(x)
+      if (p2) {
+        e = t.root.getElementsByTagName('P')[1]
+        expect(e.innerHTML).to.be('x')
+        expect(window.getComputedStyle(e, null).borderTopWidth).to.be('1px')
+      }
       tags.push(t)
     }
   })
