@@ -412,8 +412,9 @@ describe('Compiler Browser', function() {
 
           // pass a riot observable as option
           '<script type=\"riot\/tag\" src=\"tag\/observable-attr.tag\"><\/script>',
-          '<observable-attr><\/observable-attr>'
+          '<observable-attr><\/observable-attr>',
 
+          ''    // keep it last please, avoids break PRs
     ].join('\r'),
       tags = [],
       div = document.createElement('div')
@@ -1622,8 +1623,6 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
-/*
-  TODO: fix this test
   it('loops get rendered correctly also when riot.brackets get changed', function() {
 
     // change the brackets
@@ -1640,6 +1639,5 @@ describe('Compiler Browser', function() {
     expect(ps[0].innerHTML).to.be('hello world')
 
   })
-*/
 
 })
