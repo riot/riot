@@ -1,8 +1,8 @@
-/* Riot v2.2.3, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v2.2.4, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window, undefined) {
   'use strict'
-  var riot = { version: 'v2.2.3', settings: {} }
+  var riot = { version: 'v2.2.4', settings: {} }
 
   // This globals 'const' helps code size reduction
 
