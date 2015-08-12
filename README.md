@@ -170,56 +170,58 @@ Riot is made with :heart: by many smart people. Thanks to all the contributors
 
 ```
  project  : riot
- repo age : 1 year, 10 months
- active   : 384 days
- commits  : 1605
- files    : 205
+ repo age : 1 year, 11 months
+ active   : 392 days
+ commits  : 1653
+ files    : 213
  authors  :
-   521  Gianluca Guarini        32.5%
-   398  Tero Piirainen          24.8%
-   150  Aurimas                 9.3%
-    56  Tsutomu Kawamura        3.5%
-    45  rsbondi                 2.8%
-    35  Alberto Martínez       2.2%
-    27  Marcelo Eden            1.7%
+   552  Gianluca Guarini        33.4%
+   400  Tero Piirainen          24.2%
+   150  Aurimas                 9.1%
+    56  Tsutomu Kawamura        3.4%
+    45  rsbondi                 2.7%
+    43  Alberto Martínez       2.6%
+    27  Marcelo Eden            1.6%
     20  Kalman Speier           1.2%
     18  Juha Lindstedt          1.1%
     18  Márcio Coelho          1.1%
     15  Anton Heryanto          0.9%
-    14  andynemzek              0.9%
-    13  Greg                    0.8%
+    14  andynemzek              0.8%
+    14  Greg                    0.8%
     13  a-moses                 0.8%
     11  Hrvoje Šimić          0.7%
     10  Andy VanEe              0.6%
-     9  Avner Peled             0.6%
+     9  Avner Peled             0.5%
      8  Richard Bondi           0.5%
-     8  Andreas Heintze         0.5%
      8  Mark Henderson          0.5%
-     7  Avnerus                 0.4%
+     8  Andreas Heintze         0.5%
+     7  Lee Tagg                0.4%
+     7  marciojcoelho           0.4%
      7  Ashley Brener           0.4%
      7  Tianxiang Chen          0.4%
-     7  marciojcoelho           0.4%
-     7  Lee Tagg                0.4%
-     6  Jens Anders Bakke       0.4%
+     7  Avnerus                 0.4%
      6  hemanth.hm              0.4%
      6  sethyuan                0.4%
-     5  Tatu Tamminen           0.3%
+     6  Jens Anders Bakke       0.4%
      5  jigsaw                  0.3%
+     5  Tatu Tamminen           0.3%
      5  midinastasurazz         0.3%
-     4  Eric Baer               0.2%
-     4  Giovanni Cappellotto    0.2%
      4  blissland               0.2%
      4  Jasmine Hegman          0.2%
      4  xieyu33333              0.2%
-     3  Magnus Wolffelt         0.2%
+     4  Giovanni Cappellotto    0.2%
+     4  Eric Baer               0.2%
+     3  Artem Medeusheyev       0.2%
+     3  scott                   0.2%
+     3  Jim Sparkman            0.2%
      3  korige                  0.2%
      3  Alan R. Soares          0.2%
-     3  Jim Sparkman            0.2%
-     3  scott                   0.2%
-     3  Artem Medeusheyev       0.2%
+     3  Magnus Wolffelt         0.2%
+     2  Mohammed Irfan          0.1%
      2  Eric Capps              0.1%
      2  Sergey Martynov         0.1%
      2  Simon JAILLET           0.1%
+     2  Antonino Porcino        0.1%
      2  Steve Clay              0.1%
      2  Alexis THOMAS           0.1%
      2  Tim Kindberg            0.1%
@@ -239,17 +241,18 @@ Riot is made with :heart: by many smart people. Thanks to all the contributors
      2  Collin Green            0.1%
      2  Andrew Luetgers         0.1%
      2  Milosz                  0.1%
-     2  Mohammed Irfan          0.1%
      2  Moot Inc                0.1%
-     2  David Salazar           0.1%
-     2  Philippe CHARRIERE      0.1%
+     2  Mtpc                    0.1%
      2  Antoine Goutagny        0.1%
+     2  Philippe CHARRIERE      0.1%
+     2  David Salazar           0.1%
      1  kylobite                0.1%
      1  Andrew L. Van Slaars    0.1%
      1  Ari Makela              0.1%
      1  Barkóczi Dávid        0.1%
      1  Benoit Hirbec           0.1%
      1  Boris Huai              0.1%
+     1  Claudio Holanda         0.1%
      1  Constantin Rack         0.1%
      1  Courtney Couch          0.1%
      1  Danil Semelenov         0.1%
@@ -292,6 +295,7 @@ Riot is made with :heart: by many smart people. Thanks to all the contributors
      1  nino-porcino            0.1%
      1  typicode                0.1%
      1  xieyu03                 0.1%
+     1  なりたけいすけ   0.1%
 ```
 
 https://muut.com/riotjs/

@@ -28,6 +28,13 @@ Riot brings custom tags to all browsers starting from IE8.
     <button>Add #{ items.length + 1 }</button>
   </form>
 
+  <!-- style -->
+  <style scoped>
+    h3 {
+      font-size: 14px;
+    }
+  </style>
+
   <!-- logic -->
   <script>
     this.items = []

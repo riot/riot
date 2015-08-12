@@ -373,10 +373,10 @@ Once you have created your own `riot.parsers` you will be able to compile your t
 ```html
 <custom-parsers>
   <p>hi</p>
-  <style type="text/myJsParser">
+  <style type="text/myCssParser">
     @tag {color: red;}
   </style>
-  <script type="text/myCssParser">
+  <script type="text/myJsParser">
     this.version = "@version"
   </script>
 </custom-parsers>
