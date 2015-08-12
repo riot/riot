@@ -146,7 +146,7 @@ React is 10x bigger than Riot.
 <small><em>react.min.js</em> – 121KB</small>
 <span class="bar red"></span>
 
-<small><em>riot.min.js</em> – <span class="riot-size">13.21kb</span></small>
+<small><em>riot.min.js</em> – <span class="riot-size">12.75kb</span></small>
 <span class="bar blue" style="width: 10.8%"></span>
 
 <br>
