@@ -177,22 +177,20 @@ Conceptually Riot is the same thing but there are differences:
 
 2. Polymer syntax is more complex and requires one to study more books.
 
-3. Individual components are imported with HTML `link rel="import"`. Polyfills must resort to queued up XHRs, which makes it painfully slow. Riot tags are imported with `script src` and multiple tags can be combined with regular tooling.
+3. Individual components are imported with HTML `link rel="import"`. Polyfills must resort to queued up XHRs, which makes it painfully slow unless the dedicated [vulcanize](https://github.com/polymer/vulcanize) tool is used. Riot tags are imported with `script src` and multiple tags can be combined with regular tooling.
 
-4. Polymer uses two-way data binding while riot uses one-way data binding.
-
-5. No ability to perform server side rendering.
+4. No ability to perform server side rendering.
 
 
-### 22x bigger
+### 11x bigger
 
-Polymer (v0.5.6) is 10x bigger than Riot
+Polymer(v1.0.6) + WebComponents(v0.7.7) is 11x bigger than Riot
 
-<small><em>polymer.min.js</em> – 123KB</small>
+<small><em>polymer.min.js + webcomponents-lite.min.js</em> – 138KB</small>
 <span class="bar red"></span>
 
-<small><em>riot.min.js</em> – <span class="riot-size">13.21kb</span></small>
-<span class="bar blue" style="width: 10%"></span>
+<small><em>riot.min.js</em> – <span class="riot-size">12.4kb</span></small>
+<span class="bar blue" style="width: 11%"></span>
 
 Web components are said to be the [king of all polyfilling challenges](http://developer.telerik.com/featured/web-components-arent-ready-production-yet/) and this is why Polymer requires such a large amount of code.
 
