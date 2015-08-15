@@ -1,8 +1,8 @@
 {
   "name": "riot",
   "version": "2.2.4",
-  "description": "A React- like, 3.5K user interface library",
-  "homepage": "https://muut.com/riotjs/",
+  "description": "A React-like user interface micro-library",
+  "homepage": "http://riotjs.com/",
   "repository": { "type": "git", "url": "git://github.com/riot/riot.git" },
   "authors": ["Muut, Inc. and other contributors"],
   "license": "MIT",

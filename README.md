@@ -1,7 +1,7 @@
 
-[![Riot logo](doc/logo/riot480x.png)](https://muut.com/riotjs/)
+[![Riot logo](http://riotjs.com/img/logo/riot480x.png)](http://riotjs.com/)
 
-## A React- like, 3.5KB UI lib
+## A React-like user interface micro-library
 
 [![Build Status][travis-image]][travis-url]
 [![Riot Forum][riot-forum-image]][riot-forum-url]
@@ -92,7 +92,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 
 ### Use your dearest language and tools
-- Create tags with CoffeeScript, Jade, LiveScript, Typescript, ES6 or [any pre-processor](https://muut.com/riotjs/compiler.html#pre-processors) you want.
+- Create tags with CoffeeScript, Jade, LiveScript, Typescript, ES6 or [any pre-processor](http://riotjs.com/guide/compiler/#pre-processors) you want.
 - Integrate with NPM, CommonJS, AMD, Bower or Component
 - Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot), [Browserify](https://github.com/jhthorsen/riotify), or [Wintersmith](https://github.com/collingreen/wintersmith-riot) plugins
 
@@ -299,7 +299,7 @@ Riot is made with :heart: by many smart people. Thanks to all the contributors
      1  なりたけいすけ   0.1%
 ```
 
-https://muut.com/riotjs/
+http://riotjs.com/
 
 
 [travis-image]:https://img.shields.io/travis/riot/riot.svg?style=flat-square
@@ -313,7 +313,7 @@ https://muut.com/riotjs/
 [npm-url]:https://npmjs.org/package/riot
 
 [riot-forum-image]:https://img.shields.io/badge/muut-JOIN_CHAT%E2%86%92-ff0044.svg?style=flat-square
-[riot-forum-url]:https://muut.com/riotjs/forum/
+[riot-forum-url]:http://riotjs.com/forum/
 
 [coverage-image]:https://img.shields.io/coveralls/riot/riot/dev.svg?style=flat-square
 [coverage-url]:https://coveralls.io/r/riot/riot?branch=dev
