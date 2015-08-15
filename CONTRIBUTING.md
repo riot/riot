@@ -50,5 +50,11 @@ We use [Github Issues](https://github.com/riot/riot/issues) as the Riot.js bug t
 
 Please just add a link to the bottom of the README.md file
 
+
+### Updating the documentation
+
+Please go to the [website repository](https://github.com/riot/riot.github.io).
+
+
 #### We are happy to accept PRs so thank you in advance!
 
