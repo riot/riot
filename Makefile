@@ -27,7 +27,7 @@ eslint:
 	@ $(ESLINT) -c ./.eslintrc lib test
 
 test-mocha:
-	RIOT=../../dist/riot/riot.js $(ISTANBUL) cover $(MOCHA) debug -- test/runner.js -R spec
+	RIOT=../../dist/riot/riot.js $(ISTANBUL) cover $(MOCHA) -- test/runner.js -R spec
 
 test-karma:
 	@ $(KARMA) start test/karma.conf.js
