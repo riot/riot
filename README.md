@@ -55,6 +55,8 @@ Riot brings custom tags to all browsers, including IE8. Think React + Polymer bu
 </timer>
 ```
 
+[Open this example on Plunker](http://riotjs.com/examples/plunker/?app=timer)
+
 #### Mounting
 
 ``` javascript
@@ -104,6 +106,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - Compact ES6 method syntax.
 
 ### Demos
+- [**Riot Examples** - Community's Official](https://github.com/riot/examples)
 - [Riot Todo MVC](https://github.com/txchen/feplay/tree/gh-pages/riot_todo)
 - [Hackernews reader](http://git.io/riot-hn)
 - [Vuejs examples by Riotjs](https://github.com/txchen/feplay/tree/gh-pages/riot_vue)
