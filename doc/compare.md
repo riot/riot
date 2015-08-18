@@ -139,15 +139,15 @@ Just like Flux, Riot is flexible and leaves the bigger architectural decisions f
 You can build a Flux-like system by using Riot's observable and router. In fact such thing [already exists](https://github.com/jimsparkman/RiotControl).
 
 
-### 24x - 128x bigger
+### 10x - 128x bigger
 
-React is 24x bigger than Riot.
+React is 10x bigger than Riot.
 
-<small><em>react.min.js</em> – 127KB</small>
+<small><em>react.min.js</em> – 121KB</small>
 <span class="bar red"></span>
 
-<small><em>riot.min.js</em> – 6.7KB</small>
-<span class="bar blue" style="width: 4.8%"></span>
+<small><em>riot.min.js</em> – <span class="riot-size">12.75kb</span></small>
+<span class="bar blue" style="width: 10.8%"></span>
 
 <br>
 
@@ -181,18 +181,18 @@ Conceptually Riot is the same thing but there are differences:
 
 4. Polymer uses two-way data binding while riot uses one-way data binding.
 
-5. No ability to perform server side rendering, which will be part of Riot in an upcoming version.
+5. No ability to perform server side rendering.
 
 
 ### 22x bigger
 
-Polymer (v0.5.2) is 22x bigger than Riot
+Polymer (v0.5.6) is 10x bigger than Riot
 
-<small><em>polymer.min.js</em> – 120KB</small>
+<small><em>polymer.min.js</em> – 123KB</small>
 <span class="bar red"></span>
 
-<small><em>riot.min.js</em> – 6.7KB</small>
-<span class="bar blue" style="width: 4.5%"></span>
+<small><em>riot.min.js</em> – <span class="riot-size">13.21kb</span></small>
+<span class="bar blue" style="width: 10%"></span>
 
 Web components are said to be the [king of all polyfilling challenges](http://developer.telerik.com/featured/web-components-arent-ready-production-yet/) and this is why Polymer requires such a large amount of code.
 
