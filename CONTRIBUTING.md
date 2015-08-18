@@ -1,7 +1,7 @@
 # Contributing to Riot.js
 
 If you’d like to contribute a feature or bug fix, you can [fork](https://help.github.com/articles/fork-a-repo/) Riot, commit your changes, & [send a pull request](https://help.github.com/articles/using-pull-requests/).
-Please make sure to [search the issue tracker](https://github.com/mutt/riotjs/issues) first.
+Please make sure to [search the issue tracker](https://github.com/riot/riot/issues) first.
 
 ### Development Process
 
@@ -49,6 +49,12 @@ We use [Github Issues](https://github.com/riot/riot/issues) as the Riot.js bug t
 ### Adding a new Demo
 
 Please just add a link to the bottom of the README.md file
+
+
+### Updating the documentation
+
+Please go to the [website repository](https://github.com/riot/riot.github.io).
+
 
 #### We are happy to accept PRs so thank you in advance!
 
