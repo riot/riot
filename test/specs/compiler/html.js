@@ -35,6 +35,11 @@ describe('Compile HTML', function() {
     expect(render('{ "a" }')).to.equal('{ \"a\" }')
     expect(render('\\{ a \\}')).to.equal('\\\\{ a \\\\}')
   })
+  it('escapes double quotes inside the attributes', function() {
+    expect(render('<p title={ "a" }>')).to.equal('<p title="{ &quot;a&quot; }">')
+    expect(render('<p if={ a == "a" }>')).to.equal('<p if="{ a == &quot;a&quot; }">')
+    expect(render('<p class={ red: a == "a" }>')).to.equal('<p class="{ red: a == &quot;a&quot; }">')
+  })
   it('mormalizes line endings', function() {
     expect(render('<p>\r</p>\r\r\n<p>\n</p>', { whitespace: 1 })).to.equal('<p>\\n</p>\\n\\n<p>\\n</p>')
   })
