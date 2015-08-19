@@ -38,6 +38,7 @@
     "chalk": "^1.1.0",
     "chokidar": "~1.0.5",
     "riot-observable": "^2.0.0-beta",
+    "riot-router": "riot/router",
     "minimist": "~1.1.3",
     "shelljs": "~0.5.1",
     "simple-dom": "0.2.7",
