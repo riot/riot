@@ -130,7 +130,7 @@ describe('Tmpl', function() {
     expect(render('{ "a b": yes }')).to.equal('a b')
 
     // errors in expressions are silently catched allowing shorter expressions
-    expect(render('{ loading: !nonExistingVar.length }')).to.equal('loading')
+    expect(render('{ loading: !nonExistingVar.length }')).to.equal('')
 
     // expressions are just regular JavaScript
     expect(render('{ a: !no, b: yes }')).to.equal('a b')
