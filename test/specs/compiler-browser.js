@@ -1536,6 +1536,12 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('the update event returns the tag instance', function() {
+    var tag = riot.mount('loop-child')[0]
+    expect(tag.update()).to.not.be(undefined)
+    tags.push(tag)
+  })
+
   it('table with multiple bodies and dynamic styles #1052', function() {
 
     var tag = riot.mount('table-multibody')[0],
