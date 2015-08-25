@@ -302,14 +302,15 @@ riot.tag('timer',
 See [timer demo](http://jsfiddle.net/gnumanth/h9kuozp5/) and [riot.tag](/riotjs/api/#tag) API docs for more details and *limitations*.
 
 
-<span class="tag red">Warning</span> by using `riot.tag` you cannot enjoy the advantages of compiler and following features are not supported:
+<span class="tag red">Warning</span> by using `riot.tag` you cannot enjoy the advantages of the compiler and following features are not supported:
 
-1. Self- closing tags
+1. Self-closing tags
 2. Unquoted expressions. Write `value="{ val }"` instead of `value={ val }`
 3. Boolean attributes. Write `__checked="{ flag }"` instead of `checked={ flag }`
 4. Shorthand ES6 method signatures
 5. `<img src={ src }>` must be written as `<img riot-src={ src }>` in order to avoid illegal server requests
-6. `style="color: { color }"` must be written as `riot-style="color: { color }"` so that style attribute expressions work in IE.
+6. `style="color: { color }"` must be written as `riot-style="color: { color }"` so that style attribute expressions work in IE
+7. Scoped CSS precompilation
 
 
 You can take advantage of `<template>` or `<script>` tags as follows:
