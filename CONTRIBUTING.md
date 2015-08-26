@@ -1,4 +1,5 @@
 *NOW WE ARE CHANGING THE STRUCTURE OF RIOT REPO*
+
 *PLEASE SEE THE ISSUE [#1167](https://github.com/riot/riot/issues/1167) THANK YOU!*
 
 # Contributing to Riot.js
