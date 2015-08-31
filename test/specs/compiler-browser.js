@@ -414,6 +414,12 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/observable-attr.tag\"><\/script>',
           '<observable-attr><\/observable-attr>',
 
+          //dynamic tag selection
+          '<script type=\"riot\/tag\" src=\"tag\/dynamic-with-update.tag\"><\/script>',
+          '<script type=\"riot\/tag\" src=\"tag\/dynamic-one.tag\"><\/script>',
+          '<script type=\"riot\/tag\" src=\"tag\/dynamic-two.tag\"><\/script>',
+          '<dynamic-with-update></dynamic-with-update>',
+
           ''    // keep it last please, avoids break PRs
     ].join('\r'),
       tags = [],
@@ -1638,6 +1644,19 @@ describe('Compiler Browser', function() {
     expect(ps[0].innerHTML).to.be(ps[1].innerHTML)
     expect(ps[0].innerHTML).to.be('hello world')
 
+  })
+
+  it('tags with dynamic tags properly change their contents on update', function() {
+    var tag = riot.mount('dynamic-with-update')[0]
+
+    pre = tag.root.getElementsByTagName('pre')[0]
+    expect(pre.innerHTML).to.be('This tag was dynamically chosen')
+
+    tag.dynamicChoice = 'dynamic-two'
+    tag.update()
+
+    pre = tag.root.getElementsByTagName('pre')[0]
+    expect(pre.innerHTML).to.be('This tag was also dynamically chosen')
   })
 
 })

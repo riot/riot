@@ -55,4 +55,16 @@ describe('Node/io.js', function() {
     expect(els.last().text()).to.be('post 2')
   })
 
+  it('render tag: dynamic-generation', function() {
+    var dynamicOne = riot.render('dynamic-generation', {tag: 'dynamic-one'})
+    var dynamicTwo = riot.render('dynamic-generation', {tag: 'dynamic-two'})
+    var $one = cheerio.load(dynamicOne)
+    var $two = cheerio.load(dynamicTwo)
+    var elsOne = $one('pre')
+    var elsTwo = $two('pre')
+
+    expect(elsOne.text()).to.be('This tag was dynamically chosen')
+    expect(elsTwo.text()).to.be('This tag was also dynamically chosen')
+
+  })
 })
