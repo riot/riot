@@ -402,6 +402,10 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/loop-nested-strings-array.tag\"><\/script>',
           '<loop-nested-strings-array><\/loop-nested-strings-array>',
 
+          // check the loop events and the item property
+          '<script type=\"riot\/tag\" src=\"tag\/loop-events.tag\"><\/script>',
+          '<loop-events><\/loop-events>',
+
           // table with multiple bodies and dynamic style
           '<script type=\"riot\/tag\" src=\"tag\/table-multibody.tag\"><\/script>',
           '<table-multibody><\/table-multibody>',
@@ -648,7 +652,7 @@ describe('Compiler Browser', function() {
     tag.update()
 
     // remove item make sure item passed is correct
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < tag.items.length; i++) {
       var curItem = tag.removes[0],
         ev = {},
         el = root.getElementsByTagName('dt')[0]
@@ -697,6 +701,33 @@ describe('Compiler Browser', function() {
     tag.items = null
     tag.update()
     expect(root.getElementsByTagName('li').length).to.be(0)
+
+  })
+
+  it('the event.item property gets handled correctly also in the nested loops', function() {
+    var tag = riot.mount('loop-events', {
+        cb: function(e, item) {
+          eventsCounter++
+          if (e.stopPropagation)
+            e.stopPropagation()
+          expect(JSON.stringify(item)).to.be(JSON.stringify(testItem))
+        }
+      })[0],
+      eventsCounter = 0,
+      testItem
+
+    // 1st test
+    testItem = { outerCount: 'out', outerI: 0 }
+    tag.root.getElementsByTagName('inner-loop-events')[0].onclick({})
+    // 2nd test inner contents
+    testItem = { innerCount: 'in', innerI: 0 }
+    tag.root.getElementsByTagName('button')[0].onclick({})
+    tag.root.getElementsByTagName('button')[1].onclick({})
+    tag.root.getElementsByTagName('li')[0].onclick({})
+
+    expect(eventsCounter).to.be(3)
+
+    tags.push(tag)
 
   })
 
@@ -1643,6 +1674,8 @@ describe('Compiler Browser', function() {
     expect(ps.length).to.be(2)
     expect(ps[0].innerHTML).to.be(ps[1].innerHTML)
     expect(ps[0].innerHTML).to.be('hello world')
+
+    tags.push(tag)
 
   })
 
