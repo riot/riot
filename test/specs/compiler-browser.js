@@ -366,6 +366,10 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/loop-sync-options.tag\"><\/script>',
           '<loop-sync-options><\/loop-sync-options>',
 
+          // named selects check
+          '<script type=\"riot\/tag\" src=\"tag\/named-select.tag\"><\/script>',
+          '<named-select><\/named-select>',
+
           // sync the loop options in nested tags
           '<script type=\"riot\/tag\" src=\"tag\/loop-sync-options-nested.tag\"><\/script>',
           '<loop-sync-options-nested><\/loop-sync-options-nested>',
@@ -842,6 +846,15 @@ describe('Compiler Browser', function() {
 
     tags.push(tag)
 
+  })
+
+  it('the named on a select tag gets', function() {
+    var tag = riot.mount('named-select')[0]
+
+    expect(tag.tags.daSelect).to.not.be(undefined)
+    expect(tag.tags.daSelect.length).to.be(2)
+
+    tags.push(tag)
   })
 
   it('loop optgroup tag', function() {
