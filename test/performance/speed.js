@@ -21,7 +21,7 @@ var riot = require('../../dist/riot/riot'),
   myComponentHTML = `
     <h1>{ opts.title }</h1>
     <p>{ opts.description }</p>
-    <my-list-item each="{ items }">
+    <my-list-item class="{ active: opts.title }" each="{ items }">
   `,
   myListItem = 'my-list-item',
   myListItemHTML = `
@@ -71,6 +71,25 @@ function setupTags(riot, component) {
 
 }
 
+/**
+ * Trigger the tag updates
+ */
+
+function update(tag) {
+  tag.items = generateItems(30, {
+    isActive: false
+  })
+  tag.update()
+  tag.items = generateItems(160, {
+    isActive: false
+  })
+  tag.update()
+  tag.items = generateItems(10, {
+    isActive: false
+  })
+  tag.update()
+}
+
 // Initialize the test
 var doc = jsdom(`<${myComponent1}/> <${myComponent2}/>`)
 global.window = doc.defaultView
@@ -78,29 +97,20 @@ global.document = window.document
 
 setupTags(oldRiot, myComponent2)
 setupTags(riot, myComponent1)
+global.gc()
 
 suite
-.add('old riot', function() {
+.add('riot#old', function() {
   var tag = oldRiot.mount(myComponent2, data)[0]
-  tag.items.reverse()
-  tag.update()
-  tag.items.reverse()
-  tag.update()
-  tag.items.reverse()
-  tag.update()
+  update(tag)
 }, {
   teardown: function() {
     global.gc()
   }
 })
-.add('new riot', function() {
+.add('riot#new', function() {
   var tag = riot.mount(myComponent1, data)[0]
-  tag.items.reverse()
-  tag.update()
-  tag.items.reverse()
-  tag.update()
-  tag.items.reverse()
-  tag.update()
+  update(tag)
 }, {
   teardown: function() {
     global.gc()
