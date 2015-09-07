@@ -1,0 +1,6 @@
+{
+  "name": "fduarte42/riot",
+  "description": "A React- like, 3.5K user interface library",
+  "minimum-stability": "stable",
+  "license": "MIT"
+}
