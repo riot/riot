@@ -851,8 +851,8 @@ describe('Compiler Browser', function() {
   it('the named on a select tag gets', function() {
     var tag = riot.mount('named-select')[0]
 
-    expect(tag.tags.daSelect).to.not.be(undefined)
-    expect(tag.tags.daSelect.length).to.be(2)
+    expect(tag.daSelect).to.not.be(undefined)
+    expect(tag.daSelect.length).to.be(2)
 
     tags.push(tag)
   })
@@ -1296,6 +1296,7 @@ describe('Compiler Browser', function() {
       expect(tag.check[0].value).to.be('one')
       expect(tag.check[1].value).to.be('two')
       expect(tag.check[2].value).to.be('three')
+
     }
     var tag = riot.mount('multi-named', { mount: mount, mountChild: mountChild })[0]
 
