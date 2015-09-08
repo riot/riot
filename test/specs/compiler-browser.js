@@ -366,6 +366,10 @@ describe('Compiler Browser', function() {
           '<script type=\"riot\/tag\" src=\"tag\/loop-sync-options.tag\"><\/script>',
           '<loop-sync-options><\/loop-sync-options>',
 
+          // named selects check
+          '<script type=\"riot\/tag\" src=\"tag\/named-select.tag\"><\/script>',
+          '<named-select><\/named-select>',
+
           // sync the loop options in nested tags
           '<script type=\"riot\/tag\" src=\"tag\/loop-sync-options-nested.tag\"><\/script>',
           '<loop-sync-options-nested><\/loop-sync-options-nested>',
@@ -401,6 +405,10 @@ describe('Compiler Browser', function() {
           // check nested loops using arrays of non objects
           '<script type=\"riot\/tag\" src=\"tag\/loop-nested-strings-array.tag\"><\/script>',
           '<loop-nested-strings-array><\/loop-nested-strings-array>',
+
+          // check the loop events and the item property
+          '<script type=\"riot\/tag\" src=\"tag\/loop-events.tag\"><\/script>',
+          '<loop-events><\/loop-events>',
 
           // table with multiple bodies and dynamic style
           '<script type=\"riot\/tag\" src=\"tag\/table-multibody.tag\"><\/script>',
@@ -648,7 +656,7 @@ describe('Compiler Browser', function() {
     tag.update()
 
     // remove item make sure item passed is correct
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < tag.items.length; i++) {
       var curItem = tag.removes[0],
         ev = {},
         el = root.getElementsByTagName('dt')[0]
@@ -697,6 +705,33 @@ describe('Compiler Browser', function() {
     tag.items = null
     tag.update()
     expect(root.getElementsByTagName('li').length).to.be(0)
+
+  })
+
+  it('the event.item property gets handled correctly also in the nested loops', function() {
+    var tag = riot.mount('loop-events', {
+        cb: function(e, item) {
+          eventsCounter++
+          if (e.stopPropagation)
+            e.stopPropagation()
+          expect(JSON.stringify(item)).to.be(JSON.stringify(testItem))
+        }
+      })[0],
+      eventsCounter = 0,
+      testItem
+
+    // 1st test
+    testItem = { outerCount: 'out', outerI: 0 }
+    tag.root.getElementsByTagName('inner-loop-events')[0].onclick({})
+    // 2nd test inner contents
+    testItem = { innerCount: 'in', innerI: 0 }
+    tag.root.getElementsByTagName('button')[0].onclick({})
+    tag.root.getElementsByTagName('button')[1].onclick({})
+    tag.root.getElementsByTagName('li')[0].onclick({})
+
+    expect(eventsCounter).to.be(3)
+
+    tags.push(tag)
 
   })
 
@@ -811,6 +846,15 @@ describe('Compiler Browser', function() {
 
     tags.push(tag)
 
+  })
+
+  it('the named on a select tag gets', function() {
+    var tag = riot.mount('named-select')[0]
+
+    expect(tag.daSelect).to.not.be(undefined)
+    expect(tag.daSelect.length).to.be(2)
+
+    tags.push(tag)
   })
 
   it('loop optgroup tag', function() {
@@ -1252,6 +1296,7 @@ describe('Compiler Browser', function() {
       expect(tag.check[0].value).to.be('one')
       expect(tag.check[1].value).to.be('two')
       expect(tag.check[2].value).to.be('three')
+
     }
     var tag = riot.mount('multi-named', { mount: mount, mountChild: mountChild })[0]
 
@@ -1536,6 +1581,12 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('the update event returns the tag instance', function() {
+    var tag = riot.mount('loop-child')[0]
+    expect(tag.update()).to.not.be(undefined)
+    tags.push(tag)
+  })
+
   it('table with multiple bodies and dynamic styles #1052', function() {
 
     var tag = riot.mount('table-multibody')[0],
@@ -1637,6 +1688,8 @@ describe('Compiler Browser', function() {
     expect(ps.length).to.be(2)
     expect(ps[0].innerHTML).to.be(ps[1].innerHTML)
     expect(ps[0].innerHTML).to.be('hello world')
+
+    tags.push(tag)
 
   })
 
