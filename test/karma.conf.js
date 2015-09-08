@@ -36,10 +36,7 @@ module.exports = function(config) {
         included: false
       },
       'specs/compiler-browser.js',
-      'specs/observable.js',
-      'specs/mixin.js',
-      'specs/route.js',
-      'specs/tmpl.js'
+      'specs/mixin.js'
     ],
     sauceLabs: {
       build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
