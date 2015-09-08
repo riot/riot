@@ -145,6 +145,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [RiotGear](https://riotgear.js.org)
 - [Riot Bootstrap](http://cognitom.github.io/riot-bootstrap/)
 - [iToolkit](https://github.com/BE-FE/iToolkit)
+- [Riot Routehandler](https://github.com/crisward/riot-routehandler)-[(Demo)](http://codepen.io/crisward/pen/xwGJpM?editors=101)
 
 ### Resources
 - [Riot + AngularJS](https://github.com/lucasbrigida/angular-riot)
