@@ -67,7 +67,7 @@ describe('Mixin', function() {
 
   it('Will mount two tags, each having separate mix-in methods', function() {
     var one = document.createElement('my-mixin2'),
-        two = document.createElement('my-mixin2')
+      two = document.createElement('my-mixin2')
 
     one.setAttribute('id', 'one')
     two.setAttribute('id', 'two')
@@ -79,7 +79,7 @@ describe('Mixin', function() {
     })
 
     var first = riot.mount('#one')[0],
-       second = riot.mount('#two')[0]
+      second = riot.mount('#two')[0]
 
     expect(first._id).to.be(first.getId())
     expect(second._id).to.be(second.getId())

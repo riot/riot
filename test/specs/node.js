@@ -1,5 +1,5 @@
 var glob = require('glob'),
-    cheerio = require('cheerio')
+  cheerio = require('cheerio')
 
 describe('Node/io.js', function() {
 

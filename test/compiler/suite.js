@@ -2,7 +2,7 @@
 require('shelljs/global')
 
 var compiler = require('../../lib/server/compiler'),
-    expect = require('expect.js')
+  expect = require('expect.js')
 
 describe('All the tags get compiler as expected', function() {
 
@@ -52,10 +52,10 @@ describe('All the tags get compiler as expected', function() {
     function test(name, opts) {
 
       var type = opts.type,
-          dir = 'test/compiler',
-          basename = name + (type ? '.' + type : ''),
-          src = cat(dir + '/' + basename + '.tag'),
-          should = cat(dir + '/js/' + basename + '.js')
+        dir = 'test/compiler',
+        basename = name + (type ? '.' + type : ''),
+        src = cat(dir + '/' + basename + '.tag'),
+        should = cat(dir + '/js/' + basename + '.js')
 
       expect(compiler.compile(src, opts).trim()).to.be(should)
     }
