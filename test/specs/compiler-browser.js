@@ -368,7 +368,7 @@ describe('Compiler Browser', function() {
 
       // named selects check
       '<script type=\"riot\/tag\" src=\"tag\/named-select.tag\"><\/script>',
-      '<named-select><\/named-select>',
+      '<named-select name="i-am-the-select"><\/named-select>',
 
       // sync the loop options in nested tags
       '<script type=\"riot\/tag\" src=\"tag\/loop-sync-options-nested.tag\"><\/script>',
