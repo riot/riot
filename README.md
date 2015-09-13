@@ -107,7 +107,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Demos
 - [**Riot Examples** - Community's Official](https://github.com/riot/examples)
-- [Riot Todo MVC](https://github.com/txchen/feplay/tree/gh-pages/riot_todo)
+- [Riot Todo MVC](http://todomvc.com/examples/riotjs/)
 - [Hackernews reader](http://git.io/riot-hn)
 - [Vuejs examples by Riotjs](https://github.com/txchen/feplay/tree/gh-pages/riot_vue)
 - [Flux-like ES6 Todo](https://github.com/srackham/riot-todo)
@@ -122,7 +122,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Tutorials
 - [Building Apps with Riot, ES6 and Webpack](http://blog.srackham.com/posts/riot-es6-webpack-apps/)
-- [Building Apps with Riot, Babel and Browserify](https://github.com/txchen/feplay/tree/gh-pages/riot_babel)
+- [Building Apps with Riot, Babel, RiotControl and Webpack](https://github.com/txchen/feplay/tree/gh-pages/riot_webpack)
 - [Building tabs with Riot](http://www.robertwpearce.com/blog/riotjs-example/)
 - [The "React tutorial" for Riot](https://juriansluiman.nl/article/154/the-react-tutorial-for-riot)
 - [How to package "tag libraries" in Riot](https://github.com/ivan-saorin/riot-tutorial-tags-pack-app)
