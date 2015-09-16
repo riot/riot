@@ -48,10 +48,10 @@
   "devDependencies": {
     "cheerio": "^0.19.0",
     "coveralls": "^2.11.4",
-    "eslint": "^1.4.1",
+    "eslint": "^1.4.3",
     "expect.js": "^0.3.1",
     "glob": "^5.0.14",
-    "jsdom": "^6.3.0",
+    "jsdom": "^6.5.0",
     "karma": "^0.13.9",
     "karma-coverage": "^0.5.2",
     "karma-mocha": "^0.2.0",
