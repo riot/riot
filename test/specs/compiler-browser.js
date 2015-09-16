@@ -422,6 +422,10 @@ describe('Compiler Browser', function() {
       '<script type=\"riot\/tag\" src=\"tag\/observable-attr.tag\"><\/script>',
       '<observable-attr><\/observable-attr>',
 
+      // check arguments order of each attribute through array subclass loop
+      '<script type=\"riot\/tag\" src=\"tag\/loop-arraylike.tag\"><\/script>',
+      '<loop-arraylike><\/loop-arraylike>',
+
       ''    // keep it last please, avoids break PRs
     ].join('\r'),
     tags = [],
@@ -1691,6 +1695,14 @@ describe('Compiler Browser', function() {
 
     tags.push(tag)
 
+  })
+
+  it('loops correctly on array subclasses', function() {
+    var tag = riot.mount('loop-arraylike')[0],
+      root = tag.root
+    expect(normalizeHTML(root.getElementsByTagName('div')[0].innerHTML))
+      .to.be('<p>0 = zero</p><p>1 = one</p><p>2 = two</p><p>3 = three</p>')
+    tags.push(tag)
   })
 
 })
