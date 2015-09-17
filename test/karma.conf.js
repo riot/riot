@@ -26,6 +26,7 @@ module.exports = function(config) {
     },
     files: [
       'polyfills/bind.js',
+      'fixtures/symbol.js',
       '../node_modules/mocha/mocha.js',
       '../node_modules/expect.js/index.js',
       '../dist/riot/riot.js',
