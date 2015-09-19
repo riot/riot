@@ -60,7 +60,7 @@ describe('Node/io.js', function() {
     var $ = cheerio.load(blk)
     expect($('block').length).to.be(1)
     expect($('yoyo').length).to.be(1)
-    expect($('yoyo').innerHTML).to.be('Hello World!')
+    expect($('yoyo').html()).to.be('Hello World!')
   })
 
 })
