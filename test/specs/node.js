@@ -55,7 +55,7 @@ describe('Node/io.js', function() {
     expect(els.last().text()).to.be('post 2')
   })
 
-  it('render tag: blog (using yield)', function() {
+  it('render tag: simple block (using yield)', function() {
     var blk = riot.render('block')
     var $ = cheerio.load(blk)
     expect($('block').length).to.be(1)
