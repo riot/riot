@@ -55,4 +55,12 @@ describe('Node/io.js', function() {
     expect(els.last().text()).to.be('post 2')
   })
 
+  it('render tag: simple block (using yield)', function() {
+    var blk = riot.render('block')
+    var $ = cheerio.load(blk)
+    expect($('block').length).to.be(1)
+    expect($('yoyo').length).to.be(1)
+    expect($('yoyo').html()).to.be('Hello World!')
+  })
+
 })
