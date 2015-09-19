@@ -36,7 +36,7 @@
   ],
   "dependencies": {
     "chalk": "^1.1.1",
-    "chokidar": "~1.0.5",
+    "chokidar": "~1.0.6",
     "minimist": "~1.2.0",
     "riot-observable": "^2.3.0-beta",
     "riot-route": "^2.3.0-beta.3",
@@ -48,10 +48,10 @@
   "devDependencies": {
     "cheerio": "^0.19.0",
     "coveralls": "^2.11.4",
-    "eslint": "^1.4.3",
+    "eslint": "^1.5.0",
     "expect.js": "^0.3.1",
     "glob": "^5.0.14",
-    "jsdom": "^6.5.0",
+    "jsdom": "^6.5.1",
     "karma": "^0.13.9",
     "karma-coverage": "^0.5.2",
     "karma-mocha": "^0.2.0",
