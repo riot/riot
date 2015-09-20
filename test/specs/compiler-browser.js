@@ -429,6 +429,9 @@ describe('Compiler Browser', function() {
       '<script type=\"riot\/tag\" src=\"tag\/loop-ids.tag\"><\/script>',
       '<loop-ids><\/loop-ids>',
 
+      '<script type=\"riot\/tag\" src=\"tag\/each-start-end.tag\"><\/script>',
+      '<each-start-end><\/each-start-end>',
+
       ''    // keep it last please, avoids break PRs
     ].join('\r'),
     tags = [],
@@ -1721,6 +1724,29 @@ describe('Compiler Browser', function() {
       root = tag.root
     expect(normalizeHTML(root.getElementsByTagName('div')[0].innerHTML))
       .to.be('<p>0 = zero</p><p>1 = one</p><p>2 = two</p><p>3 = three</p>')
+    tags.push(tag)
+  })
+
+  it('each start end groups repeated tags', function() {
+    var tag = riot.mount('each-start-end')[0],
+      dl = tag.root.children[0].children
+
+    expect(dl[0].nodeName).to.be('DT')
+    expect(dl[0].innerHTML).to.be('static title')
+    expect(dl[1].nodeName).to.be('DD')
+    expect(dl[1].innerHTML).to.be('static def')
+
+    expect(dl[2].nodeName).to.be('DT')
+    expect(dl[2].innerHTML).to.be('title 1')
+    expect(dl[3].nodeName).to.be('DD')
+    expect(dl[3].innerHTML).to.be('def 1')
+
+    expect(dl[4].nodeName).to.be('DT')
+    expect(dl[4].innerHTML).to.be('title 2')
+    expect(dl[5].nodeName).to.be('DD')
+    expect(dl[5].innerHTML).to.be('def 2')
+
+
     tags.push(tag)
   })
 
