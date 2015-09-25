@@ -2,7 +2,7 @@ describe('Mixin', function() {
 
   var IdMixin = {
     getId: function() {
-      return this._id
+      return this._riot_id
     }
   }
 
@@ -39,7 +39,7 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect(tag._id).to.be(tag.getId())
+    expect(tag._riot_id).to.be(tag.getId())
     tag.unmount()
   })
 
@@ -81,9 +81,9 @@ describe('Mixin', function() {
     var first = riot.mount('#one')[0],
       second = riot.mount('#two')[0]
 
-    expect(first._id).to.be(first.getId())
-    expect(second._id).to.be(second.getId())
-    expect(first._id).not.to.be(second._id)
+    expect(first._riot_id).to.be(first.getId())
+    expect(second._riot_id).to.be(second.getId())
+    expect(first._riot_id).not.to.be(second._riot_id)
     expect(first.getId()).not.to.be(second.getId())
     first.unmount()
     second.unmount()
@@ -100,7 +100,7 @@ describe('Mixin', function() {
     var tag = riot.mount('my-mixin')[0],
       newOpts = {'some': 'option', 'value': Math.random()}
 
-    expect(tag._id).to.be(tag.getId())
+    expect(tag._riot_id).to.be(tag.getId())
     expect(tag.opts).to.be(tag.getOpts())
     tag.setOpts(newOpts)
     expect(tag.opts).to.be(tag.getOpts())
@@ -122,9 +122,9 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect(tag._id).to.be(tag.getId())
+    expect(tag._riot_id).to.be(tag.getId())
     expect(tag.tags['sub-mixin']).not.to.be('undefined')
-    expect(tag.tags['sub-mixin']._id).to.be(tag.tags['sub-mixin'].getId())
+    expect(tag.tags['sub-mixin']._riot_id).to.be(tag.tags['sub-mixin'].getId())
     expect(tag.getId()).not.to.be(tag.tags['sub-mixin'].getId())
     tag.unmount()
   })
@@ -139,7 +139,7 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect(tag.root.innerHTML).to.be('<span>some tag ' + tag._id + '</span>')
+    expect(tag.root.innerHTML).to.be('<span>some tag ' + tag._riot_id + '</span>')
     tag.unmount()
   })
 
@@ -168,7 +168,7 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect(tag._id).to.be(tag.getId())
+    expect(tag._riot_id).to.be(tag.getId())
     tag.unmount()
   })
 
