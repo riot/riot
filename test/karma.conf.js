@@ -30,6 +30,7 @@ module.exports = function(config) {
       '../node_modules/expect.js/index.js',
       '../dist/riot/riot.js',
       '../dist/riot/compiler.js',
+      'helpers.js',
       {
         pattern: 'tag/*.tag',
         served: true,
