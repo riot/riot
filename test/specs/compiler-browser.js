@@ -849,14 +849,14 @@ describe('Compiler Browser', function() {
 /*  it('the loop children instances get correctly removed in the right order', function() {
 
     var tag = riot.mount('loop-ids')[0],
-      thirdItemId = tag.tags['loop-ids-item'][2]._id
+      thirdItemId = tag.tags['loop-ids-item'][2]._riot_id
 
     tag.items.splice(0, 1)
     tag.update(tag.tags['loop-ids-item'])
     expect(tag.items.length).to.be(2)
     // the second tag instance got removed
     // so now the third tag got moved to the second position
-    expect(tag.tags['loop-ids-item'][1]._id).to.be(thirdItemId)
+    expect(tag.tags['loop-ids-item'][1]._riot_id).to.be(thirdItemId)
     tags.push(tag)
 
   })*/
