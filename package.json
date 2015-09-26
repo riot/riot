@@ -38,7 +38,7 @@
     "chalk": "^1.1.1",
     "chokidar": "~1.0.6",
     "minimist": "~1.2.0",
-    "riot-observable": "^2.3.0-beta",
+    "riot-observable": "^2.3.0-beta.2",
     "riot-route": "^2.3.0-beta.3",
     "riot-tmpl": "2.0.0-beta.2",
     "shelljs": "~0.5.3",
