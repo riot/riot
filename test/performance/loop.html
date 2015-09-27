@@ -31,13 +31,13 @@
   })
 
   var items = []
-  for ( var i = 0; i < 10000; i++ ) {
+  for ( var i = 0; i < 10; i++ ) {
     items.push( { value: i } )
   }
   var tag = riot.mount('*', { items: items } )[0],
       headings = tag.root.querySelectorAll('h2')
 
-  for ( var i = 0; i < 10000; i++ ) {
+  for ( var i = 0; i < 10; i++ ) {
     headings[i].classList.add('nr-' + i)
   }
 
