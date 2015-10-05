@@ -3,7 +3,7 @@
   <h3>Object loop reordering</h3>
 
   <h4>The loop:</h4>
-  <span each="{items}">{x} </span>
+  <span each="{items}" reorder="true">{x} </span>
 
   <h4>Should be:</h4>
   <p>{shouldbe}</p>
