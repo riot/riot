@@ -384,6 +384,9 @@ describe('Compiler Browser', function() {
       '<script type=\"riot\/tag\" src=\"tag\/loop-ids.tag\"><\/script>',
       '<loop-ids><\/loop-ids>',
 
+      '<script type=\"riot\/tag\" src=\"tag\/loop-unshift.tag\"><\/script>',
+      '<loop-unshift><\/loop-unshift>',
+
       ''    // keep it last please, avoids break PRs
     ].join('\r'),
     tags = [],
@@ -741,6 +744,18 @@ describe('Compiler Browser', function() {
     while (i--) {
       tags.push(multipleTags[i])
     }
+
+  })
+
+  it('the `array.unshift` method does not break the loop', function() {
+
+    var tag = riot.mount('loop-unshift')[0]
+
+    expect(tag.tags['loop-unshift-item'].length).to.be(2)
+    expect(normalizeHTML(tag.tags['loop-unshift-item'][0].root.innerHTML)).to.be('<p>woo</p>')
+    tag.items.unshift({ name: 'baz' })
+    tag.update()
+    expect(normalizeHTML(tag.tags['loop-unshift-item'][0].root.innerHTML)).to.be('<p>baz</p>')
 
   })
 
