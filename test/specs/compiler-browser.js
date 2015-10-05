@@ -836,10 +836,12 @@ describe('Compiler Browser', function() {
 
   it('loop option tag', function() {
     var tag = riot.mount('loop-option')[0],
-      root = tag.root
+      root = tag.root,
+      option = root.getElementsByTagName('select')[0]
 
     expect(normalizeHTML(root.innerHTML)).to.match(/<select><option value="1">Peter<\/option><option selected="(selected|true)" value="2">Sherman<\/option><option value="3">Laura<\/option><\/select>/)
 
+    expect(option.selectedIndex).to.be(1)
     tags.push(tag)
 
   })
@@ -892,6 +894,8 @@ describe('Compiler Browser', function() {
     tag.update()
     expect(tag.root.querySelectorAll('span')[0].className).to.be('nr-5')
     expect(tag.root.querySelectorAll('div')[0].className).to.be('nr-0')
+
+    tags.push(tag)
   })
 
   it('brackets', function() {
