@@ -102,6 +102,9 @@ describe('Compiler Browser', function() {
       '<loop-child><\/loop-child>',
       '<script type=\"riot\/tag\" src=\"tag\/loop-child.tag\"><\/script>',
 
+      '<loop-reorder><\/loop-reorder>',
+      '<script type=\"riot\/tag\" src=\"tag\/loop-reorder.tag\"><\/script>',
+
       // loop order
       '<loop-manip><\/loop-manip>',
       '<script type=\"riot\/tag\" src=\"tag\/loop-manip.tag\"><\/script>',
@@ -879,6 +882,16 @@ describe('Compiler Browser', function() {
 
     tags.push(tag)
 
+  })
+
+  it('loop reorder dom nodes', function() {
+    var tag = riot.mount('loop-reorder')[0]
+    expect(tag.root.querySelectorAll('span')[0].className).to.be('nr-0')
+    expect(tag.root.querySelectorAll('div')[0].className).to.be('nr-0')
+    tag.items.reverse()
+    tag.update()
+    expect(tag.root.querySelectorAll('span')[0].className).to.be('nr-5')
+    expect(tag.root.querySelectorAll('div')[0].className).to.be('nr-0')
   })
 
   it('brackets', function() {
