@@ -390,6 +390,9 @@ describe('Compiler Browser', function() {
       '<script type=\"riot\/tag\" src=\"tag\/loop-unshift.tag\"><\/script>',
       '<loop-unshift><\/loop-unshift>',
 
+      '<script type=\"riot\/tag\" src=\"tag\/loop-virtual.tag\"><\/script>',
+      '<loop-virtual><\/loop-virtual>',
+
       ''    // keep it last please, avoids break PRs
     ].join('\r'),
     tags = [],
@@ -1709,6 +1712,33 @@ describe('Compiler Browser', function() {
     expect(normalizeHTML(root.getElementsByTagName('div')[0].innerHTML))
       .to.be('<p>0 = zero</p><p>1 = one</p><p>2 = two</p><p>3 = three</p>')
     tags.push(tag)
+  })
+
+  it('virtual tags mount inner content and not the virtual tag root', function() {
+    var tag = riot.mount('loop-virtual')[0],
+      els = tag.root.children
+
+    expect(els[0].tagName).to.be('DT')
+    expect(els[0].innerHTML).to.be('Coffee')
+    expect(els[1].tagName).to.be('DD')
+    expect(els[1].innerHTML).to.be('Black hot drink')
+    expect(els[2].tagName).to.be('DT')
+    expect(els[2].innerHTML).to.be('Milk')
+    expect(els[3].tagName).to.be('DD')
+    expect(els[3].innerHTML).to.be('White cold drink')
+
+    tag.data.reverse()
+    tag.update()
+
+    expect(els[2].tagName).to.be('DT')
+    expect(els[2].innerHTML).to.be('Coffee')
+    expect(els[3].tagName).to.be('DD')
+    expect(els[3].innerHTML).to.be('Black hot drink')
+    expect(els[0].tagName).to.be('DT')
+    expect(els[0].innerHTML).to.be('Milk')
+    expect(els[1].tagName).to.be('DD')
+    expect(els[1].innerHTML).to.be('White cold drink')
+
   })
 
 })
