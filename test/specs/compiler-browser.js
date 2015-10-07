@@ -392,6 +392,7 @@ describe('Compiler Browser', function() {
 
       '<script type=\"riot\/tag\" src=\"tag\/loop-virtual.tag\"><\/script>',
       '<loop-virtual><\/loop-virtual>',
+      '<loop-virtual-reorder><\/loop-virtual-reorder>',
 
       ''    // keep it last please, avoids break PRs
     ].join('\r'),
@@ -1738,6 +1739,43 @@ describe('Compiler Browser', function() {
     expect(els[0].innerHTML).to.be('Milk')
     expect(els[1].tagName).to.be('DD')
     expect(els[1].innerHTML).to.be('White cold drink')
+
+    tag.data.unshift({ key: 'Tea', value: 'Hot or cold drink' })
+    tag.update()
+    expect(els[0].tagName).to.be('DT')
+    expect(els[0].innerHTML).to.be('Tea')
+    expect(els[1].tagName).to.be('DD')
+    expect(els[1].innerHTML).to.be('Hot or cold drink')
+    tags.push(tag)
+
+    var tag2 = riot.mount('loop-virtual-reorder')[0],
+      els2 = tag2.root.children
+
+    els2[0].setAttribute('test', 'ok')
+    expect(els2[0].getAttribute('test')).to.be('ok')
+    expect(els2[0].tagName).to.be('DT')
+    expect(els2[0].innerHTML).to.be('Coffee')
+    expect(els2[1].tagName).to.be('DD')
+    expect(els2[1].innerHTML).to.be('Black hot drink')
+    expect(els2[2].tagName).to.be('DT')
+    expect(els2[2].innerHTML).to.be('Milk')
+    expect(els2[3].tagName).to.be('DD')
+    expect(els2[3].innerHTML).to.be('White cold drink')
+
+    tag2.data.reverse()
+    tag2.update()
+
+    expect(els2[2].getAttribute('test')).to.be('ok')
+    expect(els2[2].tagName).to.be('DT')
+    expect(els2[2].innerHTML).to.be('Coffee')
+    expect(els2[3].tagName).to.be('DD')
+    expect(els2[3].innerHTML).to.be('Black hot drink')
+    expect(els2[0].tagName).to.be('DT')
+    expect(els2[0].innerHTML).to.be('Milk')
+    expect(els2[1].tagName).to.be('DD')
+    expect(els2[1].innerHTML).to.be('White cold drink')
+    tags.push(tag2)
+
 
   })
 
