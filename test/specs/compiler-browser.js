@@ -394,6 +394,9 @@ describe('Compiler Browser', function() {
       '<loop-virtual><\/loop-virtual>',
       '<loop-virtual-reorder><\/loop-virtual-reorder>',
 
+      '<script type=\"riot\/tag\" src=\"tag\/if-activation.tag\"><\/script>',
+      '<if-activation-tag><\/if-activation-tag>',
+
       ''    // keep it last please, avoids break PRs
     ].join('\r'),
     tags = [],
@@ -1777,6 +1780,21 @@ describe('Compiler Browser', function() {
     tags.push(tag2)
 
 
+  })
+
+  it('if conditional tag does not activate until condition is met', function() {
+    var tag = riot.mount('if-activation-tag')[0]
+    expect(tag.ifActive).to.be(false)
+    expect(tag.ifMounted).to.be(false)
+    expect(tag.ifUpdated).to.be(false)
+
+    tag.ok = true
+    tag.update()
+    expect(tag.ifActive).to.be(true)
+    expect(tag.ifMounted).to.be(true)
+    expect(tag.ifUpdated).to.be(true)
+
+    tags.push(tag)
   })
 
 })
