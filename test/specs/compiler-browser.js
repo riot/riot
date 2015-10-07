@@ -390,6 +390,10 @@ describe('Compiler Browser', function() {
       '<script type=\"riot\/tag\" src=\"tag\/loop-unshift.tag\"><\/script>',
       '<loop-unshift><\/loop-unshift>',
 
+      '<script type=\"riot\/tag\" src=\"tag\/loop-virtual.tag\"><\/script>',
+      '<loop-virtual><\/loop-virtual>',
+      '<loop-virtual-reorder><\/loop-virtual-reorder>',
+
       ''    // keep it last please, avoids break PRs
     ].join('\r'),
     tags = [],
@@ -1709,6 +1713,70 @@ describe('Compiler Browser', function() {
     expect(normalizeHTML(root.getElementsByTagName('div')[0].innerHTML))
       .to.be('<p>0 = zero</p><p>1 = one</p><p>2 = two</p><p>3 = three</p>')
     tags.push(tag)
+  })
+
+  it('virtual tags mount inner content and not the virtual tag root', function() {
+    var tag = riot.mount('loop-virtual')[0],
+      els = tag.root.children
+
+    expect(els[0].tagName).to.be('DT')
+    expect(els[0].innerHTML).to.be('Coffee')
+    expect(els[1].tagName).to.be('DD')
+    expect(els[1].innerHTML).to.be('Black hot drink')
+    expect(els[2].tagName).to.be('DT')
+    expect(els[2].innerHTML).to.be('Milk')
+    expect(els[3].tagName).to.be('DD')
+    expect(els[3].innerHTML).to.be('White cold drink')
+
+    tag.data.reverse()
+    tag.update()
+
+    expect(els[2].tagName).to.be('DT')
+    expect(els[2].innerHTML).to.be('Coffee')
+    expect(els[3].tagName).to.be('DD')
+    expect(els[3].innerHTML).to.be('Black hot drink')
+    expect(els[0].tagName).to.be('DT')
+    expect(els[0].innerHTML).to.be('Milk')
+    expect(els[1].tagName).to.be('DD')
+    expect(els[1].innerHTML).to.be('White cold drink')
+
+    tag.data.unshift({ key: 'Tea', value: 'Hot or cold drink' })
+    tag.update()
+    expect(els[0].tagName).to.be('DT')
+    expect(els[0].innerHTML).to.be('Tea')
+    expect(els[1].tagName).to.be('DD')
+    expect(els[1].innerHTML).to.be('Hot or cold drink')
+    tags.push(tag)
+
+    var tag2 = riot.mount('loop-virtual-reorder')[0],
+      els2 = tag2.root.children
+
+    els2[0].setAttribute('test', 'ok')
+    expect(els2[0].getAttribute('test')).to.be('ok')
+    expect(els2[0].tagName).to.be('DT')
+    expect(els2[0].innerHTML).to.be('Coffee')
+    expect(els2[1].tagName).to.be('DD')
+    expect(els2[1].innerHTML).to.be('Black hot drink')
+    expect(els2[2].tagName).to.be('DT')
+    expect(els2[2].innerHTML).to.be('Milk')
+    expect(els2[3].tagName).to.be('DD')
+    expect(els2[3].innerHTML).to.be('White cold drink')
+
+    tag2.data.reverse()
+    tag2.update()
+
+    expect(els2[2].getAttribute('test')).to.be('ok')
+    expect(els2[2].tagName).to.be('DT')
+    expect(els2[2].innerHTML).to.be('Coffee')
+    expect(els2[3].tagName).to.be('DD')
+    expect(els2[3].innerHTML).to.be('Black hot drink')
+    expect(els2[0].tagName).to.be('DT')
+    expect(els2[0].innerHTML).to.be('Milk')
+    expect(els2[1].tagName).to.be('DD')
+    expect(els2[1].innerHTML).to.be('White cold drink')
+    tags.push(tag2)
+
+
   })
 
 })
