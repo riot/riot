@@ -6,6 +6,9 @@
   "repository": "riot/riot",
   "author": "Muut, Inc. and other contributors",
   "license": "MIT",
+  "engines" : {
+    "node" : ">=4.0.0"
+  },
   "scripts": {
     "test": "make riot"
   },
