@@ -10,7 +10,7 @@ var riot = require('../../dist/riot/riot'),
   myComponentHTML = [
     '<h1>{ opts.title }</h1>',
     '<p>{ opts.description }</p>',
-      '<my-list-item each="{ opts.items }">'
+    '<my-list-item each="{ opts.items }">'
   ].join(''),
   myListItem = 'my-list-item',
   myListItemHTML = [

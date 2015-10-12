@@ -1,5 +1,5 @@
 # riotjs-dbmonster
-Yet another 'dbmonster' demo, using [riot.js](https://github.com/muut/riotjs)
+Yet another 'dbmonster' demo, using [riot.js](https://github.com/riot/riot)
 
 This demo is based on the ractive dbmonster demo. Other dbmonster versions I've found so far:
 

@@ -1,10 +1,14 @@
 (function (root, factory) {
+    /* istanbul ignore next */
     if (typeof define === 'function' && define.amd)
       define(['riot'], factory)
     else if (typeof exports === 'object')
       factory(require('riot'))
     else factory(root.riot)
-}(this, function (riot) {
+}(this, function (riot, undefined) {
+
+  var T_STRING = 'string'
+/* istanbul ignore next */
 var parsers = {
   html: {},
   css: {},
@@ -45,49 +49,52 @@ var BOOL_ATTR = ('allowfullscreen,async,autofocus,autoplay,checked,compact,contr
   PREFIX_ATTR = ['style', 'src', 'd'],
 
   LINE_TAG = /^<([\w\-]+)>(.*)<\/\1>/gim,
-  QUOTE = /=({[^}]+})([\s\/\>])/g,
+  QUOTE = /=({[^}]+})([\s\/\>]|$)/g,
   SET_ATTR = /([\w\-]+)=(["'])([^\2]+?)\2/g,
   EXPR = /{\s*([^}]+)\s*}/g,
   // (tagname) (html) (javascript) endtag
   CUSTOM_TAG = /^<([\w\-]+)\s?([^>]*)>([^\x00]*[\w\/}"']>$)?([^\x00]*?)^<\/\1>/gim,
-  SCRIPT = /<script(\s+type=['"]?([^>'"]+)['"]?)?>([^\x00]*?)<\/script>/gm,
-  STYLE = /<style(\s+type=['"]?([^>'"]+)['"]?|\s+scoped)?>([^\x00]*?)<\/style>/gm,
+  SCRIPT = /<script(?:\s+type=['"]?([^>'"]+)['"]?)?>([^\x00]*?)<\/script>/gi,
+  STYLE = /<style(?:\s+([^>]+))?>([^\x00]*?)<\/style>/gi,
   CSS_SELECTOR = /(^|\}|\{)\s*([^\{\}]+)\s*(?=\{)/g,
-  CSS_COMMENT = /\/\*[^\x00]*?\*\//gm,
   HTML_COMMENT = /<!--.*?-->/g,
   CLOSED_TAG = /<([\w\-]+)([^>]*)\/\s*>/g,
+  BLOCK_COMMENT = /\/\*[\s\S]*?\*\//g,
   LINE_COMMENT = /^\s*\/\/.*$/gm,
-  JS_COMMENT = /\/\*[^\x00]*?\*\//gm,
   INPUT_NUMBER = /(<input\s[^>]*?)type=['"]number['"]/gm
 
 function mktag(name, html, css, attrs, js) {
-  return 'riot.tag(\''
-    + name + '\', \''
-    + html + '\''
-    + (css ? ', \'' + css + '\'' : '')
-    + (attrs ? ', \'' + attrs.replace(/'/g, "\\'") + '\'' : '')
-    + ', function(opts) {' + js + '\n});'
+  return 'riot.tag(\'' +
+    name + '\', \'' +
+    html + '\'' +
+    (css ? ', \'' + css + '\'' : '') +
+    (attrs ? ', \'' + attrs.replace(/'/g, "\\'") + '\'' : '') +
+    ', function(opts) {' + js + '\n});'
 }
 
 function compileHTML(html, opts, type) {
 
-  var brackets = riot.util.brackets
+  if (!html) return ''
+
+  var brackets = riot.util.brackets,
+      b0 = brackets(0),
+      b1 = brackets(1)
 
   // foo={ bar } --> foo="{ bar }"
   html = html.replace(brackets(QUOTE), '="$1"$2')
 
   // whitespace
-  html = opts.whitespace ? html.replace(/\n/g, '\\n') : html.replace(/\s+/g, ' ')
+  html = opts.whitespace ? html.replace(/\r\n?|\n/g, '\\n') : html.replace(/\s+/g, ' ')
 
   // strip comments
   html = html.trim().replace(HTML_COMMENT, '')
 
   // input type=numbr
-  html = html.replace(INPUT_NUMBER, '$1riot-type='+brackets(0)+'"number"'+brackets(1)) // fake expression
+  html = html.replace(INPUT_NUMBER, '$1riot-type='+ b0 +'"number"'+ b1) // fake expression
 
   // alter special attribute names
   html = html.replace(SET_ATTR, function(full, name, _, expr) {
-    if (expr.indexOf(brackets(0)) >= 0) {
+    if (expr.indexOf(b0) >= 0) {
       name = name.toLowerCase()
 
       if (PREFIX_ATTR.indexOf(name) >= 0) name = 'riot-' + name
@@ -102,9 +109,9 @@ function compileHTML(html, opts, type) {
   // run expressions trough parser
   if (opts.expr) {
     html = html.replace(brackets(EXPR), function(_, expr) {
-      var ret = compileJS(expr, opts, type).trim().replace(/\r?\n|\r/g, '').trim()
+      var ret = compileJS(expr, opts, type).trim().replace(/[\r\n]+/g, '').trim()
       if (ret.slice(-1) == ';') ret = ret.slice(0, -1)
-      return brackets(0) + ret + brackets(1)
+      return b0 + ret + b1
     })
   }
 
@@ -134,7 +141,7 @@ function compileHTML(html, opts, type) {
 function riotjs(js) {
 
   // strip comments
-  js = js.replace(LINE_COMMENT, '').replace(JS_COMMENT, '')
+  js = js.replace(LINE_COMMENT, '').replace(BLOCK_COMMENT, '')
 
   // ES6 method signatures
   var lines = js.split('\n'),
@@ -144,11 +151,11 @@ function riotjs(js) {
     var l = line.trim()
 
     // method start
-    if (l[0] != '}' && l.indexOf('(') > 0 && l.indexOf('function') == -1) {
-      var end = /[{}]/.exec(l.slice(-1)),
-          m = end && /(\s+)([\w]+)\s*\(([\w,\s]*)\)\s*\{/.exec(line)
+    if (l[0] != '}' && ~l.indexOf('(')) {
+      var end = l.match(/[{}]$/),
+          m = end && line.match(/^(\s+)([$\w]+)\s*\(([$\w,\s]*)\)\s*\{/)
 
-      if (m && !/^(if|while|switch|for|catch)$/.test(m[2])) {
+      if (m && !/^(if|while|switch|for|catch|function)$/.test(m[2])) {
         lines[i] = m[1] + 'this.' + m[2] + ' = function(' + m[3] + ') {'
 
         // foo() { }
@@ -175,76 +182,85 @@ function riotjs(js) {
 }
 
 function scopedCSS (tag, style, type) {
-  return style.replace(CSS_COMMENT, '').replace(CSS_SELECTOR, function (m, p1, p2) {
+  // 1. Remove CSS comments
+  // 2. Find selectors and separate them by conmma
+  // 3. keep special selectors as is
+  // 4. prepend tag and [riot-tag]
+  return style.replace(BLOCK_COMMENT, '').replace(CSS_SELECTOR, function (m, p1, p2) {
     return p1 + ' ' + p2.split(/\s*,\s*/g).map(function(sel) {
-      var s = sel.trim().replace(/:scope\s*/, '')
+      var s = sel.trim()
+      var t = (/:scope/.test(s) ? '' : ' ') + s.replace(/:scope/, '')
       return s[0] == '@' || s == 'from' || s == 'to' || /%$/.test(s) ? s :
-        tag + ' ' + s + ', [riot-tag="' + tag + '"] ' + s
+        tag + t + ', [riot-tag="' + tag + '"]' + t
     }).join(',')
   }).trim()
 }
 
 function compileJS(js, opts, type) {
+  if (!js) return ''
   var parser = opts.parser || (type ? riot.parsers.js[type] : riotjs)
   if (!parser) throw new Error('Parser not found "' + type + '"')
-  return parser(js, opts)
+  return parser(js.replace(/\r\n?/g, '\n'), opts)
 }
 
 function compileTemplate(lang, html) {
   var parser = riot.parsers.html[lang]
   if (!parser) throw new Error('Template parser not found "' + lang + '"')
-  return parser(html)
+  return parser(html.replace(/\r\n?/g, '\n'))
 }
 
-function compileCSS(style, tag, type) {
-  if (type == 'scoped-css') style = scopedCSS(tag, style)
+function compileCSS(style, tag, type, scoped) {
+  if (type === 'scoped-css') scoped = 1
   else if (riot.parsers.css[type]) style = riot.parsers.css[type](tag, style)
+  else if (type !== 'css') throw new Error('CSS parser not found: "' + type + '"')
+  if (scoped) style = scopedCSS(tag, style)
   return style.replace(/\s+/g, ' ').replace(/\\/g, '\\\\').replace(/'/g, "\\'").trim()
 }
 
 function compile(src, opts) {
 
-  opts = opts || {}
+  if (!opts) opts = {}
+  else {
 
-  if (opts.brackets) riot.settings.brackets = opts.brackets
+    if (opts.brackets) riot.settings.brackets = opts.brackets
 
-  if (opts.template) src = compileTemplate(opts.template, src)
+    if (opts.template) src = compileTemplate(opts.template, src)
+  }
 
   src = src.replace(LINE_TAG, function(_, tagName, html) {
     return mktag(tagName, compileHTML(html, opts), '', '', '')
   })
 
   return src.replace(CUSTOM_TAG, function(_, tagName, attrs, html, js) {
+    var style = '',
+        type = opts.type
 
-    html = html || ''
+    if (html) {
 
-    // js wrapped inside <script> tag
-    var type = opts.type
+      // js wrapped inside <script> tag
+      if (!js.trim()) {
+        html = html.replace(SCRIPT, function(_, _type, script) {
+          if (_type) type = _type.replace('text/', '')
+          js = script
+          return ''
+        })
+      }
 
-    if (!js.trim()) {
-      html = html.replace(SCRIPT, function(_, fullType, _type, script) {
-        if (_type) type = _type.replace('text/', '')
-        js = script
+      // styles in <style> tag
+      html = html.replace(STYLE, function(_, types, _style) {
+        var scoped = /(?:^|\s+)scoped(\s|=|$)/i.test(types),
+            type = types && types.match(/(?:^|\s+)type\s*=\s*['"]?([^'"\s]+)['"]?/i)
+        if (type) type = type[1].replace('text/', '')
+        style += (style ? ' ' : '') + compileCSS(_style.trim(), tagName, type || 'css', scoped)
         return ''
       })
     }
 
-    // styles in <style> tag
-    var styleType = 'css',
-        style = ''
-
-    html = html.replace(STYLE, function(_, fullType, _type, _style) {
-      if (fullType && fullType.trim() == 'scoped') styleType = 'scoped-css'
-        else if (_type) styleType = _type.replace('text/', '')
-      style = _style
-      return ''
-    })
-
     return mktag(
       tagName,
       compileHTML(html, opts, type),
-      compileCSS(style, tagName, styleType),
-      attrs,
+      style,
+      compileHTML(attrs, ''),
       compileJS(js, opts, type)
     )
 
@@ -260,7 +276,8 @@ function GET(url, fn) {
   var req = new XMLHttpRequest()
 
   req.onreadystatechange = function() {
-    if (req.readyState == 4 && req.status == 200) fn(req.responseText)
+    if (req.readyState == 4 && (req.status == 200 || (!req.status && req.responseText.length)))
+      fn(req.responseText)
   }
   req.open('GET', url, true)
   req.send('')
@@ -288,13 +305,13 @@ function compileScripts(fn) {
   function done() {
     promise.trigger('ready')
     ready = true
-    fn && fn()
+    if (fn) fn()
   }
 
   if (!scriptsAmount) {
     done()
   } else {
-    ;[].map.call(scripts, function(script) {
+    [].map.call(scripts, function(script) {
       var url = script.getAttribute('src')
 
       function compileTag(source) {
@@ -314,7 +331,7 @@ function compileScripts(fn) {
 riot.compile = function(arg, fn) {
 
   // string
-  if (typeof arg == 'string') {
+  if (typeof arg === T_STRING) {
 
     // compile & return
     if (arg.trim()[0] == '<') {
@@ -327,20 +344,20 @@ riot.compile = function(arg, fn) {
       return GET(arg, function(str) {
         var js = unindent(compile(str))
         globalEval(js)
-        fn && fn(js, str)
+        if (fn) fn(js, str)
       })
     }
   }
 
   // must be a function
-  if (typeof arg != 'function') arg = undefined
+  if (typeof arg !== 'function') arg = undefined
 
   // all compiled
   if (ready) return arg && arg()
 
   // add to queue
   if (promise) {
-    arg && promise.on('ready', arg)
+    if (arg) promise.on('ready', arg)
 
   // grab riot/tag elements + load & execute them
   } else {

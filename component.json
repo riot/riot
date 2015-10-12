@@ -1,8 +1,8 @@
 {
   "name": "riot",
-  "version": "2.2.2-beta",
-  "description": "A React- like, 3.5K user interface library",
-  "repository": "muut/riotjs",
+  "version": "2.2.4",
+  "description": "A React-like user interface micro-library",
+  "repository": "riot/riot",
   "license": "MIT",
   "keywords": [
     "custom tags",

@@ -1,5 +1,5 @@
 var fs = require('fs'),
-    path = require('path')
+  path = require('path')
 
 describe('riotjs', function() {
 
@@ -29,6 +29,10 @@ describe('riotjs', function() {
   })
   it('keeps try/catch as is #768', function() {
     var file = 'riotjs.try-catch.js'
+    expect(render(cat('fixtures', file))).to.equal(cat('expect', file))
+  })
+  it('preserves non es6 methods #1043', function() {
+    var file = 'riotjs.getter-setter.js'
     expect(render(cat('fixtures', file))).to.equal(cat('expect', file))
   })
 

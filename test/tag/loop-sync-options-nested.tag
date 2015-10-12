@@ -1,6 +1,5 @@
 <loop-sync-options-nested>
-  <div each={ child, index in children }>
-
+  <div each={ child, index in children } reorder="true">
     <loop-sync-options-nested-child data={ child }></loop-sync-options-nested-child>
   </div>
 
@@ -26,3 +25,7 @@
     this.num = opts.data.num
   })
 </loop-sync-options-nested-child>
+
+<loop-sync-options-nested-wrapper>
+  <loop-sync-options-nested></loop-sync-options-nested>
+</loop-sync-options-nested-wrapper>

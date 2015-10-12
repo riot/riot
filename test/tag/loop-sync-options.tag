@@ -1,5 +1,5 @@
 <loop-sync-options>
-  <loop-sync-options-child each={ children }></loop-sync-options-child>
+  <loop-sync-options-child each={ child in children } data={ child } class={ active: child.val }></loop-sync-options-child>
 
   this.children = [{
     val: 'foo'
@@ -12,7 +12,11 @@
 </loop-sync-options>
 
 <loop-sync-options-child>
-  this.val = opts.val
-  this.bool = opts.bool
-  this.num = opts.num
+
+  this.on('update', function() {
+    this.val = opts.data.val
+    this.bool = opts.data.bool
+    this.num = opts.data.num
+  })
+
 </loop-sync-options-child>

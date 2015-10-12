@@ -58,5 +58,7 @@ make.js
 # these files are generated anyway
 /test/compiler/js/*
 
+/dist/*
+
 !.gitmodules
 !.travis.yml

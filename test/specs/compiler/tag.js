@@ -1,5 +1,5 @@
 var fs = require('fs'),
-    path = require('path')
+  path = require('path')
 
 describe('Compile tags', function() {
 
@@ -23,7 +23,7 @@ describe('Compile tags', function() {
 
   function testFile(name, debug) {
     var src = cat('fixtures', name + '.tag'),
-        js = render(src)
+      js = render(src)
 
     if (debug) console.info(js)
     expect(js).to.equal(cat('expect', name + '.js'))
@@ -39,6 +39,10 @@ describe('Compile tags', function() {
 
   it('Tag definition and usage on same file', function() {
     testFile('same')
+  })
+
+  it('Css scoped', function() {
+    testFile('scoped')
   })
 
   it('Quotes before ending HTML bracket', function() {

@@ -1,5 +1,7 @@
 lib/browser/wrap
+lib/browser/compiler
 lib/browser/compiler/wrap/
+lib/shared/
 test/polyfills
 test/vendor
 test/compiler/js
