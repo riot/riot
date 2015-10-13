@@ -136,10 +136,11 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Loops, Events and Callbacks](https://www.youtube.com/watch?v=T-ZV9dv93sw)
 - [Server Rendering with Node & Express](http://youtu.be/6ww1UXGJzcs)
 
-### Libraries
+### Libraries/ Frameworks
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
 - [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
 - [Cheftjs - chinese framework for Riot](https://github.com/cheft/cheftjs)
+- [Veronica - flux adaption for Riot](https://www.npmjs.com/package/veronica-x)
 
 ### Components
 - [RiotGear](https://riotgear.js.org)
