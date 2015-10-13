@@ -6,9 +6,6 @@ describe('Riot Tests', function() {
     global.compiler = require('../lib/server/compiler')
     global.expect = require('expect.js')
     require('./specs/node')
-    require('./specs/compiler-cli')
-    require('./specs/analyzer')
-  } else {
-    mocha.run()
+    require('./specs/compiler-server')
   }
 })

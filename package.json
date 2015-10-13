@@ -6,6 +6,9 @@
   "repository": "riot/riot",
   "author": "Muut, Inc. and other contributors",
   "license": "MIT",
+  "engines" : {
+    "node" : ">=4.0.0"
+  },
   "scripts": {
     "test": "make riot"
   },
@@ -35,9 +38,7 @@
     "riot.js"
   ],
   "dependencies": {
-    "chalk": "^1.1.1",
-    "chokidar": "~1.2.0",
-    "minimist": "~1.2.0",
+    "riot-cli": "^2.3.0-beta.2",
     "riot-observable": "^2.3.0-beta.4",
     "riot-route": "^2.3.0-beta.3",
     "riot-tmpl": "2.0.0-beta.2",
@@ -72,7 +73,7 @@
     "riot+compiler.min.js"
   ],
   "bin": {
-    "riot": "lib/server/cli.js"
+    "riot": "node_modules/.bin/riot"
   },
   "main": "lib/server/index.js",
   "browser": "riot.js",
