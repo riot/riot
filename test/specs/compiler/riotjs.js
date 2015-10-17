@@ -1,5 +1,5 @@
 var fs = require('fs'),
-    path = require('path')
+  path = require('path')
 
 describe('riotjs', function() {
 

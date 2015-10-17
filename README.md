@@ -1,7 +1,7 @@
 
-[![Riot logo](doc/logo/riot480x.png)](https://muut.com/riotjs/)
+[![Riot logo](http://riotjs.com/img/logo/riot480x.png)](http://riotjs.com/)
 
-## A React- like, 3.5KB UI lib
+## A React-like user interface micro-library
 
 [![Build Status][travis-image]][travis-url]
 [![Riot Forum][riot-forum-image]][riot-forum-url]
@@ -55,6 +55,8 @@ Riot brings custom tags to all browsers, including IE8. Think React + Polymer bu
 </timer>
 ```
 
+[Open this example on Plunker](http://riotjs.com/examples/plunker/?app=timer)
+
 #### Mounting
 
 ``` javascript
@@ -92,7 +94,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 
 ### Use your dearest language and tools
-- Create tags with CoffeeScript, Jade, LiveScript, Typescript, ES6 or [any pre-processor](https://muut.com/riotjs/compiler.html#pre-processors) you want.
+- Create tags with CoffeeScript, Jade, LiveScript, Typescript, ES6 or [any pre-processor](http://riotjs.com/guide/compiler/#pre-processors) you want.
 - Integrate with NPM, CommonJS, AMD, Bower or Component
 - Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot), [Browserify](https://github.com/jhthorsen/riotify), or [Wintersmith](https://github.com/collingreen/wintersmith-riot) plugins
 
@@ -104,7 +106,8 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - Compact ES6 method syntax.
 
 ### Demos
-- [Riot Todo MVC](https://github.com/txchen/feplay/tree/gh-pages/riot_todo)
+- [**Riot Examples** - Community's Official](https://github.com/riot/examples)
+- [Riot Todo MVC](http://todomvc.com/examples/riotjs/)
 - [Hackernews reader](http://git.io/riot-hn)
 - [Vuejs examples by Riotjs](https://github.com/txchen/feplay/tree/gh-pages/riot_vue)
 - [Flux-like ES6 Todo](https://github.com/srackham/riot-todo)
@@ -115,10 +118,11 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Isomorphic application](https://github.com/ListnPlay/riot-isomorphic)
 - [flux-riot todo](http://mingliangfeng.me/flux-riot)
 - [Another Riot Todo MVC](http://nippur72.github.io/riotjs-todomvc/#/)
+- [Cheft isomorphic by express](https://github.com/cheft/cheft)
 
 ### Tutorials
 - [Building Apps with Riot, ES6 and Webpack](http://blog.srackham.com/posts/riot-es6-webpack-apps/)
-- [Building Apps with Riot, Babel and Browserify](https://github.com/txchen/feplay/tree/gh-pages/riot_babel)
+- [Building Apps with Riot, Babel, RiotControl and Webpack](https://github.com/txchen/feplay/tree/gh-pages/riot_webpack)
 - [Building tabs with Riot](http://www.robertwpearce.com/blog/riotjs-example/)
 - [The "React tutorial" for Riot](https://juriansluiman.nl/article/154/the-react-tutorial-for-riot)
 - [How to package "tag libraries" in Riot](https://github.com/ivan-saorin/riot-tutorial-tags-pack-app)
@@ -132,15 +136,18 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Loops, Events and Callbacks](https://www.youtube.com/watch?v=T-ZV9dv93sw)
 - [Server Rendering with Node & Express](http://youtu.be/6ww1UXGJzcs)
 
-### Libraries
+### Libraries / Frameworks
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
 - [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
 - [Cheftjs - chinese framework for Riot](https://github.com/cheft/cheftjs)
+- [Veronica - flux adaption for Riot](https://www.npmjs.com/package/veronica-x)
 
 ### Components
 - [RiotGear](https://riotgear.js.org)
 - [Riot Bootstrap](http://cognitom.github.io/riot-bootstrap/)
 - [iToolkit](https://github.com/BE-FE/iToolkit)
+- [Riot Routehandler](https://github.com/crisward/riot-routehandler)-[(Demo)](http://codepen.io/crisward/pen/xwGJpM?editors=101)
+- [ESLint Riot Plugin](https://github.com/txchen/eslint-plugin-riot)
 
 ### Resources
 - [Riot + AngularJS](https://github.com/lucasbrigida/angular-riot)
@@ -155,6 +162,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Yeoman generator - Generator riot mobile](https://www.npmjs.com/package/generator-riot-mobile)
 - [Yeoman generator - Generator riot element](https://www.npmjs.com/package/generator-riot-element)
 - [Riot for TypeScript](https://github.com/nippur72/RiotTS)
+- [Sublime Syntax Highlighting for Riot Tag Files](https://github.com/crisward/sublime-tag)
 
 ### Performance
 - **Riot vs React performance:** [(Riot version)](https://github.com/kazzkiq/samples/tree/gh-pages/perf/dom-riot-vs-vanilla) vs [(React version)](https://github.com/kazzkiq/samples/tree/gh-pages/perf/dom-react-vs-vanilla)
@@ -298,7 +306,7 @@ Riot is made with :heart: by many smart people. Thanks to all the contributors
      1  なりたけいすけ   0.1%
 ```
 
-https://muut.com/riotjs/
+http://riotjs.com/
 
 
 [travis-image]:https://img.shields.io/travis/riot/riot.svg?style=flat-square
@@ -312,7 +320,7 @@ https://muut.com/riotjs/
 [npm-url]:https://npmjs.org/package/riot
 
 [riot-forum-image]:https://img.shields.io/badge/muut-JOIN_CHAT%E2%86%92-ff0044.svg?style=flat-square
-[riot-forum-url]:https://muut.com/riotjs/forum/
+[riot-forum-url]:http://riotjs.com/forum/
 
 [coverage-image]:https://img.shields.io/coveralls/riot/riot/dev.svg?style=flat-square
 [coverage-url]:https://coveralls.io/r/riot/riot?branch=dev

@@ -1,9 +1,9 @@
 
 var len = 10,
-	i = 0,
-    input = document.querySelector('form input'),
-    submitEvent = document.createEvent('Event'),
-    start = Date.now()
+  i = 0,
+  input = document.querySelector('form input'),
+  submitEvent = document.createEvent('Event'),
+  start = Date.now()
 
 submitEvent.initEvent('submit', true, true)
 
