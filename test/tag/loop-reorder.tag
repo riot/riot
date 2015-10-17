@@ -1,7 +1,7 @@
 <loop-reorder>
 
-  <div each="{items}">{x}</div>
-  <span each="{items}" reorder="true">{x}</span>
+  <div each="{items}" no-reorder>{x}</div>
+  <span each="{items}">{x}</span>
 
   this.items = [{ x: 1 }, { x: 2 }, { x: 3 }, { x: 4 }, { x: 5 }, { x: 6 }]
 
