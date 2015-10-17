@@ -1245,6 +1245,22 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('the before events get triggered', function() {
+    var eventsCount = 0,
+      tag,
+      incrementEvents = function () {
+        eventsCount++
+      }
+    riot.tag('before-events', '', function() {
+      this.on('before-mount', incrementEvents)
+      this.on('before-update', incrementEvents)
+      this.on('before-unmount', incrementEvents)
+    })
+    tag = riot.mount(document.createElement('before-events'))[0]
+    tag.unmount()
+    expect(eventsCount).to.be.equal(3)
+  })
+
   it('mount event should only be triggered when the conditional tags are in the DOM', function() {
     var tag = riot.mount('if-mount')[0]
 
