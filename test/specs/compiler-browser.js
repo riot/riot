@@ -1576,11 +1576,26 @@ describe('Compiler Browser', function() {
 
     var opts = tag.root._tag.opts
     if (opts)
-      expect(opts['riot-style']).to.match(/font-size:\s?2em/i)
+      expect(opts.riotStyle).to.match(/font-size:\s?2em/i)
     else
       console.log('top-attributes._tag.opts not found!')
 
     tags.push(tag)
+  })
+
+  it('camelize the options passed via dom attributes', function() {
+    var node = document.createElement('top-attributes'),
+      tag
+
+    node.setAttribute('my-random-attribute', 'hello')
+    tag = riot.mount(node, {
+      'another-random-option': 'hello'
+    })[0]
+    expect(tag.opts.myRandomAttribute).to.be.equal('hello')
+    expect(tag.opts['another-random-option']).to.be.equal('hello')
+
+    tags.push(tag)
+
   })
 
   it('the riot-tag attribute gets updated if a DOM node gets mounted using two or more different tags', function() {
