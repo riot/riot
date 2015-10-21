@@ -3,14 +3,12 @@ module.exports = {
     sliphone: {
       base: 'SauceLabs',
       deviceName: 'iPhone 6 Plus',
-      platform: 'OS X 10.10',
       version: '9.1',
       group: 0
     },
     slipad: {
       base: 'SauceLabs',
       deviceName: 'iPad Retina',
-      platform: 'OS X 10.10',
       version: '9.1',
       group: 0
     },

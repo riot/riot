@@ -44,8 +44,8 @@ test-sauce:
 
 compare:
 	# compare the current release with the previous one
-	du -h riot.js compiler.js
-	du -h dist/riot/riot.js dist/riot/compiler.js
+	du -h riot.min.js compiler.min.js
+	du -h dist/riot/riot.min.js dist/riot/compiler.min.js
 
 raw:
 	# build riot
