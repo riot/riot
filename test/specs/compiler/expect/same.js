@@ -1,8 +1,6 @@
-riot.tag('same', '', function(opts) {
+riot.tag2('same', '', '', '', function(opts) {
   var foo
-
 });
 
-riot.tag('another', '<same></same>', function(opts) {
-
+riot.tag2('another', '<same></same>', '', '', function(opts) {
 });

@@ -1,5 +1,4 @@
-riot.tag('test', '<input type="text">', function(opts) {
+riot.tag2('test', '<input type="text">', '', '', function(opts) {
 
   echo('hey')
-
 });

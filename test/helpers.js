@@ -7,7 +7,7 @@ function normalizeHTML (html) {
     .trim()
     // change all the tags properties and names to lowercase because a <li> for ie8 is a <LI>
     .replace(/<([^>]*)>/g, function(tag) { return tag.toLowerCase() })
-    .replace(/\r|\r|\n|\t/gi, '')
+    .replace(/[\r\n\t]+/g, '')
     .replace(/\>\s+\</g, '><')
 }
 
