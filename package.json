@@ -6,8 +6,8 @@
   "repository": "riot/riot",
   "author": "Muut, Inc. and other contributors",
   "license": "MIT",
-  "engines" : {
-    "node" : ">=4.0.0"
+  "engines": {
+    "node": ">=4.0.0"
   },
   "scripts": {
     "test": "make riot"
@@ -44,7 +44,7 @@
     "riot-cli": "^2.3.0-beta.3",
     "riot-observable": "^2.3.0-beta.4",
     "riot-route": "^2.3.0-beta.3",
-    "riot-tmpl": "2.3.0-beta.1",
+    "riot-tmpl": "^2.3.0-beta.4",
     "shelljs": "~0.5.3",
     "simple-dom": "0.2.7",
     "simple-html-tokenizer": "^0.2.0"
