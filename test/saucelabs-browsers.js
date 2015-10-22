@@ -1,5 +1,9 @@
 module.exports = {
   browsers: {
+/*
+    they do not work on saucelabs
+    Maybe one day we will switch to another testing platform
+    or we will just wait that saucelabs fixes the issue
     sliphone: {
       base: 'SauceLabs',
       browserName: 'iphone',
@@ -14,10 +18,23 @@ module.exports = {
       version: '9.1',
       group: 0
     },
-    slsafari: {
+*/
+    slsafari9: {
       base: 'SauceLabs',
       browserName: 'safari',
       platform: 'OS X 10.11',
+      group: 0
+    },
+    slsafari8: {
+      base: 'SauceLabs',
+      browserName: 'safari',
+      platform: 'OS X 10.10',
+      group: 0
+    },
+    slsafari7: {
+      base: 'SauceLabs',
+      browserName: 'safari',
+      platform: 'OS X 10.9',
       group: 0
     },
     slIE9: {
@@ -43,7 +60,7 @@ module.exports = {
     },
     slEdge: {
       base: 'SauceLabs',
-      browserName: 'internet explorer',
+      browserName: 'microsoftedge',
       platform: 'Windows 10',
       version: '20.10240',
       group: 2
