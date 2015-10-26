@@ -143,6 +143,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Veronica - flux adaption for Riot](https://www.npmjs.com/package/veronica-x)
 
 ### Components
+- [Material UI](http://kysonic.github.io/riot-mui/)
 - [RiotGear](https://riotgear.js.org)
 - [Riot Bootstrap](http://cognitom.github.io/riot-bootstrap/)
 - [iToolkit](https://github.com/BE-FE/iToolkit)
@@ -334,4 +335,3 @@ http://riotjs.com/
 [codeclimate-image]:https://img.shields.io/codeclimate/github/riot/riot.svg?style=flat-square
 [codeclimate-url]:https://codeclimate.com/github/riot/riot
 
-[Material UI for Riot](http://kysonic.github.io/riot-mui/)
