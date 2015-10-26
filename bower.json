@@ -1,6 +1,6 @@
 {
   "name": "riot-binfu",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "A React- like, 3.5K user interface library",
   "homepage": "https://muut.com/riotjs/",
   "repository": { "type": "git", "url": "https://github.com/hongbinfu/riot.git" },
