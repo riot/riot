@@ -33,10 +33,10 @@ test-karma:
 	@ $(KARMA) start test/karma.conf.js
 
 test-compiler:
-	@ $(MOCHA) ./test/compiler/suite
+	@ $(ISTANBUL) cover $(MOCHA) --dir coverage/server -- ./test/compiler/suite -R spec
 
 test-coveralls:
-	@ RIOT_COV=1 cat ./coverage/lcov.info ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
+	@ RIOT_COV=1 cat ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
 
 test-sauce:
 	# run the saucelabs in separate chunks
@@ -62,7 +62,8 @@ min: riot
 
 perf: riot
 	# run the performance tests
-	@ iojs --harmony --expose-gc test/performance/mem
+	@ iojs --expose-gc test/performance/speed
+	@ iojs --expose-gc test/performance/mem
 
 watch:
 	# watch and rebuild riot and its tests

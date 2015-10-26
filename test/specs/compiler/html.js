@@ -1,7 +1,7 @@
 describe('Compile HTML', function() {
 
-  function render(str) {
-    return compiler.html(str, {})
+  function render(str, opt) {
+    return compiler.html(str, opt || {})
   }
 
   it('compiles void tag into separated: <x/> -> <x></x>', function() {
@@ -34,6 +34,9 @@ describe('Compile HTML', function() {
   it('escapes some characters', function() {
     expect(render('{ "a" }')).to.equal('{ \"a\" }')
     expect(render('\\{ a \\}')).to.equal('\\\\{ a \\\\}')
+  })
+  it('mormalizes line endings', function() {
+    expect(render('<p>\r</p>\r\r\n<p>\n</p>', { whitespace: 1 })).to.equal('<p>\\n</p>\\n\\n<p>\\n</p>')
   })
 
   // custom parser in expressions

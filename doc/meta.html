@@ -4,8 +4,8 @@ script: /riotjs/site
 content_class: normal
 noheader: true
 
-riot_version: 2.2.1
-datetime: June 27
+riot_version: 2.2.3
+datetime: Aug 5
 
 
 ==== layout
@@ -35,7 +35,7 @@ datetime: June 27
 
   <p class="tease normal">
     <a href="download.html" class="tag blue">v{{ riot_version }}</a>
-    — <a href="release-notes.html"> with 4-5x faster loops than on React</a>
+    — <a href="release-notes.html"> this was a 100% bug fix release.</a>
   </p>
 
 </div>
@@ -111,7 +111,7 @@ datetime: June 27
 
     <div class="hgroup">
       <h1>{{ data.subtitle || data.title }}</h1>
-      <h2>{{ description }}</h2>
+      <h2>{{ data.desc2 || data.description }}</h2>
     </div>
 
     {{ body }}

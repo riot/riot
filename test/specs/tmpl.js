@@ -112,7 +112,9 @@ describe('Tmpl', function() {
 
     // both templates and expressions are new-line-friendly
     expect(render('\n  { yes \n ? 2 \n : 4} \n')).to.equal('\n  2 \n')
-
+    // normalized eols
+    expect(render('\r\n\n{ yes \r ? 2 : 4}\n\r')).to.equal('\n\n2\n\n')
+    expect(render('\r\n  \r')).to.equal('\n  \n')
 
     //// class shorthand
 

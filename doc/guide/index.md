@@ -10,7 +10,7 @@ minify: false
 
 Riot custom tags are the building blocks for user interfaces. They make the "view" part of the application. Let's start with an extended TODO example highlighting various features of Riot:
 
-```
+```html
 <todo>
 
   <h3>{ opts.title }</h3>
@@ -80,7 +80,7 @@ A Riot tag is a combination of layout (HTML) and logic (JavaScript). Here are th
 
 Tag definition in tag files always starts on the beginning of the line:
 
-```
+```html
 <!-- works -->
 <my-tag>
 
@@ -101,7 +101,7 @@ Inline tag definitions(in document body) must be properly indented, with all cus
 
 You can leave out the `<script>` tag:
 
-```
+```html
 <todo>
 
   <!-- layout -->
@@ -120,7 +120,7 @@ In which case the logic starts after the last HTML tag. This "open syntax" is mo
 
 You can specify a pre-processor with `type` attribute. For example:
 
-```
+```html
 <script type="coffee">
   # your coffeescript logic goes here
 </script>
@@ -184,7 +184,7 @@ Example use case would be to insert tag styles from a component library after no
 Once a tag is created you can mount it on the page as follows:
 
 
-``` html
+```html
 <body>
 
   <!-- place the custom tag anywhere inside the body -->
@@ -207,7 +207,7 @@ Custom tags inside the `body` of the page needs to be closed normally: `<todo></
 
 Some example uses of the mount method:
 
-``` js
+```js
 // mount all custom tags on the page
 riot.mount('*')
 
@@ -221,11 +221,77 @@ riot.mount('todo, forum, comments')
 A document can contain multiple instances of the same tag.
 
 
+### Accessing the DOM Directly ###
+Riot gives you access to elements that have `name` attributes directly under the `this` keyword, and plenty of shorthand property-methods like the `if="{...}"` attribute, but occasionally you need to reference and touch pieces of HTML which don't really fit inside those prebaked functions.
+
+#### How to use jQuery/Zepto/`querySelector`/etc... in Riot ###
+If you need to access the DOM inside Riot, you'll want to take a look at the [Tag Lifecycle](https://github.com/riot/riot/blob/dev/doc/guide/index.md#tag-lifecycle) and notice that the DOM elements are instaniated until the `update()` event first fires, meaning any attempt to select an element before then will fail.
+
+```html
+<example-tag>
+    <p id="findMe">Do I even Exist?</p>
+
+    <script>
+    var test1 = document.getElementById('findMe');
+    console.log('test1', test1);  // Fails
+
+    this.on('update', function(){
+        var test2 = document.getElementById('findMe');
+        console.log('test2', test2); // Succeeds
+    });
+    </script>
+</example-tag>
+```
+
+**However, you probably don't want to run whatever you're attempting to retrieve on every update.** Instead you'll most likely want to run on the `mount` event.
+
+```html
+<example-tag>
+    <p id="findMe">Do I even Exist?</p>
+
+    <script>
+    var test1 = document.getElementById('findMe');
+    console.log('test1', test1);  // Fails
+
+    this.on('update', function(){
+        var test2 = document.getElementById('findMe');
+        console.log('test2', test2); // Succeeds, fires on every update
+    });
+
+    this.on('mount', function(){
+        var test3 = document.getElementById('findMe');
+        console.log('test3', test3); // Succeeds, fires once (per mount)
+    });
+    </script>
+</example-tag>
+```
+
+#### Creating a Contexted DOM Query ####
+Now that we know how to get DOM elements by waiting for the `update` or `mount` events, we can make this useful by also adding a context to our element queries to the `root element` (the riot tag we're creating).
+
+```html
+<example-tag>
+    <p id="findMe">Do I even Exist?</p>
+    <p>Is this real life?</p>
+    <p>Or just fantasy?</p>
+
+    <script>
+    this.on('mount', function(){
+        // Contexted jQuery
+        $('p', this.root);
+
+        // Contexted Query Selector
+        this.root.querySelectorAll('p');
+    });
+    </script>
+</example-tag>
+```
+
 ### Options
 
 You can pass options for tags in the second argument
 
-```
+```html
 <script>
 riot.mount('todo', { title: 'My TODO app', items: [ ... ] })
 </script>
@@ -235,7 +301,7 @@ The passed data can be anything, ranging from a simple object to a full applicat
 
 Inside the tag the options can be referenced with the `opts` variable as follows:
 
-```
+```html
 <my-tag>
 
   <!-- Options in HTML -->
@@ -252,7 +318,7 @@ Inside the tag the options can be referenced with the `opts` variable as follows
 
 Mixins provide an easy way to share functionality across tags. When a tag is compiled by riot, any defined mixins are added and available to use in the tag.
 
-```
+```js
 var OptsMixin = {
     init: function() {
       this.on('updated', function() { console.log('Updated!') })
@@ -282,7 +348,7 @@ var OptsMixin = {
 
 In this example you are giving any instance of the `my-tag` Tag the `OptsMixin` which provides `getOpts` and `setOpts` methods. `init` method is special one which can initialize the mixin when it's loaded to the tag. (`init` method is not accessible from the tag its mixed in)
 
-```
+```js
 var my_tag_instance = riot.mount('my-tag')[0]
 
 console.log(my_tag_instance.getOpts()) //will log out any opts that the tag has
@@ -292,7 +358,7 @@ Tags will accept any object -- `{'key': 'val'}` `var mix = new function(...)` --
 
 The `my-tag` definition now has a `getId` method added to it along with anything defined in the `OptsMixin` except for the `init` function.
 
-```
+```js
 function IdMixin() {
     this.getId = function() {
         return this._id
@@ -314,13 +380,13 @@ By being defined on the tag level, mixins not only extend the functionality of y
 
 To share the mixins over files or projects, `riot.mixin` API is provided. You can register your mixin globally like this:
 
-```javascript
+```js
 riot.mixin('mixinName', mixinObject)
 ```
 
 To load the mixin to the tag, use `mixin()` method with the key.
 
-```
+```html
 <my-tag>
     <h1>{ opts.title }</h1>
 
@@ -355,7 +421,7 @@ Since the values are calculated before mounting there are no surprise issues suc
 You can listen to various lifecyle events inside the tag as follows:
 
 
-``` js
+```js
 <todo>
 
   this.on('mount', function() {
@@ -383,15 +449,15 @@ You can have multiple event listeners for the same event. See [observable](/riot
 
 ## Expressions
 
-HTML can be mixed with expressions that are enclosed in brackets:
+HTML can be mixed with expressions that are enclosed in curly braces:
 
-``` js
+```js
 { /* my_expression goes here */ }
 ```
 
 Expressions can set attributes or nested text nodes:
 
-``` html
+```html
 <h3 id={ /* attribute_expression */ }>
   { /* nested_expression */ }
 </h3>
@@ -399,7 +465,7 @@ Expressions can set attributes or nested text nodes:
 
 Expressions are 100% JavaScript. A few examples:
 
-``` js
+```js
 { title || 'Untitled' }
 { results ? 'ready' : 'loading' }
 { new Date() }
@@ -410,7 +476,7 @@ Expressions are 100% JavaScript. A few examples:
 The goal is to keep the expressions small so your HTML stays as clean as possible. If your expression grows in complexity consider moving some of logic to the "update" event. For example:
 
 
-```
+```html
 <my-tag>
 
   <!-- the `val` is calculated below .. -->
@@ -434,7 +500,7 @@ W3C states that a boolean property is true if the attribute is present at all â€
 
 The following expression does not work:
 
-``` html
+```html
 <input type="checkbox" { true ? 'checked' : ''}>
 ```
 
@@ -445,7 +511,7 @@ since only attribute and nested text expressions are valid. Riot detects 44 diff
 
 Riot has a special syntax for CSS class names. For example:
 
-``` js
+```html
 <p class={ foo: true, bar: 0, baz: new Date(), zorro: 'a value' }></p>
 ```
 
@@ -454,16 +520,16 @@ evaluates to "foo baz zorro". Property names whose value is truthful are appende
 
 ### Printing brackets
 
-You can output an expression without evaluation by escaping the opening bracket:
+You can output an expression without evaluation by escaping the opening brace:
 
 `\\{ this is not evaluated \\}` outputs `{ this is not evaluated }`
 
 
-### Customizing brackets
+### Customizing curly braces
 
-You are free to customize the brackets to your liking. For example:
+You are free to customize the braces to your liking. For example:
 
-``` js
+```js
 riot.settings.brackets = '${ }'
 riot.settings.brackets = '\{\{ }}'
 ```
@@ -483,7 +549,7 @@ Expressions inside `style` tags are ignored.
 
 Riot expressions can only render text values without HTML formatting. However you can make a custom tag to do the job. For example:
 
-```
+```html
 <raw>
   <span></span>
 
@@ -493,7 +559,7 @@ Riot expressions can only render text values without HTML formatting. However yo
 
 After the tag is defined you can use it inside other tags. For example
 
-```
+```html
 <my-tag>
   <p>Here is some raw content: <raw content="{ html }"/> </p>
 
@@ -512,7 +578,7 @@ After the tag is defined you can use it inside other tags. For example
 Let's define a parent tag `<account>` and with a nested tag `<subscription>`:
 
 
-```
+```html
 <account>
   <subscription  plan={ opts.plan } show_details="true" />
 </account>
@@ -535,7 +601,7 @@ Let's define a parent tag `<account>` and with a nested tag `<subscription>`:
 
 Then we mount the `account` tag to the page with a `plan` configuration option:
 
-```
+```html
 <body>
   <account></account>
 </body>
@@ -587,7 +653,7 @@ See [API docs](/riotjs/api/#yield) for `yield`.
 
 Elements with `name` or `id` attribute are automatically bound to the context so you'll have an easy access to them with JavaScript:
 
-```
+```html
 <login>
   <form id="login" onsubmit={ submit }>
     <input name="username">
@@ -611,7 +677,7 @@ Of course these named elements can be referred to in HTML as well: `<div>{ usern
 
 A function that deals with DOM events is called an "event handler". Event handlers are defined as follows:
 
-```
+```html
 <login>
   <form onsubmit={ submit }>
 
@@ -627,7 +693,7 @@ A function that deals with DOM events is called an "event handler". Event handle
 Attributes beginning with "on" (`onclick`, `onsubmit`, `oninput` etc...) accept a function value which is called when the event occurs. This function can also be defined dynamically with an expression. For example:
 
 
-``` html
+```html
 <form onsubmit={ condition ? method_a : method_b }>
 ```
 
@@ -637,7 +703,7 @@ The default event handler behavior is *automatically cancelled* unless the eleme
 
 For example, this submit handler will actually submit the form to the server:
 
-```
+```js
 submit() {
   return true
 }
@@ -659,7 +725,7 @@ The event handler receives the standard event object as the first argument. The 
 
 Conditionals let you show / hide elements based on a condition. For example:
 
-``` html
+```html
 <div if={ is_premium }>
   <p>This is for premium users only</p>
 </div>
@@ -678,7 +744,7 @@ The equality operator is `==` and not `===`. For example: `'a string' == true`.
 
 Loops are implemented with `each` attribute as follows:
 
-```
+```html
 <todo>
   <ul>
     <li each={ items } class={ completed: done }>
@@ -704,7 +770,7 @@ A new context is created for each item. These are [tag instances](/riotjs/api/#t
 The parent can be explicitly accessed through the `parent` variable. For example:
 
 
-```
+```html
 <todo>
   <div each={ items }>
     <h3>{ title }</h3>
@@ -728,7 +794,7 @@ The looped items are [tag instances](/riotjs/api/#tag-instance). Riot does not t
 
 Event handlers can access individual items in a collection with `event.item`. Now let's implement the `remove` function:
 
-```
+```html
 <todo>
   <div each={ items }>
     <h3>{ title }</h3>
@@ -758,7 +824,7 @@ After the event handler is executed the current tag instance is updated using `t
 
 Custom tags can also be looped. For example:
 
-``` html
+```html
 <todo-item each="{ items }" data="{ this }"></todo-item>
 ```
 
@@ -770,7 +836,7 @@ The currently looped item can be referenced with `this` which you can use to pas
 The array elements need not be objects. They can be strings or numbers as well. In this case you need to use the `{ name, i in items }` construct as follows:
 
 
-```
+```html
 <my-tag>
   <p each="{ name, i in arr }">{ i }: { name }</p>
 
@@ -785,7 +851,7 @@ The `name` is the name of the element and `i` is the index number. Both of these
 
 Plain objects can also be looped. For example:
 
-```
+```html
 <my-tag>
   <p each="{ name, value in obj }">{ name } = { value }</p>
 
@@ -804,13 +870,13 @@ Object loops are not recommended since internally Riot detects changes on the ob
 
 Standard HTML elements can be used as riot tags in the page body with the addition of the `riot-tag` attribute.
 
-```
+```html
 <ul riot-tag="my-tag"></ul>
 ```
 
 This provides users with an alternative that can provide greater compatibility with css frameworks.  The tags are treated like any other custom tag.
 
-```
+```js
 riot.mount('my-tag')
 ```
 
@@ -820,7 +886,7 @@ will mount the `ul` element shown above as if it were `<my-tag></my-tag>`
 
 Riot supports server-side rendering, with Node/io.js you can simply require tags and render to html:
 
-```
+```js
 var riot = require('riot')
 var timer = require('timer.tag')
 
@@ -891,7 +957,7 @@ This event emitting system can range from a simple API to a larger architectural
 
 Here is a very bare bones Riot application structure for user login:
 
-```
+```js
 // Login API
 var auth = riot.observable()
 
@@ -900,8 +966,8 @@ auth.login = function(params) {
     auth.trigger('login', json)
   })
 }
-
-
+```
+```html
 <!-- login view -->
 <login>
   <form onsubmit="{ login }">
@@ -925,7 +991,7 @@ auth.login = function(params) {
 
 And here we mount the application
 
-```
+```html
 <body>
   <login></login>
   <script>riot.mount('login', auth)</script>

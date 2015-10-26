@@ -6,6 +6,18 @@ body_id: riot-releases
 
 ====
 
+### 2.2.4 *August 12, 2015*
+
+- Fix the remaining core bugs before the bigger 2.3.0 release [more details](https://github.com/riot/riot/issues?q=is%3Aopen+is%3Aissue+milestone%3A2.2.4)
+- Fix bugs related to the context lost in the nested loops
+- Add support for multiple style blocks in the same component
+- Add more tests to the codebase
+- Info last stable release before dropping the IE8 support [roadmap](https://github.com/riot/riot/issues/1063)
+
+### 2.2.3 *August 4, 2015*
+
+- Fix many bugs [more details](https://github.com/riot/riot/issues/1063)
+
 ### 2.2.2 *July 5, 2015*
 
 - New child components will inherit properties from the parent also in a loop

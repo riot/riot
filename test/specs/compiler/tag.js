@@ -41,6 +41,10 @@ describe('Compile tags', function() {
     testFile('same')
   })
 
+  it('Css scoped', function() {
+    testFile('scoped')
+  })
+
   it('Quotes before ending HTML bracket', function() {
     testFile('input-last')
   })

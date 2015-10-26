@@ -1,4 +1,6 @@
 
+var defaultBrackets = riot.settings.brackets
+
 // this function is needed to run the tests also on ie8
 // ie8 returns some weird strings when we try to get the innerHTML of a tag
 function normalizeHTML (html) {
@@ -25,20 +27,6 @@ function getNextSibling(n) {
     x = x.previousSibling
   }
   return x
-}
-
-// small polyfill
-// normalize the document.contains method
-document.contains = Element.prototype.contains = function contains(node) {
-  if (!(0 in arguments)) {
-    throw new TypeError('1 argument is required')
-  }
-  do {
-    if (this === node) {
-      return true
-    }
-  } while (node = node && node.parentNode)
-  return false
 }
 
 // small polyfill
@@ -179,6 +167,10 @@ describe('Compiler Browser', function() {
           '<loop-optgroup><\/loop-optgroup>',
           '<script type=\"riot\/tag\" src=\"tag\/loop-optgroup.tag\"><\/script>',
 
+          // loop optgroup, two option tags
+          '<loop-optgroup2><\/loop-optgroup2>',
+          '<script type=\"riot\/tag\" src=\"tag\/loop-optgroup2.tag\"><\/script>',
+
           // loop position
           '<loop-position><\/loop-position>',
           '<script type=\"riot\/tag\" src=\"tag\/loop-position.tag\"><\/script>',
@@ -299,6 +291,27 @@ describe('Compiler Browser', function() {
           '<style-tag><\/style-tag>',
           '<style-tag2><\/style-tag2>',
 
+          '<script type=\"riot\/tag\">',
+          '  <style-tag3>',
+          '    <style scoped=\"scoped\" type="text/myparser">',
+          '      p {border: solid 3px black;}',
+          '    <\/style>',
+          '    <style>',
+          '      p {border: solid 1px black}',
+          '      #style4 {border: solid 2px black;}',
+          '    <\/style>',
+          '    <p><\/p>',
+          '  <\/style-tag3>',
+          '<\/script>',
+          '<style-tag3><\/style-tag3>',
+
+          '<script type=\"riot\/tag\">',
+          '  <style-tag4>',
+          '    <p id=\"style4\"><\/p><p>x</p>',
+          '  <\/style-tag4>',
+          '<\/script>',
+          '<style-tag4><\/style-tag4>',
+
           // scoped css and riot-tag, mount(selector, tagname)
 
           '<script type=\"riot\/tag\" src=\"tag\/scoped.tag\"><\/script>',
@@ -356,10 +369,18 @@ describe('Compiler Browser', function() {
           // sync the loop options in nested tags
           '<script type=\"riot\/tag\" src=\"tag\/loop-sync-options-nested.tag\"><\/script>',
           '<loop-sync-options-nested><\/loop-sync-options-nested>',
+          '<loop-sync-options-nested-wrapper><\/loop-sync-options-nested-wrapper>',
 
           // inherit properties from the parent
           '<script type=\"riot\/tag\" src=\"tag\/loop-inherit.tag\"><\/script>',
           '<loop-inherit><\/loop-inherit>',
+
+          '<script type=\"riot\/tag\" src=\"tag\/loop-double-curly-brackets.tag\"><\/script>',
+          '<loop-double-curly-brackets><\/loop-double-curly-brackets>',
+
+          // check the conditional on a loop item
+          '<script type=\"riot\/tag\" src=\"tag\/loop-conditional.tag\"><\/script>',
+          '<loop-conditional><\/loop-conditional>',
 
           // check if the events get triggered correctly
           '<script type=\"riot\/tag\" src=\"tag\/events.tag\"><\/script>',
@@ -371,8 +392,29 @@ describe('Compiler Browser', function() {
 
           // loop over tags instances
           '<script type=\"riot\/tag\" src=\"tag\/loop-tag-instances.tag\"><\/script>',
-          '<loop-tag-instances><\/loop-tag-instances>'
+          '<loop-tag-instances><\/loop-tag-instances>',
 
+          // check the loop events update
+          '<script type=\"riot\/tag\" src=\"tag\/loop-numbers-nested.tag\"><\/script>',
+          '<loop-numbers-nested><\/loop-numbers-nested>',
+
+          // check nested loops using arrays of non objects
+          '<script type=\"riot\/tag\" src=\"tag\/loop-nested-strings-array.tag\"><\/script>',
+          '<loop-nested-strings-array><\/loop-nested-strings-array>',
+
+          // table with multiple bodies and dynamic style
+          '<script type=\"riot\/tag\" src=\"tag\/table-multibody.tag\"><\/script>',
+          '<table-multibody><\/table-multibody>',
+
+          // table with caption and looped cols, ths and trs
+          '<script type=\"riot\/tag\" src=\"tag\/loop-cols.tag\"><\/script>',
+          '<loop-cols><\/loop-cols>',
+
+          // pass a riot observable as option
+          '<script type=\"riot\/tag\" src=\"tag\/observable-attr.tag\"><\/script>',
+          '<observable-attr><\/observable-attr>',
+
+          ''    // keep it last please, avoids break PRs
     ].join('\r'),
       tags = [],
       div = document.createElement('div')
@@ -380,7 +422,7 @@ describe('Compiler Browser', function() {
   // adding some custom riot parsers
   // css
   riot.parsers.css.myparser = function(tag, css) {
-    return css.replace(/@tag/, tag)
+    return css.replace(/@tag/, tag).replace(' 3px ', ' 4px ')
   }
   // js
   riot.parsers.js.myparser = function(js) {
@@ -406,6 +448,11 @@ describe('Compiler Browser', function() {
     }
     unmount(tags)
 
+  })
+
+  afterEach(function() {
+    // restore the default brackets
+    riot.settings.brackets = defaultBrackets
   })
 
   it('compiles and unmount the children tags', function(done) {
@@ -436,7 +483,7 @@ describe('Compiler Browser', function() {
 
     expect(+new Date() - begin).to.be.below(1000)
 
-    expect(tag.tags.foo).to.not.be('undefined')
+    expect(tag.tags.foo).to.not.be(undefined)
 
     tag.unmount()
 
@@ -776,6 +823,17 @@ describe('Compiler Browser', function() {
 
   })
 
+  it('loop optgroup tag (outer option, no closing option tags)', function() {
+    var tag = riot.mount('loop-optgroup2')[0],
+        root = tag.root
+
+    expect(normalizeHTML(root.innerHTML)).to
+      .match(/<select><option selected="selected">&lt;Select Option&gt; ?(<\/option>)?<optgroup label="group 1"><option value="1">Option 1.1 ?(<\/option>)?<option (?:value="2"|disabled="disabled") (?:value="2"|disabled="disabled")>Option 1.2 ?(<\/option>)?<\/optgroup><optgroup label="group 2"><option value="3">Option 2.1 ?(<\/option>)?<option (?:value="4"|disabled="disabled") (?:value="4"|disabled="disabled")>Option 2.2 ?<\/option><\/optgroup><\/select>/)
+
+    tags.push(tag)
+
+  })
+
   it('loop tr table tag', function() {
     var tag = riot.mount('table-data')[0],
         root = tag.root
@@ -986,6 +1044,8 @@ describe('Compiler Browser', function() {
 
     expect(tag.root.innerHTML).to.be('2')
 
+    tags.push(tag)
+
   })
 
   it('dynamically named elements in a loop', function() {
@@ -1005,6 +1065,7 @@ describe('Compiler Browser', function() {
     expect(styles).to.match(/div(.+)?{color: red;}/)
   })
 
+  // TODO: does this test make sense?!
   it('style injection removes type riot style tag', function() {
     var stag = document.querySelector('style[type=riot]')
     expect(stag).to.be(null)
@@ -1019,6 +1080,26 @@ describe('Compiler Browser', function() {
       expect(nextE.tagName).to.be('LINK')
     })
   }
+
+  it('scoped css tag supports htm5 syntax, multiple style tags', function () {
+
+    checkCSS(riot.mount('style-tag3')[0], '4px')
+    checkCSS(riot.mount('style-tag4')[0], '2px', 1)
+    delete riot.parsers.css.cssup
+
+    function checkCSS(t, x, p2) {
+      t.update()
+      var e = t.root.firstElementChild
+      expect(e.tagName).to.be('P')
+      expect(window.getComputedStyle(e, null).borderTopWidth).to.be(x)
+      if (p2) {
+        e = t.root.getElementsByTagName('P')[1]
+        expect(e.innerHTML).to.be('x')
+        expect(window.getComputedStyle(e, null).borderTopWidth).to.be('1px')
+      }
+      tags.push(t)
+    }
+  })
 
   it('scoped css and riot-tag, mount(selector, tagname)', function() {
     function checkBorder(t) {
@@ -1203,6 +1284,7 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('loop-sync-options')[0]
 
     expect(tag.tags['loop-sync-options-child'][0].val).to.be('foo')
+    expect(tag.tags['loop-sync-options-child'][0].root.className).to.be('active')
     expect(tag.tags['loop-sync-options-child'][1].val).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][2].val).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][0].num).to.be(undefined)
@@ -1215,8 +1297,10 @@ describe('Compiler Browser', function() {
       children: tag.children.reverse()
     })
     expect(tag.tags['loop-sync-options-child'][0].val).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][0].root.className).to.be('')
     expect(tag.tags['loop-sync-options-child'][1].val).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][2].val).to.be('foo')
+    expect(tag.tags['loop-sync-options-child'][2].root.className).to.be('active')
     expect(tag.tags['loop-sync-options-child'][0].num).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][1].num).to.be(3)
     expect(tag.tags['loop-sync-options-child'][2].num).to.be(undefined)
@@ -1228,8 +1312,10 @@ describe('Compiler Browser', function() {
       children: tag.children.reverse()
     })
     expect(tag.tags['loop-sync-options-child'][0].val).to.be('foo')
+    expect(tag.tags['loop-sync-options-child'][0].root.className).to.be('active')
     expect(tag.tags['loop-sync-options-child'][1].val).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][2].val).to.be(undefined)
+    expect(tag.tags['loop-sync-options-child'][2].root.className).to.be('')
     expect(tag.tags['loop-sync-options-child'][0].num).to.be(undefined)
     expect(tag.tags['loop-sync-options-child'][1].num).to.be(3)
     expect(tag.tags['loop-sync-options-child'][2].num).to.be(undefined)
@@ -1283,6 +1369,12 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('the children tags are in sync also in multiple nested tags', function() {
+    var tag = riot.mount('loop-sync-options-nested-wrapper')[0]
+    expect(tag.tags['loop-sync-options-nested'].tags['loop-sync-options-nested-child'].length).to.be(3)
+    tags.push(tag)
+  })
+
   it('children in a loop inherit properties from the parent', function() {
     var tag = riot.mount('loop-inherit')[0]
     expect(tag.tags['loop-inherit-item'][0].opts.nice).to.be(tag.isFun)
@@ -1293,30 +1385,58 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('loop tags get rendered correctly also with conditional attributes', function() {
+    var tag = riot.mount('loop-conditional')[0]
+    expect(tag.root.getElementsByTagName('div').length).to.be(2)
+    expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(2)
+    expect(tag.tags['loop-conditional-item'].length).to.be(3)
+    tag.items = []
+    tag.update()
+    expect(tag.root.getElementsByTagName('div').length).to.be(0)
+    expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(0)
+    expect(tag.tags['loop-conditional-item'].length).to.be(0)
+    tag.items = [2, 2, 2]
+    tag.update()
+    expect(tag.root.getElementsByTagName('div').length).to.be(3)
+    expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(3)
+    expect(tag.tags['loop-conditional-item'].length).to.be(3)
+    tags.push(tag)
+  })
+
   it('custom children items in a nested loop are always in sync with the parent tag', function() {
     var tag = riot.mount('loop-inherit')[0]
+
     expect(tag.tags['loop-inherit-item'].length).to.be(3)
     expect(tag.tags['loop-inherit-item'][0].opts.name).to.be(tag.items[0])
     expect(tag.tags['loop-inherit-item'][1].opts.name).to.be(tag.items[1])
     expect(tag.tags['loop-inherit-item'][2].opts.name).to.be(tag.items[2])
+
     tag.items.splice(1, 1)
     tag.update()
     expect(tag.root.getElementsByTagName('div').length).to.be(2)
+
     tag.items.push('active')
     tag.update()
     expect(tag.root.getElementsByTagName('div').length).to.be(3)
     expect(tag.root.getElementsByTagName('div')[2].innerHTML).to.contain('active')
     expect(tag.root.getElementsByTagName('div')[2].className).to.be('active')
-
-    /*
-    TODO: keep in sync also the nested custom tags in a loop
     expect(tag.tags['loop-inherit-item'][0].opts.name).to.be(tag.items[0])
     expect(tag.tags['loop-inherit-item'][1].opts.name).to.be(tag.items[1])
-    expect(tag.tags['loop-inherit-item'].length).to.be(2)
-
     expect(tag.tags['loop-inherit-item'].length).to.be(3)
-    expect(tag.tags['loop-inherit-item'][2].opts.name).to.be(tag.items[2])
-    */
+
+    tags.push(tag)
+
+  })
+
+  it('the DOM events get executed in the right context', function() {
+    var tag = riot.mount('loop-inherit')[0]
+    tag.tags['loop-inherit-item'][0].root.onmouseenter({})
+    expect(tag.wasHovered).to.be(true)
+    expect(tag.root.getElementsByTagName('div').length).to.be(4)
+    tag.tags['loop-inherit-item'][0].root.onclick({})
+    expect(tag.tags['loop-inherit-item'][0].wasClicked).to.be(true)
+
+    tags.push(tag)
   })
 
   it('loops over other tag instances do not override their internal properties', function() {
@@ -1327,6 +1447,20 @@ describe('Compiler Browser', function() {
     tag.update()
     expect(tag.tags['loop-tag-instances-child'][3].root.tagName.toLowerCase()).to.be('loop-tag-instances-child')
 
+    tags.push(tag)
+
+  })
+
+  it('nested loops using non object data get correctly rendered', function() {
+    var tag = riot.mount('loop-nested-strings-array')[0],
+        children = tag.root.getElementsByTagName('loop-nested-strings-array-item')
+    expect(children.length).to.be(4)
+    children = tag.root.getElementsByTagName('loop-nested-strings-array-item')
+    children[0].onclick({})
+    expect(children.length).to.be(4)
+    expect(normalizeHTML(children[0].innerHTML)).to.be('<p>b</p>')
+    expect(normalizeHTML(children[1].innerHTML)).to.be('<p>a</p>')
+    tags.push(tag)
   })
 
   it('all the events get fired also in the loop tags, the e.item property gets preserved', function() {
@@ -1362,8 +1496,148 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('top-attributes')[0]
     expect(tag.root.className).to.be('classy') // qouted
     expect(tag.root.getAttribute('data-noquote')).to.be('quotes') // not quoted
+    expect(tag.root.getAttribute('data-nqlast')).to.be('quotes') // last attr with no quotes
     expect(tag.root.style.fontSize).to.be('2em') // TODO: how to test riot-prefix?
+
+    var opts = tag.root._tag.opts
+    if (opts)
+      expect(opts['riot-style']).to.match(/font-size:\s?2em/i)
+    else
+      console.log('top-attributes._tag.opts not found!')
+
     tags.push(tag)
+  })
+
+  it('the riot-tag attribute gets updated if a DOM node gets mounted using two or more different tags', function() {
+    var div = document.createElement('div')
+    tags.push(riot.mount(div, 'timetable')[0])
+    expect(div.getAttribute('riot-tag')).to.be('timetable')
+    tags.push(riot.mount(div, 'test')[0])
+    expect(div.getAttribute('riot-tag')).to.be('test')
+
+  })
+
+  it('any DOM event in a loop updates the whole parent tag', function() {
+    var tag = riot.mount('loop-numbers-nested')[0]
+    expect(tag.root.getElementsByTagName('ul')[0].getElementsByTagName('li').length).to.be(4)
+    tag.root.getElementsByTagName('ul')[0].getElementsByTagName('li')[0].onclick({})
+    expect(tag.root.getElementsByTagName('ul')[0].getElementsByTagName('li').length).to.be(2)
+    tags.push(tag)
+  })
+
+  it('riot.observable instances could be also used in a loop', function() {
+    var tag = riot.mount('loop-child')[0]
+
+    tag.items = [riot.observable({name: 1}), {name: 2}]
+    tag.update()
+    tag.items = [{name: 2}]
+    tag.update()
+
+    tags.push(tag)
+  })
+
+  it('table with multiple bodies and dynamic styles #1052', function() {
+
+    var tag = riot.mount('table-multibody')[0],
+        bodies = tag.root.getElementsByTagName('tbody')
+
+    expect(bodies.length).to.be(3)
+    for (var i = 0; i < bodies.length; ++i) {
+      expect(normalizeHTML(bodies[0].innerHTML))
+        .to.match(/<tr style="background-color: ?(?:white|lime);?"[^>]*>(?:<td[^>]*>[A-C]\d<\/td>){3}<\/tr>/)
+    }
+
+    expect(bodies[0].getElementsByTagName('tr')[0].style.backgroundColor).to.be('white')
+    tag.root.getElementsByTagName('button')[0].onclick({})
+    expect(bodies[0].getElementsByTagName('tr')[0].style.backgroundColor).to.be('lime')
+
+    tags.push(tag)
+  })
+
+  it('table with caption and looped cols, ths, and trs #1067', function() {
+    var data = {
+      // copied from loop-cols.tag
+      headers: [
+        'Name',
+        'Number',
+        'Address',
+        'City',
+        'Contact'
+      ],
+      data: [
+        ['Abc', '10', 'A 4B', 'México', 'Juan'],
+        ['Def', '20', 'B 50', 'USA', 'Anna'],
+        ['Ghi', '30', 'D 60', 'Japan', ''],
+        ['Jkl', '40', 'E 1C', 'France', 'Balbina']
+      ]
+    }
+    var tag = riot.mount('loop-cols')[0],
+        el, i, k
+
+    tag.update()
+
+    el = getEls('caption')[0]
+    expect(el.innerHTML).to.be('Loop Cols')
+
+    el = getEls('colgroup')
+    expect(el.length).to.be(1)
+
+    el = getEls('col', el[0])
+    expect(el.length).to.be(5)
+
+    el = getEls('tr', getEls('thead')[0])
+    expect(el.length).to.be(1)
+
+    el = getEls('th', el[0])
+    expect(el.length).to.be(5)
+    for (i = 0; i < el.length; ++i) {
+      expect(el[i].tagName).to.be('TH')
+      expect(el[i].innerHTML.trim()).to.be(data.headers[i])
+    }
+
+    el = getEls('tr', getEls('tbody')[0])
+    expect(el.length).to.be(4)
+    //console.log(' - - - tbody.tr: ' + el[0].innerHTML)
+
+    for (i = 0; i < el.length; ++i) {
+      var cells = getEls('td', el[i])
+      expect(cells.length).to.be(5)
+      for (k = 0; k < cells.length; ++k) {
+        //console.log(' - - - getting data[' + i + ',' + k + ']')
+        expect(cells[k].tagName).to.be('TD')
+        expect(cells[k].innerHTML.trim()).to.be(data.data[i][k])
+      }
+    }
+
+    tags.push(tag)
+
+    function getEls(t, e) {
+      if (!e) e = tag.root
+      return e.getElementsByTagName(t)
+    }
+  })
+
+  it('allow passing riot.observale instances to the children tags', function() {
+    var tag = riot.mount('observable-attr')[0]
+    expect(tag.tags['observable-attr-child'].wasTriggered).to.be(true)
+    tags.push(tag)
+  })
+
+  it('loops get rendered correctly also when riot.brackets get changed', function() {
+
+    // change the brackets
+    riot.settings.brackets = '{{ }}'
+    var tag = riot.mount('loop-double-curly-brackets')[0],
+        ps = tag.root.getElementsByTagName('p')
+
+    expect(ps.length).to.be(2)
+    expect(ps[0].innerHTML).to.be(ps[1].innerHTML)
+    expect(ps[0].innerHTML).to.be('hello')
+    tag.change()
+    expect(ps.length).to.be(2)
+    expect(ps[0].innerHTML).to.be(ps[1].innerHTML)
+    expect(ps[0].innerHTML).to.be('hello world')
+
   })
 
 })
