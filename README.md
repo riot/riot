@@ -325,3 +325,5 @@ https://muut.com/riotjs/
 
 [codeclimate-image]:https://img.shields.io/codeclimate/github/riot/riot.svg?style=flat-square
 [codeclimate-url]:https://codeclimate.com/github/riot/riot
+
+[Material UI for Riot](http://kysonic.github.io/riot-mui/)
