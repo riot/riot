@@ -842,11 +842,12 @@ function Tag(impl, conf, innerHTML) {
 }
 
 function setEventHandler(name, handler, dom, tag) {
-
-  dom[name] = function(e) {
-
+  name = name.replace(/^on/g,"");
+  
+  var func = function(e){
     var item = tag._item,
-        ptag = tag.parent
+        ptag = tag.parent,
+        el
 
     if (!item)
       while (ptag) {
@@ -873,11 +874,17 @@ function setEventHandler(name, handler, dom, tag) {
     }
 
     if (!e.preventUpdate) {
-      var el = item ? tag.parent : tag
+      el = item ? getImmediateCustomParentTag(ptag) : tag
       el.update()
     }
-
+  };
+  if(riot.eventPlugin){
+    riot.eventPlugin.apply(riot,func);  
+  }else{
+    dom.removeEventListener(name);
+    dom.addEventListener(name,func,false);
   }
+  
 
 }
 
