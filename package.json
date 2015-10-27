@@ -44,7 +44,7 @@
     "riot-cli": "^2.3.0-beta.4",
     "riot-observable": "^2.3.0-beta.4",
     "riot-route": "^2.3.0-beta.3",
-    "riot-tmpl": "^2.3.0-beta.7",
+    "riot-tmpl": "^2.3.0-beta.8",
     "shelljs": "~0.5.3",
     "simple-dom": "0.2.7",
     "simple-html-tokenizer": "^0.2.0"
@@ -55,8 +55,8 @@
     "eslint": "^1.7.3",
     "expect.js": "^0.3.1",
     "glob": "^5.0.15",
-    "jsdom": "^7.0.1",
-    "karma": "^0.13.11",
+    "jsdom": "^7.0.2",
+    "karma": "^0.13.14",
     "karma-coverage": "^0.5.3",
     "karma-mocha": "^0.2.0",
     "karma-phantomjs-launcher": "^0.2.1",
@@ -83,8 +83,6 @@
   "spm": {
     "main": "riot.js",
     "ignore": [
-      "demo",
-      "doc",
       "test",
       "lib",
       "make"
