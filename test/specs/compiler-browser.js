@@ -481,6 +481,8 @@ describe('Compiler Browser', function() {
     tag2.unmount()
     tag3.unmount(true)
 
+    expect(tag3.isMounted).to.be(false)
+
     expect(document.body.getElementsByTagName('test').length).to.be(0)
     expect(document.getElementById('foo')).to.be(null)
     expect(document.getElementById('bar')).to.not.be(null)
