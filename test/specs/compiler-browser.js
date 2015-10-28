@@ -385,6 +385,12 @@ describe('Compiler Browser', function() {
     return js.replace(/@version/, '1.0.0')
   }
 
+  function getRiotStyles() {
+    // util.injectStyle must add <style> in head, not in body -- corrected
+    var stag = document.querySelector('style')
+    return normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
+  }
+
   before(function(next) {
 
     this.timeout(10000)
@@ -430,14 +436,17 @@ describe('Compiler Browser', function() {
 
     var src = document.getElementById('tag_src').innerHTML
 
+    // check riot.compile is actually compiling the source
+    expect(riot.compile(src, true)).to.contain("('timetable', '")
+
     // compile timer 1000 times and see how long it takes
-    var begin = +new Date()
+    var begin = Date.now()
 
     for (var i = 0; i < 1000; i++) {
       riot.compile(src, true)
     }
 
-    expect(+new Date() - begin).to.be.below(1000)
+    expect(Date.now() - begin).to.be.below(1000)
 
     expect(tag.tags.foo).to.not.be(undefined)
 
@@ -456,12 +465,11 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('custom-parsers')[0]
 
     // ie sucks!
-    var stag = document.querySelector('style'),
-      styles =  normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
+    var styles = getRiotStyles()
 
     expect(tag).to.be.an('object')
     expect(tag.version).to.be('1.0.0')
-    expect(styles).to.contain('custom-parsers {color: red;}')
+    expect(styles).to.match(/\bcustom-parsers\ ?\{\s*color: red;}/)
 
     tags.push(tag)
 
@@ -1093,11 +1101,10 @@ describe('Compiler Browser', function() {
   })
 
   it('style injection to single style tag', function() {
-    var stag = document.querySelector('style'),
-      styles =  normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
+    var styles = getRiotStyles()
 
-    expect(styles).to.match(/p(.+)?{color: blue;}/)
-    expect(styles).to.match(/div(.+)?{color: red;}/)
+    expect(styles).to.match(/\bp\s*\{color: blue;}/)
+    expect(styles).to.match(/\bdiv\s*\{color: red;}/)
   })
 
   // TODO: does this test make sense?!
