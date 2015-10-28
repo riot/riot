@@ -116,6 +116,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Another flux demo caparable to React ones](http://txchen.github.io/feplay/riot_flux)
 - [Various experiments](http://richardbondi.net/programming/riot)
 - [Isomorphic application](https://github.com/ListnPlay/riot-isomorphic)
+- [Isomorphic proof of concept](https://github.com/PabloSichert/isomorphic-proof-of-concept)
 - [flux-riot todo](http://mingliangfeng.me/flux-riot)
 - [Another Riot Todo MVC](http://nippur72.github.io/riotjs-todomvc/#/)
 - [Cheft isomorphic by express](https://github.com/cheft/cheft)
@@ -143,6 +144,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Veronica - flux adaption for Riot](https://www.npmjs.com/package/veronica-x)
 
 ### Components
+- [Material UI](http://kysonic.github.io/riot-mui/)
 - [RiotGear](https://riotgear.js.org)
 - [Riot Bootstrap](http://cognitom.github.io/riot-bootstrap/)
 - [iToolkit](https://github.com/BE-FE/iToolkit)
@@ -325,11 +327,12 @@ http://riotjs.com/
 [coverage-image]:https://img.shields.io/coveralls/riot/riot/dev.svg?style=flat-square
 [coverage-url]:https://coveralls.io/r/riot/riot?branch=dev
 
-[saucelabs-image]:https://saucelabs.com/browser-matrix/riotjs.svg
-[saucelabs-url]:https://saucelabs.com/u/riotjs
+[saucelabs-image]:https://saucelabs.com/browser-matrix/testsriotjs.svg
+[saucelabs-url]:https://saucelabs.com/u/testsriotjs
 
 [gitter-image]:https://img.shields.io/badge/GITTER-JOIN_CHAT_%E2%86%92-1dce73.svg?style=flat-square
 [gitter-url]:https://gitter.im/riot/riot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
 [codeclimate-image]:https://img.shields.io/codeclimate/github/riot/riot.svg?style=flat-square
 [codeclimate-url]:https://codeclimate.com/github/riot/riot
+

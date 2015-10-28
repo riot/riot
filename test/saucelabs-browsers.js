@@ -1,6 +1,6 @@
 module.exports = {
   browsers: {
-    /*
+/*
     they do not work on saucelabs
     Maybe one day we will switch to another testing platform
     or we will just wait that saucelabs fixes the issue
@@ -8,21 +8,33 @@ module.exports = {
       base: 'SauceLabs',
       browserName: 'iphone',
       platform: 'iOS',
-      version: '8.2',
+      version: '9.1',
       group: 0
     },
     slipad: {
       base: 'SauceLabs',
       browserName: 'ipad',
       platform: 'iOS',
-      version: '8.2',
+      version: '9.1',
       group: 0
     },
-    */
-    slsafari: {
+*/
+    slsafari9: {
+      base: 'SauceLabs',
+      browserName: 'safari',
+      platform: 'OS X 10.11',
+      group: 0
+    },
+    slsafari8: {
       base: 'SauceLabs',
       browserName: 'safari',
       platform: 'OS X 10.10',
+      group: 0
+    },
+    slsafari7: {
+      base: 'SauceLabs',
+      browserName: 'safari',
+      platform: 'OS X 10.9',
       group: 0
     },
     slIE9: {
@@ -46,6 +58,13 @@ module.exports = {
       version: '11',
       group: 1
     },
+    slEdge: {
+      base: 'SauceLabs',
+      browserName: 'microsoftedge',
+      platform: 'Windows 10',
+      version: '20.10240',
+      group: 2
+    },
     slandroid5: {
       base: 'SauceLabs',
       browserName: 'android',
@@ -60,7 +79,7 @@ module.exports = {
     slfirefox: {
       base: 'SauceLabs',
       browserName: 'firefox',
-      group: 2
+      group: 3
     },
     slandroid4: {
       base: 'SauceLabs',

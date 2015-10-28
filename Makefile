@@ -37,12 +37,12 @@ test-coveralls:
 
 test-sauce:
 	# run the saucelabs in separate chunks
-	@ for group in 0 1 2 3; do GROUP=$$group SAUCE_USERNAME=riotjs SAUCE_ACCESS_KEY=124f5640-fd66-4848-acdb-98c1d601d04d SAUCELABS=1 make test-karma; done
+	@ for group in 0 1 2 3; do GROUP=$$group SAUCELABS=1 make test-karma; done
 
 compare:
 	# compare the current release with the previous one
-	du -h riot.js compiler.js
-	du -h dist/riot/riot.js dist/riot/compiler.js
+	du -h riot.min.js compiler.min.js
+	du -h dist/riot/riot.min.js dist/riot/compiler.min.js
 
 raw:
 	# build riot

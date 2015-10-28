@@ -28,8 +28,8 @@ module.exports = function(config) {
       'polyfills/bind.js',
       '../node_modules/mocha/mocha.js',
       '../node_modules/expect.js/index.js',
-      '../dist/riot/riot+compiler.js',
-      //'../dist/riot/compiler.js',
+      '../dist/riot/riot.js',
+      '../dist/riot/compiler.js',
       'helpers.js',
       {
         pattern: 'tag/*.tag',
