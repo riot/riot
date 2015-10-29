@@ -24,7 +24,7 @@ describe('Scoped CSS', function() {
     expect(render('i[class=twitter] { background: #55ACEE }'))
         .to.equal('my-tag i[class=twitter],[riot-tag="my-tag"] i[class=twitter] { background: #55ACEE }')
   })
-  it('add my-tag to the selector with a backslash', function() {
+  it('add my-tag to the selector with a pseudo-class', function() {
     expect(render('a:after { content: "*" }'))
         .to.equal('my-tag a:after,[riot-tag="my-tag"] a:after { content: "*" }')
   })
@@ -40,7 +40,7 @@ describe('Scoped CSS', function() {
     expect(render(':scope > ul { padding: 0 }'))
         .to.equal('my-tag > ul,[riot-tag="my-tag"] > ul { padding: 0 }')
   })
-  it('add my-tag to the root selector with attr', function() {
+  it('add my-tag to the root selector with attribute', function() {
     expect(render(':scope[disabled] { color: gray }'))
         .to.equal('my-tag[disabled],[riot-tag="my-tag"][disabled] { color: gray }')
   })
@@ -60,7 +60,7 @@ describe('Scoped CSS', function() {
     expect(render('@keyframes fade { from { opacity: 1; } to { opacity: 0; } }'))
         .to.equal('@keyframes fade { from { opacity: 1; } to { opacity: 0; } }')
   })
-  it('not add my-tag to parsentage values in @keyframes', function() {
+  it('not add my-tag to parcentage values in @keyframes', function() {
     expect(render('@keyframes fade { 10% { opacity: 1; } 85% { opacity: 0; } }'))
         .to.equal('@keyframes fade { 10% { opacity: 1; } 85% { opacity: 0; } }')
   })
