@@ -3,44 +3,44 @@ describe('Compiler Browser', function() {
   var html = [
 
       // compiles test
-      '<script type=\"riot\/tag\" id=\"tag_src\">',
+      '<script type="riot\/tag" id="tag_src">',
       '  <foo>',
       '     <p>{ opts.baz } { bar }<\/p>',
 
-      '     this.bar = \"romutus\"',
+      '     this.bar = "romutus"',
 
       '  <\/foo>',
       '  <timetable>',
       '     <timer ontick={ parent.opts.ontick } start={ time } each={ time, i in times }><\/timer>',
-      '     <foo barz=\"899\" baz=\"90\"><\/foo>',
+      '     <foo barz="899" baz="90"><\/foo>',
       '     <p>{ kama }<\/p>',
 
       '     this.times = [ 1, 3, 5 ]',
-      '     this.kama = \"jooo\"',
+      '     this.kama = "jooo"',
 
       '  <\/timetable>',
       '<\/script>',
 
-      '<top-level-attr value=\"initial\"><\/top-level-attr>',
+      '<top-level-attr value="initial"><\/top-level-attr>',
 
       // check the custom parsers
 
-      '<script type=\"riot\/tag\" src=\"tag\/\~custom-parsers.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/\~custom-parsers.tag"><\/script>',
 
       '<custom-parsers><\/custom-parsers>',
 
-      '<script type=\"riot\/tag\" src=\"tag\/timer.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/timer.tag"><\/script>',
       '<timetable><\/timetable>',
 
       // mount and unmount
 
-      '<script type=\"riot\/tag\">',
+      '<script type="riot\/tag">',
       '  <test><p>val: { opts.val }<\/p><\/test>',
       '<\/script>',
 
       '<test id="test-tag"><\/test>',
-      '<div id=\"foo\"><\/div>',
-      '<div id=\"bar\"><\/div>',
+      '<div id="foo"><\/div>',
+      '<div id="bar"><\/div>',
 
       // duplicated tags in loops
 
@@ -48,7 +48,7 @@ describe('Compiler Browser', function() {
       '<outer id="outer2"><\/outer>',
       '<outer id="outer3"><\/outer>',
 
-      '<script type=\"riot\/tag\">',
+      '<script type="riot\/tag">',
 
       '<inner>',
       ' <p>',
@@ -58,7 +58,7 @@ describe('Compiler Browser', function() {
 
       '<\/script>',
 
-      '<script type=\"riot\/tag\">',
+      '<script type="riot\/tag">',
 
       '<outer>',
       '   <div each="{ data, i in opts.data }">',
@@ -70,48 +70,48 @@ describe('Compiler Browser', function() {
       '<\/script>',
 
       // each loop
-      '<script type=\"riot\/tag\" src=\"tag\/loop.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop.tag"><\/script>',
       '<loop><\/loop>',
 
       // loop context
 
       '<loop-child><\/loop-child>',
-      '<script type=\"riot\/tag\" src=\"tag\/loop-child.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-child.tag"><\/script>',
 
       '<loop-reorder><\/loop-reorder>',
-      '<script type=\"riot\/tag\" src=\"tag\/loop-reorder.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-reorder.tag"><\/script>',
 
       // loop order
       '<loop-manip><\/loop-manip>',
-      '<script type=\"riot\/tag\" src=\"tag\/loop-manip.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-manip.tag"><\/script>',
 
       // loop object
       '<loop-object><\/loop-object>',
-      '<script type=\"riot\/tag\" src=\"tag\/loop-object.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-object.tag"><\/script>',
 
       // looped child
       '<nested-child><\/nested-child>',
-      '<script type=\"riot\/tag\" src=\"tag\/nested-child.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/nested-child.tag"><\/script>',
 
       // loop option
       '<loop-option><\/loop-option>',
-      '<script type=\"riot\/tag\" src=\"tag\/loop-option.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-option.tag"><\/script>',
 
       // loop optgroup
       '<loop-optgroup><\/loop-optgroup>',
-      '<script type=\"riot\/tag\" src=\"tag\/loop-optgroup.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-optgroup.tag"><\/script>',
 
       // loop optgroup, two option tags
       '<loop-optgroup2><\/loop-optgroup2>',
-      '<script type=\"riot\/tag\" src=\"tag\/loop-optgroup2.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-optgroup2.tag"><\/script>',
 
       // loop position
       '<loop-position><\/loop-position>',
-      '<script type=\"riot\/tag\" src=\"tag\/loop-position.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-position.tag"><\/script>',
 
       // table
       '<table-data><\/table-data>',
-      '<script type=\"riot\/tag\" src=\"tag\/table-data.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/table-data.tag"><\/script>',
 
       // multiple mount at same time
       '<multi-mount value="1"><\/multi-mount>',
@@ -129,37 +129,37 @@ describe('Compiler Browser', function() {
       '<test-f><\/test-f>',
       '<test-g><\/test-g>',
 
-      '<script type=\"riot\/tag\">',
+      '<script type="riot\/tag">',
 
       '  <test-e>',
       '    <p>[ x ]<\/p>',
-      '    this.x = \"ok\"',
+      '    this.x = "ok"',
       '  <\/test-e>',
 
       '  <test-f>',
       '    <p>${ x }<\/p>',
-      '    this.x = \"ok\"',
+      '    this.x = "ok"',
       '  <\/test-f>',
 
       '  <test-g>',
       '    <p>{ x }<\/p>',
-      '    this.x = \"ok\"',
+      '    this.x = "ok"',
       '  <\/test-g>',
 
       '<\/script>',
 
       // mount the same tag multiple times
-      '<div id=\"multi-mount-container-1\"><\/div>',
+      '<div id="multi-mount-container-1"><\/div>',
 
       // multple mount using *
-      '<div id=\"multi-mount-container-2\">',
+      '<div id="multi-mount-container-2">',
       '    <test-i><\/test-i>',
       '    <test-l><\/test-l>',
       '    <test-m><\/test-m>',
       '<\/div>',
       // riot-tag attribute
 
-      '<script type=\"riot\/tag\">',
+      '<script type="riot\/tag">',
       '  <rtag><p>val: { opts.val }<\/p><\/rtag>',
       '<\/script>',
 
@@ -172,7 +172,7 @@ describe('Compiler Browser', function() {
 
       // riot-tag attribute by tag name
 
-      '<script type=\"riot\/tag\">',
+      '<script type="riot\/tag">',
       '  <rtag2><p>val: { opts.val }<\/p><\/rtag2>',
       '<\/script>',
 
@@ -183,12 +183,12 @@ describe('Compiler Browser', function() {
       '<ploop1-tag><\/ploop1-tag>',
       '<ploop2-tag><\/ploop2-tag>',
       '<ploop3-tag><\/ploop3-tag>',
-      '<script type=\"riot\/tag\" src=\"tag\/ploop-tag.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/ploop-tag.tag"><\/script>',
 
-      '<script type=\"riot\/tag\" src=\"tag\/inner-html.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/inner-html.tag"><\/script>',
       // yield tests
 
-      '<script type=\"riot\/tag\" src=\"tag\/yield-nested.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/yield-nested.tag"><\/script>',
       '<yield-parent>{ greeting }<\/yield-parent>',
 
       '<inner-html>',
@@ -203,12 +203,12 @@ describe('Compiler Browser', function() {
 
       // dynamically named elements in a loop
 
-      '<script type=\"riot\/tag\" src=\"tag\/loop-named.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-named.tag"><\/script>',
       '<loop-named><\/loop-named>',
 
       //style injection to single style tag
 
-      '<script type=\"riot\/tag\">',
+      '<script type="riot\/tag">',
       '  <style-tag>',
       '    <style scoped>',
       '      p {color: blue;}',
@@ -225,9 +225,9 @@ describe('Compiler Browser', function() {
       '<style-tag><\/style-tag>',
       '<style-tag2><\/style-tag2>',
 
-      '<script type=\"riot\/tag\">',
+      '<script type="riot\/tag">',
       '  <style-tag3>',
-      '    <style scoped=\"scoped\" type="text/myparser">',
+      '    <style scoped="scoped" type="text/myparser">',
       '      p {border: solid 3px black;}',
       '    <\/style>',
       '    <style>',
@@ -239,23 +239,23 @@ describe('Compiler Browser', function() {
       '<\/script>',
       '<style-tag3><\/style-tag3>',
 
-      '<script type=\"riot\/tag\">',
+      '<script type="riot\/tag">',
       '  <style-tag4>',
-      '    <p id=\"style4\"><\/p><p>x</p>',
+      '    <p id="style4"><\/p><p>x</p>',
       '  <\/style-tag4>',
       '<\/script>',
       '<style-tag4><\/style-tag4>',
 
       // scoped css and riot-tag, mount(selector, tagname)
 
-      '<script type=\"riot\/tag\" src=\"tag\/scoped.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/scoped.tag"><\/script>',
       '<scoped-tag><\/scoped-tag>',
       '<div riot-tag="scoped-tag"><\/div>',
       '<div id="scopedtag"><\/div>',
 
       // preserve attributes from tag definition
 
-      '<script type=\"riot\/tag\" src=\"tag\/preserve-attr.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/preserve-attr.tag"><\/script>',
       '<preserve-attr><\/preserve-attr>',
       '<div riot-tag="preserve-attr2"><\/div>',
 
@@ -265,113 +265,113 @@ describe('Compiler Browser', function() {
 
       // static named tag
 
-      '<script type=\"riot\/tag\" src=\"tag\/named-child.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/named-child.tag"><\/script>',
       '<named-child-parent><\/named-child-parent>',
 
       // mount order
-      '<script type=\"riot\/tag\" src=\"tag\/deferred-mount.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/deferred-mount.tag"><\/script>',
       '<deferred-mount><\/deferred-mount>',
 
       // multi named elements to an array
-      '<script type=\"riot\/tag\" src=\"tag\/multi-named.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/multi-named.tag"><\/script>',
       '<multi-named><\/multi-named>',
 
       // test the preventUpdate feature on the DOM events
-      '<script type=\"riot\/tag\" src=\"tag\/prevent-update.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/prevent-update.tag"><\/script>',
       '<prevent-update><\/prevent-update>',
 
       // Don't trigger mount for conditional tags
-      '<script type=\"riot\/tag\" src=\"tag\/if-mount.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/if-mount.tag"><\/script>',
       '<if-mount><\/if-mount>',
 
       // input type=number
-      '<script type=\"riot\/tag\" src=\"tag\/input-number.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/input-number.tag"><\/script>',
       '<input-number><\/input-number>',
 
       // input type=number
-      '<script type=\"riot\/tag\" src=\"tag\/nested-riot.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/nested-riot.tag"><\/script>',
       '<container-riot><\/container-riot>',
 
       // recursive tags
-      '<script type=\"riot\/tag\" src=\"tag\/treeview.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/treeview.tag"><\/script>',
       '<treeview><\/treeview>',
 
       // sync the loop options
-      '<script type=\"riot\/tag\" src=\"tag\/loop-sync-options.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-sync-options.tag"><\/script>',
       '<loop-sync-options><\/loop-sync-options>',
 
       // named selects check
-      '<script type=\"riot\/tag\" src=\"tag\/named-select.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/named-select.tag"><\/script>',
       '<named-select name="i-am-the-select"><\/named-select>',
 
       // sync the loop options in nested tags
-      '<script type=\"riot\/tag\" src=\"tag\/loop-sync-options-nested.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-sync-options-nested.tag"><\/script>',
       '<loop-sync-options-nested><\/loop-sync-options-nested>',
       '<loop-sync-options-nested-wrapper><\/loop-sync-options-nested-wrapper>',
 
       // inherit properties from the parent
-      '<script type=\"riot\/tag\" src=\"tag\/loop-inherit.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-inherit.tag"><\/script>',
       '<loop-inherit><\/loop-inherit>',
 
-      '<script type=\"riot\/tag\" src=\"tag\/loop-double-curly-brackets.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-double-curly-brackets.tag"><\/script>',
       '<loop-double-curly-brackets><\/loop-double-curly-brackets>',
 
       // check the conditional on a loop item
-      '<script type=\"riot\/tag\" src=\"tag\/loop-conditional.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-conditional.tag"><\/script>',
       '<loop-conditional><\/loop-conditional>',
 
       // check if the events get triggered correctly
-      '<script type=\"riot\/tag\" src=\"tag\/events.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/events.tag"><\/script>',
       '<events><\/events>',
 
       // top most tag preserve attribute expressions
-      '<script type=\"riot\/tag\" src=\"tag\/top-attributes.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/top-attributes.tag"><\/script>',
       '<top-attributes cls="classy"><\/top-attributes>',
 
       // loop over tags instances
-      '<script type=\"riot\/tag\" src=\"tag\/loop-tag-instances.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-tag-instances.tag"><\/script>',
       '<loop-tag-instances><\/loop-tag-instances>',
 
       // check the loop events update
-      '<script type=\"riot\/tag\" src=\"tag\/loop-numbers-nested.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-numbers-nested.tag"><\/script>',
       '<loop-numbers-nested><\/loop-numbers-nested>',
 
       // check nested loops using arrays of non objects
-      '<script type=\"riot\/tag\" src=\"tag\/loop-nested-strings-array.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-nested-strings-array.tag"><\/script>',
       '<loop-nested-strings-array><\/loop-nested-strings-array>',
 
       // check the loop events and the item property
-      '<script type=\"riot\/tag\" src=\"tag\/loop-events.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-events.tag"><\/script>',
       '<loop-events><\/loop-events>',
 
       // table with multiple bodies and dynamic style
-      '<script type=\"riot\/tag\" src=\"tag\/table-multibody.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/table-multibody.tag"><\/script>',
       '<table-multibody><\/table-multibody>',
 
       // table with caption and looped cols, ths and trs
-      '<script type=\"riot\/tag\" src=\"tag\/loop-cols.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-cols.tag"><\/script>',
       '<loop-cols><\/loop-cols>',
 
       // pass a riot observable as option
-      '<script type=\"riot\/tag\" src=\"tag\/observable-attr.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/observable-attr.tag"><\/script>',
       '<observable-attr><\/observable-attr>',
 
       // check arguments order of each attribute through array subclass loop
-      '<script type=\"riot\/tag\" src=\"tag\/loop-arraylike.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-arraylike.tag"><\/script>',
       '<loop-arraylike><\/loop-arraylike>',
 
-      '<script type=\"riot\/tag\" src=\"tag\/loop-ids.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-ids.tag"><\/script>',
       '<loop-ids><\/loop-ids>',
 
-      '<script type=\"riot\/tag\" src=\"tag\/loop-unshift.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-unshift.tag"><\/script>',
       '<loop-unshift><\/loop-unshift>',
 
-      '<script type=\"riot\/tag\" src=\"tag\/loop-virtual.tag\"><\/script>',
+      '<script type="riot\/tag" src="tag\/loop-virtual.tag"><\/script>',
       '<loop-virtual><\/loop-virtual>',
       '<loop-virtual-reorder><\/loop-virtual-reorder>',
 
       ''    // keep it last please, avoids break PRs
-    ].join('\r'),
+    ].join('\n'),
     tags = [],
     div = document.createElement('div')
 
@@ -462,10 +462,8 @@ describe('Compiler Browser', function() {
   })
 
   it('compile a custom tag using custom css and js parsers', function() {
-    var tag = riot.mount('custom-parsers')[0]
-
-    // ie sucks!
-    var styles = getRiotStyles()
+    var tag = riot.mount('custom-parsers')[0],
+      styles = getRiotStyles()
 
     expect(tag).to.be.an('object')
     expect(tag.version).to.be('1.0.0')
@@ -1107,7 +1105,7 @@ describe('Compiler Browser', function() {
     expect(styles).to.match(/\bdiv\s*\{color: red;}/)
   })
 
-  // TODO: does this test make sense?!
+  // working
   it('style injection removes type riot style tag', function() {
     var stag = document.querySelector('style[type=riot]')
     expect(stag).to.be(null)

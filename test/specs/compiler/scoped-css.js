@@ -65,15 +65,12 @@ describe('Scoped CSS', function() {
         .to.equal('@keyframes fade { 10% { opacity: 1; } 85% { opacity: 0; } }')
   })
 
-/* FIXME: Getting different parsers objects!
   it('use a custom css parser to render the css', function() {
-    riot.parsers.css.myParser = function(tag, css) {
+    compiler.parsers.css.myParser = function(tag, css) {
       return css.replace(/@tag/, tag)
     }
-    console.dir(riot.parsers)
-
     expect(render('@tag { color: red }', 'myParser'))
         .to.equal('my-tag { color: red }')
   })
-*/
+
 })

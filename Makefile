@@ -32,9 +32,6 @@ test-mocha:
 test-karma:
 	@ $(KARMA) start test/karma.conf.js
 
-test-compiler:
-	@ $(ISTANBUL) cover $(MOCHA) --dir coverage/server -- ./test/compiler/suite -R spec
-
 test-coveralls:
 	@ RIOT_COV=1 cat ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
 
@@ -50,8 +47,6 @@ compare:
 raw:
 	# build riot
 	@ mkdir -p $(DIST)
-	@ cp node_modules/riot-compiler/dist/compiler.js lib/server/
-	#@ $(SMASH) lib/browser/compiler/index.js > $(DIST)compiler.js
 	@ $(SMASH) lib/riot.js > $(DIST)riot.js
 	@ $(SMASH) lib/riot+compiler.js > $(DIST)riot+compiler.js
 

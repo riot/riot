@@ -1,3 +1,4 @@
+//src: mixed-js.tag
 function foo() {
   alert('1 < 2')
 }
