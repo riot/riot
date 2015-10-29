@@ -12,14 +12,15 @@ script:
 sudo: false
 
 install:
-  - npm install jade
-  - npm install babel-core
-  - npm install coffee-script
-  - npm install livescript
-  - npm install typescript-simple
-  - npm install stylus
-  - npm install nib
-  - npm install node-sass
+  - npm i jade
+  - npm i babel-core
+  - npm i babel-preset-es2015
+  - npm i coffee-script
+  - npm i livescript
+  - npm i typescript-simple
+  - npm i stylus
+  - npm i nib
+  - npm i node-sass
   - npm install
 
 after_success:

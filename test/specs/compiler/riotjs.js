@@ -1,7 +1,7 @@
+var fs = require('fs'),
+  path = require('path')
+
 describe('riotjs', function () {
-  var
-    path = require('path'),
-    fs = require('fs')
 
   function render(str) {
     return compiler.js(str, {})

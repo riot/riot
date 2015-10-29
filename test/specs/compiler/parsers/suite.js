@@ -40,7 +40,7 @@ function testParser(name, opts) {
 
 describe('HTML parsers', function () {
 
-  this.timeout(10000)
+  this.timeout(12000)
 
   function testStr(str, resStr, opts) {
     expect(compiler.html(str, opts || {})).to.be(resStr)
@@ -92,7 +92,7 @@ describe('HTML parsers', function () {
 
 describe('JavaScript parsers', function () {
 
-  this.timeout(10000)
+  this.timeout(20000) // first call to babel-core is slooooow!
 
   // complex.tag
   it('complex tag structure', function () {
@@ -141,7 +141,7 @@ describe('JavaScript parsers', function () {
   })
 
   // testParser.es6.tag
-  it('es6 (babel-core or babel)', function () {
+  it('es6 (babel-core 6.0.2+)', function () {
     if (have('es6')) {
       testParser('test', { type: 'es6' })
     }
@@ -149,7 +149,7 @@ describe('JavaScript parsers', function () {
 
   // testParser-attr.es6.tag
   it('es6 with shorthands (fix #1090)', function () {
-    if (have('babel')) {
+    if (have('es6')) {
       testParser('test-attr', { type: 'es6', expr: true })
     }
   })
@@ -159,7 +159,7 @@ describe('JavaScript parsers', function () {
 
 describe('Style parsers', function () {
 
-  this.timeout(10000)
+  this.timeout(12000)
 
   function _sass(tag, css) {
     return '' + compiler.parsers._req('sass').renderSync({
