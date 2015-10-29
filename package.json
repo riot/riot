@@ -42,6 +42,7 @@
     "chokidar": "~1.2.0",
     "minimist": "~1.2.0",
     "riot-cli": "^2.3.0-beta.4",
+    "riot-compiler": "^2.3.0-beta.5",
     "riot-observable": "^2.3.0-beta.4",
     "riot-route": "^2.3.0-beta.3",
     "riot-tmpl": "^2.3.0-beta.8",
@@ -70,8 +71,6 @@
     "lib",
     "riot.js",
     "riot.min.js",
-    "compiler.js",
-    "compiler.min.js",
     "riot+compiler.js",
     "riot+compiler.min.js"
   ],

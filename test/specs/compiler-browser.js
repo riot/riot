@@ -446,7 +446,7 @@ describe('Compiler Browser', function() {
       riot.compile(src, true)
     }
 
-    expect(Date.now() - begin).to.be.below(1000)
+    expect(Date.now() - begin).to.be.below(1200) // old compiler was not compiling this
 
     expect(tag.tags.foo).to.not.be(undefined)
 
