@@ -11,8 +11,16 @@ script:
 
 sudo: false
 
-before_install:
-  npm install babel && npm install jade && npm install coffee-script && npm install stylus && npm install nib && npm install node-sass && npm install
+install:
+  - npm install jade
+  - npm install babel-core
+  - npm install coffee-script
+  - npm install livescript
+  - npm install typescript-simple
+  - npm install stylus
+  - npm install nib
+  - npm install node-sass
+  - npm install
 
 after_success:
   make test-sauce && make test-coveralls
