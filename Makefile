@@ -41,8 +41,8 @@ test-sauce:
 
 compare:
 	# compare the current release with the previous one
-	du -h riot.min.js compiler.min.js
-	du -h dist/riot/riot.min.js dist/riot/compiler.min.js
+	du -h riot.min.js riot+compiler.min.js
+	du -h dist/riot/riot.min.js dist/riot/riot+compiler.min.js
 
 raw:
 	# build riot
@@ -54,7 +54,7 @@ riot: raw test
 
 min: riot
 	# minify riot
-	@ for f in riot compiler riot+compiler; do $(UGLIFY) $(DIST)$$f.js --comments --mangle -o $(DIST)$$f.min.js; done
+	@ for f in riot riot+compiler; do $(UGLIFY) $(DIST)$$f.js --comments --mangle -o $(DIST)$$f.min.js; done
 
 perf: riot
 	# run the performance tests
