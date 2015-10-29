@@ -9,9 +9,7 @@
   </style>
 
   <script>
-    foo () {
-
-    }
+    foo () {}
   </script>
 
 </stylus-test>

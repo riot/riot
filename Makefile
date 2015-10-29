@@ -50,7 +50,8 @@ compare:
 raw:
 	# build riot
 	@ mkdir -p $(DIST)
-	@ $(SMASH) lib/browser/compiler/index.js > $(DIST)compiler.js
+	@ cp node_modules/riot-compiler/dist/compiler.js lib/server/
+	#@ $(SMASH) lib/browser/compiler/index.js > $(DIST)compiler.js
 	@ $(SMASH) lib/riot.js > $(DIST)riot.js
 	@ $(SMASH) lib/riot+compiler.js > $(DIST)riot+compiler.js
 

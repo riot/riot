@@ -1,19 +1,21 @@
-<treeitem>
+<treeitems>
+  <treeitem>
 
-  <div class={ bold: isFolder() } onclick={ toggle } ondblclick={ changeType }>
-    { name }
-    <span if={ isFolder() }>[{open ? '-' : '+'}]</span>
-  </div>
+    <div class={ bold: isFolder() } onclick={ toggle } ondblclick={ changeType }>
+      { name }
+      <span if={ isFolder() }>[{open ? '-' : '+'}]</span>
+    </div>
 
-  <ul if={ isFolder() } show={ isFolder() && open }>
-    <li _each={ child, i in nodes }>
-      <treeitem data={child}></treeitem>
-    </li>
-    <li onclick={ addChild }>+</li>
-  </ul>
+    <ul if={ isFolder() } show={ isFolder() && open }>
+      <li each={ child, i in nodes }>
+        <treeitem data={child}/>
+      </li>
+      <li onclick={ addChild }>+</li>
+    </ul>
 
-  <script>
-  var self = this
-  </script>
+    <script>      /* NOTE: this script works here, in the scope of treeitems */
+    var self = this
+    </script>
 
-</treeitem>
+  </treeitem>
+</treeitems>
