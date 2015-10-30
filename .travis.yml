@@ -13,6 +13,7 @@ sudo: false
 
 install:
   - npm i jade
+  - npm i babel@5.8
   - npm i babel-core
   - npm i babel-preset-es2015
   - npm i coffee-script

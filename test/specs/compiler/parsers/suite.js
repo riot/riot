@@ -141,16 +141,24 @@ describe('JavaScript parsers', function () {
   })
 
   // testParser.es6.tag
-  it('es6 (babel-core 6.0.2+)', function () {
+  it('es6 (for babel 5.8.x)', function () {
     if (have('es6')) {
       testParser('test', { type: 'es6' })
     }
   })
 
+  // testParser.es6.tag
+  /* not working
+  it('new css.babel parser (babel-core 6.0.2+)', function () {
+    if (have('babel')) {
+      testParser('test', { type: 'babel' })
+    }
+  })*/
+
   // testParser-attr.es6.tag
-  it('es6 with shorthands (fix #1090)', function () {
-    if (have('es6')) {
-      testParser('test-attr', { type: 'es6', expr: true })
+  it('babel with shorthands (fix #1090)', function () {
+    if (have('babel')) {
+      testParser('test-attr', { type: 'babel', expr: true })
     }
   })
 
