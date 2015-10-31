@@ -43,12 +43,12 @@ module.exports = function(config) {
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
       testName: 'riotjs',
       startConnect: true,
-      recordVideo: true,
-      recordScreenshots: true
+      recordVideo: false,
+      recordScreenshots: false
     },
-    browserDisconnectTimeout: 10000,
+    captureTimeout: 300000,
+    browserNoActivityTimeout: 300000,
     browserDisconnectTolerance: 2,
-    browserNoActivityTimeout: 120000,
     customLaunchers: saucelabsBrowsers,
     browsers: browsers,
 

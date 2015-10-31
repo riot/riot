@@ -37,7 +37,8 @@ test-coveralls:
 
 test-sauce:
 	# run the saucelabs in separate chunks
-	@ for group in 0 1 2 3; do GROUP=$$group SAUCELABS=1 make test-karma; done
+	# we need to run the test on 12 different browsers divided in 7 groups
+	@ for group in {0..7}; do GROUP=$$group SAUCELABS=1 make test-karma; done
 
 compare:
 	# compare the current release with the previous one
@@ -67,7 +68,7 @@ watch:
 		node -e $(WATCH) "lib/**/*.js" "make raw" & \
 		export RIOT="./../../../../dist/riot/riot" && ./node_modules/.bin/riot --watch test/tag dist/tags.js)
 
-.PHONY: test min
+.PHONY: test min eslint test-mocha test-compiler test-coveralls test-sauce compare raw riot perf watch
 
 
 # riot maintainer tasks
