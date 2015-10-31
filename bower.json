@@ -35,8 +35,6 @@
     "**/*",
     "!/riot.js",
     "!/riot.min.js",
-    "!/compiler.js",
-    "!/compiler.min.js",
     "!/riot+compiler.js",
     "!/riot+compiler.min.js"
   ],

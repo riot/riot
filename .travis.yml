@@ -7,12 +7,20 @@ branches:
     - master
     - dev
 script:
-  make riot test-compiler
+  make riot
 
 sudo: false
 
-before_install:
-  npm install babel && npm install jade && npm install coffee-script && npm install stylus && npm install nib && npm install
+install:
+  - npm i jade
+  - npm i babel@5.8
+  - npm i coffee-script
+  - npm i livescript
+  - npm i typescript-simple
+  - npm i stylus
+  - npm i nib
+  - npm i node-sass
+  - npm install
 
 after_success:
   make test-sauce && make test-coveralls

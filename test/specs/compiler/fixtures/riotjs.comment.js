@@ -1,6 +1,6 @@
   //THIS IS A LINE COMMENT
   click (e) {
-    alert('Hello!')
+  /* COMMENT */ alert('Hello!') //COMMENT }
   }
 
   /* THIS
@@ -8,6 +8,9 @@
    * A
    * BLOCK
    * COMMENT */
-  change (e) {
-    alert('Hello!')
+  change (e)/* COMMENT */{
+    alert('Hello!')   //ANOTHER LINE COMMENT
   }
+/*COMMENT
+  click (e) {}
+*/
