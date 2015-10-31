@@ -10,7 +10,11 @@
   var T_STRING = 'string'
 /* istanbul ignore next */
 var parsers = {
-  html: {},
+  html: {
+    jade: function(html) {
+      return jade.render(html, {pretty: true, doctype: 'html'})
+    }
+  },
   css: {},
   js: {
     coffee: function(js) {
@@ -289,11 +293,11 @@ function unindent(src) {
   return src
 }
 
-function globalEval(js) {
+function globalEval(js, opts) {
   var node = doc.createElement('script'),
       root = doc.documentElement
 
-  node.text = compile(js)
+  node.text = compile(js, opts)
   root.appendChild(node)
   root.removeChild(node)
 }
@@ -315,7 +319,9 @@ function compileScripts(fn) {
       var url = script.getAttribute('src')
 
       function compileTag(source) {
-        globalEval(source)
+        globalEval(source, {
+          template: script.getAttribute('template')
+        })
         scriptsAmount--
         if (!scriptsAmount) {
           done()
