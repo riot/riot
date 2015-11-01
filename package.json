@@ -5,6 +5,13 @@
   "homepage": "http://riotjs.com/",
   "repository": "riot/riot",
   "author": "Muut, Inc. and other contributors",
+  "contributors": [
+    "Richard Bondi",
+    "Gianluca Guarini"
+    "Tsutomu Kawamura"
+    "Alberto Martínez"
+    "Tero Piirainen",
+  ],
   "license": "MIT",
   "engines": {
     "node": ">=4.0.0"
