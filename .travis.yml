@@ -23,7 +23,7 @@ install:
   - npm install
 
 after_success:
-  make test-coveralls && make test-sauce
+  make test-sauce && make test-coveralls
 
 notifications:
     email: false
