@@ -54,7 +54,7 @@ module.exports = function(config) {
 
     reporters: ['progress', 'saucelabs', 'coverage'],
     preprocessors: {
-      '../riot/riot+compiler.js': ['coverage']
+      '../dist/riot/riot+compiler.js': ['coverage']
     },
 
     coverageReporter: {
