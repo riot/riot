@@ -11,8 +11,8 @@ module.exports = {
     slipad: {
       base: 'SauceLabs',
       browserName: 'ipad',
-      platform: 'OS X 10.10',
-      deviceName: 'iPad Retina',
+      platform: 'iOS',
+      deviceName: 'iPad 2',
       version: '9.1',
       group: 0
     },
