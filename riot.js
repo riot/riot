@@ -2229,7 +2229,7 @@ riot.Tag = Tag
   /* istanbul ignore next */
   if (typeof exports === T_OBJECT)
     module.exports = riot
-  else if (typeof define === 'function' && define.amd)
+  else if (typeof define === T_FUNCTION && typeof define.amd !== T_UNDEF)
     define(function() { return (window.riot = riot) })
   else
     window.riot = riot
