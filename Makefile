@@ -38,7 +38,7 @@ test-coveralls:
 test-sauce:
 	# run the saucelabs in separate chunks
 	# we need to run the test on 12 different browsers divided in 7 groups
-	@ for group in {0..7}; do GROUP=$$group SAUCELABS=1 make test-karma; done
+	@ for group in {0..6}; do GROUP=$$group SAUCELABS=1 make test-karma; done
 
 compare:
 	# compare the current release with the previous one
