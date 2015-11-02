@@ -7,6 +7,7 @@ var
   fs = require('fs')
 var
   basedir = __dirname,
+  compiler = require('riot-compiler'),
   jsdir = path.join(basedir, 'js')
 
 function have(mod, req) {

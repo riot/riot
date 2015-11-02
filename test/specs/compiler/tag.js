@@ -1,4 +1,5 @@
 var fs = require('fs'),
+  compiler = require('riot-compiler'),
   path = require('path')
 
 describe('Compile tags', function() {

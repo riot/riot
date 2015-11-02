@@ -1,3 +1,5 @@
+var compiler = require('riot-compiler')
+
 describe('Scoped CSS', function() {
 
   function render(str, parser) {

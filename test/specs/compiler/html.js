@@ -1,3 +1,4 @@
+var compiler = require('riot-compiler')
 
 describe('Compile HTML', function() {
 
