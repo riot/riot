@@ -59,7 +59,6 @@ describe('Node/io.js', function() {
   it('render tag: simple block (using yield)', function() {
     var blk = riot.render('block')
     var $ = cheerio.load(blk)
-    console.log(blk)
     expect($('block').length).to.be(1)
     expect($('yoyo').length).to.be(1)
     expect($('yoyo').html()).to.be('Hello World!')
