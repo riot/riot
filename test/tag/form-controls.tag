@@ -10,7 +10,7 @@
   </label>
 
   <form onsubmit={ check }>
-    <input type="text">
+    <input value={ opts.text } type="text">
   </form>
 
   check() {
