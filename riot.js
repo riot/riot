@@ -1,8 +1,8 @@
-/* Riot v2.3.0-beta, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v2.3.0, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.3.0-beta', settings: {} },
+var riot = { version: 'v2.3.0', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -142,9 +142,7 @@ riot.observable = function(el) {
       for (var i = 0, fn; fn = fns[i]; ++i) {
         if (fn.busy) return
         fn.busy = 1
-        // avoid that this fn.busy gets stuck in case of errors it fixes #3
-        // TODO: try/catch should be removed
-        // https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#2-unsupported-syntax
+
         try {
           fn.apply(el, fn.typed ? [name].concat(args) : args)
         } catch (e) { /* error */}
@@ -205,7 +203,7 @@ function DEFAULT_PARSER(path) {
  * @returns {array} array
  */
 function DEFAULT_SECOND_PARSER(path, filter) {
-  var re = new RegExp('^' + filter[REPLACE](/\*/g, '(\\w+)')[REPLACE](/\.\./, '.*') + '$'),
+  var re = new RegExp('^' + filter[REPLACE](/\*/g, '([^/?#]+?)')[REPLACE](/\.\./, '.*') + '$'),
     args = path.match(re)
 
   if (args) return args.slice(1)
@@ -411,10 +409,9 @@ route.start = function () {
   }
 }
 
-/** Autostart the router **/
+/** Prepare the router **/
 route.base()
 route.parser()
-route.start()
 
 riot.route = route
 })(riot)
@@ -1249,7 +1246,6 @@ function Tag(impl, conf, innerHTML) {
 
   defineProperty(this, 'update', function(data) {
 
-    self.trigger('before-update')
     // make sure the data passed will not override
     // the component core methods
     data = cleanUpData(data)
