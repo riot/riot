@@ -45,15 +45,11 @@
     "riot.js"
   ],
   "dependencies": {
-    "chalk": "^1.1.1",
-    "chokidar": "~1.2.0",
-    "minimist": "~1.2.0",
     "riot-cli": "^2.3.0",
     "riot-compiler": "^2.3.0",
     "riot-observable": "^2.3.0",
     "riot-route": "^2.3.0",
     "riot-tmpl": "^2.3.0",
-    "shelljs": "~0.5.3",
     "simple-dom": "0.2.7",
     "simple-html-tokenizer": "^0.2.0"
   },
