@@ -611,13 +611,13 @@ describe('Compiler Browser', function() {
     tag.update()
 
     // remove item make sure item passed is correct
-/*    for (var i = 0; i < tag.items.length; i++) {
+    for (var i = 0; i < tag.items.length; i++) {
       var curItem = tag.removes[0],
         ev = {},
         el = root.getElementsByTagName('dt')[0]
       el.onclick(ev)
       expect(curItem).to.be(ev.item)
-    }*/
+    }
 
     children = root.getElementsByTagName('li')
     Array.prototype.forEach.call(children, function(child) {
@@ -907,8 +907,9 @@ describe('Compiler Browser', function() {
     tag = riot.mount('test-b')[0]
     tags.push(tag)
 
-    */
     expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>ok</p>')
+    */
+
 
     riot.settings.brackets = '${ }'
     riot.tag('test-c', '<p>${ x }</p>', function() { this.x = 'ok' })
