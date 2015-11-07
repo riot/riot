@@ -1,7 +1,3 @@
-*NOW WE ARE CHANGING THE STRUCTURE OF RIOT REPO*
-
-*PLEASE SEE THE ISSUE [#1167](https://github.com/riot/riot/issues/1167) THANK YOU!*
-
 # Contributing to Riot.js
 
 If you’d like to contribute a feature or bug fix, you can [fork](https://help.github.com/articles/fork-a-repo/) Riot, commit your changes, & [send a pull request](https://help.github.com/articles/using-pull-requests/).
