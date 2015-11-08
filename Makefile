@@ -59,8 +59,8 @@ min: riot
 
 perf: riot
 	# run the performance tests
-	@ iojs --expose-gc test/performance/speed
-	@ iojs --expose-gc test/performance/mem
+	@ node --expose-gc test/performance/speed
+	@ node --expose-gc test/performance/mem
 
 watch:
 	# watch and rebuild riot and its tests
