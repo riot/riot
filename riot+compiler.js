@@ -1,8 +1,8 @@
-/* Riot v2.3.0, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v2.3.1, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.3.0', settings: {} },
+var riot = { version: 'v2.3.1', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -106,16 +106,7 @@ riot.observable = function(el) {
   defineProperty('one', function(events, fn) {
     function on() {
       el.off(events, on)
-
-      // V8 performance optimization
-      // https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments
-      var arglen = arguments.length
-      var args = new Array(arglen)
-      for (var i = 0; i < arglen; i++) {
-        args[i] = arguments[i]
-      }
-
-      fn.apply(el, args)
+      fn.apply(el, arguments)
     }
     return el.on(events, on)
   })
@@ -127,12 +118,13 @@ riot.observable = function(el) {
    */
 
   defineProperty('trigger', function(events) {
-    // V8 performance optimization
-    // https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments
-    var arglen = arguments.length - 1
-    var args = new Array(arglen)
+
+    // getting the arguments
+    // skipping the first one
+    var arglen = arguments.length - 1,
+      args = new Array(arglen)
     for (var i = 0; i < arglen; i++) {
-      args[i] = arguments[i + 1] // skip first argument
+      args[i] = arguments[i + 1]
     }
 
     onEachEvent(events, function(name) {
@@ -178,6 +170,7 @@ var RE_ORIGIN = /^.+?\/+[^\/]+/,
   REPLACE = 'replace',
   POPSTATE = 'popstate',
   TRIGGER = 'trigger',
+  MAX_EMIT_STACK_LEVEL = 3,
   win = window,
   doc = document,
   loc = win.history.location || win.location, // see html5-history-api
@@ -185,7 +178,7 @@ var RE_ORIGIN = /^.+?\/+[^\/]+/,
   clickEvent = doc && doc.ontouchstart ? 'touchstart' : 'click',
   started = false,
   central = riot.observable(),
-  base, current, parser, secondParser
+  base, current, parser, secondParser, emitStack = [], emitStackLevel = 0
 
 /**
  * Default parser. You can replace it via router.parser method.
@@ -223,6 +216,10 @@ function normalize(path) {
   return path[REPLACE](/^\/|\/$/, '')
 }
 
+function isString(str) {
+  return typeof str == 'string'
+}
+
 /**
  * Get the part after domain name
  * @param {string} href - fullpath
@@ -244,10 +241,24 @@ function getPathFromBase(href) {
 }
 
 function emit(force) {
-  var path = getPathFromBase()
-  if (force || path != current) {
-    central[TRIGGER]('emit', path)
-    current = path
+  // the stack is needed for redirections
+  var isRoot = emitStackLevel == 0
+  if (MAX_EMIT_STACK_LEVEL <= emitStackLevel) return
+
+  emitStackLevel++
+  emitStack.push(function() {
+    var path = getPathFromBase()
+    if (force || path != current) {
+      central[TRIGGER]('emit', path)
+      current = path
+    }
+  })
+  if (isRoot) {
+    while (emitStack.length) {
+      emitStack[0]()
+      emitStack.shift()
+    }
+    emitStackLevel = 0
   }
 }
 
@@ -283,7 +294,7 @@ function click(e) {
 function go(path, title) {
   title = title || doc.title
   // browsers ignores the second parameter `title`
-  history.pushState(null, title, base + path)
+  history.pushState(null, title, base + normalize(path))
   // so we need to set it manually
   doc.title = title
   emit()
@@ -299,7 +310,7 @@ function go(path, title) {
  * @param {(string|RegExp|function)} second - title / action
  */
 prot.m = function(first, second) {
-  if (first[0] && (!second || second[0])) go(first, second)
+  if (isString(first) && (!second || isString(second))) go(first, second)
   else if (second) this.r(first, second)
   else this.r('@', first)
 }
@@ -332,7 +343,10 @@ prot.e = function(path) {
  * @param {function} action - action to register
  */
 prot.r = function(filter, action) {
-  if (filter != '@') this.$.push(filter)
+  if (filter != '@') {
+    filter = '/' + normalize(filter)
+    this.$.push(filter)
+  }
   this.on(filter, action)
 }
 
@@ -400,13 +414,17 @@ route.stop = function () {
   }
 }
 
-/** Start routing **/
-route.start = function () {
+/**
+ * Start routing
+ * @param {boolean} autoExec - automatically exec after starting if true
+ */
+route.start = function (autoExec) {
   if (!started) {
     win[ADD_EVENT_LISTENER](POPSTATE, emit)
     doc[ADD_EVENT_LISTENER](clickEvent, click)
     started = true
   }
+  if (autoExec) emit(true)
 }
 
 /** Prepare the router **/
@@ -2255,13 +2273,13 @@ var parsers = (function () {
   }
 
   var _html = {
-    jade: function (html) {
-      return _req('jade').render(html, {pretty: true, doctype: 'html'})
+    jade: function (html, opts) {
+      return _req('jade').render(html, extend({pretty: true, doctype: 'html'}, opts))
     }
   }
 
   var _css = {
-    stylus: function (tag, css) {
+    stylus: function (tag, css, opts) {
       var
         stylus = _req('stylus'), nib = _req('nib')
       /* istanbul ignore next: can't run both */
@@ -2271,27 +2289,30 @@ var parsers = (function () {
   }
 
   var _js = {
-    none: function (js) {
+    none: function (js, opts) {
       return js
     },
-    livescript: function (js) {
-      return _req('livescript').compile(js, {bare: true, header: false})
+    livescript: function (js, opts) {
+      return _req('livescript').compile(js, extend({bare: true, header: false}, opts))
     },
-    typescript: function (js) {
-      return _req('typescript')(js).replace(/\r\n?/g, '\n')
+    typescript: function (js, opts) {
+      return _req('typescript')(js, opts).replace(/\r\n?/g, '\n')
     },
-    es6: function (js) {
-      return _req('es6').transform(js, {
-        blacklist: ['useStrict', 'react'], sourceMaps: false, comments: false
-      }).code
+    es6: /* istanbul ignore next */ function (js, opts) {
+      return _req('es6').transform(js, extend({
+        blacklist: ['useStrict', 'strict', 'react'], sourceMaps: false, comments: false
+      }, opts)).code
     },
-    babel: function (js) {
-      return _req('babel').transform(js, {
-        presets: ['es2015'], ast: false, sourceMaps: false, comments: false
-      }).code
+    babel: function (js, opts) {
+      js = 'function __parser_babel_wrapper__(){' + js + '}'
+      return _req('babel').transform(js,
+        extend({
+          presets: ['es2015']
+        }, opts)
+      ).code.replace(/["']use strict["'];[\r\n]+/, '').slice(38, -2)
     },
-    coffee: function (js) {
-      return _req('coffee').compile(js, {bare: true})
+    coffee: function (js, opts) {
+      return _req('coffee').compile(js, extend({bare: true}, opts))
     }
   }
 
@@ -2351,6 +2372,16 @@ var compile = (function () {
            ', function(opts) {\n' + js + s
   }
 
+  function extend(obj, props) {
+    for (var prop in props) {
+      /* istanbul ignore next */
+      if (props.hasOwnProperty(prop)) {
+        obj[prop] = props[prop]
+      }
+    }
+    return obj
+  }
+
   function parseAttrs(str) {
     var
       list = [],
@@ -2401,14 +2432,13 @@ var compile = (function () {
 
       for (var i = 1; i < list.length; i += 2) {
         expr = list[i]
-        if (expr[0] === '^') {
+        if (expr[0] === '^')
           expr = expr.slice(1)
-        }
         else if (jsfn) {
-          expr = jsfn(expr, opts).replace(/[\r\n]+/g, ' ').trim()
-          if (expr.slice(-1) === ';') expr = expr.slice(0, -1)
+          expr = jsfn(expr, opts)
+          if (/;\s*$/.test(expr)) expr = expr.slice(0, expr.search(/;\s*$/))
         }
-        list[i] = '\u0001' + (pcex.push(expr.trim()) - 1) + _bp[1]
+        list[i] = '\u0001' + (pcex.push(expr.replace(/[\r\n]+/g, ' ').trim()) - 1) + _bp[1]
       }
       html = list.join('')
     }
@@ -2505,14 +2535,14 @@ var compile = (function () {
     }
   }
 
-  function compileJS(js, opts, type) {
+  function compileJS(js, opts, type, parserOpts) {
     if (!type) type = opts.type
 
     var parser = opts.parser || (type ? parsers.js[type] : riotjs)
     if (!parser)
       throw new Error('JS parser not found: "' + type + '"')
 
-    return parser(js).replace(TRIM_TRAIL, '')
+    return parser(js, parserOpts).replace(TRIM_TRAIL, '')
   }
 
   var CSS_SELECTOR = _regEx('(}|{|^)[ ;]*([^@ ;][^{}]*)(?={)|' + brackets.R_STRINGS.source, 'g')
@@ -2540,14 +2570,14 @@ var compile = (function () {
     })
   }
 
-  function compileCSS(style, tag, type, scoped) {
+  function compileCSS(style, tag, type, scoped, opts) {
 
     if (type) {
       if (type === 'scoped-css') {
         scoped = true
       }
       else if (parsers.css[type]) {
-        style = parsers.css[type](tag, style)
+        style = parsers.css[type](tag, style, opts)
       }
       else if (type !== 'css') {
         throw new Error('CSS parser not found: "' + type + '"')
@@ -2570,49 +2600,61 @@ var compile = (function () {
     return str ? str.replace('text/', '') : ''
   }
 
-  function getCode(code, opts, attrs) {
-    var type = getType(attrs)
+  function getAttr(str, name) {
 
-    return compileJS(code, opts, type)
+    if (str) {
+      var
+        re = _regEx(TYPE_ATTR.source.replace('type', name), 'i'),
+        match = str && str.match(re)
+      /* istanbul ignore next */
+      str = match && (match[1] || match[2])
+    }
+    return str || ''
   }
 
-  var END_TAGS = /\/>\n|<(?:\/[\w\-]+\s*|[\w\-]+(?:\s+(?:[-\w:\xA0-\xFF][\S\s]*?)?)?)>\n/g
+  function getParserOptions(attrs) {
+    var opts = getAttr(attrs, 'options')
+
+    /* istanbul ignore next */
+    if (opts) opts = JSON.parse(parserOpts)
+    return opts
+  }
+
+  function getCode(code, opts, attrs) {
+    var type = getType(attrs),
+      parserOpts = getParserOptions(attrs)
+
+    return compileJS(code, opts, type, parserOpts)
+  }
+
+  var END_TAGS = /\/>\n|^<(?:\/[\w\-]+\s*|[\w\-]+(?:\s+(?:[-\w:\xA0-\xFF][\S\s]*?)?)?)>\n/
 
   function splitBlocks(str) {
-    var
-      i, k, js = '', len = str.length
+    var k, m
 
-    k = str.indexOf('<')
-    if (k < 0 || (i = str.lastIndexOf('>\n')) < 0 || k > i)
-      return ['', str]
+    /* istanbul ignore next: this if() can't be true, but just in case... */
+    if (str[str.length - 1] === '>')
+      return [str, '']
 
-    i += 2
-    js = str.slice(i)
-    str = str.slice(0, i)
-    if (str[i - 3] !== '/') {
-
-      if (str.match(END_TAGS)) {
-        var s = RegExp.rightContext
-        if (s) {
-          js = s + js
-          str = str.slice(0, len - js.length)
-        }
+    k = str.lastIndexOf('<')
+    while (~k) {
+      if (m = str.slice(k).match(END_TAGS)) {
+        k += m.index + m[0].length
+        return [str.slice(0, k), str.slice(k)]
       }
-      else {
-        js = str + js
-        str = ''
-      }
+      k = str.lastIndexOf('<', k -1)
     }
-    return [str, js]
+
+    return ['', str]
   }
 
-  function compileTemplate(lang, html) {
+  function compileTemplate(lang, html, opts) {
     var parser = parsers.html[lang]
 
     if (!parser)
       throw new Error('Template parser not found: "' + lang + '"')
 
-    return parser(html)
+    return parser(html, opts)
   }
 
   var
@@ -2628,7 +2670,7 @@ var compile = (function () {
     _bp = brackets.array(opts.brackets)
 
     if (opts.template)
-      src = compileTemplate(opts.template, src)
+      src = compileTemplate(opts.template, src, opts.templateOptions)
 
     label = url ? '//src: ' + url + '\n' : ''
 
@@ -2658,7 +2700,7 @@ var compile = (function () {
             body = body.replace(STYLE, function (_, _attrs, _style) {
               var scoped = _attrs && /\sscoped(\s|=|$)/i.test(_attrs)
               styles += (styles ? ' ' : '') +
-                compileCSS(_style, tagName, getType(_attrs), scoped)
+                compileCSS(_style, tagName, getType(_attrs), scoped, getParserOptions(_attrs))
               return ''
             })
 
