@@ -25,7 +25,7 @@
 | React                  | 0.14.1     | 132.6kb       |
 | Web Components Polyfill| 0.7.5      | 117.1kb       |
 | Polymer                | 1.0.6      | 101.2kb       |
-| Riot                   | 2.3.0      | 18.3kb        |
+| Riot                   | 2.3.0      | 18kb          |
 
 
 ### Custom tags • Concise syntax • Virtual DOM • Full stack
