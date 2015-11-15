@@ -370,6 +370,9 @@ describe('Compiler Browser', function() {
       '<loop-virtual><\/loop-virtual>',
       '<loop-virtual-reorder><\/loop-virtual-reorder>',
 
+      '<script type="riot/tag" src="tag\/yield-multi.tag"></script>',
+      '<yield-multi><yield to="content">content</yield></yield-multi>',
+
       ''    // keep it last please, avoids break PRs
     ].join('\n'),
     tags = [],
@@ -1060,6 +1063,14 @@ describe('Compiler Browser', function() {
     child3.root.getElementsByTagName('i')[0].onclick({})
 
     tags.push(tag)
+
+  })
+
+  it('<yield> from/to multi-transclusion', function() {
+
+    var tag = riot.mount('yield-multi', {})[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>yield the content here</p>')
 
   })
 
