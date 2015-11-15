@@ -370,8 +370,8 @@ describe('Compiler Browser', function() {
       '<loop-virtual><\/loop-virtual>',
       '<loop-virtual-reorder><\/loop-virtual-reorder>',
 
-      '<script type="riot/tag" src="tag\/yield-multi.tag"></script>',
-      '<yield-multi><yield to="content">content</yield></yield-multi>',
+      '<script type="riot\/tag" src="tag\/yield-multi.tag"><\/script>',
+      '<yield-multi><yield to="content">content<\/yield><\/yield-multi>',
 
       ''    // keep it last please, avoids break PRs
     ].join('\n'),
