@@ -36,9 +36,8 @@ test-coveralls:
 	@ RIOT_COV=1 cat ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
 
 test-sauce:
-	# run the saucelabs in separate chunks
-	# we need to run the test on 12 different browsers divided in 6 groups
-	@ for group in 0 1 2 3 4 5 6; do GROUP=$$group SAUCELABS=1 make test-karma; done
+	# run the riot tests on saucelabs
+	@ SAUCELABS=1 make test-karma
 
 compare:
 	# compare the current release with the previous one

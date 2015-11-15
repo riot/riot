@@ -5,9 +5,6 @@ module.exports = function(config) {
 
   // run the tests only on the saucelabs browsers
   if (process.env.SAUCELABS) {
-    for (var browser in saucelabsBrowsers) {
-      if (saucelabsBrowsers[browser].group != process.env.GROUP) delete saucelabsBrowsers[browser]
-    }
     browsers = Object.keys(saucelabsBrowsers)
   }
 
@@ -38,6 +35,7 @@ module.exports = function(config) {
       'specs/compiler-browser.js',
       'specs/mixin.js'
     ],
+    concurrency: 2,
     sauceLabs: {
       build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
