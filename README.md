@@ -171,8 +171,8 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Miscellaneous
 - [Q&A with RiotJS author Tero Piirainen](http://www.triplet.fi/blog/q-and-a-with-riotjs-author-tero-piirainen/)
-- [riot-detector（Chrome Extension）](https://chrome.google.com/webstore/detail/riot-detector/cnnmjeggdmicjojlnjghdgkdlijiobke)
-
+- [riot-detector (Chrome Extension)](https://chrome.google.com/webstore/detail/riot-detector/cnnmjeggdmicjojlnjghdgkdlijiobke)
+- [riot (Atom Package)](https://atom.io/packages/riot)
 
 ### Credits
 
