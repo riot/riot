@@ -113,6 +113,10 @@ describe('Compiler Browser', function() {
       '<table-data><\/table-data>',
       '<script type="riot\/tag" src="tag\/table-data.tag"><\/script>',
 
+      // table extra row
+      '<table-loop-extra-row><\/table-loop-extra-row>',
+      '<script type="riot\/tag" src="tag\/table-loop-extra-row.tag"><\/script>',
+
       // multiple mount at same time
       '<multi-mount value="1"><\/multi-mount>',
       '<multi-mount value="2"><\/multi-mount>',
@@ -873,6 +877,18 @@ describe('Compiler Browser', function() {
 
     tags.push(tag)
 
+  })
+
+  it('loop tr in tables preserving preexsisting rows', function() {
+    var tag = riot.mount('table-loop-extra-row')[0],
+      root = tag.root,
+      tr = root.querySelectorAll('table tr')
+
+    expect(tr.length).to.be(5)
+    expect(normalizeHTML(tr[0].innerHTML)).to.be('<td>Extra</td><td>Row1</td>')
+    expect(normalizeHTML(tr[4].innerHTML)).to.be('<td>Extra</td><td>Row2</td>')
+
+    tags.push(tag)
   })
 
   it('loop reorder dom nodes', function() {
