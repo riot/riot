@@ -450,7 +450,7 @@ describe('Compiler Browser', function() {
       riot.compile(src, true)
     }
 
-    expect(Date.now() - begin).to.be.below(1200) // old compiler was not compiling this
+    expect(Date.now() - begin).to.be.below(1300) // old compiler was not compiling this
 
     expect(tag.tags.foo).to.not.be(undefined)
 
@@ -1736,6 +1736,33 @@ describe('Compiler Browser', function() {
 
     tags.push(tag)
 
+  })
+
+  it('riot.compile detect changes in riot.settings.brackets', function() {
+    var compiled
+
+    // change the brackets
+    riot.util.brackets.set('{{ }}')
+    expect(riot.settings.brackets).to.be('{{ }}')
+    compiled = riot.compile('<my>{{ time }} and { time }</my>', true)
+    expect(compiled).to.contain("riot.tag2('my', '{{time}} and { time }',")
+
+    // restore using riot.settings
+    riot.settings.brackets = defaultBrackets
+    compiled = riot.compile('<my>{ time } and { time }</my>', true)
+    expect(riot.util.brackets.settings.brackets).to.be(defaultBrackets)
+    expect(compiled).to.contain("riot.tag2('my', '{time} and {time}',")
+
+    // change again, now with riot.settings
+    riot.settings.brackets = '{{ }}'
+    compiled = riot.compile('<my>{{ time }} and { time }</my>', true)
+    expect(riot.util.brackets.settings.brackets).to.be('{{ }}')
+    expect(compiled).to.contain("riot.tag2('my', '{{time}} and { time }',")
+
+    riot.util.brackets.set(undefined)
+    expect(riot.settings.brackets).to.be(defaultBrackets)
+    compiled = riot.compile('<my>{ time } and { time }</my>', true)
+    expect(compiled).to.contain("riot.tag2('my', '{time} and {time}',")
   })
 
   it('loops correctly on array subclasses', function() {
