@@ -374,6 +374,9 @@ describe('Compiler Browser', function() {
       '<loop-virtual><\/loop-virtual>',
       '<loop-virtual-reorder><\/loop-virtual-reorder>',
 
+      '<script type="riot\/tag" src="tag\/yield-with-dollar.tag"><\/script>',
+      '<yield-with-dollar-2><yield-with-dollar-1 cost="$25"><\/yield-with-dollar-1><\/yield-with-dollar-2>',
+
       ''    // keep it last please, avoids break PRs
     ].join('\n'),
     tags = [],
@@ -1807,7 +1810,11 @@ describe('Compiler Browser', function() {
     expect(els2[1].innerHTML).to.be('White cold drink')
     tags.push(tag2)
 
+  })
 
+  it('yield with dollars', function() {
+    var tag = riot.mount('yield-with-dollar-2')[0]
+    expect(tag.root.innerHTML).to.be('<yield-with-dollar-1 cost="$25"><span>$25</span></yield-with-dollar-1>')
   })
 
 })
