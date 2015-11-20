@@ -1713,6 +1713,21 @@ describe('Compiler Browser', function() {
     }
   })
 
+  it('Passing options to the compiler through riot.compile (v2.3.12)', function () {
+    var str = '<passing-options>\n  <p>\n  <\/p>\nclick(e){}\n<\/passing-options>',
+      result = riot.compile(str, true, {compact: true, type: 'none'})
+    expect(result).to.contain('<p></p>')          // compact: true
+    expect(result).to.contain('\nclick(e){}\n')   // type: none
+  })
+
+  // scoped-css is deprecated, this test must be changed in future versions
+  it('Using the `style` for set the CSS parser through riot.compile (v2.3.12)', function () {
+    var str = '<style-option><style>p {top:0}<\/style>\n<\/style-option>',
+      result
+    result = riot.compile(str, {'style': 'scoped-css'})
+    expect(result).to.contain('[riot-tag="style-option"] p {top:0}')
+  })
+
   it('allow passing riot.observale instances to the children tags', function() {
     var tag = riot.mount('observable-attr')[0]
     expect(tag.tags['observable-attr-child'].wasTriggered).to.be(true)
