@@ -47,7 +47,7 @@ describe('Compile HTML', function() {
   })
 
   it('option `whitespace` normalizes and preserves line endings', function() {
-    testStr('<p>a\r</p>\r\r\n<p>\n</p>', '<p>a\\n</p>\\n\\n<p>\\n</p>', { whitespace: 1 })
+    testStr('<p>a\r</p>\r\r\n<p>\n</p>', '<p>a\n</p>\n\n<p>\n</p>', { whitespace: 1 })
   })
 
   it('option `compact` removes line endings between tags', function() {
