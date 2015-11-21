@@ -1,36 +1,129 @@
 describe('Compiler Browser', function() {
+  loadTagsAndScripts([
+    // check the custom parsers
+    'tag/~custom-parsers.tag',
+    'tag/loop.tag',
+    'tag/loop-child.tag',
+    'tag/loop-reorder.tag',
+    'tag/loop-manip.tag',
+    'tag/loop-object.tag',
+    'tag/nested-child.tag',
+    'tag/loop-option.tag',
+    'tag/loop-optgroup.tag',
+    'tag/loop-optgroup2.tag',
+    'tag/loop-position.tag',
+    'tag/table-data.tag',
+    'tag/table-loop-extra-row.tag',
+    'tag/loop-named.tag',
+    {
+      path: 'tag/timer.tag',
+      name: false
+    },
+    'tag/timetable.tag',
+    {
+      name: 'top-level-attr',
+      attrs: {
+        'value': 'initial'
+      }
+    },
+     // static named tag
+    {
+      path: 'tag/named-child.tag',
+      name: 'named-child-parent'
+    },
+    // mount order
+    'tag/deferred-mount.tag',
 
+    // multi named elements to an array
+    'tag/multi-named.tag',
+
+    // test the preventUpdate feature on the DOM events
+    'tag/prevent-update.tag',
+
+    // Don't trigger mount for conditional tags
+    'tag/if-mount.tag',
+
+    // input type=number
+    'tag/input-number.tag',
+
+    // input type=number
+    'tag/nested-riot.tag',
+    {
+      name: 'container-riot'
+    },
+
+    // recursive tags
+    'tag/treeview.tag',
+
+    // sync the loop options
+    'tag/loop-sync-options.tag',
+
+    // named selects check
+    {
+      path: 'tag/named-select.tag',
+      attrs: {
+        name: 'i-am-the-select'
+      }
+    },
+    // sync the loop options in nested tags
+    'tag/loop-sync-options-nested.tag',
+    {
+      name: 'loop-sync-options-nested-wrapper'
+    },
+
+    // inherit properties from the parent
+    'tag/loop-inherit.tag',
+
+    'tag/loop-double-curly-brackets.tag',
+
+    // check the conditional on a loop item
+    'tag/loop-conditional.tag',
+
+    // check if the events get triggered correctly
+    'tag/events.tag',
+
+    // top most tag preserve attribute expressions
+    {
+      path: 'tag/top-attributes.tag',
+      attrs: {
+        cls: 'classy'
+      }
+    },
+
+    // loop over tags instances
+    'tag/loop-tag-instances.tag',
+
+    // check the loop events update
+    'tag/loop-numbers-nested.tag',
+
+    // check nested loops using arrays of non objects
+    'tag/loop-nested-strings-array.tag',
+
+    // check the loop events and the item property
+    'tag/loop-events.tag',
+
+    // table with multiple bodies and dynamic style
+    'tag/table-multibody.tag',
+
+    // table with caption and looped cols, ths and trs
+    'tag/loop-cols.tag',
+
+    // pass a riot observable as option
+    'tag/observable-attr.tag',
+
+    // check arguments order of each attribute through array subclass loop
+    'tag/loop-arraylike.tag',
+
+    'tag/loop-ids.tag',
+
+    'tag/loop-unshift.tag',
+
+    'tag/loop-virtual.tag',
+    {
+      name: 'loop-virtual-reorder'
+    }
+  ])
   var html = [
-
-      // compiles test
-      '<script type="riot\/tag" id="tag_src">',
-      '  <foo>',
-      '     <p>{ opts.baz } { bar }<\/p>',
-
-      '     this.bar = "romutus"',
-
-      '  <\/foo>',
-      '  <timetable>',
-      '     <timer ontick={ parent.opts.ontick } start={ time } each={ time, i in times }><\/timer>',
-      '     <foo barz="899" baz="90"><\/foo>',
-      '     <p>{ kama }<\/p>',
-
-      '     this.times = [ 1, 3, 5 ]',
-      '     this.kama = "jooo"',
-
-      '  <\/timetable>',
-      '<\/script>',
-
-      '<top-level-attr value="initial"><\/top-level-attr>',
-
-      // check the custom parsers
-
-      '<script type="riot\/tag" src="tag\/\~custom-parsers.tag"><\/script>',
-
-      '<custom-parsers><\/custom-parsers>',
-
-      '<script type="riot\/tag" src="tag\/timer.tag"><\/script>',
-      '<timetable><\/timetable>',
 
       // mount and unmount
 
@@ -68,54 +161,6 @@ describe('Compiler Browser', function() {
       '<\/outer>',
 
       '<\/script>',
-
-      // each loop
-      '<script type="riot\/tag" src="tag\/loop.tag"><\/script>',
-      '<loop><\/loop>',
-
-      // loop context
-
-      '<loop-child><\/loop-child>',
-      '<script type="riot\/tag" src="tag\/loop-child.tag"><\/script>',
-
-      '<loop-reorder><\/loop-reorder>',
-      '<script type="riot\/tag" src="tag\/loop-reorder.tag"><\/script>',
-
-      // loop order
-      '<loop-manip><\/loop-manip>',
-      '<script type="riot\/tag" src="tag\/loop-manip.tag"><\/script>',
-
-      // loop object
-      '<loop-object><\/loop-object>',
-      '<script type="riot\/tag" src="tag\/loop-object.tag"><\/script>',
-
-      // looped child
-      '<nested-child><\/nested-child>',
-      '<script type="riot\/tag" src="tag\/nested-child.tag"><\/script>',
-
-      // loop option
-      '<loop-option><\/loop-option>',
-      '<script type="riot\/tag" src="tag\/loop-option.tag"><\/script>',
-
-      // loop optgroup
-      '<loop-optgroup><\/loop-optgroup>',
-      '<script type="riot\/tag" src="tag\/loop-optgroup.tag"><\/script>',
-
-      // loop optgroup, two option tags
-      '<loop-optgroup2><\/loop-optgroup2>',
-      '<script type="riot\/tag" src="tag\/loop-optgroup2.tag"><\/script>',
-
-      // loop position
-      '<loop-position><\/loop-position>',
-      '<script type="riot\/tag" src="tag\/loop-position.tag"><\/script>',
-
-      // table
-      '<table-data><\/table-data>',
-      '<script type="riot\/tag" src="tag\/table-data.tag"><\/script>',
-
-      // table extra row
-      '<table-loop-extra-row><\/table-loop-extra-row>',
-      '<script type="riot\/tag" src="tag\/table-loop-extra-row.tag"><\/script>',
 
       // multiple mount at same time
       '<multi-mount value="1"><\/multi-mount>',
@@ -205,10 +250,7 @@ describe('Compiler Browser', function() {
       '  <div>Something else<\/div>',
       '<\/yield-loop>',
 
-      // dynamically named elements in a loop
 
-      '<script type="riot\/tag" src="tag\/loop-named.tag"><\/script>',
-      '<loop-named><\/loop-named>',
 
       //style injection to single style tag
 
@@ -267,112 +309,6 @@ describe('Compiler Browser', function() {
 
       '<precompiled><\/precompiled>',
 
-      // static named tag
-
-      '<script type="riot\/tag" src="tag\/named-child.tag"><\/script>',
-      '<named-child-parent><\/named-child-parent>',
-
-      // mount order
-      '<script type="riot\/tag" src="tag\/deferred-mount.tag"><\/script>',
-      '<deferred-mount><\/deferred-mount>',
-
-      // multi named elements to an array
-      '<script type="riot\/tag" src="tag\/multi-named.tag"><\/script>',
-      '<multi-named><\/multi-named>',
-
-      // test the preventUpdate feature on the DOM events
-      '<script type="riot\/tag" src="tag\/prevent-update.tag"><\/script>',
-      '<prevent-update><\/prevent-update>',
-
-      // Don't trigger mount for conditional tags
-      '<script type="riot\/tag" src="tag\/if-mount.tag"><\/script>',
-      '<if-mount><\/if-mount>',
-
-      // input type=number
-      '<script type="riot\/tag" src="tag\/input-number.tag"><\/script>',
-      '<input-number><\/input-number>',
-
-      // input type=number
-      '<script type="riot\/tag" src="tag\/nested-riot.tag"><\/script>',
-      '<container-riot><\/container-riot>',
-
-      // recursive tags
-      '<script type="riot\/tag" src="tag\/treeview.tag"><\/script>',
-      '<treeview><\/treeview>',
-
-      // sync the loop options
-      '<script type="riot\/tag" src="tag\/loop-sync-options.tag"><\/script>',
-      '<loop-sync-options><\/loop-sync-options>',
-
-      // named selects check
-      '<script type="riot\/tag" src="tag\/named-select.tag"><\/script>',
-      '<named-select name="i-am-the-select"><\/named-select>',
-
-      // sync the loop options in nested tags
-      '<script type="riot\/tag" src="tag\/loop-sync-options-nested.tag"><\/script>',
-      '<loop-sync-options-nested><\/loop-sync-options-nested>',
-      '<loop-sync-options-nested-wrapper><\/loop-sync-options-nested-wrapper>',
-
-      // inherit properties from the parent
-      '<script type="riot\/tag" src="tag\/loop-inherit.tag"><\/script>',
-      '<loop-inherit><\/loop-inherit>',
-
-      '<script type="riot\/tag" src="tag\/loop-double-curly-brackets.tag"><\/script>',
-      '<loop-double-curly-brackets><\/loop-double-curly-brackets>',
-
-      // check the conditional on a loop item
-      '<script type="riot\/tag" src="tag\/loop-conditional.tag"><\/script>',
-      '<loop-conditional><\/loop-conditional>',
-
-      // check if the events get triggered correctly
-      '<script type="riot\/tag" src="tag\/events.tag"><\/script>',
-      '<events><\/events>',
-
-      // top most tag preserve attribute expressions
-      '<script type="riot\/tag" src="tag\/top-attributes.tag"><\/script>',
-      '<top-attributes cls="classy"><\/top-attributes>',
-
-      // loop over tags instances
-      '<script type="riot\/tag" src="tag\/loop-tag-instances.tag"><\/script>',
-      '<loop-tag-instances><\/loop-tag-instances>',
-
-      // check the loop events update
-      '<script type="riot\/tag" src="tag\/loop-numbers-nested.tag"><\/script>',
-      '<loop-numbers-nested><\/loop-numbers-nested>',
-
-      // check nested loops using arrays of non objects
-      '<script type="riot\/tag" src="tag\/loop-nested-strings-array.tag"><\/script>',
-      '<loop-nested-strings-array><\/loop-nested-strings-array>',
-
-      // check the loop events and the item property
-      '<script type="riot\/tag" src="tag\/loop-events.tag"><\/script>',
-      '<loop-events><\/loop-events>',
-
-      // table with multiple bodies and dynamic style
-      '<script type="riot\/tag" src="tag\/table-multibody.tag"><\/script>',
-      '<table-multibody><\/table-multibody>',
-
-      // table with caption and looped cols, ths and trs
-      '<script type="riot\/tag" src="tag\/loop-cols.tag"><\/script>',
-      '<loop-cols><\/loop-cols>',
-
-      // pass a riot observable as option
-      '<script type="riot\/tag" src="tag\/observable-attr.tag"><\/script>',
-      '<observable-attr><\/observable-attr>',
-
-      // check arguments order of each attribute through array subclass loop
-      '<script type="riot\/tag" src="tag\/loop-arraylike.tag"><\/script>',
-      '<loop-arraylike><\/loop-arraylike>',
-
-      '<script type="riot\/tag" src="tag\/loop-ids.tag"><\/script>',
-      '<loop-ids><\/loop-ids>',
-
-      '<script type="riot\/tag" src="tag\/loop-unshift.tag"><\/script>',
-      '<loop-unshift><\/loop-unshift>',
-
-      '<script type="riot\/tag" src="tag\/loop-virtual.tag"><\/script>',
-      '<loop-virtual><\/loop-virtual>',
-      '<loop-virtual-reorder><\/loop-virtual-reorder>',
 
       ''    // keep it last please, avoids break PRs
     ].join('\n'),
@@ -433,12 +369,40 @@ describe('Compiler Browser', function() {
         }
       })[0]
 
-    expect(document.getElementsByTagName('timer').length).to.be(3)
+    expect($$('timer', tag.root).length).to.be(3)
 
     riot.update()
-    // grab source code for performance tests
 
-    var src = document.getElementById('tag_src').innerHTML
+    expect(tag.tags.foo).to.not.be(undefined)
+
+    tag.unmount()
+
+    // no time neither for one tick
+    // because the tag got unMounted too early
+    setTimeout(function() {
+      expect(ticks).to.be(0)
+      done()
+    }, 1200)
+
+  })
+
+  it('compiler performance', function() {
+    var src =  [
+      '<foo>',
+      '  <p>{ opts.baz } { bar }<\/p>',
+
+      '  this.bar = "romutus"',
+
+      '<\/foo>',
+      '<timetable>',
+      '   <timer ontick={ parent.opts.ontick } start={ time } each={ time, i in times }><\/timer>',
+      '   <foo barz="899" baz="90"><\/foo>',
+      '   <p>{ kama }<\/p>',
+
+      '   this.times = [ 1, 3, 5 ]',
+      '   this.kama = "jooo"',
+      '<\/timetable>'
+    ].join('\n')
 
     // check riot.compile is actually compiling the source
     expect(riot.compile(src, true)).to.contain("('timetable', '")
@@ -451,17 +415,6 @@ describe('Compiler Browser', function() {
     }
 
     expect(Date.now() - begin).to.be.below(1300) // old compiler was not compiling this
-
-    expect(tag.tags.foo).to.not.be(undefined)
-
-    tag.unmount()
-
-    // no time neither for one tick
-    // because the tag got unisMounted too early
-    setTimeout(function() {
-      expect(ticks).to.be(0)
-      done()
-    }, 1200)
 
   })
 

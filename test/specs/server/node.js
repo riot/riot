@@ -1,11 +1,11 @@
 var glob = require('glob'),
-  riot = require('../../lib/server'),
+  riot = require('../../../lib/server'),
   cheerio = require('cheerio')
 
 describe('Node/io.js', function() {
 
   it('require tags', function(done) {
-    glob('../tag/*.tag', { cwd: __dirname }, function (err, tags) {
+    glob('../../tag/*.tag', { cwd: __dirname }, function (err, tags) {
       expect(err).to.be(null)
       tags.forEach(function(tag) {
         expect(require(tag)).to.be.ok()

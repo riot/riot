@@ -1,7 +1,7 @@
 lib/browser/wrap
 test/polyfills
 test/vendor
-test/specs/compiler/fixtures
-test/specs/compiler/expect
-test/specs/compiler/parsers/js
+test/specs/server/compiler/fixtures
+test/specs/server/compiler/expect
+test/specs/server/compiler/parsers/js
 test/performance/db-monster
