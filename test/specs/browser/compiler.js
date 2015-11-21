@@ -491,6 +491,14 @@ describe('Compiler Browser', function() {
 
   })
 
+  it('each tag in the "tags" property can be looped', function() {
+    var tag = riot.mount('loop-single-tags')[0]
+
+    expect($$('ul li', tag.root).length).to.be(4)
+
+    tags.push(tag)
+  })
+
   it('loop option tag', function() {
     var tag = riot.mount('loop-option')[0],
       root = tag.root,

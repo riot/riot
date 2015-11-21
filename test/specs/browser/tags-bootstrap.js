@@ -29,6 +29,7 @@ loadTagsAndScripts([
   'tag/table-data.tag',
   'tag/table-loop-extra-row.tag',
   'tag/loop-named.tag',
+  'tag/loop-single-tags.tag',
   'tag/timetable.tag',
   // mount order
   'tag/deferred-mount.tag',
