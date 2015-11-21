@@ -22,17 +22,18 @@ module.exports = function(config) {
       '/tag/': '/base/tag/'
     },
     files: [
-      'polyfills/bind.js',
+      'helpers/bind.js',
       '../node_modules/mocha/mocha.js',
       '../node_modules/expect.js/index.js',
       '../dist/riot/riot+compiler.js',
-      'helpers.js',
+      'helpers/index.js',
       {
         pattern: 'tag/*.tag',
         served: true,
         included: false
       },
-      'specs/compiler-browser.js',
+      'specs/browser/tags-bootstrap.js',
+      'specs/browser/compiler.js',
       'specs/mixin.js'
     ],
     concurrency: 2,

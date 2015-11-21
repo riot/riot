@@ -27,6 +27,14 @@ function getNextSibling(n) {
   return x
 }
 
+
+function getRiotStyles() {
+  // util.injectStyle must add <style> in head, not in body -- corrected
+  var stag = document.querySelector('style')
+  return normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
+}
+
+
 // small polyfill
 // normalize the document.contains method
 document.contains = Element.prototype.contains = function contains(node) {
@@ -112,4 +120,12 @@ function loadTagsAndScripts(arr) {
   })
 
   return tagsNames.join(',')
+}
+
+function injectHTML(html) {
+  var div = document.createElement('div')
+  div.innerHTML = html instanceof Array ? html.join('\n') : html
+  while (div.firstChild) {
+    document.body.appendChild(div.firstChild)
+  }
 }

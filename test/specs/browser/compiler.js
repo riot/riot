@@ -1,319 +1,6 @@
 describe('Compiler Browser', function() {
-  loadTagsAndScripts([
-    // check the custom parsers
-    'tag/~custom-parsers.tag',
-    'tag/loop.tag',
-    'tag/loop-child.tag',
-    'tag/loop-reorder.tag',
-    'tag/loop-manip.tag',
-    'tag/loop-object.tag',
-    'tag/nested-child.tag',
-    'tag/loop-option.tag',
-    'tag/loop-optgroup.tag',
-    'tag/loop-optgroup2.tag',
-    'tag/loop-position.tag',
-    'tag/table-data.tag',
-    'tag/table-loop-extra-row.tag',
-    'tag/loop-named.tag',
-    {
-      path: 'tag/timer.tag',
-      name: false
-    },
-    'tag/timetable.tag',
-    {
-      name: 'top-level-attr',
-      attrs: {
-        'value': 'initial'
-      }
-    },
-     // static named tag
-    {
-      path: 'tag/named-child.tag',
-      name: 'named-child-parent'
-    },
-    // mount order
-    'tag/deferred-mount.tag',
 
-    // multi named elements to an array
-    'tag/multi-named.tag',
-
-    // test the preventUpdate feature on the DOM events
-    'tag/prevent-update.tag',
-
-    // Don't trigger mount for conditional tags
-    'tag/if-mount.tag',
-
-    // input type=number
-    'tag/input-number.tag',
-
-    // input type=number
-    'tag/nested-riot.tag',
-    {
-      name: 'container-riot'
-    },
-
-    // recursive tags
-    'tag/treeview.tag',
-
-    // sync the loop options
-    'tag/loop-sync-options.tag',
-
-    // named selects check
-    {
-      path: 'tag/named-select.tag',
-      attrs: {
-        name: 'i-am-the-select'
-      }
-    },
-    // sync the loop options in nested tags
-    'tag/loop-sync-options-nested.tag',
-    {
-      name: 'loop-sync-options-nested-wrapper'
-    },
-
-    // inherit properties from the parent
-    'tag/loop-inherit.tag',
-
-    'tag/loop-double-curly-brackets.tag',
-
-    // check the conditional on a loop item
-    'tag/loop-conditional.tag',
-
-    // check if the events get triggered correctly
-    'tag/events.tag',
-
-    // top most tag preserve attribute expressions
-    {
-      path: 'tag/top-attributes.tag',
-      attrs: {
-        cls: 'classy'
-      }
-    },
-
-    // loop over tags instances
-    'tag/loop-tag-instances.tag',
-
-    // check the loop events update
-    'tag/loop-numbers-nested.tag',
-
-    // check nested loops using arrays of non objects
-    'tag/loop-nested-strings-array.tag',
-
-    // check the loop events and the item property
-    'tag/loop-events.tag',
-
-    // table with multiple bodies and dynamic style
-    'tag/table-multibody.tag',
-
-    // table with caption and looped cols, ths and trs
-    'tag/loop-cols.tag',
-
-    // pass a riot observable as option
-    'tag/observable-attr.tag',
-
-    // check arguments order of each attribute through array subclass loop
-    'tag/loop-arraylike.tag',
-
-    'tag/loop-ids.tag',
-
-    'tag/loop-unshift.tag',
-
-    'tag/loop-virtual.tag',
-    {
-      name: 'loop-virtual-reorder'
-    }
-  ])
-  var html = [
-
-      // mount and unmount
-
-      '<script type="riot\/tag">',
-      '  <test><p>val: { opts.val }<\/p><\/test>',
-      '<\/script>',
-
-      '<test id="test-tag"><\/test>',
-      '<div id="foo"><\/div>',
-      '<div id="bar"><\/div>',
-
-      // duplicated tags in loops
-
-      '<outer id="outer1"><\/outer>',
-      '<outer id="outer2"><\/outer>',
-      '<outer id="outer3"><\/outer>',
-
-      '<script type="riot\/tag">',
-
-      '<inner>',
-      ' <p>',
-      '   { opts.value }',
-      ' <\/p>',
-      '<\/inner>',
-
-      '<\/script>',
-
-      '<script type="riot\/tag">',
-
-      '<outer>',
-      '   <div each="{ data, i in opts.data }">',
-      '     <span>{ i }<\/span>',
-      '     <inner value="{ data.value }"><\/inner>',
-      '   <\/div>',
-      '<\/outer>',
-
-      '<\/script>',
-
-      // multiple mount at same time
-      '<multi-mount value="1"><\/multi-mount>',
-      '<multi-mount value="2"><\/multi-mount>',
-      '<multi-mount value="3"><\/multi-mount>',
-      '<multi-mount value="4"><\/multi-mount>',
-
-      // brackets
-
-      '<test-a><\/test-a>',
-      '<test-b><\/test-b>',
-      '<test-c><\/test-c>',
-      '<test-d><\/test-d>',
-      '<test-e><\/test-e>',
-      '<test-f><\/test-f>',
-      '<test-g><\/test-g>',
-
-      '<script type="riot\/tag">',
-
-      '  <test-e>',
-      '    <p>[ x ]<\/p>',
-      '    this.x = "ok"',
-      '  <\/test-e>',
-
-      '  <test-f>',
-      '    <p>${ x }<\/p>',
-      '    this.x = "ok"',
-      '  <\/test-f>',
-
-      '  <test-g>',
-      '    <p>{ x }<\/p>',
-      '    this.x = "ok"',
-      '  <\/test-g>',
-
-      '<\/script>',
-
-      // mount the same tag multiple times
-      '<div id="multi-mount-container-1"><\/div>',
-
-      // multple mount using *
-      '<div id="multi-mount-container-2">',
-      '    <test-i><\/test-i>',
-      '    <test-l><\/test-l>',
-      '    <test-m><\/test-m>',
-      '<\/div>',
-      // riot-tag attribute
-
-      '<script type="riot\/tag">',
-      '  <rtag><p>val: { opts.val }<\/p><\/rtag>',
-      '<\/script>',
-
-      '<div id="rtag" riot-tag="rtag"><\/div>',
-      '<div id="rtag-nested">',
-      '  <div riot-tag="rtag"><\/div>',
-      '  <div riot-tag="rtag"><\/div>',
-      '  <div riot-tag="rtag"><\/div>',
-      '<\/div>',
-
-      // riot-tag attribute by tag name
-
-      '<script type="riot\/tag">',
-      '  <rtag2><p>val: { opts.val }<\/p><\/rtag2>',
-      '<\/script>',
-
-      '<div riot-tag="rtag2"><\/div>',
-
-      // tags property in loop
-      '<ploop-tag><\/ploop-tag>',
-      '<ploop1-tag><\/ploop1-tag>',
-      '<ploop2-tag><\/ploop2-tag>',
-      '<ploop3-tag><\/ploop3-tag>',
-      '<script type="riot\/tag" src="tag\/ploop-tag.tag"><\/script>',
-
-      '<script type="riot\/tag" src="tag\/inner-html.tag"><\/script>',
-      // yield tests
-
-      '<script type="riot\/tag" src="tag\/yield-nested.tag"><\/script>',
-      '<yield-parent>{ greeting }<\/yield-parent>',
-
-      '<inner-html>',
-      '  { greeting }',
-      '  <inner value="ciao mondo"><\/inner>',
-      '<\/inner-html>',
-
-      '<yield-loop>',
-      '  { greeting }',
-      '  <div>Something else<\/div>',
-      '<\/yield-loop>',
-
-
-
-      //style injection to single style tag
-
-      '<script type="riot\/tag">',
-      '  <style-tag>',
-      '    <style scoped>',
-      '      p {color: blue;}',
-      '    <\/style>',
-      '  <\/style-tag>',
-
-      '  <style-tag2>',
-      '    <style scoped>',
-      '      div {color: red;}',
-      '    <\/style>',
-      '  <\/style-tag2>',
-      '<\/script>',
-
-      '<style-tag><\/style-tag>',
-      '<style-tag2><\/style-tag2>',
-
-      '<script type="riot\/tag">',
-      '  <style-tag3>',
-      '    <style scoped="scoped" type="text/myparser">',
-      '      p {border: solid 3px black;}',
-      '    <\/style>',
-      '    <style>',
-      '      p {border: solid 1px black}',
-      '      #style4 {border: solid 2px black;}',
-      '    <\/style>',
-      '    <p><\/p>',
-      '  <\/style-tag3>',
-      '<\/script>',
-      '<style-tag3><\/style-tag3>',
-
-      '<script type="riot\/tag">',
-      '  <style-tag4>',
-      '    <p id="style4"><\/p><p>x</p>',
-      '  <\/style-tag4>',
-      '<\/script>',
-      '<style-tag4><\/style-tag4>',
-
-      // scoped css and riot-tag, mount(selector, tagname)
-
-      '<script type="riot\/tag" src="tag\/scoped.tag"><\/script>',
-      '<scoped-tag><\/scoped-tag>',
-      '<div riot-tag="scoped-tag"><\/div>',
-      '<div id="scopedtag"><\/div>',
-
-      // preserve attributes from tag definition
-
-      '<script type="riot\/tag" src="tag\/preserve-attr.tag"><\/script>',
-      '<preserve-attr><\/preserve-attr>',
-      '<div riot-tag="preserve-attr2"><\/div>',
-
-      // precompiled tag compatibility
-
-      '<precompiled><\/precompiled>',
-
-
-      ''    // keep it last please, avoids break PRs
-    ].join('\n'),
-    tags = [],
-    div = document.createElement('div')
+  var tags = []
 
   // adding some custom riot parsers
   // css
@@ -325,19 +12,9 @@ describe('Compiler Browser', function() {
     return js.replace(/@version/, '1.0.0')
   }
 
-  function getRiotStyles() {
-    // util.injectStyle must add <style> in head, not in body -- corrected
-    var stag = document.querySelector('style')
-    return normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
-  }
-
   before(function(next) {
-
     this.timeout(10000)
-    div.innerHTML = html
-    document.body.appendChild(div)
     riot.compile(next)
-
   })
 
   after(function() {
@@ -349,7 +26,6 @@ describe('Compiler Browser', function() {
       }
     }
     unmount(tags)
-
   })
 
   afterEach(function() {
@@ -389,15 +65,15 @@ describe('Compiler Browser', function() {
   it('compiler performance', function() {
     var src =  [
       '<foo>',
-      '  <p>{ opts.baz } { bar }<\/p>',
+      '  <p>{ opts.baz } { bar }</p>',
 
       '  this.bar = "romutus"',
 
-      '<\/foo>',
+      '</foo>',
       '<timetable>',
-      '   <timer ontick={ parent.opts.ontick } start={ time } each={ time, i in times }><\/timer>',
-      '   <foo barz="899" baz="90"><\/foo>',
-      '   <p>{ kama }<\/p>',
+      '   <timer ontick={ parent.opts.ontick } start={ time } each={ time, i in times }></timer>',
+      '   <foo barz="899" baz="90"></foo>',
+      '   <p>{ kama }</p>',
 
       '   this.times = [ 1, 3, 5 ]',
       '   this.kama = "jooo"',
@@ -419,6 +95,7 @@ describe('Compiler Browser', function() {
   })
 
   it('compile a custom tag using custom css and js parsers', function() {
+
     var tag = riot.mount('custom-parsers')[0],
       styles = getRiotStyles()
 
@@ -431,6 +108,14 @@ describe('Compiler Browser', function() {
   })
 
   it('mount and unmount', function() {
+
+    riot.tag('test', '<p>val: { opts.val }<\/p>')
+
+    injectHTML([
+      '<test id="test-tag"></test>',
+      '<div id="foo"></div>',
+      '<div id="bar"></div>'
+    ])
 
     var tag = riot.mount('test', { val: 10 })[0],
       tag2 = riot.mount('#foo', 'test', { val: 30 })[0],
@@ -457,6 +142,19 @@ describe('Compiler Browser', function() {
   })
 
   it('mount a tag mutiple times', function() {
+
+    injectHTML([
+       // mount the same tag multiple times
+      '<div id="multi-mount-container-1"></div>',
+
+      // multple mount using *
+      '<div id="multi-mount-container-2">',
+      '    <test-i></test-i>',
+      '    <test-l></test-l>',
+      '    <test-m></test-m>',
+      '<\/div>'
+    ])
+
     var tag = riot.mount('#multi-mount-container-1', 'test', { val: 300 })[0]
 
     expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>val: 300</p>')
@@ -502,6 +200,12 @@ describe('Compiler Browser', function() {
   })
 
   it('avoid to duplicate tags in multiple foreach loops', function() {
+
+    injectHTML([
+      '<outer id="outer1"></outer>',
+      '<outer id="outer2"></outer>',
+      '<outer id="outer3"></outer>'
+    ])
 
     var mountTag = function(tagId) {
       var data = [],
@@ -676,6 +380,13 @@ describe('Compiler Browser', function() {
   })
 
   it('the mount method could be triggered also on several tags using a NodeList instance', function() {
+
+    injectHTML([
+      '<multi-mount value="1"></multi-mount>',
+      '<multi-mount value="2"></multi-mount>',
+      '<multi-mount value="3"></multi-mount>',
+      '<multi-mount value="4"></multi-mount>'
+    ])
 
     riot.tag('multi-mount', '{ opts.value }')
 
@@ -858,6 +569,16 @@ describe('Compiler Browser', function() {
 
   it('brackets', function() {
 
+    injectHTML([
+      '<test-a></test-a>',
+      '<test-b></test-b>',
+      '<test-c></test-c>',
+      '<test-d></test-d>',
+      '<test-e></test-e>',
+      '<test-f></test-f>',
+      '<test-g></test-g>'
+    ])
+
     var tag
 
     riot.settings.brackets = '[ ]'
@@ -895,18 +616,21 @@ describe('Compiler Browser', function() {
     expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>ok</p>')
 
     riot.settings.brackets = '[ ]'
+    riot.tag('test-e', '<p>[ x ]</p>', function() { this.x = 'ok' })
     tag = riot.mount('test-e')[0]
     tags.push(tag)
 
     expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>ok</p>')
 
     riot.settings.brackets = '${ }'
+    riot.tag('test-f', '<p>${ x }</p>', function() { this.x = 'ok' })
     tag = riot.mount('test-f')[0]
     tags.push(tag)
 
     expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>ok</p>')
 
     riot.settings.brackets = null
+    riot.tag('test-g', '<p>{ x }</p>', function() { this.x = 'ok' })
     tag = riot.mount('test-g')[0]
     tags.push(tag)
 
@@ -915,6 +639,9 @@ describe('Compiler Browser', function() {
   })
 
   it('riot-tag attribute', function() {
+
+    injectHTML('<div id="rtag" riot-tag="rtag"><\/div>')
+    riot.tag('rtag', '<p>val: { opts.val }</p>')
 
     var tag = riot.mount('#rtag', { val: 10 })[0]
     expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>val: 10</p>')
@@ -926,6 +653,12 @@ describe('Compiler Browser', function() {
 
   it('riot-tag attribute by tag name', function() {
 
+     // riot-tag attribute by tag name
+
+    riot.tag('rtag2', '<p>val: { opts.val }</p>')
+
+    injectHTML('<div riot-tag="rtag2"></div>')
+
     tag = riot.mount('rtag2', { val: 10 })[0]
     expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>val: 10</p>')
 
@@ -935,6 +668,14 @@ describe('Compiler Browser', function() {
   })
 
   it('riot-tag attribute using the "*" selector', function() {
+
+    injectHTML([
+      '<div id="rtag-nested">',
+      '  <div riot-tag="rtag"></div>',
+      '  <div riot-tag="rtag"></div>',
+      '  <div riot-tag="rtag"></div>',
+      '</div>'
+    ])
 
     var subTags = riot.mount('#rtag-nested', '*', { val: 10 })
 
@@ -949,6 +690,14 @@ describe('Compiler Browser', function() {
   })
 
   it('tags property in loop, varying levels of nesting', function() {
+
+    injectHTML([
+      '<ploop-tag></ploop-tag>',
+      '<ploop1-tag></ploop1-tag>',
+      '<ploop2-tag></ploop2-tag>',
+      '<ploop3-tag></ploop3-tag>'
+    ])
+
     var tag = riot.mount('ploop-tag, ploop1-tag, ploop2-tag, ploop3-tag', {
       elements: [{
         foo: 'foo',
@@ -973,6 +722,13 @@ describe('Compiler Browser', function() {
 
   it('simple html transclusion via <yield> tag', function() {
 
+    injectHTML([
+      '<inner-html>',
+      '  { greeting }',
+      '  <inner value="ciao mondo"></inner>',
+      '</inner-html>'
+    ])
+
     var tag = riot.mount('inner-html')[0]
 
     expect(normalizeHTML(tag.root.innerHTML)).to.be('<h1>Hello,   World  <inner value="ciao mondo"><p> ciao mondo </p></inner></h1>')
@@ -995,6 +751,8 @@ describe('Compiler Browser', function() {
 
   it('<yield> contents in a child get always compiled using its parent data', function(done) {
 
+    injectHTML('<yield-parent>{ greeting }</yield-parent>')
+
     var tag = riot.mount('yield-parent', {
       saySomething: done
     })[0]
@@ -1015,6 +773,13 @@ describe('Compiler Browser', function() {
 
   it('<yield> contents in a loop get always compiled using its parent data', function(done) {
 
+    injectHTML([
+      '<yield-loop>',
+      '  { greeting }',
+      '  <div>Something else</div>',
+      '</yield-loop>'
+    ])
+
     var tag = riot.mount('yield-loop', {
         saySomething: done
       })[0],
@@ -1033,6 +798,8 @@ describe('Compiler Browser', function() {
   })
 
   it('top level attr manipulation', function() {
+
+    injectHTML('<top-level-attr value="initial"></top-level-attr>')
 
     riot.tag('top-level-attr', '{opts.value}')
 
@@ -1114,12 +881,21 @@ describe('Compiler Browser', function() {
   })
 
   it('scoped css and riot-tag, mount(selector, tagname)', function() {
+
+
     function checkBorder(t) {
       var e = t.root.firstElementChild
       var s = window.getComputedStyle(e, null).borderTopWidth
       expect(s).to.be('1px')
 
     }
+
+    injectHTML([
+      '<scoped-tag></scoped-tag>',
+      '<div riot-tag="scoped-tag"></div>',
+      '<div id="scopedtag"></div>'
+    ])
+
     var stags = riot.mount('scoped-tag')
 
     var tag = stags[0]
@@ -1136,6 +912,7 @@ describe('Compiler Browser', function() {
   })
 
   it('preserve attributes from tag definition', function() {
+    injectHTML('<div riot-tag="preserve-attr2"></div>')
     var tag = riot.mount('preserve-attr')[0]
     expect(tag.root.className).to.be('single-quote')
     var tag2 = riot.mount('preserve-attr2')[0]
@@ -1145,6 +922,8 @@ describe('Compiler Browser', function() {
   })
 
   it('precompiled tag compatibility', function() {
+
+    injectHTML('<precompiled></precompiled>')
     riot.tag('precompiled', 'HELLO!', 'precompiled, [riot-tag="precompiled"]  { color: red }', function(opts) {
       this.nothing = opts.nothing
     })
@@ -1156,6 +935,7 @@ describe('Compiler Browser', function() {
   })
 
   it('static named tag for tags property', function() {
+    injectHTML('<named-child-parent></named-child-parent>')
     var tag = riot.mount('named-child-parent')[0]
     expect(tag.tags['tags-child'].root.innerHTML).to.be('I have a name')
 
@@ -1295,6 +1075,7 @@ describe('Compiler Browser', function() {
   })
 
   it('riot-tag as expression', function() {
+    injectHTML('<container-riot></container-riot>')
     var tag = riot.mount('container-riot')[0]
     var div = tag.root.getElementsByTagName('div')[0]
     expect(div.getAttribute('riot-tag')).to.be('nested-riot')
@@ -1398,6 +1179,8 @@ describe('Compiler Browser', function() {
   })
 
   it('the children tags are in sync also in multiple nested tags', function() {
+
+    injectHTML('<loop-sync-options-nested-wrapper></loop-sync-options-nested-wrapper>')
     var tag = riot.mount('loop-sync-options-nested-wrapper')[0]
     expect(tag.tags['loop-sync-options-nested'].tags['loop-sync-options-nested-child'].length).to.be(3)
     tags.push(tag)
@@ -1773,6 +1556,8 @@ describe('Compiler Browser', function() {
     expect(els[1].tagName).to.be('DD')
     expect(els[1].innerHTML).to.be('Hot or cold drink')
     tags.push(tag)
+
+    injectHTML('<loop-virtual-reorder></loop-virtual-reorder>')
 
     var tag2 = riot.mount('loop-virtual-reorder')[0],
       els2 = tag2.root.children
