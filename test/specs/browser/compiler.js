@@ -13,7 +13,7 @@ describe('Compiler Browser', function() {
   }
 
   before(function(next) {
-    this.timeout(10000)
+    this.timeout(1000000) // on saucelabs is REALLY slow
     riot.compile(next)
   })
 

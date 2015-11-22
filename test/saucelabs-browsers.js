@@ -1,36 +1,40 @@
 // we will re-enable the broken browsers once saucelabs will fix all the timeout issues
 module.exports = {
   browsers: {
-  /*sliphone: {
+/*    slIphone6: {
+      base: 'SauceLabs',
+      device: 'iPhone 6',
+      os: 'ios',
+      os_version: '9.1'
+    },*/
+    slIphone5: {
       base: 'SauceLabs',
       browserName: 'iphone',
-      deviceName: 'iPhone 6 Plus',
-      platform: 'iOS',
-      version: '9.1'
+      platform: 'OS X 10.10',
+      version: '8.1'
     },
-    slipad: {
+/*    slIpad: {
       base: 'SauceLabs',
       browserName: 'ipad',
       platform: 'iOS',
       deviceName: 'iPad 2',
       version: '9.1'
     },*/
-
-/*    slsafari9: {
+/*    slSafari9: {
       base: 'SauceLabs',
       browserName: 'safari',
       platform: 'OS X 10.11'
     },
-    slsafari8: {
+    slSafari8: {
       base: 'SauceLabs',
       browserName: 'safari',
       platform: 'OS X 10.10'
-    },
-    slsafari7: {
+    },*/
+    slSafari7: {
       base: 'SauceLabs',
       browserName: 'safari',
       platform: 'OS X 10.9'
-    },*/
+    },
     slIE9: {
       base: 'SauceLabs',
       browserName: 'internet explorer',
@@ -55,20 +59,20 @@ module.exports = {
       platform: 'Windows 10',
       version: '20.10240'
     },*/
-    slandroid5: {
+    slAndroid5: {
       base: 'SauceLabs',
       browserName: 'android',
       version: '5.1'
     },
-    slchrome: {
+    slChrome: {
       base: 'SauceLabs',
       browserName: 'chrome'
     },
-    slfirefox: {
+    slFirefox: {
       base: 'SauceLabs',
       browserName: 'firefox'
     },
-    slandroid4: {
+    slAndroid4: {
       base: 'SauceLabs',
       browserName: 'android',
       version: '4.0'
