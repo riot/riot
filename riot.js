@@ -1,8 +1,8 @@
-/* Riot v2.3.1, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v2.3.11, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.3.1', settings: {} },
+var riot = { version: 'v2.3.11', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -137,7 +137,7 @@ riot.observable = function(el) {
 
         try {
           fn.apply(el, fn.typed ? [name].concat(args) : args)
-        } catch (e) { /* error */}
+        } catch (e) { el.trigger('error', e) }
         if (fns[i] !== fn) { i-- }
         fn.busy = 0
       }
@@ -178,6 +178,7 @@ var RE_ORIGIN = /^.+?\/+[^\/]+/,
   clickEvent = doc && doc.ontouchstart ? 'touchstart' : 'click',
   started = false,
   central = riot.observable(),
+  routeFound = false,
   base, current, parser, secondParser, emitStack = [], emitStackLevel = 0
 
 /**
@@ -280,9 +281,13 @@ function click(e) {
   ) return
 
   if (el.href != loc.href) {
-    if (el.href.split('#')[0] == loc.href.split('#')[0]) return // internal jump
-    go(getPathFromBase(el.href), el.title || doc.title)
+    if (
+      el.href.split('#')[0] == loc.href.split('#')[0] // internal jump
+      || base != '#' && getPathFromRoot(el.href).indexOf(base) !== 0 // outside of base
+      || !go(getPathFromBase(el.href), el.title || doc.title) // route not found
+    ) return
   }
+
   e.preventDefault()
 }
 
@@ -297,7 +302,9 @@ function go(path, title) {
   history.pushState(null, title, base + normalize(path))
   // so we need to set it manually
   doc.title = title
+  routeFound = false
   emit()
+  return routeFound
 }
 
 /**
@@ -332,7 +339,7 @@ prot.e = function(path) {
     var args = (filter == '@' ? parser : secondParser)(normalize(path), normalize(filter))
     if (args) {
       this[TRIGGER].apply(null, [filter].concat(args))
-      return true // exit from loop
+      return routeFound = true // exit from loop
     }
   }, this)
 }
@@ -437,22 +444,15 @@ riot.route = route
 
 /**
  * The riot template engine
- * @version 2.3.0
+ * @version v2.3.12
  */
 
 /**
  * @module brackets
  *
- * `brackets         `  Returns a string or regex based on its parameter:
- *                      With a number returns the current left (0) or right (1) brackets.
- *                      With a regex, returns the original regex if the current brackets
- *                      are the default, or a new one with the default brackets replaced
- *                      by the current custom brackets.
- *                      WARNING: recreated regexes discards the `/i` and `/m` flags.
- * `brackets.settings`  This object mirrors the `riot.settings` object, you can assign this
- *                      if riot is not in context.
- * `brackets.set     `  The recommended option to change the current tiot brackets, check
- *                      its parameter and reconfigures the internal state immediately.
+ * `brackets         ` Returns a string or regex based on its parameter
+ * `brackets.settings` Mirrors the `riot.settings` object
+ * `brackets.set     ` The recommended option to change the current tiot brackets
  */
 
 var brackets = (function (UNDEF) {
@@ -511,20 +511,14 @@ var brackets = (function (UNDEF) {
       _pairs[5] = _regex(/\\({|})/g)
       _pairs[6] = _regex(/(\\?)({)/g)
       _pairs[7] = _regExp('(\\\\?)(?:([[({])|(' + _pairs[3] + '))|' + S_QBSRC, REGLOB)
-      _pairs[9] = _regExp(/^\s*{\^?\s*([$\w]+)(?:\s*,\s*(\S+))?\s+in\s+(\S+)\s*}/)
+      _pairs[9] = _regex(/^\s*{\^?\s*([$\w]+)(?:\s*,\s*(\S+))?\s+in\s+(\S+)\s*}/)
       _pairs[8] = pair
     }
     _brackets.settings.brackets = cachedBrackets = pair
   }
 
-  function _set(pair) {
-    if (cachedBrackets !== pair) {
-      _reset(pair)
-    }
-  }
-
   function _brackets(reOrIdx) {
-    _set(_brackets.settings.brackets)
+    _reset(_brackets.settings.brackets)
     return reOrIdx instanceof RegExp ? _regex(reOrIdx) : _pairs[reOrIdx]
   }
 
@@ -602,13 +596,13 @@ var brackets = (function (UNDEF) {
   }
 
   _brackets.array = function array(pair) {
-    if (pair != null) _reset(pair)
+    _reset(pair || _brackets.settings.brackets)
     return _pairs
   }
 
   /* istanbul ignore next: in the node version riot is not in the scope */
   _brackets.settings = typeof riot !== 'undefined' && riot.settings || {}
-  _brackets.set = _set
+  _brackets.set = _reset
 
   _brackets.R_STRINGS = STRINGS
   _brackets.R_MLCOMMS = MLCOMMS
@@ -661,7 +655,7 @@ var tmpl = (function () {
   function _create(str) {
 
     var expr = _getTmpl(str)
-    if (expr.slice(0, 11) !== "try{return ") expr = 'return ' + expr
+    if (expr.slice(0, 11) !== 'try{return ') expr = 'return ' + expr
 
     return new Function('E', expr + ';')  // eslint-disable-line indent
   }
@@ -796,7 +790,7 @@ var tmpl = (function () {
     })
 
     if (tb) {
-      expr = "try{return " + expr + '}catch(e){E(e,this)}'
+      expr = 'try{return ' + expr + '}catch(e){E(e,this)}'
     }
 
     if (key) {
@@ -992,12 +986,12 @@ function _each(dom, parent, expr) {
     impl = __tagImpl[tagName] || { tmpl: dom.outerHTML },
     useRoot = SPECIAL_TAGS_REGEX.test(tagName),
     root = dom.parentNode,
-    isSpecialTag = SPECIAL_TAGS_REGEX.test(tagName),
     ref = document.createTextNode(''),
     child = getTag(dom),
+    isOption = /option/gi.test(tagName), // the option tags must be treated differently
     tags = [],
     oldItems = [],
-    checksum,
+    hasKeys,
     isVirtual = dom.tagName == 'VIRTUAL'
 
   // parse the each expression
@@ -1019,13 +1013,15 @@ function _each(dom, parent, expr) {
       // create a fragment to hold the new DOM nodes to inject in the parent tag
       frag = document.createDocumentFragment()
 
+
+
     // object loop. any changes cause full redraw
     if (!isArray(items)) {
-      checksum = items ? JSON.stringify(items) : ''
-      items = !items ? [] :
+      hasKeys = items || false
+      items = hasKeys ?
         Object.keys(items).map(function (key) {
           return mkitem(expr, key, items[key])
-        })
+        }) : []
     }
 
     // loop all the new items
@@ -1037,7 +1033,7 @@ function _each(dom, parent, expr) {
         // does a tag exist in this position?
         tag = tags[pos]
 
-      item = !checksum && expr.key ? mkitem(expr, item, i) : item
+      item = !hasKeys && expr.key ? mkitem(expr, item, i) : item
 
       // new tag
       if (
@@ -1104,7 +1100,7 @@ function _each(dom, parent, expr) {
     unmountRedundant(items, tags)
 
     // insert the new nodes
-    if (isSpecialTag) root.appendChild(frag)
+    if (isOption) root.appendChild(frag)
     else root.insertBefore(frag, ref)
 
     // set the 'tags' property of the parent tag
@@ -1909,7 +1905,7 @@ function mkEl(name) {
  * @returns { String } tag template updated without the yield tag
  */
 function replaceYield(tmpl, innerHTML) {
-  return tmpl.replace(/<(yield)\/?>(<\/\1>)?/gi, innerHTML || '')
+  return tmpl.replace(/<yield\s*(?:\/>|>\s*<\/yield\s*>)/gi, innerHTML || '')
 }
 
 /**
