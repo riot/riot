@@ -805,6 +805,25 @@ describe('Compiler Browser', function() {
 
   })
 
+  it('<yield> with dollar signs get replaced correctly', function() {
+
+    injectHTML([
+      '<yield-with-dollar-2>',
+      '  <yield-with-dollar-1 cost="$25"></yield-with-dollar-1>',
+      '</yield-with-dollar-2>'
+    ])
+
+    riot.tag('yield-with-dollar-1', '<span>{opts.cost}</span>')
+    riot.tag('yield-with-dollar-2', '<yield></yield>')
+
+    var tag = riot.mount('yield-with-dollar-2')[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<yield-with-dollar-1 cost="$25"><span>$25</span></yield-with-dollar-1>')
+
+    tags.push(tag)
+
+  })
+
   it('top level attr manipulation', function() {
 
     injectHTML('<top-level-attr value="initial"></top-level-attr>')
