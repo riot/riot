@@ -105,6 +105,10 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - Interpolation: `Add #{ items.length + 1 }` or `class="item { selected: flag }"`
 - Compact ES6 method syntax.
 
+### CDN hosting
+- [jsDelivr](http://www.jsdelivr.com/projects/riot)
+- [cdnjs](https://cdnjs.com/libraries/riot)
+
 ### Demos
 - [**Riot Examples** - Community's Official](https://github.com/riot/examples)
 - [Riot Todo MVC](http://todomvc.com/examples/riotjs/)
