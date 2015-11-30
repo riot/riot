@@ -98,6 +98,10 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - Integrate with NPM, CommonJS, AMD, Bower or Component
 - Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot), [Browserify](https://github.com/jhthorsen/riotify), or [Wintersmith](https://github.com/collingreen/wintersmith-riot) plugins
 
+### CDN hosting
+- [jsDelivr](http://www.jsdelivr.com/projects/riot)
+- [cdnjs](https://cdnjs.com/libraries/riot)
+
 
 ### Concise syntax
 - Power shortcuts: `class={ enabled: is_enabled, hidden: hasErrors() }`.
