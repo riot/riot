@@ -379,6 +379,28 @@ describe('Compiler Browser', function() {
 
   })
 
+  it('the loop children tags must fire the \'mount\' and \'updated\' events when they are already injectend into the parent', function(done) {
+    var tag = tag = riot.mount('loop-child')[0],
+      root = tag.root
+
+    setTimeout(function() {
+      tag.tags['looped-child'].forEach(function(child) {
+        expect(child.updatedWidth).to.be.above(0)
+        expect(child.mountWidth).to.be.above(0)
+      })
+
+      tag.childrenMountWidths.forEach(function(width) {
+        expect(width).to.be.above(0)
+      })
+
+      tag.childrenUpdatedWidths.forEach(function(width) {
+        expect(width).to.be.above(0)
+      })
+      done()
+    }, 100)
+
+  })
+
   it('the mount method could be triggered also on several tags using a NodeList instance', function() {
 
     injectHTML([
@@ -475,7 +497,6 @@ describe('Compiler Browser', function() {
 
   })
 
-// TODO: fix this test
   it('the loop children instances get correctly removed in the right order', function() {
 
     var tag = riot.mount('loop-ids')[0],
@@ -595,19 +616,6 @@ describe('Compiler Browser', function() {
     tags.push(tag)
 
     expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>ok</p>')
-
-    /*
-
-    FIXME: this test fails somehow on IE9
-
-    riot.settings.brackets = '<% %>'
-    riot.tag('test-b', '<p><% x %></p>', function() { this.x = 'ok' })
-    tag = riot.mount('test-b')[0]
-    tags.push(tag)
-
-    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>ok</p>')
-    */
-
 
     riot.settings.brackets = '${ }'
     riot.tag('test-c', '<p>${ x }</p>', function() { this.x = 'ok' })
@@ -1223,21 +1231,26 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
-  it('loop tags get rendered correctly also with conditional attributes', function() {
+  it('loop tags get rendered correctly also with conditional attributes', function(done) {
     var tag = riot.mount('loop-conditional')[0]
-    expect(tag.root.getElementsByTagName('div').length).to.be(2)
-    expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(2)
-    expect(tag.tags['loop-conditional-item'].length).to.be(3)
-    tag.items = []
-    tag.update()
-    expect(tag.root.getElementsByTagName('div').length).to.be(0)
-    expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(0)
-    expect(tag.tags['loop-conditional-item'].length).to.be(0)
-    tag.items = [2, 2, 2]
-    tag.update()
-    expect(tag.root.getElementsByTagName('div').length).to.be(3)
-    expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(3)
-    expect(tag.tags['loop-conditional-item'].length).to.be(3)
+
+    setTimeout(function() {
+      expect(tag.root.getElementsByTagName('div').length).to.be(2)
+      expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(2)
+      expect(tag.tags['loop-conditional-item'].length).to.be(3)
+      tag.items = []
+      tag.update()
+      expect(tag.root.getElementsByTagName('div').length).to.be(0)
+      expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(0)
+      expect(tag.tags['loop-conditional-item'].length).to.be(0)
+      tag.items = [2, 2, 2]
+      tag.update()
+      expect(tag.root.getElementsByTagName('div').length).to.be(3)
+      expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(3)
+      expect(tag.tags['loop-conditional-item'].length).to.be(3)
+      done()
+    }, 100)
+
     tags.push(tag)
   })
 
