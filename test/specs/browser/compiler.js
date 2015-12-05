@@ -752,6 +752,14 @@ describe('Compiler Browser', function() {
 
   })
 
+  it('<yield> from/to multi-transclusion', function() {
+
+    injectHTML('<yield-multi><yield to="content">content</yield></yield-multi>')
+    var tag = riot.mount('yield-multi', {})[0]
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>yield the content here</p>')
+
+  })
+
   it('multiple mount <yield> tag', function() {
 
     riot.mount('inner-html')
@@ -831,6 +839,7 @@ describe('Compiler Browser', function() {
     tags.push(tag)
 
   })
+
 
   it('top level attr manipulation', function() {
 
