@@ -6,6 +6,38 @@ describe('Mixin', function() {
     }
   }
 
+  /*eslint-disable */
+
+  // generated from babeljs
+  // src: http://babeljs.io/repl/#?experimental=false&evaluate=true&loose=false&spec=false&code=class%20FunctMixin%20{%0A%20%20init%28%29%20{%0A%20%20%20%20this.type%20%3D%20%27func%27%0A%20%20}%0A%20%20get%20message%28%29%20{%0A%20%20%20%20return%20%27Initialized%27%3B%0A%20%20}%0A}
+
+  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+  var FunctMixin = (function () {
+    function FunctMixin() {
+      _classCallCheck(this, FunctMixin);
+    }
+
+    _createClass(FunctMixin, [{
+      key: 'init',
+      value: function init() {
+        this.type = 'func';
+      }
+    }, {
+      key: 'message',
+      get: function get() {
+        return 'Initialized';
+      }
+    }]);
+
+    return FunctMixin;
+  })();
+
+  /*eslint-enable */
+
+
   var OptsMixin = {
     getOpts: function() {
       return this.opts
@@ -122,6 +154,16 @@ describe('Mixin', function() {
     expect(tag.tags['sub-mixin']._riot_id).to.be(tag.tags['sub-mixin'].getId())
     expect(tag.getId()).not.to.be(tag.tags['sub-mixin'].getId())
     tag.unmount()
+  })
+
+  it('use and initialize raw functions as mixin', function() {
+    injectHTML('<my-mixin></my-mixin>')
+    riot.tag('my-mixin', '<span>{ message }</span>', function() {
+      this.mixin(FunctMixin)
+    })
+    var tag = riot.mount('my-mixin')[0]
+    expect(tag.root.innerHTML).to.be('<span>Initialized</span>')
+    expect(tag.type).to.be('func')
   })
 
   it('binds this-reference to the tag object', function() {
