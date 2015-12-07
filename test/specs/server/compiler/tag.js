@@ -15,7 +15,7 @@ describe('Compile tags', function() {
   }
 
   function render(str, name) {
-    return compiler.compile(str, {}, name)
+    return compiler.compile(str, {debug: true}, name)
   }
 
   function cat(dir, filename) {
