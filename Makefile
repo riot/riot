@@ -6,6 +6,7 @@ MOCHA = ./node_modules/mocha/bin/_mocha
 SMASH = ./node_modules/.bin/smash
 UGLIFY = ./node_modules/uglify-js/bin/uglifyjs
 COVERALLS = ./node_modules/coveralls/bin/coveralls.js
+RIMRAF = ./node_modules/.bin/rimraf
 
 # folders
 DIST = "dist/riot/"
@@ -49,6 +50,10 @@ raw:
 	@ mkdir -p $(DIST)
 	@ $(SMASH) lib/riot.js > $(DIST)riot.js
 	@ $(SMASH) lib/riot+compiler.js > $(DIST)riot+compiler.js
+
+clean: 
+	# clean build output, $(DIST)
+	@ $(RIMRAF) $(DIST)/*
 
 riot: raw test
 
