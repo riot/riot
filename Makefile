@@ -26,7 +26,7 @@ eslint:
 	# check code style
 	@ $(ESLINT) -c ./.eslintrc lib test
 
-test-mocha:
+test-mocha: raw
 	RIOT=../../dist/riot/riot.js $(ISTANBUL) cover $(MOCHA) -- test/runner.js -R spec
 
 test-karma:
