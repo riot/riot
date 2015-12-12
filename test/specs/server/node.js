@@ -27,6 +27,20 @@ describe('Node/io.js', function() {
     expect(els.first().attr('style')).to.be('display: none;')
   })
 
+  it('render tag: attr-test', function() {
+    var content = riot.render('attr-test', { red: true })
+    expect(content).to.be('<attr-test><a href="#" class="red"></a> <input type="checkbox"></attr-test>')
+
+    content = riot.render('attr-test', { target: '_blank', isChecked: true })
+    expect(content).to.be('<attr-test><a href="#" target="_blank"></a> <input type="checkbox" checked="checked"></attr-test>')
+
+    content = riot.render('attr-test', { target: false, isChecked: null })
+    expect(content).to.be('<attr-test><a href="#"></a> <input type="checkbox"></attr-test>')
+
+    content = riot.render('attr-test', { target: 0, isChecked: 0 })
+    expect(content).to.be('<attr-test><a href="#"></a> <input type="checkbox"></attr-test>')
+  })
+
   it('render tag: loop-child', function() {
     var lpc = riot.render('loop-child')
     var $ = cheerio.load(lpc)
