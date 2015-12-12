@@ -50,6 +50,10 @@ raw:
 	@ $(SMASH) lib/riot.js > $(DIST)riot.js
 	@ $(SMASH) lib/riot+compiler.js > $(DIST)riot+compiler.js
 
+clean:
+	# clean $(DIST)
+	@ rm -rf $(DIST)
+
 riot: raw test
 
 min: riot
