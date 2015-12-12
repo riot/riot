@@ -341,7 +341,6 @@ describe('Compiler Browser', function() {
     tag.root.getElementsByTagName('inner-loop-events')[0].onclick({})
     // 2nd test inner contents
     testItem = { innerCount: 'in', innerI: 0 }
-    tag.root.getElementsByTagName('button')[0].onclick({})
     tag.root.getElementsByTagName('button')[1].onclick({})
     tag.root.getElementsByTagName('li')[0].onclick({})
 
