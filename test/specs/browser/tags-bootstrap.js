@@ -26,6 +26,7 @@ loadTagsAndScripts([
   'tag/loop-ids.tag',
   'tag/loop-unshift.tag',
   'tag/loop-virtual.tag',
+  'tag/loop-null-items.tag',
   'tag/table-data.tag',
   'tag/table-loop-extra-row.tag',
   'tag/loop-named.tag',

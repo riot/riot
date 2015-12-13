@@ -350,6 +350,12 @@ describe('Compiler Browser', function() {
 
   })
 
+  it('can loop also collections including null items', function() {
+    var tag = riot.mount('loop-null-items')[0]
+    expect($$('li', tag.root).length).to.be(7)
+    tags.push(tag)
+  })
+
   it('each loop creates correctly a new context', function() {
 
     var tag = riot.mount('loop-child')[0],
@@ -1178,9 +1184,10 @@ describe('Compiler Browser', function() {
 
   it('raw contents', function() {
     var tag = riot.mount('raw-contents')[0],
-      p = tag.root.getElementsByTagName('p')[0],
-      span = tag.root.getElementsByTagName('span')[0],
-      div = tag.root.getElementsByTagName('div')[0]
+      p = $('p', tag.root),
+      span = $('span', tag.root),
+      div = $('div', tag.root)
+
     expect(p.contains(span)).to.be(true)
     expect(div.getAttribute('data-content')).to.be('<div>Ehy</div><p>ho</p>')
     tags.push(tag)
