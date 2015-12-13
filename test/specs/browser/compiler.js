@@ -1176,6 +1176,16 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('raw contents', function() {
+    var tag = riot.mount('raw-contents')[0],
+      p = tag.root.getElementsByTagName('p')[0],
+      span = tag.root.getElementsByTagName('span')[0],
+      div = tag.root.getElementsByTagName('div')[0]
+    expect(p.contains(span)).to.be(true)
+    expect(div.getAttribute('data-content')).to.be('<div>Ehy</div><p>ho</p>')
+    tags.push(tag)
+  })
+
   it('the loops children sync correctly their internal data even when they are nested', function() {
     var tag = riot.mount('loop-sync-options-nested')[0]
 

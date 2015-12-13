@@ -31,6 +31,7 @@ loadTagsAndScripts([
   'tag/loop-named.tag',
   'tag/loop-single-tags.tag',
   'tag/timetable.tag',
+  'tag/raw-contents.tag',
   // mount order
   'tag/deferred-mount.tag',
 
