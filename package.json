@@ -45,11 +45,11 @@
     "riot.js"
   ],
   "dependencies": {
-    "riot-cli": "^2.3.13-beta",
-    "riot-compiler": "^2.3.16-beta",
+    "riot-cli": "^2.3.13",
+    "riot-compiler": "^2.3.18",
     "riot-observable": "^2.3.11",
-    "riot-route": "^2.3.11",
-    "riot-tmpl": "^2.3.17",
+    "riot-route": "^2.3.12",
+    "riot-tmpl": "^2.3.18",
     "simple-dom": "0.2.7",
     "simple-html-tokenizer": "^0.2.0"
   },
