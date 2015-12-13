@@ -1185,10 +1185,13 @@ describe('Compiler Browser', function() {
   it('raw contents', function() {
     var tag = riot.mount('raw-contents')[0],
       p = $('p', tag.root),
+      h1 = $('h1', tag.root),
       span = $('span', tag.root),
       div = $('div', tag.root)
 
     expect(p.contains(span)).to.be(true)
+    // TODO: pass this test
+    /*expect(h1.innerHTML).to.be('Title: ' + p.innerHTML)*/
     expect(div.getAttribute('data-content')).to.be('<div>Ehy</div><p>ho</p>')
     tags.push(tag)
   })
