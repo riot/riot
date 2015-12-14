@@ -64,7 +64,7 @@ loadTagsAndScripts([
   'tag/observable-attr.tag',
   'tag/style-tag.tag',
   'tag/style-tag2.tag',
-  'tag/style-tag3.tag',
+  'tag/~style-tag3.tag',
   'tag/style-tag4.tag',
 
   'tag/preserve-attr.tag',
