@@ -1,5 +1,5 @@
 <raw-contents>
-  <h1>Title: {= text }</h1>
+  <h1>Title: {= text } { text }</h1>
   <p>{= text }</p>
 
   <div data-content={ content } ></div>
