@@ -20,12 +20,12 @@
 
 | Framework              | Version    | Minified Size |
 |------------------------|------------|---------------|
-| Ember                  | 1.13.3     | 493.3kb       |
-| Angular                | 1.4.2      | 145.5kb       |
-| React                  | 0.14.1     | 132.6kb       |
-| Web Components Polyfill| 0.7.5      | 117.1kb       |
-| Polymer                | 1.0.6      | 101.2kb       |
-| Riot                   | 2.3.11     | 18kb          |
+| Ember                  | 2.2.0      | 446.0kb       |
+| Polymer                | 1.0.6      | 183.0kb       |
+| Angular                | 1.4.8      | 148.0kb       |
+| React                  | 0.14.3     | 136.0kb       |
+| Web Components Polyfill| 0.7.19     | 118.0kb       |
+| Riot                   | 2.3.11     | 20kb          |
 
 
 ### Custom tags • Concise syntax • Virtual DOM • Full stack
