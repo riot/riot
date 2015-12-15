@@ -1,8 +1,8 @@
-/* Riot v2.3.11, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v2.3.12, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.3.11', settings: {} },
+var riot = { version: 'v2.3.12', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
