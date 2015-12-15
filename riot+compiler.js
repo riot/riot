@@ -169,6 +169,7 @@ var RE_ORIGIN = /^.+?\/+[^\/]+/,
   HAS_ATTRIBUTE = 'hasAttribute',
   REPLACE = 'replace',
   POPSTATE = 'popstate',
+  HASHCHANGE = 'hashchange',
   TRIGGER = 'trigger',
   MAX_EMIT_STACK_LEVEL = 3,
   win = window,
@@ -179,6 +180,7 @@ var RE_ORIGIN = /^.+?\/+[^\/]+/,
   started = false,
   central = riot.observable(),
   routeFound = false,
+  debouncedEmit,
   base, current, parser, secondParser, emitStack = [], emitStackLevel = 0
 
 /**
@@ -201,6 +203,32 @@ function DEFAULT_SECOND_PARSER(path, filter) {
     args = path.match(re)
 
   if (args) return args.slice(1)
+}
+
+/**
+ * Simple/cheap debounce implementation
+ * @param   {function} fn - callback
+ * @param   {number} delay - delay in seconds
+ * @returns {function} debounced function
+ */
+function debounce(fn, delay) {
+  var t
+  return function () {
+    clearTimeout(t)
+    t = setTimeout(fn, delay)
+  }
+}
+
+/**
+ * Set the window listeners to trigger the routes
+ * @param {boolean} autoExec - see route.start
+ */
+function start(autoExec) {
+  debouncedEmit = debounce(emit, 1)
+  win[ADD_EVENT_LISTENER](POPSTATE, debouncedEmit)
+  win[ADD_EVENT_LISTENER](HASHCHANGE, debouncedEmit)
+  doc[ADD_EVENT_LISTENER](clickEvent, click)
+  if (autoExec) emit(true)
 }
 
 /**
@@ -295,6 +323,7 @@ function click(e) {
  * Go to the path
  * @param {string} path - destination path
  * @param {string} title - page title
+ * @returns {boolean} - route not found flag
  */
 function go(path, title) {
   title = title || doc.title
@@ -337,7 +366,7 @@ prot.s = function() {
 prot.e = function(path) {
   this.$.concat('@').some(function(filter) {
     var args = (filter == '@' ? parser : secondParser)(normalize(path), normalize(filter))
-    if (args) {
+    if (typeof args != 'undefined') {
       this[TRIGGER].apply(null, [filter].concat(args))
       return routeFound = true // exit from loop
     }
@@ -414,7 +443,8 @@ route.query = function() {
 /** Stop routing **/
 route.stop = function () {
   if (started) {
-    win[REMOVE_EVENT_LISTENER](POPSTATE, emit)
+    win[REMOVE_EVENT_LISTENER](POPSTATE, debouncedEmit)
+    win[REMOVE_EVENT_LISTENER](HASHCHANGE, debouncedEmit)
     doc[REMOVE_EVENT_LISTENER](clickEvent, click)
     central[TRIGGER]('stop')
     started = false
@@ -427,11 +457,14 @@ route.stop = function () {
  */
 route.start = function (autoExec) {
   if (!started) {
-    win[ADD_EVENT_LISTENER](POPSTATE, emit)
-    doc[ADD_EVENT_LISTENER](clickEvent, click)
+    if (document.readyState == 'complete') start(autoExec)
+    // the timeout is needed to solve
+    // a weird safari bug https://github.com/riot/route/issues/33
+    else win[ADD_EVENT_LISTENER]('load', function() {
+      setTimeout(function() { start(autoExec) }, 1)
+    })
     started = true
   }
-  if (autoExec) emit(true)
 }
 
 /** Prepare the router **/
@@ -444,15 +477,15 @@ riot.route = route
 
 /**
  * The riot template engine
- * @version v2.3.12
+ * @version v2.3.19
  */
 
 /**
  * @module brackets
  *
  * `brackets         ` Returns a string or regex based on its parameter
- * `brackets.settings` Mirrors the `riot.settings` object
- * `brackets.set     ` The recommended option to change the current tiot brackets
+ * `brackets.settings` Mirrors the `riot.settings` object (use brackets.set in new code)
+ * `brackets.set     ` Change the current riot brackets
  */
 
 var brackets = (function (UNDEF) {
@@ -464,15 +497,15 @@ var brackets = (function (UNDEF) {
     STRINGS = /"[^"\\]*(?:\\[\S\s][^"\\]*)*"|'[^'\\]*(?:\\[\S\s][^'\\]*)*'/g,
 
     S_QBSRC = STRINGS.source + '|' +
-      /(?:[$\w\)\]]|\+\+|--)\s*(\/)(?![*\/])/.source + '|' +
+      /(?:\breturn\s+|(?:[$\w\)\]]|\+\+|--)\s*(\/)(?![*\/]))/.source + '|' +
       /\/(?=[^*\/])[^[\/\\]*(?:(?:\[(?:\\.|[^\]\\]*)*\]|\\.)[^[\/\\]*)*?(\/)[gim]*/.source,
 
     DEFAULT = '{ }',
 
     FINDBRACES = {
-      '(': _regExp('([()])|'   + S_QBSRC, REGLOB),
-      '[': _regExp('([[\\]])|' + S_QBSRC, REGLOB),
-      '{': _regExp('([{}])|'   + S_QBSRC, REGLOB)
+      '(': RegExp('([()])|'   + S_QBSRC, REGLOB),
+      '[': RegExp('([[\\]])|' + S_QBSRC, REGLOB),
+      '{': RegExp('([{}])|'   + S_QBSRC, REGLOB)
     }
 
   var
@@ -480,49 +513,60 @@ var brackets = (function (UNDEF) {
     _regex,
     _pairs = []
 
-  function _regExp(source, flags) { return new RegExp(source, flags) }
-
   function _loopback(re) { return re }
 
-  function _rewrite(re) {
+  function _rewrite(re, bp) {
+    if (!bp) bp = _pairs
     return new RegExp(
-      re.source.replace(/{/g, _pairs[2]).replace(/}/g, _pairs[3]), re.global ? REGLOB : ''
+      re.source.replace(/{/g, bp[2]).replace(/}/g, bp[3]), re.global ? REGLOB : ''
     )
   }
 
+  function _create(pair) {
+    var
+      cvt,
+      arr = pair.split(' ')
+
+    if (pair === DEFAULT) {
+      arr[2] = arr[0]
+      arr[3] = arr[1]
+      cvt = _loopback
+    }
+    else {
+      if (arr.length !== 2 || /[\x00-\x1F<>a-zA-Z0-9'",;\\]/.test(pair)) {
+        throw new Error('Unsupported brackets "' + pair + '"')
+      }
+      arr = arr.concat(pair.replace(/(?=[[\]()*+?.^$|])/g, '\\').split(' '))
+      cvt = _rewrite
+    }
+    arr[4] = cvt(arr[1].length > 1 ? /{[\S\s]*?}/ : /{[^}]*}/, arr)
+    arr[5] = cvt(/\\({|})/g, arr)
+    arr[6] = cvt(/(\\?)({)/g, arr)
+    arr[7] = RegExp('(\\\\?)(?:([[({])|(' + arr[3] + '))|' + S_QBSRC, REGLOB)
+    arr[8] = pair
+    return arr
+  }
+
   function _reset(pair) {
-    pair = pair || DEFAULT
+    if (!pair) pair = DEFAULT
 
     if (pair !== _pairs[8]) {
-      var bp = pair.split(' ')
-
-      if (pair === DEFAULT) {
-        _pairs = bp.concat(bp)
-        _regex = _loopback
-      }
-      else {
-        if (bp.length !== 2 || /[\x00-\x1F<>a-zA-Z0-9'",;\\]/.test(pair)) {
-          throw new Error('Unsupported brackets "' + pair + '"')
-        }
-        _pairs = bp.concat(pair.replace(/(?=[[\]()*+?.^$|])/g, '\\').split(' '))
-        _regex = _rewrite
-      }
-      _pairs[4] = _regex(_pairs[1].length > 1 ? /(?:^|[^\\]){[\S\s]*?}/ : /(?:^|[^\\]){[^}]*}/)
-      _pairs[5] = _regex(/\\({|})/g)
-      _pairs[6] = _regex(/(\\?)({)/g)
-      _pairs[7] = _regExp('(\\\\?)(?:([[({])|(' + _pairs[3] + '))|' + S_QBSRC, REGLOB)
-      _pairs[9] = _regex(/^\s*{\^?\s*([$\w]+)(?:\s*,\s*(\S+))?\s+in\s+(\S+)\s*}/)
-      _pairs[8] = pair
+      _pairs = _create(pair)
+      _regex = pair === DEFAULT ? _loopback : _rewrite
+      _pairs[9] = _regex(/^\s*{\^?\s*([$\w]+)(?:\s*,\s*(\S+))?\s+in\s+(\S.*)\s*}/)
+      _pairs[10] = _regex(/(^|[^\\]){=[\S\s]*?}/)
+      _brackets._rawOffset = _pairs[0].length
     }
-    _brackets.settings.brackets = cachedBrackets = pair
+    cachedBrackets = pair
   }
 
   function _brackets(reOrIdx) {
-    _reset(_brackets.settings.brackets)
     return reOrIdx instanceof RegExp ? _regex(reOrIdx) : _pairs[reOrIdx]
   }
 
-  _brackets.split = function split(str, tmpl) {
+  _brackets.split = function split(str, tmpl, _bp) {
+    // istanbul ignore next: _bp is for the compiler
+    if (!_bp) _bp = _pairs
 
     var
       parts = [],
@@ -530,7 +574,7 @@ var brackets = (function (UNDEF) {
       isexpr,
       start,
       pos,
-      re = _brackets(6)
+      re = _bp[6]
 
     isexpr = start = re.lastIndex = 0
 
@@ -552,7 +596,7 @@ var brackets = (function (UNDEF) {
       if (!match[1]) {
         unescapeStr(str.slice(start, pos))
         start = re.lastIndex
-        re = _pairs[6 + (isexpr ^= 1)]
+        re = _bp[6 + (isexpr ^= 1)]
         re.lastIndex = start
       }
     }
@@ -565,7 +609,7 @@ var brackets = (function (UNDEF) {
 
     function unescapeStr(str) {
       if (tmpl || isexpr)
-        parts.push(str && str.replace(_pairs[5], '$1'))
+        parts.push(str && str.replace(_bp[5], '$1'))
       else
         parts.push(str)
     }
@@ -592,13 +636,30 @@ var brackets = (function (UNDEF) {
   _brackets.loopKeys = function loopKeys(expr) {
     var m = expr.match(_brackets(9))
     return m ?
-      { key: m[1], pos: m[2], val: _pairs[0] + m[3] + _pairs[1] } : { val: expr.trim() }
+      { key: m[1], pos: m[2], val: _pairs[0] + m[3].trim() + _pairs[1] } : { val: expr.trim() }
   }
 
   _brackets.array = function array(pair) {
-    _reset(pair || _brackets.settings.brackets)
-    return _pairs
+    return _create(pair || cachedBrackets)
   }
+
+  var _settings
+  function _setSettings(o) {
+    var b
+    o = o || {}
+    b = o.brackets
+    Object.defineProperty(o, 'brackets', {
+      set: _reset,
+      get: function () { return cachedBrackets },
+      enumerable: true
+    })
+    _settings = o
+    _reset(b)
+  }
+  Object.defineProperty(_brackets, 'settings', {
+    set: _setSettings,
+    get: function () { return _settings }
+  })
 
   /* istanbul ignore next: in the node version riot is not in the scope */
   _brackets.settings = typeof riot !== 'undefined' && riot.settings || {}
@@ -607,8 +668,6 @@ var brackets = (function (UNDEF) {
   _brackets.R_STRINGS = STRINGS
   _brackets.R_MLCOMMS = MLCOMMS
   _brackets.S_QBLOCKS = S_QBSRC
-
-  _reset(_brackets.settings.brackets)
 
   return _brackets
 
@@ -624,9 +683,7 @@ var brackets = (function (UNDEF) {
 
 var tmpl = (function () {
 
-  var
-    FALSE  = !1,
-    _cache = {}
+  var _cache = {}
 
   function _tmpl(str, data) {
     if (!str) return str
@@ -634,11 +691,19 @@ var tmpl = (function () {
     return (_cache[str] || (_cache[str] = _create(str))).call(data, _logErr)
   }
 
+  _tmpl.isRaw = function (expr) {
+    return expr[brackets._rawOffset] === "="
+  }
+
+  _tmpl.haveRaw = function (src) {
+    return brackets(10).test(src)
+  }
+
   _tmpl.hasExpr = brackets.hasExpr
 
   _tmpl.loopKeys = brackets.loopKeys
 
-  _tmpl.errorHandler = FALSE
+  _tmpl.errorHandler = null
 
   function _logErr(err, ctx) {
 
@@ -657,18 +722,18 @@ var tmpl = (function () {
     var expr = _getTmpl(str)
     if (expr.slice(0, 11) !== 'try{return ') expr = 'return ' + expr
 
-    return new Function('E', expr + ';')  // eslint-disable-line indent
+    return new Function('E', expr + ';')
   }
 
   var
-    RE_QBLOCK = new RegExp(brackets.S_QBLOCKS, 'g'),
+    RE_QBLOCK = RegExp(brackets.S_QBLOCKS, 'g'),
     RE_QBMARK = /\x01(\d+)~/g
 
   function _getTmpl(str) {
     var
       qstr = [],
       expr,
-      parts = brackets.split(str, 1)
+      parts = brackets.split(str.replace(/\u2057/g, '"'), 1)
 
     if (parts.length > 2 || parts[0]) {
       var i, j, list = []
@@ -714,6 +779,8 @@ var tmpl = (function () {
     RE_BRACE = /,|([[{(])|$/g
 
   function _parseExpr(expr, asText, qstr) {
+
+    if (expr[0] === "=") expr = expr.slice(1)
 
     expr = expr
           .replace(RE_QBLOCK, function (s, div) {
@@ -773,7 +840,7 @@ var tmpl = (function () {
   var JS_VARNAME = /[,{][$\w]+:|(^ *|[^$\w\.])(?!(?:typeof|true|false|null|undefined|in|instanceof|is(?:Finite|NaN)|void|NaN|new|Date|RegExp|Math)(?![$\w]))([$_A-Za-z][$\w]*)/g
 
   function _wrapExpr(expr, asText, key) {
-    var tb = FALSE
+    var tb
 
     expr = expr.replace(JS_VARNAME, function (match, p, mvar, pos, s) {
       if (mvar) {
@@ -815,6 +882,8 @@ var tmpl = (function () {
   return _tmpl
 
 })()
+
+  tmpl.version = brackets.version = 'v2.3.19'
 
 
 /*
@@ -1025,7 +1094,7 @@ function _each(dom, parent, expr) {
     }
 
     // loop all the new items
-    each(items, function(item, i) {
+    items.forEach(function(item, i) {
       // reorder only if the items are objects
       var _mustReorder = mustReorder && item instanceof Object,
         oldPos = oldItems.indexOf(item),
@@ -1094,7 +1163,7 @@ function _each(dom, parent, expr) {
       // cache the real parent tag internally
       defineProperty(tag, '_parent', parent)
 
-    })
+    }, true) // allow null values
 
     // remove the redundant tags
     unmountRedundant(items, tags)
@@ -1274,20 +1343,39 @@ function Tag(impl, conf, innerHTML) {
     updateOpts()
     self.trigger('update', data)
     update(expressions, self)
-    self.trigger('updated')
+    // the updated event will be triggered
+    // once the DOM will be ready and all the reflow are completed
+    // this is useful if you want to get the "real" root properties
+    // 4 ex: root.offsetWidth ...
+    rAF(function() { self.trigger('updated') })
     return this
   })
 
   defineProperty(this, 'mixin', function() {
     each(arguments, function(mix) {
+      var instance
+
       mix = typeof mix === T_STRING ? riot.mixin(mix) : mix
-      each(Object.keys(mix), function(key) {
+
+      // check if the mixin is a function
+      if (isFunction(mix)) {
+        // create the new mixin instance
+        instance = new mix()
+        // save the prototype to loop it afterwards
+        mix = mix.prototype
+      } else instance = mix
+
+      // loop the keys in the function prototype or the all object keys
+      each(Object.getOwnPropertyNames(mix), function(key) {
         // bind methods to self
         if (key != 'init')
-          self[key] = isFunction(mix[key]) ? mix[key].bind(self) : mix[key]
+          self[key] = isFunction(instance[key]) ?
+                        instance[key].bind(self) :
+                        instance[key]
       })
+
       // init method will be called automatically
-      if (mix.init) mix.init.bind(self)()
+      if (instance.init) instance.init.bind(self)()
     })
     return this
   })
@@ -1503,7 +1591,11 @@ function update(expressions, tag) {
 
     // leave out riot- prefixes from strings inside textarea
     // fix #815: any value -> string
-    if (parent && parent.tagName == 'TEXTAREA') value = ('' + value).replace(/riot-/g, '')
+    if (parent && parent.tagName == 'TEXTAREA') {
+      value = ('' + value).replace(/riot-/g, '')
+      // change textarea's value
+      parent.value = value
+    }
 
     // no change
     if (expr.value === value) return
@@ -1571,7 +1663,8 @@ function update(expressions, tag) {
         if (!value) return
       }
 
-      if (typeof value !== T_OBJECT) setAttr(dom, attrName, value)
+      if (value && value != 0 && typeof value !== T_OBJECT)
+        setAttr(dom, attrName, value)
 
     }
 
@@ -1612,13 +1705,13 @@ function remAttr(dom, name) {
 }
 
 /**
- * Convert a string containing dashes to camle case
+ * Convert a string containing dashes to camel case
  * @param   { String } string - input string
  * @returns { String } my-string -> myString
  */
 function toCamel(string) {
-  return string.replace(/(\-\w)/g, function(match) {
-    return match.toUpperCase().replace('-', '')
+  return string.replace(/-(\w)/g, function(_, c) {
+    return c.toUpperCase()
   })
 }
 
@@ -1898,6 +1991,18 @@ function mkEl(name) {
 }
 
 /**
+ * Create a generic DOM node, and fill it with innerHTML
+ * @param   { String } name - name of the DOM node we want to create
+ * @param   { String } innerHTML - innerHTML of the new DOM
+ * @returns { Object } DOM node just created
+ */
+function mkElWithInnerHTML(name, innerHTML) {
+  var el = mkEl(name)
+  el.innerHTML = innerHTML || ''
+  return el
+}
+
+/**
  * Replace the yield tag from any tag template with the innerHTML of the
  * original tag in the page
  * @param   { String } tmpl - tag implementation template
@@ -1905,7 +2010,22 @@ function mkEl(name) {
  * @returns { String } tag template updated without the yield tag
  */
 function replaceYield(tmpl, innerHTML) {
-  return tmpl.replace(/<yield\s*(?:\/>|>\s*<\/yield\s*>)/gi, innerHTML || '')
+  var tmplElement = mkElWithInnerHTML('div', tmpl)
+  // if ($('yield[from]'.tmplElement)) { // this issues test errors
+  if (tmplElement.querySelector && tmplElement.querySelector('yield[from]')) { // code coverage path not taken (?)
+    // yield to(s) must be direct children from innerHTML(root), all other tags are ignored
+    each(mkElWithInnerHTML('div', innerHTML).childNodes, function(toYield) {
+      if (toYield.nodeType == 1 && toYield.tagName == 'YIELD' && toYield.getAttribute('to')) {
+        // replace all yield[from]
+        each($$('yield[from="'+toYield.getAttribute('to')+'"]', tmplElement), function(fromYield) {
+          fromYield.outerHTML = toYield.innerHTML
+        })
+      }
+    })
+    return tmplElement.innerHTML
+  } else
+    // just replace yield in tmpl with the innerHTML
+    return tmpl.replace(/<yield\s*(?:\/>|>\s*<\/yield\s*>)/gi, innerHTML || '')
 }
 
 /**
@@ -2032,6 +2152,16 @@ var injectStyle = (function() {
     function (css) { styleNode.innerHTML += css }
 
 })()
+
+/**
+ * requestAnimationFrame polyfill
+ */
+var rAF = (function(w) {
+  return  w.requestAnimationFrame       ||
+          w.webkitRequestAnimationFrame ||
+          w.mozRequestAnimationFrame    ||
+          function(cb) { setTimeout(cb, 1000 / 60) }
+})(window || {})
 
 /**
  * Mount a tag creating new Tag instance
@@ -2238,30 +2368,41 @@ riot.Tag = Tag
 /* istanbul ignore next */
 
 /**
- * Compiler for riot custom tags
- * @version v2.3.13
- */
-
-/**
  * @module parsers
  */
 var parsers = (function () {
-  var _mods = {}
+  var _mods = {
+    none: function (js) {
+      return js
+    }
+  }
+  _mods.javascript = _mods.none
 
-  function _try(name, req) {   //eslint-disable-line no-redeclare
+  function _try(name, req) {  //eslint-disable-line complexity
+    var parser
 
     switch (name) {
     case 'coffee':
       req = 'CoffeeScript'
       break
     case 'es6':
+    case 'babel':
       req = 'babel'
       break
+    case 'none':
+    case 'javascript':
+      return _mods.none
     default:
       if (!req) req = name
       break
     }
-    return _mods[name] = window[req]
+    parser = window[req]
+
+    if (!parser)
+      throw new Error(req + ' parser not found.')
+    _mods[name] = parser
+
+    return parser
   }
 
   function _req(name, req) {
@@ -2269,13 +2410,31 @@ var parsers = (function () {
   }
 
   var _html = {
-    jade: function (html, opts) {
-      return _req('jade').render(html, extend({pretty: true, doctype: 'html'}, opts))
+    jade: function (html, opts, url) {
+      return _req('jade').render(html, extend({
+        pretty: true,
+        filename: url,
+        doctype: 'html'
+      }, opts))
     }
   }
 
   var _css = {
-    stylus: function (tag, css, opts) {
+    less: function(tag, css, opts, url) {
+      var less = _req('less'),
+        ret
+
+      less.render(css, extend({
+        sync: true,
+        compress: true
+      }, opts), function (err, result) {
+        // istanbul ignore next
+        if (err) throw err
+        ret = result.css
+      })
+      return ret
+    },
+    stylus: function (tag, css, opts, url) {
       var
         stylus = _req('stylus'), nib = _req('nib')
       /* istanbul ignore next: can't run both */
@@ -2285,48 +2444,49 @@ var parsers = (function () {
   }
 
   var _js = {
-    none: function (js, opts) {
-      return js
-    },
-    livescript: function (js, opts) {
+    livescript: function (js, opts, url) {
       return _req('livescript').compile(js, extend({bare: true, header: false}, opts))
     },
-    typescript: function (js, opts) {
+    typescript: function (js, opts, url) {
       return _req('typescript')(js, opts).replace(/\r\n?/g, '\n')
     },
-    es6: function (js, opts) {
+    es6: function (js, opts, url) {
       return _req('es6').transform(js, extend({
         blacklist: ['useStrict', 'strict', 'react'], sourceMaps: false, comments: false
       }, opts)).code
     },
-    babel: function (js, opts) {
-      js = 'function __parser_babel_wrapper__(){' + js + '}'
+    babel: function (js, opts, url) {
+      // istanbul ignore next: url empty if comming from expression
       return _req('babel').transform(js,
         extend({
-          presets: ['es2015']
+          filename: url || ''
         }, opts)
-      ).code.replace(/["']use strict["'];[\r\n]+/, '').slice(38, -2)
+      ).code
     },
-    coffee: function (js, opts) {
+    coffee: function (js, opts, url) {
       return _req('coffee').compile(js, extend({bare: true}, opts))
-    }
+    },
+    none: _mods.none
   }
 
   _js.javascript   = _js.none
   _js.coffeescript = _js.coffee
 
-  return {html: _html, css: _css, js: _js, _req: _req}
+  return {
+    html: _html,
+    css: _css,
+    js: _js,
+    _req: _req}
 
 })()
 
 riot.parsers = parsers
 
 /**
- * @module compiler
+ * Compiler for riot custom tags
+ * @version v2.3.19
  */
 var compile = (function () {
-
-  var brackets = riot.util.brackets
 
   function _regEx(str, opt) { return new RegExp(str, opt) }
 
@@ -2334,7 +2494,7 @@ var compile = (function () {
 
     BOOL_ATTRS = _regEx(
       '^(?:disabled|checked|readonly|required|allowfullscreen|auto(?:focus|play)|' +
-      'compact|controls|default|formnovalidate|hidden|inert|ismap|itemscope|loop|' +
+      'compact|controls|default|formnovalidate|hidden|ismap|itemscope|loop|' +
       'multiple|muted|no(?:resize|shade|validate|wrap)?|open|reversed|seamless|' +
       'selected|sortable|truespeed|typemustmatch)$'),
 
@@ -2342,11 +2502,9 @@ var compile = (function () {
 
     VOID_TAGS  = /^(?:input|img|br|wbr|hr|area|base|col|embed|keygen|link|meta|param|source|track)$/,
 
-    HTML_ATTR  = /\s*([-\w:\.\xA0-\xFF]+)\s*(?:=\s*('[^']+'|"[^"]+"|\S+))?/g,
+    HTML_ATTR  = /\s*([-\w:\xA0-\xFF]+)\s*(?:=\s*('[^']+'|"[^"]+"|\S+))?/g,
 
-    TRIM_TRAIL = /[ \t]+$/gm,
-
-    _bp = null
+    TRIM_TRAIL = /[ \t]+$/gm
 
   function q(s) {
     return "'" + (s ? s
@@ -2357,7 +2515,7 @@ var compile = (function () {
   function mktag(name, html, css, attrs, js, pcex) {
     var
       c = ', ',
-      s = '}' + (pcex.length ? ', ' + q(_bp[8]) : '') + ');'
+      s = '}' + (pcex.length ? ', ' + q(pcex._bp[8]) : '') + ');'
 
     if (js && js.slice(-1) !== '\n') s = '\n' + s
 
@@ -2375,13 +2533,17 @@ var compile = (function () {
     return obj
   }
 
-  function parseAttrs(str) {
+  function parseAttrs(str, pcex) {
     var
       list = [],
       match,
       k, v,
+      _bp = pcex._bp,
       DQ = '"'
+
     HTML_ATTR.lastIndex = 0
+
+    str = str.replace(/\s+/g, ' ')
 
     while (match = HTML_ATTR.exec(str)) {
 
@@ -2416,11 +2578,12 @@ var compile = (function () {
   }
 
   function splitHtml(html, opts, pcex) {
+    var _bp = pcex._bp
 
     if (html && _bp[4].test(html)) {
       var
-        jsfn = opts.expr && (opts.parser || opts.type) ? compileJS : 0,
-        list = brackets.split(html),
+        jsfn = opts.expr && (opts.parser || opts.type) ? _compileJS : 0,
+        list = brackets.split(html, 0, _bp),
         expr
 
       for (var i = 1; i < list.length; i += 2) {
@@ -2428,8 +2591,10 @@ var compile = (function () {
         if (expr[0] === '^')
           expr = expr.slice(1)
         else if (jsfn) {
-          expr = jsfn(expr, opts)
-          if (/;\s*$/.test(expr)) expr = expr.slice(0, expr.search(/;\s*$/))
+          var israw = expr[0] === '='
+          expr = jsfn(israw ? expr.slice(1) : expr, opts).trim()
+          if (expr.slice(-1) === ';') expr = expr.slice(0, -1)
+          if (israw) expr = '=' + expr
         }
         list[i] = '\u0001' + (pcex.push(expr.replace(/[\r\n]+/g, ' ').trim()) - 1) + _bp[1]
       }
@@ -2442,7 +2607,15 @@ var compile = (function () {
     if (pcex.length) {
       html = html
         .replace(/\u0001(\d+)/g, function (_, d) {
-          return _bp[0] + pcex[d].replace(/"/g, '&quot;')
+          var expr = pcex[d]
+          if (expr[0] === '=') {
+            expr = expr.replace(brackets.R_STRINGS, function (qs) {
+              return qs
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+            })
+          }
+          return pcex._bp[0] + expr.replace(/"/g, '\u2057')
         })
     }
     return html
@@ -2450,15 +2623,12 @@ var compile = (function () {
 
   var
     HTML_COMMENT = /<!--(?!>)[\S\s]*?-->/g,
-    HTML_TAGS = /<([-\w]+)\s*([^"'\/>]*(?:(?:"[^"]*"|'[^']*'|\/[^>])[^'"\/>]*)*)(\/?)>/g
+    HTML_TAGS = /<([-\w]+)\s*([^"'\/>]*(?:(?:"[^"]*"|'[^']*'|\/[^>])[^'"\/>]*)*)(\/?)>/g,
+    PRE_TAG = _regEx(
+      /<pre(?:\s+[^'">]+(?:(?:@Q)[^'">]*)*|\s*)?>([\S\s]*?)<\/pre\s*>/
+      .source.replace('@Q', brackets.R_STRINGS.source), 'gi')
 
-  function compileHTML(html, opts, pcex, intc) {
-
-    if (!intc) {
-      _bp = brackets.array(opts.brackets)
-      html = html.replace(/\r\n?/g, '\n').replace(HTML_COMMENT, '').replace(TRIM_TRAIL, '')
-    }
-    if (!pcex) pcex = []
+  function _compileHTML(html, opts, pcex) {
 
     html = splitHtml(html, opts, pcex)
       .replace(HTML_TAGS, function (_, name, attr, ends) {
@@ -2467,19 +2637,22 @@ var compile = (function () {
 
         ends = ends && !VOID_TAGS.test(name) ? '></' + name : ''
 
-        if (attr) name += ' ' + parseAttrs(attr)
+        if (attr) name += ' ' + parseAttrs(attr, pcex)
 
         return '<' + name + ends + '>'
       })
 
     if (!opts.whitespace) {
-      var p = [],
-        pre = /<pre(?:\s+[^'">]+(?:(?:"[^"]*"|'[^']*')[^'">]*)*|\s*)>[\s\S]*<\/pre\s*>/gi
-
-      html = html.replace(pre, function (q) {
-        return '\u0002' + (p.push(q) - 1) + '~' }).trim().replace(/\s+/g, ' ')
-      if (p.length)
-        html = html.replace(/\u0002(\d+)~/g, function (q, n) { return p[n] })
+      if (/<pre[\s>]/.test(html)) {
+        var p = []
+        html = html.replace(PRE_TAG, function (q)
+          { return p.push(q) && '\u0002' }).trim().replace(/\s+/g, ' ')
+        // istanbul ignore else
+        if (p.length)
+          html = html.replace(/\u0002/g, function (_) { return p.shift() })
+      }
+      else
+        html = html.trim().replace(/\s+/g, ' ')
     }
 
     if (opts.compact) html = html.replace(/> <([-\w\/])/g, '><$1')
@@ -2487,12 +2660,27 @@ var compile = (function () {
     return restoreExpr(html, pcex)
   }
 
+  // istanbul ignore next
+  function compileHTML(html, opts, pcex) {
+    if (Array.isArray(opts)) {
+      pcex = opts
+      opts = {}
+    }
+    else {
+      if (!pcex) pcex = []
+      if (!opts) opts = {}
+    }
+
+    if (!pcex.__intflag)
+      html = html.replace(/\r\n?/g, '\n').replace(HTML_COMMENT, '').replace(TRIM_TRAIL, '')
+
+    if (!pcex._bp) pcex._bp = brackets.array(opts.brackets)
+
+    return _compileHTML(html, opts, pcex)
+  }
+
   var
-
-    JS_RMCOMMS = _regEx(
-    '(' + brackets.S_QBLOCKS + ')|' + brackets.R_MLCOMMS.source + '|//[^\r\n]*',
-    'g'),
-
+    JS_RMCOMMS = _regEx('(' + brackets.S_QBLOCKS + ')|' + brackets.R_MLCOMMS.source + '|//[^\r\n]*', 'g'),
     JS_ES6SIGN = /^([ \t]*)([$_A-Za-z][$\w]*)\s*(\([^()]*\)\s*{)/m
 
   function riotjs(js) {
@@ -2535,7 +2723,7 @@ var compile = (function () {
     }
   }
 
-  function compileJS(js, opts, type, parserOpts) {
+  function _compileJS(js, opts, type, parserOpts, url) {
     if (!js) return ''
     if (!type) type = opts.type
 
@@ -2543,7 +2731,23 @@ var compile = (function () {
     if (!parser)
       throw new Error('JS parser not found: "' + type + '"')
 
-    return parser(js, parserOpts).replace(TRIM_TRAIL, '')
+    return parser(js, parserOpts, url).replace(TRIM_TRAIL, '')
+  }
+
+  // istanbul ignore next
+  function compileJS(js, opts, type, extra) {
+    if (typeof opts === 'string') {
+      extra = type
+      type = opts
+      opts = {}
+    }
+    if (typeof type === 'object') {
+      extra = type
+      type = ''
+    }
+    else if (!extra) extra = {}
+
+    return _compileJS(js, opts, type, extra.parserOptions, extra.url)
   }
 
   var CSS_SELECTOR = _regEx('(}|{|^)[ ;]*([^@ ;{}][^{}]*)(?={)|' + brackets.R_STRINGS.source, 'g')
@@ -2571,14 +2775,15 @@ var compile = (function () {
     })
   }
 
-  function compileCSS(style, tag, type, scoped, opts) {
+  function _compileCSS(style, tag, type, opts) {
+    var scoped = (opts || (opts = {})).scoped
 
     if (type) {
       if (type === 'scoped-css') {
         scoped = true
       }
       else if (parsers.css[type]) {
-        style = parsers.css[type](tag, style, opts)
+        style = parsers.css[type](tag, style, opts.parserOpts, opts.url)
       }
       else if (type !== 'css') {
         throw new Error('CSS parser not found: "' + type + '"')
@@ -2587,7 +2792,23 @@ var compile = (function () {
 
     style = style.replace(brackets.R_MLCOMMS, '').replace(/\s+/g, ' ').trim()
 
-    return scoped ? scopedCSS(tag, style) : style
+    if (scoped) {
+      // istanbul ignore next
+      if (!tag)
+        throw new Error('Can not parse scoped CSS without a tagName')
+      style = scopedCSS(tag, style)
+    }
+    return style
+  }
+
+  // istanbul ignore next
+  function compileCSS(style, parser, opts) {
+    if (typeof parser === 'object') {
+      opts = parser
+      parser = ''
+    }
+    else if (!opts) opts = {}
+    return _compileCSS(style, opts.tagName, parser, opts)
   }
 
   var
@@ -2611,52 +2832,34 @@ var compile = (function () {
         match = str.match(re)
       str = match && match[1]
       if (str)
-        return /^['"]/.test(str) ? str.slice(1, -1) : str
+        return (/^['"]/).test(str) ? str.slice(1, -1) : str
     }
     return ''
   }
 
-  // get the parser options from the options attribute
   function getParserOptions(attrs) {
     var opts = getAttr(attrs, 'options')
-    // convert the string into a valid js object
+
     if (opts) opts = JSON.parse(opts)
     return opts
   }
 
-  // Runs the custom or default parser on the received JavaScript code.
-  // The CLI version can read code from the file system (experimental)
   function getCode(code, opts, attrs, url) {
     var type = getType(attrs),
       parserOpts = getParserOptions(attrs)
 
-    //#if READ_JS_SRC
-    var src = getAttr(attrs, 'src')
-    if (src && url) {
-      var
-        charset = getAttr(attrs, 'charset'),
-        file = path.resolve(path.dirname(url), src)
-      code = require('fs').readFileSync(file, {encoding: charset || 'utf8'})
-    }
-    //#endif
-    return compileJS(code, opts, type, parserOpts)
+    return _compileJS(code, opts, type, parserOpts, url)
   }
 
-  // Matches HTML tag ending a line. This regex still can be fooled by code as:
-  // ```js
-  // x <y && y >
-  //  z
-  // ```
   var END_TAGS = /\/>\n|^<(?:\/[\w\-]+\s*|[\w\-]+(?:\s+(?:[-\w:\xA0-\xFF][\S\s]*?)?)?)>\n/
 
   function splitBlocks(str) {
     var k, m
 
     /* istanbul ignore next: this if() can't be true, but just in case... */
-    if (str[str.length - 1] === '>')
-      return [str, '']
+    if (str[str.length - 1] === '>') return [str, '']
 
-    k = str.lastIndexOf('<')    // first probable open tag
+    k = str.lastIndexOf('<')
     while (~k) {
       if (m = str.slice(k).match(END_TAGS)) {
         k += m.index + m[0].length
@@ -2664,46 +2867,41 @@ var compile = (function () {
       }
       k = str.lastIndexOf('<', k -1)
     }
-
     return ['', str]
   }
 
-  // Runs the external HTML parser for the entire tag file
-  function compileTemplate(lang, html, opts) {
+  function compileTemplate(html, url, lang, opts) {
     var parser = parsers.html[lang]
 
     if (!parser)
       throw new Error('Template parser not found: "' + lang + '"')
 
-    return parser(html, opts)
+    return parser(html, opts, url)
   }
 
-  /*
-    CUST_TAG regex don't allow unquoted expressions containing the `>` operator.
-    STYLE and SCRIPT disallows the operator `>` at all.
-
-    The beta.4 CUST_TAG regex is fast, with RegexBuddy I get 76 steps and 14 backtracks on
-    the test/specs/fixtures/treeview.tag :) but fails with nested tags of the same name :(
-    With a greedy * operator, we have ~500 and 200bt, it is acceptable. So let's fix this.
-   */
   var
-    CUST_TAG = /^([ \t]*)<([-\w]+)(?:\s+([^'"\/>]+(?:(?:"[^"]*"|'[^']*'|\/[^>])[^'"\/>]*)*)|\s*)?(?:\/>|>[ \t]*\n?([\s\S]*)^\1<\/\2\s*>|>(.*)<\/\2\s*>)/gim,
+    CUST_TAG = _regEx(
+      /^([ \t]*)<([-\w]+)(?:\s+([^'"\/>]+(?:(?:@Q|\/[^>])[^'"\/>]*)*)|\s*)?(?:\/>|>[ \t]*\n?([\S\s]*)^\1<\/\2\s*>|>(.*)<\/\2\s*>)/
+      .source.replace('@Q', brackets.R_STRINGS.source), 'gim'),
     STYLE = /<style(\s+[^>]*)?>\n?([^<]*(?:<(?!\/style\s*>)[^<]*)*)<\/style\s*>/gi,
     SCRIPT = _regEx(STYLE.source.replace(/tyle/g, 'cript'), 'gi')
 
   function compile(src, opts, url) {
-    var label, parts = []
+    var
+      parts = [],
+      exclude
 
     if (!opts) opts = {}
 
-    _bp = brackets.array(opts.brackets)
+    exclude = opts.exclude || false
+    function included(s) { return !(exclude && ~exclude.indexOf(s)) }
+
+    var _bp = brackets.array(opts.brackets)
 
     if (opts.template)
-      src = compileTemplate(opts.template, src, opts.templateOptions)
+      src = compileTemplate(src, url, opts.template, opts.templateOptions)
 
-    label = url ? '//src: ' + url + '\n' : ''
-
-    src = label + src
+    src = src
       .replace(/\r\n?/g, '\n')
       .replace(CUST_TAG, function (_, indent, tagName, attribs, body, body2) {
 
@@ -2713,41 +2911,54 @@ var compile = (function () {
           html = '',
           pcex = []
 
+        pcex._bp = _bp
+        pcex.__intflag = 1
+
         tagName = tagName.toLowerCase()
 
-        attribs = !attribs ? '' : restoreExpr(parseAttrs(splitHtml(attribs, opts, pcex)), pcex)
+        attribs = attribs && included('attribs') ?
+          restoreExpr(parseAttrs(splitHtml(attribs, opts, pcex), pcex), pcex) : ''
 
         if (body2) body = body2
 
         if (body && (body = body.replace(HTML_COMMENT, '')) && /\S/.test(body)) {
 
-          if (body2)
-            html = compileHTML(body2, opts, pcex, 1)
+          if (body2) {
+            /* istanbul ignore next */
+            html = included('html') ? _compileHTML(body2, opts, pcex) : ''
+          }
           else {
             body = body.replace(_regEx('^' + indent, 'gm'), '')
 
-            body = body.replace(STYLE, function (_, _attrs, _style) {
-              var scoped = _attrs && /\sscoped(\s|=|$)/i.test(_attrs),
-                csstype = getType(_attrs) || opts.style
+            body = body.replace(STYLE, included('css') ? function (_, _attrs, _style) {
+              var extraOpts = {
+                scoped: _attrs && /\sscoped(\s|=|$)/i.test(_attrs),
+                url: url,
+                parserOpts: getParserOptions(_attrs)
+              }
               styles += (styles ? ' ' : '') +
-                compileCSS(_style, tagName, csstype, scoped, getParserOptions(_attrs))
+                _compileCSS(_style, tagName, getType(_attrs) || opts.style, extraOpts)
               return ''
-            })
+            } : '')
 
-            body = body.replace(SCRIPT, function (_, _attrs, _script) {
-              jscode += (jscode ? '\n' : '') + getCode(_script, opts, _attrs)
+            body = body.replace(SCRIPT, included('js') ? function (_, _attrs, _script) {
+              jscode += (jscode ? '\n' : '') + getCode(_script, opts, _attrs, url)
               return ''
-            })
+            } : '')
 
             var blocks = splitBlocks(body.replace(TRIM_TRAIL, ''))
 
-            body = blocks[0]
-            if (body)
-              html = compileHTML(body, opts, pcex, 1)
+            if (included('html')) {
+              body = blocks[0]
+              if (body)
+                html = _compileHTML(body, opts, pcex)
+            }
 
-            body = blocks[1]
-            if (/\S/.test(body))
-              jscode += (jscode ? '\n' : '') + compileJS(body, opts)
+            if (included('js')) {
+              body = blocks[1]
+              if (/\S/.test(body))
+                jscode += (jscode ? '\n' : '') + _compileJS(body, opts, null, null, url)
+            }
           }
         }
 
@@ -2767,13 +2978,21 @@ var compile = (function () {
         return mktag(tagName, html, styles, attribs, jscode, pcex)
       })
 
-    return opts.entities ? parts : src
+    if (opts.entities) return parts
+
+    return src
   }
 
+  riot.util.compiler = {
+    compile: compile,
+    html: compileHTML,
+    css: compileCSS,
+    js: compileJS,
+    version: 'v2.3.19'
+  }
   return compile
 
 })()
-
 
 /*
   Compilation for the browser
@@ -2819,7 +3038,10 @@ riot.compile = (function () {
     }
 
     function compileTag(src, opts, url) {
-      globalEval(compile(src, opts, url))
+      var code = compile(src, opts, url)
+
+      if (url) code += '\n//# sourceURL=' + url + '.js'
+      globalEval(code)
       if (!--scriptsAmount) done()
     }
 
@@ -2904,7 +3126,7 @@ riot.mount = function(a, b, c) {
   /* istanbul ignore next */
   if (typeof exports === T_OBJECT)
     module.exports = riot
-  else if (typeof define === 'function' && define.amd)
+  else if (typeof define === T_FUNCTION && typeof define.amd !== T_UNDEF)
     define(function() { return (window.riot = riot) })
   else
     window.riot = riot
