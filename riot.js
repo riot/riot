@@ -169,6 +169,7 @@ var RE_ORIGIN = /^.+?\/+[^\/]+/,
   HAS_ATTRIBUTE = 'hasAttribute',
   REPLACE = 'replace',
   POPSTATE = 'popstate',
+  HASHCHANGE = 'hashchange',
   TRIGGER = 'trigger',
   MAX_EMIT_STACK_LEVEL = 3,
   win = window,
@@ -179,6 +180,7 @@ var RE_ORIGIN = /^.+?\/+[^\/]+/,
   started = false,
   central = riot.observable(),
   routeFound = false,
+  debouncedEmit,
   base, current, parser, secondParser, emitStack = [], emitStackLevel = 0
 
 /**
@@ -201,6 +203,32 @@ function DEFAULT_SECOND_PARSER(path, filter) {
     args = path.match(re)
 
   if (args) return args.slice(1)
+}
+
+/**
+ * Simple/cheap debounce implementation
+ * @param   {function} fn - callback
+ * @param   {number} delay - delay in seconds
+ * @returns {function} debounced function
+ */
+function debounce(fn, delay) {
+  var t
+  return function () {
+    clearTimeout(t)
+    t = setTimeout(fn, delay)
+  }
+}
+
+/**
+ * Set the window listeners to trigger the routes
+ * @param {boolean} autoExec - see route.start
+ */
+function start(autoExec) {
+  debouncedEmit = debounce(emit, 1)
+  win[ADD_EVENT_LISTENER](POPSTATE, debouncedEmit)
+  win[ADD_EVENT_LISTENER](HASHCHANGE, debouncedEmit)
+  doc[ADD_EVENT_LISTENER](clickEvent, click)
+  if (autoExec) emit(true)
 }
 
 /**
@@ -295,6 +323,7 @@ function click(e) {
  * Go to the path
  * @param {string} path - destination path
  * @param {string} title - page title
+ * @returns {boolean} - route not found flag
  */
 function go(path, title) {
   title = title || doc.title
@@ -337,7 +366,7 @@ prot.s = function() {
 prot.e = function(path) {
   this.$.concat('@').some(function(filter) {
     var args = (filter == '@' ? parser : secondParser)(normalize(path), normalize(filter))
-    if (args) {
+    if (typeof args != 'undefined') {
       this[TRIGGER].apply(null, [filter].concat(args))
       return routeFound = true // exit from loop
     }
@@ -414,7 +443,8 @@ route.query = function() {
 /** Stop routing **/
 route.stop = function () {
   if (started) {
-    win[REMOVE_EVENT_LISTENER](POPSTATE, emit)
+    win[REMOVE_EVENT_LISTENER](POPSTATE, debouncedEmit)
+    win[REMOVE_EVENT_LISTENER](HASHCHANGE, debouncedEmit)
     doc[REMOVE_EVENT_LISTENER](clickEvent, click)
     central[TRIGGER]('stop')
     started = false
@@ -427,11 +457,14 @@ route.stop = function () {
  */
 route.start = function (autoExec) {
   if (!started) {
-    win[ADD_EVENT_LISTENER](POPSTATE, emit)
-    doc[ADD_EVENT_LISTENER](clickEvent, click)
+    if (document.readyState == 'complete') start(autoExec)
+    // the timeout is needed to solve
+    // a weird safari bug https://github.com/riot/route/issues/33
+    else win[ADD_EVENT_LISTENER]('load', function() {
+      setTimeout(function() { start(autoExec) }, 1)
+    })
     started = true
   }
-  if (autoExec) emit(true)
 }
 
 /** Prepare the router **/
@@ -444,15 +477,15 @@ riot.route = route
 
 /**
  * The riot template engine
- * @version v2.3.12
+ * @version v2.3.19
  */
 
 /**
  * @module brackets
  *
  * `brackets         ` Returns a string or regex based on its parameter
- * `brackets.settings` Mirrors the `riot.settings` object
- * `brackets.set     ` The recommended option to change the current tiot brackets
+ * `brackets.settings` Mirrors the `riot.settings` object (use brackets.set in new code)
+ * `brackets.set     ` Change the current riot brackets
  */
 
 var brackets = (function (UNDEF) {
@@ -464,15 +497,15 @@ var brackets = (function (UNDEF) {
     STRINGS = /"[^"\\]*(?:\\[\S\s][^"\\]*)*"|'[^'\\]*(?:\\[\S\s][^'\\]*)*'/g,
 
     S_QBSRC = STRINGS.source + '|' +
-      /(?:[$\w\)\]]|\+\+|--)\s*(\/)(?![*\/])/.source + '|' +
+      /(?:\breturn\s+|(?:[$\w\)\]]|\+\+|--)\s*(\/)(?![*\/]))/.source + '|' +
       /\/(?=[^*\/])[^[\/\\]*(?:(?:\[(?:\\.|[^\]\\]*)*\]|\\.)[^[\/\\]*)*?(\/)[gim]*/.source,
 
     DEFAULT = '{ }',
 
     FINDBRACES = {
-      '(': _regExp('([()])|'   + S_QBSRC, REGLOB),
-      '[': _regExp('([[\\]])|' + S_QBSRC, REGLOB),
-      '{': _regExp('([{}])|'   + S_QBSRC, REGLOB)
+      '(': RegExp('([()])|'   + S_QBSRC, REGLOB),
+      '[': RegExp('([[\\]])|' + S_QBSRC, REGLOB),
+      '{': RegExp('([{}])|'   + S_QBSRC, REGLOB)
     }
 
   var
@@ -480,49 +513,60 @@ var brackets = (function (UNDEF) {
     _regex,
     _pairs = []
 
-  function _regExp(source, flags) { return new RegExp(source, flags) }
-
   function _loopback(re) { return re }
 
-  function _rewrite(re) {
+  function _rewrite(re, bp) {
+    if (!bp) bp = _pairs
     return new RegExp(
-      re.source.replace(/{/g, _pairs[2]).replace(/}/g, _pairs[3]), re.global ? REGLOB : ''
+      re.source.replace(/{/g, bp[2]).replace(/}/g, bp[3]), re.global ? REGLOB : ''
     )
   }
 
+  function _create(pair) {
+    var
+      cvt,
+      arr = pair.split(' ')
+
+    if (pair === DEFAULT) {
+      arr[2] = arr[0]
+      arr[3] = arr[1]
+      cvt = _loopback
+    }
+    else {
+      if (arr.length !== 2 || /[\x00-\x1F<>a-zA-Z0-9'",;\\]/.test(pair)) {
+        throw new Error('Unsupported brackets "' + pair + '"')
+      }
+      arr = arr.concat(pair.replace(/(?=[[\]()*+?.^$|])/g, '\\').split(' '))
+      cvt = _rewrite
+    }
+    arr[4] = cvt(arr[1].length > 1 ? /{[\S\s]*?}/ : /{[^}]*}/, arr)
+    arr[5] = cvt(/\\({|})/g, arr)
+    arr[6] = cvt(/(\\?)({)/g, arr)
+    arr[7] = RegExp('(\\\\?)(?:([[({])|(' + arr[3] + '))|' + S_QBSRC, REGLOB)
+    arr[8] = pair
+    return arr
+  }
+
   function _reset(pair) {
-    pair = pair || DEFAULT
+    if (!pair) pair = DEFAULT
 
     if (pair !== _pairs[8]) {
-      var bp = pair.split(' ')
-
-      if (pair === DEFAULT) {
-        _pairs = bp.concat(bp)
-        _regex = _loopback
-      }
-      else {
-        if (bp.length !== 2 || /[\x00-\x1F<>a-zA-Z0-9'",;\\]/.test(pair)) {
-          throw new Error('Unsupported brackets "' + pair + '"')
-        }
-        _pairs = bp.concat(pair.replace(/(?=[[\]()*+?.^$|])/g, '\\').split(' '))
-        _regex = _rewrite
-      }
-      _pairs[4] = _regex(_pairs[1].length > 1 ? /(?:^|[^\\]){[\S\s]*?}/ : /(?:^|[^\\]){[^}]*}/)
-      _pairs[5] = _regex(/\\({|})/g)
-      _pairs[6] = _regex(/(\\?)({)/g)
-      _pairs[7] = _regExp('(\\\\?)(?:([[({])|(' + _pairs[3] + '))|' + S_QBSRC, REGLOB)
-      _pairs[9] = _regex(/^\s*{\^?\s*([$\w]+)(?:\s*,\s*(\S+))?\s+in\s+(\S+)\s*}/)
-      _pairs[8] = pair
+      _pairs = _create(pair)
+      _regex = pair === DEFAULT ? _loopback : _rewrite
+      _pairs[9] = _regex(/^\s*{\^?\s*([$\w]+)(?:\s*,\s*(\S+))?\s+in\s+(\S.*)\s*}/)
+      _pairs[10] = _regex(/(^|[^\\]){=[\S\s]*?}/)
+      _brackets._rawOffset = _pairs[0].length
     }
-    _brackets.settings.brackets = cachedBrackets = pair
+    cachedBrackets = pair
   }
 
   function _brackets(reOrIdx) {
-    _reset(_brackets.settings.brackets)
     return reOrIdx instanceof RegExp ? _regex(reOrIdx) : _pairs[reOrIdx]
   }
 
-  _brackets.split = function split(str, tmpl) {
+  _brackets.split = function split(str, tmpl, _bp) {
+    // istanbul ignore next: _bp is for the compiler
+    if (!_bp) _bp = _pairs
 
     var
       parts = [],
@@ -530,7 +574,7 @@ var brackets = (function (UNDEF) {
       isexpr,
       start,
       pos,
-      re = _brackets(6)
+      re = _bp[6]
 
     isexpr = start = re.lastIndex = 0
 
@@ -552,7 +596,7 @@ var brackets = (function (UNDEF) {
       if (!match[1]) {
         unescapeStr(str.slice(start, pos))
         start = re.lastIndex
-        re = _pairs[6 + (isexpr ^= 1)]
+        re = _bp[6 + (isexpr ^= 1)]
         re.lastIndex = start
       }
     }
@@ -565,7 +609,7 @@ var brackets = (function (UNDEF) {
 
     function unescapeStr(str) {
       if (tmpl || isexpr)
-        parts.push(str && str.replace(_pairs[5], '$1'))
+        parts.push(str && str.replace(_bp[5], '$1'))
       else
         parts.push(str)
     }
@@ -592,13 +636,30 @@ var brackets = (function (UNDEF) {
   _brackets.loopKeys = function loopKeys(expr) {
     var m = expr.match(_brackets(9))
     return m ?
-      { key: m[1], pos: m[2], val: _pairs[0] + m[3] + _pairs[1] } : { val: expr.trim() }
+      { key: m[1], pos: m[2], val: _pairs[0] + m[3].trim() + _pairs[1] } : { val: expr.trim() }
   }
 
   _brackets.array = function array(pair) {
-    _reset(pair || _brackets.settings.brackets)
-    return _pairs
+    return _create(pair || cachedBrackets)
   }
+
+  var _settings
+  function _setSettings(o) {
+    var b
+    o = o || {}
+    b = o.brackets
+    Object.defineProperty(o, 'brackets', {
+      set: _reset,
+      get: function () { return cachedBrackets },
+      enumerable: true
+    })
+    _settings = o
+    _reset(b)
+  }
+  Object.defineProperty(_brackets, 'settings', {
+    set: _setSettings,
+    get: function () { return _settings }
+  })
 
   /* istanbul ignore next: in the node version riot is not in the scope */
   _brackets.settings = typeof riot !== 'undefined' && riot.settings || {}
@@ -607,8 +668,6 @@ var brackets = (function (UNDEF) {
   _brackets.R_STRINGS = STRINGS
   _brackets.R_MLCOMMS = MLCOMMS
   _brackets.S_QBLOCKS = S_QBSRC
-
-  _reset(_brackets.settings.brackets)
 
   return _brackets
 
@@ -624,9 +683,7 @@ var brackets = (function (UNDEF) {
 
 var tmpl = (function () {
 
-  var
-    FALSE  = !1,
-    _cache = {}
+  var _cache = {}
 
   function _tmpl(str, data) {
     if (!str) return str
@@ -634,11 +691,19 @@ var tmpl = (function () {
     return (_cache[str] || (_cache[str] = _create(str))).call(data, _logErr)
   }
 
+  _tmpl.isRaw = function (expr) {
+    return expr[brackets._rawOffset] === "="
+  }
+
+  _tmpl.haveRaw = function (src) {
+    return brackets(10).test(src)
+  }
+
   _tmpl.hasExpr = brackets.hasExpr
 
   _tmpl.loopKeys = brackets.loopKeys
 
-  _tmpl.errorHandler = FALSE
+  _tmpl.errorHandler = null
 
   function _logErr(err, ctx) {
 
@@ -657,18 +722,18 @@ var tmpl = (function () {
     var expr = _getTmpl(str)
     if (expr.slice(0, 11) !== 'try{return ') expr = 'return ' + expr
 
-    return new Function('E', expr + ';')  // eslint-disable-line indent
+    return new Function('E', expr + ';')
   }
 
   var
-    RE_QBLOCK = new RegExp(brackets.S_QBLOCKS, 'g'),
+    RE_QBLOCK = RegExp(brackets.S_QBLOCKS, 'g'),
     RE_QBMARK = /\x01(\d+)~/g
 
   function _getTmpl(str) {
     var
       qstr = [],
       expr,
-      parts = brackets.split(str, 1)
+      parts = brackets.split(str.replace(/\u2057/g, '"'), 1)
 
     if (parts.length > 2 || parts[0]) {
       var i, j, list = []
@@ -714,6 +779,8 @@ var tmpl = (function () {
     RE_BRACE = /,|([[{(])|$/g
 
   function _parseExpr(expr, asText, qstr) {
+
+    if (expr[0] === "=") expr = expr.slice(1)
 
     expr = expr
           .replace(RE_QBLOCK, function (s, div) {
@@ -773,7 +840,7 @@ var tmpl = (function () {
   var JS_VARNAME = /[,{][$\w]+:|(^ *|[^$\w\.])(?!(?:typeof|true|false|null|undefined|in|instanceof|is(?:Finite|NaN)|void|NaN|new|Date|RegExp|Math)(?![$\w]))([$_A-Za-z][$\w]*)/g
 
   function _wrapExpr(expr, asText, key) {
-    var tb = FALSE
+    var tb
 
     expr = expr.replace(JS_VARNAME, function (match, p, mvar, pos, s) {
       if (mvar) {
@@ -815,6 +882,8 @@ var tmpl = (function () {
   return _tmpl
 
 })()
+
+  tmpl.version = brackets.version = 'v2.3.19'
 
 
 /*
@@ -1025,7 +1094,7 @@ function _each(dom, parent, expr) {
     }
 
     // loop all the new items
-    each(items, function(item, i) {
+    items.forEach(function(item, i) {
       // reorder only if the items are objects
       var _mustReorder = mustReorder && item instanceof Object,
         oldPos = oldItems.indexOf(item),
@@ -1094,7 +1163,7 @@ function _each(dom, parent, expr) {
       // cache the real parent tag internally
       defineProperty(tag, '_parent', parent)
 
-    })
+    }, true) // allow null values
 
     // remove the redundant tags
     unmountRedundant(items, tags)
@@ -1274,20 +1343,39 @@ function Tag(impl, conf, innerHTML) {
     updateOpts()
     self.trigger('update', data)
     update(expressions, self)
-    self.trigger('updated')
+    // the updated event will be triggered
+    // once the DOM will be ready and all the reflow are completed
+    // this is useful if you want to get the "real" root properties
+    // 4 ex: root.offsetWidth ...
+    rAF(function() { self.trigger('updated') })
     return this
   })
 
   defineProperty(this, 'mixin', function() {
     each(arguments, function(mix) {
+      var instance
+
       mix = typeof mix === T_STRING ? riot.mixin(mix) : mix
-      each(Object.keys(mix), function(key) {
+
+      // check if the mixin is a function
+      if (isFunction(mix)) {
+        // create the new mixin instance
+        instance = new mix()
+        // save the prototype to loop it afterwards
+        mix = mix.prototype
+      } else instance = mix
+
+      // loop the keys in the function prototype or the all object keys
+      each(Object.getOwnPropertyNames(mix), function(key) {
         // bind methods to self
         if (key != 'init')
-          self[key] = isFunction(mix[key]) ? mix[key].bind(self) : mix[key]
+          self[key] = isFunction(instance[key]) ?
+                        instance[key].bind(self) :
+                        instance[key]
       })
+
       // init method will be called automatically
-      if (mix.init) mix.init.bind(self)()
+      if (instance.init) instance.init.bind(self)()
     })
     return this
   })
@@ -1503,7 +1591,11 @@ function update(expressions, tag) {
 
     // leave out riot- prefixes from strings inside textarea
     // fix #815: any value -> string
-    if (parent && parent.tagName == 'TEXTAREA') value = ('' + value).replace(/riot-/g, '')
+    if (parent && parent.tagName == 'TEXTAREA') {
+      value = ('' + value).replace(/riot-/g, '')
+      // change textarea's value
+      parent.value = value
+    }
 
     // no change
     if (expr.value === value) return
@@ -1571,7 +1663,8 @@ function update(expressions, tag) {
         if (!value) return
       }
 
-      if (typeof value !== T_OBJECT) setAttr(dom, attrName, value)
+      if (value && value != 0 && typeof value !== T_OBJECT)
+        setAttr(dom, attrName, value)
 
     }
 
@@ -1612,13 +1705,13 @@ function remAttr(dom, name) {
 }
 
 /**
- * Convert a string containing dashes to camle case
+ * Convert a string containing dashes to camel case
  * @param   { String } string - input string
  * @returns { String } my-string -> myString
  */
 function toCamel(string) {
-  return string.replace(/(\-\w)/g, function(match) {
-    return match.toUpperCase().replace('-', '')
+  return string.replace(/-(\w)/g, function(_, c) {
+    return c.toUpperCase()
   })
 }
 
@@ -1898,6 +1991,18 @@ function mkEl(name) {
 }
 
 /**
+ * Create a generic DOM node, and fill it with innerHTML
+ * @param   { String } name - name of the DOM node we want to create
+ * @param   { String } innerHTML - innerHTML of the new DOM
+ * @returns { Object } DOM node just created
+ */
+function mkElWithInnerHTML(name, innerHTML) {
+  var el = mkEl(name)
+  el.innerHTML = innerHTML || ''
+  return el
+}
+
+/**
  * Replace the yield tag from any tag template with the innerHTML of the
  * original tag in the page
  * @param   { String } tmpl - tag implementation template
@@ -1905,7 +2010,22 @@ function mkEl(name) {
  * @returns { String } tag template updated without the yield tag
  */
 function replaceYield(tmpl, innerHTML) {
-  return tmpl.replace(/<yield\s*(?:\/>|>\s*<\/yield\s*>)/gi, innerHTML || '')
+  var tmplElement = mkElWithInnerHTML('div', tmpl)
+  // if ($('yield[from]'.tmplElement)) { // this issues test errors
+  if (tmplElement.querySelector && tmplElement.querySelector('yield[from]')) { // code coverage path not taken (?)
+    // yield to(s) must be direct children from innerHTML(root), all other tags are ignored
+    each(mkElWithInnerHTML('div', innerHTML).childNodes, function(toYield) {
+      if (toYield.nodeType == 1 && toYield.tagName == 'YIELD' && toYield.getAttribute('to')) {
+        // replace all yield[from]
+        each($$('yield[from="'+toYield.getAttribute('to')+'"]', tmplElement), function(fromYield) {
+          fromYield.outerHTML = toYield.innerHTML
+        })
+      }
+    })
+    return tmplElement.innerHTML
+  } else
+    // just replace yield in tmpl with the innerHTML
+    return tmpl.replace(/<yield\s*(?:\/>|>\s*<\/yield\s*>)/gi, innerHTML || '')
 }
 
 /**
@@ -2032,6 +2152,16 @@ var injectStyle = (function() {
     function (css) { styleNode.innerHTML += css }
 
 })()
+
+/**
+ * requestAnimationFrame polyfill
+ */
+var rAF = (function(w) {
+  return  w.requestAnimationFrame       ||
+          w.webkitRequestAnimationFrame ||
+          w.mozRequestAnimationFrame    ||
+          function(cb) { setTimeout(cb, 1000 / 60) }
+})(window || {})
 
 /**
  * Mount a tag creating new Tag instance
@@ -2239,7 +2369,7 @@ riot.Tag = Tag
   /* istanbul ignore next */
   if (typeof exports === T_OBJECT)
     module.exports = riot
-  else if (typeof define === 'function' && define.amd)
+  else if (typeof define === T_FUNCTION && typeof define.amd !== T_UNDEF)
     define(function() { return (window.riot = riot) })
   else
     window.riot = riot
