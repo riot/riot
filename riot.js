@@ -2274,7 +2274,7 @@ riot.mount = function(selector, tagName, opts) {
   function addRiotTags(arr) {
     var list = ''
     each(arr, function (e) {
-      list += ', *[' + RIOT_TAG + '="' + e.trim() + '"]'
+      list += ', *[' + RIOT_TAG + '="' + e.trim().replace(/"/g, '\\"') + '"]'
     })
     return list
   }
