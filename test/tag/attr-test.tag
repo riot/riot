@@ -1,4 +1,4 @@
 <attr-test>
-  <a href="#" target={ opts.target } class={ red:opts.red }></a>
-  <input type="checkbox" checked={ opts.isChecked }>
+  <input type="checkbox" id={ opts.checkboxId } class={ red:opts.red } checked={ opts.isChecked }>
+  <table if={ opts.includeTable } border={ opts.tableBorder }></table>
 </attr-test>
