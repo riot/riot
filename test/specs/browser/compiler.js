@@ -971,18 +971,30 @@ describe('Compiler Browser', function() {
       return css.replace(/@varcolor/, varcolor)
     }
 
-    var tag = riot.mount('style-parser')[0],
-      styles = getRiotStyles()
+    // test style defined but string replacement not occurred yet
+    var styles = getRiotStyles()
+    expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*@varcolor;\s*}/)
 
+    // test style parsing during mount
+    var tag = riot.mount('style-parser')[0]
+    styles = getRiotStyles()
     expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*red;\s*}/)
 
+    // test style parsing after manual update
     varcolor = 'green'
     riot.styleNode.updateStyles()
-
     styles = getRiotStyles()
     expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*green;\s*}/)
 
-    tags.push(tag)
+    // test remount does not affect style
+    tag.unmount()
+    injectHTML('<style-parser></style-parser>')
+    var tag2 = riot.mount('style-parser')[0]
+    styles = getRiotStyles()
+    expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*green;\s*}/)
+    expect(styles.match(/\bparsed-style\s*\{/g)).to.have.length(1)
+    tags.push(tag2)
+
   })
 
   it('preserve attributes from tag definition', function() {
