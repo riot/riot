@@ -959,6 +959,32 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('parser function in global style node', function() {
+
+    expect(riot.styleNode).to.not.be(undefined)
+    expect(riot.styleNode.tagName).to.be('STYLE')
+    expect(riot.styleNode.updateStyles).to.be.an('function')
+
+    var varcolor = 'red'
+
+    riot.styleNode.parser = function(css)  {
+      return css.replace(/@varcolor/, varcolor)
+    }
+
+    var tag = riot.mount('style-parser')[0],
+      styles = getRiotStyles()
+
+    expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*red;\s*}/)
+
+    varcolor = 'green'
+    riot.styleNode.updateStyles()
+
+    styles = getRiotStyles()
+    expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*green;\s*}/)
+
+    tags.push(tag)
+  })
+
   it('preserve attributes from tag definition', function() {
     injectHTML('<div riot-tag="preserve-attr2"></div>')
     var tag = riot.mount('preserve-attr')[0]
