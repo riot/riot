@@ -8,6 +8,19 @@ module.exports = function(config) {
     browsers = Object.keys(saucelabsBrowsers)
   }
 
+  var saucelabsConfig = {
+    build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
+    tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
+    testName: 'riotjs',
+    startConnect: true,
+    recordVideo: false,
+    recordScreenshots: false
+  }
+
+  //if (process.env.TRAVIS_JOB_NUMBER) {
+  //  saucelabsConfig.startConnect = false  // karma-runner/karma-sauce-launcher #73
+  //}
+
   config.set({
     basePath: '',
     autoWatch: true,
@@ -37,14 +50,7 @@ module.exports = function(config) {
       'specs/mixin.js'
     ],
     concurrency: 2,
-    sauceLabs: {
-      build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
-      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
-      testName: 'riotjs',
-      startConnect: false,  // karma-runner/karma-sauce-launcher#73
-      recordVideo: false,
-      recordScreenshots: false
-    },
+    sauceLabs: saucelabsConfig,
     captureTimeout: 300000,
     browserNoActivityTimeout: 300000,
     browserDisconnectTolerance: 2,
@@ -63,6 +69,8 @@ module.exports = function(config) {
         subdir: 'report-lcov'
       }]
     },
+
+    logLevel: config.LOG_DEBUG,
 
     singleRun: true
   })
