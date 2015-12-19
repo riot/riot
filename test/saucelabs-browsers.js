@@ -1,12 +1,14 @@
 // we will re-enable the broken browsers once saucelabs will fix all the timeout issues
 module.exports = {
   browsers: {
+    /*
     slIphone5: {
       base: 'SauceLabs',
       browserName: 'iphone',
       platform: 'OS X 10.10',
       version: '8.1'
     },
+    */
     slIphone6: {
       base: 'SauceLabs',
       device: 'iPhone 6',
