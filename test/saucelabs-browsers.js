@@ -25,11 +25,13 @@ module.exports = {
       browserName: 'safari',
       platform: 'OS X 10.9'
     },
+    /*
     slSafari8: {
       base: 'SauceLabs',
       browserName: 'safari',
       platform: 'OS X 10.10'
     },
+    */
     slSafari9: {
       base: 'SauceLabs',
       browserName: 'safari',
