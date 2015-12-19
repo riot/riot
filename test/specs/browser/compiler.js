@@ -972,8 +972,9 @@ describe('Compiler Browser', function() {
     }
 
     // test style defined but string replacement not occurred yet
+    // in IE9/10 incorrect styles are erased, other browsers retain them
     var styles = getRiotStyles()
-    expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*@varcolor;\s*}/)
+    expect(styles).to.match(/\bparsed-style\s*\{((\s*color:\s*@varcolor;\s*)|(\s*))}/)
 
     // test style parsing during mount
     riot.styleNode.updateStyles()
