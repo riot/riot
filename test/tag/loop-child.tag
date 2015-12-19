@@ -7,15 +7,22 @@
   this.childrenMountWidths = []
   this.childrenUpdatedWidths = []
 
+  getWidth(el) {
+    if (el.root.getBoundingClientRect)
+      return el.root.getBoundingClientRect().width
+    else
+      return 0
+  }
+
   this.on('updated', function() {
     this.tags['looped-child'].forEach(function(child) {
-      this.childrenUpdatedWidths.push(child.root.getBoundingClientRect().width)
+      this.childrenUpdatedWidths.push(this.getWidth(child))
     }.bind(this))
   })
 
   this.on('mount', function() {
     this.tags['looped-child'].forEach(function(child) {
-      this.childrenMountWidths.push(child.root.getBoundingClientRect().width)
+      this.childrenMountWidths.push(this.getWidth(child))
     }.bind(this))
   })
 
@@ -30,11 +37,11 @@
   this.color = 'red'
 
   this.on('updated', function() {
-    this.updatedWidth = this.root.getBoundingClientRect().width
+    this.updatedWidth = this.parent.getWidth(this)
   })
 
   this.on('mount', function() {
-    this.mountWidth = this.root.getBoundingClientRect().width
+    this.mountWidth = this.parent.getWidth(this)
   })
 
   hit(e) {
