@@ -976,6 +976,7 @@ describe('Compiler Browser', function() {
     expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*@varcolor;\s*}/)
 
     // test style parsing during mount
+    riot.styleNode.updateStyles()
     var tag = riot.mount('style-parser')[0]
     styles = getRiotStyles()
     expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*red;\s*}/)
