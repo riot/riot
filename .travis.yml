@@ -22,7 +22,7 @@ install:
   - npm i node-sass
   - npm install
 
-after_success:
+after_script:
   make test-sauce && make test-coveralls
 
 notifications:
