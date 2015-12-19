@@ -41,7 +41,7 @@ module.exports = function(config) {
       build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
       testName: 'riotjs',
-      startConnect: true,
+      startConnect: false,  // karma-runner/karma-sauce-launcher#73
       recordVideo: false,
       recordScreenshots: false
     },
