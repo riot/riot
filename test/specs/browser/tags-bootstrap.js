@@ -67,9 +67,6 @@ loadTagsAndScripts([
   'tag/~style-tag3.tag',
   'tag/style-tag4.tag',
 
-  // check parser function on global style tag
-  'tag/style-parser.tag',
-
   'tag/preserve-attr.tag',
 
   // these tags will be not autoinjected in the DOM

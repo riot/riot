@@ -959,43 +959,57 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
-  it('parser function in global style node', function() {
+  it('runtime parsed styles', function() {
 
+    // test riot.styleNode
     expect(riot.styleNode).to.not.be(undefined)
     expect(riot.styleNode.tagName).to.be('STYLE')
     expect(riot.styleNode.updateStyles).to.be.an('function')
 
+    // set a style parsing function before mounting the tag
     var varcolor = 'red'
-
     riot.styleNode.parser = function(css)  {
       return css.replace(/@varcolor/, varcolor)
     }
 
-    // test style defined but string replacement not occurred yet
-    var styles = getRiotStyles()
-    expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*@varcolor;\s*}/)
+    // test style isn't injected yet
+    styles = getRiotStyles()
+    expect(styles).not.to.match(/\bparsed-style\s*\{/)
 
-    // test style parsing during mount
-    riot.styleNode.updateStyles()
-    var tag = riot.mount('style-parser')[0]
+    // define a dynamically parsed style tag
+    riot.tag('runtime-style-parsing', '<div></div>', '.parsed-style { color: @varcolor; }', '', function(opts) { })
+
+    // test style isn't injected by the simple tag definition
+    styles = getRiotStyles()
+    expect(styles).not.to.match(/\bparsed-style\s*\{/)
+
+    // mount the tag
+    injectHTML(['<runtime-style-parsing></runtime-style-parsing>' ])
+    var tag = riot.mount('runtime-style-parsing')[0]
+
+    // test style correctly parsed and injected
     styles = getRiotStyles()
     expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*red;\s*}/)
 
-    // test style parsing after manual update
+    // manual update of style
     varcolor = 'green'
     riot.styleNode.updateStyles()
+
+    // test style parsing after manual update
     styles = getRiotStyles()
+    expect(styles).not.to.match(/\bparsed-style\s*\{\s*color:\s*red;\s*}/)
     expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*green;\s*}/)
+
+    // remount (unmount+mount)
+    tag.unmount()
+    tag = riot.mount('runtime-style-parsing')[0]
 
     // test remount does not affect style
-    tag.unmount()
-    injectHTML('<style-parser></style-parser>')
-    var tag2 = riot.mount('style-parser')[0]
     styles = getRiotStyles()
     expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*green;\s*}/)
-    expect(styles.match(/\bparsed-style\s*\{/g)).to.have.length(1)
-    tags.push(tag2)
 
+    // test remount does not duplicate rule
+    expect(styles.match(/\bparsed-style\s*\{/g)).to.have.length(1)
   })
 
   it('preserve attributes from tag definition', function() {
