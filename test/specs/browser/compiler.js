@@ -1001,8 +1001,9 @@ describe('Compiler Browser', function() {
     expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*green;\s*}/)
 
     // remount (unmount+mount)
-    tag.unmount()
+    tag.unmount(true)
     tag = riot.mount('runtime-style-parsing')[0]
+    expect(tag).to.not.be(undefined)
 
     // test remount does not affect style
     styles = getRiotStyles()
