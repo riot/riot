@@ -29,16 +29,16 @@ describe('Node/io.js', function() {
 
   it('render tag: attr-test', function() {
     var content = riot.render('attr-test', { red: true })
-    expect(content).to.be('<attr-test><a href="#" class="red"></a> <input type="checkbox"></attr-test>')
+    expect(content).to.be('<attr-test><input type="checkbox" class="red"> </attr-test>')
 
-    content = riot.render('attr-test', { target: '_blank', isChecked: true })
-    expect(content).to.be('<attr-test><a href="#" target="_blank"></a> <input type="checkbox" checked="checked"></attr-test>')
+    content = riot.render('attr-test', { isChecked: true, includeTable: true })
+    expect(content).to.be('<attr-test><input type="checkbox" checked="checked"> <table></table></attr-test>')
 
-    content = riot.render('attr-test', { target: false, isChecked: null })
-    expect(content).to.be('<attr-test><a href="#"></a> <input type="checkbox"></attr-test>')
+    content = riot.render('attr-test', { isChecked: null, checkboxId: 0, includeTable: true, tableBorder: 0 })
+    expect(content).to.be('<attr-test><input type="checkbox" id="0"> <table border="0"></table></attr-test>')
 
-    content = riot.render('attr-test', { target: 0, isChecked: 0 })
-    expect(content).to.be('<attr-test><a href="#"></a> <input type="checkbox"></attr-test>')
+    content = riot.render('attr-test', { isChecked: 0, checkboxId: 99 })
+    expect(content).to.be('<attr-test><input type="checkbox" id="99"> </attr-test>')
   })
 
   it('render tag: loop-child', function() {

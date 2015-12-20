@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-   - "4.*"
+   - "4.2"
 
 branches:
   only:
@@ -22,8 +22,17 @@ install:
   - npm i node-sass
   - npm install
 
-after_success:
+after_script:
   make test-sauce && make test-coveralls
 
 notifications:
     email: false
+
+env:
+  - CXX=g++-4.8
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8

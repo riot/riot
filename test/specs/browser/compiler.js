@@ -959,6 +959,60 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('runtime parsed styles', function() {
+
+    // test riot.styleNode
+    expect(riot.styleNode).to.not.be(undefined)
+    expect(riot.styleNode.tagName).to.be('STYLE')
+    expect(riot.styleNode.updateStyles).to.be.an('function')
+
+    // set a style parsing function before mounting the tag
+    var varcolor = 'red'
+    riot.styleNode.parser = function(css)  {
+      return css.replace(/@varcolor/, varcolor)
+    }
+
+    // test style isn't injected yet
+    styles = getRiotStyles()
+    expect(styles).not.to.match(/\bparsed-style\s*\{/)
+
+    // define a dynamically parsed style tag
+    riot.tag('runtime-style-parsing', '<div></div>', '.parsed-style { color: @varcolor; }', '', function(opts) { })
+
+    // test style isn't injected by the simple tag definition
+    styles = getRiotStyles()
+    expect(styles).not.to.match(/\bparsed-style\s*\{/)
+
+    // mount the tag
+    injectHTML(['<runtime-style-parsing></runtime-style-parsing>' ])
+    var tag = riot.mount('runtime-style-parsing')[0]
+
+    // test style correctly parsed and injected
+    styles = getRiotStyles()
+    expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*red;\s*}/)
+
+    // manual update of style
+    varcolor = 'green'
+    riot.styleNode.updateStyles()
+
+    // test style parsing after manual update
+    styles = getRiotStyles()
+    expect(styles).not.to.match(/\bparsed-style\s*\{\s*color:\s*red;\s*}/)
+    expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*green;\s*}/)
+
+    // remount (unmount+mount)
+    tag.unmount(true)
+    tag = riot.mount('runtime-style-parsing')[0]
+    expect(tag).to.not.be(undefined)
+
+    // test remount does not affect style
+    styles = getRiotStyles()
+    expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*green;\s*}/)
+
+    // test remount does not duplicate rule
+    expect(styles.match(/\bparsed-style\s*\{/g)).to.have.length(1)
+  })
+
   it('preserve attributes from tag definition', function() {
     injectHTML('<div riot-tag="preserve-attr2"></div>')
     var tag = riot.mount('preserve-attr')[0]
