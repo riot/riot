@@ -758,9 +758,9 @@ describe('Compiler Browser', function() {
   })
 
   it('<yield> from/to multi-transclusion', function() {
-    injectHTML('<yield-multi><yield to="content">content</yield></yield-multi>')
+    injectHTML('<yield-multi><yield to="content">content</yield><yield to="nested-content">content</yield><yield to="nowhere">content</yield></yield-multi>')
     var tag = riot.mount('yield-multi', {})[0]
-    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>yield the content here</p>')
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>yield the content here</p><div><p>yield the nested content here</p><p>do not yield the unreference content here</p></div>')
     tags.push(tag)
   })
 
