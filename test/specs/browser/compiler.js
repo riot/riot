@@ -1701,4 +1701,30 @@ it('raw contents', function() {
 
   })
 
+  it('mount search riot-tag attributes for tag names only #1463', function () {
+    var
+      names = ['x-my_tag1', 'x-my-tag2', 'x-my-3tag', 'x-m1-3tag'],
+      templ = '<@>X</@>',
+      i, el, tag, name
+
+    // test browser capability for match unquoted chars in [-_A-Z]
+    for (i = 0; i < names.length; ++i) {
+      el = appendTag('div', {'riot-tag': names[i]})
+      riot.compile(templ.replace(/@/g, names[i]))
+      tag = riot.mount(names[i])[0]
+      tags.push(tag)
+      tag = $('*[riot-tag=' + names[i] + ']')
+      expect(tag.innerHTML).to.be('X')
+    }
+
+    // double quotes work, we can't mount html element named "22"
+    name = 'x-my-tag3'
+    el = appendTag(name, {name: '22'})
+    riot.compile(templ.replace(/@/g, name))
+    tag = riot.mount('*[name="22"]')[0]
+    tags.push(tag)
+    tag = $(name)
+    expect(tag.innerHTML).to.be('X')
+  })
+
 })
