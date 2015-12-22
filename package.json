@@ -45,9 +45,9 @@
     "riot.js"
   ],
   "dependencies": {
-    "riot-cli": "^2.3.13",
+    "riot-cli": "^2.3.14",
     "riot-compiler": "^2.3.19",
-    "riot-observable": "^2.3.13",
+    "riot-observable": "^2.3.14",
     "riot-route": "^2.3.12",
     "riot-tmpl": "^2.3.19",
     "simple-dom": "0.2.7",
