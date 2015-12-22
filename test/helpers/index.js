@@ -30,7 +30,7 @@ function getNextSibling(n) {
 
 function getRiotStyles() {
   // util.injectStyle must add <style> in head, not in body -- corrected
-  var stag = document.querySelector('style')
+  var stag = riot.styleNode || document.querySelector('style')
   return normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
 }
 
