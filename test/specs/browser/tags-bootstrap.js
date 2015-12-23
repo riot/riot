@@ -103,6 +103,10 @@ loadTagsAndScripts([
     path: 'tag/yield-multi.tag',
     name: false
   },
+  {
+    path: 'tag/yield-multi2.tag',
+    name: false
+  },
 
   // the following tags will be injected having custom attributes
   {

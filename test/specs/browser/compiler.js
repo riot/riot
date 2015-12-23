@@ -764,6 +764,30 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('<yield> from/to multi-transclusion nested #1458', function() {
+    var html = [
+      '<yield-multi2>',
+      '  <yield to="options">',
+      '    <ul>',
+      '      <li>Option 1</li>',
+      '      <li>Option 2</li>',
+      '    </ul>',
+      '  </yield>',
+      '  <div>',
+      '    <yield to="toggle"><span class="icon"></span></yield>',
+      '    <yield to="hello">Hello</yield><yield to="world">World</yield>',
+      '    <yield to="hello">dummy</yield>',
+      '  </div>',
+      '</yield-multi2>'
+    ]
+    injectHTML(html.join('\n'))
+    expect($('yield-multi2')).not.to.be(null)
+    var tag = riot.mount('yield-multi2', {})[0]
+    html = '<ul><li>Option 1</li><li>Option 2</li></ul><span class="icon"></span><p>Hello World</p>'
+    expect(normalizeHTML(tag.root.innerHTML)).to.be(html)
+    tags.push(tag)
+  })
+
   it('multiple mount <yield> tag', function() {
 
     riot.mount('inner-html')
