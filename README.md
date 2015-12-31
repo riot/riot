@@ -117,7 +117,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Flux-like ES6 Todo](https://github.com/srackham/riot-todo)
 - [Simple TODO](https://muut.com/riotjs/dist/demo/)
 - [Timer](http://jsfiddle.net/gnumanth/h9kuozp5/)
-- [Another flux demo caparable to React ones](http://txchen.github.io/feplay/riot_flux)
+- [Another flux demo comparable to React ones](http://txchen.github.io/feplay/riot_flux)
 - [Various experiments](http://richardbondi.net/programming/riot)
 - [Isomorphic application](https://github.com/ListnPlay/riot-isomorphic)
 - [Isomorphic proof of concept](https://github.com/PabloSichert/isomorphic-proof-of-concept)
