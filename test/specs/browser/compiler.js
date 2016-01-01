@@ -1758,12 +1758,16 @@ it('raw contents', function() {
     expect(tag.ifActive).to.be(false)
     expect(tag.ifMounted).to.be(false)
     expect(tag.ifUpdated).to.be(false)
+    expect(tag.tags['if-activation'].isMounted).to.be(false)
+    expect(tag.tags['if-activation'].tags['if-child'].isMounted).to.be(false)
 
     tag.ok = true
     tag.update()
     expect(tag.ifActive).to.be(true)
     expect(tag.ifMounted).to.be(true)
     expect(tag.ifUpdated).to.be(true)
+    expect(tag.tags['if-activation'].isMounted).to.be(true)
+    expect(tag.tags['if-activation'].tags['if-child'].isMounted).to.be(true)
 
     tags.push(tag)
   })
