@@ -57,7 +57,7 @@ describe('Compile HTML', function() {
   describe('2.3.0', function () {
 
     it('fix #827 to input type=number', function () {
-      testStr('<input type=number>', '<input type="{\'number\'}">')
+      testStr('<input value={1} type=number>', '<input value="{1}" type="{\'number\'}">')
     })
 
     it('normalizes attributes, all values in double quotes', function () {
