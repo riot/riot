@@ -46,12 +46,12 @@
   ],
   "dependencies": {
     "riot-cli": "^2.3.14",
-    "riot-compiler": "^2.3.19",
+    "riot-compiler": "^2.3.20",
     "riot-observable": "^2.3.14",
-    "riot-route": "^2.3.12",
-    "riot-tmpl": "^2.3.19",
+    "riot-route": "^2.3.14",
+    "riot-tmpl": "^2.3.20",
     "simple-dom": "0.2.7",
-    "simple-html-tokenizer": "^0.2.0"
+    "simple-html-tokenizer": "^0.2.1"
   },
   "devDependencies": {
     "cheerio": "^0.19.0",
@@ -59,12 +59,12 @@
     "eslint": "^1.10.3",
     "expect.js": "^0.3.1",
     "istanbul": "^0.4.1",
-    "glob": "^6.0.1",
-    "jsdom": "^7.2.1",
-    "karma": "^0.13.15",
+    "glob": "^6.0.4",
+    "jsdom": "^7.2.2",
+    "karma": "^0.13.19",
     "karma-coverage": "^0.5.3",
     "karma-mocha": "^0.2.1",
-    "karma-phantomjs-launcher": "^0.2.1",
+    "karma-phantomjs-launcher": "^0.2.3",
     "karma-sauce-launcher": "^0.3.0",
     "mocha": "^2.3.4",
     "smash": "0.0.15",
