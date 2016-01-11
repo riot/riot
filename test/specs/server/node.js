@@ -78,10 +78,12 @@ describe('Node/io.js', function() {
     expect($('yoyo').html()).to.be('Hello World!')
   })
 
-  it('render tag: input tags having expressions as value', function() {
+  it('render tag: input,option,textarea tags having expressions as value', function() {
     var frm = riot.render('form-controls', { text: 'my-value' })
     var $ = cheerio.load(frm)
     expect($('input[type="text"]').val()).to.be('my-value')
+    expect($('select option:selected').val()).to.be('my-value')
+    expect($('textarea').val()).to.be('my-value')
   })
 
 })
