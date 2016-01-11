@@ -1,8 +1,8 @@
-/* Riot v2.3.12, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v2.3.13, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.3.12', settings: {} },
+var riot = { version: 'v2.3.13', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -44,8 +44,8 @@ riot.observable = function(el) {
   /**
    * Private variables and methods
    */
-
   var callbacks = {},
+    slice = Array.prototype.slice,
     onEachEvent = function(e, fn) { e.replace(/\S+/g, fn) },
     defineProperty = function (key, value) {
       Object.defineProperty(el, key, {
@@ -62,7 +62,6 @@ riot.observable = function(el) {
    * @param  { Function } fn - callback function
    * @returns { Object } el
    */
-
   defineProperty('on', function(events, fn) {
     if (typeof fn != 'function')  return el
 
@@ -80,9 +79,8 @@ riot.observable = function(el) {
    * @param   { Function } fn - callback function
    * @returns { Object } el
    */
-
   defineProperty('off', function(events, fn) {
-    if (events == '*') callbacks = {}
+    if (events == '*' && !fn) callbacks = {}
     else {
       onEachEvent(events, function(name) {
         if (fn) {
@@ -102,7 +100,6 @@ riot.observable = function(el) {
    * @param   { Function } fn - callback function
    * @returns { Object } el
    */
-
   defineProperty('one', function(events, fn) {
     function on() {
       el.off(events, on)
@@ -116,34 +113,27 @@ riot.observable = function(el) {
    * @param   { String } events - events ids
    * @returns { Object } el
    */
-
   defineProperty('trigger', function(events) {
 
     // getting the arguments
     // skipping the first one
-    var arglen = arguments.length - 1,
-      args = new Array(arglen)
-    for (var i = 0; i < arglen; i++) {
-      args[i] = arguments[i + 1]
-    }
+    var args = slice.call(arguments, 1),
+      fns
 
     onEachEvent(events, function(name) {
 
-      var fns = (callbacks[name] || []).slice(0)
+      fns = slice.call(callbacks[name] || [], 0)
 
       for (var i = 0, fn; fn = fns[i]; ++i) {
         if (fn.busy) return
         fn.busy = 1
-
-        try {
-          fn.apply(el, fn.typed ? [name].concat(args) : args)
-        } catch (e) { el.trigger('error', e) }
+        fn.apply(el, fn.typed ? [name].concat(args) : args)
         if (fns[i] !== fn) { i-- }
         fn.busy = 0
       }
 
-      if (callbacks.all && name != 'all')
-        el.trigger.apply(el, ['all', name].concat(args))
+      if (callbacks['*'] && name != '*')
+        el.trigger.apply(el, ['*', name].concat(args))
 
     })
 
@@ -154,7 +144,7 @@ riot.observable = function(el) {
 
 }
 /* istanbul ignore next */
-;(function(riot) { if (!window) return;
+;(function(riot) {
 
 /**
  * Simple client-side router
@@ -172,9 +162,10 @@ var RE_ORIGIN = /^.+?\/+[^\/]+/,
   HASHCHANGE = 'hashchange',
   TRIGGER = 'trigger',
   MAX_EMIT_STACK_LEVEL = 3,
-  win = window,
-  doc = document,
-  loc = win.history.location || win.location, // see html5-history-api
+  win = typeof window != 'undefined' && window,
+  doc = typeof document != 'undefined' && document,
+  hist = win && history,
+  loc = win && (hist.location || win.location), // see html5-history-api
   prot = Router.prototype, // to minify more
   clickEvent = doc && doc.ontouchstart ? 'touchstart' : 'click',
   started = false,
@@ -255,7 +246,7 @@ function isString(str) {
  * @returns {string} path from root
  */
 function getPathFromRoot(href) {
-  return (href || loc.href)[REPLACE](RE_ORIGIN, '')
+  return (href || loc.href || '')[REPLACE](RE_ORIGIN, '')
 }
 
 /**
@@ -265,7 +256,7 @@ function getPathFromRoot(href) {
  */
 function getPathFromBase(href) {
   return base[0] == '#'
-    ? (href || loc.href).split(base)[1] || ''
+    ? (href || loc.href || '').split(base)[1] || ''
     : getPathFromRoot(href)[REPLACE](base, '')
 }
 
@@ -323,30 +314,41 @@ function click(e) {
  * Go to the path
  * @param {string} path - destination path
  * @param {string} title - page title
+ * @param {boolean} shouldReplace - use replaceState or pushState
  * @returns {boolean} - route not found flag
  */
-function go(path, title) {
-  title = title || doc.title
-  // browsers ignores the second parameter `title`
-  history.pushState(null, title, base + normalize(path))
-  // so we need to set it manually
-  doc.title = title
-  routeFound = false
-  emit()
-  return routeFound
+function go(path, title, shouldReplace) {
+  if (hist) { // if a browser
+    path = base + normalize(path)
+    title = title || doc.title
+    // browsers ignores the second parameter `title`
+    shouldReplace
+      ? hist.replaceState(null, title, path)
+      : hist.pushState(null, title, path)
+    // so we need to set it manually
+    doc.title = title
+    routeFound = false
+    emit()
+    return routeFound
+  }
+
+  // Server-side usage: directly execute handlers for the path
+  return central[TRIGGER]('emit', getPathFromBase(path))
 }
 
 /**
  * Go to path or set action
  * a single string:                go there
  * two strings:                    go there with setting a title
+ * two strings and boolean:        replace history with setting a title
  * a single function:              set an action on the default route
  * a string/RegExp and a function: set an action on the route
  * @param {(string|function)} first - path / action / filter
  * @param {(string|RegExp|function)} second - title / action
+ * @param {boolean} third - replace flag
  */
-prot.m = function(first, second) {
-  if (isString(first) && (!second || isString(second))) go(first, second)
+prot.m = function(first, second, third) {
+  if (isString(first) && (!second || isString(second))) go(first, second, third || false)
   else if (second) this.r(first, second)
   else this.r('@', first)
 }
@@ -436,16 +438,19 @@ route.parser = function(fn, fn2) {
  */
 route.query = function() {
   var q = {}
-  loc.href[REPLACE](/[?&](.+?)=([^&]*)/g, function(_, k, v) { q[k] = v })
+  var href = loc.href || current
+  href[REPLACE](/[?&](.+?)=([^&]*)/g, function(_, k, v) { q[k] = v })
   return q
 }
 
 /** Stop routing **/
 route.stop = function () {
   if (started) {
-    win[REMOVE_EVENT_LISTENER](POPSTATE, debouncedEmit)
-    win[REMOVE_EVENT_LISTENER](HASHCHANGE, debouncedEmit)
-    doc[REMOVE_EVENT_LISTENER](clickEvent, click)
+    if (win) {
+      win[REMOVE_EVENT_LISTENER](POPSTATE, debouncedEmit)
+      win[REMOVE_EVENT_LISTENER](HASHCHANGE, debouncedEmit)
+      doc[REMOVE_EVENT_LISTENER](clickEvent, click)
+    }
     central[TRIGGER]('stop')
     started = false
   }
@@ -457,12 +462,14 @@ route.stop = function () {
  */
 route.start = function (autoExec) {
   if (!started) {
-    if (document.readyState == 'complete') start(autoExec)
-    // the timeout is needed to solve
-    // a weird safari bug https://github.com/riot/route/issues/33
-    else win[ADD_EVENT_LISTENER]('load', function() {
-      setTimeout(function() { start(autoExec) }, 1)
-    })
+    if (win) {
+      if (document.readyState == 'complete') start(autoExec)
+      // the timeout is needed to solve
+      // a weird safari bug https://github.com/riot/route/issues/33
+      else win[ADD_EVENT_LISTENER]('load', function() {
+        setTimeout(function() { start(autoExec) }, 1)
+      })
+    }
     started = true
   }
 }
@@ -477,7 +484,7 @@ riot.route = route
 
 /**
  * The riot template engine
- * @version v2.3.19
+ * @version v2.3.20
  */
 
 /**
@@ -487,6 +494,7 @@ riot.route = route
  * `brackets.settings` Mirrors the `riot.settings` object (use brackets.set in new code)
  * `brackets.set     ` Change the current riot brackets
  */
+/*global riot */
 
 var brackets = (function (UNDEF) {
 
@@ -513,16 +521,16 @@ var brackets = (function (UNDEF) {
     _regex,
     _pairs = []
 
-  function _loopback(re) { return re }
+  function _loopback (re) { return re }
 
-  function _rewrite(re, bp) {
+  function _rewrite (re, bp) {
     if (!bp) bp = _pairs
     return new RegExp(
       re.source.replace(/{/g, bp[2]).replace(/}/g, bp[3]), re.global ? REGLOB : ''
     )
   }
 
-  function _create(pair) {
+  function _create (pair) {
     var
       cvt,
       arr = pair.split(' ')
@@ -547,7 +555,7 @@ var brackets = (function (UNDEF) {
     return arr
   }
 
-  function _reset(pair) {
+  function _reset (pair) {
     if (!pair) pair = DEFAULT
 
     if (pair !== _pairs[8]) {
@@ -560,11 +568,11 @@ var brackets = (function (UNDEF) {
     cachedBrackets = pair
   }
 
-  function _brackets(reOrIdx) {
+  function _brackets (reOrIdx) {
     return reOrIdx instanceof RegExp ? _regex(reOrIdx) : _pairs[reOrIdx]
   }
 
-  _brackets.split = function split(str, tmpl, _bp) {
+  _brackets.split = function split (str, tmpl, _bp) {
     // istanbul ignore next: _bp is for the compiler
     if (!_bp) _bp = _pairs
 
@@ -607,14 +615,14 @@ var brackets = (function (UNDEF) {
 
     return parts
 
-    function unescapeStr(str) {
+    function unescapeStr (str) {
       if (tmpl || isexpr)
         parts.push(str && str.replace(_bp[5], '$1'))
       else
         parts.push(str)
     }
 
-    function skipBraces(ch, pos) {
+    function skipBraces (ch, pos) {
       var
         match,
         recch = FINDBRACES[ch],
@@ -629,22 +637,22 @@ var brackets = (function (UNDEF) {
     }
   }
 
-  _brackets.hasExpr = function hasExpr(str) {
+  _brackets.hasExpr = function hasExpr (str) {
     return _brackets(4).test(str)
   }
 
-  _brackets.loopKeys = function loopKeys(expr) {
+  _brackets.loopKeys = function loopKeys (expr) {
     var m = expr.match(_brackets(9))
     return m ?
       { key: m[1], pos: m[2], val: _pairs[0] + m[3].trim() + _pairs[1] } : { val: expr.trim() }
   }
 
-  _brackets.array = function array(pair) {
+  _brackets.array = function array (pair) {
     return _create(pair || cachedBrackets)
   }
 
   var _settings
-  function _setSettings(o) {
+  function _setSettings (o) {
     var b
     o = o || {}
     b = o.brackets
@@ -680,19 +688,20 @@ var brackets = (function (UNDEF) {
  * tmpl.hasExpr  - Test the existence of a expression inside a string
  * tmpl.loopKeys - Get the keys for an 'each' loop (used by `_each`)
  */
+/*global riot */
 
 var tmpl = (function () {
 
   var _cache = {}
 
-  function _tmpl(str, data) {
+  function _tmpl (str, data) {
     if (!str) return str
 
     return (_cache[str] || (_cache[str] = _create(str))).call(data, _logErr)
   }
 
   _tmpl.isRaw = function (expr) {
-    return expr[brackets._rawOffset] === "="
+    return expr[brackets._rawOffset] === '='
   }
 
   _tmpl.haveRaw = function (src) {
@@ -705,7 +714,7 @@ var tmpl = (function () {
 
   _tmpl.errorHandler = null
 
-  function _logErr(err, ctx) {
+  function _logErr (err, ctx) {
 
     if (_tmpl.errorHandler) {
 
@@ -717,7 +726,7 @@ var tmpl = (function () {
     }
   }
 
-  function _create(str) {
+  function _create (str) {
 
     var expr = _getTmpl(str)
     if (expr.slice(0, 11) !== 'try{return ') expr = 'return ' + expr
@@ -729,7 +738,7 @@ var tmpl = (function () {
     RE_QBLOCK = RegExp(brackets.S_QBLOCKS, 'g'),
     RE_QBMARK = /\x01(\d+)~/g
 
-  function _getTmpl(str) {
+  function _getTmpl (str) {
     var
       qstr = [],
       expr,
@@ -775,12 +784,11 @@ var tmpl = (function () {
   }
 
   var
-    CS_IDENT = /^(?:(-?[_A-Za-z\xA0-\xFF][-\w\xA0-\xFF]*)|\x01(\d+)~):/,
-    RE_BRACE = /,|([[{(])|$/g
+    CS_IDENT = /^(?:(-?[_A-Za-z\xA0-\xFF][-\w\xA0-\xFF]*)|\x01(\d+)~):/
 
-  function _parseExpr(expr, asText, qstr) {
+  function _parseExpr (expr, asText, qstr) {
 
-    if (expr[0] === "=") expr = expr.slice(1)
+    if (expr[0] === '=') expr = expr.slice(1)
 
     expr = expr
           .replace(RE_QBLOCK, function (s, div) {
@@ -820,7 +828,7 @@ var tmpl = (function () {
     }
     return expr
 
-    function skipBraces(jsb, re) {
+    function skipBraces (jsb, re) {
       var
         match,
         lv = 1,
@@ -836,10 +844,12 @@ var tmpl = (function () {
   }
 
   // istanbul ignore next: not both
-  var JS_CONTEXT = '"in this?this:' + (typeof window !== 'object' ? 'global' : 'window') + ').'
-  var JS_VARNAME = /[,{][$\w]+:|(^ *|[^$\w\.])(?!(?:typeof|true|false|null|undefined|in|instanceof|is(?:Finite|NaN)|void|NaN|new|Date|RegExp|Math)(?![$\w]))([$_A-Za-z][$\w]*)/g
+  var
+    JS_CONTEXT = '"in this?this:' + (typeof window !== 'object' ? 'global' : 'window') + ').',
+    JS_VARNAME = /[,{][$\w]+:|(^ *|[^$\w\.])(?!(?:typeof|true|false|null|undefined|in|instanceof|is(?:Finite|NaN)|void|NaN|new|Date|RegExp|Math)(?![$\w]))([$_A-Za-z][$\w]*)/g,
+    JS_NOPROPS = /^(?=(\.[$\w]+))\1(?:[^.[(]|$)/
 
-  function _wrapExpr(expr, asText, key) {
+  function _wrapExpr (expr, asText, key) {
     var tb
 
     expr = expr.replace(JS_VARNAME, function (match, p, mvar, pos, s) {
@@ -850,8 +860,9 @@ var tmpl = (function () {
           match = p + '("' + mvar + JS_CONTEXT + mvar
           if (pos) tb = (s = s[pos]) === '.' || s === '(' || s === '['
         }
-        else if (pos)
-          tb = !/^(?=(\.[$\w]+))\1(?:[^.[(]|$)/.test(s.slice(pos))
+        else if (pos) {
+          tb = !JS_NOPROPS.test(s.slice(pos))
+        }
       }
       return match
     })
@@ -883,13 +894,13 @@ var tmpl = (function () {
 
 })()
 
-  tmpl.version = brackets.version = 'v2.3.19'
+  tmpl.version = brackets.version = 'v2.3.20'
 
 
 /*
   lib/browser/tag/mkdom.js
 
-  Includes hacks needed for the Internet Explorer version 9 and bellow
+  Includes hacks needed for the Internet Explorer version 9 and below
 
 */
 // http://kangax.github.io/compat-table/es5/#ie8
@@ -898,31 +909,35 @@ var tmpl = (function () {
 var mkdom = (function (checkIE) {
 
   var rootEls = {
-      'tr': 'tbody',
-      'th': 'tr',
-      'td': 'tr',
-      'tbody': 'table',
-      'col': 'colgroup'
+      tr: 'tbody',
+      th: 'tr',
+      td: 'tr',
+      tbody: 'table',
+      col: 'colgroup'
     },
+    reToSrc = /<yield\s+to=(['"])?@\1\s*>([\S\s]+?)<\/yield\s*>/.source,
     GENERIC = 'div'
 
   checkIE = checkIE && checkIE < 10
 
   // creates any dom element in a div, table, or colgroup container
-  function _mkdom(html) {
+  function _mkdom(templ, html) {
 
-    var match = html && html.match(/^\s*<([-\w]+)/),
+    var match = templ && templ.match(/^\s*<([-\w]+)/),
       tagName = match && match[1].toLowerCase(),
       rootTag = rootEls[tagName] || GENERIC,
       el = mkEl(rootTag)
 
     el.stub = true
 
+    // replace all the yield tags with the tag inner html
+    if (html) templ = replaceYield(templ, html)
+
     /* istanbul ignore next */
     if (checkIE && tagName && (match = tagName.match(SPECIAL_TAGS_REGEX)))
-      ie9elem(el, html, tagName, !!match[1])
+      ie9elem(el, templ, tagName, !!match[1])
     else
-      el.innerHTML = html
+      el.innerHTML = templ
 
     return el
   }
@@ -943,6 +958,30 @@ var mkdom = (function (checkIE) {
 
   }
   // end ie9elem()
+
+  /**
+   * Replace the yield tag from any tag template with the innerHTML of the
+   * original tag in the page
+   * @param   { String } templ - tag implementation template
+   * @param   { String } html  - original content of the tag in the DOM
+   * @returns { String } tag template updated without the yield tag
+   */
+  function replaceYield(templ, html) {
+    // do nothing if no yield
+    if (!/<yield\b/i.test(templ)) return templ
+
+    // be careful with #1343 - string on the source having `$1`
+    var n = 0
+    templ = templ.replace(/<yield\s+from=['"]([-\w]+)['"]\s*(?:\/>|>\s*<\/yield\s*>)/ig,
+      function (str, ref) {
+        var m = html.match(RegExp(reToSrc.replace('@', ref), 'i'))
+        ++n
+        return m && m[2] || ''
+      })
+
+    // yield without any "from", replace yield in templ with the innerHTML
+    return n ? templ : templ.replace(/<yield\s*(?:\/>|>\s*<\/yield\s*>)/gi, html || '')
+  }
 
   return _mkdom
 
@@ -975,10 +1014,11 @@ function mkitem(expr, key, val) {
 function unmountRedundant(items, tags) {
 
   var i = tags.length,
-    j = items.length
+    j = items.length,
+    t
 
   while (i > j) {
-    var t = tags[--i]
+    t = tags[--i]
     tags.splice(i, 1)
     t.unmount()
   }
@@ -1008,10 +1048,10 @@ function moveNestedTags(child, i) {
  * @param { Tag } target - only if inserting, insert before this tag's first child
  */
 function addVirtual(tag, src, target) {
-  var el = tag._root
+  var el = tag._root, sib
   tag._virts = []
   while (el) {
-    var sib = el.nextSibling
+    sib = el.nextSibling
     if (target)
       src.insertBefore(el, target._root)
     else
@@ -1030,9 +1070,9 @@ function addVirtual(tag, src, target) {
  * @param { Number } len - how many child nodes to move
  */
 function moveVirtual(tag, src, target, len) {
-  var el = tag._root
-  for (var i = 0; i < len; i++) {
-    var sib = el.nextSibling
+  var el = tag._root, sib, i = 0
+  for (; i < len; i++) {
+    sib = el.nextSibling
     src.insertBefore(el, target._root)
     el = sib
   }
@@ -1185,13 +1225,76 @@ function _each(dom, parent, expr) {
   })
 
 }
+/**
+ * Object that will be used to inject and manage the css of every tag instance
+ */
+var styleManager = (function(_riot) {
+
+  if (!window) return { // skip injection on the server
+    add: function () {},
+    inject: function () {}
+  }
+
+  var styleNode = (function () {
+    // create a new style element with the correct type
+    var newNode = mkEl('style')
+    setAttr(newNode, 'type', 'text/css')
+
+    // replace any user node or insert the new one into the head
+    var userNode = $('style[type=riot]')
+    if (userNode) {
+      if (userNode.id) newNode.id = userNode.id
+      userNode.parentNode.replaceChild(newNode, userNode)
+    }
+    else document.getElementsByTagName('head')[0].appendChild(newNode)
+
+    return newNode
+  })()
+
+  // Create cache and shortcut to the correct property
+  var cssTextProp = styleNode.styleSheet,
+    stylesToInject = ''
+
+  // Expose the style node in a non-modificable property
+  Object.defineProperty(_riot, 'styleNode', {
+    value: styleNode,
+    writable: true
+  })
+
+  /**
+   * Public api
+   */
+  return {
+    /**
+     * Save a tag style to be later injected into DOM
+     * @param   { String } css [description]
+     */
+    add: function(css) {
+      stylesToInject += css
+    },
+    /**
+     * Inject all previously saved tag styles into DOM
+     * innerHTML seems slow: http://jsperf.com/riot-insert-style
+     */
+    inject: function() {
+      if (stylesToInject) {
+        if (cssTextProp) cssTextProp.cssText += stylesToInject
+        else styleNode.innerHTML += stylesToInject
+        stylesToInject = ''
+      }
+    }
+  }
+
+})(riot)
 
 
 function parseNamedElements(root, tag, childTags, forceParsingNamed) {
 
   walk(root, function(dom) {
     if (dom.nodeType == 1) {
-      dom.isLoop = dom.isLoop || (dom.parentNode && dom.parentNode.isLoop || getAttr(dom, 'each')) ? 1 : 0
+      dom.isLoop = dom.isLoop ||
+                  (dom.parentNode && dom.parentNode.isLoop || getAttr(dom, 'each'))
+                    ? 1 : 0
 
       // custom child tag
       if (childTags) {
@@ -1213,13 +1316,13 @@ function parseExpressions(root, tag, expressions) {
 
   function addExpr(dom, val, extra) {
     if (tmpl.hasExpr(val)) {
-      var expr = { dom: dom, expr: val }
-      expressions.push(extend(expr, extra))
+      expressions.push(extend({ dom: dom, expr: val }, extra))
     }
   }
 
   walk(root, function(dom) {
-    var type = dom.nodeType
+    var type = dom.nodeType,
+      attr
 
     // text node
     if (type == 3 && dom.parentNode.tagName != 'STYLE') addExpr(dom, dom.nodeValue)
@@ -1228,7 +1331,7 @@ function parseExpressions(root, tag, expressions) {
     /* element */
 
     // loop
-    var attr = getAttr(dom, 'each')
+    attr = getAttr(dom, 'each')
 
     if (attr) { _each(dom, tag, attr); return false }
 
@@ -1252,7 +1355,6 @@ function Tag(impl, conf, innerHTML) {
 
   var self = riot.observable(this),
     opts = inherit(conf.opts) || {},
-    dom = mkdom(impl.tmpl),
     parent = conf.parent,
     isLoop = conf.isLoop,
     hasImpl = conf.hasImpl,
@@ -1263,7 +1365,8 @@ function Tag(impl, conf, innerHTML) {
     fn = impl.fn,
     tagName = root.tagName.toLowerCase(),
     attr = {},
-    propsInSyncWithParent = []
+    propsInSyncWithParent = [],
+    dom
 
   if (fn && root._tag) root._tag.unmount(true)
 
@@ -1288,9 +1391,7 @@ function Tag(impl, conf, innerHTML) {
     if (tmpl.hasExpr(val)) attr[el.name] = val
   })
 
-  if (dom.innerHTML && !/^(select|optgroup|table|tbody|tr|col(?:group)?)$/.test(tagName))
-    // replace all the yield tags with the tag inner html
-    dom.innerHTML = replaceYield(dom.innerHTML, innerHTML)
+  dom = mkdom(impl.tmpl, innerHTML)
 
   // options
   function updateOpts() {
@@ -1298,7 +1399,8 @@ function Tag(impl, conf, innerHTML) {
 
     // update opts from current DOM attributes
     each(root.attributes, function(el) {
-      opts[toCamel(el.name)] = tmpl(el.value, ctx)
+      var val = el.value
+      opts[toCamel(el.name)] = tmpl.hasExpr(val) ? tmpl(val, ctx) : val
     })
     // recover those with expressions
     each(Object.keys(attr), function(name) {
@@ -1344,7 +1446,7 @@ function Tag(impl, conf, innerHTML) {
     self.trigger('update', data)
     update(expressions, self)
     // the updated event will be triggered
-    // once the DOM will be ready and all the reflow are completed
+    // once the DOM will be ready and all the reflows are completed
     // this is useful if you want to get the "real" root properties
     // 4 ex: root.offsetWidth ...
     rAF(function() { self.trigger('updated') })
@@ -1484,8 +1586,7 @@ function Tag(impl, conf, innerHTML) {
     toggle()
     self.off('*')
     self.isMounted = false
-    // somehow ie8 does not like `delete root._tag`
-    root._tag = null
+    delete root._tag
 
   })
 
@@ -1495,15 +1596,14 @@ function Tag(impl, conf, innerHTML) {
     each(childTags, function(child) { child[isMount ? 'mount' : 'unmount']() })
 
     // listen/unlisten parent (events flow one way from parent to children)
-    if (parent) {
-      var evt = isMount ? 'on' : 'off'
+    if (!parent) return
+    var evt = isMount ? 'on' : 'off'
 
-      // the loop tags will be always in sync with the parent automatically
-      if (isLoop)
-        parent[evt]('unmount', self.unmount)
-      else
-        parent[evt]('update', self.update)[evt]('unmount', self.unmount)
-    }
+    // the loop tags will be always in sync with the parent automatically
+    if (isLoop)
+      parent[evt]('unmount', self.unmount)
+    else
+      parent[evt]('update', self.update)[evt]('unmount', self.unmount)
   }
 
   // named elements available for fn
@@ -1564,10 +1664,9 @@ function setEventHandler(name, handler, dom, tag) {
  * @param   { Object } before - node added
  */
 function insertTo(root, node, before) {
-  if (root) {
-    root.insertBefore(before, node)
-    root.removeChild(node)
-  }
+  if (!root) return
+  root.insertBefore(before, node)
+  root.removeChild(node)
 }
 
 /**
@@ -1628,7 +1727,8 @@ function update(expressions, tag) {
           // maybe we can optimize this avoiding to mount the tag at all
           if (!isInStub(dom)) {
             walk(dom, function(el) {
-              if (el._tag && !el._tag.isMounted) el._tag.isMounted = !!el._tag.trigger('mount')
+              if (el._tag && !el._tag.isMounted)
+                el._tag.isMounted = !!el._tag.trigger('mount')
             })
           }
         }
@@ -1663,7 +1763,7 @@ function update(expressions, tag) {
         if (!value) return
       }
 
-      if (value && value != 0 && typeof value !== T_OBJECT)
+      if (value === 0 || value && typeof value !== T_OBJECT)
         setAttr(dom, attrName, value)
 
     }
@@ -1924,7 +2024,8 @@ function isWritable(obj, key) {
  * @returns { Object } clean object without containing the riot internal reserved words
  */
 function cleanUpData(data) {
-  if (!(data instanceof Tag) && !(data && typeof data.trigger == T_FUNCTION)) return data
+  if (!(data instanceof Tag) && !(data && typeof data.trigger == T_FUNCTION))
+    return data
 
   var o = {}
   for (var key in data) {
@@ -1991,44 +2092,6 @@ function mkEl(name) {
 }
 
 /**
- * Create a generic DOM node, and fill it with innerHTML
- * @param   { String } name - name of the DOM node we want to create
- * @param   { String } innerHTML - innerHTML of the new DOM
- * @returns { Object } DOM node just created
- */
-function mkElWithInnerHTML(name, innerHTML) {
-  var el = mkEl(name)
-  el.innerHTML = innerHTML || ''
-  return el
-}
-
-/**
- * Replace the yield tag from any tag template with the innerHTML of the
- * original tag in the page
- * @param   { String } tmpl - tag implementation template
- * @param   { String } innerHTML - original content of the tag in the DOM
- * @returns { String } tag template updated without the yield tag
- */
-function replaceYield(tmpl, innerHTML) {
-  var tmplElement = mkElWithInnerHTML('div', tmpl)
-  // if ($('yield[from]'.tmplElement)) { // this issues test errors
-  if (tmplElement.querySelector && tmplElement.querySelector('yield[from]')) { // code coverage path not taken (?)
-    // yield to(s) must be direct children from innerHTML(root), all other tags are ignored
-    each(mkElWithInnerHTML('div', innerHTML).childNodes, function(toYield) {
-      if (toYield.nodeType == 1 && toYield.tagName == 'YIELD' && toYield.getAttribute('to')) {
-        // replace all yield[from]
-        each($$('yield[from="'+toYield.getAttribute('to')+'"]', tmplElement), function(fromYield) {
-          fromYield.outerHTML = toYield.innerHTML
-        })
-      }
-    })
-    return tmplElement.innerHTML
-  } else
-    // just replace yield in tmpl with the innerHTML
-    return tmpl.replace(/<yield\s*(?:\/>|>\s*<\/yield\s*>)/gi, innerHTML || '')
-}
-
-/**
  * Shorter and fast way to select multiple nodes in the DOM
  * @param   { String } selector - DOM selector
  * @param   { Object } ctx - DOM node where the targets of our search will is located
@@ -2077,12 +2140,13 @@ function getNamedKey(dom) {
 function setNamed(dom, parent, keys) {
   // get the key value we want to add to the tag instance
   var key = getNamedKey(dom),
+    isArr,
     // add the node detected to a tag instance using the named property
     add = function(value) {
       // avoid to override the tag properties already set
       if (contains(keys, key)) return
       // check whether this value is an array
-      var isArr = isArray(value)
+      isArr = isArray(value)
       // if the key was never set
       if (!value)
         // set it once on the tag instance
@@ -2103,7 +2167,7 @@ function setNamed(dom, parent, keys) {
   // check whether this key has been already evaluated
   if (tmpl.hasExpr(key))
     // wait the first updated event only once
-    parent.one('updated', function() {
+    parent.one('mount', function() {
       key = getNamedKey(dom)
       add(parent[key])
     })
@@ -2123,44 +2187,23 @@ function startsWith(src, str) {
 }
 
 /**
- * Function needed to inject in runtime the custom tags css
+ * requestAnimationFrame function
+ * Adapted from https://gist.github.com/paulirish/1579671, license MIT
  */
-var injectStyle = (function() {
+var rAF = (function (w) {
+  var raf = w.requestAnimationFrame    ||
+            w.mozRequestAnimationFrame || w.webkitRequestAnimationFrame
 
-  if (!window) return // skip injection on the server
+  if (!raf || /iP(ad|hone|od).*OS 6/.test(w.navigator.userAgent)) {  // buggy iOS6
+    var lastTime = 0
 
-  // create the style node
-  var styleNode = mkEl('style'),
-    placeholder = $('style[type=riot]')
-
-  setAttr(styleNode, 'type', 'text/css')
-
-  // inject the new node into the DOM -- in head
-  if (placeholder) {
-    placeholder.parentNode.replaceChild(styleNode, placeholder)
-    placeholder = null
+    raf = function (cb) {
+      var nowtime = Date.now(), timeout = Math.max(16 - (nowtime - lastTime), 0)
+      setTimeout(function () { cb(lastTime = nowtime + timeout) }, timeout)
+    }
   }
-  else document.getElementsByTagName('head')[0].appendChild(styleNode)
+  return raf
 
-  /**
-   * This is the function exported that will be used to update the style tag just created
-   * innerHTML seems slow: http://jsperf.com/riot-insert-style
-   * @param   { String } css [description]
-   */
-  return styleNode.styleSheet ?
-    function (css) { styleNode.styleSheet.cssText += css } :
-    function (css) { styleNode.innerHTML += css }
-
-})()
-
-/**
- * requestAnimationFrame polyfill
- */
-var rAF = (function(w) {
-  return  w.requestAnimationFrame       ||
-          w.webkitRequestAnimationFrame ||
-          w.mozRequestAnimationFrame    ||
-          function(cb) { setTimeout(cb, 1000 / 60) }
 })(window || {})
 
 /**
@@ -2233,7 +2276,7 @@ riot.tag = function(name, html, css, attrs, fn) {
   }
   if (css) {
     if (isFunction(css)) fn = css
-    else if (injectStyle) injectStyle(css)
+    else styleManager.add(css)
   }
   __tagImpl[name] = { name: name, tmpl: html, attrs: attrs, fn: fn }
   return name
@@ -2250,7 +2293,7 @@ riot.tag = function(name, html, css, attrs, fn) {
  * @returns { String } name/id of the tag just created
  */
 riot.tag2 = function(name, html, css, attrs, fn, bpair) {
-  if (css && injectStyle) injectStyle(css)
+  if (css) styleManager.add(css)
   //if (bpair) riot.settings.brackets = bpair
   __tagImpl[name] = { name: name, tmpl: html, attrs: attrs, fn: fn }
   return name
@@ -2274,7 +2317,8 @@ riot.mount = function(selector, tagName, opts) {
   function addRiotTags(arr) {
     var list = ''
     each(arr, function (e) {
-      list += ', *[' + RIOT_TAG + '="' + e.trim() + '"]'
+      if (!/[^-\w]/.test(e))
+        list += ',*[' + RIOT_TAG + '=' + e.trim() + ']'
     })
     return list
   }
@@ -2300,6 +2344,9 @@ riot.mount = function(selector, tagName, opts) {
   }
 
   // ----- mount code -----
+
+  // inject styles into DOM
+  styleManager.inject()
 
   if (typeof tagName === T_OBJECT) {
     opts = tagName
@@ -2370,7 +2417,7 @@ riot.Tag = Tag
   if (typeof exports === T_OBJECT)
     module.exports = riot
   else if (typeof define === T_FUNCTION && typeof define.amd !== T_UNDEF)
-    define(function() { return (window.riot = riot) })
+    define(function() { return riot })
   else
     window.riot = riot
 
