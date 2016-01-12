@@ -46,6 +46,7 @@ compare:
 
 raw:
 	# build riot
+	@ make clean
 	@ mkdir -p $(DIST)
 	@ $(SMASH) lib/riot.js > $(DIST)riot.js
 	@ $(SMASH) lib/riot+compiler.js > $(DIST)riot+compiler.js
