@@ -78,6 +78,11 @@ describe('Node/io.js', function() {
     expect($('yoyo').html()).to.be('Hello World!')
   })
 
+  it('render tag: yield with no html content', function() {
+    var blk = riot.render('yield-empty')
+    expect(blk).to.be('<yield-empty></yield-empty>')
+  })
+
   it('render tag: input,option,textarea tags having expressions as value', function() {
     var frm = riot.render('form-controls', { text: 'my-value' })
     var $ = cheerio.load(frm)
