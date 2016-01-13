@@ -206,4 +206,15 @@ describe('Mixin', function() {
     tag.unmount()
   })
 
+  it('register a mixin when mouting', function() {
+    injectHTML('<my-mixin></my-mixin>')
+
+    riot.tag('my-mixin', '<span>some tag</span>', function(opts) {})
+
+    var tag = riot.mount('my-mixin', {}, [IdMixin])[0]
+
+    expect(tag._riot_id).to.be(tag.getId())
+    tag.unmount()
+  })
+
 })
