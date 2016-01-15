@@ -2,7 +2,7 @@
 
 <free-style><p onclick={ click }/>
 
-    // also test compactation of empty lines
+    <!-- also test compactation of empty lines -->
 
     <script>      // tagged script
       click (e)   // free style, this comment does not break the parser
