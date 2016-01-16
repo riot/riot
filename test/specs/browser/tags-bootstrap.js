@@ -33,6 +33,7 @@ loadTagsAndScripts([
   'tag/loop-single-tags.tag',
   'tag/timetable.tag',
   'tag/raw-contents.tag',
+  'tag/virtual-nested-unmount.tag',
   // mount order
   'tag/deferred-mount.tag',
 

@@ -1751,4 +1751,44 @@ it('raw contents', function() {
     expect(tag.innerHTML).to.be('X')
   })
 
+  it('nested virtual tags unmount properly', function() {
+    injectHTML('<virtual-nested-unmount></virtual-nested-unmount>')
+    var tag = riot.mount('virtual-nested-unmount')[0]
+    var spans = tag.root.querySelectorAll('span')
+    var divs = tag.root.querySelectorAll('div')
+    expect(spans.length).to.be(6)
+    expect(divs.length).to.be(3)
+    expect(spans[0].innerHTML).to.be('1')
+    expect(spans[1].innerHTML).to.be('1')
+    expect(spans[2].innerHTML).to.be('2')
+    expect(spans[3].innerHTML).to.be('1')
+    expect(spans[4].innerHTML).to.be('2')
+    expect(spans[5].innerHTML).to.be('3')
+    expect(divs[0].innerHTML).to.be('1')
+    expect(divs[1].innerHTML).to.be('2')
+    expect(divs[2].innerHTML).to.be('3')
+
+    tag.childItems = [
+      {title: '4', childchildItems: ['1', '2', '3', '4']},
+      {title: '5', childchildItems: ['1', '2', '3', '4', '5']}
+    ]
+    tag.update()
+    spans = tag.root.querySelectorAll('span')
+    divs = tag.root.querySelectorAll('div')
+    expect(spans.length).to.be(9)
+    expect(divs.length).to.be(2)
+    expect(spans[0].innerHTML).to.be('1')
+    expect(spans[1].innerHTML).to.be('2')
+    expect(spans[2].innerHTML).to.be('3')
+    expect(spans[3].innerHTML).to.be('4')
+    expect(spans[4].innerHTML).to.be('1')
+    expect(spans[5].innerHTML).to.be('2')
+    expect(spans[6].innerHTML).to.be('3')
+    expect(spans[7].innerHTML).to.be('4')
+    expect(spans[8].innerHTML).to.be('5')
+    expect(divs[0].innerHTML).to.be('4')
+    expect(divs[1].innerHTML).to.be('5')
+
+  })
+
 })
