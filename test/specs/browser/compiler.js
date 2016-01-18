@@ -468,6 +468,20 @@ describe('Compiler Browser', function() {
 
   })
 
+  it('tags in different each loops dont collide', function() {
+
+    var tag = riot.mount('loop-combo')[0]
+    tags.push(tag)
+
+    expect(normalizeHTML(tag.root.innerHTML))
+      .to.be('<lci x="a"></lci><div><lci x="y"></lci></div>')
+
+    tag.update({b: ['z']})
+
+    expect(normalizeHTML(tag.root.innerHTML))
+      .to.be('<lci x="a"></lci><div><lci x="z"></lci></div>')
+  })
+
   it('iterate over an object, then modify the property and update itself', function() {
 
     var tag = riot.mount('loop-object')[0]
