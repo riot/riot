@@ -122,9 +122,9 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Isomorphic application](https://github.com/ListnPlay/riot-isomorphic)
 - [Isomorphic proof of concept](https://github.com/PabloSichert/isomorphic-proof-of-concept)
 - [flux-riot todo](http://mingliangfeng.me/flux-riot)
-- [electron-riot - Riot in an electron application](https://github.com/mike-ward/electron-riot)
 - [Another Riot Todo MVC](http://nippur72.github.io/riotjs-todomvc/#/)
 - [Cheft isomorphic by express](https://github.com/cheft/cheft)
+- [electron-riot - Riot in an electron application](https://github.com/mike-ward/electron-riot)
 
 ### Tutorials
 - [Building Apps with Riot, ES6 and Webpack](http://blog.srackham.com/posts/riot-es6-webpack-apps/)
