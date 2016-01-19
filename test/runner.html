@@ -5,13 +5,6 @@
     <title>Riot.js tests</title>
     <style type="riot"></style>
     <link rel="stylesheet" href="../node_modules/mocha/mocha.css" type="text/css" />
-    <!--[if lt IE 9]>
-      <script src="polyfills/es5-shim.js"></script>
-      <script src="polyfills/html5-shiv.js"></script>
-
-      <script>html5.addElements('timetable yield timer test foo outer inner loop loop-child loop-manip nested-child multi-mount test-a test-b test-c test-d test-f test-g if-mount')</script>
-
-    <![endif]-->
   </head>
   <body>
     <div id="mocha"></div>
@@ -20,16 +13,13 @@
     <script>
       mocha.setup('bdd')
     </script>
-
-    <script src="../dist/riot/riot.js"></script>
-    <script src="../dist/riot/compiler.js"></script>
-
-    <script src="specs/compiler-browser.js"></script>
-    <script src="specs/tmpl.js"></script>
-    <script src="specs/observable.js"></script>
-    <script src="specs/route.js"></script>
+    <script src="../dist/riot/riot+compiler.js"></script>
+    <script src="helpers/index.js"></script>
+    <script src="specs/browser/tags-bootstrap.js"></script>
+    <script src="specs/browser/compiler.js"></script>
     <script src="specs/mixin.js"></script>
-
-    <script src="runner.js"></script>
+    <script>
+      mocha.run()
+    </script>
   </body>
 </html>

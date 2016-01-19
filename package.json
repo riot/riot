@@ -1,11 +1,21 @@
 {
   "name": "riot",
-  "version": "2.2.2-beta",
-  "description": "A React- like, 3.5K user interface library",
-  "homepage": "https://muut.com/riotjs/",
-  "repository": "muut/riotjs",
+  "version": "2.3.13",
+  "description": "A React-like user interface micro-library",
+  "homepage": "http://riotjs.com/",
+  "repository": "riot/riot",
   "author": "Muut, Inc. and other contributors",
+  "contributors": [
+    "Richard Bondi",
+    "Gianluca Guarini",
+    "Tsutomu Kawamura",
+    "Alberto Martínez",
+    "Tero Piirainen"
+  ],
   "license": "MIT",
+  "engines": {
+    "node": ">=4.0.0"
+  },
   "scripts": {
     "test": "make riot"
   },
@@ -35,27 +45,30 @@
     "riot.js"
   ],
   "dependencies": {
-    "chalk": "^1.1.0",
-    "chokidar": "~1.0.3",
-    "minimist": "~1.1.1",
-    "shelljs": "~0.5.1",
-    "simple-dom": "^0.2.4",
-    "simple-html-tokenizer": "^0.1.1"
+    "riot-cli": "^2.3.14",
+    "riot-compiler": "^2.3.20",
+    "riot-observable": "^2.3.14",
+    "riot-route": "^2.3.15",
+    "riot-tmpl": "^2.3.20",
+    "simple-dom": "0.2.7",
+    "simple-html-tokenizer": "^0.2.1"
   },
   "devDependencies": {
     "cheerio": "^0.19.0",
-    "coveralls": "^2.11.2",
-    "eslint": "^0.24.1",
+    "coveralls": "^2.11.6",
+    "eslint": "^1.10.3",
     "expect.js": "^0.3.1",
-    "glob": "^5.0.13",
-    "jsdom": "^5.6.0",
-    "karma": "^0.12.37",
-    "karma-coverage": "^0.4.2",
-    "karma-mocha": "^0.2.0",
-    "karma-phantomjs-launcher": "^0.2.0",
-    "karma-sauce-launcher": "^0.2.14",
-    "mocha": "^2.2.5",
-    "smash": "0.0.14",
+    "istanbul": "^0.4.2",
+    "glob": "^6.0.4",
+    "jsdom": "^7.2.2",
+    "karma": "^0.13.19",
+    "karma-coverage": "^0.5.3",
+    "karma-mocha": "^0.2.1",
+    "karma-phantomjs-launcher": "^0.2.3",
+    "karma-sauce-launcher": "^0.3.0",
+    "mocha": "^2.3.4",
+    "smash": "0.0.15",
+    "phantomjs": "^1.9.19",
     "uglify-js": "latest"
   },
   "preferGlobal": true,
@@ -63,21 +76,17 @@
     "lib",
     "riot.js",
     "riot.min.js",
-    "compiler.js",
-    "compiler.min.js",
     "riot+compiler.js",
     "riot+compiler.min.js"
   ],
   "bin": {
-    "riot": "lib/server/cli.js"
+    "riot": "node_modules/.bin/riot"
   },
   "main": "lib/server/index.js",
   "browser": "riot.js",
   "spm": {
     "main": "riot.js",
     "ignore": [
-      "demo",
-      "doc",
       "test",
       "lib",
       "make"

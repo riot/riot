@@ -1,6 +1,6 @@
 # Command line paths
 KARMA = ./node_modules/karma/bin/karma
-ISTANBUL = ./node_modules/karma-coverage/node_modules/.bin/istanbul
+ISTANBUL = ./node_modules/istanbul/lib/cli.js
 ESLINT = ./node_modules/eslint/bin/eslint.js
 MOCHA = ./node_modules/mocha/bin/_mocha
 SMASH = ./node_modules/.bin/smash
@@ -32,45 +32,47 @@ test-mocha:
 test-karma:
 	@ $(KARMA) start test/karma.conf.js
 
-test-compiler:
-	@ $(MOCHA) ./test/compiler/suite
-
 test-coveralls:
-	@ RIOT_COV=1 cat ./coverage/lcov.info ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
+	@ RIOT_COV=1 cat ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
 
 test-sauce:
-	# run the saucelabs in separate chunks
-	@ for group in 0 1 2 3; do GROUP=$$group SAUCE_USERNAME=riotjs SAUCE_ACCESS_KEY=124f5640-fd66-4848-acdb-98c1d601d04d SAUCELABS=1 make test-karma; done
+	# run the riot tests on saucelabs
+	@ SAUCELABS=1 make test-karma
 
 compare:
 	# compare the current release with the previous one
-	du -h riot.js compiler.js
-	du -h dist/riot/riot.js dist/riot/compiler.js
+	du -h riot.min.js riot+compiler.min.js
+	du -h dist/riot/riot.min.js dist/riot/riot+compiler.min.js
 
 raw:
 	# build riot
+	@ make clean
 	@ mkdir -p $(DIST)
-	@ $(SMASH) lib/browser/compiler/index.js > $(DIST)compiler.js
 	@ $(SMASH) lib/riot.js > $(DIST)riot.js
 	@ $(SMASH) lib/riot+compiler.js > $(DIST)riot+compiler.js
+
+clean:
+	# clean $(DIST)
+	@ rm -rf $(DIST)
 
 riot: raw test
 
 min: riot
 	# minify riot
-	@ for f in riot compiler riot+compiler; do $(UGLIFY) $(DIST)$$f.js --comments --mangle -o $(DIST)$$f.min.js; done
+	@ for f in riot riot+compiler; do $(UGLIFY) $(DIST)$$f.js --comments --mangle -o $(DIST)$$f.min.js; done
 
 perf: riot
 	# run the performance tests
-	@ iojs --harmony --expose-gc test/performance/mem
+	@ node --expose-gc test/performance/speed
+	@ node --expose-gc test/performance/mem
 
 watch:
 	# watch and rebuild riot and its tests
 	@ $(shell \
 		node -e $(WATCH) "lib/**/*.js" "make raw" & \
-		export RIOT="../../dist/riot/riot" && node ./lib/server/cli.js --watch test/tag dist/tags.js)
+		export RIOT="./../../../../dist/riot/riot" && ./node_modules/.bin/riot --watch test/tag dist/tags.js)
 
-.PHONY: test min
+.PHONY: test min eslint test-mocha test-compiler test-coveralls test-sauce compare raw riot perf watch
 
 
 # riot maintainer tasks
