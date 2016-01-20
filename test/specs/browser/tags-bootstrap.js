@@ -70,6 +70,8 @@ loadTagsAndScripts([
 
   'tag/preserve-attr.tag',
 
+  'tag/reserved-names.tag',
+
   // these tags will be not autoinjected in the DOM
   // that's what `name = false` means
   {

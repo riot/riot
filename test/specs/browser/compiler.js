@@ -1791,4 +1791,12 @@ it('raw contents', function() {
 
   })
 
+  it('still loops with reserved property names #1526', function() {
+    var tag = riot.mount('reserved-names')[0]
+    tag.reorder()
+    tag.update()
+    tag.reorder()
+    tag.update()
+  })
+
 })
