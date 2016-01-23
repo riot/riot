@@ -1,6 +1,6 @@
 <loop-inherit>
   <div each={ item, index in items} class={ active: item == 'active' }>
-    <loop-inherit-item id={ index } name={ item } nice={ isFun } onmouseenter={ onMouseEnter }></loop-inherit-item>
+    <loop-inherit-item id={ index } name={ item } nice={ isFun } onmouseenter={ parent.onMouseEnter }></loop-inherit-item>
   </div>
 
   <loop-inherit-list each={ item in items } if={ item != 'me' }></loop-inherit-list>
