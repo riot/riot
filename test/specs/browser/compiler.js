@@ -1104,28 +1104,41 @@ describe('Compiler Browser', function() {
     expect(eventsCount).to.be.equal(2)
   })
 
-  it('mount event should only be triggered when the conditional tags are in the DOM', function() {
+  it('child tags are only rendered when if-condition is truthy', function() {
     var tag = riot.mount('if-mount')[0]
+    var tgs = tag.tags
 
-    expect(tag.tags.ff.tags['if-level2'].tags['conditional-tag'].isMounted).to.be(false)
-    expect(tag.tags.ft.tags['if-level2'].tags['conditional-tag'].isMounted).to.be(false)
-    expect(tag.tags.tf.tags['if-level2'].tags['conditional-tag'].isMounted).to.be(false)
-    expect(tag.tags.tt.tags['if-level2'].tags['conditional-tag'].isMounted).to.be(true)
+    var expectL2 = function(base, exist) {
+      var ex = expect(base.tags['if-level2'])
+      exist ? ex.to.not.be(undefined) : ex.to.be(undefined)
+      expect($$('if-level2', base.root).length).to.be(exist ? 1 : 0)
+    }
 
-    tag.tags.tf.tags['if-level2'].toggleCondition()
-    expect(tag.tags.tf.tags['if-level2'].tags['conditional-tag'].isMounted).to.be(true)
+    var expectCond = function(base, exist) {
+      var ex = expect(base.tags['if-level2'].tags['conditional-tag'])
+      exist ? ex.to.not.be(undefined) : ex.to.be(undefined)
+      expect($$('conditional-tag', base.root).length).to.be(exist ? 1 : 0)
+    }
+
+    expectL2(tgs.ff, false)
+    expectL2(tgs.ft, false)
+
+    expectL2(tgs.tf, true)
+    expectCond(tgs.tf, false)
+
+    expectL2(tgs.tt, true)
+    expectCond(tgs.tt, true)
+
+    tgs.tf.tags['if-level2'].toggleCondition()
+    expectCond(tgs.tf, true)
 
     tag.tags.ft.toggleCondition()
-    expect(tag.tags.tf.tags['if-level2'].tags['conditional-tag'].isMounted).to.be(true)
-
-    tag.tags.ff.tags['if-level2'].toggleCondition()
-    expect(tag.tags.ff.tags['if-level2'].tags['conditional-tag'].isMounted).to.be(false)
-
-    tag.tags.ff.toggleCondition()
-    expect(tag.tags.ff.tags['if-level2'].tags['conditional-tag'].isMounted).to.be(true)
+    expectL2(tgs.ft, true)
+    expectCond(tgs.ft, true)
 
     tags.push(tag)
   })
+
   it('preserve the mount order, first the parent and then all the children', function() {
     var correctMountingOrder = [
         'deferred-mount',
@@ -1387,6 +1400,7 @@ it('raw contents', function() {
 
   it('loops over other tag instances do not override their internal properties', function() {
     var tag = riot.mount('loop-tag-instances')[0]
+    tag.start()
 
     expect(tag.tags['loop-tag-instances-child'].length).to.be(5)
     expect(tag.tags['loop-tag-instances-child'][0].root.tagName.toLowerCase()).to.be('loop-tag-instances-child')
