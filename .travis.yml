@@ -11,21 +11,6 @@ script:
 
 sudo: false
 
-install:
-  - npm i jade
-  - npm i babel@5.8
-  - npm i babel-core
-  - npm i babel-preset-es2015-riot
-  - npm i coffee-script
-  - npm i livescript
-  - npm i typescript-simple
-  - npm i stylus
-  - npm i nib
-  - npm i node-sass
-  - npm i less
-  - npm i postcss autoprefixer
-  - npm install
-
 after_script:
   make test-sauce && make test-coveralls
 

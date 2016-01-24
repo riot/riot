@@ -1,8 +1,19 @@
 var glob = require('glob'),
   riot = require('../../../lib/server'),
+  expect = require('expect.js'),
   cheerio = require('cheerio')
 
 describe('Node/io.js', function() {
+
+  // adds custom riot parsers used by some tag/*.tag files
+  // css
+  riot.parsers.css.myparser = function (tag, css) {
+    return css.replace(/@tag/, tag)
+  }
+  // js
+  riot.parsers.js.myparser = function (js) {
+    return js.replace(/@version/, '1.0.0')
+  }
 
   it('require tags', function(done) {
     glob('../../tag/*.tag', { cwd: __dirname }, function (err, tags) {
