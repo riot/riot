@@ -40,6 +40,7 @@ loadTagsAndScripts([
   'tag/select-test.tag',
   // mount order
   'tag/deferred-mount.tag',
+  'tag/expression-eval-count.tag',
 
   // multi named elements to an array
   'tag/multi-named.tag',
