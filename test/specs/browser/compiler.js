@@ -1813,4 +1813,12 @@ it('raw contents', function() {
     tag.update()
   })
 
+  it('riot-tag can be dynamically created by expression', function() {
+    injectHTML('<dynamic-riot-tag></dynamic-riot-tag>')
+    var tag = riot.mount('dynamic-riot-tag')[0]
+    var divs = tag.root.querySelectorAll('div')
+    expect(divs[0].querySelector('input').getAttribute('type')).to.be('color')
+    expect(divs[3].querySelector('input').getAttribute('type')).to.be('date')
+  })
+
 })
