@@ -1164,6 +1164,14 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it.only('only evalutes expressions once per update', function() {
+    var tag = riot.mount('expression-eval-count')[0]
+    expect(tag.count).to.be(1)
+    tag.update()
+    expect(tag.count).to.be(2)
+    tags.push(tag)
+  })
+
   it('multi named elements to an array', function() {
     var mount = function() {
         var tag = this
