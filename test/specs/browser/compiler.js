@@ -1165,6 +1165,7 @@ describe('Compiler Browser', function() {
   })
 
   it('only evalutes expressions once per update', function() {
+
     var tag = riot.mount('expression-eval-count')[0]
     expect(tag.count).to.be(1)
     tag.update()
