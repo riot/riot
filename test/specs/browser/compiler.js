@@ -1818,7 +1818,23 @@ it('raw contents', function() {
     var tag = riot.mount('dynamic-riot-tag')[0]
     var divs = tag.root.querySelectorAll('div')
     expect(divs[0].querySelector('input').getAttribute('type')).to.be('color')
+    expect(divs[1].querySelector('input').getAttribute('type')).to.be('color')
+    expect(divs[2].querySelector('input').getAttribute('type')).to.be('date')
     expect(divs[3].querySelector('input').getAttribute('type')).to.be('date')
+
+    tag.single = 'color'
+    tag.update()
+    expect(divs[3].querySelector('input').getAttribute('type')).to.be('color')
+
+    tag.intags.reverse()
+    tag.update()
+    divs = tag.root.querySelectorAll('div')
+    expect(divs[0].querySelector('input').getAttribute('type')).to.be('date')
+    expect(divs[1].querySelector('input').getAttribute('type')).to.be('color')
+    expect(divs[2].querySelector('input').getAttribute('type')).to.be('color')
+
+
+    tags.push(tag)
   })
 
 })
