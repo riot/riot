@@ -29,6 +29,8 @@ loadTagsAndScripts([
   'tag/loop-null-items.tag',
   'tag/table-data.tag',
   'tag/table-loop-extra-row.tag',
+  'tag/table-thead-tfoot.tag',
+  'tag/table-thead-tfoot-nested.tag',
   'tag/loop-named.tag',
   'tag/loop-single-tags.tag',
   'tag/timetable.tag',
