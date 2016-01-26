@@ -1550,17 +1550,17 @@ it('raw contents', function() {
       heads = tag.root.getElementsByTagName('thead'),
       foots = tag.root.getElementsByTagName('tfoot')
 
-    expect(bodies.length).to.be(3)
-    expect(heads.length).to.be(2)
-    expect(foots.length).to.be(2)
+    expect(bodies.length).to.be(1)
+    expect(heads.length).to.be(1)
+    expect(foots.length).to.be(1)
 
     var ths = tag.root.getElementsByTagName('th'),
       trs = tag.root.getElementsByTagName('tr'),
       tds = tag.root.getElementsByTagName('td')
 
-    expect(ths.length).to.be(6)
-    expect(trs.length).to.be(13)
-    expect(tds.length).to.be(15)
+    expect(ths.length).to.be(3)
+    expect(trs.length).to.be(5)
+    expect(tds.length).to.be(6)
 
     tags.push(tag)
   })
