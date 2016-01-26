@@ -1521,6 +1521,28 @@ it('raw contents', function() {
     tags.push(tag)
   })
 
+  it('table with tbody and thead #1549', function() {
+
+    var tag = riot.mount('table-thead-tfoot-nested')[0],
+      bodies = tag.root.getElementsByTagName('tbody'),
+      heads = tag.root.getElementsByTagName('thead'),
+      foots = tag.root.getElementsByTagName('tfoot')
+
+    expect(bodies.length).to.be(1)
+    expect(heads.length).to.be(1)
+    expect(foots.length).to.be(1)
+
+    var ths = tag.root.getElementsByTagName('th'),
+      trs = tag.root.getElementsByTagName('tr'),
+      tds = tag.root.getElementsByTagName('td')
+
+    expect(ths.length).to.be(3)
+    expect(trs.length).to.be(5)
+    expect(tds.length).to.be(6)
+
+    tags.push(tag)
+  })
+
   it('table with caption and looped cols, ths, and trs #1067', function() {
     var data = {
       // copied from loop-cols.tag
