@@ -46,7 +46,7 @@
   ],
   "dependencies": {
     "riot-cli": "^2.3.14",
-    "riot-compiler": "^2.3.20",
+    "riot-compiler": "^2.3.22",
     "riot-observable": "^2.3.14",
     "riot-route": "^2.3.15",
     "riot-tmpl": "^2.3.20",
@@ -66,7 +66,7 @@
     "karma-mocha": "^0.2.1",
     "karma-phantomjs-launcher": "^0.2.3",
     "karma-sauce-launcher": "^0.3.0",
-    "mocha": "^2.3.4",
+    "mocha": "^2.4.4",
     "smash": "0.0.15",
     "phantomjs": "^2.1.2",
     "uglify-js": "latest"
