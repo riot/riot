@@ -90,7 +90,7 @@ describe('Compiler Browser', function() {
       riot.compile(src, true)
     }
 
-    expect(Date.now() - begin).to.be.below(1300) // old compiler was not compiling this
+    expect(Date.now() - begin).to.be.below(1500) // compiler does more now
 
   })
 
@@ -1626,6 +1626,190 @@ it('raw contents', function() {
       if (!e) e = tag.root
       return e.getElementsByTagName(t)
     }
+  })
+
+  it('table/thead/tbody/tfoot used as root element of custom tags', function() {
+    var
+      tag = riot.mount('table-test')[0],
+      tbl
+
+    // set "tbl" to the table-test root element
+    expect(tag).to.not.be.empty()
+    tbl = tag.root
+    expect(tbl).to.not.be.empty()
+    tag.update()
+
+    testTable(tbl, 'table-caption', {
+      tbody: 1,
+      caption: true,
+      colgroup: true
+    })
+    testTable(tbl, 'table-colgroup', {
+      thead: 1,
+      tbody: 1,
+      colgroup: true
+    })
+    testTable(tbl, 'table-looped-col', {
+      thead: 1,
+      tbody: 1,
+      col: true
+    })
+    testTable(tbl, 'table-multi-col', {
+      thead: 1,
+      tbody: 1,
+      col: true
+    })
+    testTable(tbl, 'table-tfoot', {
+      tfoot: 1,
+      tbody: 1
+    })
+    testTable(tbl, 'table-tr-body-only', {
+      tr: 2
+    })
+    testTable(tbl, 'table-tr-alone', {
+      tr: 1
+    })
+    testTable(tbl, 'table-custom-thead-tfoot', {
+      thead: 1,
+      tfoot: 1,
+      tbody: 2,
+      colgroup: true
+    })
+
+    tags.push(tag)
+
+    // test the table and call the tests for the content
+    function testTable(root, name, info) {
+      var s, key, inf
+
+      root = root.querySelectorAll('table[riot-tag=' + name + ']')
+      s = name + '.length: '
+      expect(s + root.length).to.be(s + '1')
+      root = root[0]
+
+      // test content
+      for (key in info) { // eslint-disable-line
+        if (info[key] === true)
+          testOther(root, key)
+        else
+          testRows(root, key, info[key])
+      }
+    }
+
+    // test rows and cells for an element of thead/tfoot/tbody
+    function testRows(root, name, cnt) {
+      var s, i, r, c, rows, cells, templ
+
+      // check the count of this element
+      root = root.getElementsByTagName(name)
+      s = name + '.length: '
+      expect(s + root.length).to.be(s + cnt)
+      if (name === 'tr') {
+        name = 'tbody'
+        root = [{ rows: root }]
+        //...and leave cnt as-is, else adjust cnt to expected rows
+      } else cnt = name === 'tbody' ? 2 : 1
+
+      // check each element
+      for (i = 0; i < root.length; i++) {
+        // test the rows
+        rows = root[i].rows
+        expect(rows.length).to.be(cnt)
+        // test the cols
+        for (r = 0; r < rows.length; r++) {
+          c = name[1].toUpperCase()
+          s = r + 1
+          cells = rows[r].cells
+          templ = c === 'B' ? 'R' + s + '-C' : c + '-'
+          expect(cells.length).to.be(2)
+          expect(cells[0].innerHTML).to.contain(templ + '1')
+          expect(cells[1].innerHTML).to.contain(templ + '2')
+        }
+      }
+    }
+
+    // test caption, colgroup and col elements
+    function testOther(root, name) {
+      var cols, s = name + '.length: '
+
+      // we'll search the parent for <col>, later in the switch
+      if (name !== 'col') {
+        root = root.getElementsByTagName(name)
+        expect(s + root.length).to.be(s + '1')
+        root = root[0]
+      }
+      switch (name) {
+      case 'caption':
+        expect(root.innerHTML).to.contain('Title')
+        break
+      case 'colgroup':
+      case 'col':
+        cols = root.getElementsByTagName('col')
+        expect(cols).to.have.length(2)
+        expect(cols[0].width).to.be('150')
+        expect(cols[1].width).to.be('200')
+        break
+      default:
+        break
+      }
+    }
+  })
+
+  it('select as root element of custom riot tag', function () {
+    var
+      CHOOSE = 0,     // option alone
+      OPTION = 1,     // looped option
+      OPTGRP = 2,     // optgroup with options
+      list = {
+        'select-single-option': [0, CHOOSE],
+        'select-each-option': [1, OPTION],
+        'select-each-option-prompt': [2, CHOOSE, OPTION],
+        'select-each-two-options': [4, OPTION, OPTION],
+        'select-optgroup-each-option': [0, OPTGRP],
+        'select-optgroup-each-option-prompt': [0, CHOOSE, OPTGRP],
+        'select-two-optgroup-each-option': [3, OPTGRP, CHOOSE, OPTGRP],
+        'select-each-optgroup': [0, OPTGRP, OPTGRP]
+      },
+      sel, dat, tag = riot.mount('select-test')[0]
+
+    expect(tag).to.not.be.empty()
+    for (var name in list) {                 // eslint-disable-line guard-for-in
+      //console.log('Testing ' + name)
+      dat = list[name]
+      sel = tag.root.querySelector('select[riot-tag=' + name + ']')
+      expect(sel).to.not.be.empty()
+      if (sel.selectedIndex !== dat[0]) expect().fail(
+        name + '.selectIndex ' + sel.selectedIndex + ' expected to be ' + dat[0])
+      var s1 = listFromSel(sel)
+      var s2 = listFromDat(dat)
+      expect(s1).to.be(s2)
+    }
+
+    function listFromDat(dat) {
+      var op = [], s = 'Opt1,Opt2,Opt3'
+      for (i = 1; i < dat.length; i++) {
+        if (dat[i] === OPTGRP) op.push('G,' + s)
+        else if (dat[i] === OPTION) op.push(s)
+        else op.push('(choose)')
+      }
+      return op.join(',')
+    }
+    function listFromSel(el) {
+      var op = []
+      el = el.firstChild
+      while (el) {
+        if (el.tagName === 'OPTGROUP') {
+          op.push('G')
+          op = op.concat(listFromSel(el))
+        } else if (el.tagName === 'OPTION') {
+          op.push(el.text)
+        }
+        el = el.nextSibling
+      }
+      return op.join(',')
+    }
+
+    tags.push(tag)
   })
 
   it('Passing options to the compiler through riot.compile (v2.3.12)', function () {

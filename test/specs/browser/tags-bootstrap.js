@@ -36,6 +36,8 @@ loadTagsAndScripts([
   'tag/timetable.tag',
   'tag/raw-contents.tag',
   'tag/virtual-nested-unmount.tag',
+  'tag/table-test.tag',
+  'tag/select-test.tag',
   // mount order
   'tag/deferred-mount.tag',
   'tag/expression-eval-count.tag',
