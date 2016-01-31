@@ -1,8 +1,8 @@
-/* Riot v2.3.14, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v3.0.0-alpha.1, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.3.14', settings: {} },
+var riot = { version: 'v3.0.0-alpha.1', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -1089,6 +1089,7 @@ function moveVirtual(tag, src, target, len) {
  * @param   { Object } dom - DOM node we need to loop
  * @param   { Tag } parent - parent tag instance where the dom node is contained
  * @param   { String } expr - string contained in the 'each' attribute
+ * @returns { Object } expression object for this each loop
  */
 function _each(dom, parent, expr) {
 
@@ -1110,6 +1111,7 @@ function _each(dom, parent, expr) {
 
   // parse the each expression
   expr = tmpl.loopKeys(expr)
+  expr.isLoop = true
 
   // insert a marked where the loop tags will be injected
   root.insertBefore(ref, dom)
@@ -1120,8 +1122,9 @@ function _each(dom, parent, expr) {
     // remove the original DOM node
     dom.parentNode.removeChild(dom)
     if (root.stub) root = parent.root
+  })
 
-  }).on('update', function () {
+  expr.update = function () {
     // get the new items collection
     var items = tmpl(expr.val, parent),
       // create a fragment to hold the new DOM nodes to inject in the parent tag
@@ -1145,7 +1148,7 @@ function _each(dom, parent, expr) {
         oldPos = oldItems.indexOf(item),
         pos = ~oldPos && _mustReorder ? oldPos : i,
         // does a tag exist in this position?
-        tag = tags[pos]
+        tag = tags[pos], domToInsert
 
       item = !hasKeys && expr.key ? mkitem(expr, item, i) : item
 
@@ -1165,18 +1168,19 @@ function _each(dom, parent, expr) {
         }, dom.innerHTML)
 
         tag.mount()
+        domToInsert = tag.stub || tag.root
         if (isVirtual) tag._root = tag.root.firstChild // save reference for further moves or inserts
         // this tag must be appended
         if (i == tags.length) {
           if (isVirtual)
             addVirtual(tag, frag)
-          else frag.appendChild(tag.root)
+          else frag.appendChild(domToInsert)
         }
         // this tag must be insert
         else {
           if (isVirtual)
             addVirtual(tag, root, tags[i])
-          else root.insertBefore(tag.root, tags[i].root)
+          else root.insertBefore(domToInsert, tags[i].root)
           oldItems.splice(i, 0, item)
         }
 
@@ -1226,9 +1230,9 @@ function _each(dom, parent, expr) {
 
     // clone the items array
     oldItems = items.slice()
+  }
 
-  })
-
+  return expr
 }
 /**
  * Object that will be used to inject and manage the css of every tag instance
@@ -1291,70 +1295,68 @@ var styleManager = (function(_riot) {
   }
 
 })(riot)
-
-
-function parseNamedElements(root, tag, childTags, forceParsingNamed) {
-
-  walk(root, function(dom) {
-    if (dom.nodeType == 1) {
-      dom.isLoop = dom.isLoop ||
-                  (dom.parentNode && dom.parentNode.isLoop || getAttr(dom, 'each'))
-                    ? 1 : 0
-
-      // custom child tag
-      if (childTags) {
-        var child = getTag(dom)
-
-        if (child && !dom.isLoop)
-          childTags.push(initChildTag(child, {root: dom, parent: tag}, dom.innerHTML, tag))
-      }
-
-      if (!dom.isLoop || forceParsingNamed)
-        setNamed(dom, tag, [])
-    }
-
-  })
-
-}
-
 function parseExpressions(root, tag, expressions) {
+  var base = {parent: {children: expressions}}
 
-  function addExpr(dom, val, extra) {
-    if (tmpl.hasExpr(val)) {
-      expressions.push(extend({ dom: dom, expr: val }, extra))
-    }
-  }
-
-  walk(root, function(dom) {
-    var type = dom.nodeType,
-      attr
+  walk(root, function(dom, ctx) {
+    var type = dom.nodeType, parent = ctx.parent, attr, expr
 
     // text node
-    if (type == 3 && dom.parentNode.tagName != 'STYLE') addExpr(dom, dom.nodeValue)
-    if (type != 1) return
+    if (type == 3 && dom.parentNode.tagName != 'STYLE' && tmpl.hasExpr(dom.nodeValue))
+      parent.children.push({dom: dom, expr: dom.nodeValue})
 
-    /* element */
+    if (type != 1) return ctx // not an element
 
-    // loop
-    attr = getAttr(dom, 'each')
+    // loop. each does it's own thing (for now)
+    if (attr = getAttr(dom, 'each')) {
+      parent.children.push(_each(dom, tag, attr))
+      return false
+    }
 
-    if (attr) { _each(dom, tag, attr); return false }
+    // if-attrs become the new parent. Any following expressions (either on the current
+    // element, or below it) become children of this expression.
+    if (expr = getAttr(dom, 'if')) {
+      remAttr(dom, 'if')
+      attr = {isIf: true, expr: expr, dom: dom, children: []}
+      parent.children.push(attr)
+      parent = attr
+    }
+
+    if (expr = getNamedKey(dom)) {
+      parent.children.push({isNamed: true, dom: dom, expr: expr})
+    }
 
     // attribute expressions
+    var allAttrs = [], nameHasExpression = false
     each(dom.attributes, function(attr) {
-      var name = attr.name,
-        bool = name.split('__')[1]
+      var name = attr.name, bool = name.split('__')[1]
+      var hasExp = tmpl.hasExpr(attr.value)
+      if (name === 'if') return // already handled
 
-      addExpr(dom, attr.value, { attr: bool || name, bool: bool })
+      // dirty dirty hack until we can clean up named tags
+      if (name === 'name' && hasExp) nameHasExpression = true
+
+      expr = {dom: dom, expr: attr.value, attr: bool || attr.name, bool: bool}
+      allAttrs.push(expr) // stores all attributes, even without expressions
+
+      if (!hasExp) return // no expressions here
+      parent.children.push(expr)
       if (bool) { remAttr(dom, name); return false }
-
     })
 
-    // skip custom tags
-    if (getTag(dom)) return false
+    // if this is a tag, stop traversing here.
+    // we ignore the root, since parseExpressions is called while we're mounting that root
+    var tagImpl = getTag(dom)
+    if (tagImpl && dom !== root) {
+      parent.children.push({isTag: true, dom: dom, impl: tagImpl,
+        ownAttrs: allAttrs, nameHasExpression: nameHasExpression})
+      return false
+    }
 
-  })
-
+    // whatever the parent is, all child elements get the same parent.
+    // If this element had an if-attr, that's the parent for all child elements
+    return {parent: parent}
+  }, base)
 }
 function Tag(impl, conf, innerHTML) {
 
@@ -1363,13 +1365,13 @@ function Tag(impl, conf, innerHTML) {
     parent = conf.parent,
     isLoop = conf.isLoop,
     hasImpl = conf.hasImpl,
+    ownAttrs = conf.ownAttrs, // attributes on this tag (evaluated in parent context)
     item = cleanUpData(conf.item),
     expressions = [],
     childTags = [],
     root = conf.root,
     fn = impl.fn,
     tagName = root.tagName.toLowerCase(),
-    attr = {},
     propsInSyncWithParent = [],
     dom
 
@@ -1389,28 +1391,29 @@ function Tag(impl, conf, innerHTML) {
 
   extend(this, { parent: parent, root: root, opts: opts, tags: {} }, item)
 
-  // grab attributes
-  each(root.attributes, function(el) {
-    var val = el.value
-    // remember attributes with expressions only
-    if (tmpl.hasExpr(val)) attr[el.name] = val
-  })
-
   dom = mkdom(impl.tmpl, innerHTML)
 
   // options
   function updateOpts() {
     var ctx = hasImpl && isLoop ? self : parent || self
 
-    // update opts from current DOM attributes
-    each(root.attributes, function(el) {
-      var val = el.value
-      opts[toCamel(el.name)] = tmpl.hasExpr(val) ? tmpl(val, ctx) : val
-    })
-    // recover those with expressions
-    each(Object.keys(attr), function(name) {
-      opts[toCamel(name)] = tmpl(attr[name], ctx)
-    })
+    // If we're nested beneath another tag, then our attributes are evaluated
+    // in that parent context. Here, we copy them onto opts.
+    if (ownAttrs) {
+      each(ownAttrs || [], function(expr) {
+        // if the attribute doesn't actually have an expression, there
+        // won't be a value. Just use the string itself in this case.
+        var v = expr.hasOwnProperty('value') ? expr.value : expr.expr
+        opts[toCamel(expr.attr)] = v
+      })
+
+    } else {
+      each(root.attributes, function(el) {
+        var val = el.value, hasTmpl = tmpl.hasExpr(val)
+        if (hasTmpl && ownAttrs) return // already handled above
+        opts[toCamel(el.name)] = hasTmpl ? tmpl(val, ctx) : val
+      })
+    }
   }
 
   function normalizeData(data) {
@@ -1494,18 +1497,18 @@ function Tag(impl, conf, innerHTML) {
     // initialiation
     if (fn) fn.call(self, opts)
 
-    // parse layout after init. fn may calculate args for nested custom tags
-    parseExpressions(dom, self, expressions)
-
-    // mount the child tags
-    toggle(true)
-
     // update the root adding custom attributes coming from the compiler
     // it fixes also #1087
     if (impl.attrs || hasImpl) {
       walkAttributes(impl.attrs, function (k, v) { setAttr(root, k, v) })
       parseExpressions(self.root, self, expressions)
     }
+
+    // parse layout after init. fn may calculate args for nested custom tags
+    parseExpressions(dom, self, expressions)
+
+    // unmount automatically when our parent does
+    if (parent) parent.on('unmount', self.unmount)
 
     if (!self.parent || isLoop) self.update(item)
 
@@ -1520,11 +1523,6 @@ function Tag(impl, conf, innerHTML) {
       while (dom.firstChild) root.appendChild(dom.firstChild)
       if (root.stub) self.root = root = parent.root
     }
-
-    // parse the named dom nodes in the looped child
-    // adding them to the parent as well
-    if (isLoop)
-      parseNamedElements(self.root, self.parent, null, true)
 
     // if it's not a child tag we can trigger its mount event
     if (!self.parent || self.parent.isMounted) {
@@ -1590,32 +1588,12 @@ function Tag(impl, conf, innerHTML) {
 
 
     self.trigger('unmount')
-    toggle()
+    if (parent) parent.off('unmount', self.unmount)
     self.off('*')
     self.isMounted = false
     delete root._tag
 
   })
-
-  function toggle(isMount) {
-
-    // mount/unmount children
-    each(childTags, function(child) { child[isMount ? 'mount' : 'unmount']() })
-
-    // listen/unlisten parent (events flow one way from parent to children)
-    if (!parent) return
-    var evt = isMount ? 'on' : 'off'
-
-    // the loop tags will be always in sync with the parent automatically
-    if (isLoop)
-      parent[evt]('unmount', self.unmount)
-    else
-      parent[evt]('update', self.update)[evt]('unmount', self.unmount)
-  }
-
-  // named elements available for fn
-  parseNamedElements(dom, this, childTags)
-
 }
 /**
  * Attach an event to a DOM node
@@ -1688,7 +1666,7 @@ function update(expressions, tag) {
     var dom = expr.dom,
       attrName = expr.attr,
       value = tmpl(expr.expr, tag),
-      parent = expr.dom.parentNode
+      parent = dom && dom.parentNode
 
     if (expr.bool)
       value = value ? attrName : false
@@ -1703,9 +1681,16 @@ function update(expressions, tag) {
       parent.value = value
     }
 
-    // no change
-    if (expr.value === value) return
+    var old = expr.value
     expr.value = value
+
+    if (expr.isIf) return updateIf(expr, old, value, tag)
+    if (expr.isTag) return updateTagRef(expr, tag)
+    if (expr.isLoop) return expr.update()
+    if (expr.isNamed) return updateNamed(expr, old, value, tag)
+
+    // no change, so nothing more to do
+    if (old === value) return
 
     // text node
     if (!attrName) {
@@ -1719,37 +1704,6 @@ function update(expressions, tag) {
     if (isFunction(value)) {
       setEventHandler(attrName, value, dom, tag)
 
-    // if- conditional
-    } else if (attrName == 'if') {
-      var stub = expr.stub,
-        add = function() { insertTo(stub.parentNode, stub, dom) },
-        remove = function() { insertTo(dom.parentNode, dom, stub) }
-
-      // add to DOM
-      if (value) {
-        if (stub) {
-          add()
-          dom.inStub = false
-          // avoid to trigger the mount event if the tags is not visible yet
-          // maybe we can optimize this avoiding to mount the tag at all
-          if (!isInStub(dom)) {
-            walk(dom, function(el) {
-              if (el._tag && !el._tag.isMounted)
-                el._tag.isMounted = !!el._tag.trigger('mount')
-            })
-          }
-        }
-      // remove from DOM
-      } else {
-        stub = expr.stub = stub || document.createTextNode('')
-        // if the parentNode is defined we can easily replace the tag
-        if (dom.parentNode)
-          remove()
-        // otherwise we need to wait the updated event
-        else (tag.parent || tag).one('updated', remove)
-
-        dom.inStub = true
-      }
     // show / hide
     } else if (/^(show|hide)$/.test(attrName)) {
       if (attrName == 'hide') value = !value
@@ -1777,6 +1731,56 @@ function update(expressions, tag) {
 
   })
 
+}
+
+// Named expressions set a property on the parent, so that
+// <input name='foo' /> is available as this.foo
+function updateNamed(expr, old, value, tag) {
+  if (expr.done) return // only set named once
+  // names only get set on custom tags (not loop items, for example)
+  var parent = getImmediateCustomParentTag(tag)
+  setNamed(expr.dom, parent, value)
+  expr.done = true
+}
+
+// TagRef points to a child tag that may or may not exist yet.
+// This way, we don't mount a tag until it's actually going to be inserted into DOM
+function updateTagRef(expr, parent) {
+  if (expr.tag) {
+    expr.tag.update()
+    return
+  }
+
+  var conf = {root: expr.dom, parent: parent, hasImpl: true, ownAttrs: expr.ownAttrs}
+  expr.tag = initChildTag(expr.impl, conf, expr.dom.innerHTML, parent, expr.nameHasExpression)
+  expr.tag.mount()
+  expr.tag.update()
+}
+
+// If expressions add or remove DOM, as well as control the flow of updates.
+// An if-expression that remains false won't update any dependants.
+// When the truthyness changes, we insert the DOM, or a stub to hold position.
+function updateIf(expr, old, value, tag) {
+  // if the truthyness remains unchange
+  if (expr.started && !value == !old) {
+    if (value)
+      update(expr.children, tag)
+    return
+  }
+
+  var stub, dom = expr.dom
+  stub = expr.stub = expr.stub || document.createTextNode('')
+
+  // add to DOM
+  if (value) {
+    update(expr.children, tag)
+    insertTo(stub.parentNode, stub, dom)
+  } else {
+    if (dom.parentNode) insertTo(dom.parentNode, dom, stub)
+    // pretty sure this only happens with <foo each={items} if={show} />
+    else tag.stub = stub
+  }
+  expr.started = true
 }
 /**
  * Specialized function for looping an array-like collection with `each={}`
@@ -1902,11 +1906,12 @@ function moveChildTag(tag, tagName, newPos) {
  * @param   { Object } opts - tag options containing the DOM node where the tag will be mounted
  * @param   { String } innerHTML - inner html of the child node
  * @param   { Object } parent - instance of the parent tag including the child custom tag
+ * @param   { Boolean } skipName - hack to ignore the name attribute when attaching to parent
  * @returns { Object } instance of the new child tag just created
  */
-function initChildTag(child, opts, innerHTML, parent) {
+function initChildTag(child, opts, innerHTML, parent, skipName) {
   var tag = new Tag(child, opts, innerHTML),
-    tagName = getTagName(opts.root),
+    tagName = getTagName(opts.root, skipName),
     ptag = getImmediateCustomParentTag(parent)
   // fix for the parent attribute in the looped elements
   tag.parent = ptag
@@ -1962,11 +1967,12 @@ function defineProperty(el, key, value, options) {
 /**
  * Get the tag name of any DOM node
  * @param   { Object } dom - DOM node we want to parse
+ * @param   { Boolean } skipName - hack to ignore the name attribute when attaching to parent
  * @returns { String } name to identify this dom node in riot
  */
-function getTagName(dom) {
+function getTagName(dom, skipName) {
   var child = getTag(dom),
-    namedTag = getAttr(dom, 'name'),
+    namedTag = !skipName && getAttr(dom, 'name'),
     tagName = namedTag && !tmpl.hasExpr(namedTag) ?
                 namedTag :
               child ? child.name : dom.tagName.toLowerCase()
@@ -2048,16 +2054,18 @@ function cleanUpData(data) {
  * Walk down recursively all the children tags starting dom node
  * @param   { Object }   dom - starting node where we will start the recursion
  * @param   { Function } fn - callback to transform the child node just found
+ * @param   { Object }   context - fn can optionally return an object, which is passed to children
  */
-function walk(dom, fn) {
+function walk(dom, fn, context) {
   if (dom) {
+    var res = fn(dom, context)
     // stop the recursion
-    if (fn(dom) === false) return
+    if (res === false) return
     else {
       dom = dom.firstChild
 
       while (dom) {
-        walk(dom, fn)
+        walk(dom, fn, res)
         dom = dom.nextSibling
       }
     }
@@ -2144,45 +2152,26 @@ function getNamedKey(dom) {
  * Set the named properties of a tag element
  * @param { Object } dom - DOM node we need to parse
  * @param { Object } parent - tag instance where the named dom element will be eventually added
- * @param { Array } keys - list of all the tag instance properties
+ * @param { Array } key - the key on which to set on parent
  */
-function setNamed(dom, parent, keys) {
+function setNamed(dom, parent, key) {
   // get the key value we want to add to the tag instance
-  var key = getNamedKey(dom),
-    isArr,
-    // add the node detected to a tag instance using the named property
-    add = function(value) {
-      // avoid to override the tag properties already set
-      if (contains(keys, key)) return
-      // check whether this value is an array
-      isArr = isArray(value)
-      // if the key was never set
-      if (!value)
-        // set it once on the tag instance
-        parent[key] = dom
-      // if it was an array and not yet set
-      else if (!isArr || isArr && !contains(value, dom)) {
-        // add the dom node into the array
-        if (isArr)
-          value.push(dom)
-        else
-          parent[key] = [value, dom]
-      }
-    }
-
-  // skip the elements with no named properties
+  key = key || getNamedKey(dom)
   if (!key) return
 
-  // check whether this key has been already evaluated
-  if (tmpl.hasExpr(key))
-    // wait the first updated event only once
-    parent.one('mount', function() {
-      key = getNamedKey(dom)
-      add(parent[key])
-    })
-  else
-    add(parent[key])
+  var dest = parent[key]
+  var isArr = isArray(dest)
 
+  // if the key was never set, set it once on the tag instance
+  if (!dest) parent[key] = dom
+  // if it was an array and not yet set
+  else if (!isArr || isArr && !contains(dest, dom)) {
+    // add the dom node into the array
+    if (isArr)
+      dest.push(dom)
+    else
+      parent[key] = [dest, dom]
+  }
 }
 
 /**
