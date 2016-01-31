@@ -11,7 +11,7 @@ script:
 
 sudo: false
 
-after_script:
+after_success:
   make test-sauce && make test-coveralls
 
 notifications:
