@@ -1811,6 +1811,7 @@ it('raw contents', function() {
     expect(divs[0].innerHTML).to.be('4')
     expect(divs[1].innerHTML).to.be('5')
 
+    tags.push(tag)
   })
 
   it('still loops with reserved property names #1526', function() {
@@ -1819,6 +1820,27 @@ it('raw contents', function() {
     tag.update()
     tag.reorder()
     tag.update()
+    tags.push(tag)
+  })
+
+  it('non looped and conditional virtual tags mount content', function() {
+    injectHTML('<virtual-no-loop></virtual-no-loop>')
+    var tag = riot.mount('virtual-no-loop')[0]
+
+    var virts = tag.root.querySelectorAll('virtual')
+    expect(virts.length).to.be(0)
+
+    var spans = tag.root.querySelectorAll('span')
+    var divs = tag.root.querySelectorAll('div')
+    expect(spans.length).to.be(2)
+    expect(divs.length).to.be(2)
+    expect(spans[0].innerHTML).to.be('if works text')
+    expect(divs[0].innerHTML).to.be('yielded text')
+    expect(spans[1].innerHTML).to.be('virtuals yields expression')
+    expect(divs[1].innerHTML).to.be('hello there')
+
+
+    tags.push(tag)
   })
 
 })
