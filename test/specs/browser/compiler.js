@@ -788,6 +788,23 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('<yield from> name can be unquoted, without <yield to> default to its content', function () {
+    var html = [
+      '<yield-from-default>',
+      ' <yield to="icon">my-icon</yield>',
+      ' <yield to="hello">Hello $1 $2</yield>',
+      ' <yield to="loop">[⁗foo⁗,\'bar\']</yield>',
+      '</yield-from-default>'
+    ]
+
+    injectHTML(html.join('\n'))
+    expect($('yield-from-default')).not.to.be(null)
+    var tag = riot.mount('yield-from-default')[0]
+    html = '<p>(no options)</p><p>Hello $1 $2 <span class="my-icon"></span></p><p>foo</p><p>bar</p>'
+    expect(normalizeHTML(tag.root.innerHTML)).to.be(html)
+    tags.push(tag)
+  })
+
   it('multiple mount <yield> tag', function() {
 
     riot.mount('inner-html')
