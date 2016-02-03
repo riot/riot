@@ -791,11 +791,9 @@ describe('Compiler Browser', function() {
   it('<yield from> name can be unquoted, without <yield to> default to its content', function () {
     var html = [
       '<yield-from-default>',
-      '  <div>',
-      '    <yield to="icon">my-icon</yield>',
-      '    <yield to="hello">Hello $1 $2</yield>',
-      '    <yield to="loop">[⁗foo⁗,\'bar\']</yield>',
-      '  </div>',
+      ' <yield to="icon">my-icon</yield>',
+      ' <yield to="hello">Hello $1 $2</yield>',
+      ' <yield to="loop">[⁗foo⁗,\'bar\']</yield>',
       '</yield-from-default>'
     ]
 
