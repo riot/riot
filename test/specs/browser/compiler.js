@@ -1164,7 +1164,7 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
-  it.only('only evalutes expressions once per update', function() {
+  it('only evalutes expressions once per update', function() {
     var tag = riot.mount('expression-eval-count')[0]
     expect(tag.count).to.be(1)
     tag.update()
@@ -1839,6 +1839,26 @@ it('raw contents', function() {
     expect(spans[1].innerHTML).to.be('virtuals yields expression')
     expect(divs[1].innerHTML).to.be('hello there')
 
+
+    tags.push(tag)
+  })
+
+  it('virtual tags with yielded content function in a loop', function() {
+    injectHTML('<virtual-yield-loop></virtual-yield-loop>')
+    var tag = riot.mount('virtual-yield-loop')[0]
+    var spans = tag.root.querySelectorAll('span')
+
+    expect(spans[0].innerHTML).to.be('one')
+    expect(spans[1].innerHTML).to.be('two')
+    expect(spans[2].innerHTML).to.be('three')
+
+    tag.items.reverse()
+    tag.update()
+    var spans = tag.root.querySelectorAll('span')
+
+    expect(spans[0].innerHTML).to.be('three')
+    expect(spans[1].innerHTML).to.be('two')
+    expect(spans[2].innerHTML).to.be('one')
 
     tags.push(tag)
   })
