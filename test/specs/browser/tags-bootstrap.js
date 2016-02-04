@@ -74,6 +74,7 @@ loadTagsAndScripts([
   'tag/reserved-names.tag',
 
   'tag/virtual-no-loop.tag',
+  'tag/virtual-yield-loop.tag',
 
   // these tags will be not autoinjected in the DOM
   // that's what `name = false` means
