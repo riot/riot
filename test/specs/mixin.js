@@ -11,28 +11,9 @@ describe('Mixin', function() {
   // generated from babeljs
   // src: http://babeljs.io/repl/#?experimental=false&evaluate=true&loose=false&spec=false&code=class%20FunctMixin%20{%0A%20%20init%28%29%20{%0A%20%20%20%20this.type%20%3D%20%27func%27%0A%20%20}%0A%20%20get%20message%28%29%20{%0A%20%20%20%20return%20%27Initialized%27%3B%0A%20%20}%0A}
 
-  var _createClass = (function() {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ('value' in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-    return function(Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  })();
+  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError('Cannot call a class as a function');
-    }
-  }
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
   var FunctMixin = (function() {
     function FunctMixin() {
