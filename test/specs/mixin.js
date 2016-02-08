@@ -11,11 +11,30 @@ describe('Mixin', function() {
   // generated from babeljs
   // src: http://babeljs.io/repl/#?experimental=false&evaluate=true&loose=false&spec=false&code=class%20FunctMixin%20{%0A%20%20init%28%29%20{%0A%20%20%20%20this.type%20%3D%20%27func%27%0A%20%20}%0A%20%20get%20message%28%29%20{%0A%20%20%20%20return%20%27Initialized%27%3B%0A%20%20}%0A}
 
-  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+  var _createClass = (function() {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ('value' in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+    return function(Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  })();
 
-  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError('Cannot call a class as a function');
+    }
+  }
 
-  var FunctMixin = (function () {
+  var FunctMixin = (function() {
     function FunctMixin() {
       _classCallCheck(this, FunctMixin);
     }
@@ -60,6 +79,29 @@ describe('Mixin', function() {
     },
     message: 'not yet'
   }
+
+  var globalMixin = {
+    globalAttr: 'not yet',
+    init: function() {
+      this.globalAttr = 'initialized'
+    },
+    getGlobal: function() {
+      return 'global'
+    }
+  }
+
+  it('Will register a global mixin and mount a tag with global mixed-in methods', function() {
+    riot.mixin(globalMixin)
+
+    injectHTML('<my-mixin></my-mixin>')
+
+    riot.tag('my-mixin', '<span>some tag</span>')
+
+    var tag = riot.mount('my-mixin')[0]
+
+    expect('initialized').to.be(tag.globalAttr)
+    expect('global').to.be(tag.getGlobal())
+  })
 
   it('Will mount a tag and provide mixed-in methods', function() {
 
@@ -126,7 +168,10 @@ describe('Mixin', function() {
     })
 
     var tag = riot.mount('my-mixin')[0],
-      newOpts = {'some': 'option', 'value': Math.random()}
+      newOpts = {
+        'some': 'option',
+        'value': Math.random()
+      }
 
     expect(tag._riot_id).to.be(tag.getId())
     expect(tag.opts).to.be(tag.getOpts())
