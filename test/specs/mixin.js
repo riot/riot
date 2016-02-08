@@ -62,7 +62,6 @@ describe('Mixin', function() {
   }
 
   var globalMixin = {
-    globalAttr: 'not yet',
     init: function() {
       this.globalAttr = 'initialized'
     },
@@ -73,9 +72,7 @@ describe('Mixin', function() {
 
   it('Will register a global mixin and mount a tag with global mixed-in attributes and methods', function() {
     riot.mixin(globalMixin)
-
     injectHTML('<my-mixin></my-mixin>')
-
     riot.tag('my-mixin', '<span>some tag</span>')
 
     var tag = riot.mount('my-mixin')[0]
