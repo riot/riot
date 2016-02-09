@@ -59,7 +59,14 @@ riot: raw test
 
 min: riot
 	# minify riot
-	@ for f in riot riot+compiler; do $(UGLIFY) $(DIST)$$f.js --comments --mangle -o $(DIST)$$f.min.js; done
+	@ for f in riot riot+compiler; do \
+		$(UGLIFY) $(DIST)$$f.js \
+			--comments \
+			--mangle \
+			--screw-ie8 \
+			--compress  \
+			-o $(DIST)$$f.min.js; \
+		done
 
 perf: riot
 	# run the performance tests
