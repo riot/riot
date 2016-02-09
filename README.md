@@ -115,7 +115,6 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Hackernews reader](http://git.io/riot-hn)
 - [Vuejs examples by Riotjs](https://github.com/txchen/feplay/tree/gh-pages/riot_vue)
 - [Flux-like ES6 Todo](https://github.com/srackham/riot-todo)
-- [Simple TODO](https://muut.com/riotjs/dist/demo/)
 - [Timer](http://jsfiddle.net/gnumanth/h9kuozp5/)
 - [Another flux demo comparable to React ones](http://txchen.github.io/feplay/riot_flux)
 - [Various experiments](http://richardbondi.net/programming/riot)

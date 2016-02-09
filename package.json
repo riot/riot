@@ -4,13 +4,13 @@
   "description": "A React-like user interface micro-library",
   "homepage": "http://riotjs.com/",
   "repository": "riot/riot",
-  "author": "Muut, Inc. and other contributors",
+  "author": "Riot maintainers team + smart people from all over the world",
   "contributors": [
-    "Richard Bondi",
-    "Gianluca Guarini",
-    "Tsutomu Kawamura",
-    "Alberto Martínez",
-    "Tero Piirainen"
+    "Richard Bondi https://github.com/rsbondi",
+    "Gianluca Guarini https://github.com/GianlucaGuarini",
+    "Tsutomu Kawamura https://github.com/cognitom",
+    "Alberto Martínez https://github.com/aMarCruz",
+    "Tero Piirainen  https://github.com/tipiirai"
   ],
   "license": "MIT",
   "engines": {
