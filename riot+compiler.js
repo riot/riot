@@ -16,6 +16,8 @@ var riot = { version: 'v3.0.0-alpha.1', settings: {} },
   /**
    * Const
    */
+  GLOBAL_MIXIN = '__global_mixin',
+
   // riot specific prefixes
   RIOT_PREFIX = 'riot-',
   RIOT_TAG = RIOT_PREFIX + 'tag',
@@ -911,26 +913,45 @@ var tmpl = (function () {
 var mkdom = (function (checkIE) {
 
   var
-    reToSrc = /<yield\s+to=(['"])?@\1\s*>([\S\s]+?)<\/yield\s*>/.source,
+    reHasYield  = /<yield\b/i,
+    reYieldAll  = /<yield\s*(?:\/>|>([\S\s]*?)<\/yield\s*>)/ig,
+    reYieldCls  = /<yield\s+to=[^>]+>[\S\s]*?<\/yield\s*>\s*/ig,
+    reYieldDest = /<yield\s+from=['"]?([-\w]+)['"]?\s*(?:\/>|>([\S\s]*?)<\/yield\s*>)/ig,
+    rsYieldSrc  = '<yield\\s+to=[\'"]@[\'"]\\s*>([\\S\\s]*?)</yield\\s*>',
     rootEls = { tr: 'tbody', th: 'tr', td: 'tr', col: 'colgroup' },
     GENERIC = 'div'
+
 
   checkIE = checkIE && checkIE < 10
   var tblTags = checkIE
     ? SPECIAL_TAGS_REGEX : /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?)$/
 
-  // creates any dom element in a div, table, or colgroup container
-  function _mkdom(templ, html) {
+  /**
+   * Creates a DOM element to wrap the given content. Normally an `DIV`, but can be
+   * also a `TABLE`, `SELECT`, `TBODY`, `TR`, or `COLGROUP` element.
+   *
+   * @param   {string} impl   - Tag implementation with the template and root attributes
+   * @param   {string} [html] - HTML content that comes from the DOM element where you
+   *           will mount the tag, mostly the original tag in the page
+   * @param   {object} [attr] - Plain object where to store the root attributes
+   * @returns {HTMLElement} DOM element with _templ_ merged through `YIELD` with the _html_.
+   */
+  function _mkdom(impl, html, attr) {
 
-    var match = templ && templ.match(/^\s*<([-\w]+)/),
+    var templ = impl.tmpl,
+      match   = templ && templ.match(/^\s*<([-\w]+)/),
       tagName = match && match[1].toLowerCase(),
+
       el = mkEl(GENERIC)
 
+    if (!html) html = ''
+
+    if (impl.attrs) attr.attrs = replaceYield(impl.attrs, html)
+
     // replace all the yield tags with the tag inner html
-    templ = replaceYield(templ, html || '')
+    templ = replaceYield(templ, html)
 
     /* istanbul ignore next */
-    //if ((checkIE || !startsWith(tagName, 'opt')) && SPECIAL_TAGS_REGEX.test(tagName))
     if (tblTags.test(tagName))
       el = specialTags(el, templ, tagName)
     else
@@ -941,8 +962,11 @@ var mkdom = (function (checkIE) {
     return el
   }
 
-  // creates the root element for table and select child elements
-  // tr/th/td/thead/tfoot/tbody/caption/col/colgroup/option/optgroup
+
+  /*
+    Creates the root element for table or select child elements:
+    tr/th/td/thead/tfoot/tbody/caption/col/colgroup/option/optgroup
+  */
   function specialTags(el, templ, tagName) {
     var
       select = tagName[0] === 'o',
@@ -964,28 +988,31 @@ var mkdom = (function (checkIE) {
     return parent
   }
 
-  /**
-   * Replace the yield tag from any tag template with the innerHTML of the
-   * original tag in the page
-   * @param   { String } templ - tag implementation template
-   * @param   { String } html  - original content of the tag in the DOM
-   * @returns { String } tag template updated without the yield tag
-   */
+  /*
+    Replace the yield tag from any tag template with the innerHTML of the
+    original tag in the page
+  */
   function replaceYield(templ, html) {
     // do nothing if no yield
-    if (!/<yield\b/i.test(templ)) return templ
+    if (!reHasYield.test(templ)) return templ
 
     // be careful with #1343 - string on the source having `$1`
-    var n = 0
-    templ = templ.replace(/<yield\s+from=['"]([-\w]+)['"]\s*(?:\/>|>\s*<\/yield\s*>)/ig,
-      function (str, ref) {
-        var m = html.match(RegExp(reToSrc.replace('@', ref), 'i'))
-        ++n
-        return m && m[2] || ''
-      })
+    var n = 1
+    templ = templ.replace(reYieldDest, function (_, ref, def) {
+      var m = html.match(RegExp(rsYieldSrc.replace('@', ref), 'i'))
+      n = 0
+      return (m ? m[1] : def) || ''
+    })
 
     // yield without any "from", replace yield in templ with the innerHTML
-    return n ? templ : templ.replace(/<yield\s*(?:\/>|>\s*<\/yield\s*>)/gi, html)
+    if (n || reHasYield.test(templ)) {
+      if (html) html = html.replace(reYieldCls, '').trim()
+      templ = templ.replace(reYieldAll, function (_, def) {
+        return html || def || ''
+      })
+    }
+
+    return templ
   }
 
   return _mkdom
@@ -1045,44 +1072,6 @@ function moveNestedTags(child, i) {
       moveChildTag(tag, tagName, i)
   })
 }
-
-/**
- * Adds the elements for a virtual tag
- * @param { Tag } tag - the tag whose root's children will be inserted or appended
- * @param { Node } src - the node that will do the inserting or appending
- * @param { Tag } target - only if inserting, insert before this tag's first child
- */
-function addVirtual(tag, src, target) {
-  var el = tag._root, sib
-  tag._virts = []
-  while (el) {
-    sib = el.nextSibling
-    if (target)
-      src.insertBefore(el, target._root)
-    else
-      src.appendChild(el)
-
-    tag._virts.push(el) // hold for unmounting
-    el = sib
-  }
-}
-
-/**
- * Move virtual tag and all child nodes
- * @param { Tag } tag - first child reference used to start move
- * @param { Node } src  - the node that will do the inserting
- * @param { Tag } target - insert before this tag's first child
- * @param { Number } len - how many child nodes to move
- */
-function moveVirtual(tag, src, target, len) {
-  var el = tag._root, sib, i = 0
-  for (; i < len; i++) {
-    sib = el.nextSibling
-    src.insertBefore(el, target._root)
-    el = sib
-  }
-}
-
 
 /**
  * Manage tags having the 'each'
@@ -1169,17 +1158,16 @@ function _each(dom, parent, expr) {
 
         tag.mount()
         domToInsert = tag.stub || tag.root
-        if (isVirtual) tag._root = tag.root.firstChild // save reference for further moves or inserts
         // this tag must be appended
         if (i == tags.length) {
           if (isVirtual)
-            addVirtual(tag, frag)
+            makeVirtual(tag, frag)
           else frag.appendChild(domToInsert)
         }
         // this tag must be insert
         else {
           if (isVirtual)
-            addVirtual(tag, root, tags[i])
+            makeVirtual(tag, root, tags[i])
           else root.insertBefore(domToInsert, tags[i].root)
           oldItems.splice(i, 0, item)
         }
@@ -1192,7 +1180,7 @@ function _each(dom, parent, expr) {
       if (pos !== i && _mustReorder) {
         // update the DOM
         if (isVirtual)
-          moveVirtual(tag, root, tags[i], dom.childNodes.length)
+          moveVirtual(tag, root, tags[i])
         else root.insertBefore(tag.root, tags[i].root)
         // update the position attribute if it exists
         if (expr.pos)
@@ -1348,8 +1336,11 @@ function parseExpressions(root, tag, expressions) {
     // we ignore the root, since parseExpressions is called while we're mounting that root
     var tagImpl = getTag(dom)
     if (tagImpl && dom !== root) {
-      parent.children.push({isTag: true, dom: dom, impl: tagImpl,
-        ownAttrs: allAttrs, nameHasExpression: nameHasExpression})
+      attr = {dom: dom, impl: tagImpl, isTag: true,
+        ownAttrs: allAttrs, nameHasExpression: nameHasExpression}
+      if (dom.tagName == 'VIRTUAL') attr.isVirtual = true
+
+      parent.children.push(attr)
       return false
     }
 
@@ -1368,10 +1359,11 @@ function Tag(impl, conf, innerHTML) {
     ownAttrs = conf.ownAttrs, // attributes on this tag (evaluated in parent context)
     item = cleanUpData(conf.item),
     expressions = [],
-    childTags = [],
     root = conf.root,
     fn = impl.fn,
     tagName = root.tagName.toLowerCase(),
+    attr = {},
+    implAttr = {},
     propsInSyncWithParent = [],
     dom
 
@@ -1391,7 +1383,16 @@ function Tag(impl, conf, innerHTML) {
 
   extend(this, { parent: parent, root: root, opts: opts, tags: {} }, item)
 
-  dom = mkdom(impl.tmpl, innerHTML)
+  // grab attributes
+  each(root.attributes, function(el) {
+    var val = el.value
+    // remember attributes with expressions only
+    if (tmpl.hasExpr(val)) attr[el.name] = val
+  })
+
+  dom = mkdom(impl, innerHTML, implAttr)
+  implAttr = implAttr.attrs || ''
+
 
   // options
   function updateOpts() {
@@ -1494,13 +1495,17 @@ function Tag(impl, conf, innerHTML) {
 
     updateOpts()
 
+    // add global mixin
+    var globalMixin = riot.mixin(GLOBAL_MIXIN)
+    if (globalMixin) self.mixin(globalMixin)
+
     // initialiation
     if (fn) fn.call(self, opts)
 
     // update the root adding custom attributes coming from the compiler
     // it fixes also #1087
-    if (impl.attrs || hasImpl) {
-      walkAttributes(impl.attrs, function (k, v) { setAttr(root, k, v) })
+    if (implAttr || hasImpl) {
+      walkAttributes(implAttr, function (k, v) { setAttr(root, k, v) })
       parseExpressions(self.root, self, expressions)
     }
 
@@ -1719,6 +1724,10 @@ function update(expressions, tag) {
         setAttr(dom, attrName.slice(RIOT_PREFIX.length), value)
 
     } else {
+      // <select> <option selected={true}> </select>
+      if (attrName == 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.nodeName) && value)
+        parent.value = dom.value
+
       if (expr.bool) {
         dom[attrName] = value
         if (!value) return
@@ -1754,6 +1763,12 @@ function updateTagRef(expr, parent) {
   var conf = {root: expr.dom, parent: parent, hasImpl: true, ownAttrs: expr.ownAttrs}
   expr.tag = initChildTag(expr.impl, conf, expr.dom.innerHTML, parent, expr.nameHasExpression)
   expr.tag.mount()
+
+  if (expr.isVirtual) {
+    var frag = document.createDocumentFragment()
+    makeVirtual(expr.tag, frag)
+    expr.tag.root.parentElement.replaceChild(frag, expr.tag.root)
+  }
   expr.tag.update()
 }
 
@@ -1806,6 +1821,15 @@ function each(els, fn) {
  */
 function isFunction(v) {
   return typeof v === T_FUNCTION || false   // avoid IE problems
+}
+
+/**
+ * Detect if the argument passed is an object
+ * @param   { * } v - whatever you want to pass to this function
+ * @returns { Boolean } -
+ */
+function isObject(v) {
+  return typeof v === T_OBJECT || false   // avoid IE problems
 }
 
 /**
@@ -2229,6 +2253,50 @@ function mountTo(root, tagName, opts) {
 
   return tag
 }
+
+
+/**
+ * Adds the elements for a virtual tag
+ * @param { Tag } tag - the tag whose root's children will be inserted or appended
+ * @param { Node } src - the node that will do the inserting or appending
+ * @param { Tag } target - only if inserting, insert before this tag's first child
+ */
+function makeVirtual(tag, src, target) {
+  var head = document.createTextNode(''), tail = document.createTextNode(''), sib, el
+  tag._head = tag.root.insertBefore(head, tag.root.firstChild)
+  tag._tail = tag.root.appendChild(tail)
+  el = tag._head
+  tag._virts = []
+  while (el) {
+    sib = el.nextSibling
+    if (target)
+      src.insertBefore(el, target._head)
+    else
+      src.appendChild(el)
+
+    tag._virts.push(el) // hold for unmounting
+    el = sib
+  }
+}
+
+/**
+ * Move virtual tag and all child nodes
+ * @param { Tag } tag - first child reference used to start move
+ * @param { Node } src  - the node that will do the inserting
+ * @param { Tag } target - insert before this tag's first child
+ */
+function moveVirtual(tag, src, target) {
+  var el = tag._head, sib
+  while (el) {
+    sib = el.nextSibling
+    src.insertBefore(el, target._head)
+    el = sib
+    if (el == tag._tail) {
+      src.insertBefore(el, target._head)
+      break
+    }
+  }
+}
 /**
  * Riot public api
  */
@@ -2244,11 +2312,17 @@ riot.mixin = (function() {
 
   /**
    * Create/Return a mixin by its name
-   * @param   { String } name - mixin name
+   * @param   { String } name - mixin name (global mixin if missing)
    * @param   { Object } mixin - mixin logic
    * @returns { Object } the mixin logic
    */
   return function(name, mixin) {
+    if (isObject(name)) {
+      mixin = name
+      mixins[GLOBAL_MIXIN] = extend(mixins[GLOBAL_MIXIN] || {}, mixin)
+      return
+    }
+
     if (!mixin) return mixins[name]
     mixins[name] = mixin
   }
@@ -2327,18 +2401,20 @@ riot.mount = function(selector, tagName, opts) {
   }
 
   function pushTags(root) {
-    var last
-
     if (root.tagName) {
-      if (tagName && (!(last = getAttr(root, RIOT_TAG)) || last != tagName))
-        setAttr(root, RIOT_TAG, tagName)
+      var riotTag = getAttr(root, RIOT_TAG)
 
-      var tag = mountTo(root, tagName || root.getAttribute(RIOT_TAG) || root.tagName.toLowerCase(), opts)
+      // have tagName? force riot-tag to be the same
+      if (tagName && riotTag !== tagName) {
+        riotTag = tagName
+        setAttr(root, RIOT_TAG, tagName)
+      }
+      var tag = mountTo(root, riotTag || root.tagName.toLowerCase(), opts)
 
       if (tag) tags.push(tag)
-    } else if (root.length)
+    } else if (root.length) {
       each(root, pushTags)   // assume nodeList
-
+    }
   }
 
   // ----- mount code -----
@@ -2359,7 +2435,7 @@ riot.mount = function(selector, tagName, opts) {
       selector = allTags = selectAllTags()
     else
       // or just the ones named like the selector
-      selector += addRiotTags(selector.split(','))
+      selector += addRiotTags(selector.split(/, ?/))
 
     // make sure to pass always a selector
     // to the querySelectorAll function
@@ -2388,10 +2464,7 @@ riot.mount = function(selector, tagName, opts) {
     tagName = 0
   }
 
-  if (els.tagName)
-    pushTags(els)
-  else
-    each(els, pushTags)
+  pushTags(els)
 
   return tags
 }
