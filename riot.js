@@ -1,8 +1,8 @@
-/* Riot v3.0.0-alpha.1, @license MIT, (c) 2015 Muut Inc. + contributors */
+/* Riot v3.0.0-alpha.2, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v3.0.0-alpha.1', settings: {} },
+var riot = { version: 'v3.0.0-alpha.2', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
