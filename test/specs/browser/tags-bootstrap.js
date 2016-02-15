@@ -79,6 +79,7 @@ loadTagsAndScripts([
 
   'tag/virtual-no-loop.tag',
   'tag/virtual-yield-loop.tag',
+  'tag/dynamic-riot-tag.tag',
 
   // these tags will be not autoinjected in the DOM
   // that's what `name = false` means
