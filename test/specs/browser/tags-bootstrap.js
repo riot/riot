@@ -76,6 +76,8 @@ loadTagsAndScripts([
 
   'tag/reserved-names.tag',
 
+  'tag/obj-key-loop.tag',
+
   // these tags will be not autoinjected in the DOM
   // that's what `name = false` means
   {

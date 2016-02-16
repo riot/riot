@@ -2022,4 +2022,20 @@ it('raw contents', function() {
     tag.update()
   })
 
+  it('named elements in object key loop do not duplicate', function() {
+    injectHTML('<obj-key-loop></obj-key-loop>')
+    var tag = riot.mount('obj-key-loop')[0]
+
+    expect(tag.x.value).to.be('3')
+    expect(tag.y.value).to.be('44')
+    expect(tag.z.value).to.be('23')
+
+    tag.update()
+    expect(tag.x.value).to.be('3')
+    expect(tag.y.value).to.be('44')
+    expect(tag.z.value).to.be('23')
+
+    tags.push(tag)
+  })
+
 })
