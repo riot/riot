@@ -51,6 +51,7 @@ loadTagsAndScripts([
 
   // Don't trigger mount for conditional tags
   'tag/if-mount.tag',
+  'tag/if-unmount.tag',
 
   // input type=number
   'tag/input-number.tag',

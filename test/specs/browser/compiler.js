@@ -1190,6 +1190,40 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('tags under a false if statement are unmounted', function() {
+    var unmountCount = 0, cb = function() { unmountCount++ }
+    var tag = riot.mount('if-unmount', {cb: cb})[0]
+
+    // check that our child tags exist, and record their ids
+    expect(tag.tags['if-uchild'].length).to.be(3)
+    var firstIds = tag.tags['if-uchild'].map(function(c) { return c._riot_id })
+
+    // set if conditions to false
+    tag.items[0].bool = false
+    tag.update({cond: false})
+
+    // ensure the tags are gone, and that their umount callbacks were triggered
+    expect(tag.tags['if-uchild']).to.be(undefined)
+    expect(unmountCount).to.be(3)
+
+    // set conditions back to true
+    tag.items[0].bool = true
+    tag.update({cond: true})
+
+    // ensure the tags exist, and get their ids
+    expect(tag.tags['if-uchild'].length).to.be(3)
+    var secondIds = tag.tags['if-uchild'].map(function(c) { return c._riot_id })
+
+    // ensure that all of the new tags are different instances from the first time
+    var intersection = secondIds.filter(function(id2) {
+      return firstIds.indexOf(id2) > -1
+    })
+    expect(intersection.length).to.be(0)
+
+    tags.push(tag)
+  })
+
+
   it('preserve the mount order, first the parent and then all the children', function() {
     var correctMountingOrder = [
         'deferred-mount',
