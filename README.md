@@ -152,7 +152,8 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Components
 - [Material UI](http://kysonic.github.io/riot-mui/)
-- [RiotGear](https://riotgear.js.org)
+- [RiotGear Components](https://riotgear.js.org)
+- [RiotGear Router](http://riotgear.js.org/components/router/)
 - [Riot Bootstrap](http://cognitom.github.io/riot-bootstrap/)
 - [iToolkit](https://github.com/BE-FE/iToolkit)
 - [Riot Routehandler](https://github.com/crisward/riot-routehandler)-[(Demo)](http://codepen.io/crisward/pen/xwGJpM?editors=101)
