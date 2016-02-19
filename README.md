@@ -13,6 +13,9 @@
 [![Coverage Status][coverage-image]][coverage-url]
 [![Code Quality][codeclimate-image]][codeclimate-url]
 
+[![Click here to lend your support to: Riot and make a donation at pledgie.com !][donations-campaign-image]][donations-campaign-url]
+
+
 
 [![Sauce Test Status][saucelabs-image]][saucelabs-url]
 
@@ -220,3 +223,5 @@ http://riotjs.com/
 [codeclimate-image]:https://img.shields.io/codeclimate/github/riot/riot.svg?style=flat-square
 [codeclimate-url]:https://codeclimate.com/github/riot/riot
 
+[donations-campaign-url]:https://pledgie.com/campaigns/31139
+[donations-campaign-image]:https://pledgie.com/campaigns/31139.png?skin_name=chrome

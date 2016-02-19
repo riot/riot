@@ -2,7 +2,7 @@ The MIT License (MIT)
 
 Copyright (c) 2015-present
 Originally created by Muut Inc.
-Actively mantained by:
+Actively maintained by:
  - Richard Bondi https://github.com/rsbondi
  - Gianluca Guarini https://github.com/GianlucaGuarini
  - Tsutomu Kawamura https://github.com/cognitom
