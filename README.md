@@ -13,11 +13,10 @@
 [![Coverage Status][coverage-image]][coverage-url]
 [![Code Quality][codeclimate-image]][codeclimate-url]
 
-[![Click here to lend your support to: Riot and make a donation at pledgie.com !][donations-campaign-image]][donations-campaign-url]
-
-
-
 [![Sauce Test Status][saucelabs-image]][saucelabs-url]
+
+### Buy us a coffee :coffee:
+[![Click here to lend your support to: Riot and make a donation at pledgie.com !][donations-campaign-image]][donations-campaign-url]
 
 ### Framework Size Comparison
 
