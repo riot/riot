@@ -13,6 +13,9 @@
 [![Coverage Status][coverage-image]][coverage-url]
 [![Code Quality][codeclimate-image]][codeclimate-url]
 
+[![Click here to lend your support to: Riot and make a donation at pledgie.com !][donations-campaign-image]][donations-campaign-url]
+
+
 
 [![Sauce Test Status][saucelabs-image]][saucelabs-url]
 
@@ -115,7 +118,6 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Hackernews reader](http://git.io/riot-hn)
 - [Vuejs examples by Riotjs](https://github.com/txchen/feplay/tree/gh-pages/riot_vue)
 - [Flux-like ES6 Todo](https://github.com/srackham/riot-todo)
-- [Simple TODO](https://muut.com/riotjs/dist/demo/)
 - [Timer](http://jsfiddle.net/gnumanth/h9kuozp5/)
 - [Another flux demo comparable to React ones](http://txchen.github.io/feplay/riot_flux)
 - [Various experiments](http://richardbondi.net/programming/riot)
@@ -224,3 +226,5 @@ http://riotjs.com/
 [codeclimate-image]:https://img.shields.io/codeclimate/github/riot/riot.svg?style=flat-square
 [codeclimate-url]:https://codeclimate.com/github/riot/riot
 
+[donations-campaign-url]:https://pledgie.com/campaigns/31139
+[donations-campaign-image]:https://pledgie.com/campaigns/31139.png?skin_name=chrome
