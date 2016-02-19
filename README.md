@@ -15,9 +15,6 @@
 
 [![Sauce Test Status][saucelabs-image]][saucelabs-url]
 
-### Buy us a coffee :coffee:
-[![Click here to lend your support to: Riot and make a donation at pledgie.com !][donations-campaign-image]][donations-campaign-url]
-
 ### Framework Size Comparison
 
 | Framework              | Version    | Minified Size |
@@ -197,6 +194,9 @@ It's actively maintained by:
  - [Tsutomu Kawamura](https://github.com/cognitom)
  - [Alberto Martínez](https://github.com/aMarCruz)
  - [Tero Piirainen](https://github.com/tipiirai)
+
+### Buy us a coffee :coffee:
+[![Click here to lend your support to: Riot and make a donation at pledgie.com !][donations-campaign-image]][donations-campaign-url]
 
 http://riotjs.com/
 
