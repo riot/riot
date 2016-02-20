@@ -29,7 +29,7 @@
 
 ### Custom tags • Concise syntax • Virtual DOM • Full stack
 
-Riot brings custom tags to all browsers, including IE8. Think React + Polymer but with enjoyable syntax and a small learning curve.
+Riot brings custom tags to all modern browsers. Think React + Polymer but with enjoyable syntax and a small learning curve.
 
 
 #### Tag definition
