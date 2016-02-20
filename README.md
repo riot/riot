@@ -86,7 +86,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Close to standards
 - No proprietary event system.
-- Event normalization for IE8.
+- Event normalization.
 - The rendered DOM can be freely manipulated with other tools.
 - No extra HTML root elements or `data-` attributes.
 - Plays well with jQuery.
