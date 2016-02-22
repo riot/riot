@@ -53,6 +53,8 @@ loadTagsAndScripts([
   // input type=number
   'tag/input-number.tag',
 
+  'tag/input-values.tag',
+
   // input type=number
   'tag/nested-riot.tag',
 
