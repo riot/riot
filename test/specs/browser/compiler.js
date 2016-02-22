@@ -1223,6 +1223,13 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('the input values should be updated corectly on any update call', function() {
+    var tag = riot.mount('input-values')[0]
+    expect(tag.i.value).to.be('foo')
+    tag.update()
+    expect(tag.i.value).to.be('hi')
+  })
+
   it('riot-tag as expression', function() {
     injectHTML('<container-riot></container-riot>')
     var tag = riot.mount('container-riot')[0]
