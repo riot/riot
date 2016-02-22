@@ -39,6 +39,10 @@ test-sauce:
 	# run the riot tests on saucelabs
 	@ SAUCELABS=1 make test-karma
 
+test-chrome:
+	@ DEBUG=1 ${KARMA} start test/karma.conf.js --browsers=Chrome --no-single-run --watch
+
+
 compare:
 	# compare the current release with the previous one
 	du -h riot.min.js riot+compiler.min.js
@@ -46,7 +50,6 @@ compare:
 
 raw:
 	# build riot
-	@ make clean
 	@ mkdir -p $(DIST)
 	@ $(SMASH) lib/riot.js > $(DIST)riot.js
 	@ $(SMASH) lib/riot+compiler.js > $(DIST)riot+compiler.js
@@ -55,7 +58,7 @@ clean:
 	# clean $(DIST)
 	@ rm -rf $(DIST)
 
-riot: raw test
+riot: clean raw test
 
 min: riot
 	# minify riot
