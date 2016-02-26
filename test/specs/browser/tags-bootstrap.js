@@ -122,6 +122,10 @@ loadTagsAndScripts([
     path: 'tag/yield-from-default.tag',
     name: false
   },
+  {
+    path: 'tag/form-controls.tag',
+    name: false
+  },
   // the following tags will be injected having custom attributes
   {
     path: 'tag/named-select.tag',
