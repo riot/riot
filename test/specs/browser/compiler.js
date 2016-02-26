@@ -465,10 +465,10 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('loop-unshift')[0]
 
     expect(tag.tags['loop-unshift-item'].length).to.be(2)
-    expect(normalizeHTML(tag.tags['loop-unshift-item'][0].root.innerHTML)).to.be('<p>woo</p>')
+    expect(normalizeHTML(tag.root.getElementsByTagName('loop-unshift-item')[0].innerHTML)).to.be('<p>woo</p>')
     tag.items.unshift({ name: 'baz' })
     tag.update()
-    expect(normalizeHTML(tag.tags['loop-unshift-item'][0].root.innerHTML)).to.be('<p>baz</p>')
+    expect(normalizeHTML(tag.root.getElementsByTagName('loop-unshift-item')[0].innerHTML)).to.be('<p>baz</p>')
 
     tags.push(tag)
 
@@ -494,6 +494,20 @@ describe('Compiler Browser', function() {
     expect(normalizeHTML(root.getElementsByTagName('ul')[0].innerHTML)).to.be('<li>100 <a>remove</a></li><li>100 <a>remove</a></li><li>0 <a>remove</a></li><li>1 <a>remove</a></li><li>2 <a>remove</a></li><li>3 <a>remove</a></li><li>4 <a>remove</a></li><li>5 <a>remove</a></li><li>100 <a>remove</a></li><li>100 <a>remove</a></li>'.trim())
 
 
+  })
+
+  it('tags in different each loops dont collide', function() {
+
+    var tag = riot.mount('loop-combo')[0]
+    tags.push(tag)
+
+    expect(normalizeHTML(tag.root.innerHTML))
+      .to.be('<lci x="a"></lci><div><lci x="y"></lci></div>')
+
+    tag.update({b: ['z']})
+
+    expect(normalizeHTML(tag.root.innerHTML))
+      .to.be('<lci x="a"></lci><div><lci x="z"></lci></div>')
   })
 
   it('iterate over an object, then modify the property and update itself', function() {
@@ -1351,45 +1365,49 @@ describe('Compiler Browser', function() {
   it('the loops children sync correctly their internal data with their options', function() {
     var tag = riot.mount('loop-sync-options')[0]
 
-    expect(tag.tags['loop-sync-options-child'][0].val).to.be('foo')
-    expect(tag.tags['loop-sync-options-child'][0].root.className).to.be('active')
-    expect(tag.tags['loop-sync-options-child'][1].val).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][2].val).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][0].num).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][1].num).to.be(3)
-    expect(tag.tags['loop-sync-options-child'][2].num).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][0].bool).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][1].bool).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][2].bool).to.be(false)
+    function ch(idx) {
+      return tag.root.getElementsByTagName('loop-sync-options-child')[idx]._tag
+    }
+
+    expect(ch(0).val).to.be('foo')
+    expect(ch(0).root.className).to.be('active')
+    expect(ch(1).val).to.be(undefined)
+    expect(ch(2).val).to.be(undefined)
+    expect(ch(0).num).to.be(undefined)
+    expect(ch(1).num).to.be(3)
+    expect(ch(2).num).to.be(undefined)
+    expect(ch(0).bool).to.be(undefined)
+    expect(ch(1).bool).to.be(undefined)
+    expect(ch(2).bool).to.be(false)
     tag.update({
       children: tag.children.reverse()
     })
-    expect(tag.tags['loop-sync-options-child'][0].val).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][0].root.className).to.be('')
-    expect(tag.tags['loop-sync-options-child'][1].val).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][2].val).to.be('foo')
-    expect(tag.tags['loop-sync-options-child'][2].root.className).to.be('active')
-    expect(tag.tags['loop-sync-options-child'][0].num).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][1].num).to.be(3)
-    expect(tag.tags['loop-sync-options-child'][2].num).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][0].bool).to.be(false)
-    expect(tag.tags['loop-sync-options-child'][1].bool).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][2].bool).to.be(undefined)
+    expect(ch(0).val).to.be(undefined)
+    expect(ch(0).root.className).to.be('')
+    expect(ch(1).val).to.be(undefined)
+    expect(ch(2).val).to.be('foo')
+    expect(ch(2).root.className).to.be('active')
+    expect(ch(0).num).to.be(undefined)
+    expect(ch(1).num).to.be(3)
+    expect(ch(2).num).to.be(undefined)
+    expect(ch(0).bool).to.be(false)
+    expect(ch(1).bool).to.be(undefined)
+    expect(ch(2).bool).to.be(undefined)
 
     tag.update({
       children: tag.children.reverse()
     })
-    expect(tag.tags['loop-sync-options-child'][0].val).to.be('foo')
-    expect(tag.tags['loop-sync-options-child'][0].root.className).to.be('active')
-    expect(tag.tags['loop-sync-options-child'][1].val).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][2].val).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][2].root.className).to.be('')
-    expect(tag.tags['loop-sync-options-child'][0].num).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][1].num).to.be(3)
-    expect(tag.tags['loop-sync-options-child'][2].num).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][0].bool).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][1].bool).to.be(undefined)
-    expect(tag.tags['loop-sync-options-child'][2].bool).to.be(false)
+    expect(ch(0).val).to.be('foo')
+    expect(ch(0).root.className).to.be('active')
+    expect(ch(1).val).to.be(undefined)
+    expect(ch(2).val).to.be(undefined)
+    expect(ch(2).root.className).to.be('')
+    expect(ch(0).num).to.be(undefined)
+    expect(ch(1).num).to.be(3)
+    expect(ch(2).num).to.be(undefined)
+    expect(ch(0).bool).to.be(undefined)
+    expect(ch(1).bool).to.be(undefined)
+    expect(ch(2).bool).to.be(false)
     tags.push(tag)
   })
 
@@ -1486,7 +1504,7 @@ it('raw contents', function() {
       tag.update()
       expect(tag.root.getElementsByTagName('div').length).to.be(0)
       expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(0)
-      expect(tag.tags['loop-conditional-item'].length).to.be(0)
+      expect(tag.tags['loop-conditional-item']).to.be(undefined)
       tag.items = [2, 2, 2]
       tag.update()
       expect(tag.root.getElementsByTagName('div').length).to.be(3)
