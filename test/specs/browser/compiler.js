@@ -528,11 +528,12 @@ describe('Compiler Browser', function() {
   it('loop option tag', function() {
     var tag = riot.mount('loop-option')[0],
       root = tag.root,
-      option = root.getElementsByTagName('select')[0]
+      options = root.getElementsByTagName('select')[0],
+      html = normalizeHTML(root.innerHTML).replace(/ selected="selected"/, '')
 
-    expect(normalizeHTML(root.innerHTML)).to.match(/<select><option value="1">Peter<\/option><option selected="(selected|true)" value="2">Sherman<\/option><option value="3">Laura<\/option><\/select>/)
+    expect(html).to.match(/<select><option value="1">Peter<\/option><option value="2">Sherman<\/option><option value="3">Laura<\/option><\/select>/)
 
-    expect(option.selectedIndex).to.be(1)
+    expect(options.selectedIndex).to.be(1)
     tags.push(tag)
 
   })
@@ -548,9 +549,10 @@ describe('Compiler Browser', function() {
 
   it('loop optgroup tag', function() {
     var tag = riot.mount('loop-optgroup')[0],
-      root = tag.root
+      root = tag.root,
+      html = normalizeHTML(root.innerHTML).replace(/(value="\d") (selected="selected")/, '$2 $1')
 
-    expect(normalizeHTML(root.innerHTML)).to.match(/<select><optgroup label="group 1"><option value="1">Option 1.1<\/option><option value="2">Option 1.2<\/option><\/optgroup><optgroup label="group 2"><option value="3">Option 2.1<\/option><option selected="(selected|true)" value="4">Option 2.2<\/option><\/optgroup><\/select>/)
+    expect(html).to.match(/<select><optgroup label="group 1"><option value="1">Option 1.1<\/option><option value="2">Option 1.2<\/option><\/optgroup><optgroup label="group 2"><option value="3">Option 2.1<\/option><option selected="selected" value="4">Option 2.2<\/option><\/optgroup><\/select>/)
 
     tags.push(tag)
 
@@ -558,10 +560,11 @@ describe('Compiler Browser', function() {
 
   it('loop optgroup tag (outer option, no closing option tags)', function() {
     var tag = riot.mount('loop-optgroup2')[0],
-      root = tag.root
+      root = tag.root,
+      html = normalizeHTML(root.innerHTML).replace(/(value="\d") (disabled="disabled")/g, '$2 $1')
 
-    expect(normalizeHTML(root.innerHTML)).to
-      .match(/<select><option selected="selected">&lt;Select Option&gt; ?(<\/option>)?<optgroup label="group 1"><option value="1">Option 1.1 ?(<\/option>)?<option (?:value="2"|disabled="disabled") (?:value="2"|disabled="disabled")>Option 1.2 ?(<\/option>)?<\/optgroup><optgroup label="group 2"><option value="3">Option 2.1 ?(<\/option>)?<option (?:value="4"|disabled="disabled") (?:value="4"|disabled="disabled")>Option 2.2 ?<\/option><\/optgroup><\/select>/)
+    expect(html).to
+      .match(/<select><option selected="selected">&lt;Select Option&gt; ?(<\/option>)?<optgroup label="group 1"><option value="1">Option 1.1 ?(<\/option>)?<option disabled="disabled" value="2">Option 1.2 ?(<\/option>)?<\/optgroup><optgroup label="group 2"><option value="3">Option 2.1 ?(<\/option>)?<option disabled="disabled" value="4">Option 2.2 ?<\/option><\/optgroup><\/select>/)
 
     tags.push(tag)
 
@@ -2041,6 +2044,21 @@ it('raw contents', function() {
     expect(tag.x.value).to.be('3')
     expect(tag.y.value).to.be('44')
     expect(tag.z.value).to.be('23')
+
+    tags.push(tag)
+  })
+
+  it('render tag: input,option,textarea tags having expressions as value', function() {
+    injectHTML('<form-controls></form-controls>')
+    var val = 'my-value',
+      tag = riot.mount('form-controls', { text: val })[0],
+      root = tag.root
+
+    expect(root.querySelector('input[type="text"]').value).to.be(val)
+    expect(root.querySelector('select option[selected]').value).to.be(val)
+    expect(root.querySelector('textarea[name="txta1"]').value).to.be(val)
+    expect(root.querySelector('textarea[name="txta2"]').value).to.be('')
+    expect(root.querySelector('textarea[name="txta2"]').placeholder).to.be(val)
 
     tags.push(tag)
   })

@@ -99,7 +99,8 @@ describe('Node/io.js', function() {
     var $ = cheerio.load(frm)
     expect($('input[type="text"]').val()).to.be('my-value')
     expect($('select option:selected').val()).to.be('my-value')
-    expect($('textarea').val()).to.be('my-value')
+    expect($('textarea[name="txta1"]').val()).to.be('my-value')
+    expect($('textarea[name="txta2"]').val()).to.be('')
   })
 
 })

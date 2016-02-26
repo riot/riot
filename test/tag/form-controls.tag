@@ -10,7 +10,9 @@
     <option selected value={ opts.text }>my-value</option>
   </select>
 
-  <textarea>{ opts.text }</textarea>
+  <textarea name="txta1">{ opts.text }</textarea>
+
+  <textarea name="txta2" placeholder={ opts.text }></textarea>
 
   <label>
     <input type="radio" onclick={ check }> Click me
