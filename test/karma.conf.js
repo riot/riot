@@ -1,11 +1,16 @@
 module.exports = function(config) {
 
   var saucelabsBrowsers = require('./saucelabs-browsers').browsers,
-    browsers = ['PhantomJS']
+    browsers = ['PhantomJS'],
+    preprocessors = {'../dist/riot/riot+compiler.js': ['coverage']}
 
   // run the tests only on the saucelabs browsers
   if (process.env.SAUCELABS) {
     browsers = Object.keys(saucelabsBrowsers)
+  }
+
+  if (process.env.DEBUG) {
+    preprocessors = {}
   }
 
   config.set({
@@ -16,6 +21,7 @@ module.exports = function(config) {
       'karma-mocha',
       'karma-coverage',
       'karma-phantomjs-launcher',
+      'karma-chrome-launcher',
       'karma-sauce-launcher'
     ],
     proxies: {
@@ -52,9 +58,7 @@ module.exports = function(config) {
     browsers: browsers,
 
     reporters: ['progress', 'saucelabs', 'coverage'],
-    preprocessors: {
-      '../dist/riot/riot+compiler.js': ['coverage']
-    },
+    preprocessors: preprocessors,
 
     coverageReporter: {
       dir: '../coverage/browsers',
