@@ -1,6 +1,8 @@
 describe('Compiler Browser', function() {
 
   var tags = []
+  // version# for IE 8-11, 0 for others
+  var IE_VERSION = (window && window.document || {}).documentMode | 0
 
   // adding some custom riot parsers
   // css
@@ -2058,7 +2060,7 @@ it('raw contents', function() {
     expect(root.querySelector('select option[selected]').value).to.be(val)
     expect(root.querySelector('textarea[name="txta1"]').value).to.be(val)
     expect(root.querySelector('textarea[name="txta2"]').value).to.be('')
-    expect(root.querySelector('textarea[name="txta2"]').placeholder).to.be(val)
+    if (IE_VERSION !== 9) expect(root.querySelector('textarea[name="txta2"]').placeholder).to.be(val)
 
     tags.push(tag)
   })
