@@ -80,7 +80,7 @@
     "riot+compiler.min.js"
   ],
   "bin": {
-    "riot": "node_modules/.bin/riot"
+    "riot": "node_modules/riot-cli/lib/index.js"
   },
   "main": "lib/server/index.js",
   "browser": "riot.js",
