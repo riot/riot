@@ -13,6 +13,7 @@ loadTagsAndScripts([
   'tag/loop-events.tag',
   'tag/loop-sync-options-nested.tag',
   'tag/loop-inherit.tag',
+  'tag/loop-root.tag',
   'tag/loop-double-curly-brackets.tag',
   'tag/loop-conditional.tag',
   'tag/table-multibody.tag',

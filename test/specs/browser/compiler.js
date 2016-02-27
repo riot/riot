@@ -201,6 +201,20 @@ describe('Compiler Browser', function() {
 
   })
 
+  it('the root keyword should be protected also in the loops', function() {
+    var tag = riot.mount('loop-root')[0]
+
+    expect($$('li', tag.root).length).to.be(3)
+
+    tag.splice()
+    tag.update()
+
+    expect($$('li', tag.root).length).to.be(2)
+
+    tags.push(tag)
+
+  })
+
   it('avoid to duplicate tags in multiple foreach loops', function() {
 
     injectHTML([
