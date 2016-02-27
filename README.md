@@ -17,14 +17,15 @@
 
 ### Framework Size Comparison
 
-| Framework              | Version    | Minified Size |
+| Framework              | Version    | Minified Size (gzip) |
 |------------------------|------------|----------------------|
-| Ember                  | 2.3.0      | 112.9 (gzip)kb       |
-| Angular                | 1.5.0      | 53.17 (gzip)kb       |
-| Polymer                | 1.2.4      | 53.0  (gzip)kb       |
-| React                  | 0.14.7     | 38.56 (gzip)kb       |
-| Web Components Polyfill| 0.7.19     | 32.8  (gzip)kb       |
-| Riot                   | 2.3.16     | 8.56  (gzip)kb       |
+| Ember                  | 2.3.0      | 112.9kb              |
+| Angular                | 1.5.0      | 53.17kb              |
+| Polymer                | 1.2.4      | 53.0kb               |
+| React                  | 0.14.7     | 38.56kb              |
+| Web Components Polyfill| 0.7.21     | 32.8kb               |
+| Vue                    | 1.0.16     | 24.55kb              |
+| Riot                   | 2.3.16     | 8.56kb               |
 
 
 ### Custom tags • Concise syntax • Virtual DOM • Full stack
