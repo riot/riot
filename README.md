@@ -173,8 +173,6 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Yeoman generator - Generator riot mobile](https://www.npmjs.com/package/generator-riot-mobile)
 - [Yeoman generator - Generator riot element](https://www.npmjs.com/package/generator-riot-element)
 - [Riot for TypeScript](https://github.com/nippur72/RiotTS)
-- [Sublime Syntax Highlighting for Riot Tag Files - Jade & HTML](https://github.com/crisward/sublime-tag)
-- [VS Code Syntax Highlighting for Riot Tag Files - Jade & HTML](https://github.com/crisward/riot-tag)
 - [Riot loader plugin for RequireJS](https://github.com/amenadiel/requirejs-riot)
 - [Riot loader plugin for JSPM/SystemJS](https://github.com/amenadiel/systemjs-riot)
 
@@ -191,6 +189,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
   - Based on Vue's official Sublime Text highlighter
   - Note: Designed for html, not jade.
 - [sublime-tag (Sublime Text)](https://github.com/crisward/sublime-tag)
+- [riot-tag (Visual Studio)](https://github.com/crisward/riot-tag)
 
 ### Credits
 
