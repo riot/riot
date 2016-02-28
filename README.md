@@ -188,6 +188,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 ### Editors / Editor Plugins (Syntax highlighting, autcompletion, etc...)
 - [riot (Atom Package)](https://atom.io/packages/riot)
 - [language-riot-tag (Atom Package)](https://github.com/dekimasoon/language-riot-tag)
+  - Based on Vue's official Sublime Text highlighter
   - Note: Designed for html, not jade.
 - [sublime-tag (Sublime Text)](https://github.com/crisward/sublime-tag)
 
