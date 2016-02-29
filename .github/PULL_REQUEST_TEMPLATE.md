@@ -1,6 +1,6 @@
 ## __IMPORTANT: for all the pull requests use the `dev` branch__
 
-### Answer the following depending on the type of change you want to merge into Riot
+### Answer the following depending on the type of change you want to merge
 
 #### Code
 
