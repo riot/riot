@@ -2079,4 +2079,14 @@ it('raw contents', function() {
     tags.push(tag)
   })
 
+  it('support `data-is` in addition to `riot-tag` for html5 compliance', function() {
+    injectHTML('<div data-is="tag-data-is"></div>')
+    var tag = riot.mount('tag-data-is')[0]
+    var els = tag.root.getElementsByTagName('p')
+    expect(els.length).to.be(2)
+    expect(els[0].innerHTML).to.contain('html5')
+    expect(els[1].innerHTML).to.contain('too')
+    tags.push(tag)
+  })
+
 })
