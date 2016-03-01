@@ -1225,6 +1225,7 @@ describe('Compiler Browser', function() {
     expect(tag.i.value).to.be('foo')
     tag.update()
     expect(tag.i.value).to.be('foo')  // regression of #1612
+    tags.push(tag)
   })
 
   it('riot-tag as expression', function() {
@@ -1233,6 +1234,41 @@ describe('Compiler Browser', function() {
     var div = tag.root.getElementsByTagName('div')[0]
     expect(div.getAttribute('riot-tag')).to.be('nested-riot')
     tags.push(tag)
+  })
+
+  it('the "updated" event gets properly triggered in a nested child', function(done) {
+    injectHTML('<div id="updated-events-teser"></div>')
+    var tag = riot.mount('#updated-events-teser', 'named-child-parent')[0],
+      counter = 0
+
+    tag.tags['tags-child'].on('updated', function() {
+      counter ++
+      if (counter == 3) done()
+    })
+
+    tag.update()
+    tag.tags['tags-child'].update()
+
+    tags.push(tag)
+
+  })
+
+  it('the "updated" gets properly triggered also from the children tags in a loop', function(done) {
+
+    injectHTML('<div id="updated-events-in-loop"></div>')
+    var tag = riot.mount('#updated-events-in-loop', 'loop-unshift')[0],
+      counter = 0
+
+    tag.tags['loop-unshift-item'][0].on('updated', function() {
+      counter ++
+      if (counter == 3) done()
+    })
+
+    tag.update()
+    tag.tags['loop-unshift-item'][0].update()
+
+    tags.push(tag)
+
   })
 
   it('recursive structure', function() {
@@ -2001,7 +2037,7 @@ it('raw contents', function() {
   })
 
   it('nested virtual tags unmount properly', function() {
-    injectHTML('<virtual-nested-unmount></virtual-nested-unmount>')
+
     var tag = riot.mount('virtual-nested-unmount')[0]
     var spans = tag.root.querySelectorAll('span')
     var divs = tag.root.querySelectorAll('div')
@@ -2038,6 +2074,8 @@ it('raw contents', function() {
     expect(divs[0].innerHTML).to.be('4')
     expect(divs[1].innerHTML).to.be('5')
 
+    tags.push(tag)
+
   })
 
   it('still loops with reserved property names #1526', function() {
@@ -2046,10 +2084,11 @@ it('raw contents', function() {
     tag.update()
     tag.reorder()
     tag.update()
+    tags.push(tag)
   })
 
   it('named elements in object key loop do not duplicate', function() {
-    injectHTML('<obj-key-loop></obj-key-loop>')
+
     var tag = riot.mount('obj-key-loop')[0]
 
     expect(tag.x.value).to.be('3')
