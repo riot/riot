@@ -24,7 +24,7 @@ describe('Compiler Browser', function() {
       if (el.length) {
         el.forEach(unmount)
       } else {
-        el.unmount()
+        if (el.isMounted) el.unmount()
       }
     }
     unmount(tags)
@@ -1112,7 +1112,7 @@ describe('Compiler Browser', function() {
   it('static named tag for tags property', function() {
     injectHTML('<named-child-parent></named-child-parent>')
     var tag = riot.mount('named-child-parent')[0]
-    expect(tag.tags['tags-child'].root.innerHTML).to.be('I have a name')
+    expect(tag['tags-child'].root.innerHTML).to.be('I have a name')
 
     tags.push(tag)
   })
@@ -1171,7 +1171,6 @@ describe('Compiler Browser', function() {
 
   it('child tags are only rendered when if-condition is truthy', function() {
     var tag = riot.mount('if-mount')[0]
-    var tgs = tag.tags
 
     var expectL2 = function(base, exist) {
       var ex = expect(base.tags['if-level2'])
@@ -1185,21 +1184,21 @@ describe('Compiler Browser', function() {
       expect($$('conditional-tag', base.root).length).to.be(exist ? 1 : 0)
     }
 
-    expectL2(tgs.ff, false)
-    expectL2(tgs.ft, false)
+    expectL2(tag.ff, false)
+    expectL2(tag.ft, false)
 
-    expectL2(tgs.tf, true)
-    expectCond(tgs.tf, false)
+    expectL2(tag.tf, true)
+    expectCond(tag.tf, false)
 
-    expectL2(tgs.tt, true)
-    expectCond(tgs.tt, true)
+    expectL2(tag.tt, true)
+    expectCond(tag.tt, true)
 
-    tgs.tf.tags['if-level2'].toggleCondition()
-    expectCond(tgs.tf, true)
+    tag.tf.tags['if-level2'].toggleCondition()
+    expectCond(tag.tf, true)
 
-    tag.tags.ft.toggleCondition()
-    expectL2(tgs.ft, true)
-    expectCond(tgs.ft, true)
+    tag.ft.toggleCondition()
+    expectL2(tag.ft, true)
+    expectCond(tag.ft, true)
 
     tags.push(tag)
   })
@@ -1237,6 +1236,26 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('named refs are removed from parent when element leaves DOM', function() {
+    injectHTML('<named-unmount></named-unmount>')
+    var tag = riot.mount('named-unmount')[0]
+    tags.push(tag)
+
+    expect(tag.first).to.be(undefined)
+    expect(tag.second).to.be(undefined)
+
+    tag.update({cond: true, items: ['third']})
+
+    expect(tag.first).to.be.an(HTMLElement)
+    expect(tag.second).to.be.an(HTMLElement)
+    expect(tag.third).to.be.an(HTMLElement)
+
+    tag.update({cond: false, items: []})
+
+    expect(tag.first).to.be(undefined)
+    expect(tag.second).to.be(undefined)
+    expect(tag.third).to.be(undefined)
+  })
 
   it('preserve the mount order, first the parent and then all the children', function() {
     var correctMountingOrder = [
@@ -1325,13 +1344,13 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('#updated-events-teser', 'named-child-parent')[0],
       counter = 0
 
-    tag.tags['tags-child'].on('updated', function() {
+    tag.tags['named-child'].on('updated', function() {
       counter ++
       if (counter == 3) done()
     })
 
     tag.update()
-    tag.tags['tags-child'].update()
+    tag.tags['named-child'].update()
 
     tags.push(tag)
 
@@ -1485,11 +1504,11 @@ it('raw contents', function() {
 
   it('children in a loop inherit properties from the parent', function() {
     var tag = riot.mount('loop-inherit')[0]
-    expect(tag.tags['loop-inherit-item'][0].opts.nice).to.be(tag.isFun)
+    expect(tag.me.opts.nice).to.be(tag.isFun)
     tag.isFun = false
     tag.update()
-    expect(tag.tags['loop-inherit-item'][0].opts.nice).to.be(tag.isFun)
-    expect(tag.tags['loop-inherit-item'][0].tags).to.be.empty()
+    expect(tag.me.opts.nice).to.be(tag.isFun)
+    expect(tag.me.tags).to.be.empty()
     tags.push(tag)
   })
 
@@ -1519,23 +1538,25 @@ it('raw contents', function() {
   it('custom children items in a nested loop are always in sync with the parent tag', function() {
     var tag = riot.mount('loop-inherit')[0]
 
-    expect(tag.tags['loop-inherit-item'].length).to.be(3)
-    expect(tag.tags['loop-inherit-item'][0].opts.name).to.be(tag.items[0])
-    expect(tag.tags['loop-inherit-item'][1].opts.name).to.be(tag.items[1])
-    expect(tag.tags['loop-inherit-item'][2].opts.name).to.be(tag.items[2])
+    expect(tag.tags['loop-inherit-item'].length).to.be(4)
+    expect(tag.me.opts.name).to.be(tag.items[0])
+    expect(tag.you.opts.name).to.be(tag.items[1])
+    expect(tag.everybody.opts.name).to.be(tag.items[2])
 
     tag.items.splice(1, 1)
     tag.update()
     expect(tag.root.getElementsByTagName('div').length).to.be(2)
+    expect(tag.tags['loop-inherit-item'].length).to.be(3)
 
     tag.items.push('active')
     tag.update()
     expect(tag.root.getElementsByTagName('div').length).to.be(3)
     expect(tag.root.getElementsByTagName('div')[2].innerHTML).to.contain('active')
     expect(tag.root.getElementsByTagName('div')[2].className).to.be('active')
-    expect(tag.tags['loop-inherit-item'][0].opts.name).to.be(tag.items[0])
-    expect(tag.tags['loop-inherit-item'][1].opts.name).to.be(tag.items[1])
-    expect(tag.tags['loop-inherit-item'].length).to.be(3)
+    expect(tag.me.opts.name).to.be(tag.items[0])
+    expect(tag.you.opts.name).to.be(tag.items[1])
+    expect(tag.boh.opts.name).to.be('boh')
+    expect(tag.tags['loop-inherit-item'].length).to.be(4)
 
     tags.push(tag)
 

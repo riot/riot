@@ -46,6 +46,7 @@ loadTagsAndScripts([
 
   // multi named elements to an array
   'tag/multi-named.tag',
+  'tag/named-unmount.tag',
 
   // test the preventUpdate feature on the DOM events
   'tag/prevent-update.tag',
