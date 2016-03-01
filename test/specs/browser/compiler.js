@@ -1224,7 +1224,7 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('input-values')[0]
     expect(tag.i.value).to.be('foo')
     tag.update()
-    expect(tag.i.value).to.be('hi')
+    expect(tag.i.value).to.be('foo')  // regression of #1612
   })
 
   it('riot-tag as expression', function() {
