@@ -549,6 +549,9 @@ describe('Compiler Browser', function() {
 
     expect(html).to.match(/<select><option value="1">Peter<\/option><option value="2">Sherman<\/option><option value="3">Laura<\/option><\/select>/)
 
+    //expect(options[0].selected).to.be(false)
+    expect(options[1].selected).to.be(true)
+    expect(options[2].selected).to.be(false)
     expect(options.selectedIndex).to.be(1)
     tags.push(tag)
 
