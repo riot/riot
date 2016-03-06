@@ -128,7 +128,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 ### Tutorials
 - [Building Apps with Riot, ES6 and Webpack](http://blog.srackham.com/posts/riot-es6-webpack-apps/)
 - [Building Apps with Riot, Babel, RiotControl and Webpack](https://github.com/txchen/feplay/tree/gh-pages/riot_webpack)
-- [Building tabs with Riot](http://www.robertwpearce.com/blog/riotjs-example/)
+- [Building tabs with Riot](http://robertwpearce.com/blog/riotjs-example.html)
 - [The "React tutorial" for Riot](https://juriansluiman.nl/article/154/the-react-tutorial-for-riot)
 - [How to package "tag libraries" in Riot](https://github.com/ivan-saorin/riot-tutorial-tags-pack-app)
 - [Another React tutorial with Riot](https://github.com/viliamjr/commentsTuto)
