@@ -1554,9 +1554,9 @@ it('raw contents', function() {
   it('the riot-tag attribute gets updated if a DOM node gets mounted using two or more different tags', function() {
     var div = document.createElement('div')
     tags.push(riot.mount(div, 'timetable')[0])
-    expect(div.getAttribute('riot-tag')).to.be('timetable')
+    expect(div.getAttribute('riot-tag') || div.getAttribute('data-is')).to.be('timetable')
     tags.push(riot.mount(div, 'test')[0])
-    expect(div.getAttribute('riot-tag')).to.be('test')
+    expect(div.getAttribute('riot-tag') || div.getAttribute('data-is')).to.be('test')
 
   })
 
@@ -1884,7 +1884,7 @@ it('raw contents', function() {
     var str = '<style-option><style>p {top:0}<\/style>\n<\/style-option>',
       result
     result = riot.compile(str, {'style': 'scoped-css'})
-    expect(result).to.contain('[riot-tag="style-option"] p {top:0}')
+    expect(result).to.match(/\[(?:riot-tag|data-is)="style-option"\] p ?\{top:0\}/)
   })
 
   it('allow passing riot.observale instances to the children tags', function() {
@@ -2129,6 +2129,32 @@ it('raw contents', function() {
     expect(els[0].innerHTML).to.contain('html5')
     expect(els[1].innerHTML).to.contain('too')
     tags.push(tag)
+  })
+
+  it('tag names are case insensitive (converted to lowercase) in `riot.mount`', function() {
+    var i, els = document.querySelectorAll('tag-data-is,[data-is="tag-data-is"]')
+    for (i = 0; i < els.length; i++) {
+      els[i].parentNode.removeChild(els[i])
+    }
+    injectHTML('<div data-is="tag-data-is"></div>')
+    injectHTML('<tag-DATA-Is></tag-DATA-Is>')
+    var tags = riot.mount('tag-Data-Is')
+
+    expect(tags.length).to.be(2)
+    expect(tags[0].root.getElementsByTagName('p').length).to.be(2)
+    expect(tags[1].root.getElementsByTagName('p').length).to.be(2)
+    tags.push(tags[0], tags[1])
+  })
+
+  it('the value of the `data-is` attribute needs lowercase names', function() {
+    var i, els = document.querySelectorAll('tag-data-is,[data-is="tag-data-is"]')
+    for (i = 0; i < els.length; i++) {
+      els[i].parentNode.removeChild(els[i])
+    }
+    injectHTML('<div data-is="tag-DATA-Is"></div>')
+    var tags = riot.mount('tag-Data-Is')
+
+    expect(tags.length).to.be(0)
   })
 
 })
