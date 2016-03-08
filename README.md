@@ -136,7 +136,8 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot Compiler Explained](http://www.triplet.fi/blog/riot-compiler-explained/)
 - [Adding compiled Riot tags to your Gulp + Browserify build](http://www.triplet.fi/blog/adding_compiled_riot_tags_to_your_gulp_browserify_build/)
 - [The anatomy of a tag - a primer tutorial](http://www.marcusoft.net/2015/12/riotjs-anatomy-of-a-tag.html)
-
+- [Using TDD with Riot+mocha+chai](http://vitomd.com/blog/coding/tutorial_tdd_riot_mocha/)
+- 
 ### Video Tutorials
 - [Introduction](https://www.youtube.com/watch?v=al87U6NgRTc)
 - [Loops, Events and Callbacks](https://www.youtube.com/watch?v=T-ZV9dv93sw)
