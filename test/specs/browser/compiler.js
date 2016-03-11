@@ -35,6 +35,18 @@ describe('Compiler Browser', function() {
     riot.settings.brackets = defaultBrackets
   })
 
+  it('populates the vdom property correctly on riot global', function() {
+    injectHTML('<v-dom-1></v-dom-1>')
+    injectHTML('<v-dom-2></v-dom-2>')
+    var tags = riot.mount('v-dom-1, v-dom-2')
+
+    expect(tags.length).to.be(2)
+    expect(riot.vdom.length).to.be(tags.length)
+    riot.vdom.forEach(function(tag, i) {
+      expect(tag).to.be(tags[i])
+    })
+  })
+
   it('compiles and unmount the children tags', function(done) {
 
     this.timeout(5000)

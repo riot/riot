@@ -131,6 +131,14 @@ loadTagsAndScripts([
     path: 'tag/data-is.tag',
     name: false
   },
+  {
+    path: 'tag/v-dom-1.tag',
+    name: false
+  },
+  {
+    path: 'tag/v-dom-2.tag',
+    name: false
+  },
   // the following tags will be injected having custom attributes
   {
     path: 'tag/named-select.tag',
