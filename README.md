@@ -137,7 +137,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Adding compiled Riot tags to your Gulp + Browserify build](http://www.triplet.fi/blog/adding_compiled_riot_tags_to_your_gulp_browserify_build/)
 - [The anatomy of a tag - a primer tutorial](http://www.marcusoft.net/2015/12/riotjs-anatomy-of-a-tag.html)
 - [Using TDD with Riot+mocha+chai](http://vitomd.com/blog/coding/tutorial_tdd_riot_mocha/)
-- 
+
 ### Video Tutorials
 - [Introduction](https://www.youtube.com/watch?v=al87U6NgRTc)
 - [Loops, Events and Callbacks](https://www.youtube.com/watch?v=T-ZV9dv93sw)
@@ -176,6 +176,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot for TypeScript](https://github.com/nippur72/RiotTS)
 - [Riot loader plugin for RequireJS](https://github.com/amenadiel/requirejs-riot)
 - [Riot loader plugin for JSPM/SystemJS](https://github.com/amenadiel/systemjs-riot)
+- [RiotJS Style Guide](https://github.com/voorhoede/riotjs-style-guide)
 
 ### Performance
 - **Riot vs React performance:** [(Riot version)](https://github.com/kazzkiq/samples/tree/gh-pages/perf/dom-riot-vs-vanilla) vs [(React version)](https://github.com/kazzkiq/samples/tree/gh-pages/perf/dom-react-vs-vanilla)
