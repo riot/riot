@@ -176,6 +176,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot for TypeScript](https://github.com/nippur72/RiotTS)
 - [Riot loader plugin for RequireJS](https://github.com/amenadiel/requirejs-riot)
 - [Riot loader plugin for JSPM/SystemJS](https://github.com/amenadiel/systemjs-riot)
+- [RiotJS Style Guide](https://github.com/voorhoede/riotjs-style-guide)
 
 ### Performance
 - **Riot vs React performance:** [(Riot version)](https://github.com/kazzkiq/samples/tree/gh-pages/perf/dom-riot-vs-vanilla) vs [(React version)](https://github.com/kazzkiq/samples/tree/gh-pages/perf/dom-react-vs-vanilla)
