@@ -68,6 +68,9 @@ loadTagsAndScripts([
   // check if the events get triggered correctly
   'tag/events.tag',
 
+  // components in virtual get unmountd correctly
+  'tag/virtual-nested-component.tag',
+
   // pass a riot observable as option
   'tag/observable-attr.tag',
   'tag/style-tag.tag',

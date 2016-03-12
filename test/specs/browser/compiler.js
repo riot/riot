@@ -2169,4 +2169,18 @@ it('raw contents', function() {
     expect(tags.length).to.be(0)
   })
 
+  it('component nested in virtual unmounts correctly', function() {
+    injectHTML('<virtual-nested-component></virtual-nested-component>')
+    var tag = riot.mount('virtual-nested-component')[0]
+    var components = tag.root.querySelectorAll('not-virtual-component2')
+    expect(components.length).to.be(4)
+
+    tag.unmount()
+    components = tag.root.querySelectorAll('not-virtual-component2')
+    expect(components.length).to.be(0)
+
+    tags.push(tag)
+
+  })
+
 })
