@@ -4,7 +4,7 @@ const tmpl = `
   </div>
 `
 
-module.exports = function(suite, riot, body) {
+module.exports = function(suite, testName, riot) {
 
   // setup
   var ifTag = document.createElement('if-tag')
@@ -14,7 +14,7 @@ module.exports = function(suite, riot, body) {
     this.flag = false
   })
 
-  suite.add('riot#if', () => {
+  suite.add(testName, () => {
     var tag = riot.mount('if-tag')[0]
     tag.update()
     tag.flag = true

@@ -1,4 +1,4 @@
-module.exports = function(suite, riot, body) {
+module.exports = function(suite, testName, riot) {
 
   // setup
   var ifTag = document.createElement('mount-tag')
@@ -7,7 +7,7 @@ module.exports = function(suite, riot, body) {
     this.msg = 'hi'
   })
 
-  suite.add('riot#mount', () => {
+  suite.add(testName, () => {
     var tag = riot.mount('mount-tag')[0]
     tag.update()
   })
