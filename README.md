@@ -20,6 +20,7 @@
 | Framework              | Version    | Minified Size (gzip) |
 |------------------------|------------|----------------------|
 | Ember                  | 2.3.0      | 112.9kb              |
+| Ractive                | 0.7.3      | 54.47kb              |
 | Angular                | 1.5.0      | 53.17kb              |
 | Polymer                | 1.2.4      | 53.0kb               |
 | React                  | 0.14.7     | 38.56kb              |
