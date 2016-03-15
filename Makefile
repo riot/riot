@@ -70,8 +70,8 @@ min: riot
 
 perf: riot
 	# run the performance tests
-	@ node --expose-gc test/performance/speed
-	@ node --expose-gc test/performance/mem
+	@ node test/performance/benchmarks
+	@ node --expose-gc test/performance/memory
 
 watch:
 	# watch and rebuild riot and its tests
