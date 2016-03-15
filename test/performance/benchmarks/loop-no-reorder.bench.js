@@ -7,7 +7,7 @@ const tmpl = `
   </div>
 `
 
-module.exports = function(suite, riot, body) {
+module.exports = function(suite, testName, riot) {
   function generateItems(amount, hasChildren) {
     var items = []
     while (amount--) {
@@ -22,12 +22,12 @@ module.exports = function(suite, riot, body) {
   var loopTag = document.createElement('loop-tag-no-reorder')
   body.appendChild(loopTag)
   riot.tag('loop-tag-no-reorder', tmpl, function() {
-    this.items = generateItems(30, true)
+    this.items = generateItems(10, true)
   })
 
-  suite.add('riot#loop-no-reorder', () => {
+  suite.add(testName, () => {
     var tag = riot.mount('loop-tag-no-reorder')[0]
-    tag.items.push(generateItems(20, true))
+    tag.items.push(generateItems(10, true))
     tag.update()
   })
 
