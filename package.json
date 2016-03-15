@@ -46,17 +46,17 @@
   ],
   "dependencies": {
     "riot-cli": "^2.3.14",
-    "riot-compiler": "^2.3.22",
+    "riot-compiler": "^2.3.23",
     "riot-observable": "^2.3.15",
     "riot-route": "^2.3.15",
-    "riot-tmpl": "^2.3.21",
+    "riot-tmpl": "^2.3.22",
     "simple-dom": "0.3.0",
     "simple-html-tokenizer": "^0.2.1"
   },
   "devDependencies": {
     "cheerio": "^0.20.0",
     "coveralls": "^2.11.8",
-    "eslint": "^2.3.0",
+    "eslint": "^2.4.0",
     "expect.js": "^0.3.1",
     "glob": "^7.0.3",
     "istanbul": "^0.4.2",
