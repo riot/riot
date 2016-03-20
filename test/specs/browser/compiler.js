@@ -1849,7 +1849,7 @@ it('raw contents', function() {
     var str = '<style-option><style>p {top:0}<\/style>\n<\/style-option>',
       result
     result = riot.compile(str, {'style': 'scoped-css'})
-    expect(result).to.contain('[riot-tag="style-option"] p {top:0}')
+    expect(result).to.contain('[data-is="style-option"] p{top:0}')
   })
 
   it('allow passing riot.observale instances to the children tags', function() {
