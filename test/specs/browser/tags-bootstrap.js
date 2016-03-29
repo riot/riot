@@ -13,6 +13,7 @@ loadTagsAndScripts([
   'tag/loop-events.tag',
   'tag/loop-sync-options-nested.tag',
   'tag/loop-inherit.tag',
+  'tag/loop-root.tag',
   'tag/loop-double-curly-brackets.tag',
   'tag/loop-conditional.tag',
   'tag/table-multibody.tag',
@@ -53,6 +54,8 @@ loadTagsAndScripts([
   // input type=number
   'tag/input-number.tag',
 
+  'tag/input-values.tag',
+
   // input type=number
   'tag/nested-riot.tag',
 
@@ -75,6 +78,8 @@ loadTagsAndScripts([
   'tag/preserve-attr.tag',
 
   'tag/reserved-names.tag',
+
+  'tag/obj-key-loop.tag',
 
   // these tags will be not autoinjected in the DOM
   // that's what `name = false` means
@@ -116,6 +121,14 @@ loadTagsAndScripts([
   },
   {
     path: 'tag/yield-from-default.tag',
+    name: false
+  },
+  {
+    path: 'tag/form-controls.tag',
+    name: false
+  },
+  {
+    path: 'tag/data-is.tag',
     name: false
   },
   // the following tags will be injected having custom attributes

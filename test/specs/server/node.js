@@ -81,6 +81,12 @@ describe('Node/io.js', function() {
     expect(els.last().text()).to.be('post 2')
   })
 
+  it('tender tag: loop table', function() {
+    var tbl = riot.render('table-loop-extra-row'),
+      $ = cheerio.load(tbl)
+    expect($('table tr').length).to.be(5)
+  })
+
   it('render tag: simple block (using yield)', function() {
     var blk = riot.render('block')
     var $ = cheerio.load(blk)
@@ -99,7 +105,8 @@ describe('Node/io.js', function() {
     var $ = cheerio.load(frm)
     expect($('input[type="text"]').val()).to.be('my-value')
     expect($('select option:selected').val()).to.be('my-value')
-    expect($('textarea').val()).to.be('my-value')
+    expect($('textarea[name="txta1"]').val()).to.be('my-value')
+    expect($('textarea[name="txta2"]').val()).to.be('')
   })
 
 })

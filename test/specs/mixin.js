@@ -79,6 +79,7 @@ describe('Mixin', function() {
 
     expect('initialized').to.be(tag.globalAttr)
     expect('global').to.be(tag.getGlobal())
+    tag.unmount()
   })
 
   it('Will mount a tag and provide mixed-in methods', function() {
@@ -187,6 +188,7 @@ describe('Mixin', function() {
     var tag = riot.mount('my-mixin')[0]
     expect(tag.root.innerHTML).to.be('<span>Initialized</span>')
     expect(tag.type).to.be('func')
+    tag.unmount()
   })
 
   it('binds this-reference to the tag object', function() {
