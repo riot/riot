@@ -137,11 +137,19 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Adding compiled Riot tags to your Gulp + Browserify build](http://www.triplet.fi/blog/adding_compiled_riot_tags_to_your_gulp_browserify_build/)
 - [The anatomy of a tag - a primer tutorial](http://www.marcusoft.net/2015/12/riotjs-anatomy-of-a-tag.html)
 - [Using TDD with Riot+mocha+chai](http://vitomd.com/blog/coding/tutorial_tdd_riot_mocha/)
-- 
+
 ### Video Tutorials
 - [Introduction](https://www.youtube.com/watch?v=al87U6NgRTc)
 - [Loops, Events and Callbacks](https://www.youtube.com/watch?v=T-ZV9dv93sw)
 - [Server Rendering with Node & Express](http://youtu.be/6ww1UXGJzcs)
+- [Riot And Webpack Setup](https://youtu.be/UgdZbT-KPpY)
+- [Riot and Redux - Part 1](https://youtu.be/Y6vpKAGT2-8)
+- [Riot and Redux - Part 2](https://youtu.be/DgM03bvgCYc)
+- [Riot and Redux - Part 3](https://youtu.be/QuwnbuneAzM)
+- [Riot and Redux - Part 4](https://youtu.be/qc6bjtu7KG0)
+- [Riot and Redux - Part 5](https://youtu.be/M4BNsRMatVY)
+- [Riot and Redux - Part 6](https://youtu.be/jr8KDpwtRsk)
+
 
 ### Libraries / Frameworks
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
