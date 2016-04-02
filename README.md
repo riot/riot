@@ -19,14 +19,14 @@
 
 | Framework              | Version    | Minified Size (gzip) |
 |------------------------|------------|----------------------|
-| Ember                  | 2.3.0      | 112.9kb              |
+| Ember                  | 2.4.0      | 113.88kb             |
 | Ractive                | 0.7.3      | 54.47kb              |
 | Angular                | 1.5.0      | 53.17kb              |
 | Polymer                | 1.2.4      | 53.0kb               |
 | React                  | 0.14.7     | 38.56kb              |
 | Web Components Polyfill| 0.7.21     | 32.8kb               |
-| Vue                    | 1.0.16     | 24.55kb              |
-| Riot                   | 2.3.16     | 8.56kb               |
+| Vue                    | 1.0.20     | 25.04kb              |
+| Riot                   | 2.3.18     | 8.61kb               |
 
 
 ### Custom tags • Concise syntax • Virtual DOM • Full stack
