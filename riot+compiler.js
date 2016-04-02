@@ -1,8 +1,8 @@
-/* Riot v2.3.17, @license MIT */
+/* Riot v2.3.18, @license MIT */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.3.17', settings: {} },
+var riot = { version: 'v2.3.18', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -27,14 +27,16 @@ var riot = { version: 'v2.3.17', settings: {} },
   T_STRING = 'string',
   T_OBJECT = 'object',
   T_UNDEF  = 'undefined',
-  T_BOOL   = 'boolean',
   T_FUNCTION = 'function',
   // special native tags that cannot be treated like the others
   SPECIAL_TAGS_REGEX = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?|opt(?:ion|group))$/,
   RESERVED_WORDS_BLACKLIST = ['_item', '_id', '_parent', 'update', 'root', 'mount', 'unmount', 'mixin', 'isMounted', 'isLoop', 'tags', 'parent', 'opts', 'trigger', 'on', 'off', 'one'],
 
   // version# for IE 8-11, 0 for others
-  IE_VERSION = (window && window.document || {}).documentMode | 0
+  IE_VERSION = (window && window.document || {}).documentMode | 0,
+
+  // detect firefox to fix #1374
+  FIREFOX = window && !!window.InstallTrigger
 /* istanbul ignore next */
 riot.observable = function(el) {
 
@@ -175,7 +177,7 @@ riot.observable = function(el) {
  */
 
 
-var RE_ORIGIN = /^.+?\/+[^\/]+/,
+var RE_ORIGIN = /^.+?\/\/+[^\/]+/,
   EVENT_LISTENER = 'EventListener',
   REMOVE_EVENT_LISTENER = 'remove' + EVENT_LISTENER,
   ADD_EVENT_LISTENER = 'add' + EVENT_LISTENER,
@@ -269,7 +271,7 @@ function isString(str) {
  * @returns {string} path from root
  */
 function getPathFromRoot(href) {
-  return (href || loc.href || '')[REPLACE](RE_ORIGIN, '')
+  return (href || loc.href)[REPLACE](RE_ORIGIN, '')
 }
 
 /**
@@ -280,7 +282,7 @@ function getPathFromRoot(href) {
 function getPathFromBase(href) {
   return base[0] == '#'
     ? (href || loc.href || '').split(base)[1] || ''
-    : getPathFromRoot(href)[REPLACE](base, '')
+    : (loc ? getPathFromRoot(href) : href || '')[REPLACE](base, '')
 }
 
 function emit(force) {
@@ -314,6 +316,7 @@ function click(e) {
 
   var el = e.target
   while (el && el.nodeName != 'A') el = el.parentNode
+
   if (
     !el || el.nodeName != 'A' // not A tag
     || el[HAS_ATTRIBUTE]('download') // has download attr
@@ -420,10 +423,11 @@ var route = mainRouter.m.bind(mainRouter)
  */
 route.create = function() {
   var newSubRouter = new Router()
+  // assign sub-router's main method
+  var router = newSubRouter.m.bind(newSubRouter)
   // stop only this sub-router
-  newSubRouter.m.stop = newSubRouter.s.bind(newSubRouter)
-  // return sub-router's main method
-  return newSubRouter.m.bind(newSubRouter)
+  router.stop = newSubRouter.s.bind(newSubRouter)
+  return router
 }
 
 /**
@@ -507,7 +511,7 @@ riot.route = route
 
 /**
  * The riot template engine
- * @version v2.3.21
+ * @version v2.3.22
  */
 
 /**
@@ -603,7 +607,7 @@ var brackets = (function (UNDEF) {
 
     isexpr = start = re.lastIndex = 0
 
-    while (match = re.exec(str)) {
+    while ((match = re.exec(str))) {
 
       pos = match.index
 
@@ -613,8 +617,9 @@ var brackets = (function (UNDEF) {
           re.lastIndex = skipBraces(str, match[2], re.lastIndex)
           continue
         }
-        if (!match[3])
+        if (!match[3]) {
           continue
+        }
       }
 
       if (!match[1]) {
@@ -632,10 +637,11 @@ var brackets = (function (UNDEF) {
     return parts
 
     function unescapeStr (s) {
-      if (tmpl || isexpr)
+      if (tmpl || isexpr) {
         parts.push(s && s.replace(_bp[5], '$1'))
-      else
+      } else {
         parts.push(s)
+      }
     }
 
     function skipBraces (s, ch, ix) {
@@ -645,7 +651,7 @@ var brackets = (function (UNDEF) {
 
       recch.lastIndex = ix
       ix = 1
-      while (match = recch.exec(s)) {
+      while ((match = recch.exec(s))) {
         if (match[1] &&
           !(match[1] === ch ? ++ix : --ix)) break
       }
@@ -659,13 +665,10 @@ var brackets = (function (UNDEF) {
 
   _brackets.loopKeys = function loopKeys (expr) {
     var m = expr.match(_cache[9])
+
     return m
       ? { key: m[1], pos: m[2], val: _cache[0] + m[3].trim() + _cache[1] }
       : { val: expr.trim() }
-  }
-
-  _brackets.hasRaw = function (src) {
-    return _cache[10].test(src)
   }
 
   _brackets.array = function array (pair) {
@@ -677,13 +680,13 @@ var brackets = (function (UNDEF) {
       _cache = _create(pair)
       _regex = pair === DEFAULT ? _loopback : _rewrite
       _cache[9] = _regex(_pairs[9])
-      _cache[10] = _regex(_pairs[10])
     }
     cachedBrackets = pair
   }
 
   function _setSettings (o) {
     var b
+
     o = o || {}
     b = o.brackets
     Object.defineProperty(o, 'brackets', {
@@ -751,22 +754,25 @@ var tmpl = (function () {
   }
 
   function _create (str) {
-
     var expr = _getTmpl(str)
+
     if (expr.slice(0, 11) !== 'try{return ') expr = 'return ' + expr
 
-    return new Function('E', expr + ';')
+    return new Function('E', expr + ';')    //eslint-disable-line no-new-func
   }
 
   var
+    CH_IDEXPR = '\u2057',
+    RE_CSNAME = /^(?:(-?[_A-Za-z\xA0-\xFF][-\w\xA0-\xFF]*)|\u2057(\d+)~):/,
     RE_QBLOCK = RegExp(brackets.S_QBLOCKS, 'g'),
-    RE_QBMARK = /\x01(\d+)~/g
+    RE_DQUOTE = /\u2057/g,
+    RE_QBMARK = /\u2057(\d+)~/g
 
   function _getTmpl (str) {
     var
       qstr = [],
       expr,
-      parts = brackets.split(str.replace(/\u2057/g, '"'), 1)
+      parts = brackets.split(str.replace(RE_DQUOTE, '"'), 1)
 
     if (parts.length > 2 || parts[0]) {
       var i, j, list = []
@@ -775,11 +781,11 @@ var tmpl = (function () {
 
         expr = parts[i]
 
-        if (expr && (expr = i & 1 ?
+        if (expr && (expr = i & 1
 
-              _parseExpr(expr, 1, qstr) :
+            ? _parseExpr(expr, 1, qstr)
 
-              '"' + expr
+            : '"' + expr
                 .replace(/\\/g, '\\\\')
                 .replace(/\r\n?|\n/g, '\\n')
                 .replace(/"/g, '\\"') +
@@ -789,21 +795,21 @@ var tmpl = (function () {
 
       }
 
-      expr = j < 2 ? list[0] :
-             '[' + list.join(',') + '].join("")'
+      expr = j < 2 ? list[0]
+           : '[' + list.join(',') + '].join("")'
 
     } else {
 
       expr = _parseExpr(parts[1], 0, qstr)
     }
 
-    if (qstr[0])
+    if (qstr[0]) {
       expr = expr.replace(RE_QBMARK, function (_, pos) {
         return qstr[pos]
           .replace(/\r/g, '\\r')
           .replace(/\n/g, '\\n')
       })
-
+    }
     return expr
   }
 
@@ -812,16 +818,13 @@ var tmpl = (function () {
       '(': /[()]/g,
       '[': /[[\]]/g,
       '{': /[{}]/g
-    },
-    CS_IDENT = /^(?:(-?[_A-Za-z\xA0-\xFF][-\w\xA0-\xFF]*)|\x01(\d+)~):/
+    }
 
   function _parseExpr (expr, asText, qstr) {
 
-    if (expr[0] === '=') expr = expr.slice(1)
-
     expr = expr
           .replace(RE_QBLOCK, function (s, div) {
-            return s.length > 2 && !div ? '\x01' + (qstr.push(s) - 1) + '~' : s
+            return s.length > 2 && !div ? CH_IDEXPR + (qstr.push(s) - 1) + '~' : s
           })
           .replace(/\s+/g, ' ').trim()
           .replace(/\ ?([[\({},?\.:])\ ?/g, '$1')
@@ -833,7 +836,7 @@ var tmpl = (function () {
         match
 
       while (expr &&
-            (match = expr.match(CS_IDENT)) &&
+            (match = expr.match(RE_CSNAME)) &&
             !match.index
         ) {
         var
@@ -852,8 +855,8 @@ var tmpl = (function () {
         list[cnt++] = _wrapExpr(jsb, 1, key)
       }
 
-      expr = !cnt ? _wrapExpr(expr, asText) :
-          cnt > 1 ? '[' + list.join(',') + '].join(" ").trim()' : list[0]
+      expr = !cnt ? _wrapExpr(expr, asText)
+           : cnt > 1 ? '[' + list.join(',') + '].join(" ").trim()' : list[0]
     }
     return expr
 
@@ -873,7 +876,7 @@ var tmpl = (function () {
   }
 
   // istanbul ignore next: not both
-  var
+  var // eslint-disable-next-line max-len
     JS_CONTEXT = '"in this?this:' + (typeof window !== 'object' ? 'global' : 'window') + ').',
     JS_VARNAME = /[,{][$\w]+:|(^ *|[^$\w\.])(?!(?:typeof|true|false|null|undefined|in|instanceof|is(?:Finite|NaN)|void|NaN|new|Date|RegExp|Math)(?![$\w]))([$_A-Za-z][$\w]*)/g,
     JS_NOPROPS = /^(?=(\.[$\w]+))\1(?:[^.[(]|$)/
@@ -901,14 +904,14 @@ var tmpl = (function () {
 
     if (key) {
 
-      expr = (tb ?
-          'function(){' + expr + '}.call(this)' : '(' + expr + ')'
+      expr = (tb
+          ? 'function(){' + expr + '}.call(this)' : '(' + expr + ')'
         ) + '?"' + key + '":""'
 
     } else if (asText) {
 
-      expr = 'function(v){' + (tb ?
-          expr.replace('return ', 'v=') : 'v=(' + expr + ')'
+      expr = 'function(v){' + (tb
+          ? expr.replace('return ', 'v=') : 'v=(' + expr + ')'
         ) + ';return v||v===0?v:""}.call(this)'
     }
 
@@ -918,7 +921,7 @@ var tmpl = (function () {
   // istanbul ignore next: compatibility fix for beta versions
   _tmpl.parse = function (s) { return s }
 
-  _tmpl.version = brackets.version = 'v2.3.21'
+  _tmpl.version = brackets.version = 'v2.3.22'
 
   return _tmpl
 
@@ -1257,14 +1260,13 @@ function _each(dom, parent, expr) {
     if (isOption) {
       root.appendChild(frag)
 
-      // #1374 <select> <option selected={true}> </select>
-      if (root.length) {
-        var si, op = root.options
-
-        root.selectedIndex = si = -1
-        for (i = 0; i < op.length; i++) {
-          if (op[i].selected = op[i].__selected) {
-            if (si < 0) root.selectedIndex = si = i
+      // #1374 FireFox bug in <option selected={expression}>
+      if (FIREFOX && !root.multiple) {
+        for (var n = 0; n < root.length; n++) {
+          if (root[n].__riot1374) {
+            root.selectedIndex = n  // clear other options
+            delete root[n].__riot1374
+            break
           }
         }
       }
@@ -1423,7 +1425,6 @@ function Tag(impl, conf, innerHTML) {
     root = conf.root,
     tagName = root.tagName.toLowerCase(),
     attr = {},
-    implAttr = {},
     propsInSyncWithParent = [],
     dom
 
@@ -1626,12 +1627,6 @@ function Tag(impl, conf, innerHTML) {
     if (~tagIndex)
       __virtualDom.splice(tagIndex, 1)
 
-    if (this._virts) {
-      each(this._virts, function(v) {
-        if (v.parentNode) v.parentNode.removeChild(v)
-      })
-    }
-
     if (p) {
 
       if (parent) {
@@ -1654,11 +1649,19 @@ function Tag(impl, conf, innerHTML) {
 
       if (!keepRootTag)
         p.removeChild(el)
-      else
-        // the riot-tag attribute isn't needed anymore, remove it
-        remAttr(p, 'riot-tag')
+      else {
+        // the riot-tag and the data-is attributes aren't needed anymore, remove them
+        remAttr(p, RIOT_TAG_IS)
+        remAttr(p, RIOT_TAG) // this will be removed in riot 3.0.0
+      }
+
     }
 
+    if (this._virts) {
+      each(this._virts, function(v) {
+        if (v.parentNode) v.parentNode.removeChild(v)
+      })
+    }
 
     self.trigger('unmount')
     toggle()
@@ -1769,10 +1772,9 @@ function update(expressions, tag) {
 
     if (expr.bool) {
       value = !!value
-      if (attrName === 'selected') dom.__selected = value   // #1374
-    }
-    else if (value == null)
+    } else if (value == null) {
       value = ''
+    }
 
     // #1638: regression of #1612, update the dom only if the value of the
     // expression was changed
@@ -1851,6 +1853,9 @@ function update(expressions, tag) {
     } else if (expr.bool) {
       dom[attrName] = value
       if (value) setAttr(dom, attrName, attrName)
+      if (FIREFOX && attrName === 'selected' && dom.tagName === 'OPTION') {
+        dom.__riot1374 = value   // #1374
+      }
 
     } else if (value === 0 || value && typeof value !== T_OBJECT) {
       // <img src="{ expr }">
@@ -2050,7 +2055,7 @@ function defineProperty(el, key, value, options) {
     value: value,
     enumerable: false,
     writable: false,
-    configurable: false
+    configurable: true
   }, options))
   return el
 }
@@ -2449,6 +2454,7 @@ riot.mount = function(selector, tagName, opts) {
       if (tagName && riotTag !== tagName) {
         riotTag = tagName
         setAttr(root, RIOT_TAG_IS, tagName)
+        setAttr(root, RIOT_TAG, tagName) // this will be removed in riot 3.0.0
       }
       var tag = mountTo(root, riotTag || root.tagName.toLowerCase(), opts)
 
@@ -2519,6 +2525,11 @@ riot.update = function() {
     tag.update()
   })
 }
+
+/**
+ * Export the Virtual DOM
+ */
+riot.vdom = __virtualDom
 
 /**
  * Export the Tag constructor
@@ -2619,7 +2630,7 @@ riot.parsers = parsers
 
 /**
  * Compiler for riot custom tags
- * @version v2.3.22
+ * @version v2.3.23
  */
 var compile = (function () {
 
@@ -2631,7 +2642,9 @@ var compile = (function () {
 
   var HTML_COMMS = RegExp(/<!--(?!>)[\S\s]*?-->/.source + '|' + S_LINESTR, 'g')
 
-  var HTML_TAGS = /<([-\w]+)(?:\s+([^"'\/>]*(?:(?:"[^"]*"|'[^']*'|\/[^>])[^'"\/>]*)*)|\s*)(\/?)>/g
+  var HTML_TAGS = /<(-?[A-Za-z][-\w\xA0-\xFF]*)(?:\s+([^"'\/>]*(?:(?:"[^"]*"|'[^']*'|\/[^>])[^'"\/>]*)*)|\s*)(\/?)>/g
+
+  var HTML_PACK = />[ \t]+<(-?[A-Za-z]|\/[-A-Za-z])/g
 
   var BOOL_ATTRS = RegExp(
       '^(?:disabled|checked|readonly|required|allowfullscreen|auto(?:focus|play)|' +
@@ -2650,6 +2663,10 @@ var compile = (function () {
   var TRIM_TRAIL = /[ \t]+$/gm
 
   var
+    RE_HASEXPR = /\x01#\d/,
+    RE_REPEXPR = /\x01#(\d+)/g,
+    CH_IDEXPR  = '\x01#',
+    CH_DQCODE  = '\u2057',
     DQ = '"',
     SQ = "'"
 
@@ -2663,7 +2680,7 @@ var compile = (function () {
     }
 
     re.lastIndex = 0
-    while (mm = re.exec(src)) {
+    while ((mm = re.exec(src))) {
       if (mm[0][0] === '<') {
         src = RegExp.leftContext + RegExp.rightContext
         re.lastIndex = mm[3] + 1
@@ -2682,7 +2699,7 @@ var compile = (function () {
 
     str = str.replace(/\s+/g, ' ')
 
-    while (match = HTML_ATTRS.exec(str)) {
+    while ((match = HTML_ATTRS.exec(str))) {
       var
         k = match[1].toLowerCase(),
         v = match[2]
@@ -2698,7 +2715,7 @@ var compile = (function () {
         if (k === 'type' && SPEC_TYPES.test(v)) {
           type = v
         } else {
-          if (/\u0001\d/.test(v)) {
+          if (RE_HASEXPR.test(v)) {
 
             if (k === 'value') vexp = 1
             else if (BOOL_ATTRS.test(k)) k = '__' + k
@@ -2724,19 +2741,17 @@ var compile = (function () {
       var
         jsfn = opts.expr && (opts.parser || opts.type) ? _compileJS : 0,
         list = brackets.split(html, 0, _bp),
-        expr, israw
+        expr
 
       for (var i = 1; i < list.length; i += 2) {
         expr = list[i]
         if (expr[0] === '^') {
           expr = expr.slice(1)
         } else if (jsfn) {
-          israw = expr[0] === '='
-          expr = jsfn(israw ? expr.slice(1) : expr, opts).trim()
+          expr = jsfn(expr, opts).trim()
           if (expr.slice(-1) === ';') expr = expr.slice(0, -1)
-          if (israw) expr = '=' + expr
         }
-        list[i] = '\u0001' + (pcex.push(expr) - 1) + _bp[1]
+        list[i] = CH_IDEXPR + (pcex.push(expr) - 1) + _bp[1]
       }
       html = list.join('')
     }
@@ -2745,20 +2760,10 @@ var compile = (function () {
 
   function restoreExpr (html, pcex) {
     if (pcex.length) {
-      html = html
-        .replace(/\u0001(\d+)/g, function (_, d) {
-          var expr = pcex[d]
+      html = html.replace(RE_REPEXPR, function (_, d) {
 
-          if (expr[0] === '=') {
-            expr = expr.replace(brackets.R_STRINGS, function (qs) {
-              return qs
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-            })
-          }
-
-          return pcex._bp[0] + expr.trim().replace(/[\r\n]+/g, ' ').replace(/"/g, '\u2057')
-        })
+        return pcex._bp[0] + pcex[d].trim().replace(/[\r\n]+/g, ' ').replace(/"/g, CH_DQCODE)
+      })
     }
     return html
   }
@@ -2792,7 +2797,7 @@ var compile = (function () {
       if (p.length) html = html.replace(/\u0002/g, function () { return p.shift() })
     }
 
-    if (opts.compact) html = html.replace(/>[ \t]+<([-\w\/])/g, '><$1')
+    if (opts.compact) html = html.replace(HTML_PACK, '><$1')
 
     return restoreExpr(html, pcex).replace(TRIM_TRAIL, '')
   }
@@ -2829,7 +2834,7 @@ var compile = (function () {
 
     if (~js.indexOf('/')) js = rmComms(js, JS_COMMS)
 
-    while (match = js.match(JS_ES6SIGN)) {
+    while ((match = js.match(JS_ES6SIGN))) {
 
       parts.push(RE.leftContext)
       js  = RE.rightContext
@@ -2848,7 +2853,7 @@ var compile = (function () {
 
     function rmComms (s, r, m) {
       r.lastIndex = 0
-      while (m = r.exec(s)) {
+      while ((m = r.exec(s))) {
         if (m[0][0] === '/' && !m[1] && !m[2]) {
           s = RE.leftContext + ' ' + RE.rightContext
           r.lastIndex = m[3] + 1
@@ -2913,12 +2918,14 @@ var compile = (function () {
         }
 
         if (s.indexOf(scope) < 0) {
-          s = tag + ' ' + s + ',[riot-tag="' + tag + '"] ' + s
+          s = tag + ' ' + s + ',[riot-tag="' + tag + '"] ' + s +
+                              ',[data-is="' + tag + '"] ' + s
         } else {
           s = s.replace(scope, tag) + ',' +
-              s.replace(scope, '[riot-tag="' + tag + '"]')
+              s.replace(scope, '[riot-tag="' + tag + '"]') + ',' +
+              s.replace(scope, '[data-is="' + tag + '"]')
         }
-        return sel.slice(-1) === ' ' ? s + ' ' : s
+        return s
       })
 
       return p1 ? p1 + ' ' + p2 : p2
@@ -2962,7 +2969,7 @@ var compile = (function () {
 
   var MISC_ATTR = '\\s*=\\s*(' + S_STRINGS + '|{[^}]+}|\\S+)'
 
-  var END_TAGS = /\/>\n|^<(?:\/?[-\w]+\s*|[-\w]+\s+[-\w:\xA0-\xFF][\S\s]*?)>\n/
+  var END_TAGS = /\/>\n|^<(?:\/?-?[A-Za-z][-\w\xA0-\xFF]*\s*|-?[A-Za-z][-\w\xA0-\xFF]*\s+[-\w:\xA0-\xFF][\S\s]*?)>\n/
 
   function _q (s, r) {
     if (!s) return "''"
@@ -2970,17 +2977,17 @@ var compile = (function () {
     return r && ~s.indexOf('\n') ? s.replace(/\n/g, '\\n') : s
   }
 
-  function mktag (name, html, css, attribs, js, pcex) {
+  function mktag (name, html, css, attr, js, opts) {
     var
-      c = ', ',
-      s = '}' + (pcex.length ? ', ' + _q(pcex._bp[8]) : '') + ');'
+      c = opts.debug ? ',\n  ' : ', ',
+      s = '});'
 
     if (js && js.slice(-1) !== '\n') s = '\n' + s
 
     return 'riot.tag2(\'' + name + SQ +
       c + _q(html, 1) +
       c + _q(css) +
-      c + _q(attribs) + ', function(opts) {\n' + js + s
+      c + _q(attr) + ', function(opts) {\n' + js + s
   }
 
   function splitBlocks (str) {
@@ -3034,8 +3041,11 @@ var compile = (function () {
   }
 
   function getCode (code, opts, attribs, base) {
-    var type = getType(attribs)
+    var
+      type = getType(attribs),
+      src  = getAttrib(attribs, 'src')
 
+    if (src) return false
     return _compileJS(code, opts, type, getParserOptions(attribs), base)
   }
 
@@ -3060,7 +3070,7 @@ var compile = (function () {
 
   var
 
-    CUST_TAG = RegExp(/^([ \t]*)<([-\w]+)(?:\s+([^'"\/>]+(?:(?:@|\/[^>])[^'"\/>]*)*)|\s*)?(?:\/>|>[ \t]*\n?([\S\s]*)^\1<\/\2\s*>|>(.*)<\/\2\s*>)/
+    CUST_TAG = RegExp(/^([ \t]*)<(-?[A-Za-z][-\w\xA0-\xFF]*)(?:\s+([^'"\/>]+(?:(?:@|\/[^>])[^'"\/>]*)*)|\s*)?(?:\/>|>[ \t]*\n?([\S\s]*)^\1<\/\2\s*>|>(.*)<\/\2\s*>)/
       .source.replace('@', S_STRINGS), 'gim'),
 
     SCRIPTS = /<script(\s+[^>]*)?>\n?([\S\s]*?)<\/script\s*>/gi,
@@ -3155,7 +3165,7 @@ var compile = (function () {
           return ''
         }
 
-        return mktag(tagName, html, styles, attribs, jscode, pcex)
+        return mktag(tagName, html, styles, attribs, jscode, opts)
       })
 
     if (opts.entities) return parts
@@ -3168,7 +3178,7 @@ var compile = (function () {
     html: compileHTML,
     css: compileCSS,
     js: compileJS,
-    version: 'v2.3.22'
+    version: 'v2.3.23'
   }
   return compile
 
