@@ -1,21 +1,21 @@
 <select-test>
   <form id="select-test-form">
     <!--One single option, without expressions-->
-    <select riot-tag="select-single-option"/>
+    <select data-is="select-single-option"/>
     <!--Looped option, no group-->
-    <select riot-tag="select-each-option"/>
+    <select data-is="select-each-option"/>
     <!--Single option + looped option, no group-->
-    <select riot-tag="select-each-option-prompt"/>
+    <select data-is="select-each-option-prompt"/>
     <!--Two looped options, no group-->
-    <select riot-tag="select-each-two-options"/>
+    <select data-is="select-each-two-options"/>
     <!--One group with one looped option-->
-    <select riot-tag="select-optgroup-each-option"/>
+    <select data-is="select-optgroup-each-option"/>
     <!--Single option + one group with one looped option-->
-    <select riot-tag="select-optgroup-each-option-prompt"/>
+    <select data-is="select-optgroup-each-option-prompt"/>
     <!--Two groups with one looped option each-->
-    <select riot-tag="select-two-optgroup-each-option"/>
+    <select data-is="select-two-optgroup-each-option"/>
     <!--Looped group (2 items) with looped options-->
-    <select riot-tag="select-each-optgroup"/>
+    <select data-is="select-each-optgroup"/>
   </form>
   <script>
   (window||global).theOptions = ['Opt1', 'Opt2', 'Opt3']

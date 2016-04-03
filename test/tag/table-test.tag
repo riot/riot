@@ -4,35 +4,35 @@
 -->
 <table-test>
 
-  <table riot-tag="table-caption"
+  <table data-is="table-caption"
     header={ header }
     footer={ footer } rows={ rows } widths={ widths }/>
 
-  <table riot-tag="table-colgroup"
+  <table data-is="table-colgroup"
     header={ header }
     footer={ footer } rows={ rows } widths={ widths }/>
 
-  <table riot-tag="table-looped-col"
+  <table data-is="table-looped-col"
     header={ header }
     footer={ footer } rows={ rows } widths={ widths }/>
 
-  <table riot-tag="table-multi-col"
+  <table data-is="table-multi-col"
     header={ header }
     footer={ footer } rows={ rows } widths={ widths }/>
 
-  <table riot-tag="table-tfoot"
+  <table data-is="table-tfoot"
     header={ header }
     footer={ footer } rows={ rows } widths={ widths }/>
 
-  <table riot-tag="table-tr-body-only"
+  <table data-is="table-tr-body-only"
     header={ header }
     footer={ footer } rows={ rows } widths={ widths }/>
 
-  <table riot-tag="table-tr-alone"
+  <table data-is="table-tr-alone"
     header={ header }
     footer={ footer } rows={ rows } widths={ widths }/>
 
-  <table riot-tag="table-custom-thead-tfoot"
+  <table data-is="table-custom-thead-tfoot"
     header={ header }
     footer={ footer } rows={ rows } widths={ widths }/>
 
@@ -124,11 +124,11 @@
 
 <!-- table with all the main elements as riot tags (2 tbody) -->
 <table-custom-thead-tfoot>
-  <colgroup riot-tag="tag-colgroup" widths={ opts.widths }/>
-  <thead riot-tag="tag-thead" rows={ opts.header }/>
-  <tfoot riot-tag="tag-tfoot" rows={ opts.footer }/>
-  <tbody riot-tag="tag-tbody" rows={ opts.rows }/>
-  <tbody riot-tag="tag-tbody" rows={ opts.rows }/>
+  <colgroup data-is="tag-colgroup" widths={ opts.widths }/>
+  <thead data-is="tag-thead" rows={ opts.header }/>
+  <tfoot data-is="tag-tfoot" rows={ opts.footer }/>
+  <tbody data-is="tag-tbody" rows={ opts.rows }/>
+  <tbody data-is="tag-tbody" rows={ opts.rows }/>
 </table-custom-thead-tfoot>
 
 <!-- riot tags for the main table elements -->

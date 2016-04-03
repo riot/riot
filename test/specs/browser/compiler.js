@@ -693,9 +693,9 @@ describe('Compiler Browser', function() {
 
   })
 
-  it('riot-tag attribute', function() {
+  it('data-is attribute', function() {
 
-    injectHTML('<div id="rtag" riot-tag="rtag"><\/div>')
+    injectHTML('<div id="rtag" data-is="rtag"><\/div>')
     riot.tag('rtag', '<p>val: { opts.val }</p>')
 
     var tag = riot.mount('#rtag', { val: 10 })[0]
@@ -706,13 +706,13 @@ describe('Compiler Browser', function() {
 
   })
 
-  it('riot-tag attribute by tag name', function() {
+  it('data-is attribute by tag name', function() {
 
-     // riot-tag attribute by tag name
+     // data-is attribute by tag name
 
     riot.tag('rtag2', '<p>val: { opts.val }</p>')
 
-    injectHTML('<div riot-tag="rtag2"></div>')
+    injectHTML('<div data-is="rtag2"></div>')
 
     tag = riot.mount('rtag2', { val: 10 })[0]
     expect(normalizeHTML(tag.root.innerHTML)).to.be('<p>val: 10</p>')
@@ -722,13 +722,13 @@ describe('Compiler Browser', function() {
 
   })
 
-  it('riot-tag attribute using the "*" selector', function() {
+  it('data-is attribute using the "*" selector', function() {
 
     injectHTML([
       '<div id="rtag-nested">',
-      '  <div riot-tag="rtag"></div>',
-      '  <div riot-tag="rtag"></div>',
-      '  <div riot-tag="rtag"></div>',
+      '  <div data-is="rtag"></div>',
+      '  <div data-is="rtag"></div>',
+      '  <div data-is="rtag"></div>',
       '</div>'
     ])
 
@@ -1003,7 +1003,7 @@ describe('Compiler Browser', function() {
     }
   })
 
-  it('scoped css and riot-tag, mount(selector, tagname)', function() {
+  it('scoped css and data-is, mount(selector, tagname)', function() {
 
 
     function checkBorder(t) {
@@ -1015,7 +1015,7 @@ describe('Compiler Browser', function() {
 
     injectHTML([
       '<scoped-tag></scoped-tag>',
-      '<div riot-tag="scoped-tag"></div>',
+      '<div data-is="scoped-tag"></div>',
       '<div id="scopedtag"></div>'
     ])
 
@@ -1073,7 +1073,7 @@ describe('Compiler Browser', function() {
   })
 
   it('preserve attributes from tag definition', function() {
-    injectHTML('<div riot-tag="preserve-attr2"></div>')
+    injectHTML('<div data-is="preserve-attr2"></div>')
     var tag = riot.mount('preserve-attr')[0]
     expect(tag.root.className).to.be('single-quote')
     var tag2 = riot.mount('preserve-attr2')[0]
@@ -1085,7 +1085,7 @@ describe('Compiler Browser', function() {
   it('precompiled tag compatibility', function() {
 
     injectHTML('<precompiled></precompiled>')
-    riot.tag('precompiled', 'HELLO!', 'precompiled, [riot-tag="precompiled"]  { color: red }', function(opts) {
+    riot.tag('precompiled', 'HELLO!', 'precompiled, [data-is="precompiled"]  { color: red }', function(opts) {
       this.nothing = opts.nothing
     })
 
@@ -1264,11 +1264,11 @@ describe('Compiler Browser', function() {
     expect(tag.i.value).to.be('hi')
   })
 
-  it('riot-tag as expression', function() {
+  it('data-is as expression', function() {
     injectHTML('<container-riot></container-riot>')
     var tag = riot.mount('container-riot')[0]
     var div = tag.root.getElementsByTagName('div')[0]
-    expect(div.getAttribute('riot-tag')).to.be('nested-riot')
+    expect(div.getAttribute('data-is')).to.be('nested-riot')
     tags.push(tag)
   })
 
@@ -1584,12 +1584,12 @@ it('raw contents', function() {
 
   })
 
-  it('the riot-tag attribute gets updated if a DOM node gets mounted using two or more different tags', function() {
+  it('the data-is attribute gets updated if a DOM node gets mounted using two or more different tags', function() {
     var div = document.createElement('div')
     tags.push(riot.mount(div, 'timetable')[0])
-    expect(div.getAttribute('riot-tag')).to.be('timetable')
+    expect(div.getAttribute('data-is')).to.be('timetable')
     tags.push(riot.mount(div, 'test')[0])
-    expect(div.getAttribute('riot-tag')).to.be('test')
+    expect(div.getAttribute('data-is')).to.be('test')
 
   })
 
@@ -1775,7 +1775,7 @@ it('raw contents', function() {
     function testTable(root, name, info) {
       var s, key, inf
 
-      root = root.querySelectorAll('table[riot-tag=' + name + ']')
+      root = root.querySelectorAll('table[data-is=' + name + ']')
       s = name + '.length: '
       expect(s + root.length).to.be(s + '1')
       root = root[0]
@@ -1869,7 +1869,7 @@ it('raw contents', function() {
     for (var name in list) {                 // eslint-disable-line guard-for-in
       //console.log('Testing ' + name)
       dat = list[name]
-      sel = tag.root.querySelector('select[riot-tag=' + name + ']')
+      sel = tag.root.querySelector('select[data-is=' + name + ']')
       expect(sel).to.not.be.empty()
       if (sel.selectedIndex !== dat[0]) expect().fail(
         name + '.selectIndex ' + sel.selectedIndex + ' expected to be ' + dat[0])
@@ -1917,7 +1917,7 @@ it('raw contents', function() {
     var str = '<style-option><style>p {top:0}<\/style>\n<\/style-option>',
       result
     result = riot.compile(str, {'style': 'scoped-css'})
-    expect(result).to.match(/\[(?:riot-tag|data-is)="style-option"\] p ?\{top:0\}/)
+    expect(result).to.match(/\[(?:data-is)="style-option"\] p ?\{top:0\}/)
   })
 
   it('allow passing riot.observale instances to the children tags', function() {
@@ -2046,7 +2046,7 @@ it('raw contents', function() {
 
   })
 
-  it('mount search riot-tag attributes for tag names only #1463', function () {
+  it('mount search data-is attributes for tag names only #1463', function () {
     var
       names = ['x-my_tag1', 'x-my-tag2', 'x-my-3tag', 'x-m1-3tag'],
       templ = '<@>X</@>',
@@ -2054,11 +2054,11 @@ it('raw contents', function() {
 
     // test browser capability for match unquoted chars in [-_A-Z]
     for (i = 0; i < names.length; ++i) {
-      el = appendTag('div', {'riot-tag': names[i]})
+      el = appendTag('div', {'data-is': names[i]})
       riot.compile(templ.replace(/@/g, names[i]))
       tag = riot.mount(names[i])[0]
       tags.push(tag)
-      tag = $('*[riot-tag=' + names[i] + ']')
+      tag = $('*[data-is=' + names[i] + ']')
       expect(tag.innerHTML).to.be('X')
     }
 
@@ -2153,7 +2153,7 @@ it('raw contents', function() {
     tags.push(tag)
   })
 
-  it('support `data-is` in addition to `riot-tag` for html5 compliance', function() {
+  it('support `data-is` for html5 compliance', function() {
     injectHTML('<div data-is="tag-data-is"></div>')
     var tag = riot.mount('tag-data-is')[0]
     var els = tag.root.getElementsByTagName('p')
@@ -2244,9 +2244,9 @@ it('raw contents', function() {
     tags.push(tag)
   })
 
-  it('riot-tag can be dynamically created by expression', function() {
-    injectHTML('<dynamic-riot-tag></dynamic-riot-tag>')
-    var tag = riot.mount('dynamic-riot-tag')[0]
+  it('data-is can be dynamically created by expression', function() {
+    injectHTML('<dynamic-data-is></dynamic-data-is>')
+    var tag = riot.mount('dynamic-data-is')[0]
     var divs = tag.root.querySelectorAll('div')
     expect(divs[0].querySelector('input').getAttribute('type')).to.be('color')
     expect(divs[1].querySelector('input').getAttribute('type')).to.be('color')

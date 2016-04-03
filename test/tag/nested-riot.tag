@@ -3,6 +3,6 @@
 </nested-riot>
 
 <container-riot>
-  <div riot-tag="{ show }"></div>
+  <div data-is="{ show }"></div>
   this.show = "nested-riot"
 </container-riot>
