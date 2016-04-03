@@ -12,7 +12,7 @@ script:
 sudo: false
 
 after_success:
-  make test-sauce && make test-coveralls
+  '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && make test-sauce && make test-coveralls || false'
 
 notifications:
     email: false

@@ -13,6 +13,7 @@ loadTagsAndScripts([
   'tag/loop-events.tag',
   'tag/loop-sync-options-nested.tag',
   'tag/loop-inherit.tag',
+  'tag/loop-root.tag',
   'tag/loop-double-curly-brackets.tag',
   'tag/loop-conditional.tag',
   'tag/table-multibody.tag',
@@ -68,6 +69,9 @@ loadTagsAndScripts([
   // check if the events get triggered correctly
   'tag/events.tag',
 
+  // components in virtual get unmountd correctly
+  'tag/virtual-nested-component.tag',
+
   // pass a riot observable as option
   'tag/observable-attr.tag',
   'tag/style-tag.tag',
@@ -78,6 +82,8 @@ loadTagsAndScripts([
   'tag/preserve-attr.tag',
 
   'tag/reserved-names.tag',
+
+  'tag/obj-key-loop.tag',
 
   'tag/virtual-no-loop.tag',
   'tag/virtual-yield-loop.tag',
@@ -123,6 +129,22 @@ loadTagsAndScripts([
   },
   {
     path: 'tag/yield-from-default.tag',
+    name: false
+  },
+  {
+    path: 'tag/form-controls.tag',
+    name: false
+  },
+  {
+    path: 'tag/data-is.tag',
+    name: false
+  },
+  {
+    path: 'tag/v-dom-1.tag',
+    name: false
+  },
+  {
+    path: 'tag/v-dom-2.tag',
     name: false
   },
   // the following tags will be injected having custom attributes

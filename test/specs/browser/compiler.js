@@ -1,6 +1,8 @@
 describe('Compiler Browser', function() {
 
   var tags = []
+  // version# for IE 8-11, 0 for others
+  var IE_VERSION = (window && window.document || {}).documentMode | 0
 
   // adding some custom riot parsers
   // css
@@ -31,6 +33,18 @@ describe('Compiler Browser', function() {
   afterEach(function() {
     // restore the default brackets
     riot.settings.brackets = defaultBrackets
+  })
+
+  it('populates the vdom property correctly on riot global', function() {
+    injectHTML('<v-dom-1></v-dom-1>')
+    injectHTML('<v-dom-2></v-dom-2>')
+    var tags = riot.mount('v-dom-1, v-dom-2')
+
+    expect(tags.length).to.be(2)
+    expect(riot.vdom.length).to.be(tags.length)
+    riot.vdom.forEach(function(tag, i) {
+      expect(tag).to.be(tags[i])
+    })
   })
 
   it('compiles and unmount the children tags', function(done) {
@@ -194,6 +208,20 @@ describe('Compiler Browser', function() {
 
     expect(getPreviousSibling(h3).tagName.toLowerCase()).to.be('p')
     expect(getNextSibling(h3).tagName.toLowerCase()).to.be('p')
+
+    tags.push(tag)
+
+  })
+
+  it('the root keyword should be protected also in the loops', function() {
+    var tag = riot.mount('loop-root')[0]
+
+    expect($$('li', tag.root).length).to.be(3)
+
+    tag.splice()
+    tag.update()
+
+    expect($$('li', tag.root).length).to.be(2)
 
     tags.push(tag)
 
@@ -528,11 +556,15 @@ describe('Compiler Browser', function() {
   it('loop option tag', function() {
     var tag = riot.mount('loop-option')[0],
       root = tag.root,
-      option = root.getElementsByTagName('select')[0]
+      options = root.getElementsByTagName('select')[0],
+      html = normalizeHTML(root.innerHTML).replace(/ selected="selected"/, '')
 
-    expect(normalizeHTML(root.innerHTML)).to.match(/<select><option value="1">Peter<\/option><option selected="(selected|true)" value="2">Sherman<\/option><option value="3">Laura<\/option><\/select>/)
+    expect(html).to.match(/<select><option value="1">Peter<\/option><option value="2">Sherman<\/option><option value="3">Laura<\/option><\/select>/)
 
-    expect(option.selectedIndex).to.be(1)
+    //expect(options[0].selected).to.be(false)
+    expect(options[1].selected).to.be(true)
+    expect(options[2].selected).to.be(false)
+    expect(options.selectedIndex).to.be(1)
     tags.push(tag)
 
   })
@@ -548,9 +580,10 @@ describe('Compiler Browser', function() {
 
   it('loop optgroup tag', function() {
     var tag = riot.mount('loop-optgroup')[0],
-      root = tag.root
+      root = tag.root,
+      html = normalizeHTML(root.innerHTML).replace(/(value="\d") (selected="selected")/, '$2 $1')
 
-    expect(normalizeHTML(root.innerHTML)).to.match(/<select><optgroup label="group 1"><option value="1">Option 1.1<\/option><option value="2">Option 1.2<\/option><\/optgroup><optgroup label="group 2"><option value="3">Option 2.1<\/option><option selected="(selected|true)" value="4">Option 2.2<\/option><\/optgroup><\/select>/)
+    expect(html).to.match(/<select><optgroup label="group 1"><option value="1">Option 1.1<\/option><option value="2">Option 1.2<\/option><\/optgroup><optgroup label="group 2"><option value="3">Option 2.1<\/option><option selected="selected" value="4">Option 2.2<\/option><\/optgroup><\/select>/)
 
     tags.push(tag)
 
@@ -558,10 +591,11 @@ describe('Compiler Browser', function() {
 
   it('loop optgroup tag (outer option, no closing option tags)', function() {
     var tag = riot.mount('loop-optgroup2')[0],
-      root = tag.root
+      root = tag.root,
+      html = normalizeHTML(root.innerHTML).replace(/(value="\d") (disabled="disabled")/g, '$2 $1')
 
-    expect(normalizeHTML(root.innerHTML)).to
-      .match(/<select><option selected="selected">&lt;Select Option&gt; ?(<\/option>)?<optgroup label="group 1"><option value="1">Option 1.1 ?(<\/option>)?<option (?:value="2"|disabled="disabled") (?:value="2"|disabled="disabled")>Option 1.2 ?(<\/option>)?<\/optgroup><optgroup label="group 2"><option value="3">Option 2.1 ?(<\/option>)?<option (?:value="4"|disabled="disabled") (?:value="4"|disabled="disabled")>Option 2.2 ?<\/option><\/optgroup><\/select>/)
+    expect(html).to
+      .match(/<select><option selected="selected">&lt;Select Option&gt; ?(<\/option>)?<optgroup label="group 1"><option value="1">Option 1.1 ?(<\/option>)?<option disabled="disabled" value="2">Option 1.2 ?(<\/option>)?<\/optgroup><optgroup label="group 2"><option value="3">Option 2.1 ?(<\/option>)?<option disabled="disabled" value="4">Option 2.2 ?<\/option><\/optgroup><\/select>/)
 
     tags.push(tag)
 
@@ -1238,6 +1272,41 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('the "updated" event gets properly triggered in a nested child', function(done) {
+    injectHTML('<div id="updated-events-teser"></div>')
+    var tag = riot.mount('#updated-events-teser', 'named-child-parent')[0],
+      counter = 0
+
+    tag.tags['tags-child'].on('updated', function() {
+      counter ++
+      if (counter == 3) done()
+    })
+
+    tag.update()
+    tag.tags['tags-child'].update()
+
+    tags.push(tag)
+
+  })
+
+  it('the "updated" gets properly triggered also from the children tags in a loop', function(done) {
+
+    injectHTML('<div id="updated-events-in-loop"></div>')
+    var tag = riot.mount('#updated-events-in-loop', 'loop-unshift')[0],
+      counter = 0
+
+    tag.tags['loop-unshift-item'][0].on('updated', function() {
+      counter ++
+      if (counter == 3) done()
+    })
+
+    tag.update()
+    tag.tags['loop-unshift-item'][0].update()
+
+    tags.push(tag)
+
+  })
+
   it('recursive structure', function() {
     var tag = riot.mount('treeview')[0]
     expect(tag).to.be.an('object')
@@ -1433,7 +1502,6 @@ it('raw contents', function() {
 
   it('loops over other tag instances do not override their internal properties', function() {
     var tag = riot.mount('loop-tag-instances')[0]
-    tag.start()
 
     expect(tag.tags['loop-tag-instances-child'].length).to.be(5)
     expect(tag.tags['loop-tag-instances-child'][0].root.tagName.toLowerCase()).to.be('loop-tag-instances-child')
@@ -1849,7 +1917,7 @@ it('raw contents', function() {
     var str = '<style-option><style>p {top:0}<\/style>\n<\/style-option>',
       result
     result = riot.compile(str, {'style': 'scoped-css'})
-    expect(result).to.contain('[data-is="style-option"] p{top:0}')
+    expect(result).to.match(/\[(?:riot-tag|data-is)="style-option"\] p ?\{top:0\}/)
   })
 
   it('allow passing riot.observale instances to the children tags', function() {
@@ -2054,6 +2122,87 @@ it('raw contents', function() {
     tags.push(tag)
   })
 
+  it('named elements in object key loop do not duplicate', function() {
+
+    var tag = riot.mount('obj-key-loop')[0]
+
+    expect(tag.x.value).to.be('3')
+    expect(tag.y.value).to.be('44')
+    expect(tag.z.value).to.be('23')
+
+    tag.update()
+    expect(tag.x.value).to.be('3')
+    expect(tag.y.value).to.be('44')
+    expect(tag.z.value).to.be('23')
+
+    tags.push(tag)
+  })
+
+  it('render tag: input,option,textarea tags having expressions as value', function() {
+    injectHTML('<form-controls></form-controls>')
+    var val = 'my-value',
+      tag = riot.mount('form-controls', { text: val })[0],
+      root = tag.root
+
+    expect(root.querySelector('input[type="text"]').value).to.be(val)
+    expect(root.querySelector('select option[selected]').value).to.be(val)
+    expect(root.querySelector('textarea[name="txta1"]').value).to.be(val)
+    expect(root.querySelector('textarea[name="txta2"]').value).to.be('')
+    if (IE_VERSION !== 9) expect(root.querySelector('textarea[name="txta2"]').placeholder).to.be(val)
+
+    tags.push(tag)
+  })
+
+  it('support `data-is` in addition to `riot-tag` for html5 compliance', function() {
+    injectHTML('<div data-is="tag-data-is"></div>')
+    var tag = riot.mount('tag-data-is')[0]
+    var els = tag.root.getElementsByTagName('p')
+    expect(els.length).to.be(2)
+    expect(els[0].innerHTML).to.contain('html5')
+    expect(els[1].innerHTML).to.contain('too')
+    tags.push(tag)
+  })
+
+  it('tag names are case insensitive (converted to lowercase) in `riot.mount`', function() {
+    var i, els = document.querySelectorAll('tag-data-is,[data-is="tag-data-is"]')
+    for (i = 0; i < els.length; i++) {
+      els[i].parentNode.removeChild(els[i])
+    }
+    injectHTML('<div data-is="tag-data-is"></div>')
+    injectHTML('<tag-DATA-Is></tag-DATA-Is>')
+    var tags = riot.mount('tag-Data-Is')
+
+    expect(tags.length).to.be(2)
+    expect(tags[0].root.getElementsByTagName('p').length).to.be(2)
+    expect(tags[1].root.getElementsByTagName('p').length).to.be(2)
+    tags.push(tags[0], tags[1])
+  })
+
+  it('the value of the `data-is` attribute needs lowercase names', function() {
+    var i, els = document.querySelectorAll('tag-data-is,[data-is="tag-data-is"]')
+    for (i = 0; i < els.length; i++) {
+      els[i].parentNode.removeChild(els[i])
+    }
+    injectHTML('<div data-is="tag-DATA-Is"></div>')
+    var tags = riot.mount('tag-Data-Is')
+
+    expect(tags.length).to.be(0)
+  })
+
+  it('component nested in virtual unmounts correctly', function() {
+    injectHTML('<virtual-nested-component></virtual-nested-component>')
+    var tag = riot.mount('virtual-nested-component')[0]
+    var components = tag.root.querySelectorAll('not-virtual-component2')
+    expect(components.length).to.be(4)
+
+    tag.unmount()
+    components = tag.root.querySelectorAll('not-virtual-component2')
+    expect(components.length).to.be(0)
+
+    tags.push(tag)
+
+  })
+
   it('non looped and conditional virtual tags mount content', function() {
     injectHTML('<virtual-no-loop></virtual-no-loop>')
     var tag = riot.mount('virtual-no-loop')[0]
@@ -2118,5 +2267,4 @@ it('raw contents', function() {
 
     tags.push(tag)
   })
-
 })

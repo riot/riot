@@ -4,19 +4,19 @@
  *
  */
 
-var riot = require('../../dist/riot/riot'),
+var riot = require('../../../dist/riot/riot'),
   jsdom = require('jsdom').jsdom,
   myComponent = 'my-component',
-  myComponentHTML = [
+  myComponentHTML = `
     '<h1>{ opts.title }</h1>',
     '<p>{ opts.description }</p>',
     '<my-list-item each="{ opts.items }">'
-  ].join(''),
+  `,
   myListItem = 'my-list-item',
-  myListItemHTML = [
+  myListItemHTML = `
     '<input type="checkbox" onchange="{ onChange }">',
     '<span if="{ opts.isActive }">I am active</span>'
-  ].join('')
+  `
 
 
 /**
@@ -50,9 +50,7 @@ function measure(fn) {
 }
 
 /**
- *
  * Adding the custom tags to the riot internal cache
- *
  */
 
 function setupTags() {
@@ -67,7 +65,7 @@ function setupTags() {
         (result[0] / 1024 / 1024).toFixed(2) + ' MiB',
         result[1] + ' ms'
       )
-      setTimeout(loop, 1000)
+      setTimeout(loop, 50)
     }
     loop()
   })
@@ -96,10 +94,11 @@ function mount() {
 
 
 // Initialize the test
-var doc = jsdom('<' + myComponent + '/>')
+var doc = jsdom(`<${myComponent}/>`)
 global.window = doc.defaultView
 global.document = window.document
 global.gc()
+
 setupTags()
 mount()
 

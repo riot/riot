@@ -6,3 +6,4 @@ test/specs/server/compiler/fixtures
 test/specs/server/compiler/expect
 test/specs/server/compiler/parsers/js
 test/performance/db-monster
+test/performance/benchmarks/riot.*.js
