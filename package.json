@@ -45,9 +45,9 @@
     "riot.js"
   ],
   "dependencies": {
-    "riot-cli": "^2.3.14",
+    "riot-cli": "^2.4.0",
     "riot-compiler": "^2.3.23",
-    "riot-observable": "^2.3.15",
+    "riot-observable": "^2.4.0",
     "riot-route": "^2.3.16",
     "riot-tmpl": "^2.3.22",
     "simple-dom": "0.3.0",
@@ -55,12 +55,12 @@
   },
   "devDependencies": {
     "cheerio": "^0.20.0",
-    "coveralls": "^2.11.8",
-    "eslint": "^2.4.0",
+    "coveralls": "^2.11.9",
+    "eslint": "^2.7.0",
     "expect.js": "^0.3.1",
     "glob": "^7.0.3",
-    "istanbul": "^0.4.2",
-    "jsdom": "^8.1.0",
+    "istanbul": "^0.4.3",
+    "jsdom": "^8.3.0",
     "karma": "^0.13.22",
     "karma-coverage": "^0.5.5",
     "karma-mocha": "^0.2.2",
@@ -68,7 +68,7 @@
     "karma-chrome-launcher": "^0.2.2",
     "karma-sauce-launcher": "^0.3.1",
     "mocha": "^2.4.5",
-    "phantomjs-prebuilt": "^2.1.6",
+    "phantomjs-prebuilt": "^2.1.7",
     "smash": "0.0.15",
     "uglify-js": "latest"
   },

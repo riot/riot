@@ -19,14 +19,14 @@
 
 | Framework              | Version    | Minified Size (gzip) |
 |------------------------|------------|----------------------|
-| Ember                  | 2.3.0      | 112.9kb              |
+| Ember                  | 2.4.0      | 113.88kb             |
 | Ractive                | 0.7.3      | 54.47kb              |
 | Angular                | 1.5.0      | 53.17kb              |
 | Polymer                | 1.2.4      | 53.0kb               |
 | React                  | 0.14.7     | 38.56kb              |
 | Web Components Polyfill| 0.7.21     | 32.8kb               |
-| Vue                    | 1.0.16     | 24.55kb              |
-| Riot                   | 2.3.16     | 8.56kb               |
+| Vue                    | 1.0.20     | 25.04kb              |
+| Riot                   | 2.3.18     | 8.61kb               |
 
 
 ### Custom tags • Concise syntax • Virtual DOM • Full stack
@@ -144,10 +144,18 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Introduction](https://www.youtube.com/watch?v=al87U6NgRTc)
 - [Loops, Events and Callbacks](https://www.youtube.com/watch?v=T-ZV9dv93sw)
 - [Server Rendering with Node & Express](http://youtu.be/6ww1UXGJzcs)
+- [Riot And Webpack Setup](https://youtu.be/UgdZbT-KPpY)
+- [Riot and Redux - Part 1](https://youtu.be/Y6vpKAGT2-8)
+- [Riot and Redux - Part 2](https://youtu.be/DgM03bvgCYc)
+- [Riot and Redux - Part 3](https://youtu.be/QuwnbuneAzM)
+- [Riot and Redux - Part 4](https://youtu.be/qc6bjtu7KG0)
+- [Riot and Redux - Part 5](https://youtu.be/M4BNsRMatVY)
+- [Riot and Redux - Part 6](https://youtu.be/jr8KDpwtRsk)
+
 
 ### Libraries / Frameworks
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
-- [Riotux - Event Controller based on Namespaces and Stores](https://github.com/luisvinicius167/Riotux)
+- [riotux - Simple Event Contoller for Riot.js](https://github.com/luisvinicius167/riotux)
 - [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
 - [Cheftjs - chinese framework for Riot](https://github.com/cheft/cheftjs)
 - [Veronica - flux adaption for Riot](https://www.npmjs.com/package/veronica-x)
