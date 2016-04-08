@@ -54,6 +54,7 @@
     "simple-html-tokenizer": "^0.2.1"
   },
   "devDependencies": {
+    "benchmark": "^2.1.0",
     "cheerio": "^0.20.0",
     "coveralls": "^2.11.9",
     "eslint": "^2.7.0",
