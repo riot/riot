@@ -155,7 +155,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Libraries / Frameworks
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
-- [riotux - Simple Event Contoller for Riot.js, inspired in Flux Pattern.](https://github.com/luisvinicius167/riotux)
+- [riotux - Simple Event Contoller for Riot.js](https://github.com/luisvinicius167/riotux)
 - [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
 - [Cheftjs - chinese framework for Riot](https://github.com/cheft/cheftjs)
 - [Veronica - flux adaption for Riot](https://www.npmjs.com/package/veronica-x)
