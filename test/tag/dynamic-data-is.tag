@@ -6,9 +6,9 @@
   <input type="date" name="{ opts.name }" />
 </calendar>
 
-<dynamic-riot-tag>
-  <div each={inp in intags } riot-tag={ inp.tag } inpname={ inp.name }></div>
-  <div riot-tag={single}></div>
+<dynamic-data-is>
+  <div each={inp in intags } data-is={ inp.tag } inpname={ inp.name }></div>
+  <div data-is={single}></div>
 
   this.intags = [
     {name: 'aaa', tag: 'color'},
@@ -19,4 +19,4 @@
   this.single = 'calendar'
 
 
-</dynamic-riot-tag>
+</dynamic-data-is>

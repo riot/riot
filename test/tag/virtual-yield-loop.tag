@@ -1,5 +1,5 @@
 <virtual-yield-loop>
-    <virtual  riot-tag="virtual-yield-test" each={ item in items }>{ item.v }</virtual>
+    <virtual  data-is="virtual-yield-test" each={ item in items }>{ item.v }</virtual>
 
     this.items = [
         {v: 'one'},
