@@ -1503,6 +1503,8 @@ it('raw contents', function() {
   it('loops over other tag instances do not override their internal properties', function() {
     var tag = riot.mount('loop-tag-instances')[0]
 
+    tag.start()
+
     expect(tag.tags['loop-tag-instances-child'].length).to.be(5)
     expect(tag.tags['loop-tag-instances-child'][0].root.tagName.toLowerCase()).to.be('loop-tag-instances-child')
     tag.update()
