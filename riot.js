@@ -461,11 +461,13 @@ route.parser = function(fn, fn2) {
 
 /**
  * Helper function to get url query as an object
+ * @param {boolean} decode - use decodeURIComponent if true
  * @returns {object} parsed query
  */
-route.query = function() {
+route.query = function(decode) {
   var q = {}
   var href = loc.href || current
+  if (decode) href = decodeURIComponent(href)
   href[REPLACE](/[?&](.+?)=([^&]*)/g, function(_, k, v) { q[k] = v })
   return q
 }
