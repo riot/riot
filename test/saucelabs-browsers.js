@@ -1,89 +1,86 @@
+// we will re-enable the broken browsers once saucelabs will fix all the timeout issues
 module.exports = {
   browsers: {
-    sliphone: {
+    /*
+    slIphone5: {
       base: 'SauceLabs',
       browserName: 'iphone',
-      deviceName: 'iPhone 6 Plus',
-      platform: 'iOS',
-      version: '9.1',
-      group: 0
+      platform: 'OS X 10.10',
+      version: '8.1'
     },
-    slipad: {
+    */
+/*    slIphone6: {
+      base: 'SauceLabs',
+      device: 'iPhone 6',
+      platform: 'OS X 10.10',
+      os: 'ios',
+      version: '9.2'
+    },
+    slIpad: {
       base: 'SauceLabs',
       browserName: 'ipad',
-      platform: 'iOS',
-      deviceName: 'iPad 2',
-      version: '9.1',
-      group: 0
-    },
-
-    slsafari9: {
-      base: 'SauceLabs',
-      browserName: 'safari',
-      platform: 'OS X 10.11',
-      group: 1
-    },
-    slsafari8: {
-      base: 'SauceLabs',
-      browserName: 'safari',
       platform: 'OS X 10.10',
-      group: 1
-    },
-    slsafari7: {
+      deviceName: 'iPad 2',
+      version: '9.2'
+    },*/
+    slSafari7: {
       base: 'SauceLabs',
       browserName: 'safari',
-      platform: 'OS X 10.9',
-      group: 2
+      platform: 'OS X 10.9'
     },
+    /*
+    slSafari8: {
+      base: 'SauceLabs',
+      browserName: 'safari',
+      platform: 'OS X 10.10'
+    },
+    */
+  /*  slSafari9: {
+      base: 'SauceLabs',
+      browserName: 'safari',
+      platform: 'OS X 10.11'
+    },*/
     slIE9: {
       base: 'SauceLabs',
       browserName: 'internet explorer',
       platform: 'Windows 7',
-      version: '9',
-      group: 2
+      version: '9'
     },
     slIE10: {
       base: 'SauceLabs',
       browserName: 'internet explorer',
       platform: 'Windows 8',
-      version: '10',
-      group: 3
+      version: '10'
     },
     slIE11: {
       base: 'SauceLabs',
       browserName: 'internet explorer',
       platform: 'Windows 8.1',
-      version: '11',
-      group: 3
+      version: '11'
     },
-    slEdge: {
+/*    slEdge: {
       base: 'SauceLabs',
-      browserName: 'microsoftedge',
+      browserName: 'MicrosoftEdge',
       platform: 'Windows 10',
-      version: '20.10240',
-      group: 4
+      version: '20.10240'
+    },*/
+    slChrome: {
+      base: 'SauceLabs',
+      browserName: 'chrome'
     },
-    slandroid5: {
+    slFirefox: {
+      base: 'SauceLabs',
+      browserName: 'firefox'
+    },
+    slAndroid4: {
       base: 'SauceLabs',
       browserName: 'android',
-      version: '5.1',
-      group: 4
+      version: '4.0'
     },
-    slchrome: {
-      base: 'SauceLabs',
-      browserName: 'chrome',
-      group: 5
-    },
-    slfirefox: {
-      base: 'SauceLabs',
-      browserName: 'firefox',
-      group: 5
-    },
-    slandroid4: {
+    slAndroid5: {
       base: 'SauceLabs',
       browserName: 'android',
-      version: '4.0',
-      group: 6
+      version: '5.1'
     }
   }
 }

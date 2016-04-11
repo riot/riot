@@ -5,9 +5,6 @@ module.exports = function(config) {
 
   // run the tests only on the saucelabs browsers
   if (process.env.SAUCELABS) {
-    for (var browser in saucelabsBrowsers) {
-      if (saucelabsBrowsers[browser].group != process.env.GROUP) delete saucelabsBrowsers[browser]
-    }
     browsers = Object.keys(saucelabsBrowsers)
   }
 
@@ -25,19 +22,21 @@ module.exports = function(config) {
       '/tag/': '/base/tag/'
     },
     files: [
-      'polyfills/bind.js',
+      'helpers/bind.js',
       '../node_modules/mocha/mocha.js',
       '../node_modules/expect.js/index.js',
       '../dist/riot/riot+compiler.js',
-      'helpers.js',
+      'helpers/index.js',
       {
         pattern: 'tag/*.tag',
         served: true,
         included: false
       },
-      'specs/compiler-browser.js',
+      'specs/browser/tags-bootstrap.js',
+      'specs/browser/compiler.js',
       'specs/mixin.js'
     ],
+    concurrency: 2,
     sauceLabs: {
       build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,

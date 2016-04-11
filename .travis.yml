@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-   - "4.*"
+   - "4.2"
 
 branches:
   only:
@@ -11,19 +11,17 @@ script:
 
 sudo: false
 
-install:
-  - npm i jade
-  - npm i babel@5.8
-  - npm i coffee-script
-  - npm i livescript
-  - npm i typescript-simple
-  - npm i stylus
-  - npm i nib
-  - npm i node-sass
-  - npm install
-
 after_success:
-  make test-sauce && make test-coveralls
+  '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && make test-sauce && make test-coveralls || false'
 
 notifications:
     email: false
+
+env:
+  - CXX=g++-4.8
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
