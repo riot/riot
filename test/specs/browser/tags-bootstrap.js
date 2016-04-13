@@ -4,6 +4,7 @@ loadTagsAndScripts([
   'tag/~custom-parsers.tag',
   'tag/loop.tag',
   'tag/loop-child.tag',
+  'tag/loop-combo.tag',
   'tag/loop-reorder.tag',
   'tag/loop-manip.tag',
   'tag/loop-object.tag',
@@ -45,12 +46,14 @@ loadTagsAndScripts([
 
   // multi named elements to an array
   'tag/multi-named.tag',
+  'tag/named-unmount.tag',
 
   // test the preventUpdate feature on the DOM events
   'tag/prevent-update.tag',
 
   // Don't trigger mount for conditional tags
   'tag/if-mount.tag',
+  'tag/if-unmount.tag',
 
   // input type=number
   'tag/input-number.tag',
