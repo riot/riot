@@ -88,6 +88,8 @@ loadTagsAndScripts([
 
   'tag/obj-key-loop.tag',
 
+  'tag/should-update.tag',
+
   'tag/virtual-no-loop.tag',
   'tag/virtual-yield-loop.tag',
   'tag/dynamic-data-is.tag',

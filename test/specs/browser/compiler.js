@@ -1923,6 +1923,16 @@ it('raw contents', function() {
     }
   })
 
+  it('the "shouldUpdate" locks the tag update properly', function() {
+    var tag = riot.mount('should-update')[0]
+    tag.update()
+    expect(tag.count).to.be(0)
+    tag.shouldUpdate = function() { return true }
+    tag.update()
+    expect(tag.count).to.be(1)
+    tags.push(tag)
+  })
+
   it('select as root element of custom riot tag', function () {
     var
       CHOOSE = 0,     // option alone
