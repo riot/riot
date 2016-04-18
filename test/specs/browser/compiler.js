@@ -1377,9 +1377,7 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
-/*
-TODO: fix this test, it broke fixing https://github.com/riot/riot/issues/1661
-it('the loops children sync correctly their internal data with their options', function() {
+  it('the loops children sync correctly their internal data with their options', function() {
     var tag = riot.mount('loop-sync-options')[0]
 
     function ch(idx) {
@@ -1427,7 +1425,7 @@ it('the loops children sync correctly their internal data with their options', f
     expect(ch(2).bool).to.be(false)
     tags.push(tag)
   })
-*/
+
 
 /*
 // TODO: soon it will be possible!
