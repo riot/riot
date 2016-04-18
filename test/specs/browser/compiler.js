@@ -418,14 +418,12 @@ describe('Compiler Browser', function() {
 
     setTimeout(function() {
       tag.tags['looped-child'].forEach(function(child) {
-
         expect(child.mountWidth).to.be.above(0)
       })
 
       tag.childrenMountWidths.forEach(function(width) {
         expect(width).to.be.above(0)
       })
-
 
       done()
     }, 100)
