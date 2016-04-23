@@ -81,7 +81,6 @@ describe('Mixin', function() {
 
   it('Will register a global mixin without name and mount a tag with global mixed-in attributes and methods', function() {
     riot.mixin(globalMixin)
-    console.log(riot.mixin('__global_mixin'))
     injectHTML('<my-mixin></my-mixin>')
     riot.tag('my-mixin', '<span>some tag</span>')
 
