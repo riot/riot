@@ -213,6 +213,14 @@ describe('Compiler Browser', function() {
 
   })
 
+  it('SVGs nodes can be properly looped', function() {
+    var tag = riot.mount('loop-svg-nodes')[0]
+
+    expect($$('svg circle', tag.root).length).to.be(3)
+
+    tags.push(tag)
+  })
+
   it('the root keyword should be protected also in the loops', function() {
     var tag = riot.mount('loop-root')[0]
 
