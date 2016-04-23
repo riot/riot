@@ -94,6 +94,8 @@ loadTagsAndScripts([
   'tag/virtual-yield-loop.tag',
   'tag/dynamic-data-is.tag',
 
+  'tag/loop-svg-nodes.tag',
+
   // these tags will be not autoinjected in the DOM
   // that's what `name = false` means
   {
