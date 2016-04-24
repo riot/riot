@@ -42,8 +42,12 @@
     "**/*",
     "!/riot.js",
     "!/riot.min.js",
+    "!/riot.csp.js",
+    "!/riot.csp.min.js",
     "!/riot+compiler.js",
-    "!/riot+compiler.min.js"
+    "!/riot+compiler.min.js",
+    "!/riot+compiler.csp.js",
+    "!/riot+compiler.csp.min.js"
   ],
   "main": "riot.js"
 }
