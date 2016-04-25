@@ -44,10 +44,10 @@
     "riot.js"
   ],
   "dependencies": {
-    "riot-cli": "^2.4.0",
+    "riot-cli": "^2.4.1",
     "riot-compiler": "^2.3.23",
-    "riot-observable": "^2.4.1",
-    "riot-tmpl": "^2.3.22",
+    "riot-observable": "^2.4.2",
+    "riot-tmpl": "^2.4.0-beta",
     "simple-dom": "0.3.0",
     "simple-html-tokenizer": "^0.2.1"
   },
@@ -55,11 +55,11 @@
     "benchmark": "^2.1.0",
     "cheerio": "^0.20.0",
     "coveralls": "^2.11.9",
-    "eslint": "^2.7.0",
+    "eslint": "^2.8.0",
     "expect.js": "^0.3.1",
     "glob": "^7.0.3",
     "istanbul": "^0.4.3",
-    "jsdom": "^8.3.1",
+    "jsdom": "^8.4.0",
     "karma": "^0.13.22",
     "karma-coverage": "^0.5.5",
     "karma-mocha": "^0.2.2",
@@ -76,8 +76,12 @@
     "lib",
     "riot.js",
     "riot.min.js",
+    "riot.csp.js",
+    "riot.csp.min.js",
     "riot+compiler.js",
-    "riot+compiler.min.js"
+    "riot+compiler.min.js",
+    "riot+compiler.csp.js",
+    "riot+compiler.csp.min.js"
   ],
   "bin": {
     "riot": "node_modules/riot-cli/lib/index.js"
