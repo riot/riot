@@ -37,6 +37,8 @@ describe('Compiler Browser', function() {
     var dft = defineTag.names || [], mtg = makeTag.tags || []
     dft.forEach(function(name) { riot.unregister(name) })
     mtg.forEach(function(tag) { tag.unmount() })
+    defineTag.names = []
+    makeTag.tags = []
   })
 
   it('populates the vdom property correctly on riot global', function() {
@@ -268,13 +270,13 @@ describe('Compiler Browser', function() {
     mountTag('#outer2')
     mountTag('#outer3')
 
-    expect(outer1.getElementsByTagName('inner').length).to.be(5)
+    expect(outer1.getElementsByTagName('outer-inner').length).to.be(5)
     expect(outer1.getElementsByTagName('span').length).to.be(5)
     expect(outer1.getElementsByTagName('p').length).to.be(5)
-    expect(outer2.getElementsByTagName('inner').length).to.be(5)
+    expect(outer2.getElementsByTagName('outer-inner').length).to.be(5)
     expect(outer2.getElementsByTagName('span').length).to.be(5)
     expect(outer2.getElementsByTagName('p').length).to.be(5)
-    expect(outer3.getElementsByTagName('inner').length).to.be(5)
+    expect(outer3.getElementsByTagName('outer-inner').length).to.be(5)
     expect(outer3.getElementsByTagName('span').length).to.be(5)
     expect(outer3.getElementsByTagName('p').length).to.be(5)
 
@@ -799,6 +801,7 @@ describe('Compiler Browser', function() {
 
   it('simple html transclusion via <yield> tag', function() {
 
+    defineTag('<inner><p> {opts.value} </p></inner>')
     injectHTML([
       '<inner-html>',
       '  { greeting }',
@@ -863,6 +866,7 @@ describe('Compiler Browser', function() {
 
   it('multiple mount <yield> tag', function() {
 
+    defineTag('<inner><p> {opts.value} </p></inner>')
     riot.mount('inner-html')
     riot.mount('inner-html')
     riot.mount('inner-html')
@@ -2073,20 +2077,20 @@ it('raw contents', function() {
   })
 
   it('each custom tag with an if', function() {
-    defineTag('<inner>x</inner>')
+    defineTag('<inner><br></inner>')
     var tag = makeTag(`
       <inner each={item in items} if={cond} />
       this.items = [1]
       this.cond = true
     `)
-    expectHTML(tag).to.be('<inner>x</inner>')
+    expectHTML(tag).to.be('<inner><br></inner>')
 
     tag.update({cond: false})
     expectHTML(tag).to.be('')
     expect(tag.tags.inner).to.be(undefined)
 
     tag.update({cond: true})
-    expectHTML(tag).to.be('<inner>x</inner>')
+    expectHTML(tag).to.be('<inner><br></inner>')
     expect(tag.tags.inner).not.to.be(undefined)
   })
 

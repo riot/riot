@@ -128,7 +128,11 @@ function loadTagsAndScripts(arr) {
 }
 
 function defineTag(tagDef) {
-  var name = tagDef.match(/^<([\w\-]*)/)[1]
+  var name = tagDef.match(/^<([\w\-]+)/)[1]
+
+  // compile expects the closing tag not to have any leading whitespace
+  tagDef = tagDef.replace(/(\s*)(<\/[\w\-]+>)\s*$/, '\n$2')
+
   riot.compile(tagDef)
 
   // store the name so it can be un-registered
