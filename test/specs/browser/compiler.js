@@ -1525,7 +1525,7 @@ it('raw contents', function() {
     setTimeout(function() {
       expect(tag.root.getElementsByTagName('div').length).to.be(2)
       expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(2)
-      expect(tag.tags['loop-conditional-item'].length).to.be(3)
+      expect(tag.tags['loop-conditional-item'].length).to.be(2)
       tag.items = []
       tag.update()
       expect(tag.root.getElementsByTagName('div').length).to.be(0)
@@ -2072,6 +2072,34 @@ it('raw contents', function() {
     tags.push(tag)
   })
 
+  it('each custom tag with an if', function() {
+    defineTag('<inner>x</inner>')
+    var tag = makeTag(`
+      <inner each={item in items} if={cond} />
+      this.items = [1]
+      this.cond = true
+    `)
+    expectHTML(tag).to.be('<inner>x</inner>')
+
+    tag.update({cond: false})
+    expectHTML(tag).to.be('')
+    expect(tag.tags.inner).to.be(undefined)
+
+    tag.update({cond: true})
+    expectHTML(tag).to.be('<inner>x</inner>')
+    expect(tag.tags.inner).not.to.be(undefined)
+  })
+
+  it('each anonymous with an if', function() {
+    var tag = makeTag(`
+      <div each={item, i in items} if={item.cond}>{i}</div>
+      this.items = [{cond: true}, {cond: false}]
+    `)
+    expectHTML(tag).to.be('<div>0</div>')
+    tag.items[1].cond = true
+    tag.update()
+    expectHTML(tag).to.be('<div>0</div><div>1</div>')
+  })
   it('virtual tags mount inner content and not the virtual tag root', function() {
     var tag = riot.mount('loop-virtual')[0],
       els = tag.root.children
