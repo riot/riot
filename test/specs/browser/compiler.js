@@ -33,6 +33,10 @@ describe('Compiler Browser', function() {
   afterEach(function() {
     // restore the default brackets
     riot.settings.brackets = defaultBrackets
+
+    var dft = defineTag.names || [], mtg = makeTag.tags || []
+    dft.forEach(function(name) { riot.unregister(name) })
+    mtg.forEach(function(tag) { tag.unmount() })
   })
 
   it('populates the vdom property correctly on riot global', function() {
