@@ -366,6 +366,23 @@ describe('Compiler Browser', function() {
 
   })
 
+  it('event handler on each custom tag doesnt update parent', function() {
+    defineTag(`<inner>
+      <button id='btn' onclick={foo} />
+      foo() {}
+    </inner>`)
+    var tag = makeTag(`
+      <inner each={item in items} />
+      this.items = [1]
+      this.updateCount = 0
+      this.on('update', function() { this.updateCount++ })
+    `)
+
+    expect(tag.updateCount).to.be(0)
+    tag.tags.inner[0].btn.onclick({})
+    expect(tag.updateCount).to.be(0)
+  })
+
   it('the event.item property gets handled correctly also in the nested loops', function() {
     var tag = riot.mount('loop-events', {
         cb: function(e, item) {
