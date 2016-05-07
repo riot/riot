@@ -1,6 +1,6 @@
 {
   "name": "riot",
-  "version": "2.3.18",
+  "version": "2.4.0",
   "description": "A React-like user interface micro-library",
   "homepage": "http://riotjs.com/",
   "repository": "riot/riot",
@@ -48,7 +48,7 @@
     "riot-cli": "^2.5.0",
     "riot-compiler": "^2.4.1",
     "riot-observable": "^2.4.2",
-    "riot-route": "^2.3.16",
+    "riot-route": "^2.4.0",
     "riot-tmpl": "^2.4.0",
     "simple-dom": "0.3.0",
     "simple-html-tokenizer": "^0.2.3"
