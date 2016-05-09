@@ -2,7 +2,7 @@ import npm from 'rollup-plugin-npm'
 import commonjs from 'rollup-plugin-commonjs'
 
 export default {
-  format: 'iife',
+  format: 'umd',
   moduleName: 'riot',
   plugins: [
     npm({ jsnext: true, main: true }),
