@@ -1,8 +1,19 @@
 var glob = require('glob'),
   riot = require('../../../lib/server'),
+  expect = require('expect.js'),
   cheerio = require('cheerio')
 
 describe('Node/io.js', function() {
+
+  // adds custom riot parsers used by some tag/*.tag files
+  // css
+  riot.parsers.css.myparser = function (tag, css) {
+    return css.replace(/@tag/, tag)
+  }
+  // js
+  riot.parsers.js.myparser = function (js) {
+    return js.replace(/@version/, '1.0.0')
+  }
 
   it('require tags', function(done) {
     glob('../../tag/*.tag', { cwd: __dirname }, function (err, tags) {
@@ -70,6 +81,12 @@ describe('Node/io.js', function() {
     expect(els.last().text()).to.be('post 2')
   })
 
+  it('tender tag: loop table', function() {
+    var tbl = riot.render('table-loop-extra-row'),
+      $ = cheerio.load(tbl)
+    expect($('table tr').length).to.be(5)
+  })
+
   it('render tag: simple block (using yield)', function() {
     var blk = riot.render('block')
     var $ = cheerio.load(blk)
@@ -78,10 +95,18 @@ describe('Node/io.js', function() {
     expect($('yoyo').html()).to.be('Hello World!')
   })
 
-  it('render tag: input tags having expressions as value', function() {
+  it('render tag: yield with no html content', function() {
+    var blk = riot.render('yield-empty')
+    expect(blk).to.be('<yield-empty></yield-empty>')
+  })
+
+  it('render tag: input,option,textarea tags having expressions as value', function() {
     var frm = riot.render('form-controls', { text: 'my-value' })
     var $ = cheerio.load(frm)
     expect($('input[type="text"]').val()).to.be('my-value')
+    expect($('select option:selected').val()).to.be('my-value')
+    expect($('textarea[name="txta1"]').val()).to.be('my-value')
+    expect($('textarea[name="txta2"]').val()).to.be('')
   })
 
 })

@@ -28,7 +28,10 @@
     </loop-tag-instance>
   </loop-tag-instances-test>
 
-  this.inst = this.tags['loop-tag-instances-test']
+  start() {
+    this.inst = this.tags['loop-tag-instances-test']
+    this.update()
+  }
 
 </loop-tag-instances>
 

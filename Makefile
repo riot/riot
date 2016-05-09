@@ -40,6 +40,10 @@ test-sauce:
 	# run the riot tests on saucelabs
 	@ SAUCELABS=1 make test-karma
 
+test-chrome:
+	@ DEBUG=1 ${KARMA} start test/karma.conf.js --browsers=Chrome --no-single-run --watch
+
+
 compare:
 	# compare the current release with the previous one
 	du -h riot.min.js riot+compiler.min.js
@@ -54,16 +58,23 @@ clean:
 	# clean $(DIST)
 	@ rm -rf $(DIST)
 
-riot: raw test
+riot: clean raw test
 
 min: riot
 	# minify riot
-	@ for f in riot riot+compiler; do $(UGLIFY) $(DIST)$$f.js --comments --mangle -o $(DIST)$$f.min.js; done
+	@ for f in riot riot.csp riot+compiler riot+compiler.csp; do \
+		$(UGLIFY) $(DIST)$$f.js \
+			--comments \
+			--mangle \
+			--screw-ie8 \
+			--compress  \
+			-o $(DIST)$$f.min.js; \
+		done
 
 perf: riot
 	# run the performance tests
-	@ node --expose-gc test/performance/speed
-	@ node --expose-gc test/performance/mem
+	@ node test/performance/benchmarks
+	@ node --expose-gc test/performance/memory
 
 watch:
 	# watch and rebuild riot and its tests

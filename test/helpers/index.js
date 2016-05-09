@@ -11,6 +11,11 @@ function normalizeHTML(html) {
     .replace(/\>\s+\</g, '><')
 }
 
+function expectHTML(tagOrDom) {
+  var dom = tagOrDom.root ? tagOrDom.root : tagOrDom
+  return expect(normalizeHTML(dom.innerHTML))
+}
+
 function getPreviousSibling(n) {
   var x = n.previousSibling
   while (x.nodeType!=1) {
@@ -30,7 +35,7 @@ function getNextSibling(n) {
 
 function getRiotStyles() {
   // util.injectStyle must add <style> in head, not in body -- corrected
-  var stag = document.querySelector('style')
+  var stag = riot.styleNode || document.querySelector('style')
   return normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
 }
 
@@ -120,6 +125,35 @@ function loadTagsAndScripts(arr) {
   })
 
   return tagsNames.join(',')
+}
+
+function defineTag(tagDef) {
+  var name = tagDef.match(/^<([\w\-]+)/)[1]
+
+  // compile expects the closing tag not to have any leading whitespace
+  tagDef = tagDef.replace(/(\s*)(<\/[\w\-]+>)\s*$/, '\n$2')
+
+  riot.compile(tagDef)
+
+  // store the name so it can be un-registered
+  defineTag.names = defineTag.names || []
+  defineTag.names.push(name)
+}
+
+function makeTag(htmlOrName, html) {
+  var name = html ? htmlOrName : 'test-tag'
+  if (!html) html = htmlOrName
+
+  html = '<' + name + '>\n' + html.trim() + '\n</' + name + '>'
+  defineTag(html)
+  injectHTML('<' + name + '/>')
+  var tags = riot.mount(name)
+
+  // store the tag, so it can be removed
+  makeTag.tags = makeTag.tags || []
+  makeTag.tags.push(tags[0])
+
+  return tags[0]
 }
 
 function injectHTML(html) {

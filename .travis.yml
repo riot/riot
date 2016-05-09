@@ -11,19 +11,8 @@ script:
 
 sudo: false
 
-install:
-  - npm i jade
-  - npm i babel@5.8
-  - npm i coffee-script
-  - npm i livescript
-  - npm i typescript-simple
-  - npm i stylus
-  - npm i nib
-  - npm i node-sass
-  - npm install
-
-after_script:
-  make test-sauce && make test-coveralls
+after_success:
+  '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && make test-sauce && make test-coveralls || false'
 
 notifications:
     email: false

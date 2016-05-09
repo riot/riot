@@ -15,7 +15,7 @@ describe('Mixin', function() {
 
   function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-  var FunctMixin = (function () {
+  var FunctMixin = (function() {
     function FunctMixin() {
       _classCallCheck(this, FunctMixin);
     }
@@ -60,6 +60,78 @@ describe('Mixin', function() {
     },
     message: 'not yet'
   }
+
+  var globalMixin = {
+    init: function() {
+      this.globalAttr = 'initialized'
+    },
+    getGlobal: function() {
+      return 'global'
+    }
+  }
+
+  var globalMixin2 = {
+    init: function() {
+      this.globalAttr2 = 'initialized2'
+    },
+    getGlobal2: function() {
+      return 'global2'
+    }
+  }
+
+  it('Will register a global mixin without name and mount a tag with global mixed-in attributes and methods', function() {
+    riot.mixin(globalMixin)
+    injectHTML('<my-mixin></my-mixin>')
+    riot.tag('my-mixin', '<span>some tag</span>')
+
+    var tag = riot.mount('my-mixin')[0]
+
+    expect('initialized').to.be(tag.globalAttr)
+    expect('global').to.be(tag.getGlobal())
+    tag.unmount()
+  })
+
+  it('Will register multiple global mixin without name and mount a tag with global mixed-in attributes and methods', function() {
+    riot.mixin(globalMixin)
+    riot.mixin(globalMixin2)
+    injectHTML('<my-mixin></my-mixin>')
+    riot.tag('my-mixin', '<span>some tag</span>')
+
+    var tag = riot.mount('my-mixin')[0]
+
+    expect('initialized').to.be(tag.globalAttr)
+    expect('initialized2').to.be(tag.globalAttr2)
+    expect('global').to.be(tag.getGlobal())
+    expect('global2').to.be(tag.getGlobal2())
+    tag.unmount()
+  })
+
+  it('Will register a global mixin with name and mount a tag with global mixed-in attributes and methods', function() {
+    riot.mixin('global', globalMixin, true)
+    injectHTML('<my-mixin></my-mixin>')
+    riot.tag('my-mixin', '<span>some tag</span>')
+
+    var tag = riot.mount('my-mixin')[0]
+
+    expect('initialized').to.be(tag.globalAttr)
+    expect('global').to.be(tag.getGlobal())
+    tag.unmount()
+  })
+
+  it('Will register multiple global mixin with name and mount a tag with global mixed-in attributes and methods', function() {
+    riot.mixin('global', globalMixin, true)
+    riot.mixin('global2', globalMixin2, true)
+    injectHTML('<my-mixin></my-mixin>')
+    riot.tag('my-mixin', '<span>some tag</span>')
+
+    var tag = riot.mount('my-mixin')[0]
+
+    expect('initialized').to.be(tag.globalAttr)
+    expect('initialized2').to.be(tag.globalAttr2)
+    expect('global').to.be(tag.getGlobal())
+    expect('global2').to.be(tag.getGlobal2())
+    tag.unmount()
+  })
 
   it('Will mount a tag and provide mixed-in methods', function() {
 
@@ -126,7 +198,10 @@ describe('Mixin', function() {
     })
 
     var tag = riot.mount('my-mixin')[0],
-      newOpts = {'some': 'option', 'value': Math.random()}
+      newOpts = {
+        'some': 'option',
+        'value': Math.random()
+      }
 
     expect(tag._riot_id).to.be(tag.getId())
     expect(tag.opts).to.be(tag.getOpts())
@@ -164,6 +239,7 @@ describe('Mixin', function() {
     var tag = riot.mount('my-mixin')[0]
     expect(tag.root.innerHTML).to.be('<span>Initialized</span>')
     expect(tag.type).to.be('func')
+    tag.unmount()
   })
 
   it('binds this-reference to the tag object', function() {
