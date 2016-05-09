@@ -1,8 +1,8 @@
-/* Riot v2.3.18, @license MIT */
+/* Riot v2.4.0, @license MIT */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.3.18', settings: {} },
+var riot = { version: 'v2.4.0', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -30,7 +30,9 @@ var riot = { version: 'v2.3.18', settings: {} },
   T_FUNCTION = 'function',
   // special native tags that cannot be treated like the others
   SPECIAL_TAGS_REGEX = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?|opt(?:ion|group))$/,
-  RESERVED_WORDS_BLACKLIST = ['_item', '_id', '_parent', 'update', 'root', 'mount', 'unmount', 'mixin', 'isMounted', 'isLoop', 'tags', 'parent', 'opts', 'trigger', 'on', 'off', 'one'],
+  RESERVED_WORDS_BLACKLIST = /^(?:_(?:item|id|parent)|update|root|(?:un)?mount|mixin|is(?:Mounted|Loop)|tags|parent|opts|trigger|o(?:n|ff|ne))$/,
+  // SVG tags list https://www.w3.org/TR/SVG/attindex.html#PresentationAttributes
+  SVG_TAGS_LIST = ['altGlyph', 'animate', 'animateColor', 'circle', 'clipPath', 'defs', 'ellipse', 'feBlend', 'feColorMatrix', 'feComponentTransfer', 'feComposite', 'feConvolveMatrix', 'feDiffuseLighting', 'feDisplacementMap', 'feFlood', 'feGaussianBlur', 'feImage', 'feMerge', 'feMorphology', 'feOffset', 'feSpecularLighting', 'feTile', 'feTurbulence', 'filter', 'font', 'foreignObject', 'g', 'glyph', 'glyphRef', 'image', 'line', 'linearGradient', 'marker', 'mask', 'missing-glyph', 'path', 'pattern', 'polygon', 'polyline', 'radialGradient', 'rect', 'stop', 'svg', 'switch', 'symbol', 'text', 'textPath', 'tref', 'tspan', 'use'],
 
   // version# for IE 8-11, 0 for others
   IE_VERSION = (window && window.document || {}).documentMode | 0,
@@ -48,16 +50,38 @@ riot.observable = function(el) {
   el = el || {}
 
   /**
-   * Private variables and methods
+   * Private variables
    */
   var callbacks = {},
-    slice = Array.prototype.slice,
-    onEachEvent = function(e, fn) { e.replace(/\S+/g, fn) }
+    slice = Array.prototype.slice
 
-  // extend the object adding the observable methods
+  /**
+   * Private Methods
+   */
+
+  /**
+   * Helper function needed to get and loop all the events in a string
+   * @param   { String }   e - event string
+   * @param   {Function}   fn - callback
+   */
+  function onEachEvent(e, fn) {
+    var es = e.split(' '), l = es.length, i = 0, name, indx
+    for (; i < l; i++) {
+      name = es[i]
+      indx = name.indexOf('.')
+      if (name) fn( ~indx ? name.substring(0, indx) : name, i, ~indx ? name.slice(indx + 1) : null)
+    }
+  }
+
+  /**
+   * Public Api
+   */
+
+  // extend the el object adding the observable methods
   Object.defineProperties(el, {
     /**
-     * Listen to the given space separated list of `events` and execute the `callback` each time an event is triggered.
+     * Listen to the given space separated list of `events` and
+     * execute the `callback` each time an event is triggered.
      * @param  { String } events - events ids
      * @param  { Function } fn - callback function
      * @returns { Object } el
@@ -66,9 +90,10 @@ riot.observable = function(el) {
       value: function(events, fn) {
         if (typeof fn != 'function')  return el
 
-        onEachEvent(events, function(name, pos) {
+        onEachEvent(events, function(name, pos, ns) {
           (callbacks[name] = callbacks[name] || []).push(fn)
           fn.typed = pos > 0
+          fn.ns = ns
         })
 
         return el
@@ -88,11 +113,11 @@ riot.observable = function(el) {
       value: function(events, fn) {
         if (events == '*' && !fn) callbacks = {}
         else {
-          onEachEvent(events, function(name) {
-            if (fn) {
+          onEachEvent(events, function(name, pos, ns) {
+            if (fn || ns) {
               var arr = callbacks[name]
               for (var i = 0, cb; cb = arr && arr[i]; ++i) {
-                if (cb == fn) arr.splice(i--, 1)
+                if (cb == fn || ns && cb.ns == ns) arr.splice(i--, 1)
               }
             } else delete callbacks[name]
           })
@@ -105,7 +130,8 @@ riot.observable = function(el) {
     },
 
     /**
-     * Listen to the given space separated list of `events` and execute the `callback` at most once
+     * Listen to the given space separated list of `events` and
+     * execute the `callback` at most once
      * @param   { String } events - events ids
      * @param   { Function } fn - callback function
      * @returns { Object } el
@@ -124,7 +150,8 @@ riot.observable = function(el) {
     },
 
     /**
-     * Execute all callback functions that listen to the given space separated list of `events`
+     * Execute all callback functions that listen to
+     * the given space separated list of `events`
      * @param   { String } events - events ids
      * @returns { Object } el
      */
@@ -140,14 +167,14 @@ riot.observable = function(el) {
           args[i] = arguments[i + 1] // skip first argument
         }
 
-        onEachEvent(events, function(name) {
+        onEachEvent(events, function(name, pos, ns) {
 
           fns = slice.call(callbacks[name] || [], 0)
 
           for (var i = 0, fn; fn = fns[i]; ++i) {
-            if (fn.busy) return
+            if (fn.busy) continue
             fn.busy = 1
-            fn.apply(el, fn.typed ? [name].concat(args) : args)
+            if (!ns || fn.ns == ns) fn.apply(el, fn.typed ? [name].concat(args) : args)
             if (fns[i] !== fn) { i-- }
             fn.busy = 0
           }
@@ -511,9 +538,8 @@ riot.route = route
 
 /**
  * The riot template engine
- * @version v2.3.22
+ * @version v2.4.0
  */
-
 /**
  * riot.util.brackets
  *
@@ -576,7 +602,7 @@ var brackets = (function (UNDEF) {
 
     var arr = pair.split(' ')
 
-    if (arr.length !== 2 || /[\x00-\x1F<>a-zA-Z0-9'",;\\]/.test(pair)) {
+    if (arr.length !== 2 || /[\x00-\x1F<>a-zA-Z0-9'",;\\]/.test(pair)) { // eslint-disable-line
       throw new Error('Unsupported brackets "' + pair + '"')
     }
     arr = arr.concat(pair.replace(/(?=[[\]()*+?.^$|])/g, '\\').split(' '))
@@ -758,7 +784,10 @@ var tmpl = (function () {
 
     if (expr.slice(0, 11) !== 'try{return ') expr = 'return ' + expr
 
-    return new Function('E', expr + ';')    //eslint-disable-line no-new-func
+/* eslint-disable */
+
+    return new Function('E', expr + ';')
+/* eslint-enable */
   }
 
   var
@@ -921,7 +950,7 @@ var tmpl = (function () {
   // istanbul ignore next: compatibility fix for beta versions
   _tmpl.parse = function (s) { return s }
 
-  _tmpl.version = brackets.version = 'v2.3.22'
+  _tmpl.version = brackets.version = 'v2.4.0'
 
   return _tmpl
 
@@ -958,7 +987,7 @@ var mkdom = (function _mkdom() {
     var
       match   = templ && templ.match(/^\s*<([-\w]+)/),
       tagName = match && match[1].toLowerCase(),
-      el = mkEl('div')
+      el = mkEl('div', isSVGTag(tagName))
 
     // replace all the yield tags with the tag inner html
     templ = replaceYield(templ, html)
@@ -967,7 +996,7 @@ var mkdom = (function _mkdom() {
     if (tblTags.test(tagName))
       el = specialTags(el, templ, tagName)
     else
-      el.innerHTML = templ
+      setInnerHTML(el, templ)
 
     el.stub = true
 
@@ -1134,7 +1163,7 @@ function _each(dom, parent, expr) {
 
   var mustReorder = typeof getAttr(dom, 'no-reorder') !== T_STRING || remAttr(dom, 'no-reorder'),
     tagName = getTagName(dom),
-    impl = __tagImpl[tagName] || { tmpl: dom.outerHTML },
+    impl = __tagImpl[tagName] || { tmpl: getOuterHTML(dom) },
     useRoot = SPECIAL_TAGS_REGEX.test(tagName),
     root = dom.parentNode,
     ref = document.createTextNode(''),
@@ -1480,7 +1509,7 @@ function Tag(impl, conf, innerHTML) {
     if (!self.parent || !isLoop) return
     each(Object.keys(self.parent), function(k) {
       // some properties must be always in sync with the parent tag
-      var mustSync = !contains(RESERVED_WORDS_BLACKLIST, k) && contains(propsInSyncWithParent, k)
+      var mustSync = !RESERVED_WORDS_BLACKLIST.test(k) && contains(propsInSyncWithParent, k)
       if (typeof self[k] === T_UNDEF || mustSync) {
         // track the property to keep in sync
         // so we can keep it updated
@@ -1558,9 +1587,12 @@ function Tag(impl, conf, innerHTML) {
 
     updateOpts()
 
-    // add global mixin
+    // add global mixins
     var globalMixin = riot.mixin(GLOBAL_MIXIN)
-    if (globalMixin) self.mixin(globalMixin)
+    if (globalMixin)
+      for (var i in globalMixin)
+        if (globalMixin.hasOwnProperty(i))
+          self.mixin(globalMixin[i])
 
     // initialiation
     if (impl.fn) impl.fn.call(self, opts)
@@ -1895,6 +1927,46 @@ function isFunction(v) {
 }
 
 /**
+ * Get the outer html of any DOM node SVGs included
+ * @param   { Object } el - DOM node to parse
+ * @returns { String } el.outerHTML
+ */
+function getOuterHTML(el) {
+  if (el.outerHTML) return el.outerHTML
+  // some browsers do not support outerHTML on the SVGs tags
+  else {
+    var container = mkEl('div')
+    container.appendChild(el.cloneNode(true))
+    return container.innerHTML
+  }
+}
+
+/**
+ * Set the inner html of any DOM node SVGs included
+ * @param { Object } container - DOM node where we will inject the new html
+ * @param { String } html - html to inject
+ */
+function setInnerHTML(container, html) {
+  if (typeof container.innerHTML != T_UNDEF) container.innerHTML = html
+  // some browsers do not support innerHTML on the SVGs tags
+  else {
+    var doc = new DOMParser().parseFromString(html, 'application/xml')
+    container.appendChild(
+      container.ownerDocument.importNode(doc.documentElement, true)
+    )
+  }
+}
+
+/**
+ * Checks wether a DOM node must be considered part of an svg document
+ * @param   { String }  name - tag name
+ * @returns { Boolean } -
+ */
+function isSVGTag(name) {
+  return ~SVG_TAGS_LIST.indexOf(name)
+}
+
+/**
  * Detect if the argument passed is an object, exclude null.
  * NOTE: Use isObject(x) && !isArray(x) to excludes arrays.
  * @param   { * } v - whatever you want to pass to this function
@@ -2139,8 +2211,7 @@ function cleanUpData(data) {
 
   var o = {}
   for (var key in data) {
-    if (!contains(RESERVED_WORDS_BLACKLIST, key))
-      o[key] = data[key]
+    if (!RESERVED_WORDS_BLACKLIST.test(key)) o[key] = data[key]
   }
   return o
 }
@@ -2195,10 +2266,13 @@ function isInStub(dom) {
 /**
  * Create a generic DOM node
  * @param   { String } name - name of the DOM node we want to create
+ * @param   { Boolean } isSvg - should we use a SVG as parent node?
  * @returns { Object } DOM node just created
  */
-function mkEl(name) {
-  return document.createElement(name)
+function mkEl(name, isSvg) {
+  return isSvg ?
+    document.createElementNS('http://www.w3.org/2000/svg', 'svg') :
+    document.createElement(name)
 }
 
 /**
@@ -2352,23 +2426,30 @@ riot.util = { brackets: brackets, tmpl: tmpl }
  * Create a mixin that could be globally shared across all the tags
  */
 riot.mixin = (function() {
-  var mixins = {}
+  var mixins = {},
+    globals = mixins[GLOBAL_MIXIN] = {},
+    _id = 0
 
   /**
    * Create/Return a mixin by its name
-   * @param   { String } name - mixin name (global mixin if missing)
-   * @param   { Object } mixin - mixin logic
-   * @returns { Object } the mixin logic
+   * @param   { String }  name - mixin name (global mixin if object)
+   * @param   { Object }  mixin - mixin logic
+   * @param   { Boolean } g - is global?
+   * @returns { Object }  the mixin logic
    */
-  return function(name, mixin) {
+  return function(name, mixin, g) {
+    // Unnamed global
     if (isObject(name)) {
-      mixin = name
-      mixins[GLOBAL_MIXIN] = extend(mixins[GLOBAL_MIXIN] || {}, mixin)
+      riot.mixin('__unnamed_'+_id++, name, true)
       return
     }
 
-    if (!mixin) return mixins[name]
-    mixins[name] = mixin
+    var store = g ? globals : mixins
+
+    // Getter
+    if (!mixin) return store[name]
+    // Setter
+    store[name] = extend(store[name] || {}, mixin)
   }
 
 })()
@@ -2562,15 +2643,25 @@ var parsers = (function () {
     return obj
   }
 
+  function renderPug (compilerName, html, opts, url) {
+    opts = extend({
+      pretty: true,
+      filename: url,
+      doctype: 'html'
+    }, opts)
+    return _req(compilerName).render(html, opts)
+  }
+
   var _p = {
     html: {
       jade: function (html, opts, url) {
-        opts = extend({
-          pretty: true,
-          filename: url,
-          doctype: 'html'
-        }, opts)
-        return _req('jade').render(html, opts)
+        /* eslint-disable */
+        console.log('DEPRECATION WARNING: jade was renamed "pug" - the jade parser will be removed in riot@3.0.0!')
+        /* eslint-enable */
+        return renderPug('jade', html, opts, url)
+      },
+      pug: function (html, opts, url) {
+        return renderPug('pug', html, opts, url)
       }
     },
 
@@ -2622,6 +2713,10 @@ var parsers = (function () {
   _p.js.javascript   = _p.js.none
   _p.js.coffeescript = _p.js.coffee
 
+  _p.utils = {
+    extend: extend
+  }
+
   return _p
 
 })()
@@ -2630,9 +2725,14 @@ riot.parsers = parsers
 
 /**
  * Compiler for riot custom tags
- * @version v2.3.23
+ * @version v2.4.1
  */
 var compile = (function () {
+
+  /* eslint-disable */
+
+  var extend = parsers.utils.extend
+  /* eslint-enable */
 
   var S_LINESTR = /"[^"\n\\]*(?:\\[\S\s][^"\n\\]*)*"|'[^'\n\\]*(?:\\[\S\s][^'\n\\]*)*'/.source
 
@@ -3034,8 +3134,17 @@ var compile = (function () {
     return ''
   }
 
+  function unescapeHTML (str) {
+    return str
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#039;/g, '\'')
+  }
+
   function getParserOptions (attribs) {
-    var opts = getAttrib(attribs, 'options')
+    var opts = unescapeHTML(getAttrib(attribs, 'options'))
 
     return opts ? JSON.parse(opts) : null
   }
@@ -3043,18 +3152,28 @@ var compile = (function () {
   function getCode (code, opts, attribs, base) {
     var
       type = getType(attribs),
-      src  = getAttrib(attribs, 'src')
+      src  = getAttrib(attribs, 'src'),
+      jsParserOptions = extend({}, opts.parserOptions.js)
 
     if (src) return false
-    return _compileJS(code, opts, type, getParserOptions(attribs), base)
+
+    return _compileJS(
+            code,
+            opts,
+            type,
+            extend(jsParserOptions, getParserOptions(attribs)),
+            base
+          )
   }
 
   function cssCode (code, opts, attribs, url, tag) {
-    var extraOpts = {
-      parserOpts: getParserOptions(attribs),
-      scoped: attribs && /\sscoped(\s|=|$)/i.test(attribs),
-      url: url
-    }
+    var
+      parserStyleOptions = extend({}, opts.parserOptions.style),
+      extraOpts = {
+        parserOpts: extend(parserStyleOptions, getParserOptions(attribs)),
+        scoped: attribs && /\sscoped(\s|=|$)/i.test(attribs),
+        url: url
+      }
 
     return _compileCSS(code, tag, getType(attribs) || opts.style, extraOpts)
   }
@@ -3080,9 +3199,17 @@ var compile = (function () {
   function compile (src, opts, url) {
     var
       parts = [],
-      included
+      included,
+      defaultParserptions = {
+
+        template: {},
+        js: {},
+        style: {}
+      }
 
     if (!opts) opts = {}
+
+    opts.parserOptions = extend(defaultParserptions, opts.parserOptions || {})
 
     included = opts.exclude
       ? function (s) { return opts.exclude.indexOf(s) < 0 } : function () { return 1 }
@@ -3092,7 +3219,7 @@ var compile = (function () {
     var _bp = brackets.array(opts.brackets)
 
     if (opts.template) {
-      src = compileTemplate(src, url, opts.template, opts.templateOptions)
+      src = compileTemplate(src, url, opts.template, opts.parserOptions.template)
     }
 
     src = cleanSource(src)
@@ -3178,7 +3305,7 @@ var compile = (function () {
     html: compileHTML,
     css: compileCSS,
     js: compileJS,
-    version: 'v2.3.23'
+    version: 'v2.4.1'
   }
   return compile
 
