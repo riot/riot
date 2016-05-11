@@ -17,6 +17,7 @@
     </li>
   </ul>
 
+  this.cb = this.parent.cb
   this.counter = [ 'in' ]
 
   click(e) {
