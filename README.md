@@ -126,6 +126,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Cheft isomorphic by express](https://github.com/cheft/cheft)
 - [electron-riot - Riot in an electron application](https://github.com/mike-ward/electron-riot)
 - [An express, riot, jade, webpack simple boilerplate](https://github.com/revington/frontend-boilerplate)
+- [Riot.js vs React.js comparison of a simple comment box](https://github.com/vitogit/riot.js-vs-react.js-comment-box)
 
 ### Tutorials
 - [Building Apps with Riot, ES6 and Webpack](http://blog.srackham.com/posts/riot-es6-webpack-apps/)
