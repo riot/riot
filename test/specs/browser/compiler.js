@@ -1582,7 +1582,8 @@ it('raw contents', function() {
     expect(tag.root.getElementsByTagName('div')[2].innerHTML).to.contain('active')
     expect(tag.root.getElementsByTagName('div')[2].className).to.be('active')
     expect(tag.me.opts.name).to.be(tag.items[0])
-    expect(tag.you.opts.name).to.be(tag.items[1])
+    expect(tag.you).to.be(undefined)
+    expect(tag.everybody.opts.name).to.be(tag.items[1])
     expect(tag.boh.opts.name).to.be('boh')
     expect(tag.tags['loop-inherit-item'].length).to.be(4)
 
