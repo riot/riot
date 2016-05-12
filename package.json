@@ -52,7 +52,7 @@
     "simple-html-tokenizer": "^0.2.3"
   },
   "devDependencies": {
-    "babel-plugin-transform-es2015-template-literals": "^6.6.5",
+    "babel-plugin-transform-es2015-template-literals": "^6.8.0",
     "benchmark": "^2.1.0",
     "cheerio": "^0.20.0",
     "coveralls": "^2.11.9",
@@ -63,7 +63,7 @@
     "jsdom": "^9.0.0",
     "karma": "^0.13.22",
     "karma-babel-preprocessor": "^6.0.1",
-    "karma-chrome-launcher": "^0.2.3",
+    "karma-chrome-launcher": "^1.0.1",
     "karma-coverage": "^1.0.0",
     "karma-mocha": "^1.0.1",
     "karma-phantomjs-launcher": "^1.0.0",
