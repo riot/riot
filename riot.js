@@ -971,7 +971,7 @@ function IfExpr(dom, parentTag, expr) {
 }
 
 IfExpr.prototype.update = function() {
-  var newValue = tmpl(this.expr, this.parentTag), p
+  var newValue = tmpl(this.expr, this.parentTag)
 
   if (newValue && !this.current) { // insert
     this.current = this.pristine.cloneNode(true)
@@ -1439,8 +1439,7 @@ function setEventHandler(name, handler, dom, tag) {
   dom[name] = function(e) {
 
     var ptag = tag._parent,
-      item = tag._item,
-      el
+      item = tag._item
 
     if (!item)
       while (ptag && !item) {
@@ -1458,11 +1457,7 @@ function setEventHandler(name, handler, dom, tag) {
 
     e.item = item
 
-    // prevent default behaviour (by default)
-    if (handler.call(tag, e) !== true && !/radio|check/.test(dom.type)) {
-      if (e.preventDefault) e.preventDefault()
-      e.returnValue = false
-    }
+    handler.call(tag, e)
 
     if (!e.preventUpdate) {
       getImmediateCustomParentTag(tag).update()
@@ -1470,19 +1465,6 @@ function setEventHandler(name, handler, dom, tag) {
 
   }
 
-}
-
-
-/**
- * Insert a DOM node replacing another one (used by if- attribute)
- * @param   { Object } root - parent node
- * @param   { Object } node - node replaced
- * @param   { Object } before - node added
- */
-function insertTo(root, node, before) {
-  if (!root) return
-  root.insertBefore(before, node)
-  root.removeChild(node)
 }
 
 /**
@@ -2073,15 +2055,6 @@ function arrayishRemove(obj, key, value, ensureArray) {
     else if (obj[key].length == 1 && !ensureArray) obj[key] = obj[key][0]
   } else
     delete obj[key] // otherwise just delete the key
-}
-
-/**
- * Get the name property needed to identify a DOM node in riot
- * @param   { Object } dom - DOM node we need to parse
- * @returns { String | undefined } give us back a string to identify this dom node
- */
-function getNamedKey(dom) {
-  return getAttr(dom, 'id') || getAttr(dom, 'name')
 }
 
 /**
