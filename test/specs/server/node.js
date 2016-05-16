@@ -100,6 +100,12 @@ describe('Node/io.js', function() {
     expect(blk).to.be('<yield-empty></yield-empty>')
   })
 
+  it('render tag: svg loops', function() {
+    var svg = riot.render('loop-svg-nodes')
+    var $ = cheerio.load(svg)
+    expect($('circle').length).to.be(3)
+  })
+
   it('render tag: input,option,textarea tags having expressions as value', function() {
     var frm = riot.render('form-controls', { text: 'my-value' })
     var $ = cheerio.load(frm)
