@@ -52,7 +52,7 @@ compare:
 raw:
 	# build riot
 	@ mkdir -p $(DIST)
-	@ $(ROLLUP) lib/riot.js --config rollup.config.js > $(DIST)riot.rollup.js
+	@ $(ROLLUP) lib/riot.js --config rollup.config.js > $(DIST)riot.js
 
 clean:
 	# clean $(DIST)
