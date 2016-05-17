@@ -10,6 +10,7 @@ COVERALLS = ./node_modules/coveralls/bin/coveralls.js
 
 # folders
 DIST = "dist/riot/"
+CONFIG = "config/"
 
 # utils
 WATCH = "\
@@ -52,7 +53,10 @@ compare:
 raw:
 	# build riot
 	@ mkdir -p $(DIST)
-	@ $(ROLLUP) lib/riot.js --config rollup.config.js > $(DIST)riot.js
+	@ $(ROLLUP) lib/riot.js --config $(CONFIG)rollup.config.js > $(DIST)riot.js
+	@ $(ROLLUP) lib/riot+compiler.js --config $(CONFIG)rollup.config.js > $(DIST)riot+compiler.js
+	@ $(ROLLUP) lib/riot.js --config $(CONFIG)rollup.config.csp.js > $(DIST)riot.csp.js
+	@ $(ROLLUP) lib/riot+compiler.js --config $(CONFIG)rollup.config.csp.js > $(DIST)riot+compiler.csp.js
 
 clean:
 	# clean $(DIST)
