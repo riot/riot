@@ -1079,9 +1079,9 @@ describe('Compiler Browser', function() {
 
   it('deferred injection of styles in batch', function() {
 
-    // test riot.styleNode
-    expect(riot.styleNode).to.not.be(undefined)
-    expect(riot.styleNode.tagName).to.be('STYLE')
+    // test riot.util.styleNode
+    expect(riot.util.styleNode).to.not.be(undefined)
+    expect(riot.util.styleNode.tagName).to.be('STYLE')
 
     // test style isn't injected yet
     styles = getRiotStyles()
