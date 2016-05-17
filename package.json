@@ -53,6 +53,7 @@
   },
   "devDependencies": {
     "babel-plugin-transform-es2015-template-literals": "^6.8.0",
+    "babel-preset-es2015-rollup": "^1.1.1",
     "benchmark": "^2.1.0",
     "cheerio": "^0.20.0",
     "coveralls": "^2.11.9",
@@ -72,6 +73,7 @@
     "phantomjs-prebuilt": "^2.1.7",
     "rollup": "^0.26.3",
     "rollup-plugin-alias": "^1.2.0",
+    "rollup-plugin-babel": "^2.4.0",
     "rollup-plugin-commonjs": "^2.2.1",
     "rollup-plugin-npm": "^1.4.0",
     "uglify-js": "latest"

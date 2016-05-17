@@ -9,9 +9,9 @@ var riot = { version: 'v3.0.0-alpha.3', settings: {} },
   // counter to give a unique id to all the Tag instances
   __uid = 0,
   // tags instances cache
-  __virtualDom = [],
+  __VIRTUAL_DOM = [],
   // tags implementation cache
-  __tagImpl = {},
+  __TAG_IMPL = {},
 
   /**
    * Const
@@ -809,7 +809,7 @@ function _each(dom, parent, expr) {
 
   var mustReorder = typeof getAttr(dom, 'no-reorder') !== T_STRING || remAttr(dom, 'no-reorder'),
     tagName = getTagName(dom),
-    impl = __tagImpl[tagName] || { tmpl: getOuterHTML(dom) },
+    impl = __TAG_IMPL[tagName] || { tmpl: getOuterHTML(dom) },
     useRoot = SPECIAL_TAGS_REGEX.test(tagName),
     root = dom.parentNode,
     ref = document.createTextNode(''),
@@ -875,7 +875,7 @@ function _each(dom, parent, expr) {
         tag = new Tag(impl, {
           parent: parent,
           isLoop: true,
-          hasImpl: !!__tagImpl[tagName],
+          hasImpl: !!__TAG_IMPL[tagName],
           root: useRoot ? root : dom.cloneNode(),
           item: item
         }, dom.innerHTML)
@@ -1194,7 +1194,7 @@ function Tag(impl, conf, innerHTML) {
     propsInSyncWithParent = [],
     dom
 
-  // only call unmount if we have a valid __tagImpl (has name property)
+  // only call unmount if we have a valid __TAG_IMPL (has name property)
   if (impl.name && root._tag) root._tag.unmount(true)
 
   // not yet mounted
@@ -1383,13 +1383,13 @@ function Tag(impl, conf, innerHTML) {
     var el = self.root,
       p = el.parentNode,
       ptag,
-      tagIndex = __virtualDom.indexOf(self)
+      tagIndex = __VIRTUAL_DOM.indexOf(self)
 
     self.trigger('before-unmount')
 
     // remove this tag instance from the global virtualDom variable
     if (~tagIndex)
-      __virtualDom.splice(tagIndex, 1)
+      __VIRTUAL_DOM.splice(tagIndex, 1)
 
     if (p) {
 
@@ -1598,7 +1598,7 @@ function updateRtag(expr, parent) {
 
   }
 
-  expr.impl = __tagImpl[tagName]
+  expr.impl = __TAG_IMPL[tagName]
   conf = {root: expr.dom, parent: parent, hasImpl: true, tagName: tagName}
   expr.tag = initChildTag(expr.impl, conf, expr.dom.innerHTML, parent)
   expr.tagName = tagName
@@ -1737,7 +1737,7 @@ function setAttr(dom, name, val) {
  * @returns { Object } it returns an object containing the implementation of a custom tag (template and boot function)
  */
 function getTag(dom) {
-  return dom.tagName && __tagImpl[getAttr(dom, RIOT_TAG_IS) ||
+  return dom.tagName && __TAG_IMPL[getAttr(dom, RIOT_TAG_IS) ||
     getAttr(dom, RIOT_TAG) || dom.tagName.toLowerCase()]
 }
 
@@ -2095,7 +2095,7 @@ var rAF = (function (w) {
  * @returns { Tag } a new Tag instance
  */
 function mountTo(root, tagName, opts) {
-  var tag = __tagImpl[tagName],
+  var tag = __TAG_IMPL[tagName],
     // cache the inner HTML to fix #855
     innerHTML = root._innerHTML = root._innerHTML || root.innerHTML
 
@@ -2109,7 +2109,7 @@ function mountTo(root, tagName, opts) {
   if (tag && tag.mount) {
     tag.mount(true)
     // add this tag to the virtualDom variable
-    if (!contains(__virtualDom, tag)) __virtualDom.push(tag)
+    if (!contains(__VIRTUAL_DOM, tag)) __VIRTUAL_DOM.push(tag)
   }
 
   return tag
@@ -2219,7 +2219,7 @@ riot.tag = function(name, html, css, attrs, fn) {
     else styleManager.add(css)
   }
   name = name.toLowerCase()
-  __tagImpl[name] = { name: name, tmpl: html, attrs: attrs, fn: fn }
+  __TAG_IMPL[name] = { name: name, tmpl: html, attrs: attrs, fn: fn }
   return name
 }
 
@@ -2235,7 +2235,7 @@ riot.tag = function(name, html, css, attrs, fn) {
 riot.tag2 = function(name, html, css, attrs, fn) {
   if (css) styleManager.add(css)
   //if (bpair) riot.settings.brackets = bpair
-  __tagImpl[name] = { name: name, tmpl: html, attrs: attrs, fn: fn }
+  __TAG_IMPL[name] = { name: name, tmpl: html, attrs: attrs, fn: fn }
   return name
 }
 
@@ -2266,7 +2266,7 @@ riot.mount = function(selector, tagName, opts) {
   }
 
   function selectAllTags() {
-    var keys = Object.keys(__tagImpl)
+    var keys = Object.keys(__TAG_IMPL)
     return keys + addRiotTags(keys)
   }
 
@@ -2345,19 +2345,19 @@ riot.mount = function(selector, tagName, opts) {
  * @returns { Array } all the tags instances
  */
 riot.update = function() {
-  return each(__virtualDom, function(tag) {
+  return each(__VIRTUAL_DOM, function(tag) {
     tag.update()
   })
 }
 
 riot.unregister = function(name) {
-  delete __tagImpl[name]
+  delete __TAG_IMPL[name]
 }
 
 /**
  * Export the Virtual DOM
  */
-riot.vdom = __virtualDom
+riot.vdom = __VIRTUAL_DOM
 
 /**
  * Export the Tag constructor

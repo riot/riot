@@ -1,6 +1,7 @@
 import npm from 'rollup-plugin-npm'
 import commonjs from 'rollup-plugin-commonjs'
 import alias from 'rollup-plugin-alias'
+import babel from 'rollup-plugin-babel'
 import path from 'path'
 import defaults from './defaults'
 
@@ -17,6 +18,9 @@ export default Object.assign(defaults, {
       namedExports: {
         [tmplPath]: ['tmpl', 'brackets']
       }
+    }),
+    babel({
+      exclude: 'node_modules/riot-tmpl/**'
     })
   ]
 })

@@ -125,6 +125,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Cheft isomorphic by express](https://github.com/cheft/cheft)
 - [electron-riot - Riot in an electron application](https://github.com/mike-ward/electron-riot)
 - [An express, riot, jade, webpack simple boilerplate](https://github.com/revington/frontend-boilerplate)
+- [Riot.js vs React.js comparison of a simple comment box](https://github.com/vitogit/riot.js-vs-react.js-comment-box)
 
 ### Tutorials
 - [Building Apps with Riot, ES6 and Webpack](http://blog.srackham.com/posts/riot-es6-webpack-apps/)
@@ -138,6 +139,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Adding compiled Riot tags to your Gulp + Browserify build](http://www.triplet.fi/blog/adding_compiled_riot_tags_to_your_gulp_browserify_build/)
 - [The anatomy of a tag - a primer tutorial](http://www.marcusoft.net/2015/12/riotjs-anatomy-of-a-tag.html)
 - [Using TDD with Riot+mocha+chai](http://vitomd.com/blog/coding/tutorial_tdd_riot_mocha/)
+- [The Basics - from ground up to connected tag-networks](http://happy-css.com/lessons/riotjs/)
 
 ### Video Tutorials
 - [Introduction](https://www.youtube.com/watch?v=al87U6NgRTc)
@@ -166,6 +168,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot Bootstrap](http://cognitom.github.io/riot-bootstrap/)
 - [iToolkit](https://github.com/BE-FE/iToolkit)
 - [Riot Routehandler](https://github.com/crisward/riot-routehandler)-[(Demo)](http://codepen.io/crisward/pen/xwGJpM?editors=101)
+- [Riot Flipcard](https://github.com/crisward/riot-flipcard) - [(Demo)](https://crisward.github.io/riot-flipcard/)
 - [Riot Grid](https://github.com/crisward/riot-grid) - [(Demo)](http://codepen.io/crisward/pen/rxepMX?editors=101)
 - [ESLint Riot Plugin](https://github.com/txchen/eslint-plugin-riot)
 - [riot-animate](https://github.com/sartaj/riot-animate)
