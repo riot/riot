@@ -18,7 +18,8 @@ WATCH = "\
 	require('chokidar') 																  \
 		.watch(path, { ignoreInitial: true }) 						  \
 		.on('all', function() { 													  \
-			require('shelljs').exec(cmd) 										  \
+			try { require('shelljs').exec(cmd) }              \
+			catch(e) { console.log(e) }                       \
 		})"
 
 
