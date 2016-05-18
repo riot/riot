@@ -1,4 +1,5 @@
-lib/browser/wrap
+# this folder will be re added once the tests will be refactored
+test/
 test/polyfills
 test/vendor
 test/saucelabs-browsers.js
