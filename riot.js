@@ -65,7 +65,7 @@ riot.observable = function(el) {
    * @param   {Function}   fn - callback
    */
   function onEachEvent(e, fn) {
-    var es = e.split(' '), l = es.length, i = 0, name, indx
+    var es = typeof es === "string" ? e.split(' ') : e, l = es.length, i = 0, name, indx
     for (; i < l; i++) {
       name = es[i]
       indx = name.indexOf('.')
