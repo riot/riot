@@ -282,4 +282,16 @@ describe('Mixin', function() {
     tag.unmount()
   })
 
+  it('register a function mixin to Riot and load mixin to a tag', function() {
+    injectHTML('<my-mixin></my-mixin>')
+
+    riot.mixin('functMixin', FunctMixin) // register mixin
+    riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
+      this.mixin('functMixin') // load mixin
+    })
+
+    var tag = riot.mount('my-mixin')[0]
+    expect(tag.type).to.be('func')
+    tag.unmount()
+  })
 })
