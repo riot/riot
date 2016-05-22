@@ -84,6 +84,8 @@ loadTagsAndScripts([
 
   'tag/obj-key-loop.tag',
 
+  'tag/loop-protect-internal-attrs.tag',
+
   'tag/loop-svg-nodes.tag',
 
   // these tags will be not autoinjected in the DOM

@@ -1126,6 +1126,12 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('protect the internal "tags" attribute from external overrides', function() {
+    var tag = riot.mount('loop-protect-internal-attrs')[0]
+    expect(tag.tags['loop-protect-internal-attrs-child'].length).to.be(4)
+    tags.push(tag)
+  })
+
   it('preserve the mount order, first the parent and then all the children', function() {
     var correctMountingOrder = [
         'deferred-mount',
