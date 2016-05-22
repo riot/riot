@@ -52,7 +52,6 @@ raw:
 	@ $(SMASH) lib/riot.js > $(DIST)riot.js
 	@ $(SMASH) lib/riot+compiler.js > $(DIST)riot+compiler.js
 	@ $(SMASH) lib/riot.csp.js > $(DIST)riot.csp.js
-	@ $(SMASH) lib/riot+compiler.csp.js > $(DIST)riot+compiler.csp.js
 
 clean:
 	# clean $(DIST)
@@ -62,7 +61,7 @@ riot: raw test
 
 min: riot
 	# minify riot
-	@ for f in riot riot.csp riot+compiler riot+compiler.csp; do \
+	@ for f in riot riot.csp riot+compiler; do \
 		$(UGLIFY) $(DIST)$$f.js \
 			--comments \
 			--mangle \
