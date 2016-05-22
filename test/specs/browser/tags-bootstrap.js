@@ -101,6 +101,10 @@ loadTagsAndScripts([
     name: false
   },
   {
+    path: 'tag/yield-no-slash.tag',
+    name: false
+  },
+  {
     path: 'tag/inner-html.tag',
     name: false
   },

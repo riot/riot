@@ -799,6 +799,21 @@ describe('Compiler Browser', function() {
 
   })
 
+  it('yield without closing slash should be work as expected', function() {
+
+    injectHTML([
+      '<yield-no-slash>',
+      '  foo',
+      '</yield-no-slash>'
+    ])
+
+    var tag = riot.mount('yield-no-slash')[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('foo')
+    tags.push(tag)
+
+  })
+
   it('<yield> from/to multi-transclusion', function() {
     injectHTML('<yield-multi><yield to="content">content</yield><yield to="nested-content">content</yield><yield to="nowhere">content</yield></yield-multi>')
     var tag = riot.mount('yield-multi', {})[0]
