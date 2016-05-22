@@ -983,6 +983,13 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('no-named-elements attr prevents dynamically named elements in a loop', function() {
+    var tag = riot.mount('loop-no-named')[0]
+    expect(tag.first).to.be(undefined)
+    expect(tag.two).to.be(undefined)
+    tags.push(tag)
+  })
+
   it('style injection to single style tag', function() {
     var styles = getRiotStyles()
 

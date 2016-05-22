@@ -33,6 +33,7 @@ loadTagsAndScripts([
   'tag/table-thead-tfoot.tag',
   'tag/table-thead-tfoot-nested.tag',
   'tag/loop-named.tag',
+  'tag/loop-no-named.tag',
   'tag/loop-single-tags.tag',
   'tag/timetable.tag',
   'tag/raw-contents.tag',
