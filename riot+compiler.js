@@ -1,8 +1,8 @@
-/* Riot v2.4.0, @license MIT */
+/* Riot v2.4.1, @license MIT */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.4.0', settings: {} },
+var riot = { version: 'v2.4.1', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -966,7 +966,7 @@ var tmpl = (function () {
 var mkdom = (function _mkdom() {
   var
     reHasYield  = /<yield\b/i,
-    reYieldAll  = /<yield\s*(?:\/>|>([\S\s]*?)<\/yield\s*>)/ig,
+    reYieldAll  = /<yield\s*(?:\/>|>([\S\s]*?)<\/yield\s*>|>)/ig,
     reYieldSrc  = /<yield\s+to=['"]([^'">]*)['"]\s*>([\S\s]*?)<\/yield\s*>/ig,
     reYieldDest = /<yield\s+from=['"]?([-\w]+)['"]?\s*(?:\/>|>([\S\s]*?)<\/yield\s*>)/ig
   var
@@ -1210,7 +1210,7 @@ function _each(dom, parent, expr) {
       // reorder only if the items are objects
       var
         item = items[i],
-        _mustReorder = mustReorder && item instanceof Object && !hasKeys,
+        _mustReorder = mustReorder && typeof item == T_OBJECT && !hasKeys,
         oldPos = oldItems.indexOf(item),
         pos = ~oldPos && _mustReorder ? oldPos : i,
         // does a tag exist in this position?
@@ -1472,7 +1472,9 @@ function Tag(impl, conf, innerHTML) {
   // it could be handy to use it also to improve the virtual dom rendering speed
   defineProperty(this, '_riot_id', ++__uid) // base 1 allows test !t._riot_id
 
-  extend(this, { parent: parent, root: root, opts: opts, tags: {} }, item)
+  extend(this, { parent: parent, root: root, opts: opts}, item)
+  // protect the "tags" property from being overridden
+  defineProperty(this, 'tags', {})
 
   // grab attributes
   each(root.attributes, function(el) {
@@ -2447,9 +2449,20 @@ riot.mixin = (function() {
     var store = g ? globals : mixins
 
     // Getter
-    if (!mixin) return store[name]
+    if (!mixin) {
+      if (typeof store[name] === T_UNDEF) {
+        throw new Error('Unregistered mixin: ' + name)
+      }
+      return store[name]
+    }
     // Setter
-    store[name] = extend(store[name] || {}, mixin)
+    if (isFunction(mixin)) {
+      extend(mixin.prototype, store[name] || {})
+      store[name] = mixin
+    }
+    else {
+      store[name] = extend(store[name] || {}, mixin)
+    }
   }
 
 })()
