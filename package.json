@@ -75,6 +75,7 @@
     "rollup-plugin-babel": "^2.4.0",
     "rollup-plugin-commonjs": "^2.2.1",
     "rollup-plugin-npm": "^1.4.0",
+    "rollup-plugin-riot": "^0.2.0",
     "sinon": "^1.17.4",
     "sinon-chai": "^2.8.0",
     "uglify-js": "latest"

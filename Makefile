@@ -36,7 +36,7 @@ test-mocha:
 tags:
 	@ $(RIOT_CLI) --silent test/tag dist/tags.js
 
-test-karma: tags
+test-karma:
 	@ $(KARMA) start test/karma.conf.js
 
 test-coveralls:

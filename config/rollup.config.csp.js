@@ -3,7 +3,7 @@ import commonjs from 'rollup-plugin-commonjs'
 import alias from 'rollup-plugin-alias'
 import babel from 'rollup-plugin-babel'
 import path from 'path'
-import defaults from './defaults'
+var defaults = require('./defaults')
 
 const tmplPath = path.resolve(process.cwd(), 'node_modules', 'riot-tmpl', 'dist', 'csp.tmpl.js')
 

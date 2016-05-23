@@ -42,7 +42,6 @@ module.exports = function(config) {
         included: false
       },
       '../dist/riot/riot.js',
-      '../dist/tags.js',
       entryFile
     ],
     concurrency: 2,
@@ -64,19 +63,10 @@ module.exports = function(config) {
     preprocessors: preprocessors,
 
     rollupPreprocessor: {
+      // use our default rollup plugins adding also the riot plugin
+      // to import dinamically the tags
       rollup: {
-        plugins: [
-          require('rollup-plugin-npm')({
-            jsnext: true,
-            main: true
-          }),
-          require('rollup-plugin-commonjs')({
-            include: 'node_modules/**'
-          }),
-          require('rollup-plugin-babel')({
-            exclude: 'node_modules/riot-tmpl/**'
-          })
-        ]
+        plugins: require('../config/defaults').plugins.concat([require('rollup-plugin-riot')])
       },
       bundle: {
         format: 'umd',
