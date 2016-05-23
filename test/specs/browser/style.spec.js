@@ -13,6 +13,7 @@ import '../../tag/style-tag.tag'
 import '../../tag/style-tag2.tag'
 import '../../tag/style-tag4.tag'
 import '../../tag/style-tag5.tag'
+import '../../tag/scoped.tag'
 
 const expect = chai.expect
 
@@ -54,5 +55,76 @@ describe('Riot style', function() {
       t.unmount()
     }
   })
+
+
+  it('scoped css and data-is, mount(selector, tagname)', function() {
+
+
+    function checkBorder(t) {
+      var e = t.root.firstElementChild
+      var s = window.getComputedStyle(e, null).borderTopWidth
+      expect(s).to.be.equal('1px')
+    }
+
+    injectHTML([
+      '<scoped-tag></scoped-tag>',
+      '<div data-is="scoped-tag"></div>',
+      '<div id="scopedtag"></div>'
+    ])
+
+    var stags = riot.mount('scoped-tag')
+
+    var tag = stags[0]
+    checkBorder(tag)
+
+    var rtag = stags[1]
+    checkBorder(rtag)
+
+    var divtag = riot.mount('#scopedtag', 'scoped-tag')[0]
+    checkBorder(divtag)
+
+    divtag.unmount()
+    rtag.unmount()
+    tag.unmount()
+  })
+
+  it('deferred injection of styles in batch', function() {
+
+    // test riot.util.styleNode
+    expect(riot.util.styleNode).to.not.be.equal(undefined)
+    expect(riot.util.styleNode.tagName).to.be.equal('STYLE')
+
+    // test style isn't injected yet
+    var styles = getRiotStyles(riot)
+    expect(styles).not.to.match(/\bparsed-style\s*\{/)
+
+    // define a styled tag
+    riot.tag('runtime-style-parsing', '<div></div>', '.parsed-style { color: red; }', '', function(opts) { })
+
+    // test style isn't injected by the simple tag definition
+    styles = getRiotStyles(riot)
+    expect(styles).not.to.match(/\bparsed-style\s*\{/)
+
+    // mount the tag
+    injectHTML(['<runtime-style-parsing></runtime-style-parsing>' ])
+    var tag = riot.mount('runtime-style-parsing')[0]
+
+    // test style is correctly injected
+    styles = getRiotStyles(riot)
+    expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*red;\s*}/)
+
+    // remount (unmount+mount)
+    tag.unmount(true)
+    tag = riot.mount('runtime-style-parsing')[0]
+    expect(tag).to.not.be.equal(undefined)
+
+    // test remount does not affect style
+    styles = getRiotStyles(riot)
+    expect(styles).to.match(/\bparsed-style\s*\{\s*color:\s*red;\s*}/)
+
+    // test remount does not duplicate rule
+    expect(styles.match(/\bparsed-style\s*\{/g)).to.have.length(1)
+  })
+
 
 })

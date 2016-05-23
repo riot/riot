@@ -571,4 +571,12 @@ describe('Riot each', function() {
   })
 
 
+  it('protect the internal "tags" attribute from external overrides', function() {
+    injectHTML('<loop-protect-internal-attrs></loop-protect-internal-attrs>')
+    var tag = riot.mount('loop-protect-internal-attrs')[0]
+    expect(tag.tags['loop-protect-internal-attrs-child'].length).to.be.equal(4)
+    tag.unmount()
+  })
+
+
 })

@@ -16,6 +16,10 @@ import '../../tag/v-dom-2.tag'
 import '../../tag/timetable.tag'
 import '../../tag/nested-child.tag'
 import '../../tag/top-attributes.tag'
+import '../../tag/preserve-attr.tag'
+import '../../tag/named-child.tag'
+import '../../tag/deferred-mount.tag'
+import '../../tag/prevent-update.tag'
 
 const expect = chai.expect
 
@@ -341,6 +345,100 @@ describe('Riot core', function() {
     tag.unmount()
 
   })
+
+  it('preserve attributes from tag definition', function() {
+
+
+    injectHTML('<preserve-attr></preserve-attr><div data-is="preserve-attr2"></div>')
+
+    var tag = riot.mount('preserve-attr')[0]
+    expect(tag.root.className).to.be.equal('single-quote')
+    var tag2 = riot.mount('preserve-attr2')[0]
+    expect(tag2.root.className).to.be.equal('double-quote')
+    tag.unmount()
+    tag2.unmount()
+  })
+
+  it('precompiled tag compatibility', function() {
+
+    injectHTML('<precompiled></precompiled>')
+    riot.tag('precompiled', 'HELLO!', 'precompiled, [data-is="precompiled"]  { color: red }', function(opts) {
+      this.nothing = opts.nothing
+    })
+
+    var tag = riot.mount('precompiled')[0]
+    expect(window.getComputedStyle(tag.root, null).color).to.be.equal('rgb(255, 0, 0)')
+    tag.unmount()
+
+  })
+
+  it('static named tag for tags property', function() {
+    injectHTML('<named-child-parent></named-child-parent>')
+    var tag = riot.mount('named-child-parent')[0]
+    expect(tag['tags-child'].root.innerHTML).to.be.equal('I have a name')
+
+    tag.unmount()
+  })
+
+  it('preserve the mount order, first the parent and then all the children', function() {
+
+    injectHTML('<deferred-mount></deferred-mount>')
+
+    var correctMountingOrder = [
+        'deferred-mount',
+        'deferred-child-1',
+        'deferred-child-2',
+        'deferred-loop',
+        'deferred-loop',
+        'deferred-loop',
+        'deferred-loop',
+        'deferred-loop'
+      ],
+      mountingOrder = [],
+      cb = function(tagName, childTag) {
+        // make sure the mount event gets triggered when all the children tags
+        // are in the DOM
+        expect(document.contains(childTag.root)).to.be.equal(true)
+        mountingOrder.push(tagName)
+      },
+      tag = riot.mount('deferred-mount', { onmount: cb })[0]
+
+    expect(mountingOrder.join()).to.be.equal(correctMountingOrder.join())
+
+    tag.unmount()
+  })
+
+
+  it('no update should be triggered if the preventUpdate flag is set', function() {
+
+    injectHTML('<prevent-update></prevent-update>')
+
+    var tag = riot.mount('prevent-update')[0]
+
+    expect(tag['fancy-name'].innerHTML).to.be.equal('john')
+
+    tag.root.getElementsByTagName('p')[0].onclick({})
+
+    expect(tag['fancy-name'].innerHTML).to.be.equal('john')
+
+    tag.unmount()
+  })
+
+  it('the before events get triggered', function() {
+    injectHTML('<before-events></before-events>')
+    var tag,
+      incrementEvents = sinon.spy()
+
+    riot.tag('before-events', '', function() {
+      this.on('before-mount', incrementEvents)
+      this.on('before-unmount', incrementEvents)
+    })
+    tag = riot.mount(document.createElement('before-events'))[0]
+    tag.unmount()
+    expect(incrementEvents).to.have.been.calledTwice
+  })
+
+
 
 /*
   TODO: this test should not rely on the compiler!
