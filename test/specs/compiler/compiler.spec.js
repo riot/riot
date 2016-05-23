@@ -70,7 +70,7 @@ describe('Riot compiler', function() {
     riot.compile('./tag/~custom-parsers.tag', function() {
 
       var tag = riot.mount('custom-parsers')[0],
-        styles = getRiotStyles()
+        styles = getRiotStyles(riot)
 
       expect(tag).to.be.an('object')
       expect(tag.version).to.be.equal('1.0.0')
@@ -82,4 +82,28 @@ describe('Riot compiler', function() {
 
   })
 
+  // this test in theory goes in style.spec.js
+  it('scoped css tag supports htm5 syntax, multiple style tags', function (done) {
+    injectHTML('<style-tag3></style-tag3><style-tag4></style-tag4>')
+    this.timeout(5000)
+    riot.compile(['./tag/~style-tag3.tag', './tag/style-tag4.tag'], function() {
+      checkCSS(riot.mount('style-tag3')[0], '4px')
+      checkCSS(riot.mount('style-tag4')[0], '2px', 1)
+      delete riot.parsers.css.cssup
+
+      function checkCSS(t, x, p2) {
+        t.update()
+        var e = t.root.firstElementChild
+        expect(e.tagName).to.be.equal('P')
+        expect(window.getComputedStyle(e, null).borderTopWidth).to.be.equal(x)
+        if (p2) {
+          e = t.root.getElementsByTagName('P')[1]
+          expect(e.innerHTML).to.be.equal('x')
+          expect(window.getComputedStyle(e, null).borderTopWidth).to.be.equal('1px')
+        }
+        t.unmount()
+      }
+      done()
+    })
+  })
 })

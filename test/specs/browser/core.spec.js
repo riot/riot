@@ -4,7 +4,9 @@ import {
   $$,
   normalizeHTML,
   appendTag,
-  getRiotStyles
+  getRiotStyles,
+  makeTag,
+  defineTag
 } from '../../helpers/index'
 import riot from 'riot'
 
@@ -12,6 +14,8 @@ import riot from 'riot'
 import '../../tag/v-dom-1.tag'
 import '../../tag/v-dom-2.tag'
 import '../../tag/timetable.tag'
+import '../../tag/nested-child.tag'
+import '../../tag/top-attributes.tag'
 
 const expect = chai.expect
 
@@ -76,12 +80,6 @@ describe('Riot core', function() {
        // mount the same tag multiple times
       '<div id="multi-mount-container-1"></div>',
 
-      // multple mount using *
-      '<div id="multi-mount-container-2">',
-      '    <test-i></test-i>',
-      '    <test-l></test-l>',
-      '    <test-m></test-m>',
-      '<\/div>'
     ])
 
     var tag = riot.mount('#multi-mount-container-1', 'test', { val: 300 })[0]
@@ -128,5 +126,247 @@ describe('Riot core', function() {
     }, 1200)
 
   })
+
+  it('mount a tag mutiple times using "*"', function() {
+
+    injectHTML([
+      // multple mount using *
+      '<div id="multi-mount-container-2">',
+      '    <test-i></test-i>',
+      '    <test-l></test-l>',
+      '    <test-m></test-m>',
+      '<\/div>'
+    ])
+
+    riot.tag('test-i', '<p>{ x }</p>', function() { this.x = 'ok'})
+    riot.tag('test-l', '<p>{ x }</p>', function() { this.x = 'ok'})
+    riot.tag('test-m', '<p>{ x }</p>', function() { this.x = 'ok'})
+
+    var subTags = riot.mount('#multi-mount-container-2', '*')
+
+    expect(subTags.length).to.be.equal(3)
+
+    subTags = riot.mount(document.getElementById('multi-mount-container-2'), '*')
+
+    expect(subTags.length).to.be.equal(3)
+
+    subTags.forEach(tag => tag.unmount())
+
+  })
+
+  it('the mount method could be triggered also on several tags using a NodeList instance', function() {
+
+    injectHTML([
+      '<multi-mount value="1"></multi-mount>',
+      '<multi-mount value="2"></multi-mount>',
+      '<multi-mount value="3"></multi-mount>',
+      '<multi-mount value="4"></multi-mount>'
+    ])
+
+    riot.tag('multi-mount', '{ opts.value }')
+
+    var multipleTags = riot.mount(document.querySelectorAll('multi-mount'))
+
+    expect(multipleTags[0].root.innerHTML).to.be.equal('1')
+    expect(multipleTags[1].root.innerHTML).to.be.equal('2')
+    expect(multipleTags[2].root.innerHTML).to.be.equal('3')
+    expect(multipleTags[3].root.innerHTML).to.be.equal('4')
+
+    var i = multipleTags.length
+
+    multipleTags.forEach(tag => tag.unmount())
+  })
+
+
+  it('all the nested tags will are correctly pushed to the parent.tags property', function() {
+
+    injectHTML('<nested-child></nested-child>')
+
+    var tag = riot.mount('nested-child')[0],
+      root = tag.root
+
+    expect(tag.tags.child.length).to.be.equal(6)
+    expect(tag.tags['another-nested-child']).to.be.an('object')
+    tag.tags.child[0].unmount()
+    expect(tag.tags.child.length).to.be.equal(5)
+    tag.tags['another-nested-child'].unmount()
+    expect(tag.tags['another-nested-child']).to.be.equal(undefined)
+
+    tag.unmount()
+
+  })
+
+  it('brackets', function() {
+
+    injectHTML([
+      '<test-a></test-a>',
+      '<test-b></test-b>',
+      '<test-c></test-c>',
+      '<test-d></test-d>',
+      '<test-e></test-e>',
+      '<test-f></test-f>',
+      '<test-g></test-g>'
+    ])
+
+    var tag
+
+    riot.settings.brackets = '[ ]'
+    riot.tag('test-a', '<p>[ x ]</p>', function() { this.x = 'ok'})
+    tag = riot.mount('test-a')[0]
+    expect(normalizeHTML(tag.root.innerHTML)).to.be.equal('<p>ok</p>')
+    tag.unmount()
+
+    riot.settings.brackets = '${ }'
+    riot.tag('test-c', '<p>${ x }</p>', function() { this.x = 'ok' })
+    tag = riot.mount('test-c')[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be.equal('<p>ok</p>')
+    tag.unmount()
+
+    riot.settings.brackets = null
+    riot.tag('test-d', '<p>{ x }</p>', function() { this.x = 'ok' })
+    tag = riot.mount('test-d')[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be.equal('<p>ok</p>')
+    tag.unmount()
+
+    riot.settings.brackets = '[ ]'
+    riot.tag('test-e', '<p>[ x ]</p>', function() { this.x = 'ok' })
+    tag = riot.mount('test-e')[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be.equal('<p>ok</p>')
+    tag.unmount()
+
+    riot.settings.brackets = '${ }'
+    riot.tag('test-f', '<p>${ x }</p>', function() { this.x = 'ok' })
+    tag = riot.mount('test-f')[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be.equal('<p>ok</p>')
+    tag.unmount()
+
+    riot.settings.brackets = null
+    riot.tag('test-g', '<p>{ x }</p>', function() { this.x = 'ok' })
+    tag = riot.mount('test-g')[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be.equal('<p>ok</p>')
+    tag.unmount()
+
+  })
+
+  it('data-is attribute', function() {
+
+    injectHTML('<div id="rtag" data-is="rtag"><\/div>')
+    riot.tag('rtag', '<p>val: { opts.val }</p>')
+
+    var tag = riot.mount('#rtag', { val: 10 })[0]
+    expect(normalizeHTML(tag.root.innerHTML)).to.be.equal('<p>val: 10</p>')
+
+    tag.unmount()
+    expect(document.body.getElementsByTagName('rtag').length).to.be.equal(0)
+
+    tag.unmount()
+
+  })
+
+  it('data-is attribute by tag name', function() {
+
+    // data-is attribute by tag name
+
+    riot.tag('rtag2', '<p>val: { opts.val }</p>')
+
+    injectHTML('<div data-is="rtag2"></div>')
+
+    var tag = riot.mount('rtag2', { val: 10 })[0]
+    expect(normalizeHTML(tag.root.innerHTML)).to.be.equal('<p>val: 10</p>')
+
+    tag.unmount()
+    expect(document.body.querySelectorAll('rtag2').length).to.be.equal(0)
+
+  })
+
+
+  it('data-is attribute using the "*" selector', function() {
+
+    injectHTML([
+      '<div id="rtag-nested">',
+      '  <div data-is="rtag"></div>',
+      '  <div data-is="rtag"></div>',
+      '  <div data-is="rtag"></div>',
+      '</div>'
+    ])
+
+    var subTags = riot.mount('#rtag-nested', '*', { val: 10 })
+
+    expect(subTags.length).to.be.equal(3)
+
+    expect(normalizeHTML(subTags[0].root.innerHTML)).to.be.equal('<p>val: 10</p>')
+    expect(normalizeHTML(subTags[1].root.innerHTML)).to.be.equal('<p>val: 10</p>')
+    expect(normalizeHTML(subTags[2].root.innerHTML)).to.be.equal('<p>val: 10</p>')
+
+    subTags.forEach(tag => tag.unmount())
+
+  })
+
+
+  it('top level attr manipulation', function() {
+
+    injectHTML('<top-level-attr value="initial"></top-level-attr>')
+
+    riot.tag('top-level-attr', '{opts.value}')
+
+    var tag = riot.mount('top-level-attr')[0]
+
+    tag.root.setAttribute('value', 'changed')
+    tag.update()
+
+    expect(tag.root.innerHTML).to.be.equal('changed')
+
+    tag.unmount()
+  })
+
+
+  it('top level attr manipulation having expression', function() {
+
+    injectHTML('<top-level-attr></top-level-attr>')
+
+    riot.tag('top-level-attr', '{opts.value}')
+
+    var tag = riot.mount('top-level-attr')[0]
+
+    tag.root.setAttribute('value', '{1+1}')
+    tag.update()
+
+    expect(tag.root.innerHTML).to.be.equal('2')
+
+    tag.unmount()
+
+  })
+
+/*
+  TODO: this test should not rely on the compiler!
+  it('event handler on each custom tag doesnt update parent', function() {
+    defineTag(`
+    <inner>
+      <button id='btn' onclick={foo} />
+      foo() {}
+    </inner>
+    `)
+
+    var tag = makeTag(`
+      <inner each={item in items} />
+      this.items = [1]
+      this.updateCount = 0
+      this.on('update', function() { this.updateCount++ })
+    `)
+
+    expect(tag.updateCount).to.be.equal(0)
+    tag.tags.inner[0].btn.onclick({})
+    expect(tag.updateCount).to.be.equal(0)
+    tag.unmount()
+
+  })
+
+*/
+
 
 })

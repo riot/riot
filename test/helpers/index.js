@@ -1,6 +1,6 @@
 const expect = chai.expect
 
-export const defaultBrackets = riot.settings.brackets
+export const IE_VERSION = (window && window.document || {}).documentMode | 0
 
 // this export function is needed to run the tests also on ie8
 // ie8 returns some weird strings when we try to get the innerHTML of a tag
@@ -35,9 +35,9 @@ export function getNextSibling(n) {
 }
 
 
-export function getRiotStyles() {
+export function getRiotStyles(riot) {
   // util.injectStyle must add <style> in head, not in body -- corrected
-  var stag = riot.styleNode || document.querySelector('style')
+  var stag = riot.util.styleNode || document.querySelector('style')
   return normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
 }
 

@@ -91,7 +91,7 @@ perf: riot
 watch:
 	# watch and rebuild riot and its tests
 	@ $(shell \
-		node -e $(WATCH) "lib/**/*.js" "make raw" & "make tags")
+		node -e $(WATCH) "lib/**/*.js" "make raw & make tags")
 
 .PHONY: test min eslint test-mocha test-compiler test-coveralls test-sauce compare raw riot perf watch tags
 
