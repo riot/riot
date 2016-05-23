@@ -1,6 +1,6 @@
-import riot from '../dist/riot/riot'
+const expect = chai.expect,
+  defaultBrackets = riot.settings.brackets
 
-var defaultBrackets = riot.settings.brackets
 
 // this export function is needed to run the tests also on ie8
 // ie8 returns some weird strings when we try to get the innerHTML of a tag

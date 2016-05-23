@@ -2,7 +2,7 @@ module.exports = function(config) {
 
   const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
     browsers = ['PhantomJS'],
-    entryFile = './specs/browser/index.js',
+    entryFile = './specs/browser/**/*.spec.js',
     preprocessors = {
       [entryFile]: ['rollup']
     }
