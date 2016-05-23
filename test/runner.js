@@ -1,3 +1,3 @@
 describe('Riot Tests', function() {
-  require('./specs/server/node')
+  require('./specs/server')
 })

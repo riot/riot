@@ -7,6 +7,7 @@ SMASH = ./node_modules/.bin/smash
 ROLLUP = ./node_modules/.bin/rollup
 UGLIFY = ./node_modules/uglify-js/bin/uglifyjs
 COVERALLS = ./node_modules/coveralls/bin/coveralls.js
+RIOT_CLI = ./node_modules/.bin/riot
 
 # folders
 DIST = "dist/riot/"
@@ -32,7 +33,10 @@ eslint:
 test-mocha:
 	RIOT=../../dist/riot/riot.js $(ISTANBUL) cover $(MOCHA) -- test/runner.js -R spec
 
-test-karma:
+tags:
+	@ $(RIOT_CLI) --silent test/tag dist/tags.js
+
+test-karma: tags
 	@ $(KARMA) start test/karma.conf.js
 
 test-coveralls:
@@ -44,7 +48,6 @@ test-sauce:
 
 test-chrome:
 	@ DEBUG=1 ${KARMA} start test/karma.conf.js --browsers=Chrome --no-single-run --watch
-
 
 compare:
 	# compare the current release with the previous one
@@ -83,10 +86,9 @@ perf: riot
 watch:
 	# watch and rebuild riot and its tests
 	@ $(shell \
-		node -e $(WATCH) "lib/**/*.js" "make raw" & \
-		export RIOT="./../../../../dist/riot/riot" && ./node_modules/.bin/riot --watch test/tag dist/tags.js)
+		node -e $(WATCH) "lib/**/*.js" "make raw" & "make tags")
 
-.PHONY: test min eslint test-mocha test-compiler test-coveralls test-sauce compare raw riot perf watch
+.PHONY: test min eslint test-mocha test-compiler test-coveralls test-sauce compare raw riot perf watch tags
 
 
 # riot maintainer tasks

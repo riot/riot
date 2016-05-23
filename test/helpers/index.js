@@ -1,8 +1,10 @@
+import riot from '../dist/riot/riot'
+
 var defaultBrackets = riot.settings.brackets
 
-// this function is needed to run the tests also on ie8
+// this export function is needed to run the tests also on ie8
 // ie8 returns some weird strings when we try to get the innerHTML of a tag
-function normalizeHTML(html) {
+export function normalizeHTML(html) {
   return html
     .trim()
     // change all the tags properties and names to lowercase because a <li> for ie8 is a <LI>
@@ -11,12 +13,12 @@ function normalizeHTML(html) {
     .replace(/\>\s+\</g, '><')
 }
 
-function expectHTML(tagOrDom) {
+export function expectHTML(tagOrDom) {
   var dom = tagOrDom.root ? tagOrDom.root : tagOrDom
   return expect(normalizeHTML(dom.innerHTML))
 }
 
-function getPreviousSibling(n) {
+export function getPreviousSibling(n) {
   var x = n.previousSibling
   while (x.nodeType!=1) {
     x = x.previousSibling
@@ -24,7 +26,7 @@ function getPreviousSibling(n) {
   return x
 }
 
-function getNextSibling(n) {
+export function getNextSibling(n) {
   var x = n.previousSibling
   while (x.nodeType!=1) {
     x = x.previousSibling
@@ -33,7 +35,7 @@ function getNextSibling(n) {
 }
 
 
-function getRiotStyles() {
+export function getRiotStyles() {
   // util.injectStyle must add <style> in head, not in body -- corrected
   var stag = riot.styleNode || document.querySelector('style')
   return normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
@@ -60,7 +62,7 @@ document.contains = Element.prototype.contains = function contains(node) {
  * @param   { Object } ctx - DOM node where the targets of our search will is located
  * @returns { Object } dom nodes found
  */
-function $$(selector, ctx) {
+export function $$(selector, ctx) {
   return (ctx || document).querySelectorAll(selector)
 }
 
@@ -70,18 +72,18 @@ function $$(selector, ctx) {
  * @param   { Object } ctx - DOM node where the target of our search will is located
  * @returns { Object } dom node found
  */
-function $(selector, ctx) {
+export function $(selector, ctx) {
   return (ctx || document).querySelector(selector)
 }
 
-function injectScript(path) {
+export function injectScript(path) {
   var script = document.createElement('script')
   script.src = path
   script.type = 'riot/tag'
   document.head.appendChild(script)
 }
 
-function appendTag(name, attrs, innerHTML) {
+export function appendTag(name, attrs, innerHTML) {
   var tag = document.createElement(name)
   document.body.appendChild(tag)
   if (attrs)
@@ -94,7 +96,7 @@ function appendTag(name, attrs, innerHTML) {
 }
 
 
-function loadTagsAndScripts(arr) {
+export function loadTagsAndScripts(arr) {
 
   var tagsNames = []
 
@@ -127,7 +129,7 @@ function loadTagsAndScripts(arr) {
   return tagsNames.join(',')
 }
 
-function defineTag(tagDef) {
+export function defineTag(tagDef) {
   var name = tagDef.match(/^<([\w\-]+)/)[1]
 
   // compile expects the closing tag not to have any leading whitespace
@@ -140,7 +142,7 @@ function defineTag(tagDef) {
   defineTag.names.push(name)
 }
 
-function makeTag(htmlOrName, html) {
+export function makeTag(htmlOrName, html) {
   var name = html ? htmlOrName : 'test-tag'
   if (!html) html = htmlOrName
 
@@ -156,7 +158,7 @@ function makeTag(htmlOrName, html) {
   return tags[0]
 }
 
-function injectHTML(html) {
+export function injectHTML(html) {
   var div = document.createElement('div')
   div.innerHTML = html instanceof Array ? html.join('\n') : html
   while (div.firstChild) {

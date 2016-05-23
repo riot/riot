@@ -1,9 +1,10 @@
 module.exports = function(config) {
 
-  var saucelabsBrowsers = require('./saucelabs-browsers').browsers,
+  const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
     browsers = ['PhantomJS'],
+    entryFile = './specs/browser/index.js',
     preprocessors = {
-      'specs/**/*.js': ['babel']
+      [entryFile]: ['rollup']
     }
 
   // run the tests only on the saucelabs browsers
@@ -12,7 +13,7 @@ module.exports = function(config) {
   }
 
   if (!process.env.DEBUG) {
-    preprocessors['../dist/riot/riot+compiler.js'] = ['coverage']
+    preprocessors['../dist/riot/riot.js'] = ['coverage']
   }
 
   config.set({
@@ -22,28 +23,27 @@ module.exports = function(config) {
     plugins: [
       'karma-mocha',
       'karma-coverage',
+      'karma-rollup-preprocessor',
       'karma-phantomjs-launcher',
       'karma-chrome-launcher',
-      'karma-sauce-launcher',
-      'karma-babel-preprocessor'
+      'karma-sauce-launcher'
     ],
     proxies: {
       '/tag/': '/base/tag/'
     },
     files: [
-      'helpers/bind.js',
-      '../node_modules/mocha/mocha.js',
-      '../node_modules/expect.js/index.js',
-      '../dist/riot/riot+compiler.js',
-      'helpers/index.js',
+      './helpers/bind.js',
+      '../node_modules/chai/chai.js',
+      '../node_modules/sinon/pkg/sinon.js',
+      '../node_modules/sinon-chai/lib/sinon-chai.js',
       {
         pattern: 'tag/*.tag',
         served: true,
         included: false
       },
-      'specs/browser/tags-bootstrap.js',
-      'specs/browser/compiler.js',
-      'specs/mixin.js'
+      '../dist/riot/riot.js',
+      '../dist/tags.js',
+      entryFile
     ],
     concurrency: 2,
     sauceLabs: {
@@ -63,18 +63,33 @@ module.exports = function(config) {
     reporters: ['progress', 'saucelabs', 'coverage'],
     preprocessors: preprocessors,
 
+    rollupPreprocessor: {
+      rollup: {
+        plugins: [
+          require('rollup-plugin-npm')({
+            jsnext: true,
+            main: true
+          }),
+          require('rollup-plugin-commonjs')({
+            include: 'node_modules/**'
+          }),
+          require('rollup-plugin-babel')({
+            exclude: 'node_modules/riot-tmpl/**'
+          })
+        ]
+      },
+      bundle: {
+        format: 'umd',
+        sourceMap: 'inline'
+      }
+    },
+
     coverageReporter: {
       dir: '../coverage/browsers',
       reporters: [{
         type: 'lcov',
         subdir: 'report-lcov'
       }]
-    },
-
-    babelPreprocessor: {
-      options: {
-        plugins: ['transform-es2015-template-literals']
-      }
     },
 
     singleRun: true
