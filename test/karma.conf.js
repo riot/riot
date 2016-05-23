@@ -1,9 +1,10 @@
 const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
   path = require('path'),
   browsers = ['PhantomJS'],
-  RIOT_WITH_COMPILER_PATH = path.resolve(__dirname, '..', 'dist', 'riot', 'riot+compiler.es6.js'),
-  RIOT_PATH = path.resolve(__dirname, '..', 'dist', 'riot', 'riot.es6.js'),
-  entryFile = './specs/browser/**/*.spec.js',
+  RIOT_WITH_COMPILER_PATH = path.resolve('dist', 'riot', 'riot+compiler.es6.js'),
+  RIOT_PATH = path.resolve('dist', 'riot', 'riot.es6.js'),
+  // split the riot+compiler tests from the normal riot core tests
+  testFiles = `./specs/${process.env.TEST_FOLDER}/**/*.spec.js`,
   preprocessors = {}
 
 // run the tests only on the saucelabs browsers
@@ -11,15 +12,12 @@ if (process.env.SAUCELABS) {
   browsers = Object.keys(saucelabsBrowsers)
 }
 
-if (!process.env.DEBUG && process.env.RIOT_COV) {
-  preprocessors[RIOT_PATH] = ['coverage']
-}
 
-module.exports = function(opts) {
+module.exports = function(conf) {
 
-  preprocessors[opts.testFiles] = ['rollup']
+  preprocessors[testFiles] = ['rollup']
 
-  return {
+  conf.set({
     basePath: '',
     autoWatch: true,
     frameworks: ['mocha'],
@@ -44,7 +42,12 @@ module.exports = function(opts) {
         served: true,
         included: false
       },
-      opts.testFiles
+      {
+        pattern: '../dist/**/*.js',
+        served: true,
+        included: false
+      },
+      testFiles
     ],
     concurrency: 2,
     sauceLabs: {
@@ -70,7 +73,7 @@ module.exports = function(opts) {
       rollup: {
         plugins: [
           require('rollup-plugin-alias')({
-            compiler: RIOT_WITH_COMPILER_PATH,
+            'riot+compiler': RIOT_WITH_COMPILER_PATH,
             riot: RIOT_PATH
           }),
           require('rollup-plugin-riot')({
@@ -85,7 +88,7 @@ module.exports = function(opts) {
     },
 
     coverageReporter: {
-      dir: '../coverage/browsers',
+      dir: '../coverage',
       reporters: [{
         type: 'lcov',
         subdir: 'report-lcov'
@@ -93,5 +96,5 @@ module.exports = function(opts) {
     },
 
     singleRun: true
-  }
+  })
 }

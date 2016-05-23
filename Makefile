@@ -1,6 +1,5 @@
 # Command line paths
 KARMA = ./node_modules/karma/bin/karma
-ISTANBUL = ./node_modules/istanbul/lib/cli.js
 ESLINT = ./node_modules/eslint/bin/eslint.js
 MOCHA = ./node_modules/mocha/bin/_mocha
 SMASH = ./node_modules/.bin/smash
@@ -31,24 +30,24 @@ eslint:
 	@ $(ESLINT) -c ./.eslintrc lib test
 
 test-mocha:
-	RIOT=../../dist/riot/riot.js $(ISTANBUL) cover $(MOCHA) -- test/specs/server -R spec
+	RIOT=../../dist/riot/riot.js $(MOCHA) -- test/specs/server
 
 tags:
 	@ $(RIOT_CLI) --silent test/tag dist/tags.js
 
 test-karma:
-	@ $(KARMA) start test/karma.riot+compiler.conf.js
-	@ RIOT_COV=1 $(KARMA) start test/karma.riot.conf.js
+	@ TEST_FOLDER=compiler $(KARMA) start test/karma.conf.js
+	@ BABEL_ENV=test TEST_FOLDER=browser $(KARMA) start test/karma.conf.js
 
 test-coveralls:
-	@ RIOT_COV=1 cat ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
+	@ RIOT_COV=1 cat ./coverage/report-lcov/lcov.info | $(COVERALLS)
 
 test-sauce:
 	# run the riot tests on saucelabs
 	@ SAUCELABS=1 make test-karma
 
 test-chrome:
-	@ DEBUG=1 ${KARMA} start test/karma.riot.conf.js --browsers=Chrome --no-single-run --watch
+	@ DEBUG=1 TEST_FOLDER=browser ${KARMA} start test/karma.conf.js --browsers=Chrome --no-single-run --watch
 
 compare:
 	# compare the current release with the previous one
@@ -64,7 +63,7 @@ raw:
 	# Chrome Security Policy build
 	@ $(ROLLUP) lib/riot.js --config $(CONFIG)rollup.config.csp.js > $(DIST)riot.csp.js
 	# es6 builds
-	@ $(ROLLUP) lib/riot.js --config $(CONFIG)rollup.config.csp.js > $(DIST)riot.es6.js --format es6
+	@ $(ROLLUP) lib/riot.js --config $(CONFIG)rollup.config.js > $(DIST)riot.es6.js --format es6
 	@ $(ROLLUP) lib/riot+compiler.js --config $(CONFIG)rollup.config.js > $(DIST)riot+compiler.es6.js --format es6
 
 clean:

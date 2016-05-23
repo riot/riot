@@ -7,7 +7,7 @@ import {
   getRiotStyles
 } from '../../helpers/index'
 
-import riot from 'compiler' // here the compiler is just the riot+compile
+import riot from 'riot+compiler' // here the compiler is just the riot+compile
 
 // make sure riot is also globally available
 // for the compiler
