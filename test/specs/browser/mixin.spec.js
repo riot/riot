@@ -1,4 +1,5 @@
 import { injectHTML } from '../../helpers/index'
+import riot from 'riot'
 
 const expect = chai.expect
 

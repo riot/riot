@@ -16,9 +16,9 @@ CONFIG = "config/"
 # utils
 WATCH = "\
 	var arg = process.argv, path = arg[1], cmd = arg[2];  \
-	require('chokidar') 																  \
-		.watch(path, { ignoreInitial: true }) 						  \
-		.on('all', function() { 													  \
+	require('chokidar')                                   \
+		.watch(path, { ignoreInitial: true })               \
+		.on('all', function() {                             \
 			try { require('shelljs').exec(cmd) }              \
 			catch(e) { console.log(e) }                       \
 		})"
@@ -31,13 +31,14 @@ eslint:
 	@ $(ESLINT) -c ./.eslintrc lib test
 
 test-mocha:
-	RIOT=../../dist/riot/riot.js $(ISTANBUL) cover $(MOCHA) -- test/runner.js -R spec
+	RIOT=../../dist/riot/riot.js $(ISTANBUL) cover $(MOCHA) -- test/specs/server -R spec
 
 tags:
 	@ $(RIOT_CLI) --silent test/tag dist/tags.js
 
 test-karma:
-	@ $(KARMA) start test/karma.conf.js
+	@ $(KARMA) start test/karma.riot+compiler.conf.js
+	@ RIOT_COV=1 $(KARMA) start test/karma.riot.conf.js
 
 test-coveralls:
 	@ RIOT_COV=1 cat ./coverage/browsers/report-lcov/lcov.info | $(COVERALLS)
@@ -47,7 +48,7 @@ test-sauce:
 	@ SAUCELABS=1 make test-karma
 
 test-chrome:
-	@ DEBUG=1 ${KARMA} start test/karma.conf.js --browsers=Chrome --no-single-run --watch
+	@ DEBUG=1 ${KARMA} start test/karma.riot.conf.js --browsers=Chrome --no-single-run --watch
 
 compare:
 	# compare the current release with the previous one
@@ -57,9 +58,14 @@ compare:
 raw:
 	# build riot
 	@ mkdir -p $(DIST)
+	# Default builds UMD
 	@ $(ROLLUP) lib/riot.js --config $(CONFIG)rollup.config.js > $(DIST)riot.js
 	@ $(ROLLUP) lib/riot+compiler.js --config $(CONFIG)rollup.config.js > $(DIST)riot+compiler.js
+	# Chrome Security Policy build
 	@ $(ROLLUP) lib/riot.js --config $(CONFIG)rollup.config.csp.js > $(DIST)riot.csp.js
+	# es6 builds
+	@ $(ROLLUP) lib/riot.js --config $(CONFIG)rollup.config.csp.js > $(DIST)riot.es6.js --format es6
+	@ $(ROLLUP) lib/riot+compiler.js --config $(CONFIG)rollup.config.js > $(DIST)riot+compiler.es6.js --format es6
 
 clean:
 	# clean $(DIST)

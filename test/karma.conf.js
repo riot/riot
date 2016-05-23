@@ -1,22 +1,25 @@
-module.exports = function(config) {
+const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
+  path = require('path'),
+  browsers = ['PhantomJS'],
+  RIOT_WITH_COMPILER_PATH = path.resolve(__dirname, '..', 'dist', 'riot', 'riot+compiler.es6.js'),
+  RIOT_PATH = path.resolve(__dirname, '..', 'dist', 'riot', 'riot.es6.js'),
+  entryFile = './specs/browser/**/*.spec.js',
+  preprocessors = {}
 
-  const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
-    browsers = ['PhantomJS'],
-    entryFile = './specs/browser/**/*.spec.js',
-    preprocessors = {
-      [entryFile]: ['rollup']
-    }
+// run the tests only on the saucelabs browsers
+if (process.env.SAUCELABS) {
+  browsers = Object.keys(saucelabsBrowsers)
+}
 
-  // run the tests only on the saucelabs browsers
-  if (process.env.SAUCELABS) {
-    browsers = Object.keys(saucelabsBrowsers)
-  }
+if (!process.env.DEBUG && process.env.RIOT_COV) {
+  preprocessors[RIOT_PATH] = ['coverage']
+}
 
-  if (!process.env.DEBUG) {
-    preprocessors['../dist/riot/riot.js'] = ['coverage']
-  }
+module.exports = function(opts) {
 
-  config.set({
+  preprocessors[opts.testFiles] = ['rollup']
+
+  return {
     basePath: '',
     autoWatch: true,
     frameworks: ['mocha'],
@@ -32,7 +35,7 @@ module.exports = function(config) {
       '/tag/': '/base/tag/'
     },
     files: [
-      './helpers/bind.js',
+      './helpers/polyfills.js',
       '../node_modules/chai/chai.js',
       '../node_modules/sinon/pkg/sinon.js',
       '../node_modules/sinon-chai/lib/sinon-chai.js',
@@ -41,8 +44,7 @@ module.exports = function(config) {
         served: true,
         included: false
       },
-      '../dist/riot/riot.js',
-      entryFile
+      opts.testFiles
     ],
     concurrency: 2,
     sauceLabs: {
@@ -66,11 +68,19 @@ module.exports = function(config) {
       // use our default rollup plugins adding also the riot plugin
       // to import dinamically the tags
       rollup: {
-        plugins: require('../config/defaults').plugins.concat([require('rollup-plugin-riot')])
+        plugins: [
+          require('rollup-plugin-alias')({
+            compiler: RIOT_WITH_COMPILER_PATH,
+            riot: RIOT_PATH
+          }),
+          require('rollup-plugin-riot')({
+            riotPath: RIOT_PATH
+          })
+        ].concat(require('../config/defaults').plugins)
       },
       bundle: {
-        format: 'umd',
-        sourceMap: 'inline'
+        format: 'umd'
+        // sourceMap: 'inline' TODO: enable the sourcemaps in the compiler
       }
     },
 
@@ -83,5 +93,5 @@ module.exports = function(config) {
     },
 
     singleRun: true
-  })
+  }
 }
