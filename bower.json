@@ -1,6 +1,6 @@
 {
   "name": "riot",
-  "version": "3.0.0-alpha.3",
+  "version": "3.0.0-alpha.4",
   "description": "A React-like user interface micro-library",
   "homepage": "http://riotjs.com/",
   "repository": { "type": "git", "url": "git://github.com/riot/riot.git" },
@@ -45,9 +45,7 @@
     "!/riot.csp.js",
     "!/riot.csp.min.js",
     "!/riot+compiler.js",
-    "!/riot+compiler.min.js",
-    "!/riot+compiler.csp.js",
-    "!/riot+compiler.csp.min.js"
+    "!/riot+compiler.min.js"
   ],
   "main": "riot.js"
 }

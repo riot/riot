@@ -57,7 +57,6 @@ raw:
 	@ $(ROLLUP) lib/riot.js --config $(CONFIG)rollup.config.js > $(DIST)riot.js
 	@ $(ROLLUP) lib/riot+compiler.js --config $(CONFIG)rollup.config.js > $(DIST)riot+compiler.js
 	@ $(ROLLUP) lib/riot.js --config $(CONFIG)rollup.config.csp.js > $(DIST)riot.csp.js
-	@ $(ROLLUP) lib/riot+compiler.js --config $(CONFIG)rollup.config.csp.js > $(DIST)riot+compiler.csp.js
 
 clean:
 	# clean $(DIST)
@@ -67,7 +66,7 @@ riot: clean raw test
 
 min: riot
 	# minify riot
-	@ for f in riot riot.csp riot+compiler riot+compiler.csp; do \
+	@ for f in riot riot.csp riot+compiler; do \
 		$(UGLIFY) $(DIST)$$f.js \
 			--comments \
 			--mangle \

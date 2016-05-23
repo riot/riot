@@ -833,6 +833,21 @@ describe('Compiler Browser', function() {
 
   })
 
+  it('yield without closing slash should be work as expected', function() {
+
+    injectHTML([
+      '<yield-no-slash>',
+      '  foo',
+      '</yield-no-slash>'
+    ])
+
+    var tag = riot.mount('yield-no-slash')[0]
+
+    expect(normalizeHTML(tag.root.innerHTML)).to.be('foo')
+    tags.push(tag)
+
+  })
+
   it('<yield> from/to multi-transclusion', function() {
     injectHTML('<yield-multi><yield to="content">content</yield><yield to="nested-content">content</yield><yield to="nowhere">content</yield></yield-multi>')
     var tag = riot.mount('yield-multi', {})[0]
@@ -1143,6 +1158,12 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('named-child-parent')[0]
     expect(tag['tags-child'].root.innerHTML).to.be('I have a name')
 
+    tags.push(tag)
+  })
+
+  it('protect the internal "tags" attribute from external overrides', function() {
+    var tag = riot.mount('loop-protect-internal-attrs')[0]
+    expect(tag.tags['loop-protect-internal-attrs-child'].length).to.be(4)
     tags.push(tag)
   })
 

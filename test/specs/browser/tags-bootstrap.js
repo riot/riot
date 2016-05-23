@@ -94,6 +94,8 @@ loadTagsAndScripts([
   'tag/virtual-yield-loop.tag',
   'tag/dynamic-data-is.tag',
 
+  'tag/loop-protect-internal-attrs.tag',
+
   'tag/loop-svg-nodes.tag',
 
   // these tags will be not autoinjected in the DOM
@@ -108,6 +110,10 @@ loadTagsAndScripts([
   },
   {
     path: 'tag/yield-nested.tag',
+    name: false
+  },
+  {
+    path: 'tag/yield-no-slash.tag',
     name: false
   },
   {
