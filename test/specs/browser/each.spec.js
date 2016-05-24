@@ -44,7 +44,15 @@ import '../../tag/table-loop-extra-row.tag'
 import '../../tag/obj-key-loop.tag'
 import '../../tag/loop-sync-options.tag'
 import '../../tag/outer.tag'
+import '../../tag/reserved-names.tag'
+
+import '../../tag/select-test.tag'
 import '../../tag/named-select.tag'
+
+import '../../tag/table-thead-tfoot.tag'
+import '../../tag/table-multibody.tag'
+import '../../tag/table-thead-tfoot-nested.tag'
+import '../../tag/table-test.tag'
 
 import '../../tag/virtual-no-loop.tag'
 import '../../tag/virtual-yield-loop.tag'
@@ -578,5 +586,733 @@ describe('Riot each', function() {
     tag.unmount()
   })
 
+  it('the "updated" gets properly triggered also from the children tags in a loop', function(done) {
+
+    injectHTML('<div id="updated-events-in-loop"></div>')
+    var tag = riot.mount('#updated-events-in-loop', 'loop-unshift')[0],
+      counter = 0
+
+    tag.tags['loop-unshift-item'][0].on('updated', function() {
+      counter ++
+      if (counter == 2) done()
+    })
+
+    tag.update()
+    tag.tags['loop-unshift-item'][0].update()
+
+    tag.unmount()
+
+  })
+
+  it('the loops children sync correctly their internal data with their options', function() {
+
+    injectHTML('<loop-sync-options></loop-sync-options>')
+    var tag = riot.mount('loop-sync-options')[0]
+
+    function ch(idx) {
+      return tag.root.getElementsByTagName('loop-sync-options-child')[idx]._tag
+    }
+
+    expect(ch(0).val).to.be.equal('foo')
+    expect(ch(0).root.className).to.be.equal('active')
+    expect(ch(1).val).to.be.equal(undefined)
+    expect(ch(2).val).to.be.equal(undefined)
+    expect(ch(0).num).to.be.equal(undefined)
+    expect(ch(1).num).to.be.equal(3)
+    expect(ch(2).num).to.be.equal(undefined)
+    expect(ch(0).bool).to.be.equal(undefined)
+    expect(ch(1).bool).to.be.equal(undefined)
+    expect(ch(2).bool).to.be.equal(false)
+    tag.update({
+      children: tag.children.reverse()
+    })
+    expect(ch(0).val).to.be.equal(undefined)
+    expect(ch(0).root.className).to.be.equal('')
+    expect(ch(1).val).to.be.equal(undefined)
+    expect(ch(2).val).to.be.equal('foo')
+    expect(ch(2).root.className).to.be.equal('active')
+    expect(ch(0).num).to.be.equal(undefined)
+    expect(ch(1).num).to.be.equal(3)
+    expect(ch(2).num).to.be.equal(undefined)
+    expect(ch(0).bool).to.be.equal(false)
+    expect(ch(1).bool).to.be.equal(undefined)
+    expect(ch(2).bool).to.be.equal(undefined)
+
+    tag.update({
+      children: tag.children.reverse()
+    })
+    expect(ch(0).val).to.be.equal('foo')
+    expect(ch(0).root.className).to.be.equal('active')
+    expect(ch(1).val).to.be.equal(undefined)
+    expect(ch(2).val).to.be.equal(undefined)
+    expect(ch(2).root.className).to.be.equal('')
+    expect(ch(0).num).to.be.equal(undefined)
+    expect(ch(1).num).to.be.equal(3)
+    expect(ch(2).num).to.be.equal(undefined)
+    expect(ch(0).bool).to.be.equal(undefined)
+    expect(ch(1).bool).to.be.equal(undefined)
+    expect(ch(2).bool).to.be.equal(false)
+    tag.unmount()
+  })
+
+
+  it('the loops children sync correctly their internal data even when they are nested', function() {
+
+    injectHTML('<loop-sync-options-nested></loop-sync-options-nested>')
+    var tag = riot.mount('loop-sync-options-nested')[0]
+
+    expect(tag.tags['loop-sync-options-nested-child'][0].parent.root.tagName.toLowerCase()).to.be.equal('loop-sync-options-nested')
+    expect(tag.tags['loop-sync-options-nested-child'][0].val).to.be.equal('foo')
+    expect(tag.tags['loop-sync-options-nested-child'][1].val).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][2].val).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][0].num).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][1].num).to.be.equal(3)
+    expect(tag.tags['loop-sync-options-nested-child'][2].num).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][0].bool).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][1].bool).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][2].bool).to.be.equal(false)
+    tag.update({
+      children: tag.children.reverse()
+    })
+    tag.update()
+    expect(tag.tags['loop-sync-options-nested-child'][0].val).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][1].val).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][2].val).to.be.equal('foo')
+    expect(tag.tags['loop-sync-options-nested-child'][0].num).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][1].num).to.be.equal(3)
+    expect(tag.tags['loop-sync-options-nested-child'][2].num).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][0].bool).to.be.equal(false)
+    expect(tag.tags['loop-sync-options-nested-child'][1].bool).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][2].bool).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][2].parent.root.tagName.toLowerCase()).to.be.equal('loop-sync-options-nested')
+    tag.update({
+      children: tag.children.reverse()
+    })
+    tag.update()
+    expect(tag.tags['loop-sync-options-nested-child'][0].val).to.be.equal('foo')
+    expect(tag.tags['loop-sync-options-nested-child'][1].val).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][2].val).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][0].num).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][1].num).to.be.equal(3)
+    expect(tag.tags['loop-sync-options-nested-child'][2].num).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][0].bool).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][1].bool).to.be.equal(undefined)
+    expect(tag.tags['loop-sync-options-nested-child'][2].bool).to.be.equal(false)
+
+    tag.unmount()
+  })
+
+  it('the children tags are in sync also in multiple nested tags', function() {
+
+    injectHTML('<loop-sync-options-nested-wrapper></loop-sync-options-nested-wrapper>')
+    var tag = riot.mount('loop-sync-options-nested-wrapper')[0]
+    expect(tag.tags['loop-sync-options-nested'].tags['loop-sync-options-nested-child'].length).to.be.equal(3)
+    tag.unmount()
+  })
+
+
+
+  it('children in a loop inherit properties from the parent', function() {
+    injectHTML('<loop-inherit></loop-inherit>')
+    var tag = riot.mount('loop-inherit')[0]
+    expect(tag.me.opts.nice).to.be.equal(tag.isFun)
+    tag.isFun = false
+    tag.update()
+    expect(tag.me.opts.nice).to.be.equal(tag.isFun)
+    expect(tag.me.tags).to.be.empty
+    tag.unmount()
+  })
+
+
+  it('loop tags get rendered correctly also with conditional attributes', function(done) {
+
+    injectHTML('<loop-conditional></loop-conditional>')
+
+    var tag = riot.mount('loop-conditional')[0]
+
+    setTimeout(function() {
+      expect(tag.root.getElementsByTagName('div').length).to.be.equal(2)
+      expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be.equal(2)
+      expect(tag.tags['loop-conditional-item'].length).to.be.equal(2)
+      tag.items = []
+      tag.update()
+      expect(tag.root.getElementsByTagName('div').length).to.be.equal(0)
+      expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be.equal(0)
+      expect(tag.tags['loop-conditional-item']).to.be.equal(undefined)
+      tag.items = [2, 2, 2]
+      tag.update()
+      expect(tag.root.getElementsByTagName('div').length).to.be.equal(3)
+      expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be.equal(3)
+      expect(tag.tags['loop-conditional-item'].length).to.be.equal(3)
+      tag.unmount()
+      done()
+    }, 100)
+
+    it('custom children items in a nested loop are always in sync with the parent tag', function() {
+
+      injectHTML('<loop-inherit></loop-inherit>')
+
+      var tag = riot.mount('loop-inherit')[0]
+
+      expect(tag.tags['loop-inherit-item'].length).to.be.equal(4)
+      expect(tag.me.opts.name).to.be.equal(tag.items[0])
+      expect(tag.you.opts.name).to.be.equal(tag.items[1])
+      expect(tag.everybody.opts.name).to.be.equal(tag.items[2])
+
+      tag.items.splice(1, 1)
+      tag.update()
+      expect(tag.root.getElementsByTagName('div').length).to.be.equal(2)
+      expect(tag.tags['loop-inherit-item'].length).to.be.equal(3)
+
+      tag.items.push('active')
+      tag.update()
+      expect(tag.root.getElementsByTagName('div').length).to.be.equal(3)
+      expect(tag.root.getElementsByTagName('div')[2].innerHTML).to.contain('active')
+      expect(tag.root.getElementsByTagName('div')[2].className).to.be.equal('active')
+      expect(tag.me.opts.name).to.be.equal(tag.items[0])
+      expect(tag.you).to.be.equal(undefined)
+      expect(tag.everybody.opts.name).to.be.equal(tag.items[1])
+      expect(tag.boh.opts.name).to.be.equal('boh')
+      expect(tag.tags['loop-inherit-item'].length).to.be.equal(4)
+
+      tag.unmount()
+
+    })
+
+    it('the DOM events get executed in the right context', function() {
+      injectHTML('<loop-inherit></loop-inherit>')
+      var tag = riot.mount('loop-inherit')[0]
+      tag.tags['loop-inherit-item'][0].root.onmouseenter({})
+      expect(tag.wasHovered).to.be.equal(true)
+      expect(tag.root.getElementsByTagName('div').length).to.be.equal(4)
+      tag.tags['loop-inherit-item'][0].root.onclick({})
+      expect(tag.tags['loop-inherit-item'][0].wasClicked).to.be.equal(true)
+
+      tag.unmount()
+    })
+
+    it('loops over other tag instances do not override their internal properties', function() {
+      injectHTML('<loop-tag-instances></loop-tag-instances>')
+      var tag = riot.mount('loop-tag-instances')[0]
+
+      tag.start()
+
+      expect(tag.tags['loop-tag-instances-child'].length).to.be.equal(5)
+      expect(tag.tags['loop-tag-instances-child'][0].root.tagName.toLowerCase()).to.be.equal('loop-tag-instances-child')
+      tag.update()
+      expect(tag.tags['loop-tag-instances-child'][3].root.tagName.toLowerCase()).to.be.equal('loop-tag-instances-child')
+
+      tag.unmount()
+
+    })
+
+
+    it('nested loops using non object data get correctly rendered', function() {
+      injectHTML('<loop-nested-strings-array></loop-nested-strings-array>')
+      var tag = riot.mount('loop-nested-strings-array')[0],
+        children = tag.root.getElementsByTagName('loop-nested-strings-array-item')
+      expect(children.length).to.be.equal(4)
+      children = tag.root.getElementsByTagName('loop-nested-strings-array-item')
+      children[0].onclick({})
+      expect(children.length).to.be.equal(4)
+      expect(normalizeHTML(children[0].innerHTML)).to.be.equal('<p>b</p>')
+      expect(normalizeHTML(children[1].innerHTML)).to.be.equal('<p>a</p>')
+      tag.unmount()
+    })
+
+  })
+
+
+  it('any DOM event in a loop updates the whole parent tag', function() {
+    injectHTML('<loop-numbers-nested></loop-numbers-nested>')
+    var tag = riot.mount('loop-numbers-nested')[0]
+    expect(tag.root.getElementsByTagName('ul')[0].getElementsByTagName('li').length).to.be.equal(4)
+    tag.root.getElementsByTagName('ul')[0].getElementsByTagName('li')[0].onclick({})
+    expect(tag.root.getElementsByTagName('ul')[0].getElementsByTagName('li').length).to.be.equal(2)
+    tag.unmount()
+  })
+
+  it('riot.observable instances could be also used in a loop', function() {
+    injectHTML('<loop-child></loop-child>')
+    var tag = riot.mount('loop-child')[0]
+
+    tag.items = [riot.observable({name: 1}), {name: 2}]
+    tag.update()
+    tag.items = [{name: 2}]
+    tag.update()
+
+    tag.unmount()
+  })
+
+  it('the update event returns the tag instance', function() {
+    injectHTML('<loop-child></loop-child>')
+    var tag = riot.mount('loop-child')[0]
+    expect(tag.update()).to.not.be.equal(undefined)
+    tag.unmount()
+  })
+
+
+  it('table with multiple bodies and dynamic styles #1052', function() {
+
+    injectHTML('<table-multibody></table-multibody>')
+
+    var tag = riot.mount('table-multibody')[0],
+      bodies = tag.root.getElementsByTagName('tbody')
+
+    expect(bodies.length).to.be.equal(3)
+    for (var i = 0; i < bodies.length; ++i) {
+      expect(normalizeHTML(bodies[0].innerHTML))
+        .to.match(/<tr style="background-color: ?(?:white|lime);?"[^>]*>(?:<td[^>]*>[A-C]\d<\/td>){3}<\/tr>/)
+    }
+
+    expect(bodies[0].getElementsByTagName('tr')[0].style.backgroundColor).to.be.equal('white')
+    tag.root.getElementsByTagName('button')[0].onclick({})
+    expect(bodies[0].getElementsByTagName('tr')[0].style.backgroundColor).to.be.equal('lime')
+
+    tag.unmount()
+  })
+
+  it('table with tbody and thead #1549', function() {
+
+    injectHTML('<table-thead-tfoot-nested></table-thead-tfoot-nested>')
+
+    var tag = riot.mount('table-thead-tfoot-nested')[0],
+      bodies = tag.root.getElementsByTagName('tbody'),
+      heads = tag.root.getElementsByTagName('thead'),
+      foots = tag.root.getElementsByTagName('tfoot')
+
+    expect(bodies.length).to.be.equal(1)
+    expect(heads.length).to.be.equal(1)
+    expect(foots.length).to.be.equal(1)
+
+    var ths = tag.root.getElementsByTagName('th'),
+      trs = tag.root.getElementsByTagName('tr'),
+      tds = tag.root.getElementsByTagName('td')
+
+    expect(ths.length).to.be.equal(3)
+    expect(trs.length).to.be.equal(5)
+    expect(tds.length).to.be.equal(6)
+
+    tag.unmount()
+  })
+
+  it('table with caption and looped cols, ths, and trs #1067', function() {
+    injectHTML('<loop-cols></loop-cols>')
+    var data = {
+      // copied from loop-cols.tag
+      headers: [
+        'Name',
+        'Number',
+        'Address',
+        'City',
+        'Contact'
+      ],
+      data: [
+        ['Abc', '10', 'A 4B', 'México', 'Juan'],
+        ['Def', '20', 'B 50', 'USA', 'Anna'],
+        ['Ghi', '30', 'D 60', 'Japan', ''],
+        ['Jkl', '40', 'E 1C', 'France', 'Balbina']
+      ]
+    }
+    var tag = riot.mount('loop-cols')[0],
+      el, i, k
+
+    tag.update()
+
+    el = getEls('caption')[0]
+    expect(el.innerHTML).to.be.equal('Loop Cols')
+
+    el = getEls('colgroup')
+    expect(el.length).to.be.equal(1)
+
+    el = getEls('col', el[0])
+    expect(el.length).to.be.equal(5)
+
+    el = getEls('tr', getEls('thead')[0])
+    expect(el.length).to.be.equal(1)
+
+    el = getEls('th', el[0])
+    expect(el.length).to.be.equal(5)
+    for (i = 0; i < el.length; ++i) {
+      expect(el[i].tagName).to.be.equal('TH')
+      expect(el[i].innerHTML.trim()).to.be.equal(data.headers[i])
+    }
+
+    el = getEls('tr', getEls('tbody')[0])
+    expect(el.length).to.be.equal(4)
+    //console.log(' - - - tbody.tr: ' + el[0].innerHTML)
+
+    for (i = 0; i < el.length; ++i) {
+      var cells = getEls('td', el[i])
+      expect(cells.length).to.be.equal(5)
+      for (k = 0; k < cells.length; ++k) {
+        //console.log(' - - - getting data[' + i + ',' + k + ']')
+        expect(cells[k].tagName).to.be.equal('TD')
+        expect(cells[k].innerHTML.trim()).to.be.equal(data.data[i][k])
+      }
+    }
+
+    tag.unmount()
+
+    function getEls(t, e) {
+      if (!e) e = tag.root
+      return e.getElementsByTagName(t)
+    }
+  })
+
+
+
+  it('table/thead/tbody/tfoot used as root element of custom tags', function() {
+
+    injectHTML('<table-test></table-test>')
+    var
+      tag = riot.mount('table-test')[0],
+      tbl
+
+    // set "tbl" to the table-test root element
+    expect(tag).to.not.be.empty
+    tbl = tag.root
+    expect(tbl).to.not.be.empty
+    tag.update()
+
+    testTable(tbl, 'table-caption', {
+      tbody: 1,
+      caption: true,
+      colgroup: true
+    })
+    testTable(tbl, 'table-colgroup', {
+      thead: 1,
+      tbody: 1,
+      colgroup: true
+    })
+    testTable(tbl, 'table-looped-col', {
+      thead: 1,
+      tbody: 1,
+      col: true
+    })
+    testTable(tbl, 'table-multi-col', {
+      thead: 1,
+      tbody: 1,
+      col: true
+    })
+    testTable(tbl, 'table-tfoot', {
+      tfoot: 1,
+      tbody: 1
+    })
+    testTable(tbl, 'table-tr-body-only', {
+      tr: 2
+    })
+    testTable(tbl, 'table-tr-alone', {
+      tr: 1
+    })
+    testTable(tbl, 'table-custom-thead-tfoot', {
+      thead: 1,
+      tfoot: 1,
+      tbody: 2,
+      colgroup: true
+    })
+
+    tag.unmount()
+
+    // test the table and call the tests for the content
+    function testTable(root, name, info) {
+      var s, key, inf
+
+      root = root.querySelectorAll('table[data-is=' + name + ']')
+      s = name + '.length: '
+      expect(s + root.length).to.be.equal(s + '1')
+      root = root[0]
+
+      // test content
+      for (key in info) { // eslint-disable-line
+        if (info[key] === true)
+          testOther(root, key)
+        else
+          testRows(root, key, info[key])
+      }
+    }
+
+    // test rows and cells for an element of thead/tfoot/tbody
+    function testRows(root, name, cnt) {
+      var s, i, r, c, rows, cells, templ
+
+      // check the count of this element
+      root = root.getElementsByTagName(name)
+      s = name + '.length: '
+      expect(s + root.length).to.be.equal(s + cnt)
+      if (name === 'tr') {
+        name = 'tbody'
+        root = [{ rows: root }]
+        //...and leave cnt as-is, else adjust cnt to expected rows
+      } else cnt = name === 'tbody' ? 2 : 1
+
+      // check each element
+      for (i = 0; i < root.length; i++) {
+        // test the rows
+        rows = root[i].rows
+        expect(rows.length).to.be.equal(cnt)
+        // test the cols
+        for (r = 0; r < rows.length; r++) {
+          c = name[1].toUpperCase()
+          s = r + 1
+          cells = rows[r].cells
+          templ = c === 'B' ? 'R' + s + '-C' : c + '-'
+          expect(cells.length).to.be.equal(2)
+          expect(cells[0].innerHTML).to.contain(templ + '1')
+          expect(cells[1].innerHTML).to.contain(templ + '2')
+        }
+      }
+    }
+
+    // test caption, colgroup and col elements
+    function testOther(root, name) {
+      var cols, s = name + '.length: '
+
+      // we'll search the parent for <col>, later in the switch
+      if (name !== 'col') {
+        root = root.getElementsByTagName(name)
+        expect(s + root.length).to.be.equal(s + '1')
+        root = root[0]
+      }
+      switch (name) {
+      case 'caption':
+        expect(root.innerHTML).to.contain('Title')
+        break
+      case 'colgroup':
+      case 'col':
+        cols = root.getElementsByTagName('col')
+        expect(cols).to.have.length(2)
+        expect(cols[0].width).to.be.equal('150')
+        expect(cols[1].width).to.be.equal('200')
+        break
+      default:
+        break
+      }
+    }
+  })
+
+  it('select as root element of custom riot tag', function () {
+    injectHTML('<select-test></select-test>')
+    var
+      CHOOSE = 0,     // option alone
+      OPTION = 1,     // looped option
+      OPTGRP = 2,     // optgroup with options
+      list = {
+        'select-single-option': [0, CHOOSE],
+        'select-each-option': [1, OPTION],
+        'select-each-option-prompt': [2, CHOOSE, OPTION],
+        'select-each-two-options': [4, OPTION, OPTION],
+        'select-optgroup-each-option': [0, OPTGRP],
+        'select-optgroup-each-option-prompt': [0, CHOOSE, OPTGRP],
+        'select-two-optgroup-each-option': [3, OPTGRP, CHOOSE, OPTGRP],
+        'select-each-optgroup': [0, OPTGRP, OPTGRP]
+      },
+      sel, dat, tag = riot.mount('select-test')[0]
+
+    expect(tag).to.not.be.empty
+    for (var name in list) {                 // eslint-disable-line guard-for-in
+      //console.log('Testing ' + name)
+      dat = list[name]
+      sel = tag.root.querySelector('select[data-is=' + name + ']')
+      expect(sel).to.not.be.empty
+      if (sel.selectedIndex !== dat[0]) expect().fail(
+        name + '.selectIndex ' + sel.selectedIndex + ' expected to be ' + dat[0])
+      var s1 = listFromSel(sel)
+      var s2 = listFromDat(dat)
+      expect(s1).to.be.equal(s2)
+    }
+
+    function listFromDat(dat) {
+      var op = [], s = 'Opt1,Opt2,Opt3'
+      for (var i = 1; i < dat.length; i++) {
+        if (dat[i] === OPTGRP) op.push('G,' + s)
+        else if (dat[i] === OPTION) op.push(s)
+        else op.push('(choose)')
+      }
+      return op.join(',')
+    }
+    function listFromSel(el) {
+      var op = []
+      el = el.firstChild
+      while (el) {
+        if (el.tagName === 'OPTGROUP') {
+          op.push('G')
+          op = op.concat(listFromSel(el))
+        } else if (el.tagName === 'OPTION') {
+          op.push(el.text)
+        }
+        el = el.nextSibling
+      }
+      return op.join(',')
+    }
+
+    tag.unmount()
+  })
+
+  it('loops get rendered correctly also when riot.brackets get changed', function() {
+
+    injectHTML('<loop-double-curly-brackets></loop-double-curly-brackets>')
+
+    // change the brackets
+    riot.settings.brackets = '{{ }}'
+    var tag = riot.mount('loop-double-curly-brackets')[0],
+      ps = tag.root.getElementsByTagName('p')
+
+    expect(ps.length).to.be.equal(2)
+    expect(ps[0].innerHTML).to.be.equal(ps[1].innerHTML)
+    expect(ps[0].innerHTML).to.be.equal('hello')
+    tag.change()
+    expect(ps.length).to.be.equal(2)
+    expect(ps[0].innerHTML).to.be.equal(ps[1].innerHTML)
+    expect(ps[0].innerHTML).to.be.equal('hello world')
+
+    tag.unmount()
+    riot.settings.brackets = '{ }'
+
+  })
+
+  it('loops correctly on array subclasses', function() {
+    injectHTML('<loop-arraylike></loop-arraylike>')
+    var tag = riot.mount('loop-arraylike')[0],
+      root = tag.root
+    expect(normalizeHTML(root.getElementsByTagName('div')[0].innerHTML))
+      .to.be.equal('<p>0 = zero</p><p>1 = one</p><p>2 = two</p><p>3 = three</p>')
+    tag.unmount()
+  })
+
+
+  it('virtual tags mount inner content and not the virtual tag root', function() {
+    injectHTML('<loop-virtual></loop-virtual>')
+    var tag = riot.mount('loop-virtual')[0],
+      els = tag.root.children
+
+    expect(els[0].tagName).to.be.equal('DT')
+    expect(els[0].innerHTML).to.be.equal('Coffee')
+    expect(els[1].tagName).to.be.equal('DD')
+    expect(els[1].innerHTML).to.be.equal('Black hot drink')
+    expect(els[2].tagName).to.be.equal('DT')
+    expect(els[2].innerHTML).to.be.equal('Milk')
+    expect(els[3].tagName).to.be.equal('DD')
+    expect(els[3].innerHTML).to.be.equal('White cold drink')
+
+    tag.data.reverse()
+    tag.update()
+
+    expect(els[2].tagName).to.be.equal('DT')
+    expect(els[2].innerHTML).to.be.equal('Coffee')
+    expect(els[3].tagName).to.be.equal('DD')
+    expect(els[3].innerHTML).to.be.equal('Black hot drink')
+    expect(els[0].tagName).to.be.equal('DT')
+    expect(els[0].innerHTML).to.be.equal('Milk')
+    expect(els[1].tagName).to.be.equal('DD')
+    expect(els[1].innerHTML).to.be.equal('White cold drink')
+
+    tag.data.unshift({ key: 'Tea', value: 'Hot or cold drink' })
+    tag.update()
+    expect(els[0].tagName).to.be.equal('DT')
+    expect(els[0].innerHTML).to.be.equal('Tea')
+    expect(els[1].tagName).to.be.equal('DD')
+    expect(els[1].innerHTML).to.be.equal('Hot or cold drink')
+    tag.unmount()
+
+    injectHTML('<loop-virtual-reorder></loop-virtual-reorder>')
+
+    var tag2 = riot.mount('loop-virtual-reorder')[0],
+      els2 = tag2.root.children
+
+    els2[0].setAttribute('test', 'ok')
+    expect(els2[0].getAttribute('test')).to.be.equal('ok')
+    expect(els2[0].tagName).to.be.equal('DT')
+    expect(els2[0].innerHTML).to.be.equal('Coffee')
+    expect(els2[1].tagName).to.be.equal('DD')
+    expect(els2[1].innerHTML).to.be.equal('Black hot drink')
+    expect(els2[2].tagName).to.be.equal('DT')
+    expect(els2[2].innerHTML).to.be.equal('Milk')
+    expect(els2[3].tagName).to.be.equal('DD')
+    expect(els2[3].innerHTML).to.be.equal('White cold drink')
+
+    tag2.data.reverse()
+    tag2.update()
+
+    expect(els2[2].getAttribute('test')).to.be.equal('ok')
+    expect(els2[2].tagName).to.be.equal('DT')
+    expect(els2[2].innerHTML).to.be.equal('Coffee')
+    expect(els2[3].tagName).to.be.equal('DD')
+    expect(els2[3].innerHTML).to.be.equal('Black hot drink')
+    expect(els2[0].tagName).to.be.equal('DT')
+    expect(els2[0].innerHTML).to.be.equal('Milk')
+    expect(els2[1].tagName).to.be.equal('DD')
+    expect(els2[1].innerHTML).to.be.equal('White cold drink')
+    tag2.unmount()
+
+  })
+
+  it('still loops with reserved property names #1526', function() {
+    injectHTML('<reserved-names></reserved-names>')
+    var tag = riot.mount('reserved-names')[0]
+    tag.reorder()
+    tag.update()
+    tag.reorder()
+    tag.update()
+    tag.unmount()
+  })
+
+  it('named elements in object key loop do not duplicate', function() {
+
+    injectHTML('<obj-key-loop></obj-key-loop>')
+
+    var tag = riot.mount('obj-key-loop')[0]
+
+    expect(tag.x.value).to.be.equal('3')
+    expect(tag.y.value).to.be.equal('44')
+    expect(tag.z.value).to.be.equal('23')
+
+    tag.update()
+    expect(tag.x.value).to.be.equal('3')
+    expect(tag.y.value).to.be.equal('44')
+    expect(tag.z.value).to.be.equal('23')
+
+    tag.unmount()
+  })
+
+  it('non looped and conditional virtual tags mount content', function() {
+    injectHTML('<virtual-no-loop></virtual-no-loop>')
+    var tag = riot.mount('virtual-no-loop')[0]
+
+    var virts = tag.root.querySelectorAll('virtual')
+    expect(virts.length).to.be.equal(0)
+
+    var spans = tag.root.querySelectorAll('span')
+    var divs = tag.root.querySelectorAll('div')
+    expect(spans.length).to.be.equal(2)
+    expect(divs.length).to.be.equal(2)
+    expect(spans[0].innerHTML).to.be.equal('if works text')
+    expect(divs[0].innerHTML).to.be.equal('yielded text')
+    expect(spans[1].innerHTML).to.be.equal('virtuals yields expression')
+    expect(divs[1].innerHTML).to.be.equal('hello there')
+
+    tag.unmount()
+  })
+
+  it('virtual tags with yielded content function in a loop', function() {
+    injectHTML('<virtual-yield-loop></virtual-yield-loop>')
+    var tag = riot.mount('virtual-yield-loop')[0]
+    var spans = tag.root.querySelectorAll('span')
+
+    expect(spans[0].innerHTML).to.be.equal('one')
+    expect(spans[1].innerHTML).to.be.equal('two')
+    expect(spans[2].innerHTML).to.be.equal('three')
+
+    tag.items.reverse()
+    tag.update()
+
+    spans = tag.root.querySelectorAll('span')
+
+    expect(spans[0].innerHTML).to.be.equal('three')
+    expect(spans[1].innerHTML).to.be.equal('two')
+    expect(spans[2].innerHTML).to.be.equal('one')
+
+    tag.unmount()
+  })
 
 })

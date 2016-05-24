@@ -2,7 +2,10 @@ import {
   injectHTML,
   $,
   $$,
-  normalizeHTML
+  normalizeHTML,
+  expectHTML,
+  makeTag,
+  defineTag
 } from '../../helpers/index'
 
 import riot from 'riot'
@@ -110,5 +113,42 @@ describe('Riot if', function() {
     tag.unmount()
   })
 
+  it('each custom tag with an if', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+    riot.tag('inner', '<br>')
+    riot.tag('riot-tmp', '<inner each="{item in items}" if="{cond}" />', function() {
+      this.items = [1]
+      this.cond = true
+    })
+    var tag = riot.mount('riot-tmp')[0]
+
+    expectHTML(tag).to.be.equal('<inner><br></inner>')
+
+    tag.update({cond: false})
+    expectHTML(tag).to.be.equal('')
+    expect(tag.tags.inner).to.be.equal(undefined)
+
+    tag.update({cond: true})
+    expectHTML(tag).to.be.equal('<inner><br></inner>')
+    expect(tag.tags.inner).not.to.be.equal(undefined)
+
+    tag.unmount()
+  })
+
+
+  it('each anonymous with an if', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+    riot.tag('riot-tmp', `
+      <div each="{item, i in items}" if="{item.cond}">{i}</div>
+    `, function() {
+      this.items = [{cond: true}, {cond: false}]
+    })
+    var tag = riot.mount('riot-tmp')[0]
+    expectHTML(tag).to.be.equal('<div>0</div>')
+    tag.items[1].cond = true
+    tag.update()
+    expectHTML(tag).to.be.equal('<div>0</div><div>1</div>')
+    tag.unmount()
+  })
 
 })

@@ -3,7 +3,6 @@ import {
   $,
   $$,
   normalizeHTML,
-  appendTag,
   getRiotStyles
 } from '../../helpers/index'
 
@@ -15,7 +14,8 @@ window.riot = riot
 
 // include special tags to test specific features
 
-const expect = chai.expect
+const expect = chai.expect,
+  defaultBrackets = riot.settings.brackets
 
 describe('Riot compiler', function() {
 
@@ -106,4 +106,71 @@ describe('Riot compiler', function() {
       done()
     })
   })
+
+  it('Passing options to the compiler through compile (v2.3.12)', function () {
+    var str = '<passing-options>\n  <p>\n  <\/p>\nclick(e){}\n<\/passing-options>',
+      result = riot.compile(str, true, {compact: true, type: 'none'})
+    expect(result).to.contain('<p></p>')          // compact: true
+    expect(result).to.contain('\nclick(e){}\n')   // type: none
+  })
+
+  // scoped-css is deprecated, this test must be changed in future versions
+  it('Using the `style` for set the CSS parser through compile (v2.3.12)', function () {
+    var str = '<style-option><style>p {top:0}<\/style>\n<\/style-option>',
+      result
+    result = riot.compile(str, {'style': 'scoped-css'})
+    expect(result).to.match(/\[(?:data-is)="style-option"\] p ?\{top:0\}/)
+  })
+
+  it('compile detect changes in riot.settings.brackets', function() {
+    var compiled
+
+    // change the brackets
+    riot.util.brackets.set('{{ }}')
+    expect(riot.settings.brackets).to.be.equal('{{ }}')
+    compiled = riot.compile('<my>{{ time }} and { time }</my>', true)
+    expect(compiled).to.contain("riot.tag2('my', '{{time}} and { time }',")
+
+    // restore using riot.settings
+    riot.settings.brackets = defaultBrackets
+    compiled = riot.compile('<my>{ time } and { time }</my>', true)
+    expect(riot.util.brackets.settings.brackets).to.be.equal(defaultBrackets)
+    expect(compiled).to.contain("riot.tag2('my', '{time} and {time}',")
+
+    // change again, now with riot.settings
+    riot.settings.brackets = '{{ }}'
+    compiled = riot.compile('<my>{{ time }} and { time }</my>', true)
+    expect(riot.util.brackets.settings.brackets).to.be.equal('{{ }}')
+    expect(compiled).to.contain("riot.tag2('my', '{{time}} and { time }',")
+
+    riot.util.brackets.set(undefined)
+    expect(riot.settings.brackets).to.be.equal(defaultBrackets)
+    compiled = riot.compile('<my>{ time } and { time }</my>', true)
+    expect(compiled).to.contain("riot.tag2('my', '{time} and {time}',")
+  })
+
+  it('mount search data-is attributes for tag names only #1463', function () {
+    var
+      names = ['x-my_tag1', 'x-my-tag2', 'x-my-3tag', 'x-m1-3tag'],
+      templ = '<@>X</@>',
+      name
+
+    // test browser capability for match unquoted chars in [-_A-Z]
+    for (let i = 0; i < names.length; ++i) {
+      injectHTML(`<div data-is="${names[i]}"></div>`)
+      riot.compile(templ.replace(/@/g, names[i]))
+      let tag = riot.mount(names[i])[0]
+      expect($('*[data-is=' + names[i] + ']').innerHTML).to.be.equal('X')
+      tag.unmount()
+    }
+
+    // double quotes work, we can't mount html element named "22"
+    name = 'x-my-tag3'
+    injectHTML(`<${name} name="22"></${name}>`)
+    riot.compile(templ.replace(/@/g, name))
+    var tag = riot.mount('*[name="22"]')[0]
+    expect($(name).innerHTML).to.be.equal('X')
+    tag.unmount()
+  })
+
 })
