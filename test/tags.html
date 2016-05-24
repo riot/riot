@@ -29,19 +29,21 @@
     <loop-replace></loop-replace>
     <touch-events></touch-events>
     <lazy-if></lazy-if>
+    <loop-combo></loop-combo>
     <loop-multi></loop-multi>
     <loop-context></loop-context>
     <loop-option></loop-option>
     <loop-optgroup></loop-optgroup>
     <table-data></table-data>
     <timetable></timetable>
-    <div riot-tag="table-data"></div>
+    <div data-is="table-data"></div>
     <loop-strings></loop-strings>
     <loop-position></loop-position>
     <loop-nested></loop-nested>
     <loop-equalitems></loop-equalitems>
     <loop-reorder></loop-reorder>
     <expr-parent></expr-parent>
+    <expression-eval-count></expression-eval-count>
 
     <tag-nesting></tag-nesting>
 
@@ -68,6 +70,7 @@
     <events></events>
 
     <if-mount></if-mount>
+    <if-unmount></if-unmount>
 
     <loop-numbers-nested></loop-numbers-nested>
     <loop-conditional></loop-conditional>
@@ -75,7 +78,7 @@
 
   </div>
 
-  <script src="../dist/riot/riot.js"></script>
+  <script src="../dist/riot/riot+compiler.js"></script>
   <script src="../dist/tags.js"></script>
   <script>var tags = riot.mount('*', { test: { zap: 100 }})</script>
 

@@ -7,7 +7,7 @@
   this.bar = { value: 25 }
 
   this.on('mount', function() {
-    this.tags.my_name.echo()
+    this.tags.inner1.echo()
   })
 
   setTimeout(function() {

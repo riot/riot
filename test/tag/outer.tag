@@ -1,12 +1,12 @@
-<inner>
+<outer-inner>
   <p>
     { opts.value }
   </p>
-</inner>
+</outer-inner>
 
 <outer>
   <div each="{ data, i in opts.data }">
     <span>{ i }</span>
-    <inner value="{ data.value }"></inner>
+    <outer-inner value="{ data.value }"></outer-inner>
   </div>
 </outer>
