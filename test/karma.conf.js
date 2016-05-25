@@ -41,11 +41,6 @@ module.exports = function(conf) {
         served: true,
         included: false
       },
-      {
-        pattern: '../dist/**/*.js',
-        served: true,
-        included: false
-      },
       testFiles
     ],
     concurrency: 2,
