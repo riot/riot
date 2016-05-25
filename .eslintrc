@@ -30,7 +30,9 @@ globals:
   module: true
   expect: true
   body: true
-
+  chai: true
+  sinon: true
+  riot: true
 
 rules:
 

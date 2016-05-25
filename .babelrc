@@ -1,4 +1,5 @@
 {
+  "compact": true,
   "plugins": [
     "check-es2015-constants",
     "transform-es2015-arrow-functions",
@@ -19,5 +20,12 @@
     "transform-es2015-template-literals",
     "transform-es2015-unicode-regex",
     "transform-regenerator"
-  ]
+  ],
+  "env": {
+    "test": {
+      "plugins": [
+        ["__coverage__", { "only": "dist/riot/*.js" }]
+      ]
+    }
+  }
 }
