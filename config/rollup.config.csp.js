@@ -1,4 +1,4 @@
-import npm from 'rollup-plugin-npm'
+import nodeResolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import alias from 'rollup-plugin-alias'
 import babel from 'rollup-plugin-babel'
@@ -12,7 +12,7 @@ export default Object.assign(defaults, {
     alias({
       'riot-tmpl': tmplPath
     }),
-    npm({ jsnext: true, main: true }),
+    nodeResolve({ jsnext: true, main: true }),
     commonjs({
       include: 'node_modules/**',
       namedExports: {
