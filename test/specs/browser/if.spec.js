@@ -113,7 +113,33 @@ describe('Riot if', function() {
     tag.unmount()
   })
 
-  it('each custom tag with an if', function() {
+  it('A custom tag with an if dispatches the "mount", "update" and "updated" properly', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    var spy = sinon.spy(), tag
+
+    riot.tag('inner', '<br>', function() {
+      this.on('mount', spy)
+      this.on('update', spy)
+      this.on('updated', spy)
+    })
+    riot.tag('riot-tmp', '<inner if="{cond}" />', function() {
+      this.cond = false
+    })
+
+    tag = riot.mount('riot-tmp')[0]
+    expect(spy).to.not.have.been.called
+
+    tag.update({cond: true})
+    expect(spy).to.have.been.calledOnce // only 'mount' event
+
+    tag.update({cond: true})
+    expect(spy).to.have.been.calledThrice // 'update' and 'updated'
+
+    tag.unmount()
+  })
+
+  it('Custom tags with an if will dispatch the "mount" event only when the flag is', function() {
     injectHTML('<riot-tmp></riot-tmp>')
     riot.tag('inner', '<br>')
     riot.tag('riot-tmp', '<inner each="{item in items}" if="{cond}" />', function() {
