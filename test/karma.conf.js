@@ -1,11 +1,12 @@
 const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
   path = require('path'),
-  browsers = ['PhantomJS'],
   RIOT_WITH_COMPILER_PATH = path.resolve('dist', 'riot', 'riot+compiler.es6.js'),
   RIOT_PATH = path.resolve('dist', 'riot', 'riot.es6.js'),
   // split the riot+compiler tests from the normal riot core tests
   testFiles = `./specs/${process.env.TEST_FOLDER}/**/*.spec.js`,
   preprocessors = {}
+
+var browsers = ['PhantomJS'] // this is not a constant
 
 // run the tests only on the saucelabs browsers
 if (process.env.SAUCELABS) {
