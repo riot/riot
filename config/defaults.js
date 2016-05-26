@@ -11,7 +11,7 @@ module.exports = {
     commonjs({ include: 'node_modules/**' }),
     babel({
       compact: false,
-      exclude: 'node_modules/riot-tmpl/**'
+      exclude: 'node_modules/**'
     })
   ]
 }

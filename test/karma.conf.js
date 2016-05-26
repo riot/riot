@@ -22,14 +22,6 @@ module.exports = function(conf) {
     basePath: '',
     autoWatch: true,
     frameworks: ['mocha'],
-    plugins: [
-      'karma-mocha',
-      'karma-coverage',
-      'karma-rollup-preprocessor',
-      'karma-phantomjs-launcher',
-      'karma-chrome-launcher',
-      'karma-sauce-launcher'
-    ],
     proxies: {
       '/tag/': '/base/tag/'
     },
@@ -44,6 +36,7 @@ module.exports = function(conf) {
       },
       testFiles
     ],
+    // logLevel: conf.LOG_DEBUG,
     concurrency: 2,
     sauceLabs: {
       build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
@@ -71,9 +64,7 @@ module.exports = function(conf) {
             'riot+compiler': RIOT_WITH_COMPILER_PATH,
             riot: RIOT_PATH
           }),
-          require('rollup-plugin-riot')({
-            riotPath: RIOT_PATH
-          })
+          require('rollup-plugin-riot')()
         ].concat(require('../config/defaults').plugins)
       },
       bundle: {
