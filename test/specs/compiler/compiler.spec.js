@@ -6,12 +6,6 @@ import {
   getRiotStyles
 } from '../../helpers/index'
 
-import riot from 'riot+compiler' // here the compiler is just the riot+compile
-
-// make sure riot is also globally available
-// for the compiler
-window.riot = riot
-
 // include special tags to test specific features
 
 const expect = chai.expect,

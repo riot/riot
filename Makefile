@@ -9,8 +9,11 @@ COVERALLS = ./node_modules/coveralls/bin/coveralls.js
 RIOT_CLI = ./node_modules/.bin/riot
 
 # folders
-DIST = "dist/riot/"
-CONFIG = "config/"
+DIST = dist/riot/
+LIB = lib/
+CONFIG = config/
+
+GENERATED_FILES = riot.js riot.csp.js riot+compiler.js
 
 # utils
 WATCH = "\
@@ -36,7 +39,9 @@ tags:
 	@ $(RIOT_CLI) --silent test/tag dist/tags.js
 
 test-karma:
+  # Test riot+compiler.js
 	@ TEST_FOLDER=compiler $(KARMA) start test/karma.conf.js
+	# Test only riot.js and generate the coverage
 	@ BABEL_ENV=test TEST_FOLDER=browser $(KARMA) start test/karma.conf.js
 
 test-coveralls:
@@ -62,9 +67,6 @@ raw:
 	@ $(ROLLUP) lib/riot+compiler.js --config $(CONFIG)rollup.config.js > $(DIST)riot+compiler.js
 	# Chrome Security Policy build
 	@ $(ROLLUP) lib/riot.js --config $(CONFIG)rollup.config.csp.js > $(DIST)riot.csp.js
-	# es6 builds
-	@ $(ROLLUP) lib/riot.js --config $(CONFIG)rollup.config.js > $(DIST)riot.es6.js --format es6
-	@ $(ROLLUP) lib/riot+compiler.js --config $(CONFIG)rollup.config.js > $(DIST)riot+compiler.es6.js --format es6
 
 clean:
 	# clean $(DIST)
@@ -72,15 +74,15 @@ clean:
 
 riot: clean raw test
 
-min: riot
+min:
 	# minify riot
-	@ for f in riot riot.csp riot+compiler; do \
-		$(UGLIFY) $(DIST)$$f.js \
+	@ for f in $(GENERATED_FILES); do \
+		$(UGLIFY) $(DIST)$$f \
 			--comments \
 			--mangle \
 			--screw-ie8 \
 			--compress  \
-			-o $(DIST)$$f.min.js; \
+			-o $(DIST)$${f%.*}.min.js; \
 		done
 
 perf: riot

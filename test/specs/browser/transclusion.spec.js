@@ -5,7 +5,6 @@ import {
   normalizeHTML
 } from '../../helpers/index'
 
-import riot from 'riot'
 
 // include special tags to test specific features
 import '../../tag/inner-html.tag'

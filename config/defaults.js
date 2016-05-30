@@ -8,10 +8,10 @@ module.exports = {
   banner: '/* Riot WIP, @license MIT */',
   plugins: [
     nodeResolve({ jsnext: true, main: true }),
-    commonjs({ include: 'node_modules/**' }),
-    babel({
-      compact: false,
-      exclude: 'node_modules/**'
-    })
+    commonjs({
+      include: 'node_modules/**',
+      ignoreGlobal: true
+    }),
+    babel({ compact: false })
   ]
 }

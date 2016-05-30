@@ -6,8 +6,6 @@ import {
   normalizeHTML
 } from '../../helpers/index'
 
-import riot from 'riot'
-
 // include special tags to test specific features
 import '../../tag/loop-svg-nodes.tag'
 import '../../tag/loop-position.tag'

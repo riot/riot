@@ -1,9 +1,10 @@
 const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
   path = require('path'),
-  RIOT_WITH_COMPILER_PATH = path.resolve('dist', 'riot', 'riot+compiler.es6.js'),
-  RIOT_PATH = path.resolve('dist', 'riot', 'riot.es6.js'),
+  RIOT_WITH_COMPILER_PATH = '../dist/riot/riot+compiler.js',
+  RIOT_PATH = '../dist/riot/riot.js',
   // split the riot+compiler tests from the normal riot core tests
   testFiles = `./specs/${process.env.TEST_FOLDER}/**/*.spec.js`,
+  needsCompiler = process.env.TEST_FOLDER === 'compiler',
   preprocessors = {}
 
 var browsers = ['PhantomJS'] // this is not a constant
@@ -34,6 +35,7 @@ module.exports = function(conf) {
         served: true,
         included: false
       },
+      needsCompiler ? RIOT_WITH_COMPILER_PATH : RIOT_PATH,
       testFiles
     ],
     // logLevel: conf.LOG_DEBUG,
@@ -59,16 +61,16 @@ module.exports = function(conf) {
       // use our default rollup plugins adding also the riot plugin
       // to import dinamically the tags
       rollup: {
+        external: ['riot'],
         plugins: [
-          require('rollup-plugin-alias')({
-            'riot+compiler': RIOT_WITH_COMPILER_PATH,
-            riot: RIOT_PATH
-          }),
           require('rollup-plugin-riot')()
         ].concat(require('../config/defaults').plugins)
       },
       bundle: {
-        format: 'umd'
+        globals: {
+          riot: 'riot'
+        },
+        format: 'iife'
         // sourceMap: 'inline' TODO: enable the sourcemaps in the compiler
       }
     },
