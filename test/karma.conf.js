@@ -18,6 +18,8 @@ if (process.env.SAUCELABS) {
 module.exports = function(conf) {
 
   preprocessors[testFiles] = ['rollup']
+  // enable the coverage for riot.js
+  if (!needsCompiler && !process.env.DEBUG) preprocessors[RIOT_PATH] = ['coverage']
 
   conf.set({
     basePath: '',

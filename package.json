@@ -52,7 +52,6 @@
     "simple-html-tokenizer": "^0.2.5"
   },
   "devDependencies": {
-    "babel-plugin-__coverage__": "^1.11.111",
     "babel-plugin-check-es2015-constants": "^6.8.0",
     "babel-preset-es2015": "^6.9.0",
     "benchmark": "^2.1.0",
