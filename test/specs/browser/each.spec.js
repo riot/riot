@@ -1,6 +1,7 @@
 import {
   injectHTML,
   $$,
+  $,
   getNextSibling,
   getPreviousSibling,
   normalizeHTML
@@ -438,7 +439,6 @@ describe('Riot each', function() {
       options = root.getElementsByTagName('select')[0],
       html = normalizeHTML(root.innerHTML).replace(/ selected="selected"/, '')
 
-    expect(html).to.match(/<select><option value="1">Peter<\/option><option value="2">Sherman<\/option><option value="3">Laura<\/option><\/select>/)
 
     //expect(options[0].selected).to.be.equal(false)
     expect(options[1].selected).to.be.equal(true)
@@ -467,9 +467,13 @@ describe('Riot each', function() {
 
     var tag = riot.mount('loop-optgroup')[0],
       root = tag.root,
-      html = normalizeHTML(root.innerHTML).replace(/(value="\d") (selected="selected")/, '$2 $1')
+      select = $('select', root)
 
-    expect(html).to.match(/<select><optgroup label="group 1"><option value="1">Option 1.1<\/option><option value="2">Option 1.2<\/option><\/optgroup><optgroup label="group 2"><option value="3">Option 2.1<\/option><option selected="selected" value="4">Option 2.2<\/option><\/optgroup><\/select>/)
+    expect(select.options[3].selected).to.be.equal(true)
+    expect(select.options[0].value).to.be.equal('1')
+    expect(select.options[0].text).to.be.equal('Option 1.1')
+    expect(select.options[1].text).to.be.equal('Option 1.2')
+    expect(select.selectedIndex).to.be.equal(3)
 
     tag.unmount()
 
@@ -481,10 +485,13 @@ describe('Riot each', function() {
 
     var tag = riot.mount('loop-optgroup2')[0],
       root = tag.root,
-      html = normalizeHTML(root.innerHTML).replace(/(value="\d") (disabled="disabled")/g, '$2 $1')
+      select = $('select', root)
 
-    expect(html).to
-      .match(/<select><option selected="selected">&lt;Select Option&gt; ?(<\/option>)?<optgroup label="group 1"><option value="1">Option 1.1 ?(<\/option>)?<option disabled="disabled" value="2">Option 1.2 ?(<\/option>)?<\/optgroup><optgroup label="group 2"><option value="3">Option 2.1 ?(<\/option>)?<option disabled="disabled" value="4">Option 2.2 ?<\/option><\/optgroup><\/select>/)
+    expect(select.options[0].selected).to.be.equal(true)
+    expect(select.options[4].disabled).to.be.equal(true)
+    expect(select.options[1].value).to.be.equal('1')
+    expect(select.options[0].text).to.be.equal('<Select Option>')
+    expect(select.selectedIndex).to.be.equal(0)
 
     tag.unmount()
 

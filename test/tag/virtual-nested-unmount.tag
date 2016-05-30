@@ -6,7 +6,7 @@
     <br>
   </virtual>
   <button onclick="{ updateChildren }">updateChildren</button>
-  self = this;
+  var self = this;
 
   self.childItems = [
     {title:"1", childchildItems: ['1']},
