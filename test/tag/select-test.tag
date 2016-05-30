@@ -57,7 +57,7 @@
   <optgroup label="Group 1">
     <option each={ opt in theOptions }>{ opt }
   </optgroup>
-  <option selected>(choose)</option>
+  <option selected>(choose)
   <optgroup label="Group 2">
     <option each={ opt in theOptions }>{ opt }
   </optgroup>

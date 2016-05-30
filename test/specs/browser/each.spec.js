@@ -1120,8 +1120,7 @@ describe('Riot each', function() {
       dat = list[name]
       sel = tag.root.querySelector('select[data-is=' + name + ']')
       expect(sel).to.not.be.empty
-      if (sel.selectedIndex !== dat[0]) expect().fail(
-        name + '.selectIndex ' + sel.selectedIndex + ' expected to be ' + dat[0])
+      expect(sel.selectedIndex).to.be.equal(dat[0], name + '.selectIndex ' + sel.selectedIndex + ' expected to be ' + dat[0])
       var s1 = listFromSel(sel)
       var s2 = listFromDat(dat)
       expect(s1).to.be.equal(s2)
