@@ -88,6 +88,8 @@ loadTagsAndScripts([
 
   'tag/loop-svg-nodes.tag',
 
+  'tag/loop-noloop-option.tag',
+
   // these tags will be not autoinjected in the DOM
   // that's what `name = false` means
   {

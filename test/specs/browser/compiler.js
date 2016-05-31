@@ -2212,4 +2212,10 @@ it('raw contents', function() {
 
   })
 
+  it('looped options between other options get inserted correctly', function() {
+    var tag = riot.mount('loop-noloop-option')[0]
+    var options = tag.root.querySelectorAll('option')
+    expect(options[1].value).to.be('1')
+  })
+
 })
