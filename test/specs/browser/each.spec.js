@@ -38,6 +38,7 @@ import '../../tag/loop-root.tag'
 import '../../tag/loop-double-curly-brackets.tag'
 import '../../tag/loop-conditional.tag'
 import '../../tag/loop-protect-internal-attrs.tag'
+import '../../tag/loop-noloop-option.tag'
 import '../../tag/ploop-tag.tag'
 import '../../tag/table-loop-extra-row.tag'
 import '../../tag/obj-key-loop.tag'
@@ -715,7 +716,13 @@ describe('Riot each', function() {
     tag.unmount()
   })
 
+  it('looped options between other options get inserted correctly', function() {
+    injectHTML('<loop-noloop-option></loop-noloop-option>')
 
+    var tag = riot.mount('loop-noloop-option')[0]
+    var options = tag.root.querySelectorAll('option')
+    expect(options[1].value).to.be.equal('1')
+  })
 
   it('children in a loop inherit properties from the parent', function() {
     injectHTML('<loop-inherit></loop-inherit>')
@@ -727,7 +734,6 @@ describe('Riot each', function() {
     expect(tag.me.tags).to.be.empty
     tag.unmount()
   })
-
 
   it('loop tags get rendered correctly also with conditional attributes', function(done) {
 
