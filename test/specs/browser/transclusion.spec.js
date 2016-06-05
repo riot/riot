@@ -138,7 +138,7 @@ describe('Riot transclusion', function() {
 
     expect(normalizeHTML(tag.root.innerHTML)).to.be.equal('<h1>Hello, from the parent</h1><yield-child><h1>Greeting</h1><i>from the child</i><div class="selected"><b>wooha</b></div></yield-child>')
 
-    tag.root.getElementsByTagName('i')[0].onclick({})
+    tag.root.getElementsByTagName('i')[0].dispatchEvent(new Event('click'))
 
     tag.unmount()
 
@@ -166,7 +166,7 @@ describe('Riot transclusion', function() {
 
     expect(child3.root.getElementsByTagName('h2')[0].innerHTML.trim()).to.be.equal('subtitle4')
 
-    child3.root.getElementsByTagName('i')[0].onclick({})
+    child3.root.getElementsByTagName('i')[0].dispatchEvent(new Event('click'))
 
     tag.unmount()
 

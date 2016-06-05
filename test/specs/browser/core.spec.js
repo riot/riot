@@ -516,7 +516,7 @@ describe('Riot core', function() {
 
     expect(tag['fancy-name'].innerHTML).to.be.equal('john')
 
-    tag.root.getElementsByTagName('p')[0].onclick({})
+    tag.root.getElementsByTagName('p')[0].dispatchEvent(new Event('click'))
 
     expect(tag['fancy-name'].innerHTML).to.be.equal('john')
 
@@ -553,12 +553,12 @@ describe('Riot core', function() {
 
     currentItem = tag.items[0]
     currentIndex = 0
-    divTags[0].onclick({})
+    divTags[0].dispatchEvent(new Event('click'))
     tag.items.reverse()
     tag.update()
     currentItem = tag.items[0]
     currentIndex = 0
-    divTags[0].onclick({})
+    divTags[0].dispatchEvent(new Event('click'))
 
     expect(callbackCalls).to.be.equal(2)
 
@@ -792,7 +792,7 @@ describe('Riot core', function() {
     var tag = riot.mount('riot-tmp')[0]
 
     expect(tag.updateCount).to.be.equal(0)
-    tag.tags.inner[0].btn.onclick({})
+    tag.tags.inner[0].btn.dispatchEvent(new Event('click'))
     expect(tag.updateCount).to.be.equal(0)
     tag.unmount()
 
