@@ -213,6 +213,7 @@ It's actively maintained by:
  - [Gianluca Guarini](https://github.com/GianlucaGuarini)
  - [Tsutomu Kawamura](https://github.com/cognitom)
  - [Alberto Martínez](https://github.com/aMarCruz)
+ - [Grant Marvin](https://github.com/rogueg)
  - [Tero Piirainen](https://github.com/tipiirai)
 
 ### Buy us a coffee :coffee:
