@@ -1,3 +1,13 @@
+
+# if no "v" var given, default to package version
+v ?= $(shell node -pe "require('./package.json').version")
+
+# expand variable (so we can use it on branches w/o package.json)
+VERSION := $(v)
+
+# get x.x.* part of the version number
+MINOR_VERSION = `echo $(VERSION) | sed 's/\.[^.]*$$//'`
+
 # Command line paths
 KARMA = ./node_modules/karma/bin/karma
 ESLINT = ./node_modules/eslint/bin/eslint.js
@@ -98,5 +108,58 @@ watch:
 .PHONY: test min eslint test-mocha test-compiler test-coveralls test-sauce compare raw riot perf watch tags
 
 
-# riot maintainer tasks
--include ../riot-tasks/Makefile
+build:
+	# generate riot.js & riot.min.js
+	@ make min
+	@ cp dist/riot/* .
+	# write version in riot.js
+	@ sed -i '' 's/WIP/v$(VERSION)/' riot*.js
+
+
+bump:
+	# grab all latest changes to master
+	# (if there's any uncommited changes, it will stop here)
+	# bump version in *.json files
+	@ sed -i '' 's/\("version": "\)[^"]*/\1'$(VERSION)'/' *.json
+	@ make build
+	@ git status --short
+
+bump-undo:
+	# remove all uncommited changes
+	@ git reset --hard
+
+
+version:
+	# @ git checkout master
+	# create version commit
+	@ git status --short
+	@ git add --all
+	@ git commit -am "$(VERSION)"
+	@ git log --oneline -2
+	# create version tag
+	@ git tag -a 'v'$(VERSION) -m $(VERSION)
+	@ git describe
+
+version-undo:
+	# remove the version tag
+	@ git tag -d 'v'$(VERSION)
+	@ git describe
+	# remove the version commit
+	@ git reset `git rev-parse :/$(VERSION)`
+	@ git reset HEAD^
+	@ git log --oneline -2
+
+
+release: bump version
+
+release-undo:
+	make version-undo
+	make bump-undo
+
+
+publish:
+	# push new version to npm and github
+	# (github tag will also trigger an update in bower, component, cdnjs, etc)
+	@ npm publish
+	@ git push origin master
+	@ git push origin master --tags
