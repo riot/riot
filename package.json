@@ -46,7 +46,7 @@
   ],
   "dependencies": {
     "riot-cli": "^2.5.0",
-    "riot-compiler": "^2.4.1",
+    "riot-compiler": "2.4.1",
     "riot-observable": "^2.4.2",
     "riot-route": "^2.4.0",
     "riot-tmpl": "^2.4.0",
