@@ -9,6 +9,7 @@ module.exports = {
     },
     slIphone6: {
       base: 'SauceLabs',
+      browserName: 'iphone',
       platform: 'OS X 10.10',
       os: 'ios',
       version: '9.2'
