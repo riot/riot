@@ -15,15 +15,20 @@ describe('Mixin', function() {
 
   function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
+
+  function inheritsFrom(child, parent) {
+    child.prototype = Object.create(parent.prototype)
+  }
+
   var FunctMixin = (function() {
     function FunctMixin() {
-      _classCallCheck(this, FunctMixin);
+      _classCallCheck(this, FunctMixin)
     }
 
     _createClass(FunctMixin, [{
       key: 'init',
       value: function init() {
-        this.type = 'func';
+        this.type = 'func'
       }
     }, {
       key: 'message',
@@ -32,8 +37,12 @@ describe('Mixin', function() {
       }
     }]);
 
-    return FunctMixin;
+    return FunctMixin
   })();
+
+  function ChildMixin() {}
+
+  inheritsFrom(ChildMixin, FunctMixin)
 
   /*eslint-enable */
 
@@ -288,6 +297,19 @@ describe('Mixin', function() {
     riot.mixin('functMixin', FunctMixin) // register mixin
     riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
       this.mixin('functMixin') // load mixin
+    })
+
+    var tag = riot.mount('my-mixin')[0]
+    expect(tag.type).to.be('func')
+    tag.unmount()
+  })
+
+  it('register a child function mixin to Riot and load mixin to a tag', function() {
+    injectHTML('<my-mixin></my-mixin>')
+
+    riot.mixin('childMixin', ChildMixin) // register mixin
+    riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
+      this.mixin('childMixin') // load mixin
     })
 
     var tag = riot.mount('my-mixin')[0]
