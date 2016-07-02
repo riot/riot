@@ -65,6 +65,16 @@ describe('Riot core', function() {
     tags.forEach(tag => tag.unmount())
   })
 
+  it('riot can be extended', function() {
+    riot.route = function() {}
+
+    expect(riot.route).to.be.a('function')
+
+    riot.util.tmpl.errorHandle = function() {}
+
+    expect(riot.util.tmpl.errorHandle).to.be.a('function')
+  })
+
   it('mount and unmount', function() {
 
     injectHTML([
