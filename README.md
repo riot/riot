@@ -172,6 +172,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot Grid](https://github.com/crisward/riot-grid) - [(Demo)](http://codepen.io/crisward/pen/rxepMX?editors=101)
 - [ESLint Riot Plugin](https://github.com/txchen/eslint-plugin-riot)
 - [riot-animate](https://github.com/sartaj/riot-animate)
+- [Nest UI](https://github.com/fengzilong/Nest) - [(Demo)](https://fengzilong.github.io/Nest/)
 
 ### Resources
 - [Riot + AngularJS](https://github.com/lucasbrigida/angular-riot)
@@ -189,6 +190,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot loader plugin for RequireJS](https://github.com/amenadiel/requirejs-riot)
 - [Riot loader plugin for JSPM/SystemJS](https://github.com/amenadiel/systemjs-riot)
 - [RiotJS Style Guide](https://github.com/voorhoede/riotjs-style-guide)
+- [Riot Cheatsheet](http://martinmuzatko.github.io/riot-cheatsheet/)
 
 ### Performance
 - **Riot vs React performance:** [(Riot version)](https://github.com/kazzkiq/samples/tree/gh-pages/perf/dom-riot-vs-vanilla) vs [(React version)](https://github.com/kazzkiq/samples/tree/gh-pages/perf/dom-react-vs-vanilla)

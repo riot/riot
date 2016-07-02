@@ -19,6 +19,8 @@ describe('Mixin', function() {
     }
   }
 
+  class ChildMixin extends FunctMixin {}
+
   var OptsMixin = {
     getOpts: function() {
       return this.opts
@@ -269,6 +271,19 @@ describe('Mixin', function() {
     riot.mixin('functMixin', FunctMixin) // register mixin
     riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
       this.mixin('functMixin') // load mixin
+    })
+
+    var tag = riot.mount('my-mixin')[0]
+    expect(tag.type).to.be.equal('func')
+    tag.unmount()
+  })
+
+  it('register a child function mixin to Riot and load mixin to a tag', function() {
+    injectHTML('<my-mixin></my-mixin>')
+
+    riot.mixin('childMixin', ChildMixin) // register mixin
+    riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
+      this.mixin('childMixin') // load mixin
     })
 
     var tag = riot.mount('my-mixin')[0]
