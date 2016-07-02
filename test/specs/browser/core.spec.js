@@ -427,24 +427,6 @@ describe('Riot core', function() {
     tag.unmount()
   })
 
-
-  it('top level attr manipulation having expression', function() {
-
-    injectHTML('<top-level-attr></top-level-attr>')
-
-    riot.tag('top-level-attr', '{opts.value}')
-
-    var tag = riot.mount('top-level-attr')[0]
-
-    tag.root.setAttribute('value', '{1+1}')
-    tag.update()
-
-    expect(tag.root.innerHTML).to.be.equal('2')
-
-    tag.unmount()
-
-  })
-
   it('preserve attributes from tag definition', function() {
 
 
@@ -659,13 +641,6 @@ describe('Riot core', function() {
     expect(tag.root.getAttribute('data-noquote')).to.be.equal('quotes') // not quoted
     expect(tag.root.getAttribute('data-nqlast')).to.be.equal('quotes') // last attr with no quotes
     expect(tag.root.style.fontSize).to.be.equal('2em') // TODO: how to test riot-prefix?
-
-    var opts = tag.root._tag.opts
-    if (opts)
-      expect(opts.riotStyle).to.match(/font-size:\s?2em/i)
-    else
-      console.log('top-attributes._tag.opts not found!')
-
     tag.unmount()
   })
 
