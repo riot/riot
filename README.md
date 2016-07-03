@@ -21,8 +21,8 @@
 |------------------------------------------------|-----------------|----------------------|
 | Angular2                                       | 2.0.0-beta.17   | 125.29kb             |
 | Ember                                          | 2.6.1           | 112.94kb             |
-| Polymer + Web Components Polyfill Lite         | 1.4.0           | 54.48kb              |
 | Angular                                        | 1.5.7           | 56.02kb              |
+| Polymer + Web Components Polyfill Lite         | 1.4.0           | 54.48kb              |
 | React                                          | 15.2.0          | 45.49kb              |
 | Web Components Polyfill                        | 0.7.22          | 33.66kb              |
 | Vue                                            | 1.0.26          | 26.66kb              |
