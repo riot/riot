@@ -1,8 +1,8 @@
-/* Riot v2.4.1, @license MIT */
+/* Riot v2.5.0, @license MIT */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.4.1', settings: {} },
+var riot = { version: 'v2.5.0', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -1286,8 +1286,8 @@ function _each(dom, parent, expr) {
     unmountRedundant(items, tags)
 
     // insert the new nodes
+    root.insertBefore(frag, ref)
     if (isOption) {
-      root.appendChild(frag)
 
       // #1374 FireFox bug in <option selected={expression}>
       if (FIREFOX && !root.multiple) {
@@ -1300,7 +1300,6 @@ function _each(dom, parent, expr) {
         }
       }
     }
-    else root.insertBefore(frag, ref)
 
     // set the 'tags' property of the parent tag
     // if child is 'undefined' it means that we don't need to set this property
@@ -1558,7 +1557,9 @@ function Tag(impl, conf, innerHTML) {
 
   defineProperty(this, 'mixin', function() {
     each(arguments, function(mix) {
-      var instance
+      var instance,
+        props = [],
+        obj
 
       mix = typeof mix === T_STRING ? riot.mixin(mix) : mix
 
@@ -1566,17 +1567,20 @@ function Tag(impl, conf, innerHTML) {
       if (isFunction(mix)) {
         // create the new mixin instance
         instance = new mix()
-        // save the prototype to loop it afterwards
-        mix = mix.prototype
       } else instance = mix
 
+      // build multilevel prototype inheritance chain property list
+      do props = props.concat(Object.getOwnPropertyNames(obj || instance))
+      while (obj = Object.getPrototypeOf(obj || instance))
+
       // loop the keys in the function prototype or the all object keys
-      each(Object.getOwnPropertyNames(mix), function(key) {
+      each(props, function(key) {
         // bind methods to self
-        if (key != 'init')
+        if (key != 'init' && !self[key])
+          // apply method only if it does not already exist on the instance
           self[key] = isFunction(instance[key]) ?
-                        instance[key].bind(self) :
-                        instance[key]
+            instance[key].bind(self) :
+            instance[key]
       })
 
       // init method will be called automatically
@@ -2631,17 +2635,45 @@ riot.vdom = __virtualDom
 riot.Tag = Tag
 /* istanbul ignore next */
 
+// istanbul ignore next
+function safeRegex (re) {
+  var src = re.source
+  var opt = re.global ? 'g' : ''
+
+  if (re.ignoreCase) opt += 'i'
+  if (re.multiline)  opt += 'm'
+
+  for (var i = 1; i < arguments.length; i++) {
+    src = src.replace('@', '\\' + arguments[i])
+  }
+
+  return new RegExp(src, opt)
+}
+
 /**
  * @module parsers
  */
-var parsers = (function () {
+var parsers = (function (win) {
 
-  function _req (name) {
-    var parser = window[name]
+  var _p = {}
+
+  function _r (name) {
+    var parser = win[name]
 
     if (parser) return parser
 
-    throw new Error(name + ' parser not found.')
+    throw new Error('Parser "' + name + '" not loaded.')
+  }
+
+  function _req (name) {
+    var parts = name.split('.')
+
+    if (parts.length !== 2) throw new Error('Bad format for parsers._req')
+
+    var parser = _p[parts[0]][parts[1]]
+    if (parser) return parser
+
+    throw new Error('Parser "' + name + '" not found.')
   }
 
   function extend (obj, props) {
@@ -2662,87 +2694,80 @@ var parsers = (function () {
       filename: url,
       doctype: 'html'
     }, opts)
-    return _req(compilerName).render(html, opts)
+    return _r(compilerName).render(html, opts)
   }
 
-  var _p = {
-    html: {
-      jade: function (html, opts, url) {
-        /* eslint-disable */
-        console.log('DEPRECATION WARNING: jade was renamed "pug" - the jade parser will be removed in riot@3.0.0!')
-        /* eslint-enable */
-        return renderPug('jade', html, opts, url)
-      },
-      pug: function (html, opts, url) {
-        return renderPug('pug', html, opts, url)
-      }
+  _p.html = {
+    jade: function (html, opts, url) {
+      /* eslint-disable */
+      console.log('DEPRECATION WARNING: jade was renamed "pug" - The jade parser will be removed in riot@3.0.0!')
+      /* eslint-enable */
+      return renderPug('jade', html, opts, url)
     },
-
-    css: {
-      less: function (tag, css, opts, url) {
-        var ret
-
-        opts = extend({
-          sync: true,
-          syncImport: true,
-          filename: url
-        }, opts)
-        _req('less').render(css, opts, function (err, result) {
-          // istanbul ignore next
-          if (err) throw err
-          ret = result.css
-        })
-        return ret
-      }
-    },
-
-    js: {
-      es6: function (js, opts) {
-        opts = extend({
-          blacklist: ['useStrict', 'strict', 'react'],
-          sourceMaps: false,
-          comments: false
-        }, opts)
-        return _req('babel').transform(js, opts).code
-      },
-      babel: function (js, opts, url) {
-        return _req('babel').transform(js, extend({ filename: url }, opts)).code
-      },
-      coffee: function (js, opts) {
-        return _req('CoffeeScript').compile(js, extend({ bare: true }, opts))
-      },
-      livescript: function (js, opts) {
-        return _req('livescript').compile(js, extend({ bare: true, header: false }, opts))
-      },
-      typescript: function (js, opts) {
-        return _req('typescript')(js, opts)
-      },
-      none: function (js) {
-        return js
-      }
+    pug: function (html, opts, url) {
+      return renderPug('pug', html, opts, url)
     }
   }
+  _p.css = {
+    less: function (tag, css, opts, url) {
+      var ret
 
+      opts = extend({
+        sync: true,
+        syncImport: true,
+        filename: url
+      }, opts)
+      _r('less').render(css, opts, function (err, result) {
+        // istanbul ignore next
+        if (err) throw err
+        ret = result.css
+      })
+      return ret
+    }
+  }
+  _p.js = {
+    es6: function (js, opts) {
+      opts = extend({
+        blacklist: ['useStrict', 'strict', 'react'],
+        sourceMaps: false,
+        comments: false
+      }, opts)
+      return _r('babel').transform(js, opts).code
+    },
+    babel: function (js, opts, url) {
+      return _r('babel').transform(js, extend({ filename: url }, opts)).code
+    },
+    coffee: function (js, opts) {
+      return _r('CoffeeScript').compile(js, extend({ bare: true }, opts))
+    },
+    livescript: function (js, opts) {
+      return _r('livescript').compile(js, extend({ bare: true, header: false }, opts))
+    },
+    typescript: function (js, opts) {
+      return _r('typescript')(js, opts)
+    },
+    none: function (js) {
+      return js
+    }
+  }
   _p.js.javascript   = _p.js.none
   _p.js.coffeescript = _p.js.coffee
-
+  _p._req  = _req
   _p.utils = {
     extend: extend
   }
 
   return _p
 
-})()
+})(window || global)
 
 riot.parsers = parsers
 
 /**
  * Compiler for riot custom tags
- * @version v2.4.1
+ * @version v2.5.2
  */
 var compile = (function () {
-
-  /* eslint-disable */
 
   var extend = parsers.utils.extend
   /* eslint-enable */
@@ -2773,11 +2798,13 @@ var compile = (function () {
 
   var SPEC_TYPES = /^"(?:number|date(?:time)?|time|month|email|color)\b/i
 
+  var IMPORT_STATEMENT = /^(?: )*(?:import)(?:(?:.*))*$/gm
+
   var TRIM_TRAIL = /[ \t]+$/gm
 
   var
-    RE_HASEXPR = /\x01#\d/,
-    RE_REPEXPR = /\x01#(\d+)/g,
+    RE_HASEXPR = safeRegex(/@#\d/, 'x01'),
+    RE_REPEXPR = safeRegex(/@#(\d+)/g, 'x01'),
     CH_IDEXPR  = '\x01#',
     CH_DQCODE  = '\u2057',
     DQ = '"',
@@ -2879,6 +2906,20 @@ var compile = (function () {
       })
     }
     return html
+  }
+
+  function compileImports (js) {
+    var imp = []
+    var imports = ''
+    while (imp = IMPORT_STATEMENT.exec(js)) {
+      imports += imp[0].trim() + '\n'
+    }
+    return imports
+  }
+
+  function rmImports (js) {
+    var jsCode = js.replace(IMPORT_STATEMENT, '')
+    return jsCode
   }
 
   function _compileHTML (html, opts, pcex) {
@@ -2991,11 +3032,8 @@ var compile = (function () {
     if (!/\S/.test(js)) return ''
     if (!type) type = opts.type
 
-    var parser = opts.parser || (type ? parsers.js[type] : riotjs)
+    var parser = opts.parser || type && parsers._req('js.' + type, true) || riotjs
 
-    if (!parser) {
-      throw new Error('JS parser not found: "' + type + '"')
-    }
     return parser(js, parserOpts, url).replace(/\r\n?/g, '\n').replace(TRIM_TRAIL, '')
   }
 
@@ -3051,10 +3089,10 @@ var compile = (function () {
     if (type) {
       if (type === 'scoped-css') {
         scoped = true
-      } else if (parsers.css[type]) {
-        css = parsers.css[type](tag, css, opts.parserOpts || {}, opts.url)
       } else if (type !== 'css') {
-        throw new Error('CSS parser not found: "' + type + '"')
+
+        var parser = parsers._req('css.' + type, true)
+        css = parser(tag, css, opts.parserOpts || {}, opts.url)
       }
     }
 
@@ -3090,14 +3128,14 @@ var compile = (function () {
     return r && ~s.indexOf('\n') ? s.replace(/\n/g, '\\n') : s
   }
 
-  function mktag (name, html, css, attr, js, opts) {
+  function mktag (name, html, css, attr, js, imports, opts) {
     var
       c = opts.debug ? ',\n  ' : ', ',
       s = '});'
 
     if (js && js.slice(-1) !== '\n') s = '\n' + s
 
-    return 'riot.tag2(\'' + name + SQ +
+    return imports + 'riot.tag2(\'' + name + SQ +
       c + _q(html, 1) +
       c + _q(css) +
       c + _q(attr) + ', function(opts) {\n' + js + s
@@ -3192,11 +3230,8 @@ var compile = (function () {
   }
 
   function compileTemplate (html, url, lang, opts) {
-    var parser = parsers.html[lang]
 
-    if (!parser) {
-      throw new Error('Template parser not found: "' + lang + '"')
-    }
+    var parser = parsers._req('html.' + lang, true)
     return parser(html, opts, url)
   }
 
@@ -3241,6 +3276,7 @@ var compile = (function () {
           jscode = '',
           styles = '',
           html = '',
+          imports = '',
           pcex = []
 
         pcex._bp = _bp
@@ -3287,6 +3323,8 @@ var compile = (function () {
 
             if (included('js')) {
               body = _compileJS(blocks[1], opts, null, null, url)
+              imports = compileImports(jscode)
+              jscode  = rmImports(jscode)
               if (body) jscode += (jscode ? '\n' : '') + body
             }
           }
@@ -3305,7 +3343,7 @@ var compile = (function () {
           return ''
         }
 
-        return mktag(tagName, html, styles, attribs, jscode, opts)
+        return mktag(tagName, html, styles, attribs, jscode, imports, opts)
       })
 
     if (opts.entities) return parts
@@ -3318,7 +3356,7 @@ var compile = (function () {
     html: compileHTML,
     css: compileCSS,
     js: compileJS,
-    version: 'v2.4.1'
+    version: 'v2.5.2'
   }
   return compile
 

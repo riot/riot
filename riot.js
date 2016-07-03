@@ -1,8 +1,8 @@
-/* Riot v2.4.1, @license MIT */
+/* Riot v2.5.0, @license MIT */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.4.1', settings: {} },
+var riot = { version: 'v2.5.0', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -1286,8 +1286,8 @@ function _each(dom, parent, expr) {
     unmountRedundant(items, tags)
 
     // insert the new nodes
+    root.insertBefore(frag, ref)
     if (isOption) {
-      root.appendChild(frag)
 
       // #1374 FireFox bug in <option selected={expression}>
       if (FIREFOX && !root.multiple) {
@@ -1300,7 +1300,6 @@ function _each(dom, parent, expr) {
         }
       }
     }
-    else root.insertBefore(frag, ref)
 
     // set the 'tags' property of the parent tag
     // if child is 'undefined' it means that we don't need to set this property
@@ -1558,7 +1557,9 @@ function Tag(impl, conf, innerHTML) {
 
   defineProperty(this, 'mixin', function() {
     each(arguments, function(mix) {
-      var instance
+      var instance,
+        props = [],
+        obj
 
       mix = typeof mix === T_STRING ? riot.mixin(mix) : mix
 
@@ -1566,17 +1567,20 @@ function Tag(impl, conf, innerHTML) {
       if (isFunction(mix)) {
         // create the new mixin instance
         instance = new mix()
-        // save the prototype to loop it afterwards
-        mix = mix.prototype
       } else instance = mix
 
+      // build multilevel prototype inheritance chain property list
+      do props = props.concat(Object.getOwnPropertyNames(obj || instance))
+      while (obj = Object.getPrototypeOf(obj || instance))
+
       // loop the keys in the function prototype or the all object keys
-      each(Object.getOwnPropertyNames(mix), function(key) {
+      each(props, function(key) {
         // bind methods to self
-        if (key != 'init')
+        if (key != 'init' && !self[key])
+          // apply method only if it does not already exist on the instance
           self[key] = isFunction(instance[key]) ?
-                        instance[key].bind(self) :
-                        instance[key]
+            instance[key].bind(self) :
+            instance[key]
       })
 
       // init method will be called automatically
