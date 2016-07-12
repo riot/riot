@@ -109,7 +109,7 @@ describe('Node/io.js', function() {
   it('render tag: loops having conditional directives', function() {
     var tag = riot.render('loop-conditional')
     var $ = cheerio.load(tag)
-    expect($('loop-conditional-item').length).to.be.equal(2)
+    expect($('loop-conditional-item').length).to.be(3)
   })
 
   it('render tag: input,option,textarea tags having expressions as value', function() {

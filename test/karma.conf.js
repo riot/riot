@@ -23,7 +23,6 @@ module.exports = function(config) {
     },
     files: [
       'helpers/bind.js',
-      '../node_modules/mocha/mocha.js',
       '../node_modules/expect.js/index.js',
       '../dist/riot/riot+compiler.js',
       'helpers/index.js',

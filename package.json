@@ -62,7 +62,7 @@
     "glob": "^7.0.3",
     "istanbul": "^0.4.3",
     "jsdom": "^9.0.0",
-    "karma": "^0.13.22",
+    "karma": "^1.1.1",
     "karma-coverage": "^1.0.0",
     "karma-mocha": "^1.0.1",
     "karma-phantomjs-launcher": "^1.0.1",
