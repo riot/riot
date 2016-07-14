@@ -101,7 +101,7 @@ describe('Mixin', function() {
     }
   })
 
-  it('Will register a mixin with getter/setter functons', function() {
+  it('Will register a mixin with getter/setter functions', function() {
     injectHTML('<my-mixin></my-mixin>')
     riot.tag('my-mixin', '<span>some tag</span>')
 
