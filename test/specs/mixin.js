@@ -88,6 +88,34 @@ describe('Mixin', function() {
     }
   }
 
+  var getterSetterMixin = {
+    _value: false
+  }
+
+  Object.defineProperty(getterSetterMixin, 'value', {
+    get: function() {
+      return this._value
+    },
+    set: function(value) {
+      this._value = value
+    }
+  })
+
+  it('Will register a mixin with getter/setter functons', function() {
+    injectHTML('<my-mixin></my-mixin>')
+    riot.tag('my-mixin', '<span>some tag</span>')
+
+    var tag = riot.mount('my-mixin')[0]
+
+    tag.mixin(getterSetterMixin)
+
+    tag.value = true
+
+    expect(true).to.be(tag._value)
+
+    tag.unmount()
+  })
+
   it('Will register a global mixin without name and mount a tag with global mixed-in attributes and methods', function() {
     riot.mixin(globalMixin)
     injectHTML('<my-mixin></my-mixin>')
