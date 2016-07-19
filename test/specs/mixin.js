@@ -264,7 +264,6 @@ describe('Mixin', function() {
 
     expect(tag._riot_id).to.be(tag.getId())
     expect(tag.tags['sub-mixin']).not.to.be('undefined')
-
     expect(tag.tags['sub-mixin']._riot_id).to.be(tag.tags['sub-mixin'].getId())
     expect(tag.getId()).not.to.be(tag.tags['sub-mixin'].getId())
     tag.unmount()
