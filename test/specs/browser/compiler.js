@@ -1449,6 +1449,14 @@ it('raw contents', function() {
     tags.push(tag)
   })
 
+  it('children in a loop inherit properties on mount', function() {
+    var tag = riot.mount('loop-inherit-mount')[0]
+
+    tag.root.getElementsByTagName('button')[0].dispatchEvent(new CustomEvent('click'))
+
+    expect(tag.tags.child.result).to.be('test')
+  })
+
   it('loop tags get rendered correctly also with conditional attributes', function(done) {
     var tag = riot.mount('loop-conditional')[0]
 
