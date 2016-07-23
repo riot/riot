@@ -2218,7 +2218,7 @@ it('raw contents', function() {
     expect(options[1].value).to.be('1')
   })
 
-  it.only('parallel nested loop remove without error', function(done) {
+  it('parallel nested loop remove without error', function(done) {
     var tag = riot.mount('nested-parallel-loop', {items: [
       {
         type: 'rightsExpiration',
