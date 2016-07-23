@@ -91,6 +91,8 @@ loadTagsAndScripts([
 
   'tag/loop-noloop-option.tag',
 
+  'tag/nested-parallel-loop.tag',
+
   // these tags will be not autoinjected in the DOM
   // that's what `name = false` means
   {

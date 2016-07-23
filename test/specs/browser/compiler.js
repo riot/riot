@@ -2226,4 +2226,39 @@ it('raw contents', function() {
     expect(options[1].value).to.be('1')
   })
 
+  it('parallel nested loop remove without error', function(done) {
+    var tag = riot.mount('nested-parallel-loop', {items: [
+      {
+        type: 'rightsExpiration',
+        accountBased: false,
+        items: [
+          {channel: 'email', value: 'some@email.com'},
+          {channel: 'phone', value: '+1111111111'}
+        ]
+      },
+      {
+        type: 'accountWithdrawal',
+        accountBased: true,
+        items: [
+          {
+            'account1': [
+              {channel: 'email', value: 'some@email.com'},
+              {channel: 'email', value: 'some2@email.com'}
+            ]
+          }
+        ]
+      }
+    ]})[0]
+    tag.on('updated', function() {
+      setTimeout(function() {
+        tag.tags['nested-parallel-loop-group'][0].tags['nested-parallel-loop-simple'][0].del.click()
+        var simples = document.querySelectorAll('nested-parallel-loop-simple')
+        expect(tag.items[0].items.length).to.be(1)
+        expect(simples.length).to.be(1)
+        tags.push(tag)
+        done()
+      }, 0)
+    })
+  })
+
 })
