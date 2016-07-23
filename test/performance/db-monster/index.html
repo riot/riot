@@ -26,32 +26,39 @@
 
 <dbmonster></dbmonster>
 
-<script src="../../../dist/riot/riot+compiler.js"></script>
+<script src="../../../dist/riot/riot%2Bcompiler.js"></script>
 <script src="underscore-min.js"></script>
 <script src="junkola-copied-from-ember.js"></script>
-
+<script src="https://cdn.rawgit.com/mrdoob/stats.js/master/build/stats.min.js"></script>
 <script src="https://cdn.rawgit.com/paulirish/memory-stats.js/master/memory-stats.js"></script>
-<script>
-var stats = new MemoryStats();
-stats.domElement.style.position = 'fixed';
-stats.domElement.style.right        = '0px';
-stats.domElement.style.bottom       = '0px';
-document.body.appendChild( stats.domElement );
-requestAnimationFrame(function rAFloop(){
-    stats.update();
-    requestAnimationFrame(rAFloop);
-});
-</script>
+
 
 <script src="dbmonster.tag" type="riot/tag"></script>
 
 <script type="text/javascript">
   var ROWS = 100;
-  var TIMEOUT = 0;
 
-  riot.mount('dbmonster', {
-    dbs: getDatabases()
-  });
+  riot.compile(function() {
+
+    var tag = riot.mount('dbmonster', {
+      dbs: getDatabases()
+    })[0];
+
+    var memStats = new MemoryStats();
+    var stats = new Stats();
+    memStats.domElement.style.position = 'fixed';
+    stats.domElement.style.bottom = memStats.domElement.style.bottom = '0px';
+    document.body.appendChild( memStats.domElement );
+    document.body.appendChild( stats.domElement );
+    requestAnimationFrame(function rAFloop(){
+      tag.dbs = getDatabases();
+      tag.update();
+      memStats.update();
+      stats.update();
+      requestAnimationFrame(rAFloop);
+    });
+  })
+
 </script>
 
 </body>
