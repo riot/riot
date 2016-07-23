@@ -45,6 +45,7 @@ import '../../tag/obj-key-loop.tag'
 import '../../tag/loop-sync-options.tag'
 import '../../tag/outer.tag'
 import '../../tag/reserved-names.tag'
+import '../../tag/nested-parallel-loop.tag'
 
 import '../../tag/select-test.tag'
 import '../../tag/named-select.tag'
@@ -1324,5 +1325,44 @@ describe('Riot each', function() {
 
     tag.unmount()
   })
+/*
+  TODO: there seem to be still some problem in the loops properties inheritance
+  it('parallel nested loop remove without error', function(done) {
+    injectHTML('<nested-parallel-loop></nested-parallel-loop>')
+    var tag = riot.mount('nested-parallel-loop', {items: [
+      {
+        type: 'rightsExpiration',
+        accountBased: false,
+        items: [
+          {channel: 'email', value: 'some@email.com'},
+          {channel: 'phone', value: '+1111111111'}
+        ]
+      },
+      {
+        type: 'accountWithdrawal',
+        accountBased: true,
+        items: [
+          {
+            'account1': [
+              {channel: 'email', value: 'some@email.com'},
+              {channel: 'email', value: 'some2@email.com'}
+            ]
+          }
+        ]
+      }
+    ]})[0]
+
+    tag.on('mount', function() {
+      setTimeout(function() {
+        console.log(tag.tags['nested-parallel-loop-group'][0].tags)
+        tag.tags['nested-parallel-loop-group'][0].tags['nested-parallel-loop-simple'][0].del.click()
+        var simples = tag.root.querySelectorAll('nested-parallel-loop-simple')
+        expect(tag.items[0].items.length).to.be.equal(1)
+        expect(simples.length).to.be.equal(1)
+        tag.unmount()
+        done()
+      }, 0)
+    })
+  })*/
 
 })

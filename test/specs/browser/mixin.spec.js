@@ -86,6 +86,7 @@ describe('Mixin', function() {
     tag.value = true
 
     expect(true).to.be.equal(tag._value)
+    expect(true).to.be.equal(tag.value)
 
     tag.unmount()
   })
