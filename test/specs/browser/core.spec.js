@@ -321,7 +321,27 @@ describe('Riot core', function() {
     expect(divs[1].querySelector('input').getAttribute('type')).to.be.equal('color')
     expect(divs[2].querySelector('input').getAttribute('type')).to.be.equal('color')
 
+    tag.intags.splice(1, 1)
+    tag.update()
+    expect(tag.tags.color.length).to.be.equal(2) // single + remaining loop color
+    expect(tag.tags.calendar).to.be.an('object')
+
+    // below checks for strays
+    tag.intags.reverse()
+    tag.update()
+    expect(tag.tags.color.length).to.be.equal(2)
+
+    tag.intags.reverse()
+    tag.update()
+    expect(tag.tags.color.length).to.be.equal(2)
+
+    // single tags as tag object and not array after delete
+    tag.intags.splice(1, 1)
+    tag.update()
+    expect(tag.tags.color).to.be.an('object')
+
     tag.unmount()
+
   })
 
   it('support `data-is` for html5 compliance', function() {
