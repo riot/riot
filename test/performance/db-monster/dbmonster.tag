@@ -26,13 +26,5 @@
   </table>
 
   this.dbs = opts.dbs;
-  var that = this;
-
-  function redraw() {
-    that.dbs = getDatabases();
-    that.update();
-    setTimeout(redraw, TIMEOUT);
-  }
-  redraw();
 
 </dbmonster>
