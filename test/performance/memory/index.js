@@ -12,6 +12,7 @@ var riot = require('../../../dist/riot/riot'),
     '<p>{ opts.description }</p>',
     '<my-list-item each="{ opts.items }">'
   `,
+  result,
   myListItem = 'my-list-item',
   myListItemHTML = `
     '<input type="checkbox" onchange="{ onChange }">',
@@ -69,8 +70,8 @@ function setupTags() {
     }
     loop()
   })
-  riot.tag(myListItem, myListItemHTML, function () {
-    this.onChange = function () {
+  riot.tag(myListItem, myListItemHTML, function (opts) {
+    this.onChange = function (e) {
       opts.isActive = e.target.checked
     }
   })

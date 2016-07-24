@@ -1,46 +1,52 @@
-module.exports = function(config) {
+const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
+  path = require('path'),
+  RIOT_WITH_COMPILER_PATH = '../dist/riot/riot+compiler.js',
+  RIOT_PATH = '../dist/riot/riot.js',
+  // split the riot+compiler tests from the normal riot core tests
+  testFiles = `./specs/${process.env.TEST_FOLDER}/**/*.spec.js`,
+  needsCompiler = process.env.TEST_FOLDER === 'compiler',
+  preprocessors = {}
 
-  var saucelabsBrowsers = require('./saucelabs-browsers').browsers,
-    browsers = ['PhantomJS']
+var browsers = ['PhantomJS'] // this is not a constant
 
-  // run the tests only on the saucelabs browsers
-  if (process.env.SAUCELABS) {
-    browsers = Object.keys(saucelabsBrowsers)
-  }
+// run the tests only on the saucelabs browsers
+if (process.env.SAUCELABS) {
+  browsers = Object.keys(saucelabsBrowsers)
+}
 
-  config.set({
+
+module.exports = function(conf) {
+
+  preprocessors[testFiles] = ['rollup']
+  // enable the coverage for riot.js
+  if (!needsCompiler && !process.env.DEBUG) preprocessors[RIOT_PATH] = ['coverage']
+
+  conf.set({
     basePath: '',
     autoWatch: true,
     frameworks: ['mocha'],
-    plugins: [
-      'karma-mocha',
-      'karma-coverage',
-      'karma-phantomjs-launcher',
-      'karma-sauce-launcher'
-    ],
     proxies: {
       '/tag/': '/base/tag/'
     },
     files: [
-      'helpers/bind.js',
-      '../node_modules/mocha/mocha.js',
-      '../node_modules/expect.js/index.js',
-      '../dist/riot/riot+compiler.js',
-      'helpers/index.js',
+      './helpers/polyfills.js',
+      '../node_modules/chai/chai.js',
+      '../node_modules/sinon/pkg/sinon.js',
+      '../node_modules/sinon-chai/lib/sinon-chai.js',
       {
         pattern: 'tag/*.tag',
         served: true,
         included: false
       },
-      'specs/browser/tags-bootstrap.js',
-      'specs/browser/compiler.js',
-      'specs/mixin.js'
+      needsCompiler ? RIOT_WITH_COMPILER_PATH : RIOT_PATH,
+      testFiles
     ],
+    // logLevel: conf.LOG_DEBUG,
     concurrency: 2,
     sauceLabs: {
       build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
-      testName: 'riotjs',
+      testName: `riotjs${needsCompiler ? '+compiler' : ''}`,
       startConnect: true,
       recordVideo: false,
       recordScreenshots: false
@@ -52,12 +58,28 @@ module.exports = function(config) {
     browsers: browsers,
 
     reporters: ['progress', 'saucelabs', 'coverage'],
-    preprocessors: {
-      '../dist/riot/riot+compiler.js': ['coverage']
+    preprocessors: preprocessors,
+
+    rollupPreprocessor: {
+      // use our default rollup plugins adding also the riot plugin
+      // to import dinamically the tags
+      rollup: {
+        external: ['riot'],
+        plugins: [
+          require('rollup-plugin-riot')()
+        ].concat(require('../config/defaults').plugins)
+      },
+      bundle: {
+        globals: {
+          riot: 'riot'
+        },
+        format: 'iife'
+        // sourceMap: 'inline' TODO: enable the sourcemaps in the compiler
+      }
     },
 
     coverageReporter: {
-      dir: '../coverage/browsers',
+      dir: '../coverage',
       reporters: [{
         type: 'lcov',
         subdir: 'report-lcov'

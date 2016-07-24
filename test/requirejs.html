@@ -17,7 +17,9 @@
     </app>
   </script>
   <script>
-    require(['../dist/riot/riot+compiler'], function(riot) {
+    require(['../dist/riot/riot%2Bcompiler.js'], function(riot) {
+      // riot need to be available globally to compile in runtime
+      window.riot = riot
       riot.compile(function() {
         riot.mount('app')
       })

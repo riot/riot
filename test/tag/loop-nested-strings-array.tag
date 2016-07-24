@@ -14,5 +14,6 @@
     <p>{item}</p>
     this.clicked = function(evt){
         this.parent.item.array.reverse()
+        this.parent.update()
     }
 </loop-nested-strings-array-item>

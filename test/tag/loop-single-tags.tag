@@ -1,12 +1,11 @@
 <loop-single-tags>
-  <ul>
-    <li each={ tags }>{ name }</li>
-  </ul>
   <single-tag1></single-tag1>
   <single-tag2></single-tag2>
   <single-tag3></single-tag3>
   <single-tag4></single-tag4>
-
+  <ul>
+    <li each={ tags }>{ name }</li>
+  </ul>
 </loop-single-tags>
 
 <single-tag1>

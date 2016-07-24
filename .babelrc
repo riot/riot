@@ -1,0 +1,9 @@
+{
+  "compact": true,
+  "presets": [
+    "babel-preset-es2015-rollup"
+  ],
+  "plugins": [
+    "check-es2015-constants"
+  ]
+}

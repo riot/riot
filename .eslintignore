@@ -1,7 +1,7 @@
-lib/browser/wrap
+# this folder will be re added once the tests will be refactored
 test/polyfills
 test/vendor
-test/saucelabs-browsers.js
+/test/coverage
 test/specs/server/compiler/fixtures
 test/specs/server/compiler/expect
 test/specs/server/compiler/parsers/js

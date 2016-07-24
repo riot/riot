@@ -1,3 +1,7 @@
+import { injectHTML } from '../../helpers/index'
+
+const expect = chai.expect
+
 describe('Mixin', function() {
 
   var IdMixin = {
@@ -6,46 +10,16 @@ describe('Mixin', function() {
     }
   }
 
-  /*eslint-disable */
-
-  // generated from babeljs
-  // src: http://babeljs.io/repl/#?experimental=false&evaluate=true&loose=false&spec=false&code=class%20FunctMixin%20{%0A%20%20init%28%29%20{%0A%20%20%20%20this.type%20%3D%20%27func%27%0A%20%20}%0A%20%20get%20message%28%29%20{%0A%20%20%20%20return%20%27Initialized%27%3B%0A%20%20}%0A}
-
-  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
-
-  function inheritsFrom(child, parent) {
-    child.prototype = Object.create(parent.prototype)
+  class FunctMixin {
+    init() {
+      this.type = 'func'
+    }
+    get message() {
+      return 'Initialized'
+    }
   }
 
-  var FunctMixin = (function() {
-    function FunctMixin() {
-      _classCallCheck(this, FunctMixin)
-    }
-
-    _createClass(FunctMixin, [{
-      key: 'init',
-      value: function init() {
-        this.type = 'func'
-      }
-    }, {
-      key: 'message',
-      get: function get() {
-        return 'Initialized';
-      }
-    }]);
-
-    return FunctMixin
-  })();
-
-  function ChildMixin() {}
-
-  inheritsFrom(ChildMixin, FunctMixin)
-
-  /*eslint-enable */
-
+  class ChildMixin extends FunctMixin {}
 
   var OptsMixin = {
     getOpts: function() {
@@ -88,6 +62,35 @@ describe('Mixin', function() {
     }
   }
 
+  var getterSetterMixin = {
+    _value: false
+  }
+
+  Object.defineProperty(getterSetterMixin, 'value', {
+    get: function() {
+      return this._value
+    },
+    set: function(value) {
+      this._value = value
+    }
+  })
+
+  it('Will register a mixin with getter/setter functions', function() {
+    injectHTML('<my-mixin></my-mixin>')
+    riot.tag('my-mixin', '<span>some tag</span>')
+
+    var tag = riot.mount('my-mixin')[0]
+
+    tag.mixin(getterSetterMixin)
+
+    tag.value = true
+
+    expect(true).to.be.equal(tag._value)
+    expect(true).to.be.equal(tag.value)
+
+    tag.unmount()
+  })
+
   it('Will register a global mixin without name and mount a tag with global mixed-in attributes and methods', function() {
     riot.mixin(globalMixin)
     injectHTML('<my-mixin></my-mixin>')
@@ -95,8 +98,8 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect('initialized').to.be(tag.globalAttr)
-    expect('global').to.be(tag.getGlobal())
+    expect('initialized').to.be.equal(tag.globalAttr)
+    expect('global').to.be.equal(tag.getGlobal())
     tag.unmount()
   })
 
@@ -108,10 +111,10 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect('initialized').to.be(tag.globalAttr)
-    expect('initialized2').to.be(tag.globalAttr2)
-    expect('global').to.be(tag.getGlobal())
-    expect('global2').to.be(tag.getGlobal2())
+    expect('initialized').to.be.equal(tag.globalAttr)
+    expect('initialized2').to.be.equal(tag.globalAttr2)
+    expect('global').to.be.equal(tag.getGlobal())
+    expect('global2').to.be.equal(tag.getGlobal2())
     tag.unmount()
   })
 
@@ -122,8 +125,8 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect('initialized').to.be(tag.globalAttr)
-    expect('global').to.be(tag.getGlobal())
+    expect('initialized').to.be.equal(tag.globalAttr)
+    expect('global').to.be.equal(tag.getGlobal())
     tag.unmount()
   })
 
@@ -135,10 +138,10 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect('initialized').to.be(tag.globalAttr)
-    expect('initialized2').to.be(tag.globalAttr2)
-    expect('global').to.be(tag.getGlobal())
-    expect('global2').to.be(tag.getGlobal2())
+    expect('initialized').to.be.equal(tag.globalAttr)
+    expect('initialized2').to.be.equal(tag.globalAttr2)
+    expect('global').to.be.equal(tag.getGlobal())
+    expect('global2').to.be.equal(tag.getGlobal2())
     tag.unmount()
   })
 
@@ -152,7 +155,7 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect(tag._riot_id).to.be(tag.getId())
+    expect(tag._riot_id).to.be.equal(tag.getId())
     tag.unmount()
   })
 
@@ -173,7 +176,7 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect(tag.root).to.be(tag.getRoot())
+    expect(tag.root).to.be.equal(tag.getRoot())
     tag.unmount()
   })
 
@@ -191,10 +194,10 @@ describe('Mixin', function() {
     var first = riot.mount('#one')[0],
       second = riot.mount('#two')[0]
 
-    expect(first._riot_id).to.be(first.getId())
-    expect(second._riot_id).to.be(second.getId())
-    expect(first._riot_id).not.to.be(second._riot_id)
-    expect(first.getId()).not.to.be(second.getId())
+    expect(first._riot_id).to.be.equal(first.getId())
+    expect(second._riot_id).to.be.equal(second.getId())
+    expect(first._riot_id).not.to.be.equal(second._riot_id)
+    expect(first.getId()).not.to.be.equal(second.getId())
     first.unmount()
     second.unmount()
   })
@@ -212,10 +215,10 @@ describe('Mixin', function() {
         'value': Math.random()
       }
 
-    expect(tag._riot_id).to.be(tag.getId())
-    expect(tag.opts).to.be(tag.getOpts())
+    expect(tag._riot_id).to.be.equal(tag.getId())
+    expect(tag.opts).to.be.equal(tag.getOpts())
     tag.setOpts(newOpts)
-    expect(tag.opts).to.be(tag.getOpts())
+    expect(tag.opts).to.be.equal(tag.getOpts())
 
     tag.unmount()
   })
@@ -233,10 +236,10 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect(tag._riot_id).to.be(tag.getId())
-    expect(tag.tags['sub-mixin']).not.to.be('undefined')
-    expect(tag.tags['sub-mixin']._riot_id).to.be(tag.tags['sub-mixin'].getId())
-    expect(tag.getId()).not.to.be(tag.tags['sub-mixin'].getId())
+    expect(tag._riot_id).to.be.equal(tag.getId())
+    expect(tag.tags['sub-mixin']).not.to.be.equal('undefined')
+    expect(tag.tags['sub-mixin']._riot_id).to.be.equal(tag.tags['sub-mixin'].getId())
+    expect(tag.getId()).not.to.be.equal(tag.tags['sub-mixin'].getId())
     tag.unmount()
   })
 
@@ -246,8 +249,8 @@ describe('Mixin', function() {
       this.mixin(FunctMixin)
     })
     var tag = riot.mount('my-mixin')[0]
-    expect(tag.root.innerHTML).to.be('<span>Initialized</span>')
-    expect(tag.type).to.be('func')
+    expect(tag.root.innerHTML).to.be.equal('<span>Initialized</span>')
+    expect(tag.type).to.be.equal('func')
     tag.unmount()
   })
 
@@ -260,7 +263,7 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect(tag.root.innerHTML).to.be('<span>some tag ' + tag._riot_id + '</span>')
+    expect(tag.root.innerHTML).to.be.equal('<span>some tag ' + tag._riot_id + '</span>')
     tag.unmount()
   })
 
@@ -273,7 +276,7 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect(tag.message).to.be('initialized')
+    expect(tag.message).to.be.equal('initialized')
     tag.unmount()
   })
 
@@ -287,7 +290,7 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect(tag._riot_id).to.be(tag.getId())
+    expect(tag._riot_id).to.be.equal(tag.getId())
     tag.unmount()
   })
 
@@ -300,7 +303,7 @@ describe('Mixin', function() {
     })
 
     var tag = riot.mount('my-mixin')[0]
-    expect(tag.type).to.be('func')
+    expect(tag.type).to.be.equal('func')
     tag.unmount()
   })
 
@@ -313,7 +316,7 @@ describe('Mixin', function() {
     })
 
     var tag = riot.mount('my-mixin')[0]
-    expect(tag.type).to.be('func')
+    expect(tag.type).to.be.equal('func')
     tag.unmount()
   })
 })

@@ -1,6 +1,6 @@
 {
   "name": "riot",
-  "version": "2.5.0",
+  "version": "3.0.0-alpha.5",
   "description": "A React-like user interface micro-library",
   "homepage": "http://riotjs.com/",
   "repository": { "type": "git", "url": "git://github.com/riot/riot.git" },
@@ -9,6 +9,7 @@
     "Richard Bondi https://github.com/rsbondi",
     "Gianluca Guarini https://github.com/GianlucaGuarini",
     "Tsutomu Kawamura https://github.com/cognitom",
+    "Grant Marvin     https://github.com/rogueg",
     "Alberto Martínez https://github.com/aMarCruz",
     "Tero Piirainen  https://github.com/tipiirai"
   ],

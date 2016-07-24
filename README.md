@@ -106,7 +106,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Concise syntax
 - Power shortcuts: `class={ enabled: is_enabled, hidden: hasErrors() }`.
-- No extra brain load such as `render`, `state`, `constructor` or `shouldComponentUpdate`
+- No extra brain load such as `render`, `state`, or `constructor`.
 - Interpolation: `Add #{ items.length + 1 }` or `class="item { selected: flag }"`
 - Compact ES6 method syntax.
 
@@ -216,6 +216,7 @@ It's actively maintained by:
  - [Gianluca Guarini](https://github.com/GianlucaGuarini)
  - [Tsutomu Kawamura](https://github.com/cognitom)
  - [Alberto Martínez](https://github.com/aMarCruz)
+ - [Grant Marvin](https://github.com/rogueg)
  - [Tero Piirainen](https://github.com/tipiirai)
 
 ### Buy us a coffee :coffee:
