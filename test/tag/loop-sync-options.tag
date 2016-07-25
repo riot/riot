@@ -14,9 +14,9 @@
 <loop-sync-options-child>
 
   this.on('update mount', function() {
-    this.val = this.opts.data.val
-    this.bool = this.opts.data.bool
-    this.num = this.opts.data.num
+    this.val = opts.data.val
+    this.bool = opts.data.bool
+    this.num = opts.data.num
   })
 
 </loop-sync-options-child>

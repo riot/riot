@@ -620,6 +620,7 @@ describe('Riot each', function() {
       return tag.root.getElementsByTagName('loop-sync-options-child')[idx]._tag
     }
 
+    tag.update()
     expect(ch(0).val).to.be.equal('foo')
     expect(ch(0).root.className).to.be.equal('active')
     expect(ch(1).val).to.be.equal(undefined)
