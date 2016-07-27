@@ -26,6 +26,7 @@ import '../../tag/loop-cols.tag'
 import '../../tag/loop-child.tag'
 import '../../tag/loop-combo.tag'
 import '../../tag/loop-reorder.tag'
+import '../../tag/loop-reorder-inner.tag'
 import '../../tag/loop-manip.tag'
 import '../../tag/loop-object.tag'
 import '../../tag/loop-tag-instances.tag'
@@ -538,6 +539,20 @@ describe('Riot each', function() {
     tag.update()
     expect(tag.root.querySelectorAll('span')[0].className).to.be.equal('nr-5')
     expect(tag.root.querySelectorAll('div')[0].className).to.be.equal('nr-0')
+
+    tag.unmount()
+  })
+
+  it('loop reorder dom nodes with inner content intact', function() {
+
+    injectHTML('<loop-reorder-inner></loop-reorder-inner>')
+
+    var tag = riot.mount('loop-reorder-inner')[0]
+
+    expect(tag.root.querySelectorAll('span')[0].style.color).to.be.equal('red')
+    tag.items.reverse()
+    tag.update()
+    expect(tag.root.querySelectorAll('span')[1].style.color).to.be.equal('red')
 
     tag.unmount()
   })
