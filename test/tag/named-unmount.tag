@@ -1,5 +1,5 @@
 <named-unmount>
-  <div name='first' if={cond}>
+  <div ref='first' if={cond}>
     <div ref='second'></div>
   </div>
 
