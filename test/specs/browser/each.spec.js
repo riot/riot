@@ -451,7 +451,7 @@ describe('Riot each', function() {
 
   })
 
-  it('the named on a select tag gets', function() {
+  it('the referenced on a select tag gets', function() {
 
     injectHTML('<named-select></named-select>')
 
@@ -573,7 +573,7 @@ describe('Riot each', function() {
     tag.forEach(tag => tag.unmount())
   })
 
-  it('dynamically named elements in a loop', function() {
+  it('dynamically referenced elements in a loop', function() {
 
     injectHTML('<loop-named></loop-named>')
 
@@ -1268,7 +1268,7 @@ describe('Riot each', function() {
     tag.unmount()
   })
 
-  it('named elements in object key loop do not duplicate', function() {
+  it('referenced elements in object key loop do not duplicate', function() {
 
     injectHTML('<obj-key-loop></obj-key-loop>')
 

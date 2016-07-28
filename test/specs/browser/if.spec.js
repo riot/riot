@@ -90,7 +90,7 @@ describe('Riot if', function() {
     tag.unmount()
   })
 
-  it('named refs are removed from parent when element leaves DOM', function() {
+  it('refs are removed from parent when element leaves DOM', function() {
     injectHTML('<named-unmount></named-unmount>')
     var tag = riot.mount('named-unmount')[0]
 
@@ -104,6 +104,8 @@ describe('Riot if', function() {
     expect(tag.refs.third).to.be.an.instanceof(HTMLElement)
 
     tag.update({cond: false, items: []})
+
+    console.log(refs)
 
     expect(tag.refs.first).to.be.undefined
     expect(tag.refs.second).to.be.undefined
