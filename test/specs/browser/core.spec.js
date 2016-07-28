@@ -483,7 +483,7 @@ describe('Riot core', function() {
 
   })
 
-  it('static named tag for tags property', function() {
+  it('static referenced tag for tags property', function() {
     injectHTML('<named-child-parent></named-child-parent>')
     var tag = riot.mount('named-child-parent')[0]
     expect(tag.refs['tags-child'].root.innerHTML).to.be.equal('I have a name')
@@ -605,7 +605,7 @@ describe('Riot core', function() {
     tag.unmount()
   })
 
-  it('multi named elements to an array', function() {
+  it('multi referenced elements to an array', function() {
 
     injectHTML('<multi-named></multi-named>')
 
@@ -784,7 +784,7 @@ describe('Riot core', function() {
 
     injectHTML('<riot-tmp></riot-tmp>')
 
-    riot.tag('inner', '<button id="btn" onclick="{foo}" />', function() {
+    riot.tag('inner', '<button ref="btn" onclick="{foo}" />', function() {
       this.foo = function() {}.bind()
     })
 

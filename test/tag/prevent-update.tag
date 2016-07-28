@@ -1,6 +1,6 @@
 <prevent-update>
   <p onclick={ changeNameSilently }>click me</p>
-  <p id="fancy-name">{ name }</p>
+  <p ref="fancy-name">{ name }</p>
 
   this.name = 'john'
   changeNameSilently(e) {

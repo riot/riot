@@ -37,9 +37,8 @@
 </if-level1>
 
 <if-mount>
-    <if-level1 name="ff" condition="false" level2="false"></if-level1>
-    <if-level1 name="ft" condition="false" level2="true"></if-level1>
-    <if-level1 name="tf" condition="true" level2="false"></if-level1>
-    <if-level1 name="tt" condition="true" level2="true"></if-level1>
+    <if-level1 ref="ff" condition="false" level2="false"></if-level1>
+    <if-level1 ref="ft" condition="false" level2="true"></if-level1>
+    <if-level1 ref="tf" condition="true" level2="false"></if-level1>
+    <if-level1 ref="tt" condition="true" level2="true"></if-level1>
 </if-mount>
-
