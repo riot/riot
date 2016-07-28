@@ -486,7 +486,7 @@ describe('Riot core', function() {
   it('static named tag for tags property', function() {
     injectHTML('<named-child-parent></named-child-parent>')
     var tag = riot.mount('named-child-parent')[0]
-    expect(tag['tags-child'].root.innerHTML).to.be.equal('I have a name')
+    expect(tag.refs['tags-child'].root.innerHTML).to.be.equal('I have a name')
 
     tag.unmount()
   })
@@ -526,11 +526,11 @@ describe('Riot core', function() {
 
     var tag = riot.mount('prevent-update')[0]
 
-    expect(tag['fancy-name'].innerHTML).to.be.equal('john')
+    expect(tag.refs['fancy-name'].innerHTML).to.be.equal('john')
 
     tag.root.getElementsByTagName('p')[0].dispatchEvent(new CustomEvent('click'))
 
-    expect(tag['fancy-name'].innerHTML).to.be.equal('john')
+    expect(tag.refs['fancy-name'].innerHTML).to.be.equal('john')
 
     tag.unmount()
   })
@@ -611,21 +611,21 @@ describe('Riot core', function() {
 
     var mount = function() {
         var tag = this
-        expect(tag.rad[0].value).to.be.equal('1')
-        expect(tag.rad[1].value).to.be.equal('2')
-        expect(tag.rad[2].value).to.be.equal('3')
-        expect(tag.t.value).to.be.equal('1')
-        expect(tag.t_1.value).to.be.equal('1')
-        expect(tag.t_2.value).to.be.equal('2')
-        expect(tag.c[0].value).to.be.equal('1')
-        expect(tag.c[1].value).to.be.equal('2')
+        expect(tag.refs.rad[0].value).to.be.equal('1')
+        expect(tag.refs.rad[1].value).to.be.equal('2')
+        expect(tag.refs.rad[2].value).to.be.equal('3')
+        expect(tag.refs.t.value).to.be.equal('1')
+        expect(tag.refs.t_1.value).to.be.equal('1')
+        expect(tag.refs.t_2.value).to.be.equal('2')
+        expect(tag.refs.c[0].value).to.be.equal('1')
+        expect(tag.refs.c[1].value).to.be.equal('2')
       },
       mountChild = function() {
         var tag = this
-        expect(tag.child.value).to.be.equal('child')
-        expect(tag.check[0].value).to.be.equal('one')
-        expect(tag.check[1].value).to.be.equal('two')
-        expect(tag.check[2].value).to.be.equal('three')
+        expect(tag.refs.child.value).to.be.equal('child')
+        expect(tag.refs.check[0].value).to.be.equal('one')
+        expect(tag.refs.check[1].value).to.be.equal('two')
+        expect(tag.refs.check[2].value).to.be.equal('three')
 
       }
     var tag = riot.mount('multi-named', { mount: mount, mountChild: mountChild })[0]
@@ -650,9 +650,9 @@ describe('Riot core', function() {
     injectHTML('<input-values></input-values>')
 
     var tag = riot.mount('input-values')[0]
-    expect(tag.i.value).to.be.equal('foo')
+    expect(tag.refs.i.value).to.be.equal('foo')
     tag.update()
-    expect(tag.i.value).to.be.equal('hi')
+    expect(tag.refs.i.value).to.be.equal('hi')
   })
 
 
@@ -797,7 +797,7 @@ describe('Riot core', function() {
     var tag = riot.mount('riot-tmp')[0]
 
     expect(tag.updateCount).to.be.equal(0)
-    tag.tags.inner[0].btn.dispatchEvent(new CustomEvent('click'))
+    tag.tags.inner[0].refs.btn.dispatchEvent(new CustomEvent('click'))
     expect(tag.updateCount).to.be.equal(0)
     tag.unmount()
 
