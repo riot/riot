@@ -105,8 +105,6 @@ describe('Riot if', function() {
 
     tag.update({cond: false, items: []})
 
-    console.log(refs)
-
     expect(tag.refs.first).to.be.undefined
     expect(tag.refs.second).to.be.undefined
     expect(tag.refs.third).to.be.undefined
