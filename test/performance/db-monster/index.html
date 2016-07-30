@@ -36,27 +36,27 @@
 <script src="dbmonster.tag" type="riot/tag"></script>
 
 <script type="text/javascript">
-  var ROWS = 100;
+  var ROWS = 100
 
   riot.compile(function() {
 
     var tag = riot.mount('dbmonster', {
       dbs: getDatabases()
-    })[0];
+    })[0]
 
-    var memStats = new MemoryStats();
-    var stats = new Stats();
-    memStats.domElement.style.position = 'fixed';
-    stats.domElement.style.bottom = memStats.domElement.style.bottom = '0px';
-    document.body.appendChild( memStats.domElement );
-    document.body.appendChild( stats.domElement );
+    var memStats = new MemoryStats()
+    var stats = new Stats()
+    memStats.domElement.style.position = 'fixed'
+    stats.domElement.style.bottom = memStats.domElement.style.bottom = '0px'
+    document.body.appendChild( memStats.domElement )
+    document.body.appendChild( stats.domElement )
     requestAnimationFrame(function rAFloop(){
-      tag.dbs = getDatabases();
-      tag.update();
-      memStats.update();
-      stats.update();
-      requestAnimationFrame(rAFloop);
-    });
+      tag.dbs = getDatabases()
+      tag.update()
+      memStats.update()
+      stats.update()
+      requestAnimationFrame(rAFloop)
+    })
   })
 
 </script>
