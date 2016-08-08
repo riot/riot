@@ -803,5 +803,77 @@ describe('Riot core', function() {
 
   })
 
+  it('create tags extending the riot.Tag constructor', function() {
+    class Component extends riot.Tag {
+      get name() { return 'component' }
+      get tmpl() { return '<h1 onclick="{ onClick }">{ opts.message } { user }</h1>' }
+      onCreate() {
+        this.user = 'dear User'
+      }
+      onClick() {
+        this.user = 'the user is gone'
+      }
+    }
+
+    var component = new Component(document.createElement('div'), {
+      message: 'hello'
+    })
+    var h1 = $('h1', component.root)
+
+    expect(component.opts.message).to.be.equal('hello')
+    expect(component.user).to.be.equal('dear User')
+    expect(h1.textContent).to.be.equal('hello dear User')
+
+    h1.dispatchEvent(new CustomEvent('click'))
+
+    expect(h1.textContent).to.be.equal('hello the user is gone')
+
+    // make sure the component is properly registered
+    injectHTML('<component></component>')
+
+    var tag = riot.mount('component', {message: 'hi'})[0]
+    expect(tag.opts.message).to.be.equal('hi')
+
+    tag.unmount()
+    component.unmount()
+  })
+
+  it('extend existing tags created via riot.Tag constructor', function() {
+    class Component extends riot.Tag {
+      get name() { return 'component' }
+      get tmpl() { return '<h1 onclick="{ onClick }">{ opts.message } { user }</h1>' }
+      onCreate() {
+        this.user = 'dear User'
+      }
+      onClick() {
+        this.user = 'the user is gone'
+      }
+    }
+
+    class SubComponent extends Component {
+      get name() { return 'sub-component' }
+      get tmpl() { return '<h2 onclick="{ onClick }">{ opts.message } { user }</h2>' }
+    }
+
+    var subComponent = new SubComponent(document.createElement('div'), {
+      message: 'hello'
+    })
+
+    var h2 = $('h2', subComponent.root)
+
+    expect(subComponent.opts.message).to.be.equal('hello')
+    expect(subComponent.user).to.be.equal('dear User')
+    expect(h2.textContent).to.be.equal('hello dear User')
+
+    // make sure the sub-component is properly registered
+    injectHTML('<sub-component></sub-component>')
+
+    var tag = riot.mount('sub-component', {message: 'hi'})[0]
+    expect(tag.opts.message).to.be.equal('hi')
+
+    tag.unmount()
+    subComponent.unmount()
+  })
+
 
 })
