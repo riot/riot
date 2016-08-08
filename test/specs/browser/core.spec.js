@@ -7,7 +7,8 @@ import {
   appendTag,
   getRiotStyles,
   makeTag,
-  defineTag
+  defineTag,
+  fireEvent
 } from '../../helpers/index'
 
 // include special tags to test specific features
@@ -528,7 +529,7 @@ describe('Riot core', function() {
 
     expect(tag['fancy-name'].innerHTML).to.be.equal('john')
 
-    tag.root.getElementsByTagName('p')[0].dispatchEvent(new CustomEvent('click'))
+    fireEvent(tag.root.getElementsByTagName('p')[0], 'click')
 
     expect(tag['fancy-name'].innerHTML).to.be.equal('john')
 
@@ -565,12 +566,12 @@ describe('Riot core', function() {
 
     currentItem = tag.items[0]
     currentIndex = 0
-    divTags[0].dispatchEvent(new CustomEvent('click'))
+    fireEvent(divTags[0], 'click')
     tag.items.reverse()
     tag.update()
     currentItem = tag.items[0]
     currentIndex = 0
-    divTags[0].dispatchEvent(new CustomEvent('click'))
+    fireEvent(divTags[0], 'click')
 
     expect(callbackCalls).to.be.equal(2)
 
@@ -797,7 +798,7 @@ describe('Riot core', function() {
     var tag = riot.mount('riot-tmp')[0]
 
     expect(tag.updateCount).to.be.equal(0)
-    tag.tags.inner[0].btn.dispatchEvent(new CustomEvent('click'))
+    fireEvent(tag.tags.inner[0].btn, 'click')
     expect(tag.updateCount).to.be.equal(0)
     tag.unmount()
 
@@ -824,7 +825,7 @@ describe('Riot core', function() {
     expect(component.user).to.be.equal('dear User')
     expect(h1.textContent).to.be.equal('hello dear User')
 
-    h1.dispatchEvent(new CustomEvent('click'))
+    fireEvent(h1, 'click')
 
     expect(h1.textContent).to.be.equal('hello the user is gone')
 

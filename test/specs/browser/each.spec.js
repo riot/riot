@@ -4,7 +4,8 @@ import {
   $,
   getNextSibling,
   getPreviousSibling,
-  normalizeHTML
+  normalizeHTML,
+  fireEvent
 } from '../../helpers/index'
 
 // include special tags to test specific features
@@ -183,23 +184,24 @@ describe('Riot each', function() {
       var curItem = tag.removes[0],
         ev = new CustomEvent('click'),
         el = root.getElementsByTagName('dt')[0]
+
       el.dispatchEvent(ev)
       expect(curItem).to.be.equal(ev.item)
     }
 
     children = root.getElementsByTagName('li')
     Array.prototype.forEach.call(children, function(child) {
-      child.dispatchEvent(new CustomEvent('click'))
+      fireEvent(child, 'click')
     })
     expect(children.length).to.be.equal(5)
 
     // no update is required here
-    button.dispatchEvent(new CustomEvent('click'))
+    fireEvent(button, 'click')
     children = root.getElementsByTagName('li')
     expect(children.length).to.be.equal(10)
 
     Array.prototype.forEach.call(children, function(child) {
-      child.dispatchEvent(new CustomEvent('click'))
+      fireEvent(child, 'click')
     })
 
     expect(normalizeHTML(root.getElementsByTagName('ul')[0].innerHTML)).to.be.equal('<li>0 item #0 </li><li>1 item #1 </li><li>2 item #2 </li><li>3 item #3 </li><li>4 item #4 </li><li>5 item #5 </li><li>6 item #6 </li><li>7 item #7 </li><li>8 item #8 </li><li>9 item #9 </li>')
@@ -209,7 +211,7 @@ describe('Riot each', function() {
     children = root.getElementsByTagName('li')
     expect(children.length).to.be.equal(10)
     Array.prototype.forEach.call(children, function(child) {
-      child.dispatchEvent(new CustomEvent('click'))
+      fireEvent(child, 'click')
     })
 
     expect(normalizeHTML(root.getElementsByTagName('ul')[0].innerHTML)).to.be.equal('<li>0 item #9 </li><li>1 item #8 </li><li>2 item #7 </li><li>3 item #6 </li><li>4 item #5 </li><li>5 item #4 </li><li>6 item #3 </li><li>7 item #2 </li><li>8 item #1 </li><li>9 item #0 </li>'.trim())
@@ -220,7 +222,7 @@ describe('Riot each', function() {
     tag.update()
 
     Array.prototype.forEach.call(children, function(child) {
-      child.dispatchEvent(new CustomEvent('click'))
+      fireEvent(child, 'click')
     })
 
     expect(normalizeHTML(root.getElementsByTagName('ul')[0].innerHTML)).to.be.equal('<li>0 item #9 </li><li>1 item #1 </li><li>2 item #7 </li><li>3 item #6 </li><li>4 item #5 </li><li>5 item #4 </li><li>6 item #3 </li><li>7 item #2 </li><li>8 item #8 </li><li>9 item #0 </li>'.trim())
@@ -250,11 +252,11 @@ describe('Riot each', function() {
 
     // 1st test
     testItem = { outerCount: 'out', outerI: 0 }
-    tag.root.getElementsByTagName('inner-loop-events')[0].dispatchEvent(new CustomEvent('click'))
+    fireEvent(tag.root.getElementsByTagName('inner-loop-events')[0], 'click')
     // 2nd test inner contents
     testItem = { innerCount: 'in', innerI: 0 }
-    tag.root.getElementsByTagName('button')[1].dispatchEvent(new CustomEvent('click'))
-    tag.root.getElementsByTagName('li')[0].dispatchEvent(new CustomEvent('click'))
+    fireEvent(tag.root.getElementsByTagName('button')[1], 'click')
+    fireEvent(tag.root.getElementsByTagName('li')[0], 'click')
 
     expect(eventsCounter).to.be.equal(3)
 
@@ -293,7 +295,7 @@ describe('Riot each', function() {
     expect(tag.tags['looped-child'].length).to.be.equal(3)
 
     expect(root.getElementsByTagName('looped-child')[0].style.color).to.be.equal('red')
-    root.getElementsByTagName('looped-child')[0].getElementsByTagName('button')[0].dispatchEvent(new CustomEvent('click'))
+    fireEvent(root.getElementsByTagName('looped-child')[0].getElementsByTagName('button')[0], 'click')
     expect(root.getElementsByTagName('looped-child')[0].style.color).to.be.equal('blue')
 
     tag.unmount()
@@ -797,7 +799,7 @@ describe('Riot each', function() {
       tag.tags['loop-inherit-item'][0].root.onmouseenter({})
       expect(tag.wasHovered).to.be.equal(true)
       expect(tag.root.getElementsByTagName('div').length).to.be.equal(4)
-      tag.tags['loop-inherit-item'][0].root.dispatchEvent(new CustomEvent('click'))
+      fireEvent(tag.tags['loop-inherit-item'][0].root, 'click')
       expect(tag.tags['loop-inherit-item'][0].wasClicked).to.be.equal(true)
 
       tag.unmount()
@@ -825,7 +827,7 @@ describe('Riot each', function() {
         children = tag.root.getElementsByTagName('loop-nested-strings-array-item')
       expect(children.length).to.be.equal(4)
       children = tag.root.getElementsByTagName('loop-nested-strings-array-item')
-      children[0].dispatchEvent(new CustomEvent('click'))
+      fireEvent(children[0], 'click')
       expect(children.length).to.be.equal(4)
       expect(normalizeHTML(children[0].innerHTML)).to.be.equal('<p>b</p>')
       expect(normalizeHTML(children[1].innerHTML)).to.be.equal('<p>a</p>')
@@ -839,7 +841,7 @@ describe('Riot each', function() {
     injectHTML('<loop-numbers-nested></loop-numbers-nested>')
     var tag = riot.mount('loop-numbers-nested')[0]
     expect(tag.root.getElementsByTagName('ul')[0].getElementsByTagName('li').length).to.be.equal(4)
-    tag.root.getElementsByTagName('ul')[0].getElementsByTagName('li')[0].dispatchEvent(new CustomEvent('click'))
+    fireEvent(tag.root.getElementsByTagName('ul')[0].getElementsByTagName('li')[0], 'click')
     expect(tag.root.getElementsByTagName('ul')[0].getElementsByTagName('li').length).to.be.equal(2)
     tag.unmount()
   })
@@ -878,7 +880,7 @@ describe('Riot each', function() {
     }
 
     expect(bodies[0].getElementsByTagName('tr')[0].style.backgroundColor).to.be.equal('white')
-    tag.root.getElementsByTagName('button')[0].dispatchEvent(new CustomEvent('click'))
+    fireEvent(tag.root.getElementsByTagName('button')[0], 'click')
     expect(bodies[0].getElementsByTagName('tr')[0].style.backgroundColor).to.be.equal('lime')
 
     tag.unmount()

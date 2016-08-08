@@ -68,3 +68,9 @@ export function injectHTML(html) {
     document.body.appendChild(div.firstChild)
   }
 }
+
+export function fireEvent(el, name) {
+  var e = document.createEvent('HTMLEvents')
+  e.initEvent(name, false, true)
+  el.dispatchEvent(e)
+}

@@ -23,4 +23,3 @@ if (typeof window.CustomEvent !== 'function') {
   CE.prototype = window.Event.prototype
   window.CustomEvent = CE
 }
-
