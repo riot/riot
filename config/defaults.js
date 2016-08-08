@@ -12,6 +12,6 @@ module.exports = {
       include: 'node_modules/**',
       ignoreGlobal: true
     }),
-    babel({ compact: false })
+    babel()
   ]
 }
