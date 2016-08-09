@@ -1,5 +1,5 @@
 <named-select>
-  <select name="daSelect" each={ item in items }>
+  <select ref="daSelect" each={ item in items }>
     <option>---</option>
     <option each={ option in item }>{ option }</option>
   </select>

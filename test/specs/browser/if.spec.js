@@ -35,21 +35,21 @@ describe('Riot if', function() {
       expect($$('conditional-tag', base.root).length).to.be.equal(exist ? 1 : 0)
     }
 
-    expectL2(tag.ff, false)
-    expectL2(tag.ft, false)
+    expectL2(tag.refs.ff, false)
+    expectL2(tag.refs.ft, false)
 
-    expectL2(tag.tf, true)
-    expectCond(tag.tf, false)
+    expectL2(tag.refs.tf, true)
+    expectCond(tag.refs.tf, false)
 
-    expectL2(tag.tt, true)
-    expectCond(tag.tt, true)
+    expectL2(tag.refs.tt, true)
+    expectCond(tag.refs.tt, true)
 
-    tag.tf.tags['if-level2'].toggleCondition()
-    expectCond(tag.tf, true)
+    tag.refs.tf.tags['if-level2'].toggleCondition()
+    expectCond(tag.refs.tf, true)
 
-    tag.ft.toggleCondition()
-    expectL2(tag.ft, true)
-    expectCond(tag.ft, true)
+    tag.refs.ft.toggleCondition()
+    expectL2(tag.refs.ft, true)
+    expectCond(tag.refs.ft, true)
 
     tag.unmount()
   })
@@ -90,24 +90,24 @@ describe('Riot if', function() {
     tag.unmount()
   })
 
-  it('named refs are removed from parent when element leaves DOM', function() {
+  it('refs are removed from parent when element leaves DOM', function() {
     injectHTML('<named-unmount></named-unmount>')
     var tag = riot.mount('named-unmount')[0]
 
-    expect(tag.first).to.be.undefined
-    expect(tag.second).to.be.undefined
+    expect(tag.refs.first).to.be.undefined
+    expect(tag.refs.second).to.be.undefined
 
     tag.update({cond: true, items: ['third']})
 
-    expect(tag.first).to.be.an.instanceof(HTMLElement)
-    expect(tag.second).to.be.an.instanceof(HTMLElement)
-    expect(tag.third).to.be.an.instanceof(HTMLElement)
+    expect(tag.refs.first).to.be.an.instanceof(HTMLElement)
+    expect(tag.refs.second).to.be.an.instanceof(HTMLElement)
+    expect(tag.refs.third).to.be.an.instanceof(HTMLElement)
 
     tag.update({cond: false, items: []})
 
-    expect(tag.first).to.be.undefined
-    expect(tag.second).to.be.undefined
-    expect(tag.third).to.be.undefined
+    expect(tag.refs.first).to.be.undefined
+    expect(tag.refs.second).to.be.undefined
+    expect(tag.refs.third).to.be.undefined
 
     tag.unmount()
   })

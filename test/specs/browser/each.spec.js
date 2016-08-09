@@ -453,14 +453,14 @@ describe('Riot each', function() {
 
   })
 
-  it('the named on a select tag gets', function() {
+  it('the referenced on a select tag gets', function() {
 
     injectHTML('<named-select></named-select>')
 
     var tag = riot.mount('named-select')[0]
 
-    expect(tag.daSelect).to.not.be.equal(undefined)
-    expect(tag.daSelect.length).to.be.equal(2)
+    expect(tag.refs.daSelect).to.not.be.equal(undefined)
+    expect(tag.refs.daSelect.length).to.be.equal(2)
 
     tag.unmount()
   })
@@ -575,7 +575,7 @@ describe('Riot each', function() {
     tag.forEach(tag => tag.unmount())
   })
 
-  it('dynamically named elements in a loop', function() {
+  it('dynamically referenced elements in a loop', function() {
 
     injectHTML('<loop-named></loop-named>')
 
@@ -730,11 +730,11 @@ describe('Riot each', function() {
   it('children in a loop inherit properties from the parent', function() {
     injectHTML('<loop-inherit></loop-inherit>')
     var tag = riot.mount('loop-inherit')[0]
-    expect(tag.me.opts.nice).to.be.equal(tag.isFun)
+    expect(tag.refs.me.opts.nice).to.be.equal(tag.isFun)
     tag.isFun = false
     tag.update()
-    expect(tag.me.opts.nice).to.be.equal(tag.isFun)
-    expect(tag.me.tags).to.be.empty
+    expect(tag.refs.me.opts.nice).to.be.equal(tag.isFun)
+    expect(tag.refs.me.tags).to.be.empty
     tag.unmount()
   })
 
@@ -1270,20 +1270,20 @@ describe('Riot each', function() {
     tag.unmount()
   })
 
-  it('named elements in object key loop do not duplicate', function() {
+  it('referenced elements in object key loop do not duplicate', function() {
 
     injectHTML('<obj-key-loop></obj-key-loop>')
 
     var tag = riot.mount('obj-key-loop')[0]
 
-    expect(tag.x.value).to.be.equal('3')
-    expect(tag.y.value).to.be.equal('44')
-    expect(tag.z.value).to.be.equal('23')
+    expect(tag.refs.x.value).to.be.equal('3')
+    expect(tag.refs.y.value).to.be.equal('44')
+    expect(tag.refs.z.value).to.be.equal('23')
 
     tag.update()
-    expect(tag.x.value).to.be.equal('3')
-    expect(tag.y.value).to.be.equal('44')
-    expect(tag.z.value).to.be.equal('23')
+    expect(tag.refs.x.value).to.be.equal('3')
+    expect(tag.refs.y.value).to.be.equal('44')
+    expect(tag.refs.z.value).to.be.equal('23')
 
     tag.unmount()
   })
