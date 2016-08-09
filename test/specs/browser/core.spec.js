@@ -23,6 +23,7 @@ import '../../tag/deferred-mount.tag'
 import '../../tag/prevent-update.tag'
 import '../../tag/expression-eval-count.tag'
 import '../../tag/multi-named.tag'
+import '../../tag/named-data-ref.tag'
 import '../../tag/input-number.tag'
 import '../../tag/input-values.tag'
 import '../../tag/nested-riot.tag'
@@ -876,5 +877,12 @@ describe('Riot core', function() {
     subComponent.unmount()
   })
 
+  it('gets the reference by data-ref attribute', function() {
+    injectHTML('<named-data-ref></named-data-ref>')
+    var tag = riot.mount('named-data-ref')[0]
+    expect(tag.refs.greeting.value).to.be.equal('Hello')
+
+    tag.unmount()
+  })
 
 })
