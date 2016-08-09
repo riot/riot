@@ -64,7 +64,7 @@ module.exports = function(conf) {
       // use our default rollup plugins adding also the riot plugin
       // to import dinamically the tags
       rollup: {
-        external: ['riot'],
+        external: ['riot', 'external-helpers'],
         plugins: [
           require('rollup-plugin-riot')()
         ].concat(require('../config/defaults').plugins)
