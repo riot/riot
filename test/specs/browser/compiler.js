@@ -2261,4 +2261,44 @@ it('raw contents', function() {
     })
   })
 
+  it('carrot position is preserved when input is same as calculated value', function() {
+    var tag = riot.mount('input-values')[0]
+
+    var newValue = "some new text"
+    tag.i.value = newValue
+    tag.i.focus()
+    setCarrotPos(tag.i, 4)
+
+    tag.message = newValue
+    tag.update()
+
+    expect(getCarrotPos(tag.i)).to.be(4)
+
+    tags.push(tag)
+  })
 })
+
+function getCarrotPos(dom) {
+  if (dom.selectionStart != null)
+    return dom.selectionStart
+
+  if (document.selection == null)
+    return null
+
+  var range = document.selection.createRange()
+  range.moveStart('character', -dom.value.length)
+  return range.text.length
+}
+
+function setCarrotPos(dom, pos) {
+  if (dom.setSelectionRange != null) {
+    dom.setSelectionRange(pos, pos)
+    return
+  }
+
+  var range = dom.createTextRange()
+  range.collapse(true)
+  range.moveEnd('character', pos)
+  range.moveStart('character', pos)
+  range.select()
+}
