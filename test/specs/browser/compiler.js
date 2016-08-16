@@ -1460,7 +1460,7 @@ it('raw contents', function() {
   it('children in a loop inherit properties on mount', function() {
     var tag = riot.mount('loop-inherit-mount')[0]
 
-    tag.root.getElementsByTagName('button')[0].dispatchEvent(new CustomEvent('click'))
+    tag.root.getElementsByTagName('button')[0].onclick({})
 
     expect(tag.tags.child.result).to.be('test')
   })
