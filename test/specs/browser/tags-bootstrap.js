@@ -89,6 +89,8 @@ loadTagsAndScripts([
 
   'tag/loop-svg-nodes.tag',
 
+  'tag/svg-attr.tag',
+
   'tag/loop-noloop-option.tag',
 
   'tag/nested-parallel-loop.tag',

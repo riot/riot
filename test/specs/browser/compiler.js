@@ -221,6 +221,14 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('SVGs xlink attributes get correctly parsed', function() {
+    var tag = riot.mount('svg-attr')[0]
+
+    expect(tag.target.getAttributeNS('http://www.w3.org/1999/xlink', 'href')).to.be(tag.href)
+
+    tags.push(tag)
+  })
+
   it('the root keyword should be protected also in the loops', function() {
     var tag = riot.mount('loop-root')[0]
 
@@ -2264,7 +2272,7 @@ it('raw contents', function() {
   it('carrot position is preserved when input is same as calculated value', function() {
     var tag = riot.mount('input-values')[0]
 
-    var newValue = "some new text"
+    var newValue = 'some new text'
     tag.i.value = newValue
     tag.i.focus()
     setCarrotPos(tag.i, 4)
