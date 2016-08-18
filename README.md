@@ -208,6 +208,54 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [sublime-tag (Sublime Text)](https://github.com/crisward/sublime-tag)
 - [riot-tag (Visual Studio)](https://github.com/crisward/riot-tag)
 
+### How to contribute
+
+If you are reading this it's already a good sign and we are thankful for it! We try our best working as much as we could on riot but your help is always appreciated.
+
+If you want to contribute to riot helping us maintaining the project please check first the list of [our open issues](https://github.com/riot/riot/issues) to understand whether there is a task where you could help.
+
+Riot is mainly developed on UNIX systems so you will be able to run all the commands necessary to build and test the library using our [Makefile](Makefile). If you are on a Microsoft machine it could be harder to set up you development environment properly.
+
+Following the steps below you should be able to properly submit your patch to the project
+
+#### 1) Clone the repo and browse to the riot folder
+
+```shell
+$ git clone git@github.com:riot/riot.git && cd riot
+```
+#### 2) Set up your git branch
+
+```shell
+$ git checkout -b feature/my-awesome-patch
+```
+
+#### 3) Install the npm dependencies
+
+```shell
+$ npm i
+```
+
+#### 4) Build and test riot using the Makefile
+
+```shell
+# To build and test riot
+$ make riot
+
+# To build without testing
+$ make raw
+
+# To build anytime you change a src file
+$ make watch
+
+# To bench riot ( it requires ctrl+c to exit )
+$ make perf
+```
+
+#### 5) Submit your patch only on the `dev` branch making sure you have read [our pull request template](.github/PULL_REQUEST_TEMPLATE.md)
+
+#### 6) Be patient
+
+
 ### Credits
 
 Riot is made with :heart: by many smart people from all over the world. Thanks to all the contributors<br>
