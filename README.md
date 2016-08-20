@@ -20,13 +20,14 @@
 | Framework                                      | Version         | Minified Size (gzip) |
 |------------------------------------------------|-----------------|----------------------|
 | Angular2                                       | 2.0.0-beta.17   | 125.29kb             |
-| Ember                                          | 2.6.1           | 112.94kb             |
-| Angular                                        | 1.5.7           | 56.02kb              |
-| Polymer + Web Components Polyfill Lite         | 1.4.0           | 54.48kb              |
-| React                                          | 15.2.0          | 45.49kb              |
+| Ember                                          | 2.7.1           | 112.58kb             |
+| Angular                                        | 1.5.8           | 56.28kb              |
+| Polymer + Web Components Polyfill Lite         | 1.6.1           | 58.08kb              |
+| React                                          | 15.3.1          | 44.32kb              |
 | Web Components Polyfill                        | 0.7.22          | 33.66kb              |
 | Vue                                            | 1.0.26          | 26.66kb              |
-| Riot                                           | 2.5.0           | 9.25kb               |
+| Vue                                            | (v2.0.0-rc.2)   | 22.71kb              |
+| Riot                                           | 2.6.0           | 9.32kb               |
 
 
 ### Custom tags • Concise syntax • Virtual DOM • Full stack
@@ -251,7 +252,7 @@ $ make watch
 $ make perf
 ```
 
-#### 5) Submit your patch only on the `dev` branch making sure you have read [our pull request template](.github/PULL_REQUEST_TEMPLATE.md)
+#### 5) Pull request only against the `dev` branch making sure you have read [our pull request template](.github/PULL_REQUEST_TEMPLATE.md)
 
 #### 6) Be patient
 
