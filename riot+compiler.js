@@ -1,8 +1,8 @@
-/* Riot v2.5.0, @license MIT */
+/* Riot v2.6.0, @license MIT */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.5.0', settings: {} },
+var riot = { version: 'v2.6.0', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -28,6 +28,8 @@ var riot = { version: 'v2.5.0', settings: {} },
   T_OBJECT = 'object',
   T_UNDEF  = 'undefined',
   T_FUNCTION = 'function',
+  XLINK_NS = 'http://www.w3.org/1999/xlink',
+  XLINK_REGEX = /^xlink:(\w+)/,
   // special native tags that cannot be treated like the others
   SPECIAL_TAGS_REGEX = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?|opt(?:ion|group))$/,
   RESERVED_WORDS_BLACKLIST = /^(?:_(?:item|id|parent)|update|root|(?:un)?mount|mixin|is(?:Mounted|Loop)|tags|parent|opts|trigger|o(?:n|ff|ne))$/,
@@ -65,11 +67,10 @@ riot.observable = function(el) {
    * @param   {Function}   fn - callback
    */
   function onEachEvent(e, fn) {
-    var es = e.split(' '), l = es.length, i = 0, name, indx
+    var es = e.split(' '), l = es.length, i = 0
     for (; i < l; i++) {
-      name = es[i]
-      indx = name.indexOf('.')
-      if (name) fn( ~indx ? name.substring(0, indx) : name, i, ~indx ? name.slice(indx + 1) : null)
+      var name = es[i]
+      if (name) fn(name, i)
     }
   }
 
@@ -90,10 +91,9 @@ riot.observable = function(el) {
       value: function(events, fn) {
         if (typeof fn != 'function')  return el
 
-        onEachEvent(events, function(name, pos, ns) {
+        onEachEvent(events, function(name, pos) {
           (callbacks[name] = callbacks[name] || []).push(fn)
           fn.typed = pos > 0
-          fn.ns = ns
         })
 
         return el
@@ -113,11 +113,11 @@ riot.observable = function(el) {
       value: function(events, fn) {
         if (events == '*' && !fn) callbacks = {}
         else {
-          onEachEvent(events, function(name, pos, ns) {
-            if (fn || ns) {
+          onEachEvent(events, function(name, pos) {
+            if (fn) {
               var arr = callbacks[name]
               for (var i = 0, cb; cb = arr && arr[i]; ++i) {
-                if (cb == fn || ns && cb.ns == ns) arr.splice(i--, 1)
+                if (cb == fn) arr.splice(i--, 1)
               }
             } else delete callbacks[name]
           })
@@ -167,14 +167,14 @@ riot.observable = function(el) {
           args[i] = arguments[i + 1] // skip first argument
         }
 
-        onEachEvent(events, function(name, pos, ns) {
+        onEachEvent(events, function(name, pos) {
 
           fns = slice.call(callbacks[name] || [], 0)
 
           for (var i = 0, fn; fn = fns[i]; ++i) {
             if (fn.busy) continue
             fn.busy = 1
-            if (!ns || fn.ns == ns) fn.apply(el, fn.typed ? [name].concat(args) : args)
+            fn.apply(el, fn.typed ? [name].concat(args) : args)
             if (fns[i] !== fn) { i-- }
             fn.busy = 0
           }
@@ -314,7 +314,7 @@ function getPathFromBase(href) {
 
 function emit(force) {
   // the stack is needed for redirections
-  var isRoot = emitStackLevel == 0
+  var isRoot = emitStackLevel == 0, first
   if (MAX_EMIT_STACK_LEVEL <= emitStackLevel) return
 
   emitStackLevel++
@@ -326,10 +326,7 @@ function emit(force) {
     }
   })
   if (isRoot) {
-    while (emitStack.length) {
-      emitStack[0]()
-      emitStack.shift()
-    }
+    while (first = emitStack.shift()) first() // stack increses within this call
     emitStackLevel = 0
   }
 }
@@ -352,13 +349,13 @@ function click(e) {
     || el.href.indexOf(loc.href.match(RE_ORIGIN)[0]) == -1 // cross origin
   ) return
 
-  if (el.href != loc.href) {
-    if (
+  if (el.href != loc.href
+    && (
       el.href.split('#')[0] == loc.href.split('#')[0] // internal jump
-      || base != '#' && getPathFromRoot(el.href).indexOf(base) !== 0 // outside of base
+      || base[0] != '#' && getPathFromRoot(el.href).indexOf(base) !== 0 // outside of base
+      || base[0] == '#' && el.href.split(base)[0] != loc.href.split(base)[0] // outside of #base
       || !go(getPathFromBase(el.href), el.title || doc.title) // route not found
-    ) return
-  }
+    )) return
 
   e.preventDefault()
 }
@@ -371,22 +368,20 @@ function click(e) {
  * @returns {boolean} - route not found flag
  */
 function go(path, title, shouldReplace) {
-  if (hist) { // if a browser
-    path = base + normalize(path)
-    title = title || doc.title
-    // browsers ignores the second parameter `title`
-    shouldReplace
-      ? hist.replaceState(null, title, path)
-      : hist.pushState(null, title, path)
-    // so we need to set it manually
-    doc.title = title
-    routeFound = false
-    emit()
-    return routeFound
-  }
-
   // Server-side usage: directly execute handlers for the path
-  return central[TRIGGER]('emit', getPathFromBase(path))
+  if (!hist) return central[TRIGGER]('emit', getPathFromBase(path))
+
+  path = base + normalize(path)
+  title = title || doc.title
+  // browsers ignores the second parameter `title`
+  shouldReplace
+    ? hist.replaceState(null, title, path)
+    : hist.pushState(null, title, path)
+  // so we need to set it manually
+  doc.title = title
+  routeFound = false
+  emit()
+  return routeFound
 }
 
 /**
@@ -538,7 +533,7 @@ riot.route = route
 
 /**
  * The riot template engine
- * @version v2.4.0
+ * @version v2.4.1
  */
 /**
  * riot.util.brackets
@@ -561,6 +556,10 @@ var brackets = (function (UNDEF) {
     S_QBLOCKS = R_STRINGS.source + '|' +
       /(?:\breturn\s+|(?:[$\w\)\]]|\+\+|--)\s*(\/)(?![*\/]))/.source + '|' +
       /\/(?=[^*\/])[^[\/\\]*(?:(?:\[(?:\\.|[^\]\\]*)*\]|\\.)[^[\/\\]*)*?(\/)[gim]*/.source,
+
+    UNSUPPORTED = RegExp('[\\' + 'x00-\\x1F<>a-zA-Z0-9\'",;\\\\]'),
+
+    NEED_ESCAPE = /(?=[[\]()*+?.^$|])/g,
 
     FINDBRACES = {
       '(': RegExp('([()])|'   + S_QBLOCKS, REGLOB),
@@ -602,10 +601,10 @@ var brackets = (function (UNDEF) {
 
     var arr = pair.split(' ')
 
-    if (arr.length !== 2 || /[\x00-\x1F<>a-zA-Z0-9'",;\\]/.test(pair)) { // eslint-disable-line
+    if (arr.length !== 2 || UNSUPPORTED.test(pair)) {
       throw new Error('Unsupported brackets "' + pair + '"')
     }
-    arr = arr.concat(pair.replace(/(?=[[\]()*+?.^$|])/g, '\\').split(' '))
+    arr = arr.concat(pair.replace(NEED_ESCAPE, '\\').split(' '))
 
     arr[4] = _rewrite(arr[1].length > 1 ? /{[\S\s]*?}/ : _pairs[4], arr)
     arr[5] = _rewrite(pair.length > 3 ? /\\({|})/g : _pairs[5], arr)
@@ -765,6 +764,9 @@ var tmpl = (function () {
 
   _tmpl.loopKeys = brackets.loopKeys
 
+  // istanbul ignore next
+  _tmpl.clearCache = function () { _cache = {} }
+
   _tmpl.errorHandler = null
 
   function _logErr (err, ctx) {
@@ -784,10 +786,7 @@ var tmpl = (function () {
 
     if (expr.slice(0, 11) !== 'try{return ') expr = 'return ' + expr
 
-/* eslint-disable */
-
-    return new Function('E', expr + ';')
-/* eslint-enable */
+    return new Function('E', expr + ';')    // eslint-disable-line no-new-func
   }
 
   var
@@ -907,7 +906,7 @@ var tmpl = (function () {
   // istanbul ignore next: not both
   var // eslint-disable-next-line max-len
     JS_CONTEXT = '"in this?this:' + (typeof window !== 'object' ? 'global' : 'window') + ').',
-    JS_VARNAME = /[,{][$\w]+:|(^ *|[^$\w\.])(?!(?:typeof|true|false|null|undefined|in|instanceof|is(?:Finite|NaN)|void|NaN|new|Date|RegExp|Math)(?![$\w]))([$_A-Za-z][$\w]*)/g,
+    JS_VARNAME = /[,{][$\w]+(?=:)|(^ *|[^$\w\.])(?!(?:typeof|true|false|null|undefined|in|instanceof|is(?:Finite|NaN)|void|NaN|new|Date|RegExp|Math)(?![$\w]))([$_A-Za-z][$\w]*)/g,
     JS_NOPROPS = /^(?=(\.[$\w]+))\1(?:[^.[(]|$)/
 
   function _wrapExpr (expr, asText, key) {
@@ -947,10 +946,7 @@ var tmpl = (function () {
     return expr
   }
 
-  // istanbul ignore next: compatibility fix for beta versions
-  _tmpl.parse = function (s) { return s }
-
-  _tmpl.version = brackets.version = 'v2.4.0'
+  _tmpl.version = brackets.version = 'v2.4.1'
 
   return _tmpl
 
@@ -1262,7 +1258,7 @@ function _each(dom, parent, expr) {
         // update the DOM
         if (isVirtual)
           moveVirtual(tag, root, tags[i], dom.childNodes.length)
-        else root.insertBefore(tag.root, tags[i].root)
+        else if (tags[i].root.parentNode) root.insertBefore(tag.root, tags[i].root)
         // update the position attribute if it exists
         if (expr.pos)
           tag[expr.pos] = i
@@ -1506,16 +1502,16 @@ function Tag(impl, conf, innerHTML) {
     }
   }
 
-  function inheritFromParent () {
-    if (!self.parent || !isLoop) return
-    each(Object.keys(self.parent), function(k) {
+  function inheritFrom(target) {
+    each(Object.keys(target), function(k) {
       // some properties must be always in sync with the parent tag
       var mustSync = !RESERVED_WORDS_BLACKLIST.test(k) && contains(propsInSyncWithParent, k)
+
       if (typeof self[k] === T_UNDEF || mustSync) {
         // track the property to keep in sync
         // so we can keep it updated
         if (!mustSync) propsInSyncWithParent.push(k)
-        self[k] = self.parent[k]
+        self[k] = target[k]
       }
     })
   }
@@ -1531,8 +1527,10 @@ function Tag(impl, conf, innerHTML) {
     // make sure the data passed will not override
     // the component core methods
     data = cleanUpData(data)
-    // inherit properties from the parent
-    inheritFromParent()
+    // inherit properties from the parent in loop
+    if (isLoop) {
+      inheritFrom(self.parent)
+    }
     // normalize the tag properties in case an item object was initially passed
     if (data && isObject(item)) {
       normalizeData(data)
@@ -1576,11 +1574,21 @@ function Tag(impl, conf, innerHTML) {
       // loop the keys in the function prototype or the all object keys
       each(props, function(key) {
         // bind methods to self
-        if (key != 'init' && !self[key])
+        // allow mixins to override other properties/parent mixins
+        if (key != 'init') {
+          // check for getters/setters
+          var descriptor = Object.getOwnPropertyDescriptor(instance, key)
+          var hasGetterSetter = descriptor && (descriptor.get || descriptor.set)
+
           // apply method only if it does not already exist on the instance
-          self[key] = isFunction(instance[key]) ?
-            instance[key].bind(self) :
-            instance[key]
+          if (!self.hasOwnProperty(key) && hasGetterSetter) {
+            Object.defineProperty(self, key, descriptor)
+          } else {
+            self[key] = isFunction(instance[key]) ?
+              instance[key].bind(self) :
+              instance[key]
+          }
+        }
       })
 
       // init method will be called automatically
@@ -1595,10 +1603,16 @@ function Tag(impl, conf, innerHTML) {
 
     // add global mixins
     var globalMixin = riot.mixin(GLOBAL_MIXIN)
+
     if (globalMixin)
       for (var i in globalMixin)
         if (globalMixin.hasOwnProperty(i))
           self.mixin(globalMixin[i])
+
+    // children in loop should inherit from true parent
+    if (self._parent) {
+      inheritFrom(self._parent)
+    }
 
     // initialiation
     if (impl.fn) impl.fn.call(self, opts)
@@ -1839,7 +1853,7 @@ function update(expressions, tag) {
 
     // ~~#1612: look for changes in dom.value when updating the value~~
     if (attrName === 'value') {
-      dom.value = value
+      if (dom.value != value) dom.value = value
       return
     }
 
@@ -2013,13 +2027,17 @@ function getAttr(dom, name) {
 }
 
 /**
- * Set any DOM attribute
+ * Set any DOM/SVG attribute
  * @param { Object } dom - DOM node we want to update
  * @param { String } name - name of the property we want to set
  * @param { String } val - value of the property we want to set
  */
 function setAttr(dom, name, val) {
-  dom.setAttribute(name, val)
+  var xlink = XLINK_REGEX.exec(name)
+  if (xlink && xlink[1])
+    dom.setAttributeNS(XLINK_NS, xlink[1], val)
+  else
+    dom.setAttribute(name, val)
 }
 
 /**
@@ -2765,7 +2783,7 @@ riot.parsers = parsers
 
 /**
  * Compiler for riot custom tags
- * @version v2.5.2
+ * @version v2.5.3
  */
 var compile = (function () {
 
@@ -3356,7 +3374,7 @@ var compile = (function () {
     html: compileHTML,
     css: compileCSS,
     js: compileJS,
-    version: 'v2.5.2'
+    version: 'v2.5.3'
   }
   return compile
 
@@ -3459,7 +3477,7 @@ riot.compile = (function () {
         var js = compile(str, opts, url)
         globalEval(js, url)
         if (fn) fn(js, str, opts)
-      })
+      }, opts)
 
     }
     else {
