@@ -26,7 +26,7 @@
 | React                                          | 15.3.1          | 44.32kb              |
 | Web Components Polyfill                        | 0.7.22          | 33.66kb              |
 | Vue                                            | 1.0.26          | 26.66kb              |
-| Vue                                            | (v2.0.0-rc.2)   | 22.71kb              |
+| Vue                                            | v2.0.0-rc.2     | 22.71kb              |
 | Riot                                           | 2.6.0           | 9.32kb               |
 
 
