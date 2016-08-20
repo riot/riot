@@ -49,7 +49,7 @@
     "riot-compiler": "^2.5.3",
     "riot-observable": "^2.5.0",
     "riot-route": "^2.5.0",
-    "riot-tmpl": "^2.4.0",
+    "riot-tmpl": "^2.4.1",
     "simple-dom": "0.3.0",
     "simple-html-tokenizer": "^0.2.5"
   },
