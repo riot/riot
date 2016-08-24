@@ -1272,6 +1272,18 @@ describe('Compiler Browser', function() {
     tags.push(tag)
   })
 
+  it('textarea tags will be properly updated', function() {
+    var tag = riot.mount('textarea-value')[0]
+    var textarea = $('textarea', tag.root)
+    var button = $('button', tag.root)
+
+    expect(textarea.value).to.be(tag.message)
+    button.onclick({})
+    expect(textarea.value).to.be(tag.message)
+
+    tags.push(tag)
+  })
+
   it('the input values should be updated corectly on any update call', function() {
     var tag = riot.mount('input-values')[0]
     expect(tag.i.value).to.be('foo')

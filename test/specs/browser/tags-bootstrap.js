@@ -54,6 +54,7 @@ loadTagsAndScripts([
 
   // input type=number
   'tag/input-number.tag',
+  'tag/textarea-value.tag',
 
   'tag/input-values.tag',
 
