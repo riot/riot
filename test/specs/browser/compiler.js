@@ -1483,6 +1483,8 @@ it('raw contents', function() {
     tag.root.getElementsByTagName('button')[0].onclick({})
 
     expect(tag.tags.child.result).to.be('test')
+
+    tags.push(tag)
   })
 
   it('loop tags get rendered correctly also with conditional attributes', function(done) {
@@ -2235,7 +2237,6 @@ it('raw contents', function() {
   })
 
   it('component nested in virtual unmounts correctly', function() {
-    injectHTML('<virtual-nested-component></virtual-nested-component>')
     var tag = riot.mount('virtual-nested-component')[0]
     var components = tag.root.querySelectorAll('not-virtual-component2')
     expect(components.length).to.be(4)
@@ -2252,6 +2253,8 @@ it('raw contents', function() {
     var tag = riot.mount('loop-noloop-option')[0]
     var options = tag.root.querySelectorAll('option')
     expect(options[1].value).to.be('1')
+
+    tags.push(tag)
   })
 
   it('parallel nested loop remove without error', function(done) {
