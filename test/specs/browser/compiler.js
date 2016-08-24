@@ -1277,12 +1277,6 @@ describe('Compiler Browser', function() {
     expect(inp.getAttribute('value')).to.be('0')
     expect(inp.value).to.be('0')
 
-    tag = riot.mount('input-number', {num: null})[0]
-    inp = tag.root.getElementsByTagName('input')[0]
-    expect(inp.getAttribute('type')).to.be('number')
-    expect(inp.getAttribute('value')).to.be('')
-    expect(inp.value).to.be('')
-
     tags.push(tag)
   })
 
