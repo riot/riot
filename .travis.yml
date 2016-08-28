@@ -15,7 +15,7 @@ sudo: false
 
 after_success:
   if [ "$TRAVIS_BRANCH" != "next" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-    make test-sauce && make test-coveralls || false'
+    make test-sauce && make test-coveralls || false
   fi
 
 notifications:
