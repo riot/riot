@@ -1,7 +1,7 @@
 import nodeResolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import alias from 'rollup-plugin-alias'
-import babel from 'rollup-plugin-babel'
+import buble from 'rollup-plugin-buble'
 import path from 'path'
 var defaults = require('./defaults')
 
@@ -19,8 +19,6 @@ export default Object.assign(defaults, {
         [tmplPath]: ['tmpl', 'brackets']
       }
     }),
-    babel({
-      exclude: 'node_modules/riot-tmpl/**'
-    })
+    buble()
   ]
 })

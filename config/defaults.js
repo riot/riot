@@ -1,6 +1,6 @@
 const commonjs = require('rollup-plugin-commonjs'),
   nodeResolve = require('rollup-plugin-node-resolve'),
-  babel = require('rollup-plugin-babel')
+  buble = require('rollup-plugin-buble')
 
 module.exports = {
   format: 'umd',
@@ -12,6 +12,6 @@ module.exports = {
       include: 'node_modules/**',
       ignoreGlobal: true
     }),
-    babel()
+    buble()
   ]
 }

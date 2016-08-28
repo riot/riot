@@ -12,4 +12,3 @@ exclude_paths:
   - "riot.js"
   - "riot.min.js"
   - "test/**"
-  - "demo/**"
