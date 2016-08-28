@@ -97,16 +97,18 @@ min:
 
 perf: riot
 	# run the performance tests
-	@ node test/performance/benchmarks
+	@ node test/performance/benchmarks ../riot.2.2.0 --expose-gc
+	@ node test/performance/benchmarks ../riot.2.6.1 --expose-gc
+	@ node test/performance/benchmarks ../../../dist/riot/riot --expose-gc
+
+perf-leaks: riot
+	# detect memory leaks
 	@ node --expose-gc test/performance/memory
 
 watch:
 	# watch and rebuild riot and its tests
 	@ $(shell \
 		node -e $(WATCH) "lib/**/*.js" "make raw & make tags")
-
-.PHONY: test min eslint test-mocha test-compiler test-coveralls test-sauce compare raw riot perf watch tags
-
 
 build:
 	# generate riot.js & riot.min.js
@@ -163,3 +165,5 @@ publish:
 	@ npm publish
 	@ git push origin master
 	@ git push origin master --tags
+
+.PHONY: test min eslint test-mocha test-compiler test-coveralls test-sauce compare raw riot perf watch tags perf-leaks build bump bump-undo version version-undo release-undo publish

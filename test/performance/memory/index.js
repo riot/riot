@@ -10,12 +10,12 @@ var riot = require('../../../dist/riot/riot'),
   myComponentHTML = `
     '<h1>{ opts.title }</h1>',
     '<p>{ opts.description }</p>',
-    '<my-list-item each="{ opts.items }">'
+    '<my-list-item ref='itm' each="{ opts.items }">'
   `,
   result,
   myListItem = 'my-list-item',
   myListItemHTML = `
-    '<input type="checkbox" onchange="{ onChange }">',
+    '<input ref='input' type="checkbox" onchange="{ onChange }">',
     '<span if="{ opts.isActive }">I am active</span>'
   `
 
