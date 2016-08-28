@@ -25,7 +25,7 @@ const
   loopNoReorderBench = require('./loop-no-reorder.bench'),
   mountBench = require('./mount.bench')
 
-console.log(`benching: ${ riotPath }`)
+console.log(`Testing: ${ riotPath }`)
 
 // brand new
 ifBench(suite, 'if', riot)
