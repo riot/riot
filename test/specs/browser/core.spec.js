@@ -8,7 +8,9 @@ import {
   getRiotStyles,
   makeTag,
   defineTag,
-  fireEvent
+  fireEvent,
+  getCarrotPos,
+  setCarrotPos
 } from '../../helpers/index'
 
 // include special tags to test specific features
@@ -18,6 +20,7 @@ import '../../tag/timetable.tag'
 import '../../tag/nested-child.tag'
 import '../../tag/top-attributes.tag'
 import '../../tag/preserve-attr.tag'
+import '../../tag/svg-attr.tag'
 import '../../tag/named-child.tag'
 import '../../tag/deferred-mount.tag'
 import '../../tag/prevent-update.tag'
@@ -459,6 +462,14 @@ describe('Riot core', function() {
     tag.unmount()
   })
 
+  it('SVGs xlink attributes get correctly parsed', function() {
+    injectHTML('<svg-attr></svg-attr>')
+    var tag = riot.mount('svg-attr')[0]
+
+    expect(tag.refs.target.getAttributeNS('http://www.w3.org/1999/xlink', 'href')).to.be.equal(tag.href)
+    tag.unmount()
+  })
+
   it('preserve attributes from tag definition', function() {
 
 
@@ -644,7 +655,19 @@ describe('Riot core', function() {
     var inp = tag.root.getElementsByTagName('input')[0]
     expect(inp.getAttribute('type')).to.be.equal('number')
     expect(inp.value).to.be.equal('123')
+
+    tag = riot.mount('input-number', {num: 0})[0]
+    inp = tag.root.getElementsByTagName('input')[0]
+    expect(inp.getAttribute('type')).to.be.equal('number')
+    expect(inp.value).to.be.equal('0')
+
+    tag = riot.mount('input-number', {num: null})[0]
+    inp = tag.root.getElementsByTagName('input')[0]
+    expect(inp.getAttribute('type')).to.be.equal('number')
+    expect(inp.value).to.be.equal('')
+
     tag.unmount()
+
   })
 
   it('the input values should be updated corectly on any update call', function() {
@@ -655,8 +678,28 @@ describe('Riot core', function() {
     expect(tag.refs.i.value).to.be.equal('foo')
     tag.update()
     expect(tag.refs.i.value).to.be.equal('hi')
+
+    tag.unmount()
   })
 
+  it('carrot position is preserved when input is same as calculated value', function() {
+
+    injectHTML('<input-values></input-values>')
+
+    var tag = riot.mount('input-values')[0]
+
+    var newValue = 'some new text'
+    tag.refs.i.value = newValue
+    tag.refs.i.focus()
+    setCarrotPos(tag.refs.i, 4)
+
+    tag.message = newValue
+    tag.update()
+
+    expect(getCarrotPos(tag.refs.i)).to.be.equal(4)
+
+    tag.unmount()
+  })
 
   it('recursive structure', function() {
     injectHTML('<treeview></treeview>')

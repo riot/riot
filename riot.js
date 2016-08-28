@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* Riot v3.0.0-alpha.5, @license MIT */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -65,6 +66,83 @@
           if (name) fn(~indx ? name.substring(0, indx) : name, i, ~indx ? name.slice(indx + 1) : null);
         }
       }
+=======
+/* Riot v2.6.0, @license MIT */
+
+;(function(window, undefined) {
+  'use strict';
+var riot = { version: 'v2.6.0', settings: {} },
+  // be aware, internal usage
+  // ATTENTION: prefix the global dynamic variables with `__`
+
+  // counter to give a unique id to all the Tag instances
+  __uid = 0,
+  // tags instances cache
+  __virtualDom = [],
+  // tags implementation cache
+  __tagImpl = {},
+
+  /**
+   * Const
+   */
+  GLOBAL_MIXIN = '__global_mixin',
+
+  // riot specific prefixes
+  RIOT_PREFIX = 'riot-',
+  RIOT_TAG = RIOT_PREFIX + 'tag',
+  RIOT_TAG_IS = 'data-is',
+
+  // for typeof == '' comparisons
+  T_STRING = 'string',
+  T_OBJECT = 'object',
+  T_UNDEF  = 'undefined',
+  T_FUNCTION = 'function',
+  XLINK_NS = 'http://www.w3.org/1999/xlink',
+  XLINK_REGEX = /^xlink:(\w+)/,
+  // special native tags that cannot be treated like the others
+  SPECIAL_TAGS_REGEX = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?|opt(?:ion|group))$/,
+  RESERVED_WORDS_BLACKLIST = /^(?:_(?:item|id|parent)|update|root|(?:un)?mount|mixin|is(?:Mounted|Loop)|tags|parent|opts|trigger|o(?:n|ff|ne))$/,
+  // SVG tags list https://www.w3.org/TR/SVG/attindex.html#PresentationAttributes
+  SVG_TAGS_LIST = ['altGlyph', 'animate', 'animateColor', 'circle', 'clipPath', 'defs', 'ellipse', 'feBlend', 'feColorMatrix', 'feComponentTransfer', 'feComposite', 'feConvolveMatrix', 'feDiffuseLighting', 'feDisplacementMap', 'feFlood', 'feGaussianBlur', 'feImage', 'feMerge', 'feMorphology', 'feOffset', 'feSpecularLighting', 'feTile', 'feTurbulence', 'filter', 'font', 'foreignObject', 'g', 'glyph', 'glyphRef', 'image', 'line', 'linearGradient', 'marker', 'mask', 'missing-glyph', 'path', 'pattern', 'polygon', 'polyline', 'radialGradient', 'rect', 'stop', 'svg', 'switch', 'symbol', 'text', 'textPath', 'tref', 'tspan', 'use'],
+
+  // version# for IE 8-11, 0 for others
+  IE_VERSION = (window && window.document || {}).documentMode | 0,
+
+  // detect firefox to fix #1374
+  FIREFOX = window && !!window.InstallTrigger
+/* istanbul ignore next */
+riot.observable = function(el) {
+
+  /**
+   * Extend the original object or create a new empty one
+   * @type { Object }
+   */
+
+  el = el || {}
+
+  /**
+   * Private variables
+   */
+  var callbacks = {},
+    slice = Array.prototype.slice
+
+  /**
+   * Private Methods
+   */
+
+  /**
+   * Helper function needed to get and loop all the events in a string
+   * @param   { String }   e - event string
+   * @param   {Function}   fn - callback
+   */
+  function onEachEvent(e, fn) {
+    var es = e.split(' '), l = es.length, i = 0
+    for (; i < l; i++) {
+      var name = es[i]
+      if (name) fn(name, i)
+    }
+  }
+>>>>>>> dev
 
       /**
        * Public Api
@@ -1321,6 +1399,7 @@
 
       return tags;
     }
+<<<<<<< HEAD
 
     // Create a mixin that could be globally shared across all the tags
     var mixins = {};
@@ -1340,6 +1419,247 @@
         mixin('__unnamed_' + _id++, name, true);
         return;
       }
+=======
+  }
+
+  walk(root, function(dom) {
+    var type = dom.nodeType,
+      attr
+
+    // text node
+    if (type == 3 && dom.parentNode.tagName != 'STYLE') addExpr(dom, dom.nodeValue)
+    if (type != 1) return
+
+    /* element */
+
+    // loop
+    attr = getAttr(dom, 'each')
+
+    if (attr) { _each(dom, tag, attr); return false }
+
+    // attribute expressions
+    each(dom.attributes, function(attr) {
+      var name = attr.name,
+        bool = name.split('__')[1]
+
+      addExpr(dom, attr.value, { attr: bool || name, bool: bool })
+      if (bool) { remAttr(dom, name); return false }
+
+    })
+
+    // skip custom tags
+    if (getTag(dom)) return false
+
+  })
+
+}
+function Tag(impl, conf, innerHTML) {
+
+  var self = riot.observable(this),
+    opts = inherit(conf.opts) || {},
+    parent = conf.parent,
+    isLoop = conf.isLoop,
+    hasImpl = conf.hasImpl,
+    item = cleanUpData(conf.item),
+    expressions = [],
+    childTags = [],
+    root = conf.root,
+    tagName = root.tagName.toLowerCase(),
+    attr = {},
+    propsInSyncWithParent = [],
+    dom
+
+  // only call unmount if we have a valid __tagImpl (has name property)
+  if (impl.name && root._tag) root._tag.unmount(true)
+
+  // not yet mounted
+  this.isMounted = false
+  root.isLoop = isLoop
+
+  // keep a reference to the tag just created
+  // so we will be able to mount this tag multiple times
+  root._tag = this
+
+  // create a unique id to this tag
+  // it could be handy to use it also to improve the virtual dom rendering speed
+  defineProperty(this, '_riot_id', ++__uid) // base 1 allows test !t._riot_id
+
+  extend(this, { parent: parent, root: root, opts: opts}, item)
+  // protect the "tags" property from being overridden
+  defineProperty(this, 'tags', {})
+
+  // grab attributes
+  each(root.attributes, function(el) {
+    var val = el.value
+    // remember attributes with expressions only
+    if (tmpl.hasExpr(val)) attr[el.name] = val
+  })
+
+  dom = mkdom(impl.tmpl, innerHTML)
+
+  // options
+  function updateOpts() {
+    var ctx = hasImpl && isLoop ? self : parent || self
+
+    // update opts from current DOM attributes
+    each(root.attributes, function(el) {
+      var val = el.value
+      opts[toCamel(el.name)] = tmpl.hasExpr(val) ? tmpl(val, ctx) : val
+    })
+    // recover those with expressions
+    each(Object.keys(attr), function(name) {
+      opts[toCamel(name)] = tmpl(attr[name], ctx)
+    })
+  }
+
+  function normalizeData(data) {
+    for (var key in item) {
+      if (typeof self[key] !== T_UNDEF && isWritable(self, key))
+        self[key] = data[key]
+    }
+  }
+
+  function inheritFrom(target) {
+    each(Object.keys(target), function(k) {
+      // some properties must be always in sync with the parent tag
+      var mustSync = !RESERVED_WORDS_BLACKLIST.test(k) && contains(propsInSyncWithParent, k)
+
+      if (typeof self[k] === T_UNDEF || mustSync) {
+        // track the property to keep in sync
+        // so we can keep it updated
+        if (!mustSync) propsInSyncWithParent.push(k)
+        self[k] = target[k]
+      }
+    })
+  }
+
+  /**
+   * Update the tag expressions and options
+   * @param   { * }  data - data we want to use to extend the tag properties
+   * @param   { Boolean } isInherited - is this update coming from a parent tag?
+   * @returns { self }
+   */
+  defineProperty(this, 'update', function(data, isInherited) {
+
+    // make sure the data passed will not override
+    // the component core methods
+    data = cleanUpData(data)
+    // inherit properties from the parent in loop
+    if (isLoop) {
+      inheritFrom(self.parent)
+    }
+    // normalize the tag properties in case an item object was initially passed
+    if (data && isObject(item)) {
+      normalizeData(data)
+      item = data
+    }
+    extend(self, data)
+    updateOpts()
+    self.trigger('update', data)
+    update(expressions, self)
+
+    // the updated event will be triggered
+    // once the DOM will be ready and all the re-flows are completed
+    // this is useful if you want to get the "real" root properties
+    // 4 ex: root.offsetWidth ...
+    if (isInherited && self.parent)
+      // closes #1599
+      self.parent.one('updated', function() { self.trigger('updated') })
+    else rAF(function() { self.trigger('updated') })
+
+    return this
+  })
+
+  defineProperty(this, 'mixin', function() {
+    each(arguments, function(mix) {
+      var instance,
+        props = [],
+        obj
+
+      mix = typeof mix === T_STRING ? riot.mixin(mix) : mix
+
+      // check if the mixin is a function
+      if (isFunction(mix)) {
+        // create the new mixin instance
+        instance = new mix()
+      } else instance = mix
+
+      // build multilevel prototype inheritance chain property list
+      do props = props.concat(Object.getOwnPropertyNames(obj || instance))
+      while (obj = Object.getPrototypeOf(obj || instance))
+
+      // loop the keys in the function prototype or the all object keys
+      each(props, function(key) {
+        // bind methods to self
+        // allow mixins to override other properties/parent mixins
+        if (key != 'init') {
+          // check for getters/setters
+          var descriptor = Object.getOwnPropertyDescriptor(instance, key)
+          var hasGetterSetter = descriptor && (descriptor.get || descriptor.set)
+
+          // apply method only if it does not already exist on the instance
+          if (!self.hasOwnProperty(key) && hasGetterSetter) {
+            Object.defineProperty(self, key, descriptor)
+          } else {
+            self[key] = isFunction(instance[key]) ?
+              instance[key].bind(self) :
+              instance[key]
+          }
+        }
+      })
+
+      // init method will be called automatically
+      if (instance.init) instance.init.bind(self)()
+    })
+    return this
+  })
+
+  defineProperty(this, 'mount', function() {
+
+    updateOpts()
+
+    // add global mixins
+    var globalMixin = riot.mixin(GLOBAL_MIXIN)
+
+    if (globalMixin)
+      for (var i in globalMixin)
+        if (globalMixin.hasOwnProperty(i))
+          self.mixin(globalMixin[i])
+
+    // children in loop should inherit from true parent
+    if (self._parent) {
+      inheritFrom(self._parent)
+    }
+
+    // initialiation
+    if (impl.fn) impl.fn.call(self, opts)
+
+    // parse layout after init. fn may calculate args for nested custom tags
+    parseExpressions(dom, self, expressions)
+
+    // mount the child tags
+    toggle(true)
+
+    // update the root adding custom attributes coming from the compiler
+    // it fixes also #1087
+    if (impl.attrs)
+      walkAttributes(impl.attrs, function (k, v) { setAttr(root, k, v) })
+    if (impl.attrs || hasImpl)
+      parseExpressions(self.root, self, expressions)
+
+    if (!self.parent || isLoop) self.update(item)
+
+    // internal use only, fixes #403
+    self.trigger('before-mount')
+
+    if (isLoop && !hasImpl) {
+      // update the root attribute for the looped elements
+      root = dom.firstChild
+    } else {
+      while (dom.firstChild) root.appendChild(dom.firstChild)
+      if (root.stub) root = parent.root
+    }
+>>>>>>> dev
 
       var store = g ? globals : mixins;
 
@@ -1894,12 +2214,19 @@
         return keys + selectTags(keys);
       }
 
+<<<<<<< HEAD
       return tags.filter(function (t) {
         return !/[^-\w]/.test(t);
       }).reduce(function (list, t) {
         var name = t.trim().toLowerCase();
         return list + (',[' + RIOT_TAG_IS + '="' + name + '"]');
       }, '');
+=======
+    // ~~#1612: look for changes in dom.value when updating the value~~
+    if (attrName === 'value') {
+      if (dom.value != value) dom.value = value
+      return
+>>>>>>> dev
     }
 
     /**
@@ -1956,6 +2283,7 @@
       return _typeof(obj[key]) === T_UNDEF || props && props.writable;
     }
 
+<<<<<<< HEAD
     /**
      * With this function we avoid that the internal Tag methods get overridden
      * @param   { Object } data - options we want to use to extend the tag instance
@@ -1967,6 +2295,280 @@
       var o = {};
       for (var key in data) {
         if (!RESERVED_WORDS_BLACKLIST.test(key)) o[key] = data[key];
+=======
+  })
+
+}
+/**
+ * Specialized function for looping an array-like collection with `each={}`
+ * @param   { Array } els - collection of items
+ * @param   {Function} fn - callback function
+ * @returns { Array } the array looped
+ */
+function each(els, fn) {
+  var len = els ? els.length : 0
+
+  for (var i = 0, el; i < len; i++) {
+    el = els[i]
+    // return false -> current item was removed by fn during the loop
+    if (el != null && fn(el, i) === false) i--
+  }
+  return els
+}
+
+/**
+ * Detect if the argument passed is a function
+ * @param   { * } v - whatever you want to pass to this function
+ * @returns { Boolean } -
+ */
+function isFunction(v) {
+  return typeof v === T_FUNCTION || false   // avoid IE problems
+}
+
+/**
+ * Get the outer html of any DOM node SVGs included
+ * @param   { Object } el - DOM node to parse
+ * @returns { String } el.outerHTML
+ */
+function getOuterHTML(el) {
+  if (el.outerHTML) return el.outerHTML
+  // some browsers do not support outerHTML on the SVGs tags
+  else {
+    var container = mkEl('div')
+    container.appendChild(el.cloneNode(true))
+    return container.innerHTML
+  }
+}
+
+/**
+ * Set the inner html of any DOM node SVGs included
+ * @param { Object } container - DOM node where we will inject the new html
+ * @param { String } html - html to inject
+ */
+function setInnerHTML(container, html) {
+  if (typeof container.innerHTML != T_UNDEF) container.innerHTML = html
+  // some browsers do not support innerHTML on the SVGs tags
+  else {
+    var doc = new DOMParser().parseFromString(html, 'application/xml')
+    container.appendChild(
+      container.ownerDocument.importNode(doc.documentElement, true)
+    )
+  }
+}
+
+/**
+ * Checks wether a DOM node must be considered part of an svg document
+ * @param   { String }  name - tag name
+ * @returns { Boolean } -
+ */
+function isSVGTag(name) {
+  return ~SVG_TAGS_LIST.indexOf(name)
+}
+
+/**
+ * Detect if the argument passed is an object, exclude null.
+ * NOTE: Use isObject(x) && !isArray(x) to excludes arrays.
+ * @param   { * } v - whatever you want to pass to this function
+ * @returns { Boolean } -
+ */
+function isObject(v) {
+  return v && typeof v === T_OBJECT         // typeof null is 'object'
+}
+
+/**
+ * Remove any DOM attribute from a node
+ * @param   { Object } dom - DOM node we want to update
+ * @param   { String } name - name of the property we want to remove
+ */
+function remAttr(dom, name) {
+  dom.removeAttribute(name)
+}
+
+/**
+ * Convert a string containing dashes to camel case
+ * @param   { String } string - input string
+ * @returns { String } my-string -> myString
+ */
+function toCamel(string) {
+  return string.replace(/-(\w)/g, function(_, c) {
+    return c.toUpperCase()
+  })
+}
+
+/**
+ * Get the value of any DOM attribute on a node
+ * @param   { Object } dom - DOM node we want to parse
+ * @param   { String } name - name of the attribute we want to get
+ * @returns { String | undefined } name of the node attribute whether it exists
+ */
+function getAttr(dom, name) {
+  return dom.getAttribute(name)
+}
+
+/**
+ * Set any DOM/SVG attribute
+ * @param { Object } dom - DOM node we want to update
+ * @param { String } name - name of the property we want to set
+ * @param { String } val - value of the property we want to set
+ */
+function setAttr(dom, name, val) {
+  var xlink = XLINK_REGEX.exec(name)
+  if (xlink && xlink[1])
+    dom.setAttributeNS(XLINK_NS, xlink[1], val)
+  else
+    dom.setAttribute(name, val)
+}
+
+/**
+ * Detect the tag implementation by a DOM node
+ * @param   { Object } dom - DOM node we need to parse to get its tag implementation
+ * @returns { Object } it returns an object containing the implementation of a custom tag (template and boot function)
+ */
+function getTag(dom) {
+  return dom.tagName && __tagImpl[getAttr(dom, RIOT_TAG_IS) ||
+    getAttr(dom, RIOT_TAG) || dom.tagName.toLowerCase()]
+}
+/**
+ * Add a child tag to its parent into the `tags` object
+ * @param   { Object } tag - child tag instance
+ * @param   { String } tagName - key where the new tag will be stored
+ * @param   { Object } parent - tag instance where the new child tag will be included
+ */
+function addChildTag(tag, tagName, parent) {
+  var cachedTag = parent.tags[tagName]
+
+  // if there are multiple children tags having the same name
+  if (cachedTag) {
+    // if the parent tags property is not yet an array
+    // create it adding the first cached tag
+    if (!isArray(cachedTag))
+      // don't add the same tag twice
+      if (cachedTag !== tag)
+        parent.tags[tagName] = [cachedTag]
+    // add the new nested tag to the array
+    if (!contains(parent.tags[tagName], tag))
+      parent.tags[tagName].push(tag)
+  } else {
+    parent.tags[tagName] = tag
+  }
+}
+
+/**
+ * Move the position of a custom tag in its parent tag
+ * @param   { Object } tag - child tag instance
+ * @param   { String } tagName - key where the tag was stored
+ * @param   { Number } newPos - index where the new tag will be stored
+ */
+function moveChildTag(tag, tagName, newPos) {
+  var parent = tag.parent,
+    tags
+  // no parent no move
+  if (!parent) return
+
+  tags = parent.tags[tagName]
+
+  if (isArray(tags))
+    tags.splice(newPos, 0, tags.splice(tags.indexOf(tag), 1)[0])
+  else addChildTag(tag, tagName, parent)
+}
+
+/**
+ * Create a new child tag including it correctly into its parent
+ * @param   { Object } child - child tag implementation
+ * @param   { Object } opts - tag options containing the DOM node where the tag will be mounted
+ * @param   { String } innerHTML - inner html of the child node
+ * @param   { Object } parent - instance of the parent tag including the child custom tag
+ * @returns { Object } instance of the new child tag just created
+ */
+function initChildTag(child, opts, innerHTML, parent) {
+  var tag = new Tag(child, opts, innerHTML),
+    tagName = getTagName(opts.root),
+    ptag = getImmediateCustomParentTag(parent)
+  // fix for the parent attribute in the looped elements
+  tag.parent = ptag
+  // store the real parent tag
+  // in some cases this could be different from the custom parent tag
+  // for example in nested loops
+  tag._parent = parent
+
+  // add this tag to the custom parent tag
+  addChildTag(tag, tagName, ptag)
+  // and also to the real parent tag
+  if (ptag !== parent)
+    addChildTag(tag, tagName, parent)
+  // empty the child node once we got its template
+  // to avoid that its children get compiled multiple times
+  opts.root.innerHTML = ''
+
+  return tag
+}
+
+/**
+ * Loop backward all the parents tree to detect the first custom parent tag
+ * @param   { Object } tag - a Tag instance
+ * @returns { Object } the instance of the first custom parent tag found
+ */
+function getImmediateCustomParentTag(tag) {
+  var ptag = tag
+  while (!getTag(ptag.root)) {
+    if (!ptag.parent) break
+    ptag = ptag.parent
+  }
+  return ptag
+}
+
+/**
+ * Helper function to set an immutable property
+ * @param   { Object } el - object where the new property will be set
+ * @param   { String } key - object key where the new property will be stored
+ * @param   { * } value - value of the new property
+* @param   { Object } options - set the propery overriding the default options
+ * @returns { Object } - the initial object
+ */
+function defineProperty(el, key, value, options) {
+  Object.defineProperty(el, key, extend({
+    value: value,
+    enumerable: false,
+    writable: false,
+    configurable: true
+  }, options))
+  return el
+}
+
+/**
+ * Get the tag name of any DOM node
+ * @param   { Object } dom - DOM node we want to parse
+ * @returns { String } name to identify this dom node in riot
+ */
+function getTagName(dom) {
+  var child = getTag(dom),
+    namedTag = getAttr(dom, 'name'),
+    tagName = namedTag && !tmpl.hasExpr(namedTag) ?
+                namedTag :
+              child ? child.name : dom.tagName.toLowerCase()
+
+  return tagName
+}
+
+/**
+ * Extend any object with other properties
+ * @param   { Object } src - source object
+ * @returns { Object } the resulting extended object
+ *
+ * var obj = { foo: 'baz' }
+ * extend(obj, {bar: 'bar', foo: 'bar'})
+ * console.log(obj) => {bar: 'bar', foo: 'bar'}
+ *
+ */
+function extend(src) {
+  var obj, args = arguments
+  for (var i = 1; i < args.length; ++i) {
+    if (obj = args[i]) {
+      for (var key in obj) {
+        // check if this property of the source object could be overridden
+        if (isWritable(src, key))
+          src[key] = obj[key]
+>>>>>>> dev
       }
       return o;
     }

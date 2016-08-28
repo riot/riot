@@ -21,8 +21,8 @@
 
 <nested-parallel-loop-simple>
   <div>
-    <input name="channel-value" type="text" onchange={changeValue} value={opts.data.value}>
-    <button name="del" type="button" onclick={removeNotification}>Delete</button>
+    <input ref="channel-value" type="text" onchange={changeValue} value={opts.data.value}>
+    <button ref="del" type="button" onclick={removeNotification}>Delete</button>
   </div>
 
   <script>

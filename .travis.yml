@@ -14,16 +14,9 @@ script:
 sudo: false
 
 after_success:
-  '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && make test-sauce && make test-coveralls || false'
+  if [ "$TRAVIS_BRANCH" != "next" ] && [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+    make test-sauce && make test-coveralls || false'
+  fi
 
 notifications:
     email: false
-
-env:
-  - CXX=g++-4.8
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-4.8

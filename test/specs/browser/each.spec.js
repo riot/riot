@@ -1327,10 +1327,13 @@ describe('Riot each', function() {
 
     tag.unmount()
   })
+
 /*
-  TODO: there seem to be still some problem in the loops properties inheritance
+  TODO: fix me!
   it('parallel nested loop remove without error', function(done) {
+
     injectHTML('<nested-parallel-loop></nested-parallel-loop>')
+
     var tag = riot.mount('nested-parallel-loop', {items: [
       {
         type: 'rightsExpiration',
@@ -1354,17 +1357,19 @@ describe('Riot each', function() {
       }
     ]})[0]
 
-    tag.on('mount', function() {
+    tag.on('updated', function() {
       setTimeout(function() {
-        console.log(tag.tags['nested-parallel-loop-group'][0].tags)
-        tag.tags['nested-parallel-loop-group'][0].tags['nested-parallel-loop-simple'][0].del.click()
-        var simples = tag.root.querySelectorAll('nested-parallel-loop-simple')
+        fireEvent(tag.tags['nested-parallel-loop-group'][0].tags['nested-parallel-loop-simple'][0].refs.del, 'click')
+        var simples = document.querySelectorAll('nested-parallel-loop-simple')
         expect(tag.items[0].items.length).to.be.equal(1)
         expect(simples.length).to.be.equal(1)
         tag.unmount()
         done()
       }, 0)
     })
-  })*/
+
+    tag.update()
+  })
+  */
 
 })

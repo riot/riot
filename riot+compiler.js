@@ -1994,6 +1994,7 @@
       }
     }
 
+<<<<<<< HEAD
     /**
      * Minimize risk: only zero or one _space_ between attr & value
      * @param   { String }   html - html string we want to parse
@@ -2003,6 +2004,69 @@
       if (!html) return;
       var m,
           re = /([-\w]+) ?= ?(?:"([^"]*)|'([^']*)|({[^}]*}))/g;
+=======
+  return _p
+
+})(window || global)
+
+riot.parsers = parsers
+
+/**
+ * Compiler for riot custom tags
+ * @version v2.5.3
+ */
+var compile = (function () {
+
+  var extend = parsers.utils.extend
+  /* eslint-enable */
+
+  var S_LINESTR = /"[^"\n\\]*(?:\\[\S\s][^"\n\\]*)*"|'[^'\n\\]*(?:\\[\S\s][^'\n\\]*)*'/.source
+
+  var S_STRINGS = brackets.R_STRINGS.source
+
+  var HTML_ATTRS = / *([-\w:\xA0-\xFF]+) ?(?:= ?('[^']*'|"[^"]*"|\S+))?/g
+
+  var HTML_COMMS = RegExp(/<!--(?!>)[\S\s]*?-->/.source + '|' + S_LINESTR, 'g')
+
+  var HTML_TAGS = /<(-?[A-Za-z][-\w\xA0-\xFF]*)(?:\s+([^"'\/>]*(?:(?:"[^"]*"|'[^']*'|\/[^>])[^'"\/>]*)*)|\s*)(\/?)>/g
+
+  var HTML_PACK = />[ \t]+<(-?[A-Za-z]|\/[-A-Za-z])/g
+
+  var BOOL_ATTRS = RegExp(
+      '^(?:disabled|checked|readonly|required|allowfullscreen|auto(?:focus|play)|' +
+      'compact|controls|default|formnovalidate|hidden|ismap|itemscope|loop|' +
+      'multiple|muted|no(?:resize|shade|validate|wrap)?|open|reversed|seamless|' +
+      'selected|sortable|truespeed|typemustmatch)$')
+
+  var RIOT_ATTRS = ['style', 'src', 'd']
+
+  var VOID_TAGS = /^(?:input|img|br|wbr|hr|area|base|col|embed|keygen|link|meta|param|source|track)$/
+
+  var PRE_TAGS = /<pre(?:\s+(?:[^">]*|"[^"]*")*)?>([\S\s]+?)<\/pre\s*>/gi
+
+  var SPEC_TYPES = /^"(?:number|date(?:time)?|time|month|email|color)\b/i
+
+  var IMPORT_STATEMENT = /^(?: )*(?:import)(?:(?:.*))*$/gm
+
+  var TRIM_TRAIL = /[ \t]+$/gm
+
+  var
+    RE_HASEXPR = safeRegex(/@#\d/, 'x01'),
+    RE_REPEXPR = safeRegex(/@#(\d+)/g, 'x01'),
+    CH_IDEXPR  = '\x01#',
+    CH_DQCODE  = '\u2057',
+    DQ = '"',
+    SQ = "'"
+
+  function cleanSource (src) {
+    var
+      mm,
+      re = HTML_COMMS
+
+    if (~src.indexOf('\r')) {
+      src = src.replace(/\r\n?/g, '\n')
+    }
+>>>>>>> dev
 
       while (m = re.exec(html)) {
         fn(m[1].toLowerCase(), m[2] || m[3] || m[4]);
@@ -2848,8 +2912,19 @@
 
       if (opts.entities) return parts;
 
+<<<<<<< HEAD
       return src;
     }
+=======
+  riot.util.compiler = {
+    compile: compile,
+    html: compileHTML,
+    css: compileCSS,
+    js: compileJS,
+    version: 'v2.5.3'
+  }
+  return compile
+>>>>>>> dev
 
     var version = 'v3.0.0-alpha.1';
 
@@ -2933,11 +3008,20 @@
 
       if ((typeof arg === 'undefined' ? 'undefined' : _typeof(arg)) === T_STRING) {
 
+<<<<<<< HEAD
         // 2nd parameter is optional, but can be null
         if (isObject(fn)) {
           opts = fn;
           fn = false;
         }
+=======
+      // `riot.compile(url [, callback][, options])`
+      GET(arg, function (str, opts, url) {
+        var js = compile(str, opts, url)
+        globalEval(js, url)
+        if (fn) fn(js, str, opts)
+      }, opts)
+>>>>>>> dev
 
         // `riot.compile(tag [, callback | true][, options])`
         if (/^\s*</m.test(arg)) {
