@@ -1,4 +1,5 @@
 var glob = require('glob'),
+  path = require('path'),
   riot = require('../../../lib/server'),
   expect = require('chai').expect,
   cheerio = require('cheerio')
@@ -19,6 +20,7 @@ describe('Node/io.js', function() {
     glob('../../tag/*.tag', { cwd: __dirname }, function (err, tags) {
       expect(err).to.be.equal(null)
       tags.forEach(function(tag) {
+        if (tag[0] === '~') return
         expect(require(tag)).to.be.ok
       })
       done()
@@ -119,6 +121,15 @@ describe('Node/io.js', function() {
     expect($('select option:selected').val()).to.be.equal('my-value')
     expect($('textarea[name="txta1"]').val()).to.be.equal('my-value')
     expect($('textarea[name="txta2"]').val()).to.be.equal('')
+  })
+
+  it('load tag with custom options', function() {
+    var tag = riot.require(path.resolve(__dirname, '../../tag/~custom-parsers.tag'), { exclude: ['html', 'css'] })
+/*    var tmpl = riot.render('custom-parsers')
+
+    expect(tag).to.be.equal('custom-parsers')
+    expect(tmpl).to.be.equal('<custom-parsers></custom-parsers>')*/
+
   })
 
 })
