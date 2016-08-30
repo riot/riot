@@ -117,6 +117,24 @@ describe('Mixin', function() {
     tag.unmount()
   })
 
+  it('Will register a mixin whose prototype has getter/setter functions', function() {
+    injectHTML('<my-mixin></my-mixin>')
+    riot.tag('my-mixin', '<span>some tag</span>')
+
+    var tag = riot.mount('my-mixin')[0]
+
+    var mixinInstance = Object.create(getterSetterMixin)
+
+    tag.mixin(mixinInstance)
+
+    tag.value = true
+
+    expect(true).to.be(tag._value)
+    expect(true).to.be(tag.value)
+
+    tag.unmount()
+  })
+
   it('Will register a global mixin without name and mount a tag with global mixed-in attributes and methods', function() {
     riot.mixin(globalMixin)
     injectHTML('<my-mixin></my-mixin>')
