@@ -288,7 +288,7 @@ http://riotjs.com/
 [coverage-image]:https://img.shields.io/coveralls/riot/riot/dev.svg?style=flat-square
 [coverage-url]:https://coveralls.io/r/riot/riot?branch=dev
 
-[saucelabs-image]:https://saucelabs.com/browser-matrix/testsriotjs.svg
+[saucelabs-image]:https://saucelabs.com/browser-matrix/testsriotjs.svg?1
 [saucelabs-url]:https://saucelabs.com/u/testsriotjs
 
 [gitter-image]:https://img.shields.io/badge/GITTER-JOIN_CHAT_%E2%86%92-1dce73.svg?style=flat-square
