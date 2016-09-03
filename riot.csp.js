@@ -6954,13 +6954,13 @@ exports.tmpl = tmpl;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/* Riot v2.6.0, @license MIT */
+/* Riot v2.6.1, @license MIT */
 
 ;(function(window, undefined) {
   'use strict';
 var tmpl = cspTmpl.tmpl,
   brackets = cspTmpl.brackets
-var riot = { version: 'v2.6.0', settings: {} },
+var riot = { version: 'v2.6.1', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -8356,7 +8356,7 @@ function update(expressions, tag) {
     var dom = expr.dom,
       attrName = expr.attr,
       value = tmpl(expr.expr, tag),
-      parent = expr.dom.parentNode
+      parent = expr.parent || expr.dom.parentNode
 
     if (expr.bool) {
       value = !!value
@@ -8378,6 +8378,9 @@ function update(expressions, tag) {
       value += ''
       // test for parent avoids error with invalid assignment to nodeValue
       if (parent) {
+        // cache the parent node because somehow it will become null on IE
+        // on the next iteration
+        expr.parent = parent
         if (parent.tagName === 'TEXTAREA') {
           parent.value = value                    // #1113
           if (!IE_VERSION) dom.nodeValue = value  // #1625 IE throws here, nodeValue
@@ -8389,12 +8392,15 @@ function update(expressions, tag) {
 
     // ~~#1612: look for changes in dom.value when updating the value~~
     if (attrName === 'value') {
-      if (dom.value != value) dom.value = value
+      if (dom.value !== value) {
+        dom.value = value
+        setAttr(dom, attrName, value)
+      }
       return
+    } else {
+      // remove original attribute
+      remAttr(dom, attrName)
     }
-
-    // remove original attribute
-    remAttr(dom, attrName)
 
     // event handler
     if (isFunction(value)) {
