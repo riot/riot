@@ -208,6 +208,8 @@ HTML syntax is the de facto language on the web and it's designed for building u
   - Note: Designed for html, not jade.
 - [sublime-tag (Sublime Text)](https://github.com/crisward/sublime-tag)
 - [riot-tag (Visual Studio)](https://github.com/crisward/riot-tag)
+- [web-mode (Emacs)](http://web-mode.org)
+  - See how to configure [#1967](https://github.com/riot/riot/issues/1967) 
 
 ### How to contribute
 
@@ -289,7 +291,7 @@ http://riotjs.com/
 [coverage-image]:https://img.shields.io/coveralls/riot/riot/dev.svg?style=flat-square
 [coverage-url]:https://coveralls.io/r/riot/riot?branch=dev
 
-[saucelabs-image]:https://saucelabs.com/browser-matrix/testsriotjs.svg
+[saucelabs-image]:https://saucelabs.com/browser-matrix/testsriotjs.svg?1
 [saucelabs-url]:https://saucelabs.com/u/testsriotjs
 
 [gitter-image]:https://img.shields.io/badge/GITTER-JOIN_CHAT_%E2%86%92-1dce73.svg?style=flat-square
