@@ -63,8 +63,8 @@ describe('Riot core', function() {
     var tags = riot.mount('v-dom-1, v-dom-2')
 
     expect(tags.length).to.be.equal(2)
-    expect(riot.vdom).to.have.length(tags.length)
-    riot.vdom.forEach(function(tag, i) {
+    expect(riot.util.vdom).to.have.length(tags.length)
+    riot.util.vdom.forEach(function(tag, i) {
       expect(tag).to.be.equal(tags[i])
     })
     tags.forEach(tag => tag.unmount())
