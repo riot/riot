@@ -60,7 +60,7 @@
     "eslint": "^3.4.0",
     "glob": "^7.0.6",
     "istanbul": "^0.4.5",
-    "jsdom": "^9.4.5",
+    "jsdom": "^9.5.0",
     "karma": "^1.2.0",
     "karma-chrome-launcher": "^2.0.0",
     "karma-coverage": "^1.1.1",
