@@ -12,7 +12,7 @@
 </loop-virtual>
 
 <loop-virtual-reorder>
-  <virtual each={item in data} reorder="true">
+  <virtual each={item in data} no-reorder>
     <dt>{item.key}</dt>
     <dd>{item.value}</dd>
   </virtual>
