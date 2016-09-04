@@ -47,6 +47,7 @@ function generateItems (amount) {
 function measure(fn) {
   var startTime = Date.now()
   fn()
+  global.gc()
   return [process.memoryUsage().heapUsed, Date.now() - startTime]
 }
 
@@ -98,7 +99,6 @@ function mount() {
 var doc = jsdom(`<${myComponent}/>`)
 global.window = doc.defaultView
 global.document = window.document
-global.gc()
 
 setupTags()
 mount()
