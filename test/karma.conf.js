@@ -2,6 +2,7 @@ const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
   path = require('path'),
   RIOT_WITH_COMPILER_PATH = '../dist/riot/riot+compiler.js',
   RIOT_PATH = '../dist/riot/riot.js',
+  isDebug = process.env.DEBUG,
   // split the riot+compiler tests from the normal riot core tests
   testFiles = `./specs/${process.env.TEST_FOLDER}/**/*.spec.js`,
   needsCompiler = process.env.TEST_FOLDER === 'compiler',
@@ -16,10 +17,9 @@ if (process.env.SAUCELABS) {
 
 
 module.exports = function(conf) {
-
   preprocessors[testFiles] = ['rollup']
   // enable the coverage for riot.js
-  if (!needsCompiler && !process.env.DEBUG) preprocessors[RIOT_PATH] = ['coverage']
+  if (!needsCompiler && !isDebug) preprocessors[RIOT_PATH] = ['coverage']
 
   conf.set({
     basePath: '',
@@ -75,6 +75,13 @@ module.exports = function(conf) {
         },
         format: 'iife'
         // sourceMap: 'inline' TODO: enable the sourcemaps in the compiler
+      }
+    },
+
+    client: {
+      mocha: {
+        // change Karma's debug.html to the mocha web reporter
+        reporter: 'html'
       }
     },
 
