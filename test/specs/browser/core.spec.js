@@ -562,6 +562,25 @@ describe('Riot core', function() {
     expect(incrementEvents).to.have.been.calledTwice
   })
 
+  it('the before mount event gets triggered before the component markup creation', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', `
+      <p>{ flag }<p>
+    `, function() {
+      this.flag = true
+      this.on('before-mount', () => {
+        this.flag = false
+      })
+    })
+
+    var tag = riot.mount('riot-tmp')[0]
+
+    expect($('p', tag.root).innerHTML).to.be.equal('false')
+
+    tag.unmount()
+  })
+
   it('all the events get fired also in the loop tags, the e.item property gets preserved', function() {
     injectHTML('<events></events>')
     var currentItem,
