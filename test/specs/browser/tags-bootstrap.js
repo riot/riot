@@ -4,6 +4,7 @@ loadTagsAndScripts([
   'tag/~custom-parsers.tag',
   'tag/loop.tag',
   'tag/loop-child.tag',
+  'tag/loop-combo.tag',
   'tag/loop-reorder.tag',
   'tag/loop-manip.tag',
   'tag/loop-object.tag',
