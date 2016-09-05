@@ -1328,8 +1328,6 @@ describe('Riot each', function() {
     tag.unmount()
   })
 
-/*
-  TODO: fix me!
   it('parallel nested loop remove without error', function(done) {
 
     injectHTML('<nested-parallel-loop></nested-parallel-loop>')
@@ -1370,6 +1368,6 @@ describe('Riot each', function() {
 
     tag.update()
   })
-  */
+
 
 })
