@@ -39,6 +39,7 @@ import '../../tag/form-controls.tag'
 import '../../tag/data-is.tag'
 import '../../tag/virtual-nested-component.tag'
 import '../../tag/dynamic-data-is.tag'
+import '../../tag/query-selector.tag'
 
 const expect = chai.expect,
   defaultBrackets = riot.settings.brackets
@@ -925,6 +926,43 @@ describe('Riot core', function() {
     var tag = riot.mount('named-data-ref')[0]
     expect(tag.refs.greeting.value).to.be.equal('Hello')
 
+    tag.unmount()
+  })
+
+  it('gets single node by querySelector', function() {
+    injectHTML('<query-selector></query-selector>')
+    var tag = riot.mount('query-selector')[0]
+    expect(tag.querySelector('.first').value).to.be.equal('a')
+    expect(tag.$('.first').value).to.be.equal('a')
+    tag.unmount()
+  })
+
+  it('gets multiple nodes by querySelectorAll', function() {
+    injectHTML('<query-selector></query-selector>')
+    var tag = riot.mount('query-selector')[0]
+    expect(tag.querySelectorAll('.first')[1].value).to.be.equal('b')
+    expect(tag.$$('.first')[1].value).to.be.equal('b')
+    tag.unmount()
+  })
+
+  it('returns Tag instance when it is a custom tag', function() {
+    injectHTML('<query-selector></query-selector>')
+    var tag = riot.mount('query-selector')[0]
+    expect(tag.$('.second', true).constructor.name).to.be.equal('Tag')
+    tag.unmount()
+  })
+
+  it('returns undefined when it is not a custom tag', function() {
+    injectHTML('<query-selector></query-selector>')
+    var tag = riot.mount('query-selector')[0]
+    expect(tag.$('.first', true)).to.be.undefined
+    tag.unmount()
+  })
+
+  it('returns tags which has data-is attr, too', function() {
+    injectHTML('<query-selector></query-selector>')
+    var tag = riot.mount('query-selector')[0]
+    expect(tag.$$('query-selector-sub')[1].getAttribute('value')).to.be.equal('y')
     tag.unmount()
   })
 
