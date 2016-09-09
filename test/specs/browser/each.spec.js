@@ -1195,10 +1195,11 @@ describe('Riot each', function() {
 
 
   it('virtual tags mount inner content and not the virtual tag root', function() {
-    injectHTML('<loop-virtual></loop-virtual>')
+    injectHTML('<loop-virtual></loop-virtual>') // no-reorder
     var tag = riot.mount('loop-virtual')[0],
       els = tag.root.children
 
+    els[0].setAttribute('test', 'ok')
     expect(els[0].tagName).to.be.equal('DT')
     expect(els[0].innerHTML).to.be.equal('Coffee')
     expect(els[1].tagName).to.be.equal('DD')
@@ -1211,6 +1212,7 @@ describe('Riot each', function() {
     tag.data.reverse()
     tag.update()
 
+    expect(els[0].getAttribute('test')).to.be.equal('ok') // same place after reverse
     expect(els[2].tagName).to.be.equal('DT')
     expect(els[2].innerHTML).to.be.equal('Coffee')
     expect(els[3].tagName).to.be.equal('DD')
@@ -1247,7 +1249,7 @@ describe('Riot each', function() {
     tag2.data.reverse()
     tag2.update()
 
-    expect(els2[2].getAttribute('test')).to.be.equal('ok')
+    expect(els2[2].getAttribute('test')).to.be.equal('ok') // moved after reverse
     expect(els2[2].tagName).to.be.equal('DT')
     expect(els2[2].innerHTML).to.be.equal('Coffee')
     expect(els2[3].tagName).to.be.equal('DD')
