@@ -8,9 +8,9 @@
 
 <nested-parallel-loop-group>
   <div>
-    <nested-parallel-loop-simple each={ items } data={ this } if={ !this.accountBased }>
+    <nested-parallel-loop-simple each={ items } data={ this } items={ parent.items } if={ !this.accountBased }>
     </nested-parallel-loop-simple>
-    <nested-parallel-loop-account-based each={ items } data={ this } if={ this.accountBased }>
+    <nested-parallel-loop-account-based each={ items } data={ this } items={ parent.items } if={ this.accountBased }>
     </nested-parallel-loop-account-based>
   </div>
 
@@ -26,11 +26,13 @@
   </div>
 
   <script>
-    this.items = opts.data.items
+    this.items = opts.items
 
     removeNotification(e) {
       var item = e.item
       this.items.splice(this.items.indexOf(item), 1)
+      e.preventUpdate = true
+      this.parent.update()
     }
   </script>
 </nested-parallel-loop-simple>

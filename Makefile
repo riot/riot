@@ -31,7 +31,7 @@ WATCH = "\
 	require('chokidar')                                   \
 		.watch(path, { ignoreInitial: true })               \
 		.on('all', function() {                             \
-			try { require('shelljs').exec(cmd) }              \
+			try { require('shelljs').exec(cmd); }             \
 			catch(e) { console.log(e) }                       \
 		})"
 
@@ -107,8 +107,7 @@ perf-leaks: riot
 
 watch:
 	# watch and rebuild riot and its tests
-	@ $(shell \
-		node -e $(WATCH) "lib/**/*.js" "make raw & make tags")
+	@ node -e $(WATCH) "lib/**/*.js" "make raw & make tags"
 
 build:
 	# generate riot.js & riot.min.js

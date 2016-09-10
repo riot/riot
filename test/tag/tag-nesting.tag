@@ -23,17 +23,18 @@
 <inner1>
   <p>Inner1 foo: { opts.foo.value }</p>
   <p>Inner1 bar: { opts.bar.value }</p>
-  <p name="test"></p>
+  <p ref="test"></p>
   <inner2 bar={ opts.bar } />
 
   var bar = opts.bar.value
 
   echo() {
-    this.test.innerHTML = '+ECHOED+'
+    this.refs.test.innerHTML = '+ECHOED+'
   }
 
 </inner1>
 
 <inner2>
   <p>Inner2: { opts.bar.value + 50 }</p>
+
 </inner2>
