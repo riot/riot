@@ -24,7 +24,7 @@ var RE_SVG_TAGS = /^(altGlyph|animate(?:Color)?|circle|clipPath|defs|ellipse|fe(
 var RE_HTML_ATTRS = /([-\w]+) ?= ?(?:"([^"]*)|'([^']*)|({[^}]*}))/g;
 var RE_BOOL_ATTRS = /^(?:disabled|checked|readonly|required|allowfullscreen|auto(?:focus|play)|compact|controls|default|formnovalidate|hidden|ismap|itemscope|loop|multiple|muted|no(?:resize|shade|validate|wrap)?|open|reversed|seamless|selected|sortable|truespeed|typemustmatch)$/;
 var IE_VERSION = (WIN && WIN.document || {}).documentMode | 0;
-var FIREFOX = WIN && !!WIN.InstallTrigger;
+var FIREFOX = WIN && !!WIN.InstallTrigger
 
 /**
  * Check whether a DOM node must be considered a part of an svg document
@@ -120,16 +120,16 @@ function isReservedName(value) {
 }
 
 var check = Object.freeze({
-  isSVGTag: isSVGTag,
-  isBoolAttr: isBoolAttr,
-  isFunction: isFunction,
-  isObject: isObject,
-  isUndefined: isUndefined,
-  isString: isString,
-  isBlank: isBlank,
-  isArray: isArray,
-  isWritable: isWritable,
-  isReservedName: isReservedName
+	isSVGTag: isSVGTag,
+	isBoolAttr: isBoolAttr,
+	isFunction: isFunction,
+	isObject: isObject,
+	isUndefined: isUndefined,
+	isString: isString,
+	isBlank: isBlank,
+	isArray: isArray,
+	isWritable: isWritable,
+	isReservedName: isReservedName
 });
 
 /**
@@ -246,6 +246,16 @@ function setAttr(dom, name, val) {
 }
 
 /**
+ * Insert safely a tag to fix #1962 #1649
+ * @param   { HTMLElement } root - children container
+ * @param   { HTMLElement } curr - node to insert
+ * @param   { HTMLElement } next - node that should preceed the current node inserted
+ */
+function safeInsert(root, curr, next) {
+  root.insertBefore(curr, next.parentNode && next)
+}
+
+/**
  * Minimize risk: only zero or one _space_ between attr & value
  * @param   { String }   html - html string we want to parse
  * @param   { Function } fn - callback function to apply on any attribute found
@@ -282,24 +292,26 @@ function walkNodes(dom, fn, context) {
 }
 
 var dom = Object.freeze({
-  $$: $$,
-  $: $,
-  createFrag: createFrag,
-  createDOMPlaceholder: createDOMPlaceholder,
-  mkEl: mkEl,
-  getOuterHTML: getOuterHTML,
-  setInnerHTML: setInnerHTML,
-  remAttr: remAttr,
-  getAttr: getAttr,
-  setAttr: setAttr,
-  walkAttrs: walkAttrs,
-  walkNodes: walkNodes
+	$$: $$,
+	$: $,
+	createFrag: createFrag,
+	createDOMPlaceholder: createDOMPlaceholder,
+	mkEl: mkEl,
+	getOuterHTML: getOuterHTML,
+	setInnerHTML: setInnerHTML,
+	remAttr: remAttr,
+	getAttr: getAttr,
+	setAttr: setAttr,
+	safeInsert: safeInsert,
+	walkAttrs: walkAttrs,
+	walkNodes: walkNodes
 });
 
 var styleNode;
 var cssTextProp;
 var byName = {};
-var remainder = [];
+var remainder = []
+
 // skip the following code on the server
 if (WIN) {
   styleNode = (function () {
@@ -870,13 +882,13 @@ function extend(src) {
 }
 
 var misc = Object.freeze({
-  inherit: inherit,
-  each: each,
-  contains: contains,
-  toCamel: toCamel,
-  startsWith: startsWith,
-  defineProperty: defineProperty,
-  extend: extend
+	inherit: inherit,
+	each: each,
+	contains: contains,
+	toCamel: toCamel,
+	startsWith: startsWith,
+	defineProperty: defineProperty,
+	extend: extend
 });
 
 var observable = function(el) {
@@ -1063,129 +1075,16 @@ function setEventHandler(name, handler, dom, tag) {
   dom.addEventListener(eventName, cb, false)
 }
 
-function updateExpression(expr) {
-  var dom = expr.dom,
-    attrName = expr.attr,
-    value = tmpl(expr.expr, this),
-    isValueAttr = attrName == 'value',
-    isVirtual = expr.root && expr.root.tagName == 'VIRTUAL',
-    parent = dom && (expr.parent || dom.parentNode)
-
-  if (expr.bool)
-    value = value ? attrName : false
-  else if (value == null)
-    value = ''
-
-  if (expr._riot_id) { // if it's a tag
-    if (expr.isMounted) {
-      expr.update()
-
-    // if it hasn't been mounted yet, do that now.
-    } else {
-      expr.mount()
-
-      if (isVirtual) {
-        var frag = document.createDocumentFragment()
-        makeVirtual.call(expr, frag)
-        expr.root.parentElement.replaceChild(frag, expr.root)
-      }
-    }
-    return
-  }
-
-  if (expr.update) {
-    expr.update()
-    return
-  }
-
-  var old = expr.value
-  expr.value = value
-
-  if (expr.isRtag && value) return updateRtag(expr, this)
-
-  // no change, so nothing more to do
-  if (
-    isValueAttr && dom.value == value || // was the value of this dom node changed?
-    !isValueAttr && old === value // was the old value still the same?
-  ) return
-
-  // textarea and text nodes have no attribute name
-  if (!attrName) {
-    // about #815 w/o replace: the browser converts the value to a string,
-    // the comparison by "==" does too, but not in the server
-    value += ''
-    // test for parent avoids error with invalid assignment to nodeValue
-    if (parent) {
-      // cache the parent node because somehow it will become null on IE
-      // on the next iteration
-      expr.parent = parent
-      if (parent.tagName === 'TEXTAREA') {
-        parent.value = value                    // #1113
-        if (!IE_VERSION) dom.nodeValue = value  // #1625 IE throws here, nodeValue
-      }                                         // will be available on 'updated'
-      else dom.nodeValue = value
-    }
-    return
-  }
-
-  // remove original attribute
-  remAttr(dom, attrName)
-
-  // event handler
-  if (isFunction(value)) {
-    setEventHandler(attrName, value, dom, this)
-
-  // show / hide
-  } else if (/^(show|hide)$/.test(attrName)) {
-    if (attrName == 'hide') value = !value
-    dom.style.display = value ? '' : 'none'
-
-  // field value
-  } else if (attrName == 'value') {
-    dom.value = value
-
-  // <img src="{ expr }">
-  } else if (startsWith(attrName, RIOT_PREFIX) && attrName != RIOT_TAG_IS) {
-
-    if (value)
-      setAttr(dom, attrName.slice(RIOT_PREFIX.length), value)
-
-  } else {
-    // <select> <option selected={true}> </select>
-    if (attrName == 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.nodeName) && value)
-      parent.value = dom.value
-
-    if (expr.bool) {
-      dom[attrName] = value
-      if (!value) return
-    }
-
-    if (value === 0 || value && typeof value !== T_OBJECT)
-      setAttr(dom, attrName, value)
-
-  }
-}
-
-/**
- * Update the expressions in a Tag instance
- * @param   { Array } expressions - expression that must be re evaluated
- * @param   { Tag } tag - tag instance
- */
-function update(expressions) {
-  each(expressions, updateExpression.bind(this))
-}
-
 /**
  * Update dynamically created riot-tag with changing expressions
- * @param   { Object } expr - expression tag and expression info
- * @param   { Tag } parent - parent for tag creation
+ * @param { Object } expr - expression tag and expression info
+ * @param { Tag } parent - parent for tag creation
  */
-
 function updateRtag(expr, parent) {
   var tagName = tmpl(expr.value, parent),
     conf
 
-  if (expr.tag && expr.tagName == tagName) {
+  if (expr.tag && expr.tagName === tagName) {
     expr.tag.update()
     return
   }
@@ -1215,6 +1114,122 @@ function updateRtag(expr, parent) {
     arrayishRemove(_tags, delName, expr.tag)
     expr.tag.unmount()
   })
+}
+
+/**
+ * Update on single tag expression
+ * @this Tag
+ * @param { Object } expr - expression logic
+ * @returns { undefined }
+ */
+function updateExpression(expr) {
+  var dom = expr.dom,
+    attrName = expr.attr,
+    value = tmpl(expr.expr, this),
+    isValueAttr = attrName === 'value',
+    isVirtual = expr.root && expr.root.tagName === 'VIRTUAL',
+    parent = dom && (expr.parent || dom.parentNode),
+    old
+
+  if (expr.bool)
+    value = value ? attrName : false
+  else if (isUndefined(value) || value === null)
+    value = ''
+
+  if (expr._riot_id) { // if it's a tag
+    if (expr.isMounted) {
+      expr.update()
+
+    // if it hasn't been mounted yet, do that now.
+    } else {
+      expr.mount()
+
+      if (isVirtual) {
+        var frag = document.createDocumentFragment()
+        makeVirtual.call(expr, frag)
+        expr.root.parentElement.replaceChild(frag, expr.root)
+      }
+    }
+    return
+  }
+
+  old = expr.value
+  expr.value = value
+
+  if (expr.update) {
+    expr.update()
+    return
+  }
+
+  if (old === value) return
+  if (expr.isRtag && value) return updateRtag(expr, this)
+  // no change, so nothing more to do
+  if (isValueAttr && dom.value === value) return
+
+  // textarea and text nodes have no attribute name
+  if (!attrName) {
+    // about #815 w/o replace: the browser converts the value to a string,
+    // the comparison by "==" does too, but not in the server
+    value += ''
+    // test for parent avoids error with invalid assignment to nodeValue
+    if (parent) {
+      // cache the parent node because somehow it will become null on IE
+      // on the next iteration
+      expr.parent = parent
+      if (parent.tagName === 'TEXTAREA') {
+        parent.value = value                    // #1113
+        if (!IE_VERSION) dom.nodeValue = value  // #1625 IE throws here, nodeValue
+      }                                         // will be available on 'updated'
+      else dom.nodeValue = value
+    }
+    return
+  }
+
+  // remove original attribute
+  remAttr(dom, attrName)
+
+  // event handler
+  if (isFunction(value)) {
+    setEventHandler(attrName, value, dom, this)
+
+  // show / hide
+  } else if (/^(show|hide)$/.test(attrName)) {
+    if (attrName === 'hide') value = !value
+    dom.style.display = value ? '' : 'none'
+
+  // field value
+  } else if (isValueAttr) {
+    dom.value = value
+
+  // <img src="{ expr }">
+  } else if (startsWith(attrName, RIOT_PREFIX) && attrName !== RIOT_TAG_IS) {
+
+    if (value)
+      setAttr(dom, attrName.slice(RIOT_PREFIX.length), value)
+
+  } else {
+    // <select> <option selected={true}> </select>
+    if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.nodeName) && value)
+      parent.value = dom.value
+
+    if (expr.bool) {
+      dom[attrName] = value
+      if (!value) return
+    }
+
+    if (value === 0 || value && typeof value !== T_OBJECT)
+      setAttr(dom, attrName, value)
+
+  }
+}
+
+/**
+ * Update all the expressions in a Tag instance
+ * @this Tag
+ * @param { Array } expressions - expression that must be re evaluated
+ */
+function update$1$1(expressions) {
+  each(expressions, updateExpression.bind(this))
 }
 
 var IfExpr = {
@@ -1249,7 +1264,7 @@ var IfExpr = {
       this.expressions = []
     }
 
-    if (newValue) update.call(this.parentTag, this.expressions)
+    if (newValue) update$1$1.call(this.parentTag, this.expressions)
   },
   unmount: function unmount() {
     unmountAll(this.expressions || [])
@@ -1377,11 +1392,10 @@ function moveNestedTags(i) {
  * @param   { Boolean } isVirtual - is it a virtual tag?
  */
 function move(root, nextTag, isVirtual) {
-  // and move it
   if (isVirtual)
     moveVirtual.apply(this, [root, nextTag])
-  else if (nextTag.root.parentNode)
-    root.insertBefore(this.root, nextTag.root)
+  else
+    safeInsert(root, this.root, nextTag.root)
 }
 
 /**
@@ -1395,7 +1409,7 @@ function insert(root, nextTag, isVirtual) {
   if (isVirtual)
     makeVirtual.apply(this, [root, nextTag])
   else
-    root.insertBefore(this.root, nextTag.root)
+    safeInsert(root, this.root, nextTag.root)
 }
 
 /**
@@ -1451,7 +1465,7 @@ function _each(dom, parent, expr) {
     hasKeys,
     isLoop = true,
     isAnonymous = !__TAG_IMPL[tagName],
-    isVirtual = dom.tagName == 'VIRTUAL'
+    isVirtual = dom.tagName === 'VIRTUAL'
 
   // parse the each expression
   expr = tmpl.loopKeys(expr)
@@ -1464,6 +1478,7 @@ function _each(dom, parent, expr) {
   root.removeChild(dom)
 
   expr.update = function updateEach() {
+
     // get the new items collection
     var items = tmpl(expr.val, parent),
       // create a fragment to hold the new DOM nodes to inject in the parent tag
@@ -1491,7 +1506,7 @@ function _each(dom, parent, expr) {
     each(items, function(item, i) {
       // reorder only if the items are objects
       var
-        _mustReorder = mustReorder && typeof item == T_OBJECT && !hasKeys,
+        _mustReorder = mustReorder && typeof item === T_OBJECT && !hasKeys,
         oldPos = oldItems.indexOf(item),
         pos = ~oldPos && _mustReorder ? oldPos : i,
         // does a tag exist in this position?
@@ -1506,7 +1521,7 @@ function _each(dom, parent, expr) {
         _mustReorder && !~oldPos || !tag // by default we always try to reorder the DOM elements
       ) {
 
-        var mustAppend = i == tags.length
+        var mustAppend = i === tags.length
 
         tag = new Tag(impl, {
           parent: parent,
@@ -1562,6 +1577,7 @@ function _each(dom, parent, expr) {
 
     // clone the items array
     oldItems = items.slice()
+
   }
 
   expr.unmount = function() {
@@ -1588,10 +1604,10 @@ function parseExpressions(root, expressions, mustIncludeRoot) {
     if (!mustIncludeRoot && dom === root) return {parent: parent}
 
     // text node
-    if (type == 3 && dom.parentNode.tagName != 'STYLE' && tmpl.hasExpr(dom.nodeValue))
+    if (type === 3 && dom.parentNode.tagName !== 'STYLE' && tmpl.hasExpr(dom.nodeValue))
       parent.children.push({dom: dom, expr: dom.nodeValue})
 
-    if (type != 1) return ctx // not an element
+    if (type !== 1) return ctx // not an element
 
     // loop. each does it's own thing (for now)
     if (attr = getAttr(dom, 'each')) {
@@ -1658,13 +1674,21 @@ function parseAttributes(dom, attrs, fn) {
   })
 }
 
+/*
+  Includes hacks needed for the Internet Explorer version 9 and below
+  See: http://kangax.github.io/compat-table/es5/#ie8
+       http://codeplanet.io/dropping-ie8/
+*/
+
 var reHasYield  = /<yield\b/i;
 var reYieldAll  = /<yield\s*(?:\/>|>([\S\s]*?)<\/yield\s*>|>)/ig;
 var reYieldSrc  = /<yield\s+to=['"]([^'">]*)['"]\s*>([\S\s]*?)<\/yield\s*>/ig;
 var reYieldDest = /<yield\s+from=['"]?([-\w]+)['"]?\s*(?:\/>|>([\S\s]*?)<\/yield\s*>)/ig;
 var rootEls = { tr: 'tbody', th: 'tr', td: 'tr', col: 'colgroup' };
 var tblTags = IE_VERSION && IE_VERSION < 10 ? RE_SPECIAL_TAGS : RE_SPECIAL_TAGS_NO_OPTION;
-var GENERIC = 'div';
+var GENERIC = 'div'
+
+
 /*
   Creates the root element for table or select child elements:
   tr/th/td/thead/tfoot/tbody/caption/col/colgroup/option/optgroup
@@ -1946,7 +1970,7 @@ function mixin(name, mix, g) {
  * Update all the tags instances created
  * @returns { Array } all the tags instances
  */
-function update$1() {
+function update$2() {
   return each(__VIRTUAL_DOM, function (tag) { return tag.update(); })
 }
 
@@ -1975,7 +1999,7 @@ function updateOpts(isLoop, parent, isAnonymous, opts, instAttrs) {
 
   var ctx = !isAnonymous && isLoop ? this : parent || this
   each(instAttrs, function (attr) {
-    if (attr.expr) update.call(ctx, [attr.expr])
+    if (attr.expr) update$1$1.call(ctx, [attr.expr])
     opts[toCamel(attr.name)] = attr.expr ? attr.expr.value : attr.value
   })
 }
@@ -2052,7 +2076,7 @@ function Tag(impl, conf, innerHTML) {
     extend(this, data)
     updateOpts.apply(this, [isLoop, parent, isAnonymous, opts, instAttrs])
     if (this.isMounted) this.trigger('update', data)
-    update.call(this, expressions)
+    update$1$1.call(this, expressions)
     if (this.isMounted) this.trigger('updated')
 
     return this
@@ -2089,7 +2113,7 @@ function Tag(impl, conf, innerHTML) {
       each(props, function (key) {
         // bind methods to this
         // allow mixins to override other properties/parent mixins
-        if (key != 'init') {
+        if (key !== 'init') {
           // check for getters/setters
           var descriptor = Object.getOwnPropertyDescriptor(instance, key) || Object.getOwnPropertyDescriptor(proto, key)
           var hasGetterSetter = descriptor && (descriptor.get || descriptor.set)
@@ -2371,7 +2395,7 @@ function getTagName(dom, skipName) {
  * @returns { Object } clean object without containing the riot internal reserved words
  */
 function cleanUpData(data) {
-  if (!(data instanceof Tag) && !(data && typeof data.trigger == T_FUNCTION))
+  if (!(data instanceof Tag) && !(data && typeof data.trigger === T_FUNCTION))
     return data
 
   var o = {}
@@ -2419,7 +2443,7 @@ function arrayishRemove(obj, key, value, ensureArray) {
       if (item === value) obj[key].splice(i, 1)
     })
     if (!obj[key].length) delete obj[key]
-    else if (obj[key].length == 1 && !ensureArray) obj[key] = obj[key][0]
+    else if (obj[key].length === 1 && !ensureArray) obj[key] = obj[key][0]
   } else
     delete obj[key] // otherwise just delete the key
 }
@@ -2520,7 +2544,7 @@ function moveVirtual(src, target) {
     sib = el.nextSibling
     frag.appendChild(el)
     el = sib
-    if (el == this$1._internal.tail) {
+    if (el === this$1._internal.tail) {
       frag.appendChild(el)
       src.insertBefore(frag, target._internal.head)
       break
@@ -2550,21 +2574,21 @@ function selectTags(tags) {
 
 
 var tags = Object.freeze({
-  getTag: getTag,
-  inheritFrom: inheritFrom,
-  moveChildTag: moveChildTag,
-  initChildTag: initChildTag,
-  getImmediateCustomParentTag: getImmediateCustomParentTag,
-  unmountAll: unmountAll,
-  getTagName: getTagName,
-  cleanUpData: cleanUpData,
-  arrayishAdd: arrayishAdd,
-  arrayishRemove: arrayishRemove,
-  isInStub: isInStub,
-  mountTo: mountTo,
-  makeVirtual: makeVirtual,
-  moveVirtual: moveVirtual,
-  selectTags: selectTags
+	getTag: getTag,
+	inheritFrom: inheritFrom,
+	moveChildTag: moveChildTag,
+	initChildTag: initChildTag,
+	getImmediateCustomParentTag: getImmediateCustomParentTag,
+	unmountAll: unmountAll,
+	getTagName: getTagName,
+	cleanUpData: cleanUpData,
+	arrayishAdd: arrayishAdd,
+	arrayishRemove: arrayishRemove,
+	isInStub: isInStub,
+	mountTo: mountTo,
+	makeVirtual: makeVirtual,
+	moveVirtual: moveVirtual,
+	selectTags: selectTags
 });
 
 /**
@@ -2593,7 +2617,7 @@ exports.tag = tag;
 exports.tag2 = tag2;
 exports.mount = mount;
 exports.mixin = mixin;
-exports.update = update$1;
+exports.update = update$2;
 exports.unregister = unregister;
 
 Object.defineProperty(exports, '__esModule', { value: true });
