@@ -1,4 +1,4 @@
-/* Riot v3.0.0-alpha.8, @license MIT */
+/* Riot v3.0.0-alpha.9, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1481,10 +1481,20 @@ function _each(dom, parent, expr) {
 
     // get the new items collection
     var items = tmpl(expr.val, parent),
-      // create a fragment to hold the new DOM nodes to inject in the parent tag
-      frag = createFrag()
+      parentNode,
+      frag,
+      placeholder
+
 
     root = ref.parentNode
+
+    if (parentNode) {
+      placeholder = createDOMPlaceholder('')
+      parentNode.insertBefore(placeholder, root)
+      parentNode.removeChild(root)
+    } else {
+      frag = createFrag()
+    }
 
     // object loop. any changes cause full redraw
     if (!isArray(items)) {
@@ -1535,7 +1545,7 @@ function _each(dom, parent, expr) {
         tag.mount()
 
         if (mustAppend)
-          append.apply(tag, [frag, isVirtual])
+          append.apply(tag, [frag || root, isVirtual])
         else
           insert.apply(tag, [root, tags[i], isVirtual])
 
@@ -1569,14 +1579,18 @@ function _each(dom, parent, expr) {
     // remove the redundant tags
     unmountRedundant(items, tags, tagName, parent)
 
-    // insert the new nodes
-    if (frag.childNodes) root.insertBefore(frag, ref)
-
     // #1374 FireFox bug in <option selected={expression}>
     if (isOption && FIREFOX && !root.multiple) updateSelect(root)
 
     // clone the items array
     oldItems = items.slice()
+
+    if (frag) {
+      root.insertBefore(frag, ref)
+    } else {
+      parentNode.insertBefore(root, placeholder)
+      parentNode.removeChild(placeholder)
+    }
 
   }
 
