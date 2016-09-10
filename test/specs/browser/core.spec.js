@@ -4,10 +4,6 @@ import {
   $$,
   IE_VERSION,
   normalizeHTML,
-  appendTag,
-  getRiotStyles,
-  makeTag,
-  defineTag,
   fireEvent,
   getCarrotPos,
   setCarrotPos
@@ -210,8 +206,6 @@ describe('Riot core', function() {
     expect(multipleTags[2].root.innerHTML).to.be.equal('3')
     expect(multipleTags[3].root.innerHTML).to.be.equal('4')
 
-    var i = multipleTags.length
-
     multipleTags.forEach(tag => tag.unmount())
   })
 
@@ -220,8 +214,7 @@ describe('Riot core', function() {
 
     injectHTML('<nested-child></nested-child>')
 
-    var tag = riot.mount('nested-child')[0],
-      root = tag.root
+    var tag = riot.mount('nested-child')[0]
 
     expect(tag.tags.child.length).to.be.equal(6)
     expect(tag.tags['another-nested-child']).to.be.an('object')

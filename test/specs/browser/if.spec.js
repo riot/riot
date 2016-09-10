@@ -1,11 +1,7 @@
 import {
   injectHTML,
-  $,
-  $$,
-  normalizeHTML,
   expectHTML,
-  makeTag,
-  defineTag
+  $$
 } from '../../helpers/index'
 
 

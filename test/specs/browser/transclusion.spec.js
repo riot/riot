@@ -1,7 +1,6 @@
 import {
   injectHTML,
   $,
-  $$,
   normalizeHTML,
   fireEvent
 } from '../../helpers/index'

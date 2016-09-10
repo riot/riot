@@ -1,5 +1,4 @@
 const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
-  path = require('path'),
   RIOT_WITH_COMPILER_PATH = '../dist/riot/riot+compiler.js',
   RIOT_PATH = '../dist/riot/riot.js',
   isDebug = process.env.DEBUG,

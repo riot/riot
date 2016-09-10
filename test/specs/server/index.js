@@ -125,10 +125,10 @@ describe('Node/io.js', function() {
 
   it('load tag with custom options', function() {
     var tag = riot.require(path.resolve(__dirname, '../../tag/~custom-parsers.tag'), { exclude: ['html', 'css'] })
-/*    var tmpl = riot.render('custom-parsers')
+    var tmpl = riot.render('custom-parsers')
 
     expect(tag).to.be.equal('custom-parsers')
-    expect(tmpl).to.be.equal('<custom-parsers></custom-parsers>')*/
+    expect(tmpl).to.be.equal('<custom-parsers></custom-parsers>')
 
   })
 

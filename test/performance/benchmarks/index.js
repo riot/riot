@@ -4,17 +4,6 @@ global.document = window.document
 global.body = window.document.body
 global.history = {}
 
-/**
- * Check the memory usage analizing the heap
- * @param  { function } fn
- * @return { array } memory used + duration
- */
-
-function measure(fn) {
-  var startTime = Date.now()
-  return [process.memoryUsage().heapUsed, Date.now() - startTime]
-}
-
 const
   Benchmark = require('benchmark'),
   suite = new Benchmark.Suite(),

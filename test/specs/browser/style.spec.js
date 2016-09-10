@@ -1,8 +1,5 @@
 import {
   injectHTML,
-  $,
-  $$,
-  normalizeHTML,
   getRiotStyles
 } from '../../helpers/index'
 
@@ -98,7 +95,7 @@ describe('Riot style', function() {
     expect(styles).not.to.match(/\bparsed-style\s*\{/)
 
     // define a styled tag
-    riot.tag('runtime-style-parsing', '<div></div>', '.parsed-style { color: red; }', '', function(opts) { })
+    riot.tag('runtime-style-parsing', '<div></div>', '.parsed-style { color: red; }', '', function() { })
 
     // test style isn't injected by the simple tag definition
     styles = getRiotStyles(riot)

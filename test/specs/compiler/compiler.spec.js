@@ -1,8 +1,6 @@
 import {
   injectHTML,
   $,
-  $$,
-  normalizeHTML,
   getRiotStyles
 } from '../../helpers/index'
 

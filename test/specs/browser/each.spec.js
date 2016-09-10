@@ -307,8 +307,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-child></loop-child>')
 
-    var tag = tag = riot.mount('loop-child')[0],
-      root = tag.root
+    var tag = tag = riot.mount('loop-child')[0]
 
     setTimeout(function() {
       tag.tags['looped-child'].forEach(function(child) {
@@ -347,8 +346,7 @@ describe('Riot each', function() {
     injectHTML('<loop-manip></loop-manip>')
 
     var tag = riot.mount('loop-manip')[0],
-      root = tag.root,
-      children = root.getElementsByTagName('loop-manip')
+      root = tag.root
 
     tag.top()
     tag.update()
@@ -440,8 +438,7 @@ describe('Riot each', function() {
 
     var tag = riot.mount('loop-option')[0],
       root = tag.root,
-      options = root.getElementsByTagName('select')[0],
-      html = normalizeHTML(root.innerHTML).replace(/ selected="selected"/, '')
+      options = root.getElementsByTagName('select')[0]
 
 
     //expect(options[0].selected).to.be.equal(false)
@@ -1030,7 +1027,7 @@ describe('Riot each', function() {
 
     // test the table and call the tests for the content
     function testTable(root, name, info) {
-      var s, key, inf
+      var s, key
 
       root = root.querySelectorAll('table[data-is=' + name + ']')
       s = name + '.length: '

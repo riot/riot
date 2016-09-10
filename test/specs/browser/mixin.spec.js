@@ -167,7 +167,7 @@ describe('Mixin', function() {
 
     injectHTML('<my-mixin></my-mixin>')
 
-    riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
+    riot.tag('my-mixin', '<span>some tag</span>', function() {
       this.mixin(IdMixin)
     })
 
@@ -188,7 +188,7 @@ describe('Mixin', function() {
 
     var rootmixin = new RootMixin()
 
-    riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
+    riot.tag('my-mixin', '<span>some tag</span>', function() {
       this.mixin(rootmixin)
     })
 
@@ -205,7 +205,7 @@ describe('Mixin', function() {
       '<my-mixin2 id="two"></my-mixin2>'
     ])
 
-    riot.tag('my-mixin2', '<span>some tag</span>', function(opts) {
+    riot.tag('my-mixin2', '<span>some tag</span>', function() {
       this.mixin(IdMixin)
     })
 
@@ -223,7 +223,7 @@ describe('Mixin', function() {
   it('Will mount a tag with multiple mixins mixed-in', function() {
     injectHTML('<my-mixin></my-mixin>')
 
-    riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
+    riot.tag('my-mixin', '<span>some tag</span>', function() {
       this.mixin(IdMixin, OptsMixin)
     })
 
@@ -244,11 +244,11 @@ describe('Mixin', function() {
   it('Will mount a parent tag with a mixin and a sub-tag wtih a mixin', function() {
     injectHTML('<my-mixin></my-mixin>')
 
-    riot.tag('my-mixin', '<span>some tag</span><sub-mixin></sub-mixin>', function(opts) {
+    riot.tag('my-mixin', '<span>some tag</span><sub-mixin></sub-mixin>', function() {
       this.mixin(IdMixin, OptsMixin)
     })
 
-    riot.tag('sub-mixin', '<span>sub mixin</span>', function(opts) {
+    riot.tag('sub-mixin', '<span>sub mixin</span>', function() {
       this.mixin(IdMixin)
     })
 
@@ -275,7 +275,7 @@ describe('Mixin', function() {
   it('binds this-reference to the tag object', function() {
     injectHTML('<my-mixin></my-mixin>')
 
-    riot.tag('my-mixin', '<span>some tag { getId() }</span>', function(opts) {
+    riot.tag('my-mixin', '<span>some tag { getId() }</span>', function() {
       this.mixin(IdMixin)
     })
 
@@ -288,7 +288,7 @@ describe('Mixin', function() {
   it('initializes the mixin', function() {
     injectHTML('<my-mixin></my-mixin>')
 
-    riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
+    riot.tag('my-mixin', '<span>some tag</span>', function() {
       this.mixin(MixinWithInit)
     })
 
@@ -302,7 +302,7 @@ describe('Mixin', function() {
     injectHTML('<my-mixin></my-mixin>')
 
     riot.mixin('idMixin', IdMixin) // register mixin
-    riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
+    riot.tag('my-mixin', '<span>some tag</span>', function() {
       this.mixin('idMixin') // load mixin
     })
 
@@ -316,7 +316,7 @@ describe('Mixin', function() {
     injectHTML('<my-mixin></my-mixin>')
 
     riot.mixin('functMixin', FunctMixin) // register mixin
-    riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
+    riot.tag('my-mixin', '<span>some tag</span>', function() {
       this.mixin('functMixin') // load mixin
     })
 
@@ -329,7 +329,7 @@ describe('Mixin', function() {
     injectHTML('<my-mixin></my-mixin>')
 
     riot.mixin('childMixin', ChildMixin) // register mixin
-    riot.tag('my-mixin', '<span>some tag</span>', function(opts) {
+    riot.tag('my-mixin', '<span>some tag</span>', function() {
       this.mixin('childMixin') // load mixin
     })
 

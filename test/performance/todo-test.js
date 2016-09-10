@@ -1,6 +1,5 @@
 
-var len = 10,
-  i = 0,
+var i = 0,
   input = document.querySelector('form input'),
   submitEvent = document.createEvent('Event'),
   start = Date.now()
