@@ -601,7 +601,7 @@ describe('Riot each', function() {
 
     tag.tags['loop-unshift-item'][0].on('updated', function() {
       counter ++
-      if (counter == 2) done()
+      if (counter === 2) done()
     })
 
     tag.update()

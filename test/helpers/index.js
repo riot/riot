@@ -20,7 +20,7 @@ export function expectHTML(tagOrDom) {
 
 export function getPreviousSibling(n) {
   var x = n.previousSibling
-  while (x.nodeType!=1) {
+  while (x.nodeType !== 1) {
     x = x.previousSibling
   }
   return x
@@ -28,7 +28,7 @@ export function getPreviousSibling(n) {
 
 export function getNextSibling(n) {
   var x = n.previousSibling
-  while (x.nodeType!=1) {
+  while (x.nodeType !== 1) {
     x = x.previousSibling
   }
   return x
@@ -70,10 +70,10 @@ export function injectHTML(html) {
 }
 
 export function getCarrotPos(dom) {
-  if (dom.selectionStart != null)
+  if (dom.selectionStart !== null)
     return dom.selectionStart
 
-  if (document.selection == null)
+  if (document.selection === null)
     return null
 
   var range = document.selection.createRange()
@@ -82,7 +82,7 @@ export function getCarrotPos(dom) {
 }
 
 export function setCarrotPos(dom, pos) {
-  if (dom.setSelectionRange != null) {
+  if (dom.setSelectionRange !== null) {
     dom.setSelectionRange(pos, pos)
     return
   }

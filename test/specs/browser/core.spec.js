@@ -609,7 +609,7 @@ describe('Riot core', function() {
 
     tag.tags['named-child'].on('updated', function() {
       counter ++
-      if (counter == 2) done()
+      if (counter === 2) done()
     })
 
     tag.update()
@@ -687,9 +687,9 @@ describe('Riot core', function() {
     injectHTML('<input-values></input-values>')
 
     var tag = riot.mount('input-values')[0]
-    expect(tag.refs.i.value).to.be.equal('foo')
-    tag.update()
     expect(tag.refs.i.value).to.be.equal('hi')
+    tag.update()
+    expect(tag.refs.i.value).to.be.equal('foo')
 
     tag.unmount()
   })
