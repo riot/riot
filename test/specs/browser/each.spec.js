@@ -47,6 +47,7 @@ import '../../tag/loop-sync-options.tag'
 import '../../tag/outer.tag'
 import '../../tag/reserved-names.tag'
 import '../../tag/nested-parallel-loop.tag'
+import '../../tag/loop-bug-1649.tag'
 
 import '../../tag/select-test.tag'
 import '../../tag/named-select.tag'
@@ -1368,5 +1369,27 @@ describe('Riot each', function() {
     tag.update()
   })
 
+  it('looped items with conditional get properly inserted into the DOM', function() {
+    injectHTML('<loop-bug-1649></loop-bug-1649>')
+    var tag = riot.mount('loop-bug-1649')[0]
+    var children
 
+    children = $$('.list', tag.root)
+    expect(children.length).to.be.equal(2)
+
+    fireEvent($('.remove', children[0]), 'click')
+
+    children = $$('.list', tag.root)
+    expect(children.length).to.be.equal(1)
+
+    fireEvent(tag.refs['folder-link-2'], 'click')
+
+    children = $$('.list', tag.root)
+    expect(children.length).to.be.equal(2)
+
+    fireEvent($('.remove', children[0]), 'click')
+
+    children = $$('.list', tag.root)
+    expect(children.length).to.be.equal(1)
+  })
 })
