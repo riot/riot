@@ -1,9 +1,369 @@
-/* istanbul ignore next */
+/* Riot v3.0.0-alpha.7, @license MIT */
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+	typeof define === 'function' && define.amd ? define(['exports'], factory) :
+	(factory((global.riot = global.riot || {})));
+}(this, (function (exports) { 'use strict';
+
+var __VIRTUAL_DOM = [];
+var __TAG_IMPL = {};
+var GLOBAL_MIXIN = '__global_mixin';
+var RIOT_PREFIX = 'riot-';
+var RIOT_TAG_IS = 'data-is';
+var T_STRING = 'string';
+var T_OBJECT = 'object';
+var T_UNDEF  = 'undefined';
+var T_FUNCTION = 'function';
+var XLINK_NS = 'http://www.w3.org/1999/xlink';
+var XLINK_REGEX = /^xlink:(\w+)/;
+var WIN = typeof window === T_UNDEF ? undefined : window;
+var RE_SPECIAL_TAGS = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?|opt(?:ion|group))$/;
+var RE_SPECIAL_TAGS_NO_OPTION = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?)$/;
+var RE_RESERVED_NAMES = /^(?:_(?:item|id|parent)|update|root|(?:un)?mount|mixin|is(?:Mounted|Loop)|tags|parent|opts|trigger|o(?:n|ff|ne))$/;
+var RE_SVG_TAGS = /^(altGlyph|animate(?:Color)?|circle|clipPath|defs|ellipse|fe(?:Blend|ColorMatrix|ComponentTransfer|Composite|ConvolveMatrix|DiffuseLighting|DisplacementMap|Flood|GaussianBlur|Image|Merge|Morphology|Offset|SpecularLighting|Tile|Turbulence)|filter|font|foreignObject|g(?:lyph)?(?:Ref)?|image|line(?:arGradient)?|ma(?:rker|sk)|missing-glyph|path|pattern|poly(?:gon|line)|radialGradient|rect|stop|svg|switch|symbol|text(?:Path)?|tref|tspan|use)$/;
+var RE_HTML_ATTRS = /([-\w]+) ?= ?(?:"([^"]*)|'([^']*)|({[^}]*}))/g;
+var RE_BOOL_ATTRS = /^(?:disabled|checked|readonly|required|allowfullscreen|auto(?:focus|play)|compact|controls|default|formnovalidate|hidden|ismap|itemscope|loop|multiple|muted|no(?:resize|shade|validate|wrap)?|open|reversed|seamless|selected|sortable|truespeed|typemustmatch)$/;
+var IE_VERSION = (WIN && WIN.document || {}).documentMode | 0;
+var FIREFOX = WIN && !!WIN.InstallTrigger;
+
+/**
+ * Check whether a DOM node must be considered a part of an svg document
+ * @param   { String } name -
+ * @returns { Boolean } -
+ */
+function isSVGTag(name) {
+  return RE_SVG_TAGS.test(name)
+}
+
+/**
+ * Check Check if the passed argument is undefined
+ * @param   { String } value -
+ * @returns { Boolean } -
+ */
+function isBoolAttr(value) {
+  return RE_BOOL_ATTRS.test(value)
+}
+
+/**
+ * Check if passed argument is a function
+ * @param   { * } value -
+ * @returns { Boolean } -
+ */
+function isFunction(value) {
+  return typeof value === T_FUNCTION || false // avoid IE problems
+}
+
+/**
+ * Check if passed argument is an object, exclude null
+ * NOTE: use isObject(x) && !isArray(x) to excludes arrays.
+ * @param   { * } value -
+ * @returns { Boolean } -
+ */
+function isObject(value) {
+  return value && typeof value === T_OBJECT // typeof null is 'object'
+}
+
+/**
+ * Check if passed argument is undefined
+ * @param   { * } value -
+ * @returns { Boolean } -
+ */
+function isUndefined(value) {
+  return typeof value === T_UNDEF
+}
+
+/**
+ * Check if passed argument is a string
+ * @param   { * } value -
+ * @returns { Boolean } -
+ */
+function isString(value) {
+  return typeof value === T_STRING
+}
+
+/**
+ * Check if passed argument is empty. Different from falsy, because we dont consider 0 or false to be blank
+ * @param { * } value -
+ * @returns { Boolean } -
+ */
+function isBlank(value) {
+  return isUndefined(value) || value === null || value === ''
+}
+
+/**
+ * Check if passed argument is a kind of array
+ * @param   { * } value -
+ * @returns { Boolean } -
+ */
+function isArray(value) {
+  return Array.isArray(value) || value instanceof Array
+}
+
+/**
+ * Check whether object's property could be overridden
+ * @param   { Object }  obj - source object
+ * @param   { String }  key - object property
+ * @returns { Boolean } -
+ */
+function isWritable(obj, key) {
+  var descriptor = Object.getOwnPropertyDescriptor(obj, key)
+  return isUndefined(obj[key]) || descriptor && descriptor.writable
+}
+
+/**
+ * Check if passed argument is a reserved name
+ * @param   { String } value -
+ * @returns { Boolean } -
+ */
+function isReservedName(value) {
+  return RE_RESERVED_NAMES.test(value)
+}
+
+var check = Object.freeze({
+  isSVGTag: isSVGTag,
+  isBoolAttr: isBoolAttr,
+  isFunction: isFunction,
+  isObject: isObject,
+  isUndefined: isUndefined,
+  isString: isString,
+  isBlank: isBlank,
+  isArray: isArray,
+  isWritable: isWritable,
+  isReservedName: isReservedName
+});
+
+/**
+ * Shorter and fast way to select multiple nodes in the DOM
+ * @param   { String } selector - DOM selector
+ * @param   { Object } ctx - DOM node where the targets of our search will is located
+ * @returns { Object } dom nodes found
+ */
+function $$(selector, ctx) {
+  return (ctx || document).querySelectorAll(selector)
+}
+
+/**
+ * Shorter and fast way to select a single node in the DOM
+ * @param   { String } selector - unique dom selector
+ * @param   { Object } ctx - DOM node where the target of our search will is located
+ * @returns { Object } dom node found
+ */
+function $(selector, ctx) {
+  return (ctx || document).querySelector(selector)
+}
+
+/**
+ * Create a document fragment
+ * @returns { Object } document fragment
+ */
+function createFrag() {
+  return document.createDocumentFragment()
+}
+
+/**
+ * Create a document text node
+ * @returns { Object } create a text node to use as placeholder
+ */
+function createDOMPlaceholder() {
+  return document.createTextNode('')
+}
+
+/**
+ * Create a generic DOM node
+ * @param   { String } name - name of the DOM node we want to create
+ * @param   { Boolean } isSvg - should we use a SVG as parent node?
+ * @returns { Object } DOM node just created
+ */
+function mkEl(name, isSvg) {
+  return isSvg ?
+    document.createElementNS('http://www.w3.org/2000/svg', 'svg') :
+    document.createElement(name)
+}
+
+/**
+ * Get the outer html of any DOM node SVGs included
+ * @param   { Object } el - DOM node to parse
+ * @returns { String } el.outerHTML
+ */
+function getOuterHTML(el) {
+  if (el.outerHTML)
+    return el.outerHTML
+  // some browsers do not support outerHTML on the SVGs tags
+  else {
+    var container = mkEl('div')
+    container.appendChild(el.cloneNode(true))
+    return container.innerHTML
+  }
+}
+
+/**
+ * Set the inner html of any DOM node SVGs included
+ * @param { Object } container - DOM node where we'll inject new html
+ * @param { String } html - html to inject
+ */
+function setInnerHTML(container, html) {
+  if (!isUndefined(container.innerHTML))
+    container.innerHTML = html
+    // some browsers do not support innerHTML on the SVGs tags
+  else {
+    var doc = new DOMParser().parseFromString(html, 'application/xml')
+    var node = container.ownerDocument.importNode(doc.documentElement, true)
+    container.appendChild(node)
+  }
+}
+
+/**
+ * Remove any DOM attribute from a node
+ * @param   { Object } dom - DOM node we want to update
+ * @param   { String } name - name of the property we want to remove
+ */
+function remAttr(dom, name) {
+  dom.removeAttribute(name)
+}
+
+/**
+ * Get the value of any DOM attribute on a node
+ * @param   { Object } dom - DOM node we want to parse
+ * @param   { String } name - name of the attribute we want to get
+ * @returns { String | undefined } name of the node attribute whether it exists
+ */
+function getAttr(dom, name) {
+  return dom.getAttribute(name)
+}
+
+/**
+ * Set any DOM attribute
+ * @param { Object } dom - DOM node we want to update
+ * @param { String } name - name of the property we want to set
+ * @param { String } val - value of the property we want to set
+ */
+function setAttr(dom, name, val) {
+  var xlink = XLINK_REGEX.exec(name)
+  if (xlink && xlink[1])
+    dom.setAttributeNS(XLINK_NS, xlink[1], val)
+  else
+    dom.setAttribute(name, val)
+}
+
+/**
+ * Minimize risk: only zero or one _space_ between attr & value
+ * @param   { String }   html - html string we want to parse
+ * @param   { Function } fn - callback function to apply on any attribute found
+ */
+function walkAttrs(html, fn) {
+  if (!html)
+    return
+  var m
+  while (m = RE_HTML_ATTRS.exec(html))
+    fn(m[1].toLowerCase(), m[2] || m[3] || m[4])
+}
+
+/**
+ * Walk down recursively all the children tags starting dom node
+ * @param   { Object }   dom - starting node where we will start the recursion
+ * @param   { Function } fn - callback to transform the child node just found
+ * @param   { Object }   context - fn can optionally return an object, which is passed to children
+ */
+function walkNodes(dom, fn, context) {
+  if (dom) {
+    var res = fn(dom, context)
+    var next
+    // stop the recursion
+    if (res === false) return
+
+    dom = dom.firstChild
+
+    while (dom) {
+      next = dom.nextSibling
+      walkNodes(dom, fn, res)
+      dom = next
+    }
+  }
+}
+
+var dom = Object.freeze({
+  $$: $$,
+  $: $,
+  createFrag: createFrag,
+  createDOMPlaceholder: createDOMPlaceholder,
+  mkEl: mkEl,
+  getOuterHTML: getOuterHTML,
+  setInnerHTML: setInnerHTML,
+  remAttr: remAttr,
+  getAttr: getAttr,
+  setAttr: setAttr,
+  walkAttrs: walkAttrs,
+  walkNodes: walkNodes
+});
+
+var styleNode;
+var cssTextProp;
+var byName = {};
+var remainder = [];
+// skip the following code on the server
+if (WIN) {
+  styleNode = (function () {
+    // create a new style element with the correct type
+    var newNode = mkEl('style')
+    setAttr(newNode, 'type', 'text/css')
+
+    // replace any user node or insert the new one into the head
+    var userNode = $('style[type=riot]')
+    if (userNode) {
+      if (userNode.id) newNode.id = userNode.id
+      userNode.parentNode.replaceChild(newNode, userNode)
+    }
+    else document.getElementsByTagName('head')[0].appendChild(newNode)
+
+    return newNode
+  })()
+  cssTextProp = styleNode.styleSheet
+}
+
+/**
+ * Object that will be used to inject and manage the css of every tag instance
+ */
+var styleManager = {
+  styleNode: styleNode,
+  /**
+   * Save a tag style to be later injected into DOM
+   * @param { String } css - css string
+   * @param { String } name - if it's passed we will map the css to a tagname
+   */
+  add: function add(css, name) {
+    if (name) byName[name] = css
+    else remainder.push(css)
+  },
+  /**
+   * Inject all previously saved tag styles into DOM
+   * innerHTML seems slow: http://jsperf.com/riot-insert-style
+   */
+  inject: function inject() {
+    if (!WIN) return
+    var style = Object.keys(byName)
+      .map(function(k) { return byName[k] })
+      .concat(remainder).join('\n')
+    if (cssTextProp) cssTextProp.cssText = style
+    else styleNode.innerHTML = style
+  }
+}
+
+var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+function unwrapExports (x) {
+	return x && x.__esModule ? x['default'] : x;
+}
+
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+var csp_tmpl = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
 	(factory((global.cspTmpl = global.cspTmpl || {})));
-}(this, (function (exports) { 'use strict';
+}(commonjsGlobal, (function (exports) { 'use strict';
 
 function InfiniteChecker (maxIterations) {
   if (this instanceof InfiniteChecker) {
@@ -22,7 +382,7 @@ InfiniteChecker.prototype.check = function () {
 }
 
 function getGlobal (str) {
-  var ctx = (typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this)
+  var ctx = (typeof window !== 'undefined' ? window : typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : this)
   return typeof str !== 'undefined' ? ctx[str] : ctx
 }
 
@@ -33,11 +393,13 @@ var primitives = names.map(getGlobal)
 var protos = primitives.map(getProto)
 
 function Primitives (context) {
+  var this$1 = this;
+
   if (this instanceof Primitives) {
     this.context = context
     for (var i = 0; i < names.length; i++) {
-      if (!this.context[names[i]]) {
-        this.context[names[i]] = wrap(primitives[i])
+      if (!this$1.context[names[i]]) {
+        this$1.context[names[i]] = wrap(primitives[i])
       }
     }
   } else {
@@ -140,7 +502,7 @@ function wrap (prim) {
   return result
 }
 
-var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {}
+var commonjsGlobal$$ = typeof window !== 'undefined' ? window : typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : typeof self !== 'undefined' ? self : {}
 
 function interopDefault(ex) {
 	return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
@@ -189,7 +551,7 @@ var esprima = createCommonjsModule(function (module, exports) {
     } else {
         factory((root.esprima = {}));
     }
-}(commonjsGlobal, function (exports) {
+}(commonjsGlobal$$, function (exports) {
     'use strict';
 
     var Token,
@@ -1901,6 +2263,8 @@ var esprima = createCommonjsModule(function (module, exports) {
     WrappingNode.prototype = Node.prototype = {
 
         processComment: function () {
+            var this$1 = this;
+
             var lastChild,
                 innerComments,
                 leadingComments,
@@ -1924,7 +2288,7 @@ var esprima = createCommonjsModule(function (module, exports) {
                 innerComments = [];
                 for (i = extra.leadingComments.length - 1; i >= 0; --i) {
                     comment = extra.leadingComments[i];
-                    if (this.range[1] >= comment.range[1]) {
+                    if (this$1.range[1] >= comment.range[1]) {
                         innerComments.unshift(comment);
                         extra.leadingComments.splice(i, 1);
                         extra.trailingComments.splice(i, 1);
@@ -1941,7 +2305,7 @@ var esprima = createCommonjsModule(function (module, exports) {
                 trailingComments = [];
                 for (i = extra.trailingComments.length - 1; i >= 0; --i) {
                     comment = extra.trailingComments[i];
-                    if (comment.range[0] >= this.range[1]) {
+                    if (comment.range[0] >= this$1.range[1]) {
                         trailingComments.unshift(comment);
                         extra.trailingComments.splice(i, 1);
                     }
@@ -1965,7 +2329,7 @@ var esprima = createCommonjsModule(function (module, exports) {
                     leadingComments = [];
                     for (i = lastChild.leadingComments.length - 1; i >= 0; --i) {
                         comment = lastChild.leadingComments[i];
-                        if (comment.range[1] <= this.range[0]) {
+                        if (comment.range[1] <= this$1.range[0]) {
                             leadingComments.unshift(comment);
                             lastChild.leadingComments.splice(i, 1);
                         }
@@ -1979,7 +2343,7 @@ var esprima = createCommonjsModule(function (module, exports) {
                 leadingComments = [];
                 for (i = extra.leadingComments.length - 1; i >= 0; --i) {
                     comment = extra.leadingComments[i];
-                    if (comment.range[1] <= this.range[0]) {
+                    if (comment.range[1] <= this$1.range[0]) {
                         leadingComments.unshift(comment);
                         extra.leadingComments.splice(i, 1);
                     }
@@ -6954,1732 +7318,67 @@ exports.tmpl = tmpl;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/* Riot v3.0.0-alpha.6, @license MIT */
+});
 
-;(function(window, undefined) {
-  'use strict';
-var tmpl = cspTmpl.tmpl,
-  brackets = cspTmpl.brackets
-var riot = { version: 'v3.0.0-alpha.6', settings: {} },
-  // be aware, internal usage
-  // ATTENTION: prefix the global dynamic variables with `__`
+unwrapExports(csp_tmpl);
 
-  // counter to give a unique id to all the Tag instances
-  __uid = 0,
-  // tags instances cache
-  __virtualDom = [],
-  // tags implementation cache
-  __tagImpl = {},
-
-  /**
-   * Const
-   */
-  GLOBAL_MIXIN = '__global_mixin',
-
-  // riot specific prefixes
-  RIOT_PREFIX = 'riot-',
-  RIOT_TAG = RIOT_PREFIX + 'tag',
-  RIOT_TAG_IS = 'data-is',
-
-  // for typeof == '' comparisons
-  T_STRING = 'string',
-  T_OBJECT = 'object',
-  T_UNDEF  = 'undefined',
-  T_FUNCTION = 'function',
-  XLINK_NS = 'http://www.w3.org/1999/xlink',
-  XLINK_REGEX = /^xlink:(\w+)/,
-  // special native tags that cannot be treated like the others
-  SPECIAL_TAGS_REGEX = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?|opt(?:ion|group))$/,
-  RESERVED_WORDS_BLACKLIST = /^(?:_(?:item|id|parent)|update|root|(?:un)?mount|mixin|is(?:Mounted|Loop)|tags|parent|opts|trigger|o(?:n|ff|ne))$/,
-  // SVG tags list https://www.w3.org/TR/SVG/attindex.html#PresentationAttributes
-  SVG_TAGS_LIST = ['altGlyph', 'animate', 'animateColor', 'circle', 'clipPath', 'defs', 'ellipse', 'feBlend', 'feColorMatrix', 'feComponentTransfer', 'feComposite', 'feConvolveMatrix', 'feDiffuseLighting', 'feDisplacementMap', 'feFlood', 'feGaussianBlur', 'feImage', 'feMerge', 'feMorphology', 'feOffset', 'feSpecularLighting', 'feTile', 'feTurbulence', 'filter', 'font', 'foreignObject', 'g', 'glyph', 'glyphRef', 'image', 'line', 'linearGradient', 'marker', 'mask', 'missing-glyph', 'path', 'pattern', 'polygon', 'polyline', 'radialGradient', 'rect', 'stop', 'svg', 'switch', 'symbol', 'text', 'textPath', 'tref', 'tspan', 'use'],
-
-  // version# for IE 8-11, 0 for others
-  IE_VERSION = (window && window.document || {}).documentMode | 0,
-
-  // detect firefox to fix #1374
-  FIREFOX = window && !!window.InstallTrigger
-/* istanbul ignore next */
-riot.observable = function(el) {
-
-  /**
-   * Extend the original object or create a new empty one
-   * @type { Object }
-   */
-
-  el = el || {}
-
-  /**
-   * Private variables
-   */
-  var callbacks = {},
-    slice = Array.prototype.slice
-
-  /**
-   * Private Methods
-   */
-
-  /**
-   * Helper function needed to get and loop all the events in a string
-   * @param   { String }   e - event string
-   * @param   {Function}   fn - callback
-   */
-  function onEachEvent(e, fn) {
-    var es = e.split(' '), l = es.length, i = 0
-    for (; i < l; i++) {
-      var name = es[i]
-      if (name) fn(name, i)
-    }
-  }
-
-  /**
-   * Public Api
-   */
-
-  // extend the el object adding the observable methods
-  Object.defineProperties(el, {
-    /**
-     * Listen to the given space separated list of `events` and
-     * execute the `callback` each time an event is triggered.
-     * @param  { String } events - events ids
-     * @param  { Function } fn - callback function
-     * @returns { Object } el
-     */
-    on: {
-      value: function(events, fn) {
-        if (typeof fn != 'function')  return el
-
-        onEachEvent(events, function(name, pos) {
-          (callbacks[name] = callbacks[name] || []).push(fn)
-          fn.typed = pos > 0
-        })
-
-        return el
-      },
-      enumerable: false,
-      writable: false,
-      configurable: false
-    },
-
-    /**
-     * Removes the given space separated list of `events` listeners
-     * @param   { String } events - events ids
-     * @param   { Function } fn - callback function
-     * @returns { Object } el
-     */
-    off: {
-      value: function(events, fn) {
-        if (events == '*' && !fn) callbacks = {}
-        else {
-          onEachEvent(events, function(name, pos) {
-            if (fn) {
-              var arr = callbacks[name]
-              for (var i = 0, cb; cb = arr && arr[i]; ++i) {
-                if (cb == fn) arr.splice(i--, 1)
-              }
-            } else delete callbacks[name]
-          })
-        }
-        return el
-      },
-      enumerable: false,
-      writable: false,
-      configurable: false
-    },
-
-    /**
-     * Listen to the given space separated list of `events` and
-     * execute the `callback` at most once
-     * @param   { String } events - events ids
-     * @param   { Function } fn - callback function
-     * @returns { Object } el
-     */
-    one: {
-      value: function(events, fn) {
-        function on() {
-          el.off(events, on)
-          fn.apply(el, arguments)
-        }
-        return el.on(events, on)
-      },
-      enumerable: false,
-      writable: false,
-      configurable: false
-    },
-
-    /**
-     * Execute all callback functions that listen to
-     * the given space separated list of `events`
-     * @param   { String } events - events ids
-     * @returns { Object } el
-     */
-    trigger: {
-      value: function(events) {
-
-        // getting the arguments
-        var arglen = arguments.length - 1,
-          args = new Array(arglen),
-          fns
-
-        for (var i = 0; i < arglen; i++) {
-          args[i] = arguments[i + 1] // skip first argument
-        }
-
-        onEachEvent(events, function(name, pos) {
-
-          fns = slice.call(callbacks[name] || [], 0)
-
-          for (var i = 0, fn; fn = fns[i]; ++i) {
-            if (fn.busy) continue
-            fn.busy = 1
-            fn.apply(el, fn.typed ? [name].concat(args) : args)
-            if (fns[i] !== fn) { i-- }
-            fn.busy = 0
-          }
-
-          if (callbacks['*'] && name != '*')
-            el.trigger.apply(el, ['*', name].concat(args))
-
-        })
-
-        return el
-      },
-      enumerable: false,
-      writable: false,
-      configurable: false
-    }
-  })
-
-  return el
-
-}
-/* istanbul ignore next */
-;(function(riot) {
+var tmpl = csp_tmpl.tmpl;
+var brackets = csp_tmpl.brackets;
 
 /**
- * Simple client-side router
- * @module riot-route
+ * Simple object prototypal inheritance
+ * @param   { Object } parent - parent object
+ * @returns { Object } child instance
  */
-
-
-var RE_ORIGIN = /^.+?\/\/+[^\/]+/,
-  EVENT_LISTENER = 'EventListener',
-  REMOVE_EVENT_LISTENER = 'remove' + EVENT_LISTENER,
-  ADD_EVENT_LISTENER = 'add' + EVENT_LISTENER,
-  HAS_ATTRIBUTE = 'hasAttribute',
-  REPLACE = 'replace',
-  POPSTATE = 'popstate',
-  HASHCHANGE = 'hashchange',
-  TRIGGER = 'trigger',
-  MAX_EMIT_STACK_LEVEL = 3,
-  win = typeof window != 'undefined' && window,
-  doc = typeof document != 'undefined' && document,
-  hist = win && history,
-  loc = win && (hist.location || win.location), // see html5-history-api
-  prot = Router.prototype, // to minify more
-  clickEvent = doc && doc.ontouchstart ? 'touchstart' : 'click',
-  started = false,
-  central = riot.observable(),
-  routeFound = false,
-  debouncedEmit,
-  base, current, parser, secondParser, emitStack = [], emitStackLevel = 0
-
-/**
- * Default parser. You can replace it via router.parser method.
- * @param {string} path - current path (normalized)
- * @returns {array} array
- */
-function DEFAULT_PARSER(path) {
-  return path.split(/[/?#]/)
+function inherit(parent) {
+  return Object.assign ? Object.assign({}, parent) : extend({}, parent)
 }
 
-/**
- * Default parser (second). You can replace it via router.parser method.
- * @param {string} path - current path (normalized)
- * @param {string} filter - filter string (normalized)
- * @returns {array} array
- */
-function DEFAULT_SECOND_PARSER(path, filter) {
-  var re = new RegExp('^' + filter[REPLACE](/\*/g, '([^/?#]+?)')[REPLACE](/\.\./, '.*') + '$'),
-    args = path.match(re)
-
-  if (args) return args.slice(1)
-}
-
-/**
- * Simple/cheap debounce implementation
- * @param   {function} fn - callback
- * @param   {number} delay - delay in seconds
- * @returns {function} debounced function
- */
-function debounce(fn, delay) {
-  var t
-  return function () {
-    clearTimeout(t)
-    t = setTimeout(fn, delay)
-  }
-}
-
-/**
- * Set the window listeners to trigger the routes
- * @param {boolean} autoExec - see route.start
- */
-function start(autoExec) {
-  debouncedEmit = debounce(emit, 1)
-  win[ADD_EVENT_LISTENER](POPSTATE, debouncedEmit)
-  win[ADD_EVENT_LISTENER](HASHCHANGE, debouncedEmit)
-  doc[ADD_EVENT_LISTENER](clickEvent, click)
-  if (autoExec) emit(true)
-}
-
-/**
- * Router class
- */
-function Router() {
-  this.$ = []
-  riot.observable(this) // make it observable
-  central.on('stop', this.s.bind(this))
-  central.on('emit', this.e.bind(this))
-}
-
-function normalize(path) {
-  return path[REPLACE](/^\/|\/$/, '')
-}
-
-function isString(str) {
-  return typeof str == 'string'
-}
-
-/**
- * Get the part after domain name
- * @param {string} href - fullpath
- * @returns {string} path from root
- */
-function getPathFromRoot(href) {
-  return (href || loc.href)[REPLACE](RE_ORIGIN, '')
-}
-
-/**
- * Get the part after base
- * @param {string} href - fullpath
- * @returns {string} path from base
- */
-function getPathFromBase(href) {
-  return base[0] == '#'
-    ? (href || loc.href || '').split(base)[1] || ''
-    : (loc ? getPathFromRoot(href) : href || '')[REPLACE](base, '')
-}
-
-function emit(force) {
-  // the stack is needed for redirections
-  var isRoot = emitStackLevel == 0, first
-  if (MAX_EMIT_STACK_LEVEL <= emitStackLevel) return
-
-  emitStackLevel++
-  emitStack.push(function() {
-    var path = getPathFromBase()
-    if (force || path != current) {
-      central[TRIGGER]('emit', path)
-      current = path
-    }
-  })
-  if (isRoot) {
-    while (first = emitStack.shift()) first() // stack increses within this call
-    emitStackLevel = 0
-  }
-}
-
-function click(e) {
-  if (
-    e.which != 1 // not left click
-    || e.metaKey || e.ctrlKey || e.shiftKey // or meta keys
-    || e.defaultPrevented // or default prevented
-  ) return
-
-  var el = e.target
-  while (el && el.nodeName != 'A') el = el.parentNode
-
-  if (
-    !el || el.nodeName != 'A' // not A tag
-    || el[HAS_ATTRIBUTE]('download') // has download attr
-    || !el[HAS_ATTRIBUTE]('href') // has no href attr
-    || el.target && el.target != '_self' // another window or frame
-    || el.href.indexOf(loc.href.match(RE_ORIGIN)[0]) == -1 // cross origin
-  ) return
-
-  if (el.href != loc.href
-    && (
-      el.href.split('#')[0] == loc.href.split('#')[0] // internal jump
-      || base[0] != '#' && getPathFromRoot(el.href).indexOf(base) !== 0 // outside of base
-      || base[0] == '#' && el.href.split(base)[0] != loc.href.split(base)[0] // outside of #base
-      || !go(getPathFromBase(el.href), el.title || doc.title) // route not found
-    )) return
-
-  e.preventDefault()
-}
-
-/**
- * Go to the path
- * @param {string} path - destination path
- * @param {string} title - page title
- * @param {boolean} shouldReplace - use replaceState or pushState
- * @returns {boolean} - route not found flag
- */
-function go(path, title, shouldReplace) {
-  // Server-side usage: directly execute handlers for the path
-  if (!hist) return central[TRIGGER]('emit', getPathFromBase(path))
-
-  path = base + normalize(path)
-  title = title || doc.title
-  // browsers ignores the second parameter `title`
-  shouldReplace
-    ? hist.replaceState(null, title, path)
-    : hist.pushState(null, title, path)
-  // so we need to set it manually
-  doc.title = title
-  routeFound = false
-  emit()
-  return routeFound
-}
-
-/**
- * Go to path or set action
- * a single string:                go there
- * two strings:                    go there with setting a title
- * two strings and boolean:        replace history with setting a title
- * a single function:              set an action on the default route
- * a string/RegExp and a function: set an action on the route
- * @param {(string|function)} first - path / action / filter
- * @param {(string|RegExp|function)} second - title / action
- * @param {boolean} third - replace flag
- */
-prot.m = function(first, second, third) {
-  if (isString(first) && (!second || isString(second))) go(first, second, third || false)
-  else if (second) this.r(first, second)
-  else this.r('@', first)
-}
-
-/**
- * Stop routing
- */
-prot.s = function() {
-  this.off('*')
-  this.$ = []
-}
-
-/**
- * Emit
- * @param {string} path - path
- */
-prot.e = function(path) {
-  this.$.concat('@').some(function(filter) {
-    var args = (filter == '@' ? parser : secondParser)(normalize(path), normalize(filter))
-    if (typeof args != 'undefined') {
-      this[TRIGGER].apply(null, [filter].concat(args))
-      return routeFound = true // exit from loop
-    }
-  }, this)
-}
-
-/**
- * Register route
- * @param {string} filter - filter for matching to url
- * @param {function} action - action to register
- */
-prot.r = function(filter, action) {
-  if (filter != '@') {
-    filter = '/' + normalize(filter)
-    this.$.push(filter)
-  }
-  this.on(filter, action)
-}
-
-var mainRouter = new Router()
-var route = mainRouter.m.bind(mainRouter)
-
-/**
- * Create a sub router
- * @returns {function} the method of a new Router object
- */
-route.create = function() {
-  var newSubRouter = new Router()
-  // assign sub-router's main method
-  var router = newSubRouter.m.bind(newSubRouter)
-  // stop only this sub-router
-  router.stop = newSubRouter.s.bind(newSubRouter)
-  return router
-}
-
-/**
- * Set the base of url
- * @param {(str|RegExp)} arg - a new base or '#' or '#!'
- */
-route.base = function(arg) {
-  base = arg || '#'
-  current = getPathFromBase() // recalculate current path
-}
-
-/** Exec routing right now **/
-route.exec = function() {
-  emit(true)
-}
-
-/**
- * Replace the default router to yours
- * @param {function} fn - your parser function
- * @param {function} fn2 - your secondParser function
- */
-route.parser = function(fn, fn2) {
-  if (!fn && !fn2) {
-    // reset parser for testing...
-    parser = DEFAULT_PARSER
-    secondParser = DEFAULT_SECOND_PARSER
-  }
-  if (fn) parser = fn
-  if (fn2) secondParser = fn2
-}
-
-/**
- * Helper function to get url query as an object
- * @returns {object} parsed query
- */
-route.query = function() {
-  var q = {}
-  var href = loc.href || current
-  href[REPLACE](/[?&](.+?)=([^&]*)/g, function(_, k, v) { q[k] = v })
-  return q
-}
-
-/** Stop routing **/
-route.stop = function () {
-  if (started) {
-    if (win) {
-      win[REMOVE_EVENT_LISTENER](POPSTATE, debouncedEmit)
-      win[REMOVE_EVENT_LISTENER](HASHCHANGE, debouncedEmit)
-      doc[REMOVE_EVENT_LISTENER](clickEvent, click)
-    }
-    central[TRIGGER]('stop')
-    started = false
-  }
-}
-
-/**
- * Start routing
- * @param {boolean} autoExec - automatically exec after starting if true
- */
-route.start = function (autoExec) {
-  if (!started) {
-    if (win) {
-      if (document.readyState == 'complete') start(autoExec)
-      // the timeout is needed to solve
-      // a weird safari bug https://github.com/riot/route/issues/33
-      else win[ADD_EVENT_LISTENER]('load', function() {
-        setTimeout(function() { start(autoExec) }, 1)
-      })
-    }
-    started = true
-  }
-}
-
-/** Prepare the router **/
-route.base()
-route.parser()
-
-riot.route = route
-})(riot)
-/* istanbul ignore next */
-/*
-  lib/browser/tag/mkdom.js
-
-  Includes hacks needed for the Internet Explorer version 9 and below
-  See: http://kangax.github.io/compat-table/es5/#ie8
-       http://codeplanet.io/dropping-ie8/
-*/
-var mkdom = (function _mkdom() {
-  var
-    reHasYield  = /<yield\b/i,
-    reYieldAll  = /<yield\s*(?:\/>|>([\S\s]*?)<\/yield\s*>|>)/ig,
-    reYieldSrc  = /<yield\s+to=['"]([^'">]*)['"]\s*>([\S\s]*?)<\/yield\s*>/ig,
-    reYieldDest = /<yield\s+from=['"]?([-\w]+)['"]?\s*(?:\/>|>([\S\s]*?)<\/yield\s*>)/ig
-  var
-    rootEls = { tr: 'tbody', th: 'tr', td: 'tr', col: 'colgroup' },
-    tblTags = IE_VERSION && IE_VERSION < 10
-      ? SPECIAL_TAGS_REGEX : /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?)$/
-
-  /**
-   * Creates a DOM element to wrap the given content. Normally an `DIV`, but can be
-   * also a `TABLE`, `SELECT`, `TBODY`, `TR`, or `COLGROUP` element.
-   *
-   * @param   {string} templ  - The template coming from the custom tag definition
-   * @param   {string} [html] - HTML content that comes from the DOM element where you
-   *           will mount the tag, mostly the original tag in the page
-   * @returns {HTMLElement} DOM element with _templ_ merged through `YIELD` with the _html_.
-   */
-  function _mkdom(templ, html) {
-    var
-      match   = templ && templ.match(/^\s*<([-\w]+)/),
-      tagName = match && match[1].toLowerCase(),
-      el = mkEl('div', isSVGTag(tagName))
-
-    // replace all the yield tags with the tag inner html
-    templ = replaceYield(templ, html)
-
-    /* istanbul ignore next */
-    if (tblTags.test(tagName))
-      el = specialTags(el, templ, tagName)
-    else
-      setInnerHTML(el, templ)
-
-    el.stub = true
-
-    return el
-  }
-
-  /*
-    Creates the root element for table or select child elements:
-    tr/th/td/thead/tfoot/tbody/caption/col/colgroup/option/optgroup
-  */
-  function specialTags(el, templ, tagName) {
-    var
-      select = tagName[0] === 'o',
-      parent = select ? 'select>' : 'table>'
-
-    // trim() is important here, this ensures we don't have artifacts,
-    // so we can check if we have only one element inside the parent
-    el.innerHTML = '<' + parent + templ.trim() + '</' + parent
-    parent = el.firstChild
-
-    // returns the immediate parent if tr/th/td/col is the only element, if not
-    // returns the whole tree, as this can include additional elements
-    if (select) {
-      parent.selectedIndex = -1  // for IE9, compatible w/current riot behavior
-    } else {
-      // avoids insertion of cointainer inside container (ex: tbody inside tbody)
-      var tname = rootEls[tagName]
-      if (tname && parent.childElementCount === 1) parent = $(tname, parent)
-    }
-    return parent
-  }
-
-  /*
-    Replace the yield tag from any tag template with the innerHTML of the
-    original tag in the page
-  */
-  function replaceYield(templ, html) {
-    // do nothing if no yield
-    if (!reHasYield.test(templ)) return templ
-
-    // be careful with #1343 - string on the source having `$1`
-    var src = {}
-
-    html = html && html.replace(reYieldSrc, function (_, ref, text) {
-      src[ref] = src[ref] || text   // preserve first definition
-      return ''
-    }).trim()
-
-    return templ
-      .replace(reYieldDest, function (_, ref, def) {  // yield with from - to attrs
-        return src[ref] || def || ''
-      })
-      .replace(reYieldAll, function (_, def) {        // yield without any "from"
-        return html || def || ''
-      })
-  }
-
-  return _mkdom
-
-})()
-
-/**
- * Convert the item looped into an object used to extend the child tag properties
- * @param   { Object } expr - object containing the keys used to extend the children tags
- * @param   { * } key - value to assign to the new object returned
- * @param   { * } val - value containing the position of the item in the array
- * @returns { Object } - new object containing the values of the original item
- *
- * The variables 'key' and 'val' are arbitrary.
- * They depend on the collection type looped (Array, Object)
- * and on the expression used on the each tag
- *
- */
-function mkitem(expr, key, val) {
-  var item = {}
-  item[expr.key] = key
-  if (expr.pos) item[expr.pos] = val
-  return item
-}
-
-/**
- * Unmount the redundant tags
- * @param   { Array } items - array containing the current items to loop
- * @param   { Array } tags - array containing all the children tags
- */
-function unmountRedundant(items, tags) {
-
-  var i = tags.length,
-    j = items.length,
-    t
-
-  while (i > j) {
-    t = tags[--i]
-    tags.splice(i, 1)
-    t.unmount()
-  }
-}
-
-/**
- * Move the nested custom tags in non custom loop tags
- * @param   { Object } child - non custom loop tag
- * @param   { Number } i - current position of the loop tag
- */
-function moveNestedTags(child, i) {
-  Object.keys(child.tags).forEach(function(tagName) {
-    var tag = child.tags[tagName]
-    if (isArray(tag))
-      each(tag, function (t) {
-        moveChildTag(t, tagName, i)
-      })
-    else
-      moveChildTag(tag, tagName, i)
-  })
-}
-
-/**
- * Adds the elements for a virtual tag
- * @param { Tag } tag - the tag whose root's children will be inserted or appended
- * @param { Node } src - the node that will do the inserting or appending
- * @param { Tag } target - only if inserting, insert before this tag's first child
- */
-function addVirtual(tag, src, target) {
-  var el = tag._root, sib
-  tag._virts = []
-  while (el) {
-    sib = el.nextSibling
-    if (target)
-      src.insertBefore(el, target._root)
-    else
-      src.appendChild(el)
-
-    tag._virts.push(el) // hold for unmounting
-    el = sib
-  }
-}
-
-/**
- * Move virtual tag and all child nodes
- * @param { Tag } tag - first child reference used to start move
- * @param { Node } src  - the node that will do the inserting
- * @param { Tag } target - insert before this tag's first child
- * @param { Number } len - how many child nodes to move
- */
-function moveVirtual(tag, src, target, len) {
-  var el = tag._root, sib, i = 0
-  for (; i < len; i++) {
-    sib = el.nextSibling
-    src.insertBefore(el, target._root)
-    el = sib
-  }
-}
-
-
-/**
- * Manage tags having the 'each'
- * @param   { Object } dom - DOM node we need to loop
- * @param   { Tag } parent - parent tag instance where the dom node is contained
- * @param   { String } expr - string contained in the 'each' attribute
- */
-function _each(dom, parent, expr) {
-
-  // remove the each property from the original tag
-  remAttr(dom, 'each')
-
-  var mustReorder = typeof getAttr(dom, 'no-reorder') !== T_STRING || remAttr(dom, 'no-reorder'),
-    tagName = getTagName(dom),
-    impl = __tagImpl[tagName] || { tmpl: getOuterHTML(dom) },
-    useRoot = SPECIAL_TAGS_REGEX.test(tagName),
-    root = dom.parentNode,
-    ref = document.createTextNode(''),
-    child = getTag(dom),
-    isOption = tagName.toLowerCase() === 'option', // the option tags must be treated differently
-    tags = [],
-    oldItems = [],
-    hasKeys,
-    isVirtual = dom.tagName == 'VIRTUAL'
-
-  // parse the each expression
-  expr = tmpl.loopKeys(expr)
-
-  // insert a marked where the loop tags will be injected
-  root.insertBefore(ref, dom)
-
-  // clean template code
-  parent.one('before-mount', function () {
-
-    // remove the original DOM node
-    dom.parentNode.removeChild(dom)
-    if (root.stub) root = parent.root
-
-  }).on('update', function () {
-    // get the new items collection
-    var items = tmpl(expr.val, parent),
-      // create a fragment to hold the new DOM nodes to inject in the parent tag
-      frag = document.createDocumentFragment()
-
-    // object loop. any changes cause full redraw
-    if (!isArray(items)) {
-      hasKeys = items || false
-      items = hasKeys ?
-        Object.keys(items).map(function (key) {
-          return mkitem(expr, key, items[key])
-        }) : []
-    }
-
-    // loop all the new items
-    var i = 0,
-      itemsLength = items.length
-
-    for (; i < itemsLength; i++) {
-      // reorder only if the items are objects
-      var
-        item = items[i],
-        _mustReorder = mustReorder && typeof item == T_OBJECT && !hasKeys,
-        oldPos = oldItems.indexOf(item),
-        pos = ~oldPos && _mustReorder ? oldPos : i,
-        // does a tag exist in this position?
-        tag = tags[pos]
-
-      item = !hasKeys && expr.key ? mkitem(expr, item, i) : item
-
-      // new tag
-      if (
-        !_mustReorder && !tag // with no-reorder we just update the old tags
-        ||
-        _mustReorder && !~oldPos || !tag // by default we always try to reorder the DOM elements
-      ) {
-
-        tag = new Tag(impl, {
-          parent: parent,
-          isLoop: true,
-          hasImpl: !!__tagImpl[tagName],
-          root: useRoot ? root : dom.cloneNode(),
-          item: item
-        }, dom.innerHTML)
-
-        tag.mount()
-
-        if (isVirtual) tag._root = tag.root.firstChild // save reference for further moves or inserts
-        // this tag must be appended
-        if (i == tags.length || !tags[i]) { // fix 1581
-          if (isVirtual)
-            addVirtual(tag, frag)
-          else frag.appendChild(tag.root)
-        }
-        // this tag must be insert
-        else {
-          if (isVirtual)
-            addVirtual(tag, root, tags[i])
-          else root.insertBefore(tag.root, tags[i].root) // #1374 some browsers reset selected here
-          oldItems.splice(i, 0, item)
-        }
-
-        tags.splice(i, 0, tag)
-        pos = i // handled here so no move
-      } else tag.update(item, true)
-
-      // reorder the tag if it's not located in its previous position
-      if (
-        pos !== i && _mustReorder &&
-        tags[i] // fix 1581 unable to reproduce it in a test!
-      ) {
-        // update the DOM
-        if (isVirtual)
-          moveVirtual(tag, root, tags[i], dom.childNodes.length)
-        else if (tags[i].root.parentNode) root.insertBefore(tag.root, tags[i].root)
-        // update the position attribute if it exists
-        if (expr.pos)
-          tag[expr.pos] = i
-        // move the old tag instance
-        tags.splice(i, 0, tags.splice(pos, 1)[0])
-        // move the old item
-        oldItems.splice(i, 0, oldItems.splice(pos, 1)[0])
-        // if the loop tags are not custom
-        // we need to move all their custom tags into the right position
-        if (!child && tag.tags) moveNestedTags(tag, i)
-      }
-
-      // cache the original item to use it in the events bound to this node
-      // and its children
-      tag._item = item
-      // cache the real parent tag internally
-      defineProperty(tag, '_parent', parent)
-    }
-
-    // remove the redundant tags
-    unmountRedundant(items, tags)
-
-    // insert the new nodes
-    root.insertBefore(frag, ref)
-    if (isOption) {
-
-      // #1374 FireFox bug in <option selected={expression}>
-      if (FIREFOX && !root.multiple) {
-        for (var n = 0; n < root.length; n++) {
-          if (root[n].__riot1374) {
-            root.selectedIndex = n  // clear other options
-            delete root[n].__riot1374
-            break
-          }
-        }
-      }
-    }
-
-    // set the 'tags' property of the parent tag
-    // if child is 'undefined' it means that we don't need to set this property
-    // for example:
-    // we don't need store the `myTag.tags['div']` property if we are looping a div tag
-    // but we need to track the `myTag.tags['child']` property looping a custom child node named `child`
-    if (child) parent.tags[tagName] = tags
-
-    // clone the items array
-    oldItems = items.slice()
-
-  })
-
-}
-/**
- * Object that will be used to inject and manage the css of every tag instance
- */
-var styleManager = (function(_riot) {
-
-  if (!window) return { // skip injection on the server
-    add: function () {},
-    inject: function () {}
-  }
-
-  var styleNode = (function () {
-    // create a new style element with the correct type
-    var newNode = mkEl('style')
-    setAttr(newNode, 'type', 'text/css')
-
-    // replace any user node or insert the new one into the head
-    var userNode = $('style[type=riot]')
-    if (userNode) {
-      if (userNode.id) newNode.id = userNode.id
-      userNode.parentNode.replaceChild(newNode, userNode)
-    }
-    else document.getElementsByTagName('head')[0].appendChild(newNode)
-
-    return newNode
-  })()
-
-  // Create cache and shortcut to the correct property
-  var cssTextProp = styleNode.styleSheet,
-    stylesToInject = ''
-
-  // Expose the style node in a non-modificable property
-  Object.defineProperty(_riot, 'styleNode', {
-    value: styleNode,
-    writable: true
-  })
-
-  /**
-   * Public api
-   */
-  return {
-    /**
-     * Save a tag style to be later injected into DOM
-     * @param   { String } css [description]
-     */
-    add: function(css) {
-      stylesToInject += css
-    },
-    /**
-     * Inject all previously saved tag styles into DOM
-     * innerHTML seems slow: http://jsperf.com/riot-insert-style
-     */
-    inject: function() {
-      if (stylesToInject) {
-        if (cssTextProp) cssTextProp.cssText += stylesToInject
-        else styleNode.innerHTML += stylesToInject
-        stylesToInject = ''
-      }
-    }
-  }
-
-})(riot)
-
-
-function parseNamedElements(root, tag, childTags, forceParsingNamed) {
-
-  walk(root, function(dom) {
-    if (dom.nodeType == 1) {
-      dom.isLoop = dom.isLoop ||
-                  (dom.parentNode && dom.parentNode.isLoop || getAttr(dom, 'each'))
-                    ? 1 : 0
-
-      // custom child tag
-      if (childTags) {
-        var child = getTag(dom)
-
-        if (child && !dom.isLoop)
-          childTags.push(initChildTag(child, {root: dom, parent: tag}, dom.innerHTML, tag))
-      }
-
-      if (!dom.isLoop || forceParsingNamed)
-        setNamed(dom, tag, [])
-    }
-
-  })
-
-}
-
-function parseExpressions(root, tag, expressions) {
-
-  function addExpr(dom, val, extra) {
-    if (tmpl.hasExpr(val)) {
-      expressions.push(extend({ dom: dom, expr: val }, extra))
-    }
-  }
-
-  walk(root, function(dom) {
-    var type = dom.nodeType,
-      attr
-
-    // text node
-    if (type == 3 && dom.parentNode.tagName != 'STYLE') addExpr(dom, dom.nodeValue)
-    if (type != 1) return
-
-    /* element */
-
-    // loop
-    attr = getAttr(dom, 'each')
-
-    if (attr) { _each(dom, tag, attr); return false }
-
-    // attribute expressions
-    each(dom.attributes, function(attr) {
-      var name = attr.name,
-        bool = name.split('__')[1]
-
-      addExpr(dom, attr.value, { attr: bool || name, bool: bool })
-      if (bool) { remAttr(dom, name); return false }
-
-    })
-
-    // skip custom tags
-    if (getTag(dom)) return false
-
-  })
-
-}
-function Tag(impl, conf, innerHTML) {
-
-  var self = riot.observable(this),
-    opts = inherit(conf.opts) || {},
-    parent = conf.parent,
-    isLoop = conf.isLoop,
-    hasImpl = conf.hasImpl,
-    item = cleanUpData(conf.item),
-    expressions = [],
-    childTags = [],
-    root = conf.root,
-    tagName = root.tagName.toLowerCase(),
-    attr = {},
-    propsInSyncWithParent = [],
-    dom
-
-  // only call unmount if we have a valid __tagImpl (has name property)
-  if (impl.name && root._tag) root._tag.unmount(true)
-
-  // not yet mounted
-  this.isMounted = false
-  root.isLoop = isLoop
-
-  // keep a reference to the tag just created
-  // so we will be able to mount this tag multiple times
-  root._tag = this
-
-  // create a unique id to this tag
-  // it could be handy to use it also to improve the virtual dom rendering speed
-  defineProperty(this, '_riot_id', ++__uid) // base 1 allows test !t._riot_id
-
-  extend(this, { parent: parent, root: root, opts: opts}, item)
-  // protect the "tags" property from being overridden
-  defineProperty(this, 'tags', {})
-
-  // grab attributes
-  each(root.attributes, function(el) {
-    var val = el.value
-    // remember attributes with expressions only
-    if (tmpl.hasExpr(val)) attr[el.name] = val
-  })
-
-  dom = mkdom(impl.tmpl, innerHTML)
-
-  // options
-  function updateOpts() {
-    var ctx = hasImpl && isLoop ? self : parent || self
-
-    // update opts from current DOM attributes
-    each(root.attributes, function(el) {
-      var val = el.value
-      opts[toCamel(el.name)] = tmpl.hasExpr(val) ? tmpl(val, ctx) : val
-    })
-    // recover those with expressions
-    each(Object.keys(attr), function(name) {
-      opts[toCamel(name)] = tmpl(attr[name], ctx)
-    })
-  }
-
-  function normalizeData(data) {
-    for (var key in item) {
-      if (typeof self[key] !== T_UNDEF && isWritable(self, key))
-        self[key] = data[key]
-    }
-  }
-
-  function inheritFrom(target) {
-    each(Object.keys(target), function(k) {
-      // some properties must be always in sync with the parent tag
-      var mustSync = !RESERVED_WORDS_BLACKLIST.test(k) && contains(propsInSyncWithParent, k)
-
-      if (typeof self[k] === T_UNDEF || mustSync) {
-        // track the property to keep in sync
-        // so we can keep it updated
-        if (!mustSync) propsInSyncWithParent.push(k)
-        self[k] = target[k]
-      }
-    })
-  }
-
-  /**
-   * Update the tag expressions and options
-   * @param   { * }  data - data we want to use to extend the tag properties
-   * @param   { Boolean } isInherited - is this update coming from a parent tag?
-   * @returns { self }
-   */
-  defineProperty(this, 'update', function(data, isInherited) {
-
-    // make sure the data passed will not override
-    // the component core methods
-    data = cleanUpData(data)
-    // inherit properties from the parent in loop
-    if (isLoop) {
-      inheritFrom(self.parent)
-    }
-    // normalize the tag properties in case an item object was initially passed
-    if (data && isObject(item)) {
-      normalizeData(data)
-      item = data
-    }
-    extend(self, data)
-    updateOpts()
-    self.trigger('update', data)
-    update(expressions, self)
-
-    // the updated event will be triggered
-    // once the DOM will be ready and all the re-flows are completed
-    // this is useful if you want to get the "real" root properties
-    // 4 ex: root.offsetWidth ...
-    if (isInherited && self.parent)
-      // closes #1599
-      self.parent.one('updated', function() { self.trigger('updated') })
-    else rAF(function() { self.trigger('updated') })
-
-    return this
-  })
-
-  defineProperty(this, 'mixin', function() {
-    each(arguments, function(mix) {
-      var instance,
-        props = [],
-        obj
-
-      mix = typeof mix === T_STRING ? riot.mixin(mix) : mix
-
-      // check if the mixin is a function
-      if (isFunction(mix)) {
-        // create the new mixin instance
-        instance = new mix()
-      } else instance = mix
-
-      var proto = Object.getPrototypeOf(instance)
-
-      // build multilevel prototype inheritance chain property list
-      do props = props.concat(Object.getOwnPropertyNames(obj || instance))
-      while (obj = Object.getPrototypeOf(obj || instance))
-
-      // loop the keys in the function prototype or the all object keys
-      each(props, function(key) {
-        // bind methods to self
-        // allow mixins to override other properties/parent mixins
-        if (key != 'init') {
-          // check for getters/setters
-          var descriptor = Object.getOwnPropertyDescriptor(instance, key) || Object.getOwnPropertyDescriptor(proto, key)
-          var hasGetterSetter = descriptor && (descriptor.get || descriptor.set)
-
-          // apply method only if it does not already exist on the instance
-          if (!self.hasOwnProperty(key) && hasGetterSetter) {
-            Object.defineProperty(self, key, descriptor)
-          } else {
-            self[key] = isFunction(instance[key]) ?
-              instance[key].bind(self) :
-              instance[key]
-          }
-        }
-      })
-
-      // init method will be called automatically
-      if (instance.init) instance.init.bind(self)()
-    })
-    return this
-  })
-
-  defineProperty(this, 'mount', function() {
-
-    updateOpts()
-
-    // add global mixins
-    var globalMixin = riot.mixin(GLOBAL_MIXIN)
-
-    if (globalMixin)
-      for (var i in globalMixin)
-        if (globalMixin.hasOwnProperty(i))
-          self.mixin(globalMixin[i])
-
-    // children in loop should inherit from true parent
-    if (self._parent) {
-      inheritFrom(self._parent)
-    }
-
-    // initialiation
-    if (impl.fn) impl.fn.call(self, opts)
-
-    // parse layout after init. fn may calculate args for nested custom tags
-    parseExpressions(dom, self, expressions)
-
-    // mount the child tags
-    toggle(true)
-
-    // update the root adding custom attributes coming from the compiler
-    // it fixes also #1087
-    if (impl.attrs)
-      walkAttributes(impl.attrs, function (k, v) { setAttr(root, k, v) })
-    if (impl.attrs || hasImpl)
-      parseExpressions(self.root, self, expressions)
-
-    if (!self.parent || isLoop) self.update(item)
-
-    // internal use only, fixes #403
-    self.trigger('before-mount')
-
-    if (isLoop && !hasImpl) {
-      // update the root attribute for the looped elements
-      root = dom.firstChild
-    } else {
-      while (dom.firstChild) root.appendChild(dom.firstChild)
-      if (root.stub) root = parent.root
-    }
-
-    defineProperty(self, 'root', root)
-
-    // parse the named dom nodes in the looped child
-    // adding them to the parent as well
-    if (isLoop)
-      parseNamedElements(self.root, self.parent, null, true)
-
-    // if it's not a child tag we can trigger its mount event
-    if (!self.parent || self.parent.isMounted) {
-      self.isMounted = true
-      self.trigger('mount')
-    }
-    // otherwise we need to wait that the parent event gets triggered
-    else self.parent.one('mount', function() {
-      // avoid to trigger the `mount` event for the tags
-      // not visible included in an if statement
-      if (!isInStub(self.root)) {
-        self.parent.isMounted = self.isMounted = true
-        self.trigger('mount')
-      }
-    })
-  })
-
-
-  defineProperty(this, 'unmount', function(keepRootTag) {
-    var el = root,
-      p = el.parentNode,
-      ptag,
-      tagIndex = __virtualDom.indexOf(self)
-
-    self.trigger('before-unmount')
-
-    // remove this tag instance from the global virtualDom variable
-    if (~tagIndex)
-      __virtualDom.splice(tagIndex, 1)
-
-    if (p) {
-
-      if (parent) {
-        ptag = getImmediateCustomParentTag(parent)
-        // remove this tag from the parent tags object
-        // if there are multiple nested tags with same name..
-        // remove this element form the array
-        if (isArray(ptag.tags[tagName]))
-          each(ptag.tags[tagName], function(tag, i) {
-            if (tag._riot_id == self._riot_id)
-              ptag.tags[tagName].splice(i, 1)
-          })
-        else
-          // otherwise just delete the tag instance
-          ptag.tags[tagName] = undefined
-      }
-
-      else
-        while (el.firstChild) el.removeChild(el.firstChild)
-
-      if (!keepRootTag)
-        p.removeChild(el)
-      else {
-        // the riot-tag and the data-is attributes aren't needed anymore, remove them
-        remAttr(p, RIOT_TAG_IS)
-        remAttr(p, RIOT_TAG) // this will be removed in riot 3.0.0
-      }
-
-    }
-
-    if (this._virts) {
-      each(this._virts, function(v) {
-        if (v.parentNode) v.parentNode.removeChild(v)
-      })
-    }
-
-    self.trigger('unmount')
-    toggle()
-    self.off('*')
-    self.isMounted = false
-    delete root._tag
-
-  })
-
-  // proxy function to bind updates
-  // dispatched from a parent tag
-  function onChildUpdate(data) { self.update(data, true) }
-
-  function toggle(isMount) {
-
-    // mount/unmount children
-    each(childTags, function(child) { child[isMount ? 'mount' : 'unmount']() })
-
-    // listen/unlisten parent (events flow one way from parent to children)
-    if (!parent) return
-    var evt = isMount ? 'on' : 'off'
-
-    // the loop tags will be always in sync with the parent automatically
-    if (isLoop)
-      parent[evt]('unmount', self.unmount)
-    else {
-      parent[evt]('update', onChildUpdate)[evt]('unmount', self.unmount)
-    }
-  }
-
-
-  // named elements available for fn
-  parseNamedElements(dom, this, childTags)
-
-}
-/**
- * Attach an event to a DOM node
- * @param { String } name - event name
- * @param { Function } handler - event callback
- * @param { Object } dom - dom node
- * @param { Tag } tag - tag instance
- */
-function setEventHandler(name, handler, dom, tag) {
-
-  dom[name] = function(e) {
-
-    var ptag = tag._parent,
-      item = tag._item,
-      el
-
-    if (!item)
-      while (ptag && !item) {
-        item = ptag._item
-        ptag = ptag._parent
-      }
-
-    // cross browser event fix
-    e = e || window.event
-
-    // override the event properties
-    if (isWritable(e, 'currentTarget')) e.currentTarget = dom
-    if (isWritable(e, 'target')) e.target = e.srcElement
-    if (isWritable(e, 'which')) e.which = e.charCode || e.keyCode
-
-    e.item = item
-
-    // prevent default behaviour (by default)
-    if (handler.call(tag, e) !== true && !/radio|check/.test(dom.type)) {
-      if (e.preventDefault) e.preventDefault()
-      e.returnValue = false
-    }
-
-    if (!e.preventUpdate) {
-      el = item ? getImmediateCustomParentTag(ptag) : tag
-      el.update()
-    }
-
-  }
-
-}
-
-
-/**
- * Insert a DOM node replacing another one (used by if- attribute)
- * @param   { Object } root - parent node
- * @param   { Object } node - node replaced
- * @param   { Object } before - node added
- */
-function insertTo(root, node, before) {
-  if (!root) return
-  root.insertBefore(before, node)
-  root.removeChild(node)
-}
-
-/**
- * Update the expressions in a Tag instance
- * @param   { Array } expressions - expression that must be re evaluated
- * @param   { Tag } tag - tag instance
- */
-function update(expressions, tag) {
-
-  each(expressions, function(expr, i) {
-
-    var dom = expr.dom,
-      attrName = expr.attr,
-      value = tmpl(expr.expr, tag),
-      parent = expr.parent || expr.dom.parentNode
-
-    if (expr.bool) {
-      value = !!value
-    } else if (value == null) {
-      value = ''
-    }
-
-    // #1638: regression of #1612, update the dom only if the value of the
-    // expression was changed
-    if (expr.value === value) {
-      return
-    }
-    expr.value = value
-
-    // textarea and text nodes has no attribute name
-    if (!attrName) {
-      // about #815 w/o replace: the browser converts the value to a string,
-      // the comparison by "==" does too, but not in the server
-      value += ''
-      // test for parent avoids error with invalid assignment to nodeValue
-      if (parent) {
-        // cache the parent node because somehow it will become null on IE
-        // on the next iteration
-        expr.parent = parent
-        if (parent.tagName === 'TEXTAREA') {
-          parent.value = value                    // #1113
-          if (!IE_VERSION) dom.nodeValue = value  // #1625 IE throws here, nodeValue
-        }                                         // will be available on 'updated'
-        else dom.nodeValue = value
-      }
-      return
-    }
-
-    // ~~#1612: look for changes in dom.value when updating the value~~
-    if (attrName === 'value') {
-      if (dom.value !== value) {
-        dom.value = value
-        setAttr(dom, attrName, value)
-      }
-      return
-    } else {
-      // remove original attribute
-      remAttr(dom, attrName)
-    }
-
-    // event handler
-    if (isFunction(value)) {
-      setEventHandler(attrName, value, dom, tag)
-
-    // if- conditional
-    } else if (attrName == 'if') {
-      var stub = expr.stub,
-        add = function() { insertTo(stub.parentNode, stub, dom) },
-        remove = function() { insertTo(dom.parentNode, dom, stub) }
-
-      // add to DOM
-      if (value) {
-        if (stub) {
-          add()
-          dom.inStub = false
-          // avoid to trigger the mount event if the tags is not visible yet
-          // maybe we can optimize this avoiding to mount the tag at all
-          if (!isInStub(dom)) {
-            walk(dom, function(el) {
-              if (el._tag && !el._tag.isMounted)
-                el._tag.isMounted = !!el._tag.trigger('mount')
-            })
-          }
-        }
-      // remove from DOM
-      } else {
-        stub = expr.stub = stub || document.createTextNode('')
-        // if the parentNode is defined we can easily replace the tag
-        if (dom.parentNode)
-          remove()
-        // otherwise we need to wait the updated event
-        else (tag.parent || tag).one('updated', remove)
-
-        dom.inStub = true
-      }
-    // show / hide
-    } else if (attrName === 'show') {
-      dom.style.display = value ? '' : 'none'
-
-    } else if (attrName === 'hide') {
-      dom.style.display = value ? 'none' : ''
-
-    } else if (expr.bool) {
-      dom[attrName] = value
-      if (value) setAttr(dom, attrName, attrName)
-      if (FIREFOX && attrName === 'selected' && dom.tagName === 'OPTION') {
-        dom.__riot1374 = value   // #1374
-      }
-
-    } else if (value === 0 || value && typeof value !== T_OBJECT) {
-      // <img src="{ expr }">
-      if (startsWith(attrName, RIOT_PREFIX) && attrName != RIOT_TAG) {
-        attrName = attrName.slice(RIOT_PREFIX.length)
-      }
-      setAttr(dom, attrName, value)
-    }
-
-  })
-
-}
 /**
  * Specialized function for looping an array-like collection with `each={}`
- * @param   { Array } els - collection of items
+ * @param   { Array } list - collection of items
  * @param   {Function} fn - callback function
  * @returns { Array } the array looped
  */
-function each(els, fn) {
-  var len = els ? els.length : 0
+function each(list, fn) {
+  var len = list ? list.length : 0
 
-  for (var i = 0, el; i < len; i++) {
-    el = els[i]
+  for (var i = 0, el; i < len; ++i) {
+    el = list[i]
     // return false -> current item was removed by fn during the loop
-    if (el != null && fn(el, i) === false) i--
+    if (fn(el, i) === false)
+      i--
   }
-  return els
+  return list
 }
 
 /**
- * Detect if the argument passed is a function
- * @param   { * } v - whatever you want to pass to this function
+ * Check whether an array contains an item
+ * @param   { Array } array - target array
+ * @param   { * } item - item to test
  * @returns { Boolean } -
  */
-function isFunction(v) {
-  return typeof v === T_FUNCTION || false   // avoid IE problems
-}
-
-/**
- * Get the outer html of any DOM node SVGs included
- * @param   { Object } el - DOM node to parse
- * @returns { String } el.outerHTML
- */
-function getOuterHTML(el) {
-  if (el.outerHTML) return el.outerHTML
-  // some browsers do not support outerHTML on the SVGs tags
-  else {
-    var container = mkEl('div')
-    container.appendChild(el.cloneNode(true))
-    return container.innerHTML
-  }
-}
-
-/**
- * Set the inner html of any DOM node SVGs included
- * @param { Object } container - DOM node where we will inject the new html
- * @param { String } html - html to inject
- */
-function setInnerHTML(container, html) {
-  if (typeof container.innerHTML != T_UNDEF) container.innerHTML = html
-  // some browsers do not support innerHTML on the SVGs tags
-  else {
-    var doc = new DOMParser().parseFromString(html, 'application/xml')
-    container.appendChild(
-      container.ownerDocument.importNode(doc.documentElement, true)
-    )
-  }
-}
-
-/**
- * Checks wether a DOM node must be considered part of an svg document
- * @param   { String }  name - tag name
- * @returns { Boolean } -
- */
-function isSVGTag(name) {
-  return ~SVG_TAGS_LIST.indexOf(name)
-}
-
-/**
- * Detect if the argument passed is an object, exclude null.
- * NOTE: Use isObject(x) && !isArray(x) to excludes arrays.
- * @param   { * } v - whatever you want to pass to this function
- * @returns { Boolean } -
- */
-function isObject(v) {
-  return v && typeof v === T_OBJECT         // typeof null is 'object'
-}
-
-/**
- * Remove any DOM attribute from a node
- * @param   { Object } dom - DOM node we want to update
- * @param   { String } name - name of the property we want to remove
- */
-function remAttr(dom, name) {
-  dom.removeAttribute(name)
+function contains(array, item) {
+  return ~array.indexOf(item)
 }
 
 /**
  * Convert a string containing dashes to camel case
- * @param   { String } string - input string
+ * @param   { String } str - input string
  * @returns { String } my-string -> myString
  */
-function toCamel(string) {
-  return string.replace(/-(\w)/g, function(_, c) {
-    return c.toUpperCase()
-  })
+function toCamel(str) {
+  return str.replace(/-(\w)/g, function (_, c) { return c.toUpperCase(); })
 }
 
 /**
- * Get the value of any DOM attribute on a node
- * @param   { Object } dom - DOM node we want to parse
- * @param   { String } name - name of the attribute we want to get
- * @returns { String | undefined } name of the node attribute whether it exists
+ * Faster String startsWith alternative
+ * @param   { String } str - source string
+ * @param   { String } value - test string
+ * @returns { Boolean } -
  */
-function getAttr(dom, name) {
-  return dom.getAttribute(name)
-}
-
-/**
- * Set any DOM/SVG attribute
- * @param { Object } dom - DOM node we want to update
- * @param { String } name - name of the property we want to set
- * @param { String } val - value of the property we want to set
- */
-function setAttr(dom, name, val) {
-  var xlink = XLINK_REGEX.exec(name)
-  if (xlink && xlink[1])
-    dom.setAttributeNS(XLINK_NS, xlink[1], val)
-  else
-    dom.setAttribute(name, val)
-}
-
-/**
- * Detect the tag implementation by a DOM node
- * @param   { Object } dom - DOM node we need to parse to get its tag implementation
- * @returns { Object } it returns an object containing the implementation of a custom tag (template and boot function)
- */
-function getTag(dom) {
-  return dom.tagName && __tagImpl[getAttr(dom, RIOT_TAG_IS) ||
-    getAttr(dom, RIOT_TAG) || dom.tagName.toLowerCase()]
-}
-/**
- * Add a child tag to its parent into the `tags` object
- * @param   { Object } tag - child tag instance
- * @param   { String } tagName - key where the new tag will be stored
- * @param   { Object } parent - tag instance where the new child tag will be included
- */
-function addChildTag(tag, tagName, parent) {
-  var cachedTag = parent.tags[tagName]
-
-  // if there are multiple children tags having the same name
-  if (cachedTag) {
-    // if the parent tags property is not yet an array
-    // create it adding the first cached tag
-    if (!isArray(cachedTag))
-      // don't add the same tag twice
-      if (cachedTag !== tag)
-        parent.tags[tagName] = [cachedTag]
-    // add the new nested tag to the array
-    if (!contains(parent.tags[tagName], tag))
-      parent.tags[tagName].push(tag)
-  } else {
-    parent.tags[tagName] = tag
-  }
-}
-
-/**
- * Move the position of a custom tag in its parent tag
- * @param   { Object } tag - child tag instance
- * @param   { String } tagName - key where the tag was stored
- * @param   { Number } newPos - index where the new tag will be stored
- */
-function moveChildTag(tag, tagName, newPos) {
-  var parent = tag.parent,
-    tags
-  // no parent no move
-  if (!parent) return
-
-  tags = parent.tags[tagName]
-
-  if (isArray(tags))
-    tags.splice(newPos, 0, tags.splice(tags.indexOf(tag), 1)[0])
-  else addChildTag(tag, tagName, parent)
-}
-
-/**
- * Create a new child tag including it correctly into its parent
- * @param   { Object } child - child tag implementation
- * @param   { Object } opts - tag options containing the DOM node where the tag will be mounted
- * @param   { String } innerHTML - inner html of the child node
- * @param   { Object } parent - instance of the parent tag including the child custom tag
- * @returns { Object } instance of the new child tag just created
- */
-function initChildTag(child, opts, innerHTML, parent) {
-  var tag = new Tag(child, opts, innerHTML),
-    tagName = getTagName(opts.root),
-    ptag = getImmediateCustomParentTag(parent)
-  // fix for the parent attribute in the looped elements
-  tag.parent = ptag
-  // store the real parent tag
-  // in some cases this could be different from the custom parent tag
-  // for example in nested loops
-  tag._parent = parent
-
-  // add this tag to the custom parent tag
-  addChildTag(tag, tagName, ptag)
-  // and also to the real parent tag
-  if (ptag !== parent)
-    addChildTag(tag, tagName, parent)
-  // empty the child node once we got its template
-  // to avoid that its children get compiled multiple times
-  opts.root.innerHTML = ''
-
-  return tag
-}
-
-/**
- * Loop backward all the parents tree to detect the first custom parent tag
- * @param   { Object } tag - a Tag instance
- * @returns { Object } the instance of the first custom parent tag found
- */
-function getImmediateCustomParentTag(tag) {
-  var ptag = tag
-  while (!getTag(ptag.root)) {
-    if (!ptag.parent) break
-    ptag = ptag.parent
-  }
-  return ptag
+function startsWith(str, value) {
+  return str.slice(0, value.length) === value
 }
 
 /**
@@ -8687,7 +7386,7 @@ function getImmediateCustomParentTag(tag) {
  * @param   { Object } el - object where the new property will be set
  * @param   { String } key - object key where the new property will be stored
  * @param   { * } value - value of the new property
-* @param   { Object } options - set the propery overriding the default options
+ * @param   { Object } options - set the propery overriding the default options
  * @returns { Object } - the initial object
  */
 function defineProperty(el, key, value, options) {
@@ -8698,21 +7397,6 @@ function defineProperty(el, key, value, options) {
     configurable: true
   }, options))
   return el
-}
-
-/**
- * Get the tag name of any DOM node
- * @param   { Object } dom - DOM node we want to parse
- * @returns { String } name to identify this dom node in riot
- */
-function getTagName(dom) {
-  var child = getTag(dom),
-    namedTag = getAttr(dom, 'name'),
-    tagName = namedTag && !tmpl.hasExpr(namedTag) ?
-                namedTag :
-              child ? child.name : dom.tagName.toLowerCase()
-
-  return tagName
 }
 
 /**
@@ -8739,34 +7423,1501 @@ function extend(src) {
   return src
 }
 
+var misc = Object.freeze({
+  inherit: inherit,
+  each: each,
+  contains: contains,
+  toCamel: toCamel,
+  startsWith: startsWith,
+  defineProperty: defineProperty,
+  extend: extend
+});
+
+var observable = function(el) {
+
+  /**
+   * Extend the original object or create a new empty one
+   * @type { Object }
+   */
+
+  el = el || {}
+
+  /**
+   * Private variables
+   */
+  var callbacks = {},
+    slice = Array.prototype.slice
+
+  /**
+   * Public Api
+   */
+
+  // extend the el object adding the observable methods
+  Object.defineProperties(el, {
+    /**
+     * Listen to the given `event` ands
+     * execute the `callback` each time an event is triggered.
+     * @param  { String } event - event id
+     * @param  { Function } fn - callback function
+     * @returns { Object } el
+     */
+    on: {
+      value: function(event, fn) {
+        if (typeof fn == 'function')
+          (callbacks[event] = callbacks[event] || []).push(fn)
+        return el
+      },
+      enumerable: false,
+      writable: false,
+      configurable: false
+    },
+
+    /**
+     * Removes the given `event` listeners
+     * @param   { String } event - event id
+     * @param   { Function } fn - callback function
+     * @returns { Object } el
+     */
+    off: {
+      value: function(event, fn) {
+        if (event == '*' && !fn) callbacks = {}
+        else {
+          if (fn) {
+            var arr = callbacks[event]
+            for (var i = 0, cb; cb = arr && arr[i]; ++i) {
+              if (cb == fn) arr.splice(i--, 1)
+            }
+          } else delete callbacks[event]
+        }
+        return el
+      },
+      enumerable: false,
+      writable: false,
+      configurable: false
+    },
+
+    /**
+     * Listen to the given `event` and
+     * execute the `callback` at most once
+     * @param   { String } event - event id
+     * @param   { Function } fn - callback function
+     * @returns { Object } el
+     */
+    one: {
+      value: function(event, fn) {
+        function on() {
+          el.off(event, on)
+          fn.apply(el, arguments)
+        }
+        return el.on(event, on)
+      },
+      enumerable: false,
+      writable: false,
+      configurable: false
+    },
+
+    /**
+     * Execute all callback functions that listen to
+     * the given `event`
+     * @param   { String } event - event id
+     * @returns { Object } el
+     */
+    trigger: {
+      value: function(event) {
+        var arguments$1 = arguments;
+
+
+        // getting the arguments
+        var arglen = arguments.length - 1,
+          args = new Array(arglen),
+          fns,
+          fn,
+          i
+
+        for (i = 0; i < arglen; i++) {
+          args[i] = arguments$1[i + 1] // skip first argument
+        }
+
+        fns = slice.call(callbacks[event] || [], 0)
+
+        for (i = 0; fn = fns[i]; ++i) {
+          fn.apply(el, args)
+          if (fns[i] !== fn) { i-- }
+        }
+
+        if (callbacks['*'] && event != '*')
+          el.trigger.apply(el, ['*', event].concat(args))
+
+        return el
+      },
+      enumerable: false,
+      writable: false,
+      configurable: false
+    }
+  })
+
+  return el
+
+}
+
+var EVENTS_PREFIX_REGEX = /^on/
+
 /**
- * Check whether an array contains an item
- * @param   { Array } arr - target array
- * @param   { * } item - item to test
- * @returns { Boolean } Does 'arr' contain 'item'?
+ * Trigger DOM events
+ * @param   { HTMLElement } dom - dom element target of the event
+ * @param   { Function } handler - user function
+ * @param   { Object } e - event object
  */
-function contains(arr, item) {
-  return ~arr.indexOf(item)
+function handleEvent(dom, handler, e) {
+  var ptag = this._parent,
+    item = this._item
+
+  if (!item)
+    while (ptag && !item) {
+      item = ptag._item
+      ptag = ptag._parent
+    }
+
+  // override the event properties
+  if (isWritable(e, 'currentTarget')) e.currentTarget = dom
+  if (isWritable(e, 'target')) e.target = e.srcElement
+  if (isWritable(e, 'which')) e.which = e.charCode || e.keyCode
+
+  e.item = item
+
+  handler.call(this, e)
+
+  if (!e.preventUpdate) {
+    getImmediateCustomParentTag(this).update()
+  }
 }
 
 /**
- * Check whether an object is a kind of array
- * @param   { * } a - anything
- * @returns {Boolean} is 'a' an array?
+ * Attach an event to a DOM node
+ * @param { String } name - event name
+ * @param { Function } handler - event callback
+ * @param { Object } dom - dom node
+ * @param { Tag } tag - tag instance
  */
-function isArray(a) { return Array.isArray(a) || a instanceof Array }
+function setEventHandler(name, handler, dom, tag) {
+  var eventName, cb = handleEvent.bind(tag, dom, handler)
 
-/**
- * Detect whether a property of an object could be overridden
- * @param   { Object }  obj - source object
- * @param   { String }  key - object property
- * @returns { Boolean } is this property writable?
- */
-function isWritable(obj, key) {
-  var props = Object.getOwnPropertyDescriptor(obj, key)
-  return typeof obj[key] === T_UNDEF || props && props.writable
+  if (!dom.addEventListener) {
+    dom[name] = cb
+    return
+  }
+
+  // normalize event name
+  eventName = name.replace(EVENTS_PREFIX_REGEX, '')
+
+  if (tag._internal.eventHandlers[eventName])
+    dom.removeEventListener(eventName, tag._internal.eventHandlers[eventName])
+
+  tag._internal.eventHandlers[eventName] = cb
+  dom.addEventListener(eventName, cb, false)
 }
 
+function updateExpression(expr) {
+  var dom = expr.dom,
+    attrName = expr.attr,
+    value = tmpl(expr.expr, this),
+    isValueAttr = attrName == 'value',
+    isVirtual = expr.root && expr.root.tagName == 'VIRTUAL',
+    parent = dom && (expr.parent || dom.parentNode)
+
+  if (expr.bool)
+    value = value ? attrName : false
+  else if (value == null)
+    value = ''
+
+  if (expr._riot_id) { // if it's a tag
+    if (expr.isMounted) {
+      expr.update()
+
+    // if it hasn't been mounted yet, do that now.
+    } else {
+      expr.mount()
+
+      if (isVirtual) {
+        var frag = document.createDocumentFragment()
+        makeVirtual.call(expr, frag)
+        expr.root.parentElement.replaceChild(frag, expr.root)
+      }
+    }
+    return
+  }
+
+  if (expr.update) {
+    expr.update()
+    return
+  }
+
+  var old = expr.value
+  expr.value = value
+
+  if (expr.isRtag && value) return updateRtag(expr, this)
+
+  // no change, so nothing more to do
+  if (
+    isValueAttr && dom.value == value || // was the value of this dom node changed?
+    !isValueAttr && old === value // was the old value still the same?
+  ) return
+
+  // textarea and text nodes have no attribute name
+  if (!attrName) {
+    // about #815 w/o replace: the browser converts the value to a string,
+    // the comparison by "==" does too, but not in the server
+    value += ''
+    // test for parent avoids error with invalid assignment to nodeValue
+    if (parent) {
+      // cache the parent node because somehow it will become null on IE
+      // on the next iteration
+      expr.parent = parent
+      if (parent.tagName === 'TEXTAREA') {
+        parent.value = value                    // #1113
+        if (!IE_VERSION) dom.nodeValue = value  // #1625 IE throws here, nodeValue
+      }                                         // will be available on 'updated'
+      else dom.nodeValue = value
+    }
+    return
+  }
+
+  // remove original attribute
+  remAttr(dom, attrName)
+
+  // event handler
+  if (isFunction(value)) {
+    setEventHandler(attrName, value, dom, this)
+
+  // show / hide
+  } else if (/^(show|hide)$/.test(attrName)) {
+    if (attrName == 'hide') value = !value
+    dom.style.display = value ? '' : 'none'
+
+  // field value
+  } else if (attrName == 'value') {
+    dom.value = value
+
+  // <img src="{ expr }">
+  } else if (startsWith(attrName, RIOT_PREFIX) && attrName != RIOT_TAG_IS) {
+
+    if (value)
+      setAttr(dom, attrName.slice(RIOT_PREFIX.length), value)
+
+  } else {
+    // <select> <option selected={true}> </select>
+    if (attrName == 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.nodeName) && value)
+      parent.value = dom.value
+
+    if (expr.bool) {
+      dom[attrName] = value
+      if (!value) return
+    }
+
+    if (value === 0 || value && typeof value !== T_OBJECT)
+      setAttr(dom, attrName, value)
+
+  }
+}
+
+/**
+ * Update the expressions in a Tag instance
+ * @param   { Array } expressions - expression that must be re evaluated
+ * @param   { Tag } tag - tag instance
+ */
+function update(expressions) {
+  each(expressions, updateExpression.bind(this))
+}
+
+/**
+ * Update dynamically created riot-tag with changing expressions
+ * @param   { Object } expr - expression tag and expression info
+ * @param   { Tag } parent - parent for tag creation
+ */
+
+function updateRtag(expr, parent) {
+  var tagName = tmpl(expr.value, parent),
+    conf
+
+  if (expr.tag && expr.tagName == tagName) {
+    expr.tag.update()
+    return
+  }
+
+  // sync _parent to accommodate changing tagnames
+  if (expr.tag) {
+    var delName = expr.tag.opts.dataIs,
+      tags = expr.tag._parent.tags
+
+    arrayishRemove(tags, delName, expr.tag)
+
+  }
+
+  expr.impl = __TAG_IMPL[tagName]
+  conf = {root: expr.dom, parent: parent, hasImpl: true, tagName: tagName}
+  expr.tag = initChildTag(expr.impl, conf, expr.dom.innerHTML, parent)
+  expr.tagName = tagName
+  expr.tag.mount()
+  expr.tag.update()
+
+  // parent is the placeholder tag, not the dynamic tag so clean up
+  parent.on('unmount', function () {
+    var delName = expr.tag.opts.dataIs,
+      tags = expr.tag.parent.tags,
+      _tags = expr.tag._parent.tags
+    arrayishRemove(tags, delName, expr.tag)
+    arrayishRemove(_tags, delName, expr.tag)
+    expr.tag.unmount()
+  })
+}
+
+var IfExpr = {
+  init: function init(dom, parentTag, expr) {
+    remAttr(dom, 'if')
+    this.parentTag = parentTag
+    this.expr = expr
+    this.stub = document.createTextNode('')
+    this.pristine = dom
+
+    var p = dom.parentNode
+    p.insertBefore(this.stub, dom)
+    p.removeChild(dom)
+
+    return this
+  },
+  update: function update$1() {
+    var newValue = tmpl(this.expr, this.parentTag)
+
+    if (newValue && !this.current) { // insert
+      this.current = this.pristine.cloneNode(true)
+      this.stub.parentNode.insertBefore(this.current, this.stub)
+
+      this.expressions = []
+      parseExpressions.apply(this.parentTag, [this.current, this.expressions, true])
+    }
+
+    else if (!newValue && this.current) { // remove
+      unmountAll(this.expressions)
+      this.current.parentNode.removeChild(this.current)
+      this.current = null
+      this.expressions = []
+    }
+
+    if (newValue) update.call(this.parentTag, this.expressions)
+  },
+  unmount: function unmount() {
+    unmountAll(this.expressions || [])
+    delete this.pristine
+    delete this.parentNode
+    delete this.stub
+  }
+}
+
+var RefExpr = {
+  init: function init(dom, attrName, attrValue, parent) {
+    this.dom = dom
+    this.attr = attrName
+    this.rawValue = attrValue
+    this.parent = parent
+    this.hasExp = tmpl.hasExpr(attrValue)
+    this.firstRun = true
+
+    return this
+  },
+  update: function update() {
+    var value = this.rawValue
+    if (this.hasExp)
+      value = tmpl(this.rawValue, this.parent)
+
+    // if nothing changed, we're done
+    if (!this.firstRun && value === this.value) return
+
+    var customParent = this.parent && getImmediateCustomParentTag(this.parent)
+
+    // if the referenced element is a custom tag, then we set the tag itself, rather than DOM
+    var tagOrDom = this.tag || this.dom
+
+    // the name changed, so we need to remove it from the old key (if present)
+    if (!isBlank(this.value) && customParent)
+      arrayishRemove(customParent.refs, this.value, tagOrDom)
+
+    if (isBlank(value)) {
+      // if the value is blank, we remove it
+      remAttr(this.dom, this.attr)
+    } else {
+      // add it to the refs of parent tag (this behavior was changed >=3.0)
+      if (customParent) arrayishAdd(customParent.refs, value, tagOrDom)
+      // set the actual DOM attr
+      setAttr(this.dom, this.attr, value)
+    }
+    this.value = value
+    this.firstRun = false
+  },
+  unmount: function unmount() {
+    var tagOrDom = this.tag || this.dom
+    var customParent = this.parent && getImmediateCustomParentTag(this.parent)
+    if (!isBlank(this.value) && customParent)
+      arrayishRemove(customParent.refs, this.value, tagOrDom)
+    delete this.dom
+    delete this.parent
+  }
+}
+
+/**
+ * Convert the item looped into an object used to extend the child tag properties
+ * @param   { Object } expr - object containing the keys used to extend the children tags
+ * @param   { * } key - value to assign to the new object returned
+ * @param   { * } val - value containing the position of the item in the array
+ * @param   { Object } base - prototype object for the new item
+ * @returns { Object } - new object containing the values of the original item
+ *
+ * The variables 'key' and 'val' are arbitrary.
+ * They depend on the collection type looped (Array, Object)
+ * and on the expression used on the each tag
+ *
+ */
+function mkitem(expr, key, val, base) {
+  var item = base ? Object.create(base) : {}
+  item[expr.key] = key
+  if (expr.pos) item[expr.pos] = val
+  return item
+}
+
+/**
+ * Unmount the redundant tags
+ * @param   { Array } items - array containing the current items to loop
+ * @param   { Array } tags - array containing all the children tags
+ * @param   { String } tagName - key used to identify the type of tag
+ * @param   { Object } parent - parent tag to remove the child from
+ */
+function unmountRedundant(items, tags, tagName, parent) {
+
+  var i = tags.length,
+    j = items.length,
+    t
+
+  while (i > j) {
+    t = tags[--i]
+    tags.splice(i, 1)
+    t.unmount()
+    arrayishRemove(parent.tags, tagName, t, true)
+  }
+}
+
+/**
+ * Move the nested custom tags in non custom loop tags
+ * @this Tag
+ * @param   { Number } i - current position of the loop tag
+ */
+function moveNestedTags(i) {
+  var this$1 = this;
+
+  each(Object.keys(this.tags), function (tagName) {
+    var tag = this$1.tags[tagName]
+    if (isArray(tag))
+      each(tag, function (t) {
+        moveChildTag.apply(t, [tagName, i])
+      })
+    else
+      moveChildTag.apply(tag, [tagName, i])
+  })
+}
+
+/**
+ * Move a child tag
+ * @this Tag
+ * @param   { HTMLElement } root - dom node containing all the loop children
+ * @param   { Tag } nextTag - instance of the next tag preceding the one we want to move
+ * @param   { Boolean } isVirtual - is it a virtual tag?
+ */
+function move(root, nextTag, isVirtual) {
+  // and move it
+  if (isVirtual)
+    moveVirtual.apply(this, [root, nextTag])
+  else if (nextTag.root.parentNode)
+    root.insertBefore(this.root, nextTag.root)
+}
+
+/**
+ * Insert and mount a child tag
+ * @this Tag
+ * @param   { HTMLElement } root - dom node containing all the loop children
+ * @param   { Tag } nextTag - instance of the next tag preceding the one we want to insert
+ * @param   { Boolean } isVirtual - is it a virtual tag?
+ */
+function insert(root, nextTag, isVirtual) {
+  if (isVirtual)
+    makeVirtual.apply(this, [root, nextTag])
+  else
+    root.insertBefore(this.root, nextTag.root)
+}
+
+/**
+ * Append a new tag into the DOM
+ * @this Tag
+ * @param   { HTMLElement } root - dom node containing all the loop children
+ * @param   { Boolean } isVirtual - is it a virtual tag?
+ */
+function append(root, isVirtual) {
+  if (isVirtual)
+    makeVirtual.call(this, root)
+  else
+    root.appendChild(this.root)
+}
+
+/**
+ * Update option nodes that seem to be buggy on Firefox see also #1374
+ * @param   { HTMLElement } root - <select> tag
+ */
+function updateSelect(root) {
+  for (var n = 0; n < root.length; n++) {
+    if (root[n].__riot1374) {
+      root.selectedIndex = n  // clear other options
+      delete root[n].__riot1374
+      break
+    }
+  }
+}
+
+/**
+ * Manage tags having the 'each'
+ * @param   { HTMLElement } dom - DOM node we need to loop
+ * @param   { Tag } parent - parent tag instance where the dom node is contained
+ * @param   { String } expr - string contained in the 'each' attribute
+ * @returns { Object } expression object for this each loop
+ */
+function _each(dom, parent, expr) {
+
+  // remove the each property from the original tag
+  remAttr(dom, 'each')
+
+  var mustReorder = typeof getAttr(dom, 'no-reorder') !== T_STRING || remAttr(dom, 'no-reorder'),
+    tagName = getTagName(dom),
+    impl = __TAG_IMPL[tagName] || { tmpl: getOuterHTML(dom) },
+    useRoot = RE_SPECIAL_TAGS.test(tagName),
+    root = dom.parentNode,
+    ref = createDOMPlaceholder(),
+    child = getTag(dom),
+    ifExpr = getAttr(dom, 'if'),
+    isOption = tagName.toLowerCase() === 'option', // the option tags must be treated differently
+    tags = [],
+    oldItems = [],
+    hasKeys,
+    isLoop = true,
+    isAnonymous = !__TAG_IMPL[tagName],
+    isVirtual = dom.tagName == 'VIRTUAL'
+
+  // parse the each expression
+  expr = tmpl.loopKeys(expr)
+  expr.isLoop = true
+
+  if (ifExpr) remAttr(dom, 'if')
+
+  // insert a marked where the loop tags will be injected
+  root.insertBefore(ref, dom)
+  root.removeChild(dom)
+
+  expr.update = function updateEach() {
+    // get the new items collection
+    var items = tmpl(expr.val, parent),
+      // create a fragment to hold the new DOM nodes to inject in the parent tag
+      frag = createFrag()
+
+    root = ref.parentNode
+
+    // object loop. any changes cause full redraw
+    if (!isArray(items)) {
+      hasKeys = items || false
+      items = hasKeys ?
+        Object.keys(items).map(function (key) {
+          return mkitem(expr, key, items[key])
+        }) : []
+    }
+
+    if (ifExpr) {
+      items = items.filter(function(item, i) {
+        var context = mkitem(expr, item, i, parent)
+        return !!tmpl(ifExpr, context)
+      })
+    }
+
+    // loop all the new items
+    each(items, function(item, i) {
+      // reorder only if the items are objects
+      var
+        _mustReorder = mustReorder && typeof item == T_OBJECT && !hasKeys,
+        oldPos = oldItems.indexOf(item),
+        pos = ~oldPos && _mustReorder ? oldPos : i,
+        // does a tag exist in this position?
+        tag = tags[pos]
+
+      item = !hasKeys && expr.key ? mkitem(expr, item, i) : item
+
+      // new tag
+      if (
+        !_mustReorder && !tag // with no-reorder we just update the old tags
+        ||
+        _mustReorder && !~oldPos || !tag // by default we always try to reorder the DOM elements
+      ) {
+
+        var mustAppend = i == tags.length
+
+        tag = new Tag(impl, {
+          parent: parent,
+          isLoop: isLoop,
+          isAnonymous: isAnonymous,
+          root: useRoot ? root : dom.cloneNode(),
+          item: item
+        }, dom.innerHTML)
+
+        // mount the tag
+        tag.mount()
+
+        if (mustAppend)
+          append.apply(tag, [frag, isVirtual])
+        else
+          insert.apply(tag, [root, tags[i], isVirtual])
+
+        if (!mustAppend) oldItems.splice(i, 0, item)
+        tags.splice(i, 0, tag)
+        if (child) arrayishAdd(parent.tags, tagName, tag, true)
+        pos = i // handled here so no move
+      } else tag.update(item)
+
+      // reorder the tag if it's not located in its previous position
+      if (pos !== i && _mustReorder) {
+        move.apply(tag, [root, tags[i], isVirtual])
+        // update the position attribute if it exists
+        if (expr.pos) tag[expr.pos] = i
+        // move the old tag instance
+        tags.splice(i, 0, tags.splice(pos, 1)[0])
+        // move the old item
+        oldItems.splice(i, 0, oldItems.splice(pos, 1)[0])
+        // if the loop tags are not custom
+        // we need to move all their custom tags into the right position
+        if (!child && tag.tags) moveNestedTags.call(tag, i)
+      }
+
+      // cache the original item to use it in the events bound to this node
+      // and its children
+      tag._item = item
+      // cache the real parent tag internally
+      defineProperty(tag, '_parent', parent)
+    })
+
+    // remove the redundant tags
+    unmountRedundant(items, tags, tagName, parent)
+
+    // insert the new nodes
+    if (frag.childNodes) root.insertBefore(frag, ref)
+
+    // #1374 FireFox bug in <option selected={expression}>
+    if (isOption && FIREFOX && !root.multiple) updateSelect(root)
+
+    // clone the items array
+    oldItems = items.slice()
+  }
+
+  expr.unmount = function() {
+    each(tags, function(t) { t.unmount() })
+  }
+
+  return expr
+}
+
+/**
+ * Walk the tag DOM to detect the expressions to evaluate
+ * @this Tag
+ * @param   { HTMLElement } root - root tag where we will start digging the expressions
+ * @param   { Array } expressions - empty array where the expressions will be added
+ * @param   { Boolean } mustIncludeRoot - flag to decide whether the root must be parsed as well
+ */
+function parseExpressions(root, expressions, mustIncludeRoot) {
+  var this$1 = this;
+
+  var base = {parent: {children: expressions}}
+
+  walkNodes(root, function (dom, ctx) {
+    var type = dom.nodeType, parent = ctx.parent, attr, expr, tagImpl
+    if (!mustIncludeRoot && dom === root) return {parent: parent}
+
+    // text node
+    if (type == 3 && dom.parentNode.tagName != 'STYLE' && tmpl.hasExpr(dom.nodeValue))
+      parent.children.push({dom: dom, expr: dom.nodeValue})
+
+    if (type != 1) return ctx // not an element
+
+    // loop. each does it's own thing (for now)
+    if (attr = getAttr(dom, 'each')) {
+      parent.children.push(_each(dom, this$1, attr))
+      return false
+    }
+
+    // if-attrs become the new parent. Any following expressions (either on the current
+    // element, or below it) become children of this expression.
+    if (attr = getAttr(dom, 'if')) {
+      parent.children.push(Object.create(IfExpr).init(dom, this$1, attr))
+      return false
+    }
+
+    if (expr = getAttr(dom, RIOT_TAG_IS)) {
+      if (tmpl.hasExpr(expr)) {
+        parent.children.push({isRtag: true, expr: expr, dom: dom})
+        return false
+      }
+    }
+
+    // if this is a tag, stop traversing here.
+    // we ignore the root, since parseExpressions is called while we're mounting that root
+    tagImpl = getTag(dom)
+    if (tagImpl && (dom !== root || mustIncludeRoot)) {
+      var conf = {root: dom, parent: this$1, hasImpl: true}
+      parent.children.push(initChildTag(tagImpl, conf, dom.innerHTML, this$1))
+      return false
+    }
+
+    // attribute expressions
+    parseAttributes.apply(this$1, [dom, dom.attributes, function(attr, expr) {
+      if (!expr) return
+      parent.children.push(expr)
+    }])
+
+    // whatever the parent is, all child elements get the same parent.
+    // If this element had an if-attr, that's the parent for all child elements
+    return {parent: parent}
+  }, base)
+}
+
+/**
+ * Calls `fn` for every attribute on an element. If that attr has an expression,
+ * it is also passed to fn.
+ * @this Tag
+ * @param   { HTMLElement } dom - dom node to parse
+ * @param   { Array } attrs - array of attributes
+ * @param   { Function } fn - callback to exec on any iteration
+ */
+function parseAttributes(dom, attrs, fn) {
+  var this$1 = this;
+
+  each(attrs, function (attr) {
+    var name = attr.name, bool = isBoolAttr(name), expr
+
+    if (~['ref', 'data-ref'].indexOf(name)) {
+      expr =  Object.create(RefExpr).init(dom, name, attr.value, this$1)
+    } else if (tmpl.hasExpr(attr.value)) {
+      expr = {dom: dom, expr: attr.value, attr: attr.name, bool: bool}
+    }
+
+    fn(attr, expr)
+  })
+}
+
+var reHasYield  = /<yield\b/i;
+var reYieldAll  = /<yield\s*(?:\/>|>([\S\s]*?)<\/yield\s*>|>)/ig;
+var reYieldSrc  = /<yield\s+to=['"]([^'">]*)['"]\s*>([\S\s]*?)<\/yield\s*>/ig;
+var reYieldDest = /<yield\s+from=['"]?([-\w]+)['"]?\s*(?:\/>|>([\S\s]*?)<\/yield\s*>)/ig;
+var rootEls = { tr: 'tbody', th: 'tr', td: 'tr', col: 'colgroup' };
+var tblTags = IE_VERSION && IE_VERSION < 10 ? RE_SPECIAL_TAGS : RE_SPECIAL_TAGS_NO_OPTION;
+var GENERIC = 'div';
+/*
+  Creates the root element for table or select child elements:
+  tr/th/td/thead/tfoot/tbody/caption/col/colgroup/option/optgroup
+*/
+function specialTags(el, templ, tagName) {
+
+  var
+    select = tagName[0] === 'o',
+    parent = select ? 'select>' : 'table>'
+
+  // trim() is important here, this ensures we don't have artifacts,
+  // so we can check if we have only one element inside the parent
+  el.innerHTML = '<' + parent + templ.trim() + '</' + parent
+  parent = el.firstChild
+
+  // returns the immediate parent if tr/th/td/col is the only element, if not
+  // returns the whole tree, as this can include additional elements
+  if (select) {
+    parent.selectedIndex = -1  // for IE9, compatible w/current riot behavior
+  } else {
+    // avoids insertion of cointainer inside container (ex: tbody inside tbody)
+    var tname = rootEls[tagName]
+    if (tname && parent.childElementCount === 1) parent = $(tname, parent)
+  }
+  return parent
+}
+
+/*
+  Replace the yield tag from any tag template with the innerHTML of the
+  original tag in the page
+*/
+function replaceYield(templ, html) {
+  // do nothing if no yield
+  if (!reHasYield.test(templ)) return templ
+
+  // be careful with #1343 - string on the source having `$1`
+  var src = {}
+
+  html = html && html.replace(reYieldSrc, function (_, ref, text) {
+    src[ref] = src[ref] || text   // preserve first definition
+    return ''
+  }).trim()
+
+  return templ
+    .replace(reYieldDest, function (_, ref, def) {  // yield with from - to attrs
+      return src[ref] || def || ''
+    })
+    .replace(reYieldAll, function (_, def) {        // yield without any "from"
+      return html || def || ''
+    })
+}
+
+/**
+ * Creates a DOM element to wrap the given content. Normally an `DIV`, but can be
+ * also a `TABLE`, `SELECT`, `TBODY`, `TR`, or `COLGROUP` element.
+ *
+ * @param   {string} templ  - The template coming from the custom tag definition
+ * @param   {string} [html] - HTML content that comes from the DOM element where you
+ *           will mount the tag, mostly the original tag in the page
+ * @returns {HTMLElement} DOM element with _templ_ merged through `YIELD` with the _html_.
+ */
+function mkdom(templ, html) {
+  var match   = templ && templ.match(/^\s*<([-\w]+)/),
+    tagName = match && match[1].toLowerCase(),
+    el = mkEl(GENERIC, isSVGTag(tagName))
+
+  // replace all the yield tags with the tag inner html
+  templ = replaceYield(templ, html)
+
+  /* istanbul ignore next */
+  if (tblTags.test(tagName))
+    el = specialTags(el, templ, tagName)
+  else
+    setInnerHTML(el, templ)
+
+  el.stub = true
+
+  return el
+}
+
+/**
+ * Another way to create a riot tag a bit more es6 friendly
+ * @param { HTMLElement } el - tag DOM selector or DOM node/s
+ * @param { Object } opts - tag logic
+ * @returns { Tag } new riot tag instance
+ */
+function Tag$1(el, opts) {
+  // get the tag properties from the class constructor
+  var ref = this;
+  var name = ref.name;
+  var tmpl = ref.tmpl;
+  var css = ref.css;
+  var attrs = ref.attrs;
+  var onCreate = ref.onCreate;
+  // register a new tag and cache the class prototype
+  if (!__TAG_IMPL[name]) {
+    tag(name, tmpl, css, attrs, onCreate)
+    // cache the class constructor
+    __TAG_IMPL[name].class = this.constructor
+  }
+
+  // mount the tag using the class instance
+  mountTo(el, name, opts, this)
+
+  return this
+}
+
+/**
+ * Create a new riot tag implementation
+ * @param   { String }   name - name/id of the new riot tag
+ * @param   { String }   tmpl - tag template
+ * @param   { String }   css - custom tag css
+ * @param   { String }   attrs - root tag attributes
+ * @param   { Function } fn - user function
+ * @returns { String } name/id of the tag just created
+ */
+function tag(name, tmpl, css, attrs, fn) {
+  if (isFunction(attrs)) {
+    fn = attrs
+
+    if (/^[\w\-]+\s?=/.test(css)) {
+      attrs = css
+      css = ''
+    } else
+      attrs = ''
+  }
+
+  if (css) {
+    if (isFunction(css))
+      fn = css
+    else
+      styleManager.add(css)
+  }
+
+  name = name.toLowerCase()
+  __TAG_IMPL[name] = { name: name, tmpl: tmpl, attrs: attrs, fn: fn }
+
+  return name
+}
+
+/**
+ * Create a new riot tag implementation (for use by the compiler)
+ * @param   { String }   name - name/id of the new riot tag
+ * @param   { String }   tmpl - tag template
+ * @param   { String }   css - custom tag css
+ * @param   { String }   attrs - root tag attributes
+ * @param   { Function } fn - user function
+ * @returns { String } name/id of the tag just created
+ */
+function tag2(name, tmpl, css, attrs, fn) {
+  if (css)
+    styleManager.add(css, name)
+
+  var exists = !!__TAG_IMPL[name]
+  __TAG_IMPL[name] = { name: name, tmpl: tmpl, attrs: attrs, fn: fn }
+
+  if (exists && riot.util.hotReloader)
+    riot.util.hotReloader(name)
+
+  return name
+}
+
+/**
+ * Mount a tag using a specific tag implementation
+ * @param   { * } selector - tag DOM selector or DOM node/s
+ * @param   { String } tagName - tag implementation name
+ * @param   { Object } opts - tag logic
+ * @returns { Array } new tags instances
+ */
+function mount(selector, tagName, opts) {
+  var tags = []
+
+  function pushTagsTo(root) {
+    if (root.tagName) {
+      var riotTag = getAttr(root, RIOT_TAG_IS)
+
+      // have tagName? force riot-tag to be the same
+      if (tagName && riotTag !== tagName) {
+        riotTag = tagName
+        setAttr(root, RIOT_TAG_IS, tagName)
+      }
+
+      var tag = mountTo(root, riotTag || root.tagName.toLowerCase(), opts)
+
+      if (tag)
+        tags.push(tag)
+    } else if (root.length)
+      each(root, pushTagsTo) // assume nodeList
+  }
+
+  // inject styles into DOM
+  styleManager.inject()
+
+  if (isObject(tagName)) {
+    opts = tagName
+    tagName = 0
+  }
+
+  var elem
+  var allTags
+
+  // crawl the DOM to find the tag
+  if (isString(selector)) {
+    selector = selector === '*' ?
+      // select all registered tags
+      // & tags found with the riot-tag attribute set
+      allTags = selectTags() :
+      // or just the ones named like the selector
+      selector + selectTags(selector.split(/, */))
+
+    // make sure to pass always a selector
+    // to the querySelectorAll function
+    elem = selector ? $$(selector) : []
+  }
+  else
+    // probably you have passed already a tag or a NodeList
+    elem = selector
+
+  // select all the registered and mount them inside their root elements
+  if (tagName === '*') {
+    // get all custom tags
+    tagName = allTags || selectTags()
+    // if the root els it's just a single tag
+    if (elem.tagName)
+      elem = $$(tagName, elem)
+    else {
+      // select all the children for all the different root elements
+      var nodeList = []
+
+      each(elem, function (_el) { return nodeList.push($$(tagName, _el)); })
+
+      elem = nodeList
+    }
+    // get rid of the tagName
+    tagName = 0
+  }
+
+  pushTagsTo(elem)
+
+  return tags
+}
+
+// Create a mixin that could be globally shared across all the tags
+var mixins = {}
+var globals = mixins[GLOBAL_MIXIN] = {}
+var _id = 0
+
+/**
+ * Create/Return a mixin by its name
+ * @param   { String }  name - mixin name (global mixin if object)
+ * @param   { Object }  mix - mixin logic
+ * @param   { Boolean } g - is global?
+ * @returns { Object }  the mixin logic
+ */
+function mixin(name, mix, g) {
+  // Unnamed global
+  if (isObject(name)) {
+    mixin(("__unnamed_" + (_id++)), name, true)
+    return
+  }
+
+  var store = g ? globals : mixins
+
+  // Getter
+  if (!mix) {
+    if (isUndefined(store[name]))
+      throw new Error('Unregistered mixin: ' + name)
+
+    return store[name]
+  }
+
+  // Setter
+  store[name] = isFunction(mix) ?
+    extend(mix.prototype, store[name] || {}) && mix :
+    extend(store[name] || {}, mix)
+}
+
+/**
+ * Update all the tags instances created
+ * @returns { Array } all the tags instances
+ */
+function update$1() {
+  return each(__VIRTUAL_DOM, function (tag) { return tag.update(); })
+}
+
+function unregister(name) {
+  delete __TAG_IMPL[name]
+}
+
+// counter to give a unique id to all the Tag instances
+var __uid = 0
+
+/**
+ * We need to update opts for this tag. That requires updating the expressions
+ * in any attributes on the tag, and then copying the result onto opts.
+ * @this Tag
+ * @param   {Boolean} isLoop - is it a loop tag?
+ * @param   { Tag }  parent - parent tag node
+ * @param   { Boolean }  isAnonymous - is it a tag without any impl? (a tag not registered)
+ * @param   { Object }  opts - tag options
+ * @param   { Array }  instAttrs - tag attributes array
+ */
+function updateOpts(isLoop, parent, isAnonymous, opts, instAttrs) {
+  // isAnonymous `each` tags treat `dom` and `root` differently. In this case
+  // (and only this case) we don't need to do updateOpts, because the regular parse
+  // will update those attrs. Plus, isAnonymous tags don't need opts anyway
+  if (isLoop && isAnonymous) return
+
+  var ctx = !isAnonymous && isLoop ? this : parent || this
+  each(instAttrs, function (attr) {
+    if (attr.expr) update.call(ctx, [attr.expr])
+    opts[toCamel(attr.name)] = attr.expr ? attr.expr.value : attr.value
+  })
+}
+
+
+/**
+ * Tag class
+ * @constructor
+ * @param { Object } impl - it contains the tag template, and logic
+ * @param { Object } conf - tag options
+ * @param { String } innerHTML - html that eventually we need to inject in the tag
+ */
+function Tag(impl, conf, innerHTML) {
+
+  var opts = inherit(conf.opts),
+    parent = conf.parent,
+    isLoop = conf.isLoop,
+    isAnonymous = conf.isAnonymous,
+    item = cleanUpData(conf.item),
+    instAttrs = [], // All attributes on the Tag when it's first parsed
+    implAttrs = [], // expressions on this type of Tag
+    expressions = [],
+    root = conf.root,
+    tagName = conf.tagName || root.tagName.toLowerCase(),
+    propsInSyncWithParent = [],
+    dom
+
+  // make this tag observable
+  observable(this)
+  // only call unmount if we have a valid __TAG_IMPL (has name property)
+  if (impl.name && root._tag) root._tag.unmount(true)
+
+  // not yet mounted
+  this.isMounted = false
+  root.isLoop = isLoop
+
+  defineProperty(this, '_internal', {
+    isAnonymous: isAnonymous,
+    instAttrs: instAttrs,
+    innerHTML: innerHTML,
+    eventHandlers: {},
+    // these vars will be needed only for the virtual tags
+    virts: [],
+    tail: null,
+    head: null
+  })
+
+  // create a unique id to this tag
+  // it could be handy to use it also to improve the virtual dom rendering speed
+  defineProperty(this, '_riot_id', ++__uid) // base 1 allows test !t._riot_id
+
+  extend(this, { parent: parent, root: root, opts: opts }, item)
+  // protect the "tags" and "refs" property from being overridden
+  defineProperty(this, 'tags', {})
+  defineProperty(this, 'refs', {})
+
+  dom = mkdom(impl.tmpl, innerHTML)
+
+  /**
+   * Update the tag expressions and options
+   * @param   { * }  data - data we want to use to extend the tag properties
+   * @returns { Tag }
+   */
+  defineProperty(this, 'update', function tagUpdate(data) {
+    if (isFunction(this.shouldUpdate) && !this.shouldUpdate()) return
+
+    // make sure the data passed will not override
+    // the component core methods
+    data = cleanUpData(data)
+
+    // inherit properties from the parent, but only for isAnonymous tags
+    if (isLoop && isAnonymous) inheritFrom.apply(this, [this.parent, propsInSyncWithParent])
+
+    extend(this, data)
+    updateOpts.apply(this, [isLoop, parent, isAnonymous, opts, instAttrs])
+    if (this.isMounted) this.trigger('update', data)
+    update.call(this, expressions)
+    if (this.isMounted) this.trigger('updated')
+
+    return this
+
+  })
+
+  /**
+   * Add a mixin to this tag
+   * @returns { Tag }
+   */
+  defineProperty(this, 'mixin', function tagMixin() {
+    var this$1 = this;
+
+    each(arguments, function (mix) {
+      var instance,
+        props = [],
+        obj
+
+      mix = isString(mix) ? mixin(mix) : mix
+
+      // check if the mixin is a function
+      if (isFunction(mix)) {
+        // create the new mixin instance
+        instance = new mix()
+      } else instance = mix
+
+      var proto = Object.getPrototypeOf(instance)
+
+      // build multilevel prototype inheritance chain property list
+      do props = props.concat(Object.getOwnPropertyNames(obj || instance))
+      while (obj = Object.getPrototypeOf(obj || instance))
+
+      // loop the keys in the function prototype or the all object keys
+      each(props, function (key) {
+        // bind methods to this
+        // allow mixins to override other properties/parent mixins
+        if (key != 'init') {
+          // check for getters/setters
+          var descriptor = Object.getOwnPropertyDescriptor(instance, key) || Object.getOwnPropertyDescriptor(proto, key)
+          var hasGetterSetter = descriptor && (descriptor.get || descriptor.set)
+
+          // apply method only if it does not already exist on the instance
+          if (!this$1.hasOwnProperty(key) && hasGetterSetter) {
+            Object.defineProperty(this$1, key, descriptor)
+          } else {
+            this$1[key] = isFunction(instance[key]) ?
+              instance[key].bind(this$1) :
+              instance[key]
+          }
+        }
+      })
+
+      // init method will be called automatically
+      if (instance.init)
+        instance.init.bind(this$1)()
+    })
+    return this
+  })
+
+  /**
+   * Mount the current tag instance
+   * @returns { Tag }
+   */
+  defineProperty(this, 'mount', function tagMount() {
+    var this$1 = this;
+
+    root._tag = this // keep a reference to the tag just created
+
+    // add global mixins
+    var globalMixin = mixin(GLOBAL_MIXIN)
+
+    if (globalMixin)
+      for (var i in globalMixin)
+        if (globalMixin.hasOwnProperty(i))
+          this$1.mixin(globalMixin[i])
+
+    // Read all the attrs on this instance. This give us the info we need for updateOpts
+    parseAttributes.apply(parent, [root, root.attributes, function (attr, expr) {
+      if (!isAnonymous && RefExpr.isPrototypeOf(expr)) expr.tag = this$1
+      attr.expr = expr
+      instAttrs.push(attr)
+    }])
+
+    // children in loop should inherit from true parent
+    if (this._parent && isAnonymous) inheritFrom.apply(this, [this._parent, propsInSyncWithParent])
+
+    // initialiation
+    updateOpts.apply(this, [isLoop, parent, isAnonymous, opts, instAttrs])
+    if (impl.fn) impl.fn.call(this, opts)
+
+    this.trigger('before-mount')
+
+    // update the root adding custom attributes coming from the compiler
+    implAttrs = []
+    walkAttrs(impl.attrs, function (k, v) { implAttrs.push({name: k, value: v}) })
+    parseAttributes.apply(this, [root, implAttrs, function (attr, expr) {
+      if (expr) expressions.push(expr)
+      else setAttr(root, attr.name, attr.value)
+    }])
+
+    // parse layout after init. fn may calculate args for nested custom tags
+    parseExpressions.apply(this, [dom, expressions, false])
+
+    this.update(item)
+
+    if (isLoop && isAnonymous) {
+      // update the root attribute for the looped elements
+      this.root = root = dom.firstChild
+    } else {
+      while (dom.firstChild) root.appendChild(dom.firstChild)
+      if (root.stub) root = parent.root
+    }
+
+    defineProperty(this, 'root', root)
+    this.isMounted = true
+
+    // if it's not a child tag we can trigger its mount event
+    if (!this.parent || this.parent.isMounted) {
+      this.trigger('mount')
+    }
+    // otherwise we need to wait that the parent event gets triggered
+    else this.parent.one('mount', function () {
+      this$1.trigger('mount')
+    })
+  })
+
+  /**
+   * Unmount the tag instance
+   * @param { Boolean } mustKeepRoot - if it's true the root node will not be removed
+   */
+  defineProperty(this, 'unmount', function tagUnmount(mustKeepRoot) {
+    var this$1 = this;
+
+    var el = this.root,
+      p = el.parentNode,
+      ptag,
+      tagIndex = __VIRTUAL_DOM.indexOf(this)
+
+    this.trigger('before-unmount')
+
+    // unbind all the events
+    each(Object.keys(this._internal.eventHandlers), function (eventName) {
+      this$1.root.removeEventListener(eventName, this$1._internal.eventHandlers[eventName])
+    })
+
+    // remove this tag instance from the global virtualDom variable
+    if (~tagIndex)
+      __VIRTUAL_DOM.splice(tagIndex, 1)
+
+    if (p) {
+
+      if (parent) {
+        ptag = getImmediateCustomParentTag(parent)
+        arrayishRemove(ptag.tags, tagName, this)
+      }
+
+      else
+        while (el.firstChild) el.removeChild(el.firstChild)
+
+      if (!mustKeepRoot)
+        p.removeChild(el)
+      else
+        // the riot-tag and the data-is attributes aren't needed anymore, remove them
+        remAttr(p, RIOT_TAG_IS)
+
+    }
+
+    if (this._internal.virts) {
+      each(this._internal.virts, function (v) {
+        if (v.parentNode) v.parentNode.removeChild(v)
+      })
+    }
+
+    // allow expressions to unmount themselves
+    unmountAll(expressions)
+    each(instAttrs, function (a) { return a.expr && a.expr.unmount && a.expr.unmount(); })
+
+    this.trigger('unmount')
+    this.off('*')
+    this.isMounted = false
+
+    delete this.root._tag
+
+  })
+}
+
+/**
+ * Detect the tag implementation by a DOM node
+ * @param   { Object } dom - DOM node we need to parse to get its tag implementation
+ * @returns { Object } it returns an object containing the implementation of a custom tag (template and boot function)
+ */
+function getTag(dom) {
+  return dom.tagName && __TAG_IMPL[getAttr(dom, RIOT_TAG_IS) ||
+    getAttr(dom, RIOT_TAG_IS) || dom.tagName.toLowerCase()]
+}
+
+/**
+ * Inherit properties from a target tag instance
+ * @this Tag
+ * @param   { Tag } target - tag where we will inherit properties
+ * @param   { Array } propsInSyncWithParent - array of properties to sync with the target
+ */
+function inheritFrom(target, propsInSyncWithParent) {
+  var this$1 = this;
+
+  each(Object.keys(target), function (k) {
+    // some properties must be always in sync with the parent tag
+    var mustSync = !isReservedName(k) && contains(propsInSyncWithParent, k)
+
+    if (isUndefined(this$1[k]) || mustSync) {
+      // track the property to keep in sync
+      // so we can keep it updated
+      if (!mustSync) propsInSyncWithParent.push(k)
+      this$1[k] = target[k]
+    }
+  })
+}
+
+/**
+ * Move the position of a custom tag in its parent tag
+ * @this Tag
+ * @param   { String } tagName - key where the tag was stored
+ * @param   { Number } newPos - index where the new tag will be stored
+ */
+function moveChildTag(tagName, newPos) {
+  var parent = this.parent,
+    tags
+  // no parent no move
+  if (!parent) return
+
+  tags = parent.tags[tagName]
+
+  if (isArray(tags))
+    tags.splice(newPos, 0, tags.splice(tags.indexOf(this), 1)[0])
+  else arrayishAdd(parent.tags, tagName, this)
+}
+
+/**
+ * Create a new child tag including it correctly into its parent
+ * @param   { Object } child - child tag implementation
+ * @param   { Object } opts - tag options containing the DOM node where the tag will be mounted
+ * @param   { String } innerHTML - inner html of the child node
+ * @param   { Object } parent - instance of the parent tag including the child custom tag
+ * @param   { Boolean } skipName - hack to ignore the name attribute when attaching to parent
+ * @returns { Object } instance of the new child tag just created
+ */
+function initChildTag(child, opts, innerHTML, parent) {
+  var tag = new Tag(child, opts, innerHTML),
+    tagName = opts.tagName || getTagName(opts.root, true),
+    ptag = getImmediateCustomParentTag(parent)
+  // fix for the parent attribute in the looped elements
+  tag.parent = ptag
+  // store the real parent tag
+  // in some cases this could be different from the custom parent tag
+  // for example in nested loops
+  tag._parent = parent
+
+  // add this tag to the custom parent tag
+  arrayishAdd(ptag.tags, tagName, tag)
+
+  // and also to the real parent tag
+  if (ptag !== parent)
+    arrayishAdd(parent.tags, tagName, tag)
+
+  // empty the child node once we got its template
+  // to avoid that its children get compiled multiple times
+  opts.root.innerHTML = ''
+
+  return tag
+}
+
+/**
+ * Loop backward all the parents tree to detect the first custom parent tag
+ * @param   { Object } tag - a Tag instance
+ * @returns { Object } the instance of the first custom parent tag found
+ */
+function getImmediateCustomParentTag(tag) {
+  var ptag = tag
+  while (ptag._internal.isAnonymous) {
+    if (!ptag.parent) break
+    ptag = ptag.parent
+  }
+  return ptag
+}
+
+/**
+ * Trigger the unmount method on all the expressions
+ * @param   { Array } expressions - DOM expressions
+ */
+function unmountAll(expressions) {
+  each(expressions, function(expr) {
+    if (expr instanceof Tag) expr.unmount(true)
+    else if (expr.unmount) expr.unmount()
+  })
+}
+
+/**
+ * Get the tag name of any DOM node
+ * @param   { Object } dom - DOM node we want to parse
+ * @param   { Boolean } skipName - hack to ignore the name attribute when attaching to parent
+ * @returns { String } name to identify this dom node in riot
+ */
+function getTagName(dom, skipName) {
+  var child = getTag(dom),
+    namedTag = !skipName && getAttr(dom, 'name'),
+    tagName = namedTag && !tmpl.hasExpr(namedTag) ?
+                namedTag :
+              child ? child.name : dom.tagName.toLowerCase()
+
+  return tagName
+}
 
 /**
  * With this function we avoid that the internal Tag methods get overridden
@@ -8779,43 +8930,52 @@ function cleanUpData(data) {
 
   var o = {}
   for (var key in data) {
-    if (!RESERVED_WORDS_BLACKLIST.test(key)) o[key] = data[key]
+    if (!RE_RESERVED_NAMES.test(key)) o[key] = data[key]
   }
   return o
 }
 
 /**
- * Walk down recursively all the children tags starting dom node
- * @param   { Object }   dom - starting node where we will start the recursion
- * @param   { Function } fn - callback to transform the child node just found
+ * Set the property of an object for a given key. If something already
+ * exists there, then it becomes an array containing both the old and new value.
+ * @param { Object } obj - object on which to set the property
+ * @param { String } key - property name
+ * @param { Object } value - the value of the property to be set
+ * @param { Boolean } ensureArray - ensure that the property remains an array
  */
-function walk(dom, fn) {
-  if (dom) {
-    // stop the recursion
-    if (fn(dom) === false) return
-    else {
-      dom = dom.firstChild
+function arrayishAdd(obj, key, value, ensureArray) {
+  var dest = obj[key]
+  var isArr = isArray(dest)
 
-      while (dom) {
-        walk(dom, fn)
-        dom = dom.nextSibling
-      }
-    }
+  if (dest && dest === value) return
+
+  // if the key was never set, set it once
+  if (!dest && ensureArray) obj[key] = [value]
+  else if (!dest) obj[key] = value
+  // if it was an array and not yet set
+  else if (!isArr || isArr && !contains(dest, value)) {
+    if (isArr) dest.push(value)
+    else obj[key] = [dest, value]
   }
 }
 
 /**
- * Minimize risk: only zero or one _space_ between attr & value
- * @param   { String }   html - html string we want to parse
- * @param   { Function } fn - callback function to apply on any attribute found
- */
-function walkAttributes(html, fn) {
-  var m,
-    re = /([-\w]+) ?= ?(?:"([^"]*)|'([^']*)|({[^}]*}))/g
-
-  while (m = re.exec(html)) {
-    fn(m[1].toLowerCase(), m[2] || m[3] || m[4])
-  }
+ * Removes an item from an object at a given key. If the key points to an array,
+ * then the item is just removed from the array.
+ * @param { Object } obj - object on which to remove the property
+ * @param { String } key - property name
+ * @param { Object } value - the value of the property to be removed
+ * @param { Boolean } ensureArray - ensure that the property remains an array
+*/
+function arrayishRemove(obj, key, value, ensureArray) {
+  if (isArray(obj[key])) {
+    each(obj[key], function(item, i) {
+      if (item === value) obj[key].splice(i, 1)
+    })
+    if (!obj[key].length) delete obj[key]
+    else if (obj[key].length == 1 && !ensureArray) obj[key] = obj[key][0]
+  } else
+    delete obj[key] // otherwise just delete the key
 }
 
 /**
@@ -8825,381 +8985,171 @@ function walkAttributes(html, fn) {
  */
 function isInStub(dom) {
   while (dom) {
-    if (dom.inStub) return true
+    if (dom.inStub)
+      return true
     dom = dom.parentNode
   }
   return false
 }
 
 /**
- * Create a generic DOM node
- * @param   { String } name - name of the DOM node we want to create
- * @param   { Boolean } isSvg - should we use a SVG as parent node?
- * @returns { Object } DOM node just created
- */
-function mkEl(name, isSvg) {
-  return isSvg ?
-    document.createElementNS('http://www.w3.org/2000/svg', 'svg') :
-    document.createElement(name)
-}
-
-/**
- * Shorter and fast way to select multiple nodes in the DOM
- * @param   { String } selector - DOM selector
- * @param   { Object } ctx - DOM node where the targets of our search will is located
- * @returns { Object } dom nodes found
- */
-function $$(selector, ctx) {
-  return (ctx || document).querySelectorAll(selector)
-}
-
-/**
- * Shorter and fast way to select a single node in the DOM
- * @param   { String } selector - unique dom selector
- * @param   { Object } ctx - DOM node where the target of our search will is located
- * @returns { Object } dom node found
- */
-function $(selector, ctx) {
-  return (ctx || document).querySelector(selector)
-}
-
-/**
- * Simple object prototypal inheritance
- * @param   { Object } parent - parent object
- * @returns { Object } child instance
- */
-function inherit(parent) {
-  return Object.create(parent || null)
-}
-
-/**
- * Get the name property needed to identify a DOM node in riot
- * @param   { Object } dom - DOM node we need to parse
- * @returns { String | undefined } give us back a string to identify this dom node
- */
-function getNamedKey(dom) {
-  return getAttr(dom, 'id') || getAttr(dom, 'name')
-}
-
-/**
- * Set the named properties of a tag element
- * @param { Object } dom - DOM node we need to parse
- * @param { Object } parent - tag instance where the named dom element will be eventually added
- * @param { Array } keys - list of all the tag instance properties
- */
-function setNamed(dom, parent, keys) {
-  // get the key value we want to add to the tag instance
-  var key = getNamedKey(dom),
-    isArr,
-    // add the node detected to a tag instance using the named property
-    add = function(value) {
-      // avoid to override the tag properties already set
-      if (contains(keys, key)) return
-      // check whether this value is an array
-      isArr = isArray(value)
-      // if the key was never set
-      if (!value)
-        // set it once on the tag instance
-        parent[key] = dom
-      // if it was an array and not yet set
-      else if (!isArr || isArr && !contains(value, dom)) {
-        // add the dom node into the array
-        if (isArr)
-          value.push(dom)
-        else
-          parent[key] = [value, dom]
-      }
-    }
-
-  // skip the elements with no named properties
-  if (!key) return
-
-  // check whether this key has been already evaluated
-  if (tmpl.hasExpr(key))
-    // wait the first updated event only once
-    parent.one('mount', function() {
-      key = getNamedKey(dom)
-      add(parent[key])
-    })
-  else
-    add(parent[key])
-
-}
-
-/**
- * Faster String startsWith alternative
- * @param   { String } src - source string
- * @param   { String } str - test string
- * @returns { Boolean } -
- */
-function startsWith(src, str) {
-  return src.slice(0, str.length) === str
-}
-
-/**
- * requestAnimationFrame function
- * Adapted from https://gist.github.com/paulirish/1579671, license MIT
- */
-var rAF = (function (w) {
-  var raf = w.requestAnimationFrame    ||
-            w.mozRequestAnimationFrame || w.webkitRequestAnimationFrame
-
-  if (!raf || /iP(ad|hone|od).*OS 6/.test(w.navigator.userAgent)) {  // buggy iOS6
-    var lastTime = 0
-
-    raf = function (cb) {
-      var nowtime = Date.now(), timeout = Math.max(16 - (nowtime - lastTime), 0)
-      setTimeout(function () { cb(lastTime = nowtime + timeout) }, timeout)
-    }
-  }
-  return raf
-
-})(window || {})
-
-/**
  * Mount a tag creating new Tag instance
  * @param   { Object } root - dom node where the tag will be mounted
  * @param   { String } tagName - name of the riot tag we want to mount
  * @param   { Object } opts - options to pass to the Tag instance
+ * @param   { Object } ctx - optional context that will be used to extend an existing class ( used in riot.Tag )
  * @returns { Tag } a new Tag instance
  */
-function mountTo(root, tagName, opts) {
-  var tag = __tagImpl[tagName],
+function mountTo(root, tagName, opts, ctx) {
+  var impl = __TAG_IMPL[tagName],
+    implClass = __TAG_IMPL[tagName].class,
+    tag = ctx || (implClass ? Object.create(implClass.prototype) : {}),
     // cache the inner HTML to fix #855
     innerHTML = root._innerHTML = root._innerHTML || root.innerHTML
 
   // clear the inner html
   root.innerHTML = ''
 
-  if (tag && root) tag = new Tag(tag, { root: root, opts: opts }, innerHTML)
+  var conf = { root: root, opts: opts }
+  if (opts && opts.parent) conf.parent = opts.parent
+
+  if (impl && root) Tag.apply(tag, [impl, conf, innerHTML])
 
   if (tag && tag.mount) {
-    tag.mount()
+    tag.mount(true)
     // add this tag to the virtualDom variable
-    if (!contains(__virtualDom, tag)) __virtualDom.push(tag)
+    if (!contains(__VIRTUAL_DOM, tag)) __VIRTUAL_DOM.push(tag)
   }
 
   return tag
 }
+
+
+/**
+ * Adds the elements for a virtual tag
+ * @this Tag
+ * @param { Node } src - the node that will do the inserting or appending
+ * @param { Tag } target - only if inserting, insert before this tag's first child
+ */
+function makeVirtual(src, target) {
+  var this$1 = this;
+
+  var head = createDOMPlaceholder(),
+    tail = createDOMPlaceholder(),
+    frag = createFrag(),
+    sib, el
+
+  this._internal.head = this.root.insertBefore(head, this.root.firstChild)
+  this._internal.tail = this.root.appendChild(tail)
+
+  el = this._internal.head
+
+  while (el) {
+    sib = el.nextSibling
+    frag.appendChild(el)
+    this$1._internal.virts.push(el) // hold for unmounting
+    el = sib
+  }
+
+  if (target)
+    src.insertBefore(frag, target._internal.head)
+  else
+    src.appendChild(frag)
+}
+
+/**
+ * Move virtual tag and all child nodes
+ * @this Tag
+ * @param { Node } src  - the node that will do the inserting
+ * @param { Tag } target - insert before this tag's first child
+ */
+function moveVirtual(src, target) {
+  var this$1 = this;
+
+  var el = this._internal.head,
+    frag = createFrag(),
+    sib
+
+  while (el) {
+    sib = el.nextSibling
+    frag.appendChild(el)
+    el = sib
+    if (el == this$1._internal.tail) {
+      frag.appendChild(el)
+      src.insertBefore(frag, target._internal.head)
+      break
+    }
+  }
+}
+
+/**
+ * Get selectors for tags
+ * @param   { Array } tags - tag names to select
+ * @returns { String } selector
+ */
+function selectTags(tags) {
+  // select all tags
+  if (!tags) {
+    var keys = Object.keys(__TAG_IMPL)
+    return keys + selectTags(keys)
+  }
+
+  return tags
+    .filter(function (t) { return !/[^-\w]/.test(t); })
+    .reduce(function (list, t) {
+      var name = t.trim().toLowerCase()
+      return list + ",[" + RIOT_TAG_IS + "=\"" + name + "\"]"
+    }, '')
+}
+
+
+var tags = Object.freeze({
+  getTag: getTag,
+  inheritFrom: inheritFrom,
+  moveChildTag: moveChildTag,
+  initChildTag: initChildTag,
+  getImmediateCustomParentTag: getImmediateCustomParentTag,
+  unmountAll: unmountAll,
+  getTagName: getTagName,
+  cleanUpData: cleanUpData,
+  arrayishAdd: arrayishAdd,
+  arrayishRemove: arrayishRemove,
+  isInStub: isInStub,
+  mountTo: mountTo,
+  makeVirtual: makeVirtual,
+  moveVirtual: moveVirtual,
+  selectTags: selectTags
+});
+
 /**
  * Riot public api
  */
 
-// share methods for other riot parts, e.g. compiler
-riot.util = { brackets: brackets, tmpl: tmpl }
-
-/**
- * Create a mixin that could be globally shared across all the tags
- */
-riot.mixin = (function() {
-  var mixins = {},
-    globals = mixins[GLOBAL_MIXIN] = {},
-    _id = 0
-
-  /**
-   * Create/Return a mixin by its name
-   * @param   { String }  name - mixin name (global mixin if object)
-   * @param   { Object }  mixin - mixin logic
-   * @param   { Boolean } g - is global?
-   * @returns { Object }  the mixin logic
-   */
-  return function(name, mixin, g) {
-    // Unnamed global
-    if (isObject(name)) {
-      riot.mixin('__unnamed_'+_id++, name, true)
-      return
-    }
-
-    var store = g ? globals : mixins
-
-    // Getter
-    if (!mixin) {
-      if (typeof store[name] === T_UNDEF) {
-        throw new Error('Unregistered mixin: ' + name)
-      }
-      return store[name]
-    }
-    // Setter
-    if (isFunction(mixin)) {
-      extend(mixin.prototype, store[name] || {})
-      store[name] = mixin
-    }
-    else {
-      store[name] = extend(store[name] || {}, mixin)
-    }
-  }
-
-})()
-
-/**
- * Create a new riot tag implementation
- * @param   { String }   name - name/id of the new riot tag
- * @param   { String }   html - tag template
- * @param   { String }   css - custom tag css
- * @param   { String }   attrs - root tag attributes
- * @param   { Function } fn - user function
- * @returns { String } name/id of the tag just created
- */
-riot.tag = function(name, html, css, attrs, fn) {
-  if (isFunction(attrs)) {
-    fn = attrs
-    if (/^[\w\-]+\s?=/.test(css)) {
-      attrs = css
-      css = ''
-    } else attrs = ''
-  }
-  if (css) {
-    if (isFunction(css)) fn = css
-    else styleManager.add(css)
-  }
-  name = name.toLowerCase()
-  __tagImpl[name] = { name: name, tmpl: html, attrs: attrs, fn: fn }
-  return name
+var settings = Object.create(brackets.settings)
+var util = {
+  tmpl: tmpl,
+  brackets: brackets,
+  styleManager: styleManager,
+  vdom: __VIRTUAL_DOM,
+  styleNode: styleManager.styleNode,
+  // export the riot internal utils as well
+  dom: dom,
+  check: check,
+  misc: misc,
+  tags: tags
 }
 
-/**
- * Create a new riot tag implementation (for use by the compiler)
- * @param   { String }   name - name/id of the new riot tag
- * @param   { String }   html - tag template
- * @param   { String }   css - custom tag css
- * @param   { String }   attrs - root tag attributes
- * @param   { Function } fn - user function
- * @returns { String } name/id of the tag just created
- */
-riot.tag2 = function(name, html, css, attrs, fn) {
-  if (css) styleManager.add(css)
-  //if (bpair) riot.settings.brackets = bpair
-  __tagImpl[name] = { name: name, tmpl: html, attrs: attrs, fn: fn }
-  return name
-}
+exports.settings = settings;
+exports.util = util;
+exports.observable = observable;
+exports.Tag = Tag$1;
+exports.tag = tag;
+exports.tag2 = tag2;
+exports.mount = mount;
+exports.mixin = mixin;
+exports.update = update$1;
+exports.unregister = unregister;
 
-/**
- * Mount a tag using a specific tag implementation
- * @param   { String } selector - tag DOM selector
- * @param   { String } tagName - tag implementation name
- * @param   { Object } opts - tag logic
- * @returns { Array } new tags instances
- */
-riot.mount = function(selector, tagName, opts) {
+Object.defineProperty(exports, '__esModule', { value: true });
 
-  var els,
-    allTags,
-    tags = []
-
-  // helper functions
-
-  function addRiotTags(arr) {
-    var list = ''
-    each(arr, function (e) {
-      if (!/[^-\w]/.test(e)) {
-        e = e.trim().toLowerCase()
-        list += ',[' + RIOT_TAG_IS + '="' + e + '"],[' + RIOT_TAG + '="' + e + '"]'
-      }
-    })
-    return list
-  }
-
-  function selectAllTags() {
-    var keys = Object.keys(__tagImpl)
-    return keys + addRiotTags(keys)
-  }
-
-  function pushTags(root) {
-    if (root.tagName) {
-      var riotTag = getAttr(root, RIOT_TAG_IS) || getAttr(root, RIOT_TAG)
-
-      // have tagName? force riot-tag to be the same
-      if (tagName && riotTag !== tagName) {
-        riotTag = tagName
-        setAttr(root, RIOT_TAG_IS, tagName)
-        setAttr(root, RIOT_TAG, tagName) // this will be removed in riot 3.0.0
-      }
-      var tag = mountTo(root, riotTag || root.tagName.toLowerCase(), opts)
-
-      if (tag) tags.push(tag)
-    } else if (root.length) {
-      each(root, pushTags)   // assume nodeList
-    }
-  }
-
-  // ----- mount code -----
-
-  // inject styles into DOM
-  styleManager.inject()
-
-  if (isObject(tagName)) {
-    opts = tagName
-    tagName = 0
-  }
-
-  // crawl the DOM to find the tag
-  if (typeof selector === T_STRING) {
-    if (selector === '*')
-      // select all the tags registered
-      // and also the tags found with the riot-tag attribute set
-      selector = allTags = selectAllTags()
-    else
-      // or just the ones named like the selector
-      selector += addRiotTags(selector.split(/, */))
-
-    // make sure to pass always a selector
-    // to the querySelectorAll function
-    els = selector ? $$(selector) : []
-  }
-  else
-    // probably you have passed already a tag or a NodeList
-    els = selector
-
-  // select all the registered and mount them inside their root elements
-  if (tagName === '*') {
-    // get all custom tags
-    tagName = allTags || selectAllTags()
-    // if the root els it's just a single tag
-    if (els.tagName)
-      els = $$(tagName, els)
-    else {
-      // select all the children for all the different root elements
-      var nodeList = []
-      each(els, function (_el) {
-        nodeList.push($$(tagName, _el))
-      })
-      els = nodeList
-    }
-    // get rid of the tagName
-    tagName = 0
-  }
-
-  pushTags(els)
-
-  return tags
-}
-
-/**
- * Update all the tags instances created
- * @returns { Array } all the tags instances
- */
-riot.update = function() {
-  return each(__virtualDom, function(tag) {
-    tag.update()
-  })
-}
-
-/**
- * Export the Virtual DOM
- */
-riot.vdom = __virtualDom
-
-/**
- * Export the Tag constructor
- */
-riot.Tag = Tag
-  // support CommonJS, AMD & browser
-  /* istanbul ignore next */
-  if (typeof exports === T_OBJECT)
-    module.exports = riot
-  else if (typeof define === T_FUNCTION && typeof define.amd !== T_UNDEF)
-    define(function() { return riot })
-  else
-    window.riot = riot
-
-})(typeof window != 'undefined' ? window : void 0);
+})));
