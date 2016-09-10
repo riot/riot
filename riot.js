@@ -1,4 +1,4 @@
-/* Riot v3.0.0-alpha.7, @license MIT */
+/* Riot v3.0.0-alpha.8, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
