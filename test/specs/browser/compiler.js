@@ -1510,6 +1510,13 @@ it('raw contents', function() {
     tags.push(tag)
   })
 
+  it('Conditional tags should not inherit from the parent unless they are in a loop', function() {
+    var tag = riot.mount('nested-child')[0]
+    expect(tag.tags.child[0].name).to.be(undefined)
+
+    tags.push(tag)
+  })
+
   it('custom children items in a nested loop are always in sync with the parent tag', function() {
     var tag = riot.mount('loop-inherit')[0]
 
