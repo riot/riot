@@ -28,6 +28,7 @@ import '../../tag/input-values.tag'
 import '../../tag/nested-riot.tag'
 import '../../tag/treeview.tag'
 import '../../tag/events.tag'
+import '../../tag/runtime-event-listener-switch.tag'
 import '../../tag/should-update.tag'
 import '../../tag/observable-attr.tag'
 import '../../tag/virtual-nested-unmount.tag'
@@ -600,6 +601,32 @@ describe('Riot core', function() {
     expect(callbackCalls).to.be.equal(2)
 
     tag.unmount()
+  })
+
+  it('event listeners can be switched in runtime without memory leaks', function() {
+    injectHTML('<runtime-event-listener-switch></runtime-event-listener-switch>')
+    var
+      args = [],
+      cb = function(name) {
+        args.push(name)
+      },
+      tag = riot.mount('runtime-event-listener-switch', { cb })[0],
+      pFirst = $('p.first', tag.root),
+      pSecond = $('p.second', tag.root)
+
+    fireEvent(pFirst, 'click')
+    expect(args[0]).to.be.equal('ev1')
+    fireEvent(pSecond, 'mouseenter')
+    expect(args[1]).to.be.equal('ev2')
+    fireEvent(pFirst, 'click')
+    expect(args[2]).to.be.equal('ev1')
+    fireEvent(pFirst, 'mouseenter')
+    expect(args[3]).to.be.equal('ev2')
+
+    expect(args.length).to.be.equal(4)
+
+    tag.unmount()
+
   })
 
   it('the "updated" event gets properly triggered in a nested child', function(done) {
