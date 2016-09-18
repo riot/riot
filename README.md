@@ -27,7 +27,7 @@
 | Web Components Polyfill                        | 0.7.22          | 33.66kb              |
 | Vue                                            | 1.0.26          | 26.66kb              |
 | Vue                                            | 2.0.0-rc.2      | 22.71kb              |
-| Riot                                           | 2.6.0           | 9.32kb               |
+| Riot                                           | 2.6.2           | 9.35kb               |
 
 
 ### Custom tags • Concise syntax • Virtual DOM • Full stack
@@ -209,7 +209,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [sublime-tag (Sublime Text)](https://github.com/crisward/sublime-tag)
 - [riot-tag (Visual Studio)](https://github.com/crisward/riot-tag)
 - [web-mode (Emacs)](http://web-mode.org)
-  - See how to configure [#1967](https://github.com/riot/riot/issues/1967) 
+  - See how to configure [#1967](https://github.com/riot/riot/issues/1967)
 
 ### How to contribute
 
