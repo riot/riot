@@ -1,4 +1,4 @@
-/* Riot v3.0.0-alpha.9, @license MIT */
+/* Riot WIP, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -24,7 +24,7 @@ var RE_SVG_TAGS = /^(altGlyph|animate(?:Color)?|circle|clipPath|defs|ellipse|fe(
 var RE_HTML_ATTRS = /([-\w]+) ?= ?(?:"([^"]*)|'([^']*)|({[^}]*}))/g;
 var RE_BOOL_ATTRS = /^(?:disabled|checked|readonly|required|allowfullscreen|auto(?:focus|play)|compact|controls|default|formnovalidate|hidden|ismap|itemscope|loop|multiple|muted|no(?:resize|shade|validate|wrap)?|open|reversed|seamless|selected|sortable|truespeed|typemustmatch)$/;
 var IE_VERSION = (WIN && WIN.document || {}).documentMode | 0;
-var FIREFOX = WIN && !!WIN.InstallTrigger
+var FIREFOX = WIN && !!WIN.InstallTrigger;
 
 /**
  * Check whether a DOM node must be considered a part of an svg document
@@ -120,16 +120,16 @@ function isReservedName(value) {
 }
 
 var check = Object.freeze({
-	isSVGTag: isSVGTag,
-	isBoolAttr: isBoolAttr,
-	isFunction: isFunction,
-	isObject: isObject,
-	isUndefined: isUndefined,
-	isString: isString,
-	isBlank: isBlank,
-	isArray: isArray,
-	isWritable: isWritable,
-	isReservedName: isReservedName
+  isSVGTag: isSVGTag,
+  isBoolAttr: isBoolAttr,
+  isFunction: isFunction,
+  isObject: isObject,
+  isUndefined: isUndefined,
+  isString: isString,
+  isBlank: isBlank,
+  isArray: isArray,
+  isWritable: isWritable,
+  isReservedName: isReservedName
 });
 
 /**
@@ -292,26 +292,25 @@ function walkNodes(dom, fn, context) {
 }
 
 var dom = Object.freeze({
-	$$: $$,
-	$: $,
-	createFrag: createFrag,
-	createDOMPlaceholder: createDOMPlaceholder,
-	mkEl: mkEl,
-	getOuterHTML: getOuterHTML,
-	setInnerHTML: setInnerHTML,
-	remAttr: remAttr,
-	getAttr: getAttr,
-	setAttr: setAttr,
-	safeInsert: safeInsert,
-	walkAttrs: walkAttrs,
-	walkNodes: walkNodes
+  $$: $$,
+  $: $,
+  createFrag: createFrag,
+  createDOMPlaceholder: createDOMPlaceholder,
+  mkEl: mkEl,
+  getOuterHTML: getOuterHTML,
+  setInnerHTML: setInnerHTML,
+  remAttr: remAttr,
+  getAttr: getAttr,
+  setAttr: setAttr,
+  safeInsert: safeInsert,
+  walkAttrs: walkAttrs,
+  walkNodes: walkNodes
 });
 
 var styleNode;
 var cssTextProp;
 var byName = {};
-var remainder = []
-
+var remainder = [];
 // skip the following code on the server
 if (WIN) {
   styleNode = (function () {
@@ -882,13 +881,13 @@ function extend(src) {
 }
 
 var misc = Object.freeze({
-	inherit: inherit,
-	each: each,
-	contains: contains,
-	toCamel: toCamel,
-	startsWith: startsWith,
-	defineProperty: defineProperty,
-	extend: extend
+  inherit: inherit,
+  each: each,
+  contains: contains,
+  toCamel: toCamel,
+  startsWith: startsWith,
+  defineProperty: defineProperty,
+  extend: extend
 });
 
 var observable = function(el) {
@@ -1228,7 +1227,7 @@ function updateExpression(expr) {
  * @this Tag
  * @param { Array } expressions - expression that must be re evaluated
  */
-function update$1$1(expressions) {
+function update(expressions) {
   each(expressions, updateExpression.bind(this))
 }
 
@@ -1264,7 +1263,7 @@ var IfExpr = {
       this.expressions = []
     }
 
-    if (newValue) update$1$1.call(this.parentTag, this.expressions)
+    if (newValue) update.call(this.parentTag, this.expressions)
   },
   unmount: function unmount() {
     unmountAll(this.expressions || [])
@@ -1688,21 +1687,9 @@ function parseAttributes(dom, attrs, fn) {
   })
 }
 
-/*
-  Includes hacks needed for the Internet Explorer version 9 and below
-  See: http://kangax.github.io/compat-table/es5/#ie8
-       http://codeplanet.io/dropping-ie8/
-*/
-
-var reHasYield  = /<yield\b/i;
-var reYieldAll  = /<yield\s*(?:\/>|>([\S\s]*?)<\/yield\s*>|>)/ig;
-var reYieldSrc  = /<yield\s+to=['"]([^'">]*)['"]\s*>([\S\s]*?)<\/yield\s*>/ig;
-var reYieldDest = /<yield\s+from=['"]?([-\w]+)['"]?\s*(?:\/>|>([\S\s]*?)<\/yield\s*>)/ig;
 var rootEls = { tr: 'tbody', th: 'tr', td: 'tr', col: 'colgroup' };
 var tblTags = IE_VERSION && IE_VERSION < 10 ? RE_SPECIAL_TAGS : RE_SPECIAL_TAGS_NO_OPTION;
-var GENERIC = 'div'
-
-
+var GENERIC = 'div';
 /*
   Creates the root element for table or select child elements:
   tr/th/td/thead/tfoot/tbody/caption/col/colgroup/option/optgroup
@@ -1735,24 +1722,46 @@ function specialTags(el, templ, tagName) {
   original tag in the page
 */
 function replaceYield(templ, html) {
-  // do nothing if no yield
-  if (!reHasYield.test(templ)) return templ
 
-  // be careful with #1343 - string on the source having `$1`
-  var src = {}
+  var parser = new DOMParser()
+  var templDom = parser.parseFromString(templ, 'text/html')
+  var htmlDom = parser.parseFromString(html, 'text/html')
+  var to = {}, from = {}
+  var traverse = function(doc, onYield, debug) {
+    for (var i=0; i<doc.children.length; i++) {
+      var el = doc.children.item(i)
+      if (getTag(el)) return false // Skip riot tags, they'll be replaced when they're instantiated
+      if (el.tagName.toLowerCase() === 'yield') {
+        onYield(el)
+        continue
+      }
+      traverse(el, onYield, debug)
+    }
+  }
+  var sortByAttr = function(el, attr, dest) {
+    var name = ''
+    if (el.hasAttribute(attr)) name = el.getAttribute(attr)
+    if (name in dest) {
+      console.warn("Duplicate yield: '"+"' in "+el.tagName)
+    } else {
+      dest[name] = el
+    }
+  }
+  traverse(templDom, function(el) { sortByAttr(el, 'from', from) })
+  traverse(htmlDom, function(el) {
+    console.log({addinTo: el})
+    sortByAttr(el, 'to', to) }
+  , true)
+  Object.keys(from).forEach(function(yieldName) {
+    if (yieldName in to) {
+      var repl = parser.parseFromString('<span>'+to[yieldName].innerHTML+'</span>', 'text/html').body.firstChild
+      from[yieldName].parentElement.replaceChild(repl, from[yieldName])
+    } else {
+      console.warn({'No such yield': yieldName, to: to, from: from, templDom: templDom, htmlDom: htmlDom, templ: templ, html: html})
+    }
+  })
+  return templDom.body.innerHTML
 
-  html = html && html.replace(reYieldSrc, function (_, ref, text) {
-    src[ref] = src[ref] || text   // preserve first definition
-    return ''
-  }).trim()
-
-  return templ
-    .replace(reYieldDest, function (_, ref, def) {  // yield with from - to attrs
-      return src[ref] || def || ''
-    })
-    .replace(reYieldAll, function (_, def) {        // yield without any "from"
-      return html || def || ''
-    })
 }
 
 /**
@@ -1984,7 +1993,7 @@ function mixin(name, mix, g) {
  * Update all the tags instances created
  * @returns { Array } all the tags instances
  */
-function update$2() {
+function update$1() {
   return each(__VIRTUAL_DOM, function (tag) { return tag.update(); })
 }
 
@@ -2013,7 +2022,7 @@ function updateOpts(isLoop, parent, isAnonymous, opts, instAttrs) {
 
   var ctx = !isAnonymous && isLoop ? this : parent || this
   each(instAttrs, function (attr) {
-    if (attr.expr) update$1$1.call(ctx, [attr.expr])
+    if (attr.expr) update.call(ctx, [attr.expr])
     opts[toCamel(attr.name)] = attr.expr ? attr.expr.value : attr.value
   })
 }
@@ -2090,7 +2099,7 @@ function Tag(impl, conf, innerHTML) {
     extend(this, data)
     updateOpts.apply(this, [isLoop, parent, isAnonymous, opts, instAttrs])
     if (this.isMounted) this.trigger('update', data)
-    update$1$1.call(this, expressions)
+    update.call(this, expressions)
     if (this.isMounted) this.trigger('updated')
 
     return this
@@ -2588,21 +2597,21 @@ function selectTags(tags) {
 
 
 var tags = Object.freeze({
-	getTag: getTag,
-	inheritFrom: inheritFrom,
-	moveChildTag: moveChildTag,
-	initChildTag: initChildTag,
-	getImmediateCustomParentTag: getImmediateCustomParentTag,
-	unmountAll: unmountAll,
-	getTagName: getTagName,
-	cleanUpData: cleanUpData,
-	arrayishAdd: arrayishAdd,
-	arrayishRemove: arrayishRemove,
-	isInStub: isInStub,
-	mountTo: mountTo,
-	makeVirtual: makeVirtual,
-	moveVirtual: moveVirtual,
-	selectTags: selectTags
+  getTag: getTag,
+  inheritFrom: inheritFrom,
+  moveChildTag: moveChildTag,
+  initChildTag: initChildTag,
+  getImmediateCustomParentTag: getImmediateCustomParentTag,
+  unmountAll: unmountAll,
+  getTagName: getTagName,
+  cleanUpData: cleanUpData,
+  arrayishAdd: arrayishAdd,
+  arrayishRemove: arrayishRemove,
+  isInStub: isInStub,
+  mountTo: mountTo,
+  makeVirtual: makeVirtual,
+  moveVirtual: moveVirtual,
+  selectTags: selectTags
 });
 
 /**
@@ -2625,18 +2634,17 @@ var util = {
 
 
 
-
-var riot = Object.freeze({
-	settings: settings,
-	util: util,
-	observable: observable,
-	Tag: Tag$1,
-	tag: tag,
-	tag2: tag2,
-	mount: mount$1,
-	mixin: mixin,
-	update: update$2,
-	unregister: unregister
+var riot$1 = Object.freeze({
+  settings: settings,
+  util: util,
+  observable: observable,
+  Tag: Tag$1,
+  tag: tag,
+  tag2: tag2,
+  mount: mount$1,
+  mixin: mixin,
+  update: update$1,
+  unregister: unregister
 });
 
 /**
@@ -2764,8 +2772,7 @@ var RE_REPEXPR = /\x01#(\d+)/g;
 var CH_IDEXPR  = '\x01#';
 var CH_DQCODE  = '\u2057';
 var DQ = '"';
-var SQ = "'"
-
+var SQ = "'";
 function cleanSource (src) {
   var
     mm,
@@ -3175,8 +3182,7 @@ function compileTemplate (html, url, lang, opts) {
 var CUST_TAG = RegExp(/^([ \t]*)<(-?[A-Za-z][-\w\xA0-\xFF]*)(?:\s+([^'"\/>]+(?:(?:@|\/[^>])[^'"\/>]*)*)|\s*)?(?:\/>|>[ \t]*\n?([\S\s]*)^\1<\/\2\s*>|>(.*)<\/\2\s*>)/
     .source.replace('@', S_STRINGS), 'gim');
 var SCRIPTS = /<script(\s+[^>]*)?>\n?([\S\s]*?)<\/script\s*>/gi;
-var STYLES = /<style(\s+[^>]*)?>\n?([\S\s]*?)<\/style\s*>/gi
-
+var STYLES = /<style(\s+[^>]*)?>\n?([\S\s]*?)<\/style\s*>/gi;
 function compile$1 (src, opts, url) {
   var
     parts = [],
@@ -3285,7 +3291,8 @@ var compiler = {
 }
 
 var promise;
-var ready       // all the scripts were compiled?
+var ready;
+// all the scripts were compiled?
 
 // gets the source of an external tag with an async call
 function GET (url, fn, opts) {
@@ -3417,14 +3424,14 @@ var compile = function (arg, fn, opts) {
 
 }
 
-function mount$$1(a, b, c) {
+function mount(a, b, c) {
   var ret
   compile(function () { ret = mount$1(a, b, c) })
   return ret
 }
 
-var riot_compiler = extend({}, riot, {
-  mount: mount$$1,
+var riot_compiler = extend({}, riot$1, {
+  mount: mount,
   compile: compile,
   parsers: parsers
 })
