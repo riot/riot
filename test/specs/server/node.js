@@ -121,4 +121,9 @@ describe('Node/io.js', function() {
     expect($('textarea[name="txta2"]').val()).to.be('')
   })
 
+  it('render subsequent tags, when required from parent tag', function() {
+    var tag = riot.render('import-tag')
+    expect(tag).to.be('<import-tag><imported-tag><span>I am imported</span></imported-tag></import-tag>')
+  })
+
 })
