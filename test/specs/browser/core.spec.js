@@ -19,6 +19,7 @@ import '../../tag/preserve-attr.tag'
 import '../../tag/svg-attr.tag'
 import '../../tag/named-child.tag'
 import '../../tag/deferred-mount.tag'
+import '../../tag/deferred-unmount.tag'
 import '../../tag/prevent-update.tag'
 import '../../tag/expression-eval-count.tag'
 import '../../tag/multi-named.tag'
@@ -524,6 +525,29 @@ describe('Riot core', function() {
     expect(mountingOrder.join()).to.be.equal(correctMountingOrder.join())
 
     tag.unmount()
+  })
+
+  it('defer unmounting of children', function(done) {
+
+    injectHTML('<deferred-unmount></deferred-unmount>')
+
+    var tag = riot.mount('deferred-unmount')[0]
+    expect(tag.beforeUnmountCalled).to.be.equal(false)
+    expect(tag.isMounted).to.be.equal(true)
+    tag.unmount()
+
+    // should still be mounted
+    setTimeout(function() {
+      expect(tag.beforeUnmountCalled).to.be.equal(true)
+      expect(tag.isMounted).to.be.equal(true)
+    }, 1)
+
+    // should be unmounted
+    setTimeout(function() {
+      expect(tag.beforeUnmountCalled).to.be.equal(true)
+      expect(tag.isMounted).to.be.equal(false)
+      done()
+    }, 20)
   })
 
 
