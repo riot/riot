@@ -1,5 +1,5 @@
 <loop-sync-options-nested>
-  <div each={ child, index in children }>
+  <div each={ child, index in children } reorder="true">
     <loop-sync-options-nested-child data={ child }></loop-sync-options-nested-child>
   </div>
 

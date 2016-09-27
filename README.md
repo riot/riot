@@ -13,24 +13,26 @@
 [![Coverage Status][coverage-image]][coverage-url]
 [![Code Quality][codeclimate-image]][codeclimate-url]
 
-
 [![Sauce Test Status][saucelabs-image]][saucelabs-url]
 
 ### Framework Size Comparison
 
-| Framework              | Version    | Minified Size |
-|------------------------|------------|---------------|
-| Ember                  | 1.13.3     | 493.3kb       |
-| Angular                | 1.4.2      | 145.5kb       |
-| React                  | 0.13.3     | 121.7kb       |
-| Web Components Polyfill| 0.7.5      | 117.1kb       |
-| Polymer                | 1.0.6      | 101.2kb       |
-| Riot                   | 2.2.3      | <span class="riot-size">12.75kb</span> |
+| Framework                                      | Version         | Minified Size (gzip) |
+|------------------------------------------------|-----------------|----------------------|
+| Angular2                                       | 2.0.0-beta.17   | 125.29kb             |
+| Ember                                          | 2.7.1           | 112.58kb             |
+| Angular                                        | 1.5.8           | 56.28kb              |
+| Polymer + Web Components Polyfill Lite         | 1.6.1           | 58.08kb              |
+| React                                          | 15.3.1          | 44.32kb              |
+| Web Components Polyfill                        | 0.7.22          | 33.66kb              |
+| Vue                                            | 1.0.26          | 26.66kb              |
+| Vue                                            | 2.0.0-rc.2      | 22.71kb              |
+| Riot                                           | 2.6.0           | 9.32kb               |
 
 
-### Custom tags • Concise syntax • Virtual DOM • Full stack • IE8
+### Custom tags • Concise syntax • Virtual DOM • Full stack
 
-Riot brings custom tags to all browsers, including IE8. Think React + Polymer but with enjoyable syntax and a small learning curve.
+Riot brings custom tags to all modern browsers. Think React + Polymer but with enjoyable syntax and a small learning curve.
 
 
 #### Tag definition
@@ -87,7 +89,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Close to standards
 - No proprietary event system.
-- Event normalization for IE8.
+- Event normalization.
 - The rendered DOM can be freely manipulated with other tools.
 - No extra HTML root elements or `data-` attributes.
 - Plays well with jQuery.
@@ -98,6 +100,10 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - Integrate with NPM, CommonJS, AMD, Bower or Component
 - Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot), [Browserify](https://github.com/jhthorsen/riotify), or [Wintersmith](https://github.com/collingreen/wintersmith-riot) plugins
 
+### CDN hosting
+- [jsDelivr](http://www.jsdelivr.com/projects/riot)
+- [cdnjs](https://cdnjs.com/libraries/riot)
+
 
 ### Concise syntax
 - Power shortcuts: `class={ enabled: is_enabled, hidden: hasErrors() }`.
@@ -107,50 +113,72 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Demos
 - [**Riot Examples** - Community's Official](https://github.com/riot/examples)
-- [Riot Todo MVC](https://github.com/txchen/feplay/tree/gh-pages/riot_todo)
+- [Riot Todo MVC](http://todomvc.com/examples/riotjs/)
 - [Hackernews reader](http://git.io/riot-hn)
 - [Vuejs examples by Riotjs](https://github.com/txchen/feplay/tree/gh-pages/riot_vue)
 - [Flux-like ES6 Todo](https://github.com/srackham/riot-todo)
-- [Simple TODO](https://muut.com/riotjs/dist/demo/)
 - [Timer](http://jsfiddle.net/gnumanth/h9kuozp5/)
-- [Another flux demo caparable to React ones](http://txchen.github.io/feplay/riot_flux)
+- [Another flux demo comparable to React ones](http://txchen.github.io/feplay/riot_flux)
 - [Various experiments](http://richardbondi.net/programming/riot)
 - [Isomorphic application](https://github.com/ListnPlay/riot-isomorphic)
+- [Isomorphic proof of concept](https://github.com/PabloSichert/isomorphic-proof-of-concept)
 - [flux-riot todo](http://mingliangfeng.me/flux-riot)
 - [Another Riot Todo MVC](http://nippur72.github.io/riotjs-todomvc/#/)
 - [Cheft isomorphic by express](https://github.com/cheft/cheft)
+- [electron-riot - Riot in an electron application](https://github.com/mike-ward/electron-riot)
+- [An express, riot, jade, webpack simple boilerplate](https://github.com/revington/frontend-boilerplate)
+- [Riot.js vs React.js comparison of a simple comment box](https://github.com/vitogit/riot.js-vs-react.js-comment-box)
 
 ### Tutorials
 - [Building Apps with Riot, ES6 and Webpack](http://blog.srackham.com/posts/riot-es6-webpack-apps/)
-- [Building Apps with Riot, Babel and Browserify](https://github.com/txchen/feplay/tree/gh-pages/riot_babel)
-- [Building tabs with Riot](http://www.robertwpearce.com/blog/riotjs-example/)
+- [Building Apps with Riot, Babel, RiotControl and Webpack](https://github.com/txchen/feplay/tree/gh-pages/riot_webpack)
+- [Building tabs with Riot](http://robertwpearce.com/blog/riotjs-example.html)
 - [The "React tutorial" for Riot](https://juriansluiman.nl/article/154/the-react-tutorial-for-riot)
 - [How to package "tag libraries" in Riot](https://github.com/ivan-saorin/riot-tutorial-tags-pack-app)
 - [Another React tutorial with Riot](https://github.com/viliamjr/commentsTuto)
 - [Riot Custom Tag by Example](http://www.triplet.fi/blog/riot-custom-tag-by-example/)
 - [Riot Compiler Explained](http://www.triplet.fi/blog/riot-compiler-explained/)
 - [Adding compiled Riot tags to your Gulp + Browserify build](http://www.triplet.fi/blog/adding_compiled_riot_tags_to_your_gulp_browserify_build/)
+- [The anatomy of a tag - a primer tutorial](http://www.marcusoft.net/2015/12/riotjs-anatomy-of-a-tag.html)
+- [Using TDD with Riot+mocha+chai](http://vitomd.com/blog/coding/tutorial_tdd_riot_mocha/)
+- [The Basics - from ground up to connected tag-networks](http://happy-css.com/lessons/riotjs/)
 
 ### Video Tutorials
 - [Introduction](https://www.youtube.com/watch?v=al87U6NgRTc)
 - [Loops, Events and Callbacks](https://www.youtube.com/watch?v=T-ZV9dv93sw)
 - [Server Rendering with Node & Express](http://youtu.be/6ww1UXGJzcs)
+- [Riot And Webpack Setup](https://youtu.be/UgdZbT-KPpY)
+- [Riot and Redux - Part 1](https://youtu.be/Y6vpKAGT2-8)
+- [Riot and Redux - Part 2](https://youtu.be/DgM03bvgCYc)
+- [Riot and Redux - Part 3](https://youtu.be/QuwnbuneAzM)
+- [Riot and Redux - Part 4](https://youtu.be/qc6bjtu7KG0)
+- [Riot and Redux - Part 5](https://youtu.be/M4BNsRMatVY)
+- [Riot and Redux - Part 6](https://youtu.be/jr8KDpwtRsk)
 
-### Libraries/ Frameworks
+### Libraries / Frameworks
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
+- [riotux - Simple Event Contoller for Riot.js](https://github.com/luisvinicius167/riotux)
 - [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
 - [Cheftjs - chinese framework for Riot](https://github.com/cheft/cheftjs)
 - [Veronica - flux adaption for Riot](https://www.npmjs.com/package/veronica-x)
 
 ### Components
-- [RiotGear](https://riotgear.js.org)
+- [Material UI](http://kysonic.github.io/riot-mui/)
+- [RiotGear Components](https://riotgear.js.org)
+- [RiotGear Router](http://riotgear.js.org/components/router/)
 - [Riot Bootstrap](http://cognitom.github.io/riot-bootstrap/)
 - [iToolkit](https://github.com/BE-FE/iToolkit)
+- [Riot Routehandler](https://github.com/crisward/riot-routehandler)-[(Demo)](http://codepen.io/crisward/pen/xwGJpM?editors=101)
+- [Riot Flipcard](https://github.com/crisward/riot-flipcard) - [(Demo)](https://crisward.github.io/riot-flipcard/)
+- [Riot Grid](https://github.com/crisward/riot-grid) - [(Demo)](http://codepen.io/crisward/pen/rxepMX?editors=101)
+- [ESLint Riot Plugin](https://github.com/txchen/eslint-plugin-riot)
+- [riot-animate](https://github.com/sartaj/riot-animate)
+- [Nest UI](https://github.com/fengzilong/Nest) - [(Demo)](https://fengzilong.github.io/Nest/)
 
 ### Resources
 - [Riot + AngularJS](https://github.com/lucasbrigida/angular-riot)
 - [Module loader for WebPack](https://www.npmjs.com/package/riotjs-loader)
-- [Riot + Meteor]( https://atmospherejs.com/xaiki/riotjs)
+- [Riot + Meteor]( https://atmospherejs.com/baysao/riotjs)
 - [Riot Snake Game](http://cdn.rawgit.com/atian25/blog/master/assets/riot-snake.html)
 - [Riot Tag Syntax Checker](http://cognitom.github.io/riot-checker/)
 - [Riot 文档中译版](https://github.com/Centaur/riotjs_doc_cn) :cn:
@@ -160,151 +188,90 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Yeoman generator - Generator riot mobile](https://www.npmjs.com/package/generator-riot-mobile)
 - [Yeoman generator - Generator riot element](https://www.npmjs.com/package/generator-riot-element)
 - [Riot for TypeScript](https://github.com/nippur72/RiotTS)
+- [Riot loader plugin for RequireJS](https://github.com/amenadiel/requirejs-riot)
+- [Riot loader plugin for JSPM/SystemJS](https://github.com/amenadiel/systemjs-riot)
+- [RiotJS Style Guide](https://github.com/voorhoede/riotjs-style-guide)
+- [Riot Cheatsheet](http://martinmuzatko.github.io/riot-cheatsheet/)
 
 ### Performance
 - **Riot vs React performance:** [(Riot version)](https://github.com/kazzkiq/samples/tree/gh-pages/perf/dom-riot-vs-vanilla) vs [(React version)](https://github.com/kazzkiq/samples/tree/gh-pages/perf/dom-react-vs-vanilla)
 
 ### Miscellaneous
 - [Q&A with RiotJS author Tero Piirainen](http://www.triplet.fi/blog/q-and-a-with-riotjs-author-tero-piirainen/)
-- [riot-detector（Chrome Extension）](https://chrome.google.com/webstore/detail/riot-detector/cnnmjeggdmicjojlnjghdgkdlijiobke)
+- [riot-detector (Chrome Extension)](https://chrome.google.com/webstore/detail/riot-detector/cnnmjeggdmicjojlnjghdgkdlijiobke)
+
+### Editors / Editor Plugins (Syntax highlighting, autcompletion, etc...)
+- [riot (Atom Package)](https://atom.io/packages/riot)
+- [language-riot-tag (Atom Package)](https://github.com/dekimasoon/language-riot-tag)
+  - Based on Vue's official Sublime Text highlighter
+  - Note: Designed for html, not jade.
+- [sublime-tag (Sublime Text)](https://github.com/crisward/sublime-tag)
+- [riot-tag (Visual Studio)](https://github.com/crisward/riot-tag)
+- [web-mode (Emacs)](http://web-mode.org)
+  - See how to configure [#1967](https://github.com/riot/riot/issues/1967) 
+
+### How to contribute
+
+If you are reading this it's already a good sign and we are thankful for it! We try our best working as much as we could on riot but your help is always appreciated.
+
+If you want to contribute to riot helping us maintaining the project please check first the list of [our open issues](https://github.com/riot/riot/issues) to understand whether there is a task where you could help.
+
+Riot is mainly developed on UNIX systems so you will be able to run all the commands necessary to build and test the library using our [Makefile](Makefile). If you are on a Microsoft machine it could be harder to set up you development environment properly.
+
+Following the steps below you should be able to properly submit your patch to the project
+
+#### 1) Clone the repo and browse to the riot folder
+
+```shell
+$ git clone git@github.com:riot/riot.git && cd riot
+```
+#### 2) Set up your git branch
+
+```shell
+$ git checkout -b feature/my-awesome-patch
+```
+
+#### 3) Install the npm dependencies
+
+```shell
+$ npm i
+```
+
+#### 4) Build and test riot using the Makefile
+
+```shell
+# To build and test riot
+$ make riot
+
+# To build without testing
+$ make raw
+
+# To build anytime you change a src file
+$ make watch
+
+# To bench riot ( it requires ctrl+c to exit )
+$ make perf
+```
+
+#### 5) Pull request only against the `dev` branch making sure you have read [our pull request template](.github/PULL_REQUEST_TEMPLATE.md)
+
+#### 6) Be patient
 
 
 ### Credits
 
-Riot is made with :heart: by many smart people. Thanks to all the contributors
+Riot is made with :heart: by many smart people from all over the world. Thanks to all the contributors<br>
+It's actively maintained by:
+ - [Richard Bondi](https://github.com/rsbondi)
+ - [Gianluca Guarini](https://github.com/GianlucaGuarini)
+ - [Tsutomu Kawamura](https://github.com/cognitom)
+ - [Alberto Martínez](https://github.com/aMarCruz)
+ - [Tero Piirainen](https://github.com/tipiirai)
 
-```
- project  : riot
- repo age : 1 year, 11 months
- active   : 392 days
- commits  : 1653
- files    : 213
- authors  :
-   552  Gianluca Guarini        33.4%
-   400  Tero Piirainen          24.2%
-   150  Aurimas                 9.1%
-    56  Tsutomu Kawamura        3.4%
-    45  rsbondi                 2.7%
-    43  Alberto Martínez       2.6%
-    27  Marcelo Eden            1.6%
-    20  Kalman Speier           1.2%
-    18  Juha Lindstedt          1.1%
-    18  Márcio Coelho          1.1%
-    15  Anton Heryanto          0.9%
-    14  andynemzek              0.8%
-    14  Greg                    0.8%
-    13  a-moses                 0.8%
-    11  Hrvoje Šimić          0.7%
-    10  Andy VanEe              0.6%
-     9  Avner Peled             0.5%
-     8  Richard Bondi           0.5%
-     8  Mark Henderson          0.5%
-     8  Andreas Heintze         0.5%
-     7  Lee Tagg                0.4%
-     7  marciojcoelho           0.4%
-     7  Ashley Brener           0.4%
-     7  Tianxiang Chen          0.4%
-     7  Avnerus                 0.4%
-     6  hemanth.hm              0.4%
-     6  sethyuan                0.4%
-     6  Jens Anders Bakke       0.4%
-     5  jigsaw                  0.3%
-     5  Tatu Tamminen           0.3%
-     5  midinastasurazz         0.3%
-     4  blissland               0.2%
-     4  Jasmine Hegman          0.2%
-     4  xieyu33333              0.2%
-     4  Giovanni Cappellotto    0.2%
-     4  Eric Baer               0.2%
-     3  Artem Medeusheyev       0.2%
-     3  scott                   0.2%
-     3  Jim Sparkman            0.2%
-     3  korige                  0.2%
-     3  Alan R. Soares          0.2%
-     3  Magnus Wolffelt         0.2%
-     2  Mohammed Irfan          0.1%
-     2  Eric Capps              0.1%
-     2  Sergey Martynov         0.1%
-     2  Simon JAILLET           0.1%
-     2  Antonino Porcino        0.1%
-     2  Steve Clay              0.1%
-     2  Alexis THOMAS           0.1%
-     2  Tim Kindberg            0.1%
-     2  Tobias Baunbæk         0.1%
-     2  Jon Wolfe               0.1%
-     2  crazy2be                0.1%
-     2  jmas                    0.1%
-     2  luffs                   0.1%
-     2  oldpig                  0.1%
-     2  Andrew Feng             0.1%
-     2  yibuyisheng             0.1%
-     2  Žiga                   0.1%
-     2  陈海峰               0.1%
-     2  Bolt                    0.1%
-     2  Andrew Kiellor          0.1%
-     2  Markus A. Stone         0.1%
-     2  Collin Green            0.1%
-     2  Andrew Luetgers         0.1%
-     2  Milosz                  0.1%
-     2  Moot Inc                0.1%
-     2  Mtpc                    0.1%
-     2  Antoine Goutagny        0.1%
-     2  Philippe CHARRIERE      0.1%
-     2  David Salazar           0.1%
-     1  kylobite                0.1%
-     1  Andrew L. Van Slaars    0.1%
-     1  Ari Makela              0.1%
-     1  Barkóczi Dávid        0.1%
-     1  Benoit Hirbec           0.1%
-     1  Boris Huai              0.1%
-     1  Claudio Holanda         0.1%
-     1  Constantin Rack         0.1%
-     1  Courtney Couch          0.1%
-     1  Danil Semelenov         0.1%
-     1  Eliseo Arias            0.1%
-     1  Fernando Correia        0.1%
-     1  Ian Walter              0.1%
-     1  Ivan Saorin             0.1%
-     1  Joel Thornton           0.1%
-     1  Jonathan Dumaine        0.1%
-     1  Jonny Buchanan          0.1%
-     1  Jorrit Schippers        0.1%
-     1  Justin Dorfman          0.1%
-     1  Juwan Yoo               0.1%
-     1  Liu Jin                 0.1%
-     1  Marcin Jekot            0.1%
-     1  Matthew McCullough      0.1%
-     1  Maxence Dalmais         0.1%
-     1  Mike Breen              0.1%
-     1  Mike Ward               0.1%
-     1  Patrik Buckau           0.1%
-     1  Quim Calpe              0.1%
-     1  Riccardo Gueli Alletti  0.1%
-     1  Ryan O’Hara           0.1%
-     1  Sam Morgan              0.1%
-     1  Simone Vittori          0.1%
-     1  Steel Brain             0.1%
-     1  Steven Koch             0.1%
-     1  TZ | 天猪             0.1%
-     1  Tenor Biel              0.1%
-     1  The Gitter Badger       0.1%
-     1  Trent Ogren             0.1%
-     1  Umut Sirin              0.1%
-     1  XiongLiding             0.1%
-     1  Zach Aysan              0.1%
-     1  afc163                  0.1%
-     1  borishuai               0.1%
-     1  boynet                  0.1%
-     1  h2so5                   0.1%
-     1  jamesnolanverran        0.1%
-     1  nino-porcino            0.1%
-     1  typicode                0.1%
-     1  xieyu03                 0.1%
-     1  なりたけいすけ   0.1%
-```
+### Buy us a coffee :coffee:
+[![Click here to lend your support to: Riot and make a donation at pledgie.com !][donations-campaign-image]][donations-campaign-url]
 
 http://riotjs.com/
-
 
 [travis-image]:https://img.shields.io/travis/riot/riot.svg?style=flat-square
 [travis-url]:https://travis-ci.org/riot/riot
@@ -322,11 +289,14 @@ http://riotjs.com/
 [coverage-image]:https://img.shields.io/coveralls/riot/riot/dev.svg?style=flat-square
 [coverage-url]:https://coveralls.io/r/riot/riot?branch=dev
 
-[saucelabs-image]:https://saucelabs.com/browser-matrix/riotjs.svg
-[saucelabs-url]:https://saucelabs.com/u/riotjs
+[saucelabs-image]:https://saucelabs.com/browser-matrix/testsriotjs.svg?1
+[saucelabs-url]:https://saucelabs.com/u/testsriotjs
 
 [gitter-image]:https://img.shields.io/badge/GITTER-JOIN_CHAT_%E2%86%92-1dce73.svg?style=flat-square
 [gitter-url]:https://gitter.im/riot/riot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
 [codeclimate-image]:https://img.shields.io/codeclimate/github/riot/riot.svg?style=flat-square
 [codeclimate-url]:https://codeclimate.com/github/riot/riot
+
+[donations-campaign-url]:https://pledgie.com/campaigns/31139
+[donations-campaign-image]:https://pledgie.com/campaigns/31139.png?skin_name=chrome

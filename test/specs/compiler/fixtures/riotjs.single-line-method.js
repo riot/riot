@@ -1,1 +1,0 @@
-  click (e) { alert('Hello!') }

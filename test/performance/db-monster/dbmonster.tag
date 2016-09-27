@@ -1,7 +1,7 @@
 <dbmonster>
   <table class="table table-striped latest-data">
     <tbody>
-      <tr each={ dbs }>
+      <tr each={ dbs } no-reorder>
 
         <td class="dbname">
           { name }
@@ -13,7 +13,7 @@
           </span>
         </td>
 
-        <td each={ topFiveQueries } class="Query { className }">
+        <td each={ topFiveQueries } no-reorder class="Query { className }">
           { elapsed }
           <div class="popover left">
             <div class="popover-content">{ query }</div>
@@ -26,13 +26,5 @@
   </table>
 
   this.dbs = opts.dbs;
-  var that = this;
-
-  function redraw() {
-    that.dbs = getDatabases();
-    that.update();
-    setTimeout(redraw, TIMEOUT);
-  }
-  redraw();
 
 </dbmonster>

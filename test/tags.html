@@ -9,27 +9,13 @@
     #tags > * { display: inline-block; vertical-align: top; margin: 20px 50px }
     a { color: blue; cursor: pointer }
   </style>
-
-  <!--[if lt IE 9]>
-    <script src="polyfills/es5-shim.js"></script>
-    <script src="polyfills/html5-shiv.js"></script>
-    <script>
-      html5.addElements(
-        'yield timetable timer loop-manip loop-child looped-child loop-context yield-child yield-child-2 yield-parent yield-loop' +
-        'loop-strings img-test loop-replace loop-position tag-nesting ' +
-        'inner1 inner2 loop-option loop-optgroup inner-html yield-parent inner-content loop-object loop-multi ' +
-        'loop-nested table-data if-test if-child treeview lazy-if ' +
-        'treeitem expr-parent expr-child form-controls isloop-test plans plan'
-      )
-    </script>
-  <![endif]-->
-
 </head>
 
 <body>
 
   <div id="tags">
 
+    <attr-selected></attr-selected>
     <form-controls></form-controls>
     <isloop-test></isloop-test>
 
@@ -85,6 +71,7 @@
 
     <loop-numbers-nested></loop-numbers-nested>
     <loop-conditional></loop-conditional>
+    <reserved-names></reserved-names>
 
   </div>
 

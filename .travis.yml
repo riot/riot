@@ -1,21 +1,27 @@
 language: node_js
 node_js:
-   - "0.12.7"
+   - "4.2"
 
 branches:
   only:
     - master
     - dev
 script:
-  make riot test-compiler
+  make riot
 
 sudo: false
 
-before_install:
-  npm install babel && npm install jade && npm install coffee-script && npm install stylus && npm install nib && npm install
-
 after_success:
-  make test-sauce && make test-coveralls
+  '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && make test-sauce && make test-coveralls || false'
 
 notifications:
     email: false
+
+env:
+  - CXX=g++-4.8
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8

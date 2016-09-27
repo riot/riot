@@ -1,8 +1,9 @@
 lib/browser/wrap
-lib/browser/compiler/wrap/
 test/polyfills
 test/vendor
-test/compiler/js
-test/specs/compiler/fixtures
-test/specs/compiler/expect
+test/saucelabs-browsers.js
+test/specs/server/compiler/fixtures
+test/specs/server/compiler/expect
+test/specs/server/compiler/parsers/js
 test/performance/db-monster
+test/performance/benchmarks/riot.*.js

@@ -8,12 +8,12 @@
 
   <conditional-tag if="{condition}"></conditional-tag>
 
-  this.condition = (opts.condition == 'true');
-  var self = this;
+  this.condition = (opts.condition == 'true')
+  var self = this
 
   this.toggleCondition = function() {
-    self.condition = !self.condition;
-    self.update();
+    self.condition = !self.condition
+    self.update()
   }
 </if-level2>
 <if-level1>
@@ -25,14 +25,14 @@
   </div>
 
 
-  this.condition = (opts.condition == 'true');
-  this.level2Condition = opts.level2;
+  this.condition = (opts.condition == 'true')
+  this.level2Condition = opts.level2
 
-  var self = this;
+  var self = this
 
   this.toggleCondition = function() {
-    self.condition = !self.condition;
-    self.update();
+    self.condition = !self.condition
+    self.update()
   }
 </if-level1>
 

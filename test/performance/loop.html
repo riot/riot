@@ -13,7 +13,7 @@
   riot.tag('my-tag', '<div> <h1>Riot <button onclick="{ clicked }">reverse list</button> <span id="timestamp"></span></h1> <h2 each="{ item, i in opts.items }">Line #{ item.value }, { i }</h2> </div>', function(opts) {
 
     var self = this,
-        x = new Date().getTime()
+      x = new Date().getTime()
 
     this.items = opts.items
 
@@ -24,7 +24,7 @@
 
     }
 
-    this.on('updated', function(){
+    this.on('updated', function() {
       self.timestamp.innerHTML = ' - Reversing took ' + ( new Date().getTime() - x ) + 'ms'
     })
 
@@ -35,7 +35,7 @@
     items.push( { value: i } )
   }
   var tag = riot.mount('*', { items: items } )[0],
-      headings = tag.root.querySelectorAll('h2')
+    headings = tag.root.querySelectorAll('h2')
 
   for ( var i = 0; i < 10000; i++ ) {
     headings[i].classList.add('nr-' + i)
