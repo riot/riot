@@ -1066,6 +1066,9 @@ function setEventHandler(name, handler, dom, tag) {
     return
   }
 
+  // avoid to bind twice the same event
+  dom[name] = null
+
   // normalize event name
   eventName = name.replace(EVENTS_PREFIX_REGEX, '')
 
@@ -2122,8 +2125,6 @@ function Tag$$1(impl, conf, innerHTML) {
 
       var proto = Object.getPrototypeOf(instance)
 
-      var proto = Object.getPrototypeOf(instance)
-
       // build multilevel prototype inheritance chain property list
       do { props = props.concat(Object.getOwnPropertyNames(obj || instance)) }
       while (obj = Object.getPrototypeOf(obj || instance))
@@ -2639,20 +2640,50 @@ var riot$1 = Object.freeze({
 
 /**
  * Compiler for riot custom tags
- * @version v3.0.0-alpha.1
+ * @version v3.0.0-alpha.2
  */
+
+// istanbul ignore next
+function safeRegex (re) {
+  var arguments$1 = arguments;
+
+  var src = re.source
+  var opt = re.global ? 'g' : ''
+
+  if (re.ignoreCase) { opt += 'i' }
+  if (re.multiline)  { opt += 'm' }
+
+  for (var i = 1; i < arguments.length; i++) {
+    src = src.replace('@', '\\' + arguments$1[i])
+  }
+
+  return new RegExp(src, opt)
+}
 
 /**
  * @module parsers
  */
-var parsers$1 = (function () {
+var parsers$1 = (function (win) {
 
-  function _req (name) {
-    var parser = window[name]
+  var _p = {}
+
+  function _r (name) {
+    var parser = win[name]
 
     if (parser) { return parser }
 
-    throw new Error(name + ' parser not found.')
+    throw new Error('Parser "' + name + '" not loaded.')
+  }
+
+  function _req (name) {
+    var parts = name.split('.')
+
+    if (parts.length !== 2) { throw new Error('Bad format for parsers._req') }
+
+    var parser = _p[parts[0]][parts[1]]
+    if (parser) { return parser }
+
+    throw new Error('Parser "' + name + '" not found.')
   }
 
   function extend (obj, props) {
@@ -2667,73 +2698,92 @@ var parsers$1 = (function () {
     return obj
   }
 
-  var _p = {
-    html: {
-      jade: function (html, opts, url) {
-        opts = extend({
-          pretty: true,
-          filename: url,
-          doctype: 'html'
-        }, opts)
-        return _req('jade').render(html, opts)
-      }
-    },
-
-    css: {
-      less: function (tag, css, opts, url) {
-        var ret
-
-        opts = extend({
-          sync: true,
-          syncImport: true,
-          filename: url
-        }, opts)
-        _req('less').render(css, opts, function (err, result) {
-          // istanbul ignore next
-          if (err) { throw err }
-          ret = result.css
-        })
-        return ret
-      }
-    },
-
-    js: {
-      es6: function (js, opts) {
-        opts = extend({
-          blacklist: ['useStrict', 'strict', 'react'],
-          sourceMaps: false,
-          comments: false
-        }, opts)
-        return _req('babel').transform(js, opts).code
-      },
-      babel: function (js, opts, url) {
-        return _req('babel').transform(js, extend({ filename: url }, opts)).code
-      },
-      coffee: function (js, opts) {
-        return _req('CoffeeScript').compile(js, extend({ bare: true }, opts))
-      },
-      livescript: function (js, opts) {
-        return _req('livescript').compile(js, extend({ bare: true, header: false }, opts))
-      },
-      typescript: function (js, opts) {
-        return _req('typescript')(js, opts)
-      },
-      none: function (js) {
-        return js
-      }
-    }
+  function renderPug (compilerName, html, opts, url) {
+    opts = extend({
+      pretty: true,
+      filename: url,
+      doctype: 'html'
+    }, opts)
+    return _r(compilerName).render(html, opts)
   }
 
+  _p.html = {
+    jade: function (html, opts, url) {
+      /* eslint-disable */
+      console.log('DEPRECATION WARNING: jade was renamed "pug" - The jade parser will be removed in riot@3.0.0!')
+      /* eslint-enable */
+      return renderPug('jade', html, opts, url)
+    },
+    pug: function (html, opts, url) {
+      return renderPug('pug', html, opts, url)
+    }
+  }
+  _p.css = {
+    less: function (tag, css, opts, url) {
+      var ret
+
+      opts = extend({
+        sync: true,
+        syncImport: true,
+        filename: url
+      }, opts)
+      _r('less').render(css, opts, function (err, result) {
+        // istanbul ignore next
+        if (err) { throw err }
+        ret = result.css
+      })
+      return ret
+    }
+  }
+  _p.js = {
+    es6: function (js, opts) {
+      opts = extend({
+        blacklist: ['useStrict', 'strict', 'react'],
+        sourceMaps: false,
+        comments: false
+      }, opts)
+      return _r('babel').transform(js, opts).code
+    },
+    babel: function (js, opts, url) {
+      return _r('babel').transform(js, extend({ filename: url }, opts)).code
+    },
+    buble: function (js, opts, url) {
+      opts = extend({
+        source: url,
+        modules: false
+      }, opts)
+      return _r('buble').transform(js, opts).code
+    },
+    coffee: function (js, opts) {
+      return _r('CoffeeScript').compile(js, extend({ bare: true }, opts))
+    },
+    livescript: function (js, opts) {
+      return _r('livescript').compile(js, extend({ bare: true, header: false }, opts))
+    },
+    typescript: function (js, opts) {
+      return _r('typescript')(js, opts)
+    },
+    none: function (js) {
+      return js
+    }
+  }
   _p.js.javascript   = _p.js.none
   _p.js.coffeescript = _p.js.coffee
+  _p._req  = _req
+  _p.utils = {
+    extend: extend
+  }
 
   return _p
 
-})()
+})(window || global)
 
 /**
  * @module compiler
  */
+
+var extend$1 = parsers$1.utils.extend
+/* eslint-enable */
 
 var S_LINESTR = /"[^"\n\\]*(?:\\[\S\s][^"\n\\]*)*"|'[^'\n\\]*(?:\\[\S\s][^'\n\\]*)*'/.source
 
@@ -2755,10 +2805,12 @@ var PRE_TAGS = /<pre(?:\s+(?:[^">]*|"[^"]*")*)?>([\S\s]+?)<\/pre\s*>/gi
 
 var SPEC_TYPES = /^"(?:number|date(?:time)?|time|month|email|color)\b/i
 
+var IMPORT_STATEMENT = /^\s*import(?:\s*[*{]|\s+[$_a-zA-Z'"]).*\n?/gm
+
 var TRIM_TRAIL = /[ \t]+$/gm
 
-var RE_HASEXPR = /\x01#\d/;
-var RE_REPEXPR = /\x01#(\d+)/g;
+var RE_HASEXPR = safeRegex(/@#\d/, 'x01');
+var RE_REPEXPR = safeRegex(/@#(\d+)/g, 'x01');
 var CH_IDEXPR  = '\x01#';
 var CH_DQCODE  = '\u2057';
 var DQ = '"';
@@ -2861,7 +2913,22 @@ function restoreExpr (html, pcex) {
   return html
 }
 
+function compileImports (js) {
+  var imp = []
+  var imports = ''
+  while (imp = IMPORT_STATEMENT.exec(js)) {
+    imports += imp[0].trim() + '\n'
+  }
+  return imports
+}
+
+function rmImports (js) {
+  var jsCode = js.replace(IMPORT_STATEMENT, '')
+  return jsCode
+}
+
 function _compileHTML (html, opts, pcex) {
+  if (!/\S/.test(html)) { return '' }
 
   html = splitHtml(html, opts, pcex)
     .replace(HTML_TAGS, function (_, name, attr, ends) {
@@ -2971,11 +3038,8 @@ function _compileJS (js, opts, type, parserOpts, url) {
   if (!/\S/.test(js)) { return '' }
   if (!type) { type = opts.type }
 
-  var parser = opts.parser || (type ? parsers$1.js[type] : riotjs)
+  var parser = opts.parser || type && parsers$1._req('js.' + type, true) || riotjs
 
-  if (!parser) {
-    throw new Error('JS parser not found: "' + type + '"')
-  }
   return parser(js, parserOpts, url).replace(/\r\n?/g, '\n').replace(TRIM_TRAIL, '')
 }
 
@@ -3031,10 +3095,10 @@ function _compileCSS (css, tag, type, opts) {
   if (type) {
     if (type === 'scoped-css') {
       scoped = true
-    } else if (parsers$1.css[type]) {
-      css = parsers$1.css[type](tag, css, opts.parserOpts || {}, opts.url)
     } else if (type !== 'css') {
-      throw new Error('CSS parser not found: "' + type + '"')
+
+      var parser = parsers$1._req('css.' + type, true)
+      css = parser(tag, css, opts.parserOpts || {}, opts.url)
     }
   }
 
@@ -3070,14 +3134,14 @@ function _q (s, r) {
   return r && ~s.indexOf('\n') ? s.replace(/\n/g, '\\n') : s
 }
 
-function mktag (name, html, css, attr, js, opts) {
+function mktag (name, html, css, attr, js, imports, opts) {
   var
     c = opts.debug ? ',\n  ' : ', ',
     s = '});'
 
   if (js && js.slice(-1) !== '\n') { s = '\n' + s }
 
-  return 'riot.tag2(\'' + name + SQ +
+  return imports + 'riot.tag2(\'' + name + SQ +
     c + _q(html, 1) +
     c + _q(css) +
     c + _q(attr) + ', function(opts) {\n' + js + s
@@ -3094,7 +3158,9 @@ function splitBlocks (str) {
       m = str.slice(k, n).match(END_TAGS)
       if (m) {
         k += m.index + m[0].length
-        return [str.slice(0, k), str.slice(k)]
+        m = str.slice(0, k)
+        if (m.slice(-5) === '<-/>\n') { m = m.slice(0, -5) }
+        return [m, str.slice(k)]
       }
       n = k
       k = str.lastIndexOf('<', k - 1)
@@ -3129,11 +3195,11 @@ function getAttrib (attribs, name) {
 
 function unescapeHTML (str) {
   return str
-          .replace('&amp;', /&/g)
-          .replace('&lt;', /</g)
-          .replace('&gt;', />/g)
-          .replace('&quot;', /"/g)
-          .replace('&#039;', /'/g)
+          .replace(/&amp;/g, '&')
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '"')
+          .replace(/&#039;/g, '\'')
 }
 
 function getParserOptions (attribs) {
@@ -3145,28 +3211,35 @@ function getParserOptions (attribs) {
 function getCode (code, opts, attribs, base) {
   var
     type = getType(attribs),
-    src  = getAttrib(attribs, 'src')
+    src  = getAttrib(attribs, 'src'),
+    jsParserOptions = extend$1({}, opts.parserOptions.js)
 
   if (src) { return false }
-  return _compileJS(code, opts, type, getParserOptions(attribs), base)
+
+  return _compileJS(
+          code,
+          opts,
+          type,
+          extend$1(jsParserOptions, getParserOptions(attribs)),
+          base
+        )
 }
 
 function cssCode (code, opts, attribs, url, tag) {
-  var extraOpts = {
-    parserOpts: getParserOptions(attribs),
-    scoped: attribs && /\sscoped(\s|=|$)/i.test(attribs),
-    url: url
-  }
+  var
+    parserStyleOptions = extend$1({}, opts.parserOptions.style),
+    extraOpts = {
+      parserOpts: extend$1(parserStyleOptions, getParserOptions(attribs)),
+      scoped: attribs && /\sscoped(\s|=|$)/i.test(attribs),
+      url: url
+    }
 
   return _compileCSS(code, tag, getType(attribs) || opts.style, extraOpts)
 }
 
 function compileTemplate (html, url, lang, opts) {
-  var parser = parsers$1.html[lang]
 
-  if (!parser) {
-    throw new Error('Template parser not found: "' + lang + '"')
-  }
+  var parser = parsers$1._req('html.' + lang, true)
   return parser(html, opts, url)
 }
 
@@ -3178,9 +3251,17 @@ var STYLES = /<style(\s+[^>]*)?>\n?([\S\s]*?)<\/style\s*>/gi
 function compile$1 (src, opts, url) {
   var
     parts = [],
-    included
+    included,
+    defaultParserptions = {
+
+      template: {},
+      js: {},
+      style: {}
+    }
 
   if (!opts) { opts = {} }
+
+  opts.parserOptions = extend$1(defaultParserptions, opts.parserOptions || {})
 
   included = opts.exclude
     ? function (s) { return opts.exclude.indexOf(s) < 0 } : function () { return 1 }
@@ -3190,7 +3271,7 @@ function compile$1 (src, opts, url) {
   var _bp = brackets.array(opts.brackets)
 
   if (opts.template) {
-    src = compileTemplate(src, url, opts.template, opts.templateOptions)
+    src = compileTemplate(src, url, opts.template, opts.parserOptions.template)
   }
 
   src = cleanSource(src)
@@ -3199,6 +3280,7 @@ function compile$1 (src, opts, url) {
         jscode = '',
         styles = '',
         html = '',
+        imports = '',
         pcex = []
 
       pcex._bp = _bp
@@ -3245,7 +3327,13 @@ function compile$1 (src, opts, url) {
 
           if (included('js')) {
             body = _compileJS(blocks[1], opts, null, null, url)
+            imports = compileImports(jscode)
+            jscode  = rmImports(jscode)
             if (body) { jscode += (jscode ? '\n' : '') + body }
+            jscode = jscode.replace(IMPORT_STATEMENT, function (s) {
+              imports += s.trim() + '\n'
+              return ''
+            })
           }
         }
       }
@@ -3258,12 +3346,13 @@ function compile$1 (src, opts, url) {
           html: html,
           css: styles,
           attribs: attribs,
-          js: jscode
+          js: jscode,
+          imports: imports
         })
         return ''
       }
 
-      return mktag(tagName, html, styles, attribs, jscode, opts)
+      return mktag(tagName, html, styles, attribs, jscode, imports, opts)
     })
 
   if (opts.entities) { return parts }
@@ -3271,7 +3360,7 @@ function compile$1 (src, opts, url) {
   return src
 }
 
-var version = 'v3.0.0-alpha.1'
+var version = 'v3.0.0-alpha.2'
 
 var compiler = {
   compile: compile$1,
