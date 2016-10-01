@@ -1115,7 +1115,7 @@ describe('Riot each', function() {
         'select-each-option-prompt': [2, CHOOSE, OPTION],
         'select-each-two-options': [4, OPTION, OPTION],
         'select-optgroup-each-option': [0, OPTGRP],
-        'select-optgroup-each-option-prompt': [0, CHOOSE, OPTGRP],
+        'select-optgroup-each-option-prompt': [3, OPTGRP, CHOOSE],
         'select-two-optgroup-each-option': [3, OPTGRP, CHOOSE, OPTGRP],
         'select-each-optgroup': [0, OPTGRP, OPTGRP]
       },

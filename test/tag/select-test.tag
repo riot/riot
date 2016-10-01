@@ -31,41 +31,41 @@
 </select-each-option>
 
 <select-each-option-prompt>
-  <option>(choose)
+  <option>(choose)</option>
   <option each={ opt, i in theOptions } selected={ i == 1 }>{ opt }</option>
 </select-each-option-prompt>
 
 <select-each-two-options>
-  <option each={ opt, i in theOptions }>{ opt }
+  <option each={ opt, i in theOptions }>{ opt }</option>
   <option each={ opt, i in theOptions } selected={ i == 1 }>{ opt }</option>
 </select-each-two-options>
 
 <select-optgroup-each-option>
   <optgroup label="Group 1">
-    <option each={ opt in theOptions }>{ opt }
+    <option each={ opt in theOptions }>{ opt }</option>
   </optgroup>
 </select-optgroup-each-option>
 
 <select-optgroup-each-option-prompt>
-  <option selected>(choose)
   <optgroup label="Group 1">
-    <option each={ opt in theOptions }>{ opt }
+    <option each={ opt in theOptions }>{ opt }</option>
   </optgroup>
+  <option selected>(choose)</option>
 </select-optgroup-each-option-prompt>
 
 <select-two-optgroup-each-option>
   <optgroup label="Group 1">
-    <option each={ opt in theOptions }>{ opt }
+    <option each={ opt in theOptions }>{ opt }</option>
   </optgroup>
-  <option selected>(choose)
+  <option selected>(choose)</option>
   <optgroup label="Group 2">
-    <option each={ opt in theOptions }>{ opt }
+    <option each={ opt in theOptions }>{ opt }</option>
   </optgroup>
 </select-two-optgroup-each-option>
 
 <select-each-optgroup>
   <optgroup each={ group in groups } label={ group }>
-    <option each={ opt in theOptions }>{ opt }
+    <option each={ opt in theOptions }>{ opt }</option>
   </optgroup>
   <script>
     this.groups = ['Group 1', 'Group 2']
