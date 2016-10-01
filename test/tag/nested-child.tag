@@ -10,6 +10,8 @@
 
   <another-nested-child title="whathever"></another-nested-child>
 
+  this.name = 'my name'
+
 </nested-child>
 
 

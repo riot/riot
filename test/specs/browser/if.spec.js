@@ -7,6 +7,7 @@ import {
 
 // include special tags to test specific features
 import '../../tag/if-mount.tag'
+import '../../tag/nested-child.tag'
 import '../../tag/if-unmount.tag'
 import '../../tag/named-unmount.tag'
 
@@ -104,6 +105,14 @@ describe('Riot if', function() {
     expect(tag.refs.first).to.be.undefined
     expect(tag.refs.second).to.be.undefined
     expect(tag.refs.third).to.be.undefined
+
+    tag.unmount()
+  })
+
+  it('Conditional tags should not inherit from the parent unless they are in a loop', function() {
+    injectHTML('<nested-child></nested-child>')
+    var tag = riot.mount('nested-child')[0]
+    expect(tag.tags.child[0].name).to.be.equal(undefined)
 
     tag.unmount()
   })

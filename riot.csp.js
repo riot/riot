@@ -7330,7 +7330,62 @@ exports.tmpl = tmpl;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
+<<<<<<< HEAD
 });
+=======
+/* Riot v2.6.2, @license MIT */
+
+;(function(window, undefined) {
+  'use strict';
+var tmpl = cspTmpl.tmpl,
+  brackets = cspTmpl.brackets
+var riot = { version: 'v2.6.2', settings: {} },
+  // be aware, internal usage
+  // ATTENTION: prefix the global dynamic variables with `__`
+
+  // counter to give a unique id to all the Tag instances
+  __uid = 0,
+  // tags instances cache
+  __virtualDom = [],
+  // tags implementation cache
+  __tagImpl = {},
+
+  /**
+   * Const
+   */
+  GLOBAL_MIXIN = '__global_mixin',
+
+  // riot specific prefixes
+  RIOT_PREFIX = 'riot-',
+  RIOT_TAG = RIOT_PREFIX + 'tag',
+  RIOT_TAG_IS = 'data-is',
+
+  // for typeof == '' comparisons
+  T_STRING = 'string',
+  T_OBJECT = 'object',
+  T_UNDEF  = 'undefined',
+  T_FUNCTION = 'function',
+  XLINK_NS = 'http://www.w3.org/1999/xlink',
+  XLINK_REGEX = /^xlink:(\w+)/,
+  // special native tags that cannot be treated like the others
+  SPECIAL_TAGS_REGEX = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?|opt(?:ion|group))$/,
+  RESERVED_WORDS_BLACKLIST = /^(?:_(?:item|id|parent)|update|root|(?:un)?mount|mixin|is(?:Mounted|Loop)|tags|parent|opts|trigger|o(?:n|ff|ne))$/,
+  // SVG tags list https://www.w3.org/TR/SVG/attindex.html#PresentationAttributes
+  SVG_TAGS_LIST = ['altGlyph', 'animate', 'animateColor', 'circle', 'clipPath', 'defs', 'ellipse', 'feBlend', 'feColorMatrix', 'feComponentTransfer', 'feComposite', 'feConvolveMatrix', 'feDiffuseLighting', 'feDisplacementMap', 'feFlood', 'feGaussianBlur', 'feImage', 'feMerge', 'feMorphology', 'feOffset', 'feSpecularLighting', 'feTile', 'feTurbulence', 'filter', 'font', 'foreignObject', 'g', 'glyph', 'glyphRef', 'image', 'line', 'linearGradient', 'marker', 'mask', 'missing-glyph', 'path', 'pattern', 'polygon', 'polyline', 'radialGradient', 'rect', 'stop', 'svg', 'switch', 'symbol', 'text', 'textPath', 'tref', 'tspan', 'use'],
+
+  // version# for IE 8-11, 0 for others
+  IE_VERSION = (window && window.document || {}).documentMode | 0,
+
+  // detect firefox to fix #1374
+  FIREFOX = window && !!window.InstallTrigger
+/* istanbul ignore next */
+riot.observable = function(el) {
+
+  /**
+   * Extend the original object or create a new empty one
+   * @type { Object }
+   */
+>>>>>>> dev
 
 var tmpl = csp_tmpl.tmpl;
 var brackets = csp_tmpl.brackets;
@@ -8674,6 +8729,8 @@ function Tag$$1(impl, conf, innerHTML) {
 
       var proto = Object.getPrototypeOf(instance)
 
+      var proto = Object.getPrototypeOf(instance)
+
       // build multilevel prototype inheritance chain property list
       do { props = props.concat(Object.getOwnPropertyNames(obj || instance)) }
       while (obj = Object.getPrototypeOf(obj || instance))
@@ -8730,7 +8787,13 @@ function Tag$$1(impl, conf, innerHTML) {
     }])
 
     // children in loop should inherit from true parent
+<<<<<<< HEAD
     if (this._parent && isAnonymous) { inheritFrom.apply(this, [this._parent, propsInSyncWithParent]) }
+=======
+    if (self._parent && self._parent.root.isLoop) {
+      inheritFrom(self._parent)
+    }
+>>>>>>> dev
 
     // initialiation
     updateOpts.apply(this, [isLoop, parent, isAnonymous, opts, instAttrs])
@@ -9025,6 +9088,134 @@ function isInStub(dom) {
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * Create a generic DOM node
+ * @param   { String } name - name of the DOM node we want to create
+ * @param   { Boolean } isSvg - should we use a SVG as parent node?
+ * @returns { Object } DOM node just created
+ */
+function mkEl(name, isSvg) {
+  return isSvg ?
+    document.createElementNS('http://www.w3.org/2000/svg', 'svg') :
+    document.createElement(name)
+}
+
+/**
+ * Shorter and fast way to select multiple nodes in the DOM
+ * @param   { String } selector - DOM selector
+ * @param   { Object } ctx - DOM node where the targets of our search will is located
+ * @returns { Object } dom nodes found
+ */
+function $$(selector, ctx) {
+  return (ctx || document).querySelectorAll(selector)
+}
+
+/**
+ * Shorter and fast way to select a single node in the DOM
+ * @param   { String } selector - unique dom selector
+ * @param   { Object } ctx - DOM node where the target of our search will is located
+ * @returns { Object } dom node found
+ */
+function $(selector, ctx) {
+  return (ctx || document).querySelector(selector)
+}
+
+/**
+ * Simple object prototypal inheritance
+ * @param   { Object } parent - parent object
+ * @returns { Object } child instance
+ */
+function inherit(parent) {
+  return Object.create(parent || null)
+}
+
+/**
+ * Get the name property needed to identify a DOM node in riot
+ * @param   { Object } dom - DOM node we need to parse
+ * @returns { String | undefined } give us back a string to identify this dom node
+ */
+function getNamedKey(dom) {
+  return getAttr(dom, 'id') || getAttr(dom, 'name')
+}
+
+/**
+ * Set the named properties of a tag element
+ * @param { Object } dom - DOM node we need to parse
+ * @param { Object } parent - tag instance where the named dom element will be eventually added
+ * @param { Array } keys - list of all the tag instance properties
+ */
+function setNamed(dom, parent, keys) {
+  // get the key value we want to add to the tag instance
+  var key = getNamedKey(dom),
+    isArr,
+    // add the node detected to a tag instance using the named property
+    add = function(value) {
+      // avoid to override the tag properties already set
+      if (contains(keys, key)) return
+      // check whether this value is an array
+      isArr = isArray(value)
+      // if the key was never set
+      if (!value)
+        // set it once on the tag instance
+        parent[key] = dom
+      // if it was an array and not yet set
+      else if (!isArr || isArr && !contains(value, dom)) {
+        // add the dom node into the array
+        if (isArr)
+          value.push(dom)
+        else
+          parent[key] = [value, dom]
+      }
+    }
+
+  // skip the elements with no named properties
+  if (!key) return
+
+  // check whether this key has been already evaluated
+  if (tmpl.hasExpr(key))
+    // wait the first updated event only once
+    parent.one('mount', function() {
+      key = getNamedKey(dom)
+      add(parent[key])
+    })
+  else
+    add(parent[key])
+
+}
+
+/**
+ * Faster String startsWith alternative
+ * @param   { String } src - source string
+ * @param   { String } str - test string
+ * @returns { Boolean } -
+ */
+function startsWith(src, str) {
+  return src.slice(0, str.length) === str
+}
+
+/**
+ * requestAnimationFrame function
+ * Adapted from https://gist.github.com/paulirish/1579671, license MIT
+ */
+var rAF = (function (w) {
+  var raf = w.requestAnimationFrame    ||
+            w.mozRequestAnimationFrame || w.webkitRequestAnimationFrame
+
+  if (!raf || /iP(ad|hone|od).*OS 6/.test(w.navigator.userAgent)) {  // buggy iOS6
+    var lastTime = 0
+
+    raf = function (cb) {
+      var nowtime = Date.now(), timeout = Math.max(16 - (nowtime - lastTime), 0)
+      setTimeout(function () { cb(lastTime = nowtime + timeout) }, timeout)
+    }
+  }
+  return raf
+
+})(window || {})
+
+/**
+>>>>>>> dev
  * Mount a tag creating new Tag instance
  * @param   { Object } root - dom node where the tag will be mounted
  * @param   { String } tagName - name of the riot tag we want to mount

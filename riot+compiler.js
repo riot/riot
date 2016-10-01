@@ -2122,6 +2122,8 @@ function Tag$$1(impl, conf, innerHTML) {
 
       var proto = Object.getPrototypeOf(instance)
 
+      var proto = Object.getPrototypeOf(instance)
+
       // build multilevel prototype inheritance chain property list
       do { props = props.concat(Object.getOwnPropertyNames(obj || instance)) }
       while (obj = Object.getPrototypeOf(obj || instance))
