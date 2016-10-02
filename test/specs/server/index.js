@@ -4,7 +4,7 @@ var glob = require('glob'),
   expect = require('chai').expect,
   cheerio = require('cheerio')
 
-describe('Node/io.js', function() {
+describe('Node', function() {
 
   // adds custom riot parsers used by some tag/*.tag files
   // css
