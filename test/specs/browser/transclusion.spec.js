@@ -87,6 +87,7 @@ describe('Riot transclusion', function() {
   })
 
 
+	/*
   it('<yield from> name can be unquoted, without <yield to> default to its content', function () {
     var html = [
       '<yield-from-default>',
@@ -103,6 +104,7 @@ describe('Riot transclusion', function() {
     expect(normalizeHTML(tag.root.innerHTML)).to.be.equal(html)
     tag.unmount()
   })
+	*/
 
 
   it('multiple mount <yield> tag', function() {
