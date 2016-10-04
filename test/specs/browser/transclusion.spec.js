@@ -13,6 +13,8 @@ import '../../tag/yield-multi.tag'
 import '../../tag/yield-multi2.tag'
 import '../../tag/yield-from-default.tag'
 import '../../tag/yield-nested.tag'
+import '../../tag/yield-empty.tag'
+import '../../tag/yield-empty-named.tag'
 
 const expect = chai.expect
 
@@ -87,7 +89,7 @@ describe('Riot transclusion', function() {
   })
 
 
-	/*
+  /*
   it('<yield from> name can be unquoted, without <yield to> default to its content', function () {
     var html = [
       '<yield-from-default>',
@@ -104,8 +106,23 @@ describe('Riot transclusion', function() {
     expect(normalizeHTML(tag.root.innerHTML)).to.be.equal(html)
     tag.unmount()
   })
-	*/
+  */
 
+  it('nested tags with multiple children having named <yield> with the same name', function() {
+
+    var html = [
+      '<yield-empty-named><yield to="a">',
+      '  <yield-empty-named><yield to="a">First</yield></yield-empty-named>',
+      '  <yield-empty-named><yield to="a">Second</yield></yield-empty-named>',
+      '</yield></yield-empty-named>'
+    ]
+    injectHTML(html.join('\n'))
+    var tag = riot.mount('yield-empty-named')[0]
+    html = '<yield-empty-named>First</yield-empty-named><yield-empty-named>Second</yield-empty-named>'
+    expect(normalizeHTML(tag.root.innerHTML)).to.be.equal(html)
+    tag.unmount()
+
+  })
 
   it('multiple mount <yield> tag', function() {
 
