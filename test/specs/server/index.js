@@ -4,7 +4,7 @@ var glob = require('glob'),
   expect = require('chai').expect,
   cheerio = require('cheerio')
 
-describe('Node/io.js', function() {
+describe('Node', function() {
 
   // adds custom riot parsers used by some tag/*.tag files
   // css
@@ -20,7 +20,7 @@ describe('Node/io.js', function() {
     glob('../../tag/*.tag', { cwd: __dirname }, function (err, tags) {
       expect(err).to.be.equal(null)
       tags.forEach(function(tag) {
-        if (tag[0] === '~') return
+        if (/~/.test(tag)) return
         expect(require(tag)).to.be.ok
       })
       done()
@@ -130,6 +130,22 @@ describe('Node/io.js', function() {
     expect(tag).to.be.equal('custom-parsers')
     expect(tmpl).to.be.equal('<custom-parsers></custom-parsers>')
 
+    tag = riot.require(path.resolve(__dirname, '../../tag/~custom-parsers.tag'))
+    tmpl = riot.render('custom-parsers')
+
+    expect(tag).to.be.equal('custom-parsers')
+    expect(tmpl).to.be.equal('<custom-parsers><p>hi</p></custom-parsers>')
+
+    expect(require('../../../lib/server')).to.be.not.equal('custom-parsers')
+  })
+
+
+  it('Load tags containing nested require calls', function() {
+    var tag = require(path.resolve(__dirname, '../../tag/~import-tags.tag'))
+    var tmpl = riot.render('import-tags')
+
+    expect(tag).to.be.equal('import-tags')
+    expect(tmpl).to.have.length
   })
 
 })
