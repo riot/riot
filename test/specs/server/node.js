@@ -1,7 +1,8 @@
 var glob = require('glob'),
   riot = require('../../../lib/server'),
   expect = require('expect.js'),
-  cheerio = require('cheerio')
+  cheerio = require('cheerio'),
+  path = require('path')
 
 describe('Node/io.js', function() {
 
@@ -19,6 +20,7 @@ describe('Node/io.js', function() {
     glob('../../tag/*.tag', { cwd: __dirname }, function (err, tags) {
       expect(err).to.be(null)
       tags.forEach(function(tag) {
+        if (/~/.test(tag)) return
         expect(require(tag)).to.be.ok()
       })
       done()
@@ -121,9 +123,29 @@ describe('Node/io.js', function() {
     expect($('textarea[name="txta2"]').val()).to.be('')
   })
 
-  it('render subsequent tags, when required from parent tag', function() {
-    var tag = riot.render('import-tag')
-    expect(tag).to.be('<import-tag><imported-tag><span>I am imported</span></imported-tag></import-tag>')
+  it('load tag with custom options', function() {
+    var tag = riot.require(path.resolve(__dirname, '../../tag/~custom-parsers.tag'), { exclude: ['html', 'css'] })
+    var tmpl = riot.render('custom-parsers')
+
+    expect(tag).to.be('custom-parsers')
+    expect(tmpl).to.be('<custom-parsers></custom-parsers>')
+
+    tag = riot.require(path.resolve(__dirname, '../../tag/~custom-parsers.tag'))
+    tmpl = riot.render('custom-parsers')
+
+    expect(tag).to.be('custom-parsers')
+    expect(tmpl).to.be('<custom-parsers><p>hi</p></custom-parsers>')
+
+    expect(require('../../../lib/server')).to.not.be('custom-parsers')
+  })
+
+
+  it('Load tags containing nested require calls', function() {
+    var tag = require(path.resolve(__dirname, '../../tag/~import-tags.tag'))
+    var tmpl = riot.render('import-tags')
+
+    expect(tag).to.be.equal('import-tags')
+    expect(tmpl).to.have.length
   })
 
 })
