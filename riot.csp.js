@@ -6954,13 +6954,13 @@ exports.tmpl = tmpl;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/* Riot v2.6.2, @license MIT */
+/* Riot v2.6.3, @license MIT */
 
 ;(function(window, undefined) {
   'use strict';
 var tmpl = cspTmpl.tmpl,
   brackets = cspTmpl.brackets
-var riot = { version: 'v2.6.2', settings: {} },
+var riot = { version: 'v2.6.3', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
