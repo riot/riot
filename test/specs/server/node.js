@@ -139,13 +139,26 @@ describe('Node/io.js', function() {
     expect(require('../../../lib/server')).to.not.be('custom-parsers')
   })
 
-
-  it('Load tags containing nested require calls', function() {
+  it('load tags containing nested require calls', function() {
     var tag = require(path.resolve(__dirname, '../../tag/~import-tags.tag'))
     var tmpl = riot.render('import-tags')
 
     expect(tag).to.be.equal('import-tags')
     expect(tmpl).to.have.length
+  })
+
+  it('render tag: async rendering', function(done) {
+    riot.renderAsync('async-rendering').then(function(tmpl) {
+      expect(tmpl).to.be('<async-rendering><p>hi</p></async-rendering>')
+      done()
+    })
+  })
+
+  it('render tag: async rendering can timeout', function(done) {
+    riot.renderAsync('async-rendering', { delay: 1010 }).catch(function(e) {
+      expect(e).to.have.length
+      done()
+    })
   })
 
 })
