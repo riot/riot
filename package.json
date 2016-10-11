@@ -50,7 +50,7 @@
     "riot-observable": "^2.5.0",
     "riot-route": "^2.5.0",
     "riot-tmpl": "^2.4.1",
-    "simple-dom": "0.3.0",
+    "simple-dom": "0.3.2",
     "simple-html-tokenizer": "^0.2.5"
   },
   "devDependencies": {
