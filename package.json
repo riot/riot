@@ -45,11 +45,11 @@
     "riot.js"
   ],
   "dependencies": {
-    "riot-cli": "^2.6.1",
+    "riot-cli": "^2.6.2",
     "riot-compiler": "next",
     "riot-observable": "^3.0.0-alpha.2",
     "riot-tmpl": "^2.4.1",
-    "simple-dom": "0.3.0",
+    "simple-dom": "0.3.2",
     "simple-html-tokenizer": "^0.2.5"
   },
   "devDependencies": {
@@ -68,9 +68,9 @@
     "karma-phantomjs-launcher": "^1.0.2",
     "karma-rollup-preprocessor": "^2.0.2",
     "karma-sauce-launcher": "^1.0.0",
-    "mocha": "^3.1.0",
+    "mocha": "^3.1.2",
     "phantomjs-prebuilt": "^2.1.13",
-    "rollup": "^0.36.1",
+    "rollup": "^0.36.3",
     "rollup-plugin-alias": "^1.2.0",
     "rollup-plugin-buble": "^0.14.0",
     "rollup-plugin-commonjs": "^5.0.4",
