@@ -6283,7 +6283,7 @@ function hoist(ast){
 
     walkAll(ast)
     prependScope(ast, variables, functions)
-    
+
   } else {
     walk(ast)
   }
@@ -6356,15 +6356,15 @@ function prependScope(nodes, variables, functions){
     var declarations = []
     for (var i=0;i<variables.length;i++){
       declarations.push({
-        type: 'VariableDeclarator', 
+        type: 'VariableDeclarator',
         id: variables[i].id,
         init: null
       })
     }
-    
+
     nodes.unshift({
-      type: 'VariableDeclaration', 
-      kind: 'var', 
+      type: 'VariableDeclaration',
+      kind: 'var',
       declarations: declarations
     })
 
@@ -6372,7 +6372,7 @@ function prependScope(nodes, variables, functions){
 
   if (functions && functions.length){
     for (var i=0;i<functions.length;i++){
-      nodes.unshift(functions[i]) 
+      nodes.unshift(functions[i])
     }
   }
 }

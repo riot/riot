@@ -139,7 +139,6 @@ describe('Node', function() {
     expect(require('../../../lib/server')).to.be.not.equal('custom-parsers')
   })
 
-
   it('Load tags containing nested require calls', function() {
     var tag = require(path.resolve(__dirname, '../../tag/~import-tags.tag'))
     var tmpl = riot.render('import-tags')
@@ -148,4 +147,17 @@ describe('Node', function() {
     expect(tmpl).to.have.length
   })
 
+  it('render tag: async rendering', function(done) {
+    riot.renderAsync('async-rendering').then(function(tmpl) {
+      expect(tmpl).to.be.equal('<async-rendering><p>hi</p></async-rendering>')
+      done()
+    })
+  })
+
+  it('render tag: async rendering can timeout', function(done) {
+    riot.renderAsync('async-rendering', { delay: 1010 }).catch(function(e) {
+      expect(e).to.have.length
+      done()
+    })
+  })
 })

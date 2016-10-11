@@ -22,7 +22,7 @@
   this.nums = [1, 2, 3]
 
   setTimeout(function() {
-    self.update({ flag: true })
+    if (this.isMounted) self.update({ flag: true })
   }, 300)
 
 
