@@ -1852,6 +1852,7 @@ var esprima = createCommonjsModule$$1(function (module, exports) {
         try {
             return new RegExp(pattern, flags);
         } catch (exception) {
+            /* istanbul ignore next */
             return null;
         }
     }
@@ -2048,7 +2049,7 @@ var esprima = createCommonjsModule$$1(function (module, exports) {
             return value && (value.length > 1) && (value[0] >= 'a') && (value[0] <= 'z');
         }
 
-        previous = extra.tokenValues[extra.tokens.length - 1];
+        previous = extra.tokenValues[extra.tokenValues.length - 1];
         regex = (previous !== null);
 
         switch (previous) {
@@ -6236,7 +6237,7 @@ var esprima = createCommonjsModule$$1(function (module, exports) {
     }
 
     // Sync with *.json manifests.
-    exports.version = '2.7.2';
+    exports.version = '2.7.3';
 
     exports.tokenize = tokenize;
 
@@ -6903,7 +6904,7 @@ function ReturnValue(type, value){
 
 /**
  * The riot template engine
- * @version v2.4.1
+ * @version v2.4.2
  */
 /**
  * riot.util.brackets
@@ -7162,7 +7163,7 @@ var tmpl = (function () {
   }
 
   var
-    CH_IDEXPR = '\u2057',
+    CH_IDEXPR = String.fromCharCode(0x2057),
     RE_CSNAME = /^(?:(-?[_A-Za-z\xA0-\xFF][-\w\xA0-\xFF]*)|\u2057(\d+)~):/,
     RE_QBLOCK = RegExp(brackets.S_QBLOCKS, 'g'),
     RE_DQUOTE = /\u2057/g,
@@ -7278,7 +7279,7 @@ var tmpl = (function () {
   // istanbul ignore next: not both
   var // eslint-disable-next-line max-len
     JS_CONTEXT = '"in this?this:' + (typeof window !== 'object' ? 'global' : 'window') + ').',
-    JS_VARNAME = /[,{][$\w]+(?=:)|(^ *|[^$\w\.])(?!(?:typeof|true|false|null|undefined|in|instanceof|is(?:Finite|NaN)|void|NaN|new|Date|RegExp|Math)(?![$\w]))([$_A-Za-z][$\w]*)/g,
+    JS_VARNAME = /[,{][\$\w]+(?=:)|(^ *|[^$\w\.{])(?!(?:typeof|true|false|null|undefined|in|instanceof|is(?:Finite|NaN)|void|NaN|new|Date|RegExp|Math)(?![$\w]))([$_A-Za-z][$\w]*)/g,
     JS_NOPROPS = /^(?=(\.[$\w]+))\1(?:[^.[(]|$)/
 
   function _wrapExpr (expr, asText, key) {
@@ -7318,7 +7319,7 @@ var tmpl = (function () {
     return expr
   }
 
-  _tmpl.version = brackets.version = 'v2.4.1'
+  _tmpl.version = brackets.version = 'v2.4.2'
 
   return _tmpl
 

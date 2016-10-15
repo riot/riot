@@ -1,5 +1,5 @@
 <obj-key-loop>
-   <div each={name, value in looped}>
+   <div each={ value, name in looped}>
     <input ref="{name}" value="{value}"/><br>
   </div>
 
