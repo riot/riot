@@ -206,7 +206,7 @@ http://riotjs.com/
 [npm-downloads-image]:http://img.shields.io/npm/dm/riot.svg?style=flat-square
 [npm-url]:https://npmjs.org/package/riot
 
-[riot-forum-image]:https://img.shields.io/badge/muut-JOIN_CHAT%E2%86%92-ff0044.svg?style=flat-square
+[riot-forum-image]:https://img.shields.io/badge/muut-JOIN_FORUM%E2%86%92-ff0044.svg?style=flat-square
 [riot-forum-url]:http://riotjs.com/forum/
 
 [coverage-image]:https://img.shields.io/coveralls/riot/riot/dev.svg?style=flat-square
