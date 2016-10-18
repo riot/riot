@@ -27,6 +27,7 @@ import '../../tag/loop-cols.tag'
 import '../../tag/loop-child.tag'
 import '../../tag/loop-combo.tag'
 import '../../tag/loop-reorder.tag'
+import '../../tag/loop-swap-type.tag'
 import '../../tag/loop-manip.tag'
 import '../../tag/loop-object.tag'
 import '../../tag/loop-tag-instances.tag'
@@ -1258,6 +1259,24 @@ describe('Riot each', function() {
     expect(els2[1].innerHTML).to.be.equal('White cold drink')
     tag2.unmount()
 
+  })
+
+  it('redraws correctly after items type is swapped from array to object and back', function () {
+    injectHTML('<loop-swap-type></loop-swap-type>')
+    var tag = riot.mount('loop-swap-type')[0]
+
+    tag.swap()
+    tag.update()
+    var els = tag.root.children
+    expect(els[0].innerHTML).to.be.equal('3')
+    expect(els[1].innerHTML).to.be.equal('4')
+
+    tag.swap()
+    tag.update()
+    els = tag.root.children
+    expect(els[0].innerHTML).to.be.equal('1')
+    expect(els[1].innerHTML).to.be.equal('2')
+    tag.unmount()
   })
 
   it('still loops with reserved property names #1526', function() {
