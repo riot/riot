@@ -87,7 +87,7 @@ describe('Riot core', function() {
 
     var tag = riot.mount('test', { val: 10 })[0],
       tag2 = riot.mount('#foo', 'test', { val: 30 })[0],
-      tag3 = riot.mount(document.getElementById('bar'), 'test', { val: 50 })[0]
+      tag3 = riot.mount($('#bar'), 'test', { val: 50 })[0]
 
     expect(normalizeHTML(tag.root.innerHTML)).to.be.equal('<p>val: 10</p>')
     expect(normalizeHTML(tag2.root.innerHTML)).to.be.equal('<p>val: 30</p>')
@@ -99,9 +99,9 @@ describe('Riot core', function() {
 
     expect(tag3.isMounted).to.be.equal(false)
 
-    expect(document.body.getElementsByTagName('test').length).to.be.equal(0)
-    expect(document.getElementById('foo')).to.be.equal(null)
-    expect(document.getElementById('bar')).to.not.be.equal(null)
+    expect($$('test').length).to.be.equal(0)
+    expect($('#foo')).to.be.equal(null)
+    expect($('#bar')).to.not.be.equal(null)
 
     expect(tag.root._tag).to.be.equal(undefined)
     expect(tag2.root._tag).to.be.equal(undefined)
@@ -181,7 +181,7 @@ describe('Riot core', function() {
 
     expect(subTags.length).to.be.equal(3)
 
-    subTags = riot.mount(document.getElementById('multi-mount-container-2'), '*')
+    subTags = riot.mount($('#multi-mount-container-2'), '*')
 
     expect(subTags.length).to.be.equal(3)
 
@@ -200,7 +200,7 @@ describe('Riot core', function() {
 
     riot.tag('multi-mount', '{ opts.value }')
 
-    var multipleTags = riot.mount(document.querySelectorAll('multi-mount'))
+    var multipleTags = riot.mount($$('multi-mount'))
 
     expect(multipleTags[0].root.innerHTML).to.be.equal('1')
     expect(multipleTags[1].root.innerHTML).to.be.equal('2')
@@ -294,7 +294,7 @@ describe('Riot core', function() {
     expect(normalizeHTML(tag.root.innerHTML)).to.be.equal('<p>val: 10</p>')
 
     tag.unmount()
-    expect(document.body.getElementsByTagName('rtag').length).to.be.equal(0)
+    expect($$('rtag').length).to.be.equal(0)
 
     tag.unmount()
 
@@ -354,7 +354,7 @@ describe('Riot core', function() {
   })
 
   it('tag names are case insensitive (converted to lowercase) in `riot.mount`', function() {
-    var i, els = document.querySelectorAll('tag-data-is,[data-is="tag-data-is"]')
+    var i, els = $$('tag-data-is,[data-is="tag-data-is"]')
     for (i = 0; i < els.length; i++) {
       els[i].parentNode.removeChild(els[i])
     }
@@ -382,7 +382,7 @@ describe('Riot core', function() {
   })
 
   it('the value of the `data-is` attribute needs lowercase names', function() {
-    var i, els = document.querySelectorAll('tag-data-is,[data-is="tag-data-is"]')
+    var i, els = $$('tag-data-is,[data-is="tag-data-is"]')
     for (i = 0; i < els.length; i++) {
       els[i].parentNode.removeChild(els[i])
     }
@@ -412,7 +412,7 @@ describe('Riot core', function() {
     expect(normalizeHTML(tag.root.innerHTML)).to.be.equal('<p>val: 10</p>')
 
     tag.unmount()
-    expect(document.body.querySelectorAll('rtag2').length).to.be.equal(0)
+    expect($$('rtag2').length).to.be.equal(0)
 
   })
 
