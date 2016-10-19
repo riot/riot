@@ -1,6 +1,7 @@
 import {
   injectHTML,
-  getRiotStyles
+  getRiotStyles,
+  $
 } from '../../helpers/index'
 
 
@@ -27,7 +28,7 @@ describe('Riot style', function() {
   })
 
   it('style injection removes type riot style tag', function() {
-    var stag = document.querySelector('style[type=riot]')
+    var stag = $('style[type=riot]')
     expect(stag).to.be.equal(null)
   })
 
