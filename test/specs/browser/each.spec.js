@@ -67,7 +67,7 @@ describe('Riot each', function() {
   it('the loop elements keep their position in the DOM', function() {
     injectHTML('<loop-position></loop-position>')
     var tag = riot.mount('loop-position')[0],
-      h3 = tag.root.getElementsByTagName('h3')[0]
+      h3 = $('h3', tag.root)
 
     expect(getPreviousSibling(h3).tagName.toLowerCase()).to.be.equal('p')
     expect(getNextSibling(h3).tagName.toLowerCase()).to.be.equal('p')
@@ -823,9 +823,9 @@ describe('Riot each', function() {
     it('nested loops using non object data get correctly rendered', function() {
       injectHTML('<loop-nested-strings-array></loop-nested-strings-array>')
       var tag = riot.mount('loop-nested-strings-array')[0],
-        children = tag.root.getElementsByTagName('loop-nested-strings-array-item')
+        children = $$('loop-nested-strings-array-item', tag.root)
       expect(children.length).to.be.equal(4)
-      children = tag.root.getElementsByTagName('loop-nested-strings-array-item')
+      children = $$('loop-nested-strings-array-item', tag.root)
       fireEvent(children[0], 'click')
       expect(children.length).to.be.equal(4)
       expect(normalizeHTML(children[0].innerHTML)).to.be.equal('<p>b</p>')
@@ -870,7 +870,7 @@ describe('Riot each', function() {
     injectHTML('<table-multibody></table-multibody>')
 
     var tag = riot.mount('table-multibody')[0],
-      bodies = tag.root.getElementsByTagName('tbody')
+      bodies = $$('tbody', tag.root)
 
     expect(bodies.length).to.be.equal(3)
     for (var i = 0; i < bodies.length; ++i) {
@@ -890,17 +890,17 @@ describe('Riot each', function() {
     injectHTML('<table-thead-tfoot-nested></table-thead-tfoot-nested>')
 
     var tag = riot.mount('table-thead-tfoot-nested')[0],
-      bodies = tag.root.getElementsByTagName('tbody'),
-      heads = tag.root.getElementsByTagName('thead'),
-      foots = tag.root.getElementsByTagName('tfoot')
+      bodies = $$('tbody', tag.root),
+      heads = $$('thead', tag.root),
+      foots = $$('tfoot', tag.root)
 
     expect(bodies.length).to.be.equal(1)
     expect(heads.length).to.be.equal(1)
     expect(foots.length).to.be.equal(1)
 
-    var ths = tag.root.getElementsByTagName('th'),
-      trs = tag.root.getElementsByTagName('tr'),
-      tds = tag.root.getElementsByTagName('td')
+    var ths = $$('th', tag.root),
+      trs = $$('tr', tag.root),
+      tds = $$('td', tag.root)
 
     expect(ths.length).to.be.equal(3)
     expect(trs.length).to.be.equal(5)
@@ -1168,7 +1168,7 @@ describe('Riot each', function() {
     // change the brackets
     riot.settings.brackets = '{{ }}'
     var tag = riot.mount('loop-double-curly-brackets')[0],
-      ps = tag.root.getElementsByTagName('p')
+      ps = $$('p', tag.root)
 
     expect(ps.length).to.be.equal(2)
     expect(ps[0].innerHTML).to.be.equal(ps[1].innerHTML)

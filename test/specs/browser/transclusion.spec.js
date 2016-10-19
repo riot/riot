@@ -138,7 +138,7 @@ describe('Riot transclusion', function() {
 
     expect(normalizeHTML(tag.root.innerHTML)).to.be.equal('<h1>Hello, from the parent</h1><yield-child><h1>Greeting</h1><i>from the child</i><div class="selected"><b>wooha</b></div></yield-child>')
 
-    fireEvent(tag.root.getElementsByTagName('i')[0], 'click')
+    fireEvent($('i', tag.root), 'click')
 
     tag.unmount()
 

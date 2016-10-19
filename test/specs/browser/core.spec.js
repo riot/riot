@@ -346,7 +346,7 @@ describe('Riot core', function() {
   it('support `data-is` for html5 compliance', function() {
     injectHTML('<div data-is="tag-data-is"></div>')
     var tag = riot.mount('tag-data-is')[0]
-    var els = tag.root.getElementsByTagName('p')
+    var els = $$('p', tag.root)
     expect(els.length).to.be.equal(2)
     expect(els[0].innerHTML).to.contain('html5')
     expect(els[1].innerHTML).to.contain('too')
@@ -363,8 +363,8 @@ describe('Riot core', function() {
     var tags = riot.mount('tag-Data-Is')
 
     expect(tags.length).to.be.equal(2)
-    expect(tags[0].root.getElementsByTagName('p').length).to.be.equal(2)
-    expect(tags[1].root.getElementsByTagName('p').length).to.be.equal(2)
+    expect($$('p', tags[0].root).length).to.be.equal(2)
+    expect($$('p', tags[1].root).length).to.be.equal(2)
     tags.push(tags[0], tags[1])
   })
 
@@ -395,7 +395,7 @@ describe('Riot core', function() {
   it('data-is as expression', function() {
     injectHTML('<container-riot></container-riot>')
     var tag = riot.mount('container-riot')[0]
-    var div = tag.root.getElementsByTagName('div')[0]
+    var div = $('div', tag.root)
     expect(div.getAttribute('data-is')).to.be.equal('nested-riot')
     tag.unmount()
   })
@@ -535,7 +535,7 @@ describe('Riot core', function() {
 
     expect(tag.refs['fancy-name'].innerHTML).to.be.equal('john')
 
-    fireEvent(tag.root.getElementsByTagName('p')[0], 'click')
+    fireEvent($$('p')[0], 'click', tag.root)
 
     expect(tag.refs['fancy-name'].innerHTML).to.be.equal('john')
 
@@ -587,7 +587,7 @@ describe('Riot core', function() {
           callbackCalls++
         }
       })[0],
-      divTags = tag.root.getElementsByTagName('div')
+      divTags = $$('div', tag.root)
 
     currentItem = tag.items[0]
     currentIndex = 0
@@ -691,17 +691,17 @@ describe('Riot core', function() {
     injectHTML('<input-number></input-number>')
 
     var tag = riot.mount('input-number', {num: 123})[0]
-    var inp = tag.root.getElementsByTagName('input')[0]
+    var inp = $('input', tag.root)
     expect(inp.getAttribute('type')).to.be.equal('number')
     expect(inp.value).to.be.equal('123')
 
     tag = riot.mount('input-number', {num: 0})[0]
-    inp = tag.root.getElementsByTagName('input')[0]
+    inp = $('input', tag.root)
     expect(inp.getAttribute('type')).to.be.equal('number')
     expect(inp.value).to.be.equal('0')
 
     tag = riot.mount('input-number', {num: null})[0]
-    inp = tag.root.getElementsByTagName('input')[0]
+    inp = $('input', tag.root)
     expect(inp.getAttribute('type')).to.be.equal('number')
     expect(inp.value).to.be.equal('')
 
