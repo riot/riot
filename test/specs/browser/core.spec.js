@@ -303,22 +303,22 @@ describe('Riot core', function() {
   it('data-is can be dynamically created by expression', function() {
     injectHTML('<dynamic-data-is></dynamic-data-is>')
     var tag = riot.mount('dynamic-data-is')[0]
-    var divs = tag.root.querySelectorAll('div')
-    expect(divs[0].querySelector('input').getAttribute('type')).to.be.equal('color')
-    expect(divs[1].querySelector('input').getAttribute('type')).to.be.equal('color')
-    expect(divs[2].querySelector('input').getAttribute('type')).to.be.equal('date')
-    expect(divs[3].querySelector('input').getAttribute('type')).to.be.equal('date')
+    var divs = $$('div', tag.root)
+    expect($('input', divs[0]).getAttribute('type')).to.be.equal('color')
+    expect($('input', divs[1]).getAttribute('type')).to.be.equal('color')
+    expect($('input', divs[2]).getAttribute('type')).to.be.equal('date')
+    expect($('input', divs[3]).getAttribute('type')).to.be.equal('date')
 
     tag.single = 'color'
     tag.update()
-    expect(divs[3].querySelector('input').getAttribute('type')).to.be.equal('color')
+    expect($('input', divs[3]).getAttribute('type')).to.be.equal('color')
 
     tag.intags.reverse()
     tag.update()
-    divs = tag.root.querySelectorAll('div')
-    expect(divs[0].querySelector('input').getAttribute('type')).to.be.equal('date')
-    expect(divs[1].querySelector('input').getAttribute('type')).to.be.equal('color')
-    expect(divs[2].querySelector('input').getAttribute('type')).to.be.equal('color')
+    divs = $$('div', tag.root)
+    expect($('input', divs[0]).getAttribute('type')).to.be.equal('date')
+    expect($('input', divs[1]).getAttribute('type')).to.be.equal('color')
+    expect($('input', divs[2]).getAttribute('type')).to.be.equal('color')
 
     tag.intags.splice(1, 1)
     tag.update()
@@ -797,8 +797,8 @@ describe('Riot core', function() {
   it('nested virtual tags unmount properly', function() {
     injectHTML('<virtual-nested-unmount></virtual-nested-unmount>')
     var tag = riot.mount('virtual-nested-unmount')[0]
-    var spans = tag.root.querySelectorAll('span')
-    var divs = tag.root.querySelectorAll('div')
+    var spans = $$('span', tag.root)
+    var divs = $$('div', tag.root)
     expect(spans.length).to.be.equal(6)
     expect(divs.length).to.be.equal(3)
     expect(spans[0].innerHTML).to.be.equal('1')
@@ -816,8 +816,8 @@ describe('Riot core', function() {
       {title: '5', childchildItems: ['1', '2', '3', '4', '5']}
     ]
     tag.update()
-    spans = tag.root.querySelectorAll('span')
-    divs = tag.root.querySelectorAll('div')
+    spans = $$('span', tag.root)
+    divs = $$('div', tag.root)
     expect(spans.length).to.be.equal(9)
     expect(divs.length).to.be.equal(2)
     expect(spans[0].innerHTML).to.be.equal('1')
@@ -841,11 +841,11 @@ describe('Riot core', function() {
       tag = riot.mount('form-controls', { text: val })[0],
       root = tag.root
 
-    expect(root.querySelector('input[type="text"]').value).to.be.equal(val)
-    expect(root.querySelector('select option[selected]').value).to.be.equal(val)
-    expect(root.querySelector('textarea[name="txta1"]').value).to.be.equal(val)
-    expect(root.querySelector('textarea[name="txta2"]').value).to.be.equal('')
-    if (IE_VERSION !== 9) expect(root.querySelector('textarea[name="txta2"]').placeholder).to.be.equal(val)
+    expect($('input[type="text"]', root).value).to.be.equal(val)
+    expect($('select option[selected]', root).value).to.be.equal(val)
+    expect($('textarea[name="txta1"]', root).value).to.be.equal(val)
+    expect($('textarea[name="txta2"]', root).value).to.be.equal('')
+    if (IE_VERSION !== 9) expect($('textarea[name="txta2"]', root).placeholder).to.be.equal(val)
 
     tag.unmount()
   })
@@ -854,7 +854,7 @@ describe('Riot core', function() {
   it('component nested in virtual unmounts correctly', function() {
     injectHTML('<virtual-nested-component></virtual-nested-component>')
     var tag = riot.mount('virtual-nested-component')[0]
-    var components = tag.root.querySelectorAll('not-virtual-component2')
+    var components = $$('not-virtual-component2', tag.root)
 
     expect(components.length).to.be.equal(4)
     expect(tag.tags['not-virtual-component2']).to.have.length(4)
@@ -862,13 +862,13 @@ describe('Riot core', function() {
     tag.people.pop()
     tag.update()
 
-    components = tag.root.querySelectorAll('not-virtual-component2')
+    components = $$('not-virtual-component2', tag.root)
     expect(components.length).to.be.equal(3)
     expect(tag.tags['not-virtual-component2']).to.have.length(3)
 
     tag.unmount()
 
-    components = tag.root.querySelectorAll('not-virtual-component2')
+    components = $$('not-virtual-component2', tag.root)
     expect(components.length).to.be.equal(0)
 
   })

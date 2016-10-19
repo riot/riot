@@ -519,7 +519,7 @@ describe('Riot each', function() {
 
     var tag = riot.mount('table-loop-extra-row')[0],
       root = tag.root,
-      tr = root.querySelectorAll('table tr')
+      tr = $$('table tr', root)
 
     expect(tr.length).to.be.equal(5)
     expect(normalizeHTML(tr[0].innerHTML)).to.be.equal('<td>Extra</td><td>Row1</td>')
@@ -533,12 +533,12 @@ describe('Riot each', function() {
     injectHTML('<loop-reorder></loop-reorder>')
 
     var tag = riot.mount('loop-reorder')[0]
-    expect(tag.root.querySelectorAll('span')[0].className).to.be.equal('nr-0')
-    expect(tag.root.querySelectorAll('div')[0].className).to.be.equal('nr-0')
+    expect($$('span', tag.root)[0].className).to.be.equal('nr-0')
+    expect($$('div', tag.root)[0].className).to.be.equal('nr-0')
     tag.items.reverse()
     tag.update()
-    expect(tag.root.querySelectorAll('span')[0].className).to.be.equal('nr-5')
-    expect(tag.root.querySelectorAll('div')[0].className).to.be.equal('nr-0')
+    expect($$('span', tag.root)[0].className).to.be.equal('nr-5')
+    expect($$('div', tag.root)[0].className).to.be.equal('nr-0')
 
     tag.unmount()
   })
@@ -722,7 +722,7 @@ describe('Riot each', function() {
     injectHTML('<loop-noloop-option></loop-noloop-option>')
 
     var tag = riot.mount('loop-noloop-option')[0]
-    var options = tag.root.querySelectorAll('option')
+    var options = $$('option', tag.root)
     expect(options[1].value).to.be.equal('1')
   })
 
@@ -1031,7 +1031,7 @@ describe('Riot each', function() {
     function testTable(root, name, info) {
       var s, key
 
-      root = root.querySelectorAll('table[data-is=' + name + ']')
+      root = $$('table[data-is=' + name + ']', root)
       s = name + '.length: '
       expect(s + root.length).to.be.equal(s + '1')
       root = root[0]
@@ -1126,7 +1126,7 @@ describe('Riot each', function() {
     for (var name in list) {                 // eslint-disable-line guard-for-in
       //console.log('Testing ' + name)
       dat = list[name]
-      sel = tag.root.querySelector('select[data-is=' + name + ']')
+      sel = $('select[data-is=' + name + ']', tag.root)
       expect(sel).to.not.be.empty
       expect(sel.selectedIndex).to.be.equal(dat[0], name + '.selectIndex ' + sel.selectedIndex + ' expected to be ' + dat[0])
       var s1 = listFromSel(sel)
@@ -1311,11 +1311,11 @@ describe('Riot each', function() {
     injectHTML('<virtual-no-loop></virtual-no-loop>')
     var tag = riot.mount('virtual-no-loop')[0]
 
-    var virts = tag.root.querySelectorAll('virtual')
+    var virts = $$('virtual', tag.root)
     expect(virts.length).to.be.equal(0)
 
-    var spans = tag.root.querySelectorAll('span')
-    var divs = tag.root.querySelectorAll('div')
+    var spans = $$('span', tag.root)
+    var divs = $$('div', tag.root)
     expect(spans.length).to.be.equal(2)
     expect(divs.length).to.be.equal(2)
     expect(spans[0].innerHTML).to.be.equal('if works text')
@@ -1329,7 +1329,7 @@ describe('Riot each', function() {
   it('virtual tags with yielded content function in a loop', function() {
     injectHTML('<virtual-yield-loop></virtual-yield-loop>')
     var tag = riot.mount('virtual-yield-loop')[0]
-    var spans = tag.root.querySelectorAll('span')
+    var spans = $$('span', tag.root)
 
     expect(spans[0].innerHTML).to.be.equal('one')
     expect(spans[1].innerHTML).to.be.equal('two')
@@ -1338,7 +1338,7 @@ describe('Riot each', function() {
     tag.items.reverse()
     tag.update()
 
-    spans = tag.root.querySelectorAll('span')
+    spans = $$('span', tag.root)
 
     expect(spans[0].innerHTML).to.be.equal('three')
     expect(spans[1].innerHTML).to.be.equal('two')
@@ -1377,7 +1377,7 @@ describe('Riot each', function() {
     tag.on('updated', function() {
       setTimeout(function() {
         fireEvent(tag.tags['nested-parallel-loop-group'][0].tags['nested-parallel-loop-simple'][0].refs.del, 'click')
-        var simples = document.querySelectorAll('nested-parallel-loop-simple')
+        var simples = $$('nested-parallel-loop-simple')
         expect(tag.items[0].items.length).to.be.equal(1)
         expect(simples.length).to.be.equal(1)
         tag.unmount()
