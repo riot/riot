@@ -8046,6 +8046,8 @@ function _each(dom, parent, expr) {
         Object.keys(items).map(function (key) {
           return mkitem(expr, items[key], key)
         }) : [];
+    } else {
+      hasKeys = false;
     }
 
     if (ifExpr) {
@@ -8109,7 +8111,7 @@ function _each(dom, parent, expr) {
         oldItems.splice(i, 0, oldItems.splice(pos, 1)[0]);
         // if the loop tags are not custom
         // we need to move all their custom tags into the right position
-        if (!child && tag.tags) { moveNestedTags.call(tag, i); }
+        if (!child || isVirtual && tag.tags) { moveNestedTags.call(tag, i); }
       }
 
       // cache the original item to use it in the events bound to this node

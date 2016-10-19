@@ -855,7 +855,16 @@ describe('Riot core', function() {
     injectHTML('<virtual-nested-component></virtual-nested-component>')
     var tag = riot.mount('virtual-nested-component')[0]
     var components = tag.root.querySelectorAll('not-virtual-component2')
+
     expect(components.length).to.be.equal(4)
+    expect(tag.tags['not-virtual-component2']).to.have.length(4)
+
+    tag.people.pop()
+    tag.update()
+
+    components = tag.root.querySelectorAll('not-virtual-component2')
+    expect(components.length).to.be.equal(3)
+    expect(tag.tags['not-virtual-component2']).to.have.length(3)
 
     tag.unmount()
 
