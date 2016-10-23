@@ -309,9 +309,15 @@ describe('Riot core', function() {
     expect($('input', divs[2]).getAttribute('type')).to.be.equal('date')
     expect($('input', divs[3]).getAttribute('type')).to.be.equal('date')
 
+    expect(divs[0].getAttribute('data-is')).to.be.equal('color')
+    expect(divs[1].getAttribute('data-is')).to.be.equal('color')
+    expect(divs[2].getAttribute('data-is')).to.be.equal('calendar')
+    expect(divs[3].getAttribute('data-is')).to.be.equal('calendar')
+
     tag.single = 'color'
     tag.update()
     expect($('input', divs[3]).getAttribute('type')).to.be.equal('color')
+    expect(divs[3].getAttribute('data-is')).to.be.equal('color')
 
     tag.intags.reverse()
     tag.update()
@@ -319,6 +325,10 @@ describe('Riot core', function() {
     expect($('input', divs[0]).getAttribute('type')).to.be.equal('date')
     expect($('input', divs[1]).getAttribute('type')).to.be.equal('color')
     expect($('input', divs[2]).getAttribute('type')).to.be.equal('color')
+
+    expect(divs[0].getAttribute('data-is')).to.be.equal('calendar')
+    expect(divs[1].getAttribute('data-is')).to.be.equal('color')
+    expect(divs[2].getAttribute('data-is')).to.be.equal('color')
 
     tag.intags.splice(1, 1)
     tag.update()
