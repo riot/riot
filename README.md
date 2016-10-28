@@ -128,6 +128,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [electron-riot - Riot in an electron application](https://github.com/mike-ward/electron-riot)
 - [An express, riot, jade, webpack simple boilerplate](https://github.com/revington/frontend-boilerplate)
 - [Riot.js vs React.js comparison of a simple comment box](https://github.com/vitogit/riot.js-vs-react.js-comment-box)
+- [Riot Seed project - webpack, routing, ava tests, dispatcher](https://github.com/continuata/riot-seed)
 
 ### Tutorials
 - [Building Apps with Riot, ES6 and Webpack](http://blog.srackham.com/posts/riot-es6-webpack-apps/)
@@ -162,6 +163,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
 - [Cheftjs - chinese framework for Riot](https://github.com/cheft/cheftjs)
 - [Veronica - flux adaption for Riot](https://www.npmjs.com/package/veronica-x)
+- [Minimal Flux dispatcher pattern](https://gist.github.com/continuata/c605846751c09a5e94d12ae8c91cbf05)
 
 ### Components
 - [Material UI](http://kysonic.github.io/riot-mui/)
