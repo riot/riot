@@ -115,7 +115,7 @@ describe('Node', function() {
   })
 
   it('render tag: input,option,textarea tags having expressions as value', function() {
-    var frm = riot.render('form-controls', { text: 'my-value' })
+    var frm = riot.render('form-controls', { text: 'my-value', bool: true })
     var $ = cheerio.load(frm)
     expect($('input[type="text"]').val()).to.be.equal('my-value')
     expect($('select option:selected').val()).to.be.equal('my-value')
