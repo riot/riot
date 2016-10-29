@@ -3,7 +3,7 @@
 
   this.count = 0
 
-  shouldUpdate() { return false }
+  shouldUpdate(data) { return data }
 
   this.on('update', function() {
     this.count ++

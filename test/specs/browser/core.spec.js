@@ -782,8 +782,7 @@ describe('Riot core', function() {
     var tag = riot.mount('should-update')[0]
     tag.update()
     expect(tag.count).to.be.equal(0)
-    tag.shouldUpdate = function() { return true }
-    tag.update()
+    tag.update(true)
     expect(tag.count).to.be.equal(1)
     tag.unmount()
   })
