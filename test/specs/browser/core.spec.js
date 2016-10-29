@@ -36,6 +36,7 @@ import '../../tag/form-controls.tag'
 import '../../tag/data-is.tag'
 import '../../tag/virtual-nested-component.tag'
 import '../../tag/dynamic-data-is.tag'
+import '../../tag/update-context.tag'
 
 const expect = chai.expect,
   defaultBrackets = riot.settings.brackets
@@ -309,15 +310,9 @@ describe('Riot core', function() {
     expect($('input', divs[2]).getAttribute('type')).to.be.equal('date')
     expect($('input', divs[3]).getAttribute('type')).to.be.equal('date')
 
-    expect(divs[0].getAttribute('data-is')).to.be.equal('color')
-    expect(divs[1].getAttribute('data-is')).to.be.equal('color')
-    expect(divs[2].getAttribute('data-is')).to.be.equal('calendar')
-    expect(divs[3].getAttribute('data-is')).to.be.equal('calendar')
-
     tag.single = 'color'
     tag.update()
     expect($('input', divs[3]).getAttribute('type')).to.be.equal('color')
-    expect(divs[3].getAttribute('data-is')).to.be.equal('color')
 
     tag.intags.reverse()
     tag.update()
@@ -325,10 +320,6 @@ describe('Riot core', function() {
     expect($('input', divs[0]).getAttribute('type')).to.be.equal('date')
     expect($('input', divs[1]).getAttribute('type')).to.be.equal('color')
     expect($('input', divs[2]).getAttribute('type')).to.be.equal('color')
-
-    expect(divs[0].getAttribute('data-is')).to.be.equal('calendar')
-    expect(divs[1].getAttribute('data-is')).to.be.equal('color')
-    expect(divs[2].getAttribute('data-is')).to.be.equal('color')
 
     tag.intags.splice(1, 1)
     tag.update()
@@ -904,6 +895,20 @@ describe('Riot core', function() {
     expect(tag.updateCount).to.be.equal(0)
     tag.unmount()
 
+  })
+
+  it('make sure the tag context is preserved during updates', function(done) {
+    injectHTML('<update-context></update-context>')
+
+    var tag = riot.mount('update-context')[0]
+
+    expect(tag.message).to.be.equal('hi')
+
+    tag.on('updated', function() {
+      expect($('p', this.root).textContent).to.be.equal('goodbye')
+      expect(tag.unmount()).to.be.an('object')
+      done()
+    })
   })
 
   it('create tags extending the riot.Tag constructor', function() {
