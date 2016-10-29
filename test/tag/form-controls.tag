@@ -20,6 +20,7 @@
 
   <form onsubmit={ check }>
     <input value={ opts.text } type="text">
+    <input value={ opts.bool } type="text">
   </form>
 
   check() {
