@@ -4,7 +4,7 @@ const expect = chai.expect
 
 describe('Mixin', function() {
 
-  var IdMixin = {
+  const IdMixin = {
     getId: function() {
       return this._riot_id
     }
@@ -21,7 +21,7 @@ describe('Mixin', function() {
 
   class ChildMixin extends FunctMixin {}
 
-  var OptsMixin = {
+  const OptsMixin = {
     getOpts: function() {
       return this.opts
     },
@@ -37,32 +37,33 @@ describe('Mixin', function() {
     }
   }
 
-  var MixinWithInit = {
+  const MixinWithInit = {
     init: function() {
       this.message = 'initialized'
     },
     message: 'not yet'
   }
 
-  var globalMixin = {
+  const globalMixin = {
     init: function() {
-      this.globalAttr = 'initialized'
+      this.__globalAttr__ = 'initialized'
+      this.__optsKeys__ = Object.keys(this.opts)
     },
-    getGlobal: function() {
+    __getGlobal__: function() {
       return 'global'
     }
   }
 
-  var globalMixin2 = {
+  const globalMixin2 = {
     init: function() {
-      this.globalAttr2 = 'initialized2'
+      this.__globalAttr2__ = 'initialized2'
     },
-    getGlobal2: function() {
+    __getGlobal2__: function() {
       return 'global2'
     }
   }
 
-  var getterSetterMixin = {
+  const getterSetterMixin = {
     _value: false
   }
 
@@ -116,8 +117,8 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect('initialized').to.be.equal(tag.globalAttr)
-    expect('global').to.be.equal(tag.getGlobal())
+    expect('initialized').to.be.equal(tag.__globalAttr__)
+    expect('global').to.be.equal(tag.__getGlobal__())
     tag.unmount()
   })
 
@@ -129,10 +130,10 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect('initialized').to.be.equal(tag.globalAttr)
-    expect('initialized2').to.be.equal(tag.globalAttr2)
-    expect('global').to.be.equal(tag.getGlobal())
-    expect('global2').to.be.equal(tag.getGlobal2())
+    expect('initialized').to.be.equal(tag.__globalAttr__)
+    expect('initialized2').to.be.equal(tag.__globalAttr2__)
+    expect('global').to.be.equal(tag.__getGlobal__())
+    expect('global2').to.be.equal(tag.__getGlobal2__())
     tag.unmount()
   })
 
@@ -143,8 +144,8 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect('initialized').to.be.equal(tag.globalAttr)
-    expect('global').to.be.equal(tag.getGlobal())
+    expect('initialized').to.be.equal(tag.__globalAttr__)
+    expect('global').to.be.equal(tag.__getGlobal__())
     tag.unmount()
   })
 
@@ -156,10 +157,10 @@ describe('Mixin', function() {
 
     var tag = riot.mount('my-mixin')[0]
 
-    expect('initialized').to.be.equal(tag.globalAttr)
-    expect('initialized2').to.be.equal(tag.globalAttr2)
-    expect('global').to.be.equal(tag.getGlobal())
-    expect('global2').to.be.equal(tag.getGlobal2())
+    expect('initialized').to.be.equal(tag.__globalAttr__)
+    expect('initialized2').to.be.equal(tag.__globalAttr2__)
+    expect('global').to.be.equal(tag.__getGlobal__())
+    expect('global2').to.be.equal(tag.__getGlobal2__())
     tag.unmount()
   })
 
@@ -218,6 +219,16 @@ describe('Mixin', function() {
     expect(first.getId()).not.to.be.equal(second.getId())
     first.unmount()
     second.unmount()
+  })
+
+  it('Options should be available also in the "init" method', function() {
+    injectHTML('<my-mixin></my-mixin>')
+
+    riot.tag('my-mixin', '<p>foo</p>')
+
+    const tag = riot.mount('my-mixin', { foo: 'foo', bar: 'bar'})[0]
+
+    expect(tag.__optsKeys__).to.be.deep.equal(['foo', 'bar'])
   })
 
   it('Will mount a tag with multiple mixins mixed-in', function() {
