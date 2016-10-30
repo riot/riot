@@ -222,13 +222,13 @@ describe('Mixin', function() {
   })
 
   it('Options should be available also in the "init" method', function() {
-    injectHTML('<my-mixin></my-mixin>')
+    injectHTML('<my-mixin baz="baz"></my-mixin>')
 
     riot.tag('my-mixin', '<p>foo</p>')
 
     const tag = riot.mount('my-mixin', { foo: 'foo', bar: 'bar'})[0]
 
-    expect(tag.__optsKeys__).to.be.deep.equal(['foo', 'bar'])
+    expect(tag.__optsKeys__).to.be.deep.equal(['foo', 'bar', 'baz'])
   })
 
   it('Will mount a tag with multiple mixins mixed-in', function() {
