@@ -1,4 +1,4 @@
-/* Riot v3.0.0-alpha.11, @license MIT */
+/* Riot v3.0.0-alpha.12, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1100,6 +1100,7 @@ function updateRtag(expr, parent) {
     var delName = expr.tag.opts.dataIs,
       tags = expr.tag._parent.tags;
 
+    setAttr(expr.tag.root, RIOT_TAG_IS, tagName); // update for css
     arrayishRemove(tags, delName, expr.tag);
 
   }
@@ -1558,7 +1559,7 @@ function _each(dom, parent, expr) {
         oldItems.splice(i, 0, oldItems.splice(pos, 1)[0]);
         // if the loop tags are not custom
         // we need to move all their custom tags into the right position
-        if (!child || isVirtual && tag.tags) { moveNestedTags.call(tag, i); }
+        if (!child && tag.tags) { moveNestedTags.call(tag, i); }
       }
 
       // cache the original item to use it in the events bound to this node
@@ -2027,6 +2028,7 @@ function Tag$$1(impl, conf, innerHTML) {
     expressions = [],
     root = conf.root,
     tagName = conf.tagName || root.tagName.toLowerCase(),
+    isVirtual = tagName === 'virtual',
     propsInSyncWithParent = [],
     dom;
 
@@ -2063,10 +2065,10 @@ function Tag$$1(impl, conf, innerHTML) {
   /**
    * Update the tag expressions and options
    * @param   { * }  data - data we want to use to extend the tag properties
-   * @returns { Tag }
+   * @returns { Tag } the current tag instance
    */
   defineProperty(this, 'update', function tagUpdate(data) {
-    if (isFunction(this.shouldUpdate) && !this.shouldUpdate()) { return }
+    if (isFunction(this.shouldUpdate) && !this.shouldUpdate(data)) { return }
 
     // make sure the data passed will not override
     // the component core methods
@@ -2083,11 +2085,11 @@ function Tag$$1(impl, conf, innerHTML) {
 
     return this
 
-  });
+  }.bind(this));
 
   /**
    * Add a mixin to this tag
-   * @returns { Tag }
+   * @returns { Tag } the current tag instance
    */
   defineProperty(this, 'mixin', function tagMixin() {
     var this$1 = this;
@@ -2136,16 +2138,37 @@ function Tag$$1(impl, conf, innerHTML) {
         { instance.init.bind(this$1)(); }
     });
     return this
-  });
+  }.bind(this));
 
   /**
    * Mount the current tag instance
-   * @returns { Tag }
+   * @returns { Tag } the current tag instance
    */
   defineProperty(this, 'mount', function tagMount() {
     var this$1 = this;
 
     root._tag = this; // keep a reference to the tag just created
+
+    // Read all the attrs on this instance. This give us the info we need for updateOpts
+    parseAttributes.apply(parent, [root, root.attributes, function (attr, expr) {
+      if (!isAnonymous && RefExpr.isPrototypeOf(expr)) { expr.tag = this$1; }
+      attr.expr = expr;
+      instAttrs.push(attr);
+    }]);
+
+    // update the root adding custom attributes coming from the compiler
+    implAttrs = [];
+    walkAttrs(impl.attrs, function (k, v) { implAttrs.push({name: k, value: v}); });
+    parseAttributes.apply(this, [root, implAttrs, function (attr, expr) {
+      if (expr) { expressions.push(expr); }
+      else { setAttr(root, attr.name, attr.value); }
+    }]);
+
+    // children in loop should inherit from true parent
+    if (this._parent && isAnonymous) { inheritFrom.apply(this, [this._parent, propsInSyncWithParent]); }
+
+    // initialiation
+    updateOpts.apply(this, [isLoop, parent, isAnonymous, opts, instAttrs]);
 
     // add global mixins
     var globalMixin = mixin$$1(GLOBAL_MIXIN);
@@ -2155,29 +2178,9 @@ function Tag$$1(impl, conf, innerHTML) {
         { if (globalMixin.hasOwnProperty(i))
           { this$1.mixin(globalMixin[i]); } } }
 
-    // Read all the attrs on this instance. This give us the info we need for updateOpts
-    parseAttributes.apply(parent, [root, root.attributes, function (attr, expr) {
-      if (!isAnonymous && RefExpr.isPrototypeOf(expr)) { expr.tag = this$1; }
-      attr.expr = expr;
-      instAttrs.push(attr);
-    }]);
-
-    // children in loop should inherit from true parent
-    if (this._parent && isAnonymous) { inheritFrom.apply(this, [this._parent, propsInSyncWithParent]); }
-
-    // initialiation
-    updateOpts.apply(this, [isLoop, parent, isAnonymous, opts, instAttrs]);
     if (impl.fn) { impl.fn.call(this, opts); }
 
     this.trigger('before-mount');
-
-    // update the root adding custom attributes coming from the compiler
-    implAttrs = [];
-    walkAttrs(impl.attrs, function (k, v) { implAttrs.push({name: k, value: v}); });
-    parseAttributes.apply(this, [root, implAttrs, function (attr, expr) {
-      if (expr) { expressions.push(expr); }
-      else { setAttr(root, attr.name, attr.value); }
-    }]);
 
     // parse layout after init. fn may calculate args for nested custom tags
     parseExpressions.apply(this, [dom, expressions, false]);
@@ -2203,13 +2206,19 @@ function Tag$$1(impl, conf, innerHTML) {
     else { this.parent.one('mount', function () {
       this$1.trigger('mount');
     }); }
-  });
+
+    return this
+
+  }.bind(this));
 
   /**
    * Unmount the tag instance
    * @param { Boolean } mustKeepRoot - if it's true the root node will not be removed
+   * @returns { Tag } the current tag instance
    */
   defineProperty(this, 'unmount', function tagUnmount(mustKeepRoot) {
+    var this$1 = this;
+
     var el = this.root,
       p = el.parentNode,
       ptag,
@@ -2225,7 +2234,14 @@ function Tag$$1(impl, conf, innerHTML) {
 
       if (parent) {
         ptag = getImmediateCustomParentTag(parent);
-        arrayishRemove(ptag.tags, tagName, this);
+
+        if (isVirtual) {
+          Object.keys(this.tags).forEach(function (tagName) {
+            arrayishRemove(ptag.tags, tagName, this$1.tags[tagName]);
+          });
+        } else {
+          arrayishRemove(ptag.tags, tagName, this);
+        }
       }
 
       else
@@ -2255,7 +2271,9 @@ function Tag$$1(impl, conf, innerHTML) {
 
     delete this.root._tag;
 
-  });
+    return this
+
+  }.bind(this));
 }
 
 /**
