@@ -6955,13 +6955,13 @@ exports.tmpl = tmpl;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/* Riot v2.6.4, @license MIT */
+/* Riot v2.6.5, @license MIT */
 
 ;(function(window, undefined) {
   'use strict';
 var tmpl = cspTmpl.tmpl,
   brackets = cspTmpl.brackets
-var riot = { version: 'v2.6.4', settings: {} },
+var riot = { version: 'v2.6.5', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -7792,10 +7792,15 @@ function _each(dom, parent, expr) {
         pos !== i && _mustReorder &&
         tags[i] // fix 1581 unable to reproduce it in a test!
       ) {
-        // update the DOM
-        if (isVirtual)
-          moveVirtual(tag, root, tags[i], dom.childNodes.length)
-        else if (tags[i].root.parentNode) root.insertBefore(tag.root, tags[i].root)
+
+        // #closes 2040
+        if (contains(items, oldItems[i])) {
+          // update the DOM
+          if (isVirtual)
+            moveVirtual(tag, root, tags[i], dom.childNodes.length)
+          else if (tags[i].root.parentNode) root.insertBefore(tag.root, tags[i].root)
+        }
+
         // update the position attribute if it exists
         if (expr.pos)
           tag[expr.pos] = i
