@@ -5,7 +5,7 @@
 	(factory((global.riot = global.riot || {})));
 }(this, (function (exports) { 'use strict';
 
-var __VIRTUAL_DOM = [];
+var __TAGS_CACHE = [];
 var __TAG_IMPL = {};
 var GLOBAL_MIXIN = '__global_mixin';
 var RIOT_PREFIX = 'riot-';
@@ -6283,7 +6283,7 @@ function hoist(ast){
 
     walkAll(ast);
     prependScope(ast, variables, functions);
-    
+
   } else {
     walk(ast);
   }
@@ -6356,15 +6356,15 @@ function prependScope(nodes, variables, functions){
     var declarations = [];
     for (var i=0;i<variables.length;i++){
       declarations.push({
-        type: 'VariableDeclarator', 
+        type: 'VariableDeclarator',
         id: variables[i].id,
         init: null
       });
     }
-    
+
     nodes.unshift({
-      type: 'VariableDeclaration', 
-      kind: 'var', 
+      type: 'VariableDeclaration',
+      kind: 'var',
       declarations: declarations
     });
 
@@ -6372,7 +6372,7 @@ function prependScope(nodes, variables, functions){
 
   if (functions && functions.length){
     for (var i=0;i<functions.length;i++){
-      nodes.unshift(functions[i]); 
+      nodes.unshift(functions[i]);
     }
   }
 }
@@ -8528,7 +8528,7 @@ function mixin$$1(name, mix, g) {
  * @returns { Array } all the tags instances
  */
 function update$2() {
-  return each(__VIRTUAL_DOM, function (tag$$1) { return tag$$1.update(); })
+  return each(__TAGS_CACHE, function (tag$$1) { return tag$$1.update(); })
 }
 
 function unregister$$1(name) {
@@ -8775,13 +8775,13 @@ function Tag$$1(impl, conf, innerHTML) {
     var el = this.root,
       p = el.parentNode,
       ptag,
-      tagIndex = __VIRTUAL_DOM.indexOf(this);
+      tagIndex = __TAGS_CACHE.indexOf(this);
 
     this.trigger('before-unmount');
 
     // remove this tag instance from the global virtualDom variable
     if (~tagIndex)
-      { __VIRTUAL_DOM.splice(tagIndex, 1); }
+      { __TAGS_CACHE.splice(tagIndex, 1); }
 
     if (p) {
 
@@ -9054,7 +9054,7 @@ function mountTo(root, tagName, opts, ctx) {
   if (tag && tag.mount) {
     tag.mount(true);
     // add this tag to the virtualDom variable
-    if (!contains(__VIRTUAL_DOM, tag)) { __VIRTUAL_DOM.push(tag); }
+    if (!contains(__TAGS_CACHE, tag)) { __TAGS_CACHE.push(tag); }
   }
 
   return tag
@@ -9166,7 +9166,7 @@ var util = {
   tmpl: tmpl,
   brackets: brackets,
   styleManager: styleManager,
-  vdom: __VIRTUAL_DOM,
+  vdom: __TAGS_CACHE,
   styleNode: styleManager.styleNode,
   // export the riot internal utils as well
   dom: dom,
