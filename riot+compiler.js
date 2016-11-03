@@ -1,8 +1,8 @@
-/* Riot v2.6.4, @license MIT */
+/* Riot v2.6.5, @license MIT */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.6.4', settings: {} },
+var riot = { version: 'v2.6.5', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -1255,10 +1255,15 @@ function _each(dom, parent, expr) {
         pos !== i && _mustReorder &&
         tags[i] // fix 1581 unable to reproduce it in a test!
       ) {
-        // update the DOM
-        if (isVirtual)
-          moveVirtual(tag, root, tags[i], dom.childNodes.length)
-        else if (tags[i].root.parentNode) root.insertBefore(tag.root, tags[i].root)
+
+        // #closes 2040
+        if (contains(items, oldItems[i])) {
+          // update the DOM
+          if (isVirtual)
+            moveVirtual(tag, root, tags[i], dom.childNodes.length)
+          else if (tags[i].root.parentNode) root.insertBefore(tag.root, tags[i].root)
+        }
+
         // update the position attribute if it exists
         if (expr.pos)
           tag[expr.pos] = i
@@ -3515,9 +3520,10 @@ riot.compile = (function () {
 // reassign mount methods -----
 var mount = riot.mount
 
-riot.mount = function (a, b, c) {
-  var ret
-  riot.compile(function () { ret = mount(a, b, c) })
+riot.mount = function () {
+  var ret,
+    args = arguments
+  riot.compile(function () { ret = mount.apply(riot, args) })
   return ret
 }
   // support CommonJS, AMD & browser
