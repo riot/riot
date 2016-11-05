@@ -1499,7 +1499,7 @@ it('raw contents', function() {
       expect(tag.root.getElementsByTagName('div').length).to.be(0)
       expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(0)
       expect(tag.tags['loop-conditional-item'].length).to.be(0)
-      tag.items = [2, 2, 2]
+      tag.items = [{value: 2}, {value: 2}, {value: 2}]
       tag.update()
       expect(tag.root.getElementsByTagName('div').length).to.be(3)
       expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be(3)
