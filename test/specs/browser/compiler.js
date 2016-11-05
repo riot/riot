@@ -217,6 +217,8 @@ describe('Compiler Browser', function() {
     var tag = riot.mount('loop-svg-nodes')[0]
 
     expect($$('svg circle', tag.root).length).to.be(3)
+    expect($('svg circle',  tag.root) instanceof HTMLElement).to.be(false)
+    expect($('p',  tag.root) instanceof HTMLElement).to.be(true)
 
     tags.push(tag)
   })
