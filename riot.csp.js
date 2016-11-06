@@ -1,4 +1,4 @@
-/* Riot v3.0.0-alpha.12, @license MIT */
+/* Riot v3.0.0-alpha.13, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -6283,7 +6283,7 @@ function hoist(ast){
 
     walkAll(ast);
     prependScope(ast, variables, functions);
-
+    
   } else {
     walk(ast);
   }
@@ -6356,15 +6356,15 @@ function prependScope(nodes, variables, functions){
     var declarations = [];
     for (var i=0;i<variables.length;i++){
       declarations.push({
-        type: 'VariableDeclarator',
+        type: 'VariableDeclarator', 
         id: variables[i].id,
         init: null
       });
     }
-
+    
     nodes.unshift({
-      type: 'VariableDeclaration',
-      kind: 'var',
+      type: 'VariableDeclaration', 
+      kind: 'var', 
       declarations: declarations
     });
 
@@ -6372,7 +6372,7 @@ function prependScope(nodes, variables, functions){
 
   if (functions && functions.length){
     for (var i=0;i<functions.length;i++){
-      nodes.unshift(functions[i]);
+      nodes.unshift(functions[i]); 
     }
   }
 }
@@ -7336,15 +7336,6 @@ var tmpl = csp_tmpl.tmpl;
 var brackets = csp_tmpl.brackets;
 
 /**
- * Simple object prototypal inheritance
- * @param   { Object } parent - parent object
- * @returns { Object } child instance
- */
-function inherit(parent) {
-  return Object.assign ? Object.assign({}, parent) : extend({}, parent)
-}
-
-/**
  * Specialized function for looping an array-like collection with `each={}`
  * @param   { Array } list - collection of items
  * @param   {Function} fn - callback function
@@ -7434,7 +7425,6 @@ function extend(src) {
 }
 
 var misc = Object.freeze({
-	inherit: inherit,
 	each: each,
 	contains: contains,
 	toCamel: toCamel,
@@ -8053,8 +8043,13 @@ function _each(dom, parent, expr) {
 
     if (ifExpr) {
       items = items.filter(function(item, i) {
-        var context = mkitem(expr, item, i, parent);
-        return !!tmpl(ifExpr, context)
+        if (expr.key) {
+          return !!tmpl(ifExpr, mkitem(expr, item, i, parent))
+        }
+        // in case it's not a keyed loop
+        // we test the validity of the if expression against
+        // the item and the parent
+        return !!tmpl(ifExpr, parent) || !!tmpl(ifExpr, item)
       });
     }
 
@@ -8103,7 +8098,10 @@ function _each(dom, parent, expr) {
 
       // reorder the tag if it's not located in its previous position
       if (pos !== i && _mustReorder) {
-        move.apply(tag, [root, tags[i], isVirtual]);
+        // #closes 2040
+        if (contains(items, oldItems[i])) {
+          move.apply(tag, [root, tags[i], isVirtual]);
+        }
         // update the position attribute if it exists
         if (expr.pos) { tag[expr.pos] = i; }
         // move the old tag instance
@@ -8150,11 +8148,12 @@ function _each(dom, parent, expr) {
  * @param   { HTMLElement } root - root tag where we will start digging the expressions
  * @param   { Array } expressions - empty array where the expressions will be added
  * @param   { Boolean } mustIncludeRoot - flag to decide whether the root must be parsed as well
+ * @returns { Object } an object containing the root noode and the dom tree
  */
 function parseExpressions(root, expressions, mustIncludeRoot) {
   var this$1 = this;
 
-  var base = {parent: {children: expressions}};
+  var tree = {parent: {children: expressions}};
 
   walkNodes(root, function (dom, ctx) {
     var type = dom.nodeType, parent = ctx.parent, attr, expr, tagImpl;
@@ -8204,7 +8203,9 @@ function parseExpressions(root, expressions, mustIncludeRoot) {
     // whatever the parent is, all child elements get the same parent.
     // If this element had an if-attr, that's the parent for all child elements
     return {parent: parent}
-  }, base);
+  }, tree);
+
+  return { tree: tree, root: root }
 }
 
 /**
@@ -8250,7 +8251,7 @@ var GENERIC = 'div';
   Creates the root element for table or select child elements:
   tr/th/td/thead/tfoot/tbody/caption/col/colgroup/option/optgroup
 */
-function specialTags(el, templ, tagName) {
+function specialTags(el, tmpl, tagName) {
 
   var
     select = tagName[0] === 'o',
@@ -8258,7 +8259,7 @@ function specialTags(el, templ, tagName) {
 
   // trim() is important here, this ensures we don't have artifacts,
   // so we can check if we have only one element inside the parent
-  el.innerHTML = '<' + parent + templ.trim() + '</' + parent;
+  el.innerHTML = '<' + parent + tmpl.trim() + '</' + parent;
   parent = el.firstChild;
 
   // returns the immediate parent if tr/th/td/col is the only element, if not
@@ -8277,9 +8278,9 @@ function specialTags(el, templ, tagName) {
   Replace the yield tag from any tag template with the innerHTML of the
   original tag in the page
 */
-function replaceYield(templ, html) {
+function replaceYield(tmpl, html) {
   // do nothing if no yield
-  if (!reHasYield.test(templ)) { return templ }
+  if (!reHasYield.test(tmpl)) { return tmpl }
 
   // be careful with #1343 - string on the source having `$1`
   var src = {};
@@ -8289,7 +8290,7 @@ function replaceYield(templ, html) {
     return ''
   }).trim();
 
-  return templ
+  return tmpl
     .replace(reYieldDest, function (_, ref, def) {  // yield with from - to attrs
       return src[ref] || def || ''
     })
@@ -8302,24 +8303,25 @@ function replaceYield(templ, html) {
  * Creates a DOM element to wrap the given content. Normally an `DIV`, but can be
  * also a `TABLE`, `SELECT`, `TBODY`, `TR`, or `COLGROUP` element.
  *
- * @param   {string} templ  - The template coming from the custom tag definition
- * @param   {string} [html] - HTML content that comes from the DOM element where you
+ * @param   { String } tmpl  - The template coming from the custom tag definition
+ * @param   { String } html - HTML content that comes from the DOM element where you
  *           will mount the tag, mostly the original tag in the page
- * @returns {HTMLElement} DOM element with _templ_ merged through `YIELD` with the _html_.
+ * @param   { Boolean } checkSvg - flag needed to know if we need to force the svg rendering in case of loop nodes
+ * @returns { HTMLElement } DOM element with _tmpl_ merged through `YIELD` with the _html_.
  */
-function mkdom(templ, html) {
-  var match   = templ && templ.match(/^\s*<([-\w]+)/),
+function mkdom(tmpl, html, checkSvg) {
+  var match   = tmpl && tmpl.match(/^\s*<([-\w]+)/),
     tagName = match && match[1].toLowerCase(),
-    el = mkEl(GENERIC, isSVGTag(tagName));
+    el = mkEl(GENERIC, checkSvg && isSVGTag(tagName));
 
   // replace all the yield tags with the tag inner html
-  templ = replaceYield(templ, html);
+  tmpl = replaceYield(tmpl, html);
 
   /* istanbul ignore next */
   if (tblTags.test(tagName))
-    { el = specialTags(el, templ, tagName); }
+    { el = specialTags(el, tmpl, tagName); }
   else
-    { setInnerHTML(el, templ); }
+    { setInnerHTML(el, tmpl); }
 
   el.stub = true;
 
@@ -8571,7 +8573,7 @@ function updateOpts(isLoop, parent, isAnonymous, opts, instAttrs) {
  */
 function Tag$$1(impl, conf, innerHTML) {
 
-  var opts = inherit(conf.opts),
+  var opts = extend({}, conf.opts),
     parent = conf.parent,
     isLoop = conf.isLoop,
     isAnonymous = conf.isAnonymous,
@@ -8613,7 +8615,7 @@ function Tag$$1(impl, conf, innerHTML) {
   defineProperty(this, 'tags', {});
   defineProperty(this, 'refs', {});
 
-  dom = mkdom(impl.tmpl, innerHTML);
+  dom = mkdom(impl.tmpl, innerHTML, isLoop);
 
   /**
    * Update the tag expressions and options
@@ -8629,7 +8631,6 @@ function Tag$$1(impl, conf, innerHTML) {
 
     // inherit properties from the parent, but only for isAnonymous tags
     if (isLoop && isAnonymous) { inheritFrom.apply(this, [this.parent, propsInSyncWithParent]); }
-
     extend(this, data);
     updateOpts.apply(this, [isLoop, parent, isAnonymous, opts, instAttrs]);
     if (this.isMounted) { this.trigger('update', data); }
