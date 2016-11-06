@@ -6955,13 +6955,13 @@ exports.tmpl = tmpl;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-/* Riot v2.6.6, @license MIT */
+/* Riot v2.6.7, @license MIT */
 
 ;(function(window, undefined) {
   'use strict';
 var tmpl = cspTmpl.tmpl,
   brackets = cspTmpl.brackets
-var riot = { version: 'v2.6.6', settings: {} },
+var riot = { version: 'v2.6.7', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -7688,13 +7688,14 @@ function moveVirtual(tag, src, target, len) {
  * @param   {Boolean} isVirtual [description]
  * @param   { Tag }  prevTag - tag instance used as reference to prepend our new tag
  * @param   { Tag }  newTag - new tag to be inserted
- * @param    { HTMLElement }  root - loop parent node
+ * @param   { HTMLElement }  root - loop parent node
  * @param   { Array }  tags - array containing the current tags list
+ * @param   { Function }  virtualFn - callback needed to move or insert virtual DOM
+ * @param   { Object } dom - DOM node we need to loop
  */
-function insertTag(isVirtual, prevTag, newTag, root, tags) {
+function insertTag(isVirtual, prevTag, newTag, root, tags, virtualFn, dom) {
   if (isInStub(prevTag.root)) return
-  if (isVirtual)
-    addVirtual(prevTag, root, newTag)
+  if (isVirtual) virtualFn(prevTag, root, newTag, dom.childNodes.length)
   else root.insertBefore(prevTag.root, newTag.root) // #1374 some browsers reset selected here
 }
 
@@ -7793,7 +7794,7 @@ function _each(dom, parent, expr) {
         }
         // this tag must be insert
         else {
-          insertTag(isVirtual, tag, tags[i], root, tags)
+          insertTag(isVirtual, tag, tags[i], root, tags, addVirtual, dom)
           oldItems.splice(i, 0, item)
         }
 
@@ -7809,7 +7810,7 @@ function _each(dom, parent, expr) {
         // #closes 2040 PLEASE DON'T REMOVE IT!
         // there are no tests for this feature
         if (contains(items, oldItems[i]))
-          insertTag(isVirtual, tag, tags[i], root, tags)
+          insertTag(isVirtual, tag, tags[i], root, tags, moveVirtual, dom)
 
         // update the position attribute if it exists
         if (expr.pos)
