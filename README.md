@@ -27,7 +27,7 @@
 | Web Components Polyfill                        | 0.7.22          | 33.66kb              |
 | Vue                                            | 1.0.28          | 26.83kb              |
 | Vue                                            | 2.0.5           | 24.12kb              |
-| Riot                                           | 2.6.6           | 9.42kb               |
+| Riot                                           | 2.6.7           | 9.39kb               |
 
 
 ### Custom tags • Concise syntax • Virtual DOM • Full stack
