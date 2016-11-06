@@ -1346,47 +1346,6 @@ describe('Riot each', function() {
     tag.unmount()
   })
 
-  it('parallel nested loop remove without error', function(done) {
-
-    injectHTML('<nested-parallel-loop></nested-parallel-loop>')
-
-    var tag = riot.mount('nested-parallel-loop', {items: [
-      {
-        type: 'rightsExpiration',
-        accountBased: false,
-        items: [
-          {channel: 'email', value: 'some@email.com'},
-          {channel: 'phone', value: '+1111111111'}
-        ]
-      },
-      {
-        type: 'accountWithdrawal',
-        accountBased: true,
-        items: [
-          {
-            'account1': [
-              {channel: 'email', value: 'some@email.com'},
-              {channel: 'email', value: 'some2@email.com'}
-            ]
-          }
-        ]
-      }
-    ]})[0]
-
-    tag.on('updated', function() {
-      setTimeout(function() {
-        fireEvent(tag.tags['nested-parallel-loop-group'][0].tags['nested-parallel-loop-simple'][0].refs.del, 'click')
-        var simples = $$('nested-parallel-loop-simple')
-        expect(tag.items[0].items.length).to.be.equal(1)
-        expect(simples.length).to.be.equal(1)
-        tag.unmount()
-        done()
-      }, 0)
-    })
-
-    tag.update()
-  })
-
   it('looped items with conditional get properly inserted into the DOM', function() {
     injectHTML('<loop-bug-1649></loop-bug-1649>')
     var tag = riot.mount('loop-bug-1649')[0]
