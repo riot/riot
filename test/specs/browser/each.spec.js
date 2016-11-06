@@ -47,7 +47,6 @@ import '../../tag/obj-key-loop.tag'
 import '../../tag/loop-sync-options.tag'
 import '../../tag/outer.tag'
 import '../../tag/reserved-names.tag'
-import '../../tag/nested-parallel-loop.tag'
 import '../../tag/loop-bug-1649.tag'
 
 import '../../tag/select-test.tag'
