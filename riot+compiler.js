@@ -1,8 +1,8 @@
-/* Riot v2.6.5, @license MIT */
+/* Riot v2.6.6, @license MIT */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.6.5', settings: {} },
+var riot = { version: 'v2.6.6', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -974,16 +974,17 @@ var mkdom = (function _mkdom() {
    * Creates a DOM element to wrap the given content. Normally an `DIV`, but can be
    * also a `TABLE`, `SELECT`, `TBODY`, `TR`, or `COLGROUP` element.
    *
-   * @param   {string} templ  - The template coming from the custom tag definition
-   * @param   {string} [html] - HTML content that comes from the DOM element where you
+   * @param   { String } templ  - The template coming from the custom tag definition
+   * @param   { String } [html] - HTML content that comes from the DOM element where you
    *           will mount the tag, mostly the original tag in the page
+   * @param   { Boolean } checkSvg - flag needed to know if we need to force the svg rendering in case of loop nodes
    * @returns {HTMLElement} DOM element with _templ_ merged through `YIELD` with the _html_.
    */
-  function _mkdom(templ, html) {
+  function _mkdom(templ, html, checkSvg) {
     var
       match   = templ && templ.match(/^\s*<([-\w]+)/),
       tagName = match && match[1].toLowerCase(),
-      el = mkEl('div', isSVGTag(tagName))
+      el = mkEl('div', checkSvg && isSVGTag(tagName))
 
     // replace all the yield tags with the tag inner html
     templ = replaceYield(templ, html)
@@ -1145,6 +1146,21 @@ function moveVirtual(tag, src, target, len) {
   }
 }
 
+/**
+ * Insert a new tag avoiding the insert for the conditional tags
+ * @param   {Boolean} isVirtual [description]
+ * @param   { Tag }  prevTag - tag instance used as reference to prepend our new tag
+ * @param   { Tag }  newTag - new tag to be inserted
+ * @param    { HTMLElement }  root - loop parent node
+ * @param   { Array }  tags - array containing the current tags list
+ */
+function insertTag(isVirtual, prevTag, newTag, root, tags) {
+  if (isInStub(prevTag.root)) return
+  if (isVirtual)
+    addVirtual(prevTag, root, newTag)
+  else root.insertBefore(prevTag.root, newTag.root) // #1374 some browsers reset selected here
+}
+
 
 /**
  * Manage tags having the 'each'
@@ -1240,9 +1256,7 @@ function _each(dom, parent, expr) {
         }
         // this tag must be insert
         else {
-          if (isVirtual)
-            addVirtual(tag, root, tags[i])
-          else root.insertBefore(tag.root, tags[i].root) // #1374 some browsers reset selected here
+          insertTag(isVirtual, tag, tags[i], root, tags)
           oldItems.splice(i, 0, item)
         }
 
@@ -1255,14 +1269,10 @@ function _each(dom, parent, expr) {
         pos !== i && _mustReorder &&
         tags[i] // fix 1581 unable to reproduce it in a test!
       ) {
-
-        // #closes 2040
-        if (contains(items, oldItems[i])) {
-          // update the DOM
-          if (isVirtual)
-            moveVirtual(tag, root, tags[i], dom.childNodes.length)
-          else if (tags[i].root.parentNode) root.insertBefore(tag.root, tags[i].root)
-        }
+        // #closes 2040 PLEASE DON'T REMOVE IT!
+        // there are no tests for this feature
+        if (contains(items, oldItems[i]))
+          insertTag(isVirtual, tag, tags[i], root, tags)
 
         // update the position attribute if it exists
         if (expr.pos)
@@ -1483,7 +1493,7 @@ function Tag(impl, conf, innerHTML) {
     if (tmpl.hasExpr(val)) attr[el.name] = val
   })
 
-  dom = mkdom(impl.tmpl, innerHTML)
+  dom = mkdom(impl.tmpl, innerHTML, isLoop)
 
   // options
   function updateOpts() {
