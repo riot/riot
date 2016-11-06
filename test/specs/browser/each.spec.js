@@ -83,6 +83,8 @@ describe('Riot each', function() {
     var tag = riot.mount('loop-svg-nodes')[0]
 
     expect($$('svg circle', tag.root).length).to.be.equal(3)
+    expect($('svg circle',  tag.root) instanceof HTMLElement).to.be.equal(false)
+    expect($('p',  tag.root) instanceof HTMLElement).to.be.equal(true)
 
     tag.unmount()
   })
@@ -752,7 +754,7 @@ describe('Riot each', function() {
       expect(tag.root.getElementsByTagName('div').length).to.be.equal(0)
       expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be.equal(0)
       expect(tag.tags['loop-conditional-item']).to.be.equal(undefined)
-      tag.items = [2, 2, 2]
+      tag.items = [{value: 2}, {value: 2}, {value: 2}]
       tag.update()
       expect(tag.root.getElementsByTagName('div').length).to.be.equal(3)
       expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be.equal(3)
@@ -760,79 +762,76 @@ describe('Riot each', function() {
       tag.unmount()
       done()
     }, 100)
-
-    it('custom children items in a nested loop are always in sync with the parent tag', function() {
-
-      injectHTML('<loop-inherit></loop-inherit>')
-
-      var tag = riot.mount('loop-inherit')[0]
-
-      expect(tag.tags['loop-inherit-item'].length).to.be.equal(4)
-      expect(tag.me.opts.name).to.be.equal(tag.items[0])
-      expect(tag.you.opts.name).to.be.equal(tag.items[1])
-      expect(tag.everybody.opts.name).to.be.equal(tag.items[2])
-
-      tag.items.splice(1, 1)
-      tag.update()
-      expect(tag.root.getElementsByTagName('div').length).to.be.equal(2)
-      expect(tag.tags['loop-inherit-item'].length).to.be.equal(3)
-
-      tag.items.push('active')
-      tag.update()
-      expect(tag.root.getElementsByTagName('div').length).to.be.equal(3)
-      expect(tag.root.getElementsByTagName('div')[2].innerHTML).to.contain('active')
-      expect(tag.root.getElementsByTagName('div')[2].className).to.be.equal('active')
-      expect(tag.me.opts.name).to.be.equal(tag.items[0])
-      expect(tag.you).to.be.equal(undefined)
-      expect(tag.everybody.opts.name).to.be.equal(tag.items[1])
-      expect(tag.boh.opts.name).to.be.equal('boh')
-      expect(tag.tags['loop-inherit-item'].length).to.be.equal(4)
-
-      tag.unmount()
-
-    })
-
-    it('the DOM events get executed in the right context', function() {
-      injectHTML('<loop-inherit></loop-inherit>')
-      var tag = riot.mount('loop-inherit')[0]
-      tag.tags['loop-inherit-item'][0].root.onmouseenter({})
-      expect(tag.wasHovered).to.be.equal(true)
-      expect(tag.root.getElementsByTagName('div').length).to.be.equal(4)
-      fireEvent(tag.tags['loop-inherit-item'][0].root, 'click')
-      expect(tag.tags['loop-inherit-item'][0].wasClicked).to.be.equal(true)
-
-      tag.unmount()
-    })
-
-    it('loops over other tag instances do not override their internal properties', function() {
-      injectHTML('<loop-tag-instances></loop-tag-instances>')
-      var tag = riot.mount('loop-tag-instances')[0]
-
-      tag.start()
-
-      expect(tag.tags['loop-tag-instances-child'].length).to.be.equal(5)
-      expect(tag.tags['loop-tag-instances-child'][0].root.tagName.toLowerCase()).to.be.equal('loop-tag-instances-child')
-      tag.update()
-      expect(tag.tags['loop-tag-instances-child'][3].root.tagName.toLowerCase()).to.be.equal('loop-tag-instances-child')
-
-      tag.unmount()
-
-    })
+  })
 
 
-    it('nested loops using non object data get correctly rendered', function() {
-      injectHTML('<loop-nested-strings-array></loop-nested-strings-array>')
-      var tag = riot.mount('loop-nested-strings-array')[0],
-        children = $$('loop-nested-strings-array-item', tag.root)
-      expect(children.length).to.be.equal(4)
+  it('custom children items in a nested loop are always in sync with the parent tag', function() {
+
+    injectHTML('<loop-inherit></loop-inherit>')
+
+    var tag = riot.mount('loop-inherit')[0]
+
+    expect(tag.tags['loop-inherit-item'].length).to.be.equal(4)
+    expect(tag.tags['loop-inherit-item'][1].opts.name).to.be.equal(tag.items[0])
+    expect(tag.tags['loop-inherit-item'][2].opts.name).to.be.equal(tag.items[1])
+    expect(tag.tags['loop-inherit-item'][3].opts.name).to.be.equal(tag.items[2])
+
+    tag.items.splice(1, 1)
+    tag.update()
+    expect(tag.root.getElementsByTagName('div').length).to.be.equal(2)
+
+    tag.items.push('active')
+    tag.update()
+    expect(tag.root.getElementsByTagName('div').length).to.be.equal(3)
+    expect(tag.root.getElementsByTagName('div')[2].innerHTML).to.contain('active')
+    expect(tag.root.getElementsByTagName('div')[2].className).to.be.equal('active')
+    expect(tag.tags['loop-inherit-item'][1].opts.name).to.be.equal(tag.items[0])
+    expect(tag.tags['loop-inherit-item'][2].opts.name).to.be.equal(tag.items[1])
+    expect(tag.tags['loop-inherit-item'].length).to.be.equal(4)
+
+    tag.unmount()
+
+  })
+
+  it('the DOM events get executed in the right context', function() {
+    injectHTML('<loop-inherit></loop-inherit>')
+    var tag = riot.mount('loop-inherit')[0]
+    fireEvent(tag.tags['loop-inherit-item'][0].root, 'mouseenter')
+    expect(tag.wasHovered).to.be.equal(true)
+    expect(tag.root.getElementsByTagName('div').length).to.be.equal(4)
+    fireEvent(tag.tags['loop-inherit-item'][0].root, 'click')
+    expect(tag.tags['loop-inherit-item'][0].wasClicked).to.be.equal(true)
+
+    tag.unmount()
+  })
+
+  it('loops over other tag instances do not override their internal properties', function() {
+    injectHTML('<loop-tag-instances></loop-tag-instances>')
+    var tag = riot.mount('loop-tag-instances')[0]
+
+    tag.start()
+
+    expect(tag.tags['loop-tag-instances-child'].length).to.be.equal(5)
+    expect(tag.tags['loop-tag-instances-child'][0].root.tagName.toLowerCase()).to.be.equal('loop-tag-instances-child')
+    tag.update()
+    expect(tag.tags['loop-tag-instances-child'][3].root.tagName.toLowerCase()).to.be.equal('loop-tag-instances-child')
+
+    tag.unmount()
+
+  })
+
+
+  it('nested loops using non object data get correctly rendered', function() {
+    injectHTML('<loop-nested-strings-array></loop-nested-strings-array>')
+    var tag = riot.mount('loop-nested-strings-array')[0],
       children = $$('loop-nested-strings-array-item', tag.root)
-      fireEvent(children[0], 'click')
-      expect(children.length).to.be.equal(4)
-      expect(normalizeHTML(children[0].innerHTML)).to.be.equal('<p>b</p>')
-      expect(normalizeHTML(children[1].innerHTML)).to.be.equal('<p>a</p>')
-      tag.unmount()
-    })
-
+    expect(children.length).to.be.equal(4)
+    children = $$('loop-nested-strings-array-item', tag.root)
+    fireEvent(children[0], 'click')
+    expect(children.length).to.be.equal(4)
+    expect(normalizeHTML(children[0].innerHTML)).to.be.equal('<p>b</p>')
+    expect(normalizeHTML(children[1].innerHTML)).to.be.equal('<p>a</p>')
+    tag.unmount()
   })
 
 

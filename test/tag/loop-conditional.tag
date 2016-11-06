@@ -1,14 +1,18 @@
 <loop-conditional>
-  <div onclick={ change } if={ value <= 2 } each={value in items}>
+  <div onclick={ change } each={ items } if={ value <= 2 }>
     <loop-conditional-nested-item value={value} ></loop-conditional-nested-item>
   </div>
-  <loop-conditional-item onclick={ change } each={ value in items } value={ value } if={ value <= 2 }>
+  <loop-conditional-item onclick={ change } each={ items } if={ value <= 2 } value={ value }>
   </loop-conditional-item>
 
-  this.items = [1,2,3]
+  <footer>
+    <loop-conditional-nested-item each={ items } if={ false }></loop-conditional-nested-item>
+  </footer>
+
+  this.items = [{value: 1},{value: 2}, {value: 3 }]
 
   change() {
-    this.items = [1,2,3,4,2,1]
+    this.items = [{value: 1}, {value: 2}, {value: 3}, {value: 4}, {value: 2}, { value: 1 }]
     this.update()
   }
 
