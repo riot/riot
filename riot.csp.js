@@ -6283,7 +6283,7 @@ function hoist(ast){
 
     walkAll(ast);
     prependScope(ast, variables, functions);
-    
+
   } else {
     walk(ast);
   }
@@ -6356,15 +6356,15 @@ function prependScope(nodes, variables, functions){
     var declarations = [];
     for (var i=0;i<variables.length;i++){
       declarations.push({
-        type: 'VariableDeclarator', 
+        type: 'VariableDeclarator',
         id: variables[i].id,
         init: null
       });
     }
-    
+
     nodes.unshift({
-      type: 'VariableDeclaration', 
-      kind: 'var', 
+      type: 'VariableDeclaration',
+      kind: 'var',
       declarations: declarations
     });
 
@@ -6372,7 +6372,7 @@ function prependScope(nodes, variables, functions){
 
   if (functions && functions.length){
     for (var i=0;i<functions.length;i++){
-      nodes.unshift(functions[i]); 
+      nodes.unshift(functions[i]);
     }
   }
 }
@@ -8085,10 +8085,25 @@ function _each(dom, parent, expr) {
         // mount the tag
         tag.mount();
 
+<<<<<<< HEAD
         if (mustAppend)
           { append.apply(tag, [frag || root, isVirtual]); }
         else
           { insert.apply(tag, [root, tags[i], isVirtual]); }
+=======
+        if (isVirtual) tag._root = tag.root.firstChild // save reference for further moves or inserts
+        // this tag must be appended
+        if (i == tags.length || !tags[i]) { // fix 1581
+          if (isVirtual)
+            addVirtual(tag, frag)
+          else frag.appendChild(tag.root)
+        }
+        // this tag must be insert
+        else {
+          insertTag(isVirtual, tag, tags[i], root, tags, addVirtual, dom)
+          oldItems.splice(i, 0, item)
+        }
+>>>>>>> dev
 
         if (!mustAppend) { oldItems.splice(i, 0, item); }
         tags.splice(i, 0, tag);
@@ -8097,11 +8112,23 @@ function _each(dom, parent, expr) {
       } else { tag.update(item); }
 
       // reorder the tag if it's not located in its previous position
+<<<<<<< HEAD
       if (pos !== i && _mustReorder) {
         // #closes 2040
         if (contains(items, oldItems[i])) {
           move.apply(tag, [root, tags[i], isVirtual]);
         }
+=======
+      if (
+        pos !== i && _mustReorder &&
+        tags[i] // fix 1581 unable to reproduce it in a test!
+      ) {
+        // #closes 2040 PLEASE DON'T REMOVE IT!
+        // there are no tests for this feature
+        if (contains(items, oldItems[i]))
+          insertTag(isVirtual, tag, tags[i], root, tags, moveVirtual, dom)
+
+>>>>>>> dev
         // update the position attribute if it exists
         if (expr.pos) { tag[expr.pos] = i; }
         // move the old tag instance
@@ -8407,6 +8434,7 @@ function tag2$$1(name, tmpl, css, attrs, fn) {
   if (exists && util.hotReloader)
     { util.hotReloader(name); }
 
+<<<<<<< HEAD
   return name
 }
 
@@ -8419,6 +8447,9 @@ function tag2$$1(name, tmpl, css, attrs, fn) {
  */
 function mount$$1(selector, tagName, opts) {
   var tags = [];
+=======
+  dom = mkdom(impl.tmpl, innerHTML, isLoop)
+>>>>>>> dev
 
   function pushTagsTo(root) {
     if (root.tagName) {
