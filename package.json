@@ -58,7 +58,7 @@
     "cheerio": "^0.22.0",
     "chokidar-cli": "^1.2.0",
     "coveralls": "^2.11.15",
-    "eslint": "^3.10.0",
+    "eslint": "^3.10.1",
     "glob": "^7.1.1",
     "istanbul": "^0.4.5",
     "jsdom": "^9.8.3",
