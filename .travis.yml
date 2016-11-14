@@ -14,7 +14,7 @@ script:
 sudo: false
 
 after_success:
-  test $TRAVIS_BRANCH != "next" && test $TRAVIS_PULL_REQUEST == "false" && make test-sauce && make test-coveralls
+  test $TRAVIS_PULL_REQUEST == "false" && make test-sauce && make test-coveralls
 
 notifications:
     email: false
