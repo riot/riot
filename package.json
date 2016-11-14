@@ -56,6 +56,7 @@
     "benchmark": "^2.1.2",
     "chai": "^3.5.0",
     "cheerio": "^0.22.0",
+    "chokidar-cli": "^1.2.0",
     "coveralls": "^2.11.15",
     "eslint": "^3.10.0",
     "glob": "^7.1.1",
