@@ -4,17 +4,17 @@ module.exports = {
     slIphone5: {
       base: 'SauceLabs',
       browserName: 'iphone',
-      version: '8.1'
+      version: '8.4'
     },
     slIphone6: {
       base: 'SauceLabs',
       browserName: 'iphone',
-      version: '9.2'
+      version: '9.3'
     },
     slIpad: {
       base: 'SauceLabs',
       browserName: 'ipad',
-      version: '9.2'
+      version: '9.3'
     },
     slSafari7: {
       base: 'SauceLabs',
