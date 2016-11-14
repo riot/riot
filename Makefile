@@ -17,6 +17,7 @@ ROLLUP = ./node_modules/.bin/rollup
 UGLIFY = ./node_modules/uglify-js/bin/uglifyjs
 COVERALLS = ./node_modules/coveralls/bin/coveralls.js
 RIOT_CLI = ./node_modules/.bin/riot
+CHOKIDAR = ./node_modules/.bin/chokidar
 
 # folders
 DIST = dist/riot/
@@ -24,16 +25,6 @@ LIB = lib/
 CONFIG = config/
 
 GENERATED_FILES = riot.js riot.csp.js riot+compiler.js
-
-# utils
-WATCH = "\
-	var arg = process.argv, path = arg[1], cmd = arg[2];  \
-	require('chokidar')                                   \
-		.watch(path, { ignoreInitial: true })               \
-		.on('all', function() {                             \
-			try { require('shelljs').exec(cmd); }             \
-			catch(e) { console.log(e) }                       \
-		})"
 
 
 test: eslint test-mocha test-karma
@@ -106,8 +97,8 @@ perf-leaks: riot
 	@ node --expose-gc test/performance/memory
 
 watch:
-	# watch and rebuild riot and its tests
-	@ node -e $(WATCH) "lib/**/*.js" "make raw & make tags"
+	# watch and rebuild riot and its testswatch:
+	@ $(CHOKIDAR) lib/**/*.js -c 'make raw & make tags'
 
 build:
 	# generate riot.js & riot.min.js
