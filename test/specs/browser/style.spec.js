@@ -9,7 +9,6 @@ import {
 import '../../tag/style-tag.tag'
 import '../../tag/style-tag2.tag'
 import '../../tag/style-tag4.tag'
-import '../../tag/style-tag5.tag'
 import '../../tag/scoped.tag'
 
 const expect = chai.expect
@@ -34,9 +33,9 @@ describe('Riot style', function() {
 
   it('scoped css tag supports htm5 syntax, multiple style tags', function () {
 
-    injectHTML('<style-tag5></style-tag5><style-tag4></style-tag4>')
+    injectHTML('<style-tag4></style-tag4>')
 
-    checkCSS(riot.mount('style-tag5')[0], '3px')
+    checkCSS(riot.mount('style-tag4')[0], '3px')
 
     function checkCSS(t, x, p2) {
       t.update()

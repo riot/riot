@@ -1,3 +1,6 @@
 <style-tag4>
-  <p id="style4"></p><p>x</p>
+  <style>
+    p {border: solid 3px black;}
+  </style>
+  <p></p>
 </style-tag4>
