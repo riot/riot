@@ -1,4 +1,4 @@
-/* Riot v3.0.0-alpha.13, @license MIT */
+/* Riot v3.0.0-rc, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -6283,7 +6283,7 @@ function hoist(ast){
 
     walkAll(ast);
     prependScope(ast, variables, functions);
-
+    
   } else {
     walk(ast);
   }
@@ -6356,15 +6356,15 @@ function prependScope(nodes, variables, functions){
     var declarations = [];
     for (var i=0;i<variables.length;i++){
       declarations.push({
-        type: 'VariableDeclarator',
+        type: 'VariableDeclarator', 
         id: variables[i].id,
         init: null
       });
     }
-
+    
     nodes.unshift({
-      type: 'VariableDeclaration',
-      kind: 'var',
+      type: 'VariableDeclaration', 
+      kind: 'var', 
       declarations: declarations
     });
 
@@ -6372,7 +6372,7 @@ function prependScope(nodes, variables, functions){
 
   if (functions && functions.length){
     for (var i=0;i<functions.length;i++){
-      nodes.unshift(functions[i]);
+      nodes.unshift(functions[i]); 
     }
   }
 }
@@ -7542,7 +7542,6 @@ var observable = function(el) {
 
         for (i = 0; fn = fns[i]; ++i) {
           fn.apply(el, args);
-          if (fns[i] !== fn) { i--; }
         }
 
         if (callbacks['*'] && event != '*')
@@ -7736,7 +7735,10 @@ function updateExpression(expr) {
   }
 
   // remove original attribute
-  remAttr(dom, attrName);
+  if (!expr.isAttrRemoved) {
+    remAttr(dom, attrName);
+    expr.isAttrRemoved = true;
+  }
 
   // event handler
   if (isFunction(value)) {
@@ -7753,14 +7755,13 @@ function updateExpression(expr) {
 
   // <img src="{ expr }">
   } else if (startsWith(attrName, RIOT_PREFIX) && attrName !== RIOT_TAG_IS) {
-
-    if (value)
+    if (value != null)
       { setAttr(dom, attrName.slice(RIOT_PREFIX.length), value); }
-
   } else {
     // <select> <option selected={true}> </select>
-    if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.nodeName) && value)
-      { parent.value = dom.value; }
+    if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value != null) {
+      parent.value = dom.value;
+    }
 
     if (expr.bool) {
       dom[attrName] = value;
@@ -8069,7 +8070,7 @@ function _each(dom, parent, expr) {
       if (
         !_mustReorder && !tag // with no-reorder we just update the old tags
         ||
-        _mustReorder && !~oldPos || !tag // by default we always try to reorder the DOM elements
+        _mustReorder && !~oldPos // by default we always try to reorder the DOM elements
       ) {
 
         var mustAppend = i === tags.length;
@@ -8085,25 +8086,10 @@ function _each(dom, parent, expr) {
         // mount the tag
         tag.mount();
 
-<<<<<<< HEAD
         if (mustAppend)
           { append.apply(tag, [frag || root, isVirtual]); }
         else
           { insert.apply(tag, [root, tags[i], isVirtual]); }
-=======
-        if (isVirtual) tag._root = tag.root.firstChild // save reference for further moves or inserts
-        // this tag must be appended
-        if (i == tags.length || !tags[i]) { // fix 1581
-          if (isVirtual)
-            addVirtual(tag, frag)
-          else frag.appendChild(tag.root)
-        }
-        // this tag must be insert
-        else {
-          insertTag(isVirtual, tag, tags[i], root, tags, addVirtual, dom)
-          oldItems.splice(i, 0, item)
-        }
->>>>>>> dev
 
         if (!mustAppend) { oldItems.splice(i, 0, item); }
         tags.splice(i, 0, tag);
@@ -8112,23 +8098,11 @@ function _each(dom, parent, expr) {
       } else { tag.update(item); }
 
       // reorder the tag if it's not located in its previous position
-<<<<<<< HEAD
       if (pos !== i && _mustReorder) {
         // #closes 2040
         if (contains(items, oldItems[i])) {
           move.apply(tag, [root, tags[i], isVirtual]);
         }
-=======
-      if (
-        pos !== i && _mustReorder &&
-        tags[i] // fix 1581 unable to reproduce it in a test!
-      ) {
-        // #closes 2040 PLEASE DON'T REMOVE IT!
-        // there are no tests for this feature
-        if (contains(items, oldItems[i]))
-          insertTag(isVirtual, tag, tags[i], root, tags, moveVirtual, dom)
-
->>>>>>> dev
         // update the position attribute if it exists
         if (expr.pos) { tag[expr.pos] = i; }
         // move the old tag instance
@@ -8434,7 +8408,6 @@ function tag2$$1(name, tmpl, css, attrs, fn) {
   if (exists && util.hotReloader)
     { util.hotReloader(name); }
 
-<<<<<<< HEAD
   return name
 }
 
@@ -8447,9 +8420,6 @@ function tag2$$1(name, tmpl, css, attrs, fn) {
  */
 function mount$$1(selector, tagName, opts) {
   var tags = [];
-=======
-  dom = mkdom(impl.tmpl, innerHTML, isLoop)
->>>>>>> dev
 
   function pushTagsTo(root) {
     if (root.tagName) {
@@ -8758,10 +8728,13 @@ function Tag$$1(impl, conf, innerHTML) {
     // add global mixins
     var globalMixin = mixin$$1(GLOBAL_MIXIN);
 
-    if (globalMixin)
-      { for (var i in globalMixin)
-        { if (globalMixin.hasOwnProperty(i))
-          { this$1.mixin(globalMixin[i]); } } }
+    if (globalMixin) {
+      for (var i in globalMixin) {
+        if (globalMixin.hasOwnProperty(i)) {
+          this$1.mixin(globalMixin[i]);
+        }
+      }
+    }
 
     if (impl.fn) { impl.fn.call(this, opts); }
 
@@ -8816,7 +8789,6 @@ function Tag$$1(impl, conf, innerHTML) {
       { __TAGS_CACHE.splice(tagIndex, 1); }
 
     if (p) {
-
       if (parent) {
         ptag = getImmediateCustomParentTag(parent);
 
@@ -8827,17 +8799,16 @@ function Tag$$1(impl, conf, innerHTML) {
         } else {
           arrayishRemove(ptag.tags, tagName, this);
         }
+      } else {
+        while (el.firstChild) { el.removeChild(el.firstChild); }
       }
 
-      else
-        { while (el.firstChild) { el.removeChild(el.firstChild); } }
-
-      if (!mustKeepRoot)
-        { p.removeChild(el); }
-      else
+      if (!mustKeepRoot) {
+        p.removeChild(el);
+      } else {
         // the riot-tag and the data-is attributes aren't needed anymore, remove them
-        { remAttr(p, RIOT_TAG_IS); }
-
+        remAttr(p, RIOT_TAG_IS);
+      }
     }
 
     if (this._internal.virts) {

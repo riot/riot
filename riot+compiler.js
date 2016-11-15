@@ -1,4 +1,4 @@
-/* Riot v3.0.0-alpha.13, @license MIT */
+/* Riot v3.0.0-rc, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -989,7 +989,6 @@ var observable = function(el) {
 
         for (i = 0; fn = fns[i]; ++i) {
           fn.apply(el, args);
-          if (fns[i] !== fn) { i--; }
         }
 
         if (callbacks['*'] && event != '*')
@@ -1183,7 +1182,10 @@ function updateExpression(expr) {
   }
 
   // remove original attribute
-  remAttr(dom, attrName);
+  if (!expr.isAttrRemoved) {
+    remAttr(dom, attrName);
+    expr.isAttrRemoved = true;
+  }
 
   // event handler
   if (isFunction(value)) {
@@ -1200,14 +1202,13 @@ function updateExpression(expr) {
 
   // <img src="{ expr }">
   } else if (startsWith(attrName, RIOT_PREFIX) && attrName !== RIOT_TAG_IS) {
-
-    if (value)
+    if (value != null)
       { setAttr(dom, attrName.slice(RIOT_PREFIX.length), value); }
-
   } else {
     // <select> <option selected={true}> </select>
-    if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.nodeName) && value)
-      { parent.value = dom.value; }
+    if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value != null) {
+      parent.value = dom.value;
+    }
 
     if (expr.bool) {
       dom[attrName] = value;
@@ -1516,7 +1517,7 @@ function _each(dom, parent, expr) {
       if (
         !_mustReorder && !tag // with no-reorder we just update the old tags
         ||
-        _mustReorder && !~oldPos || !tag // by default we always try to reorder the DOM elements
+        _mustReorder && !~oldPos // by default we always try to reorder the DOM elements
       ) {
 
         var mustAppend = i === tags.length;
@@ -2174,10 +2175,13 @@ function Tag$$1(impl, conf, innerHTML) {
     // add global mixins
     var globalMixin = mixin$$1(GLOBAL_MIXIN);
 
-    if (globalMixin)
-      { for (var i in globalMixin)
-        { if (globalMixin.hasOwnProperty(i))
-          { this$1.mixin(globalMixin[i]); } } }
+    if (globalMixin) {
+      for (var i in globalMixin) {
+        if (globalMixin.hasOwnProperty(i)) {
+          this$1.mixin(globalMixin[i]);
+        }
+      }
+    }
 
     if (impl.fn) { impl.fn.call(this, opts); }
 
@@ -2232,7 +2236,6 @@ function Tag$$1(impl, conf, innerHTML) {
       { __TAGS_CACHE.splice(tagIndex, 1); }
 
     if (p) {
-
       if (parent) {
         ptag = getImmediateCustomParentTag(parent);
 
@@ -2243,17 +2246,16 @@ function Tag$$1(impl, conf, innerHTML) {
         } else {
           arrayishRemove(ptag.tags, tagName, this);
         }
+      } else {
+        while (el.firstChild) { el.removeChild(el.firstChild); }
       }
 
-      else
-        { while (el.firstChild) { el.removeChild(el.firstChild); } }
-
-      if (!mustKeepRoot)
-        { p.removeChild(el); }
-      else
+      if (!mustKeepRoot) {
+        p.removeChild(el);
+      } else {
         // the riot-tag and the data-is attributes aren't needed anymore, remove them
-        { remAttr(p, RIOT_TAG_IS); }
-
+        remAttr(p, RIOT_TAG_IS);
+      }
     }
 
     if (this._internal.virts) {
@@ -2641,7 +2643,7 @@ var riot$1 = Object.freeze({
 
 /**
  * Compiler for riot custom tags
- * @version v3.0.0-alpha.3
+ * @version v3.0.0-alpha.4
  */
 
 // istanbul ignore next
@@ -2798,7 +2800,7 @@ var HTML_TAGS = /<(-?[A-Za-z][-\w\xA0-\xFF]*)(?:\s+([^"'\/>]*(?:(?:"[^"]*"|'[^']
 
 var HTML_PACK = />[ \t]+<(-?[A-Za-z]|\/[-A-Za-z])/g;
 
-var RIOT_ATTRS = ['style', 'src', 'd'];
+var RIOT_ATTRS = ['style', 'src', 'd', 'value'];
 
 var VOID_TAGS = /^(?:input|img|br|wbr|hr|area|base|col|embed|keygen|link|meta|param|source|track)$/;
 
@@ -2806,7 +2808,7 @@ var PRE_TAGS = /<pre(?:\s+(?:[^">]*|"[^"]*")*)?>([\S\s]+?)<\/pre\s*>/gi;
 
 var SPEC_TYPES = /^"(?:number|date(?:time)?|time|month|email|color)\b/i;
 
-var IMPORT_STATEMENT = /^\s*import(?:\s*[*{]|\s+[$_a-zA-Z'"]).*\n?/gm;
+var IMPORT_STATEMENT = /^\s*import(?:(\s|\S)*)['|"]/gm;
 
 var TRIM_TRAIL = /[ \t]+$/gm;
 
@@ -2865,7 +2867,7 @@ function parseAttribs (str, pcex) {
         if (RE_HASEXPR.test(v)) {
 
           if (k === 'value') { vexp = 1; }
-          else if (~RIOT_ATTRS.indexOf(k)) { k = 'riot-' + k; }
+          if (~RIOT_ATTRS.indexOf(k)) { k = 'riot-' + k; }
         }
 
         list.push(k + '=' + v);
@@ -2912,20 +2914,6 @@ function restoreExpr (html, pcex) {
     });
   }
   return html
-}
-
-function compileImports (js) {
-  var imp = [];
-  var imports = '';
-  while (imp = IMPORT_STATEMENT.exec(js)) {
-    imports += imp[0].trim() + '\n';
-  }
-  return imports
-}
-
-function rmImports (js) {
-  var jsCode = js.replace(IMPORT_STATEMENT, '');
-  return jsCode
 }
 
 function _compileHTML (html, opts, pcex) {
@@ -3071,16 +3059,18 @@ function scopedCSS (tag, css) {
     p2 = p2.replace(/[^,]+/g, function (sel) {
       var s = sel.trim();
 
+      if (s.indexOf(tag) === 0) {
+        return sel
+      }
+
       if (!s || s === 'from' || s === 'to' || s.slice(-1) === '%') {
         return sel
       }
 
       if (s.indexOf(scope) < 0) {
-        s = tag + ' ' + s + ',[riot-tag="' + tag + '"] ' + s +
-                            ',[data-is="' + tag + '"] ' + s;
+        s = tag + ' ' + s + ',[data-is="' + tag + '"] ' + s;
       } else {
         s = s.replace(scope, tag) + ',' +
-            s.replace(scope, '[riot-tag="' + tag + '"]') + ',' +
             s.replace(scope, '[data-is="' + tag + '"]');
       }
       return s
@@ -3091,12 +3081,10 @@ function scopedCSS (tag, css) {
 }
 
 function _compileCSS (css, tag, type, opts) {
-  var scoped = (opts || (opts = {})).scoped;
+  opts = opts || {};
 
   if (type) {
-    if (type === 'scoped-css') {
-      scoped = true;
-    } else if (type !== 'css') {
+    if (type !== 'css') {
 
       var parser = parsers$1._req('css.' + type, true);
       css = parser(tag, css, opts.parserOpts || {}, opts.url);
@@ -3104,13 +3092,8 @@ function _compileCSS (css, tag, type, opts) {
   }
 
   css = css.replace(brackets.R_MLCOMMS, '').replace(/\s+/g, ' ').trim();
+  if (tag) { css = scopedCSS(tag, css); }
 
-  if (scoped) {
-    if (!tag) {
-      throw new Error('Can not parse scoped CSS without a tagName')
-    }
-    css = scopedCSS(tag, css);
-  }
   return css
 }
 
@@ -3231,7 +3214,6 @@ function cssCode (code, opts, attribs, url, tag) {
     parserStyleOptions = extend$1({}, opts.parserOptions.style),
     extraOpts = {
       parserOpts: extend$1(parserStyleOptions, getParserOptions(attribs)),
-      scoped: attribs && /\sscoped(\s|=|$)/i.test(attribs),
       url: url
     };
 
@@ -3328,8 +3310,6 @@ function compile$1 (src, opts, url) {
 
           if (included('js')) {
             body = _compileJS(blocks[1], opts, null, null, url);
-            imports = compileImports(jscode);
-            jscode  = rmImports(jscode);
             if (body) { jscode += (jscode ? '\n' : '') + body; }
             jscode = jscode.replace(IMPORT_STATEMENT, function (s) {
               imports += s.trim() + '\n';
@@ -3361,7 +3341,7 @@ function compile$1 (src, opts, url) {
   return src
 }
 
-var version = 'v3.0.0-alpha.3';
+var version = 'v3.0.0-alpha.4';
 
 var compiler = {
   compile: compile$1,

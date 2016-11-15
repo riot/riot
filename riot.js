@@ -1,4 +1,4 @@
-/* Riot v3.0.0-alpha.13, @license MIT */
+/* Riot v3.0.0-rc, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -989,7 +989,6 @@ var observable = function(el) {
 
         for (i = 0; fn = fns[i]; ++i) {
           fn.apply(el, args);
-          if (fns[i] !== fn) { i--; }
         }
 
         if (callbacks['*'] && event != '*')
@@ -1183,7 +1182,10 @@ function updateExpression(expr) {
   }
 
   // remove original attribute
-  remAttr(dom, attrName);
+  if (!expr.isAttrRemoved) {
+    remAttr(dom, attrName);
+    expr.isAttrRemoved = true;
+  }
 
   // event handler
   if (isFunction(value)) {
@@ -1200,14 +1202,13 @@ function updateExpression(expr) {
 
   // <img src="{ expr }">
   } else if (startsWith(attrName, RIOT_PREFIX) && attrName !== RIOT_TAG_IS) {
-
-    if (value)
+    if (value != null)
       { setAttr(dom, attrName.slice(RIOT_PREFIX.length), value); }
-
   } else {
     // <select> <option selected={true}> </select>
-    if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.nodeName) && value)
-      { parent.value = dom.value; }
+    if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value != null) {
+      parent.value = dom.value;
+    }
 
     if (expr.bool) {
       dom[attrName] = value;
@@ -1516,7 +1517,7 @@ function _each(dom, parent, expr) {
       if (
         !_mustReorder && !tag // with no-reorder we just update the old tags
         ||
-        _mustReorder && !~oldPos || !tag // by default we always try to reorder the DOM elements
+        _mustReorder && !~oldPos // by default we always try to reorder the DOM elements
       ) {
 
         var mustAppend = i === tags.length;
@@ -2174,10 +2175,13 @@ function Tag$$1(impl, conf, innerHTML) {
     // add global mixins
     var globalMixin = mixin$$1(GLOBAL_MIXIN);
 
-    if (globalMixin)
-      { for (var i in globalMixin)
-        { if (globalMixin.hasOwnProperty(i))
-          { this$1.mixin(globalMixin[i]); } } }
+    if (globalMixin) {
+      for (var i in globalMixin) {
+        if (globalMixin.hasOwnProperty(i)) {
+          this$1.mixin(globalMixin[i]);
+        }
+      }
+    }
 
     if (impl.fn) { impl.fn.call(this, opts); }
 
@@ -2232,7 +2236,6 @@ function Tag$$1(impl, conf, innerHTML) {
       { __TAGS_CACHE.splice(tagIndex, 1); }
 
     if (p) {
-
       if (parent) {
         ptag = getImmediateCustomParentTag(parent);
 
@@ -2243,17 +2246,16 @@ function Tag$$1(impl, conf, innerHTML) {
         } else {
           arrayishRemove(ptag.tags, tagName, this);
         }
+      } else {
+        while (el.firstChild) { el.removeChild(el.firstChild); }
       }
 
-      else
-        { while (el.firstChild) { el.removeChild(el.firstChild); } }
-
-      if (!mustKeepRoot)
-        { p.removeChild(el); }
-      else
+      if (!mustKeepRoot) {
+        p.removeChild(el);
+      } else {
         // the riot-tag and the data-is attributes aren't needed anymore, remove them
-        { remAttr(p, RIOT_TAG_IS); }
-
+        remAttr(p, RIOT_TAG_IS);
+      }
     }
 
     if (this._internal.virts) {
