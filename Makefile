@@ -31,7 +31,7 @@ test: eslint test-mocha test-karma
 
 eslint:
 	# check code style
-	@ $(ESLINT) -c ./.eslintrc lib test
+	@ $(ESLINT) -c ./.eslintrc.json lib test
 
 test-mocha:
 	RIOT=../../dist/riot/riot.js $(MOCHA) -- test/specs/server
