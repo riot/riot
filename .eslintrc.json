@@ -10,14 +10,14 @@
     "sourceType": "module"
   },
   "rules": {
+    "eqeqeq": ["error", "smart"],
     "indent": ["error", 2],
     "linebreak-style": ["error", "unix"],
     "no-cond-assign": "off",
     "no-console": "off",
-    "quotes": ["error", "single", "avoid-escape"],
-    "semi": ["error", "never"],
     "no-unexpected-multiline": "error",
-    "eqeqeq": ["error", "smart"]
+    "quotes": ["error", "single", "avoid-escape"],
+    "semi": ["error", "never"]
   },
   "globals": {
     "expect": true,
