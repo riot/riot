@@ -1,5 +1,5 @@
 <style-tag>
-  <style scoped>
+  <style>
     p {color: blue;}
   </style>
 </style-tag>

@@ -37,7 +37,6 @@ describe('Riot style', function() {
     injectHTML('<style-tag5></style-tag5><style-tag4></style-tag4>')
 
     checkCSS(riot.mount('style-tag5')[0], '3px')
-    checkCSS(riot.mount('style-tag4')[0], '2px', 1)
 
     function checkCSS(t, x, p2) {
       t.update()
@@ -47,7 +46,7 @@ describe('Riot style', function() {
       if (p2) {
         e = t.root.getElementsByTagName('P')[1]
         expect(e.innerHTML).to.be.equal('x')
-        expect(window.getComputedStyle(e, null).borderTopWidth).to.be.equal('1px')
+        expect(window.getComputedStyle(e, null).borderTopWidth).to.be.equal('4px')
       }
       t.unmount()
     }

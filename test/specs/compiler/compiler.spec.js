@@ -75,12 +75,12 @@ describe('Riot compiler', function() {
   })
 
   // this test in theory goes in style.spec.js
-  it('scoped css tag supports htm5 syntax, multiple style tags', function (done) {
+/*  it('scoped css tag supports htm5 syntax, multiple style tags', function (done) {
     injectHTML('<style-tag3></style-tag3><style-tag4></style-tag4>')
     this.timeout(5000)
     riot.compile(['./tag/~style-tag3.tag', './tag/style-tag4.tag'], function() {
       checkCSS(riot.mount('style-tag3')[0], '4px')
-      checkCSS(riot.mount('style-tag4')[0], '2px', 1)
+      checkCSS(riot.mount('style-tag4')[0], '1px', 1)
       delete riot.parsers.css.cssup
 
       function checkCSS(t, x, p2) {
@@ -97,21 +97,13 @@ describe('Riot compiler', function() {
       }
       done()
     })
-  })
+  })*/
 
   it('Passing options to the compiler through compile (v2.3.12)', function () {
     var str = '<passing-options>\n  <p>\n  <\/p>\nclick(e){}\n<\/passing-options>',
       result = riot.compile(str, true, {compact: true, type: 'none'})
     expect(result).to.contain('<p></p>')          // compact: true
     expect(result).to.contain('\nclick(e){}\n')   // type: none
-  })
-
-  // scoped-css is deprecated, this test must be changed in future versions
-  it('Using the `style` for set the CSS parser through compile (v2.3.12)', function () {
-    var str = '<style-option><style>p {top:0}<\/style>\n<\/style-option>',
-      result
-    result = riot.compile(str, {'style': 'scoped-css'})
-    expect(result).to.match(/\[(?:data-is)="style-option"\] p ?\{top:0\}/)
   })
 
   it('compile detect changes in riot.settings.brackets', function() {
