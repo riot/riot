@@ -29,6 +29,18 @@
 | Vue                                            | 2.0.5           | 24.12kb              |
 | Riot                                           | 2.6.7           | 9.39kb               |
 
+### Browsers support
+
+Riot is supported by all modern browsers and it does not require any addictional polyfill
+
+- IE 9+
+- Edge
+- Chrome
+- Safari 7+
+- Firefox
+- Chrome
+- Safari iOS
+- Android
 
 ### Custom tags • Concise syntax • Virtual DOM • Full stack
 
