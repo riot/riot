@@ -10,7 +10,7 @@
 
   <p>after</p>
 
-  <p each={ num, i in nums} if={ num == parent.flag }>{ num }</p>
+  <p each={ num, i in nums} if={ parent && num == parent.flag }>{ num }</p>
 
   <p>
     <if-child show={ flag } />

@@ -27,7 +27,7 @@
 </inner-loop-events>
 
 <loop-events-button-1>
-  <button onclick={ this.click() }>Click me { innerI }</button>
+  <button onclick={ click }>Click me { innerI }</button>
   click(e) {
     opts.cb(e, e.item)
   }

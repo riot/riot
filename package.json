@@ -46,9 +46,9 @@
   ],
   "dependencies": {
     "riot-cli": "^2.6.2",
-    "riot-compiler": "next",
-    "riot-observable": "^3.0.0-rc",
-    "riot-tmpl": "^2.4.2",
+    "riot-compiler": "^3.0.0",
+    "riot-observable": "^3.0.0",
+    "riot-tmpl": "^3.0.0-rc",
     "simple-dom": "0.3.2",
     "simple-html-tokenizer": "^0.2.5"
   },
@@ -58,7 +58,7 @@
     "cheerio": "^0.22.0",
     "chokidar-cli": "^1.2.0",
     "coveralls": "^2.11.15",
-    "eslint": "^3.10.1",
+    "eslint": "^3.10.2",
     "glob": "^7.1.1",
     "istanbul": "^0.4.5",
     "jsdom": "^9.8.3",

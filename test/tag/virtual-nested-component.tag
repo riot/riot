@@ -1,7 +1,7 @@
 <virtual-nested-component>
   <div>
-    <virtual name="person" each="{ person in people }">
-      <not-virtual-component2 name={person.name} age={person.age}></not-virtual-component2>
+    <virtual each={ person in people }>
+      <not-virtual-component2 name={ person.name } age={ person.age }></not-virtual-component2>
     </virtual>
   </div>
   <script>
@@ -16,5 +16,5 @@
 </virtual-nested-component>
 
 <not-virtual-component2>
-  <span>{ person.name } - { person.age } <br/></span>
+  <span>{ opts.name } - { opts.age } <br/></span>
 </not-virtual-component2>
