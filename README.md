@@ -31,7 +31,7 @@
 
 ### Browsers support
 
-Riot is supported by all modern browsers and it does not require any addictional polyfill
+Riot is supported by all modern browsers and it does not require any additional polyfill
 
 - IE 9+
 - Edge
