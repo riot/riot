@@ -48,7 +48,7 @@
     "riot-cli": "^2.6.2",
     "riot-compiler": "^3.0.0",
     "riot-observable": "^3.0.0",
-    "riot-tmpl": "^3.0.0-rc",
+    "riot-tmpl": "^3.0.0",
     "simple-dom": "0.3.2",
     "simple-html-tokenizer": "^0.2.5"
   },
