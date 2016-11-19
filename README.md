@@ -1,7 +1,7 @@
 
 [![Riot logo](http://riotjs.com/img/logo/riot480x.png)](http://riotjs.com/)
 
-## A React-like user interface micro-library
+## Simple and elegant component-based UI library
 
 [![Build Status][travis-image]][travis-url]
 [![Riot Forum][riot-forum-image]][riot-forum-url]
@@ -45,7 +45,6 @@ Riot is supported by all modern browsers and it does not require any additional 
 ### Custom tags • Concise syntax • Virtual DOM • Full stack
 
 Riot brings custom tags to all modern browsers. Think React + Polymer but with enjoyable syntax and a small learning curve.
-
 
 #### Tag definition
 
