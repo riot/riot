@@ -780,7 +780,7 @@ describe('Riot core', function() {
   it('the "shouldUpdate" locks the tag update properly', function() {
     injectHTML('<should-update></should-update>')
     var tag = riot.mount('should-update')[0]
-    tag.update()
+    expect(tag.update()).to.be.ok
     expect(tag.count).to.be.equal(0)
     tag.update(true)
     expect(tag.count).to.be.equal(1)
