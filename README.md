@@ -154,6 +154,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [The anatomy of a tag - a primer tutorial](http://www.marcusoft.net/2015/12/riotjs-anatomy-of-a-tag.html)
 - [Using TDD with Riot+mocha+chai](http://vitomd.com/blog/coding/tutorial_tdd_riot_mocha/)
 - [The Basics - from ground up to connected tag-networks](http://happy-css.com/lessons/riotjs/)
+- [Hello Riot.js : a quick tutorial about this awesome lib](http://vitomd.com/blog/coding/hello-riot-js-quick-tutorial-about-this-awesome-lib/)
 
 ### Video Tutorials
 - [Introduction](https://www.youtube.com/watch?v=al87U6NgRTc)
