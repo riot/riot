@@ -1,4 +1,4 @@
-/* Riot v3.0.0-rc, @license MIT */
+/* Riot v3.0.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -19,7 +19,7 @@ var XLINK_REGEX = /^xlink:(\w+)/;
 var WIN = typeof window === T_UNDEF ? undefined : window;
 var RE_SPECIAL_TAGS = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?|opt(?:ion|group))$/;
 var RE_SPECIAL_TAGS_NO_OPTION = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?)$/;
-var RE_RESERVED_NAMES = /^(?:_(?:item|id|parent)|update|root|(?:un)?mount|mixin|is(?:Mounted|Loop)|tags|parent|opts|trigger|o(?:n|ff|ne))$/;
+var RE_RESERVED_NAMES = /^(?:_(?:item|id|parent)|update|root|(?:un)?mount|mixin|is(?:Mounted|Loop)|tags|refs|parent|opts|trigger|o(?:n|ff|ne))$/;
 var RE_SVG_TAGS = /^(altGlyph|animate(?:Color)?|circle|clipPath|defs|ellipse|fe(?:Blend|ColorMatrix|ComponentTransfer|Composite|ConvolveMatrix|DiffuseLighting|DisplacementMap|Flood|GaussianBlur|Image|Merge|Morphology|Offset|SpecularLighting|Tile|Turbulence)|filter|font|foreignObject|g(?:lyph)?(?:Ref)?|image|line(?:arGradient)?|ma(?:rker|sk)|missing-glyph|path|pattern|poly(?:gon|line)|radialGradient|rect|stop|svg|switch|symbol|text(?:Path)?|tref|tspan|use)$/;
 var RE_HTML_ATTRS = /([-\w]+) ?= ?(?:"([^"]*)|'([^']*)|({[^}]*}))/g;
 var RE_BOOL_ATTRS = /^(?:disabled|checked|readonly|required|allowfullscreen|auto(?:focus|play)|compact|controls|default|formnovalidate|hidden|ismap|itemscope|loop|multiple|muted|no(?:resize|shade|validate|wrap)?|open|reversed|seamless|selected|sortable|truespeed|typemustmatch)$/;
@@ -361,7 +361,7 @@ var styleManager = {
 
 /**
  * The riot template engine
- * @version v2.4.2
+ * @version v3.0.0
  */
 /**
  * riot.util.brackets
@@ -588,8 +588,6 @@ var tmpl = (function () {
     return (_cache[str] || (_cache[str] = _create(str))).call(data, _logErr)
   }
 
-  _tmpl.haveRaw = brackets.hasRaw;
-
   _tmpl.hasExpr = brackets.hasExpr;
 
   _tmpl.loopKeys = brackets.loopKeys;
@@ -601,13 +599,21 @@ var tmpl = (function () {
 
   function _logErr (err, ctx) {
 
-    if (_tmpl.errorHandler) {
+    err.riotData = {
+      tagName: ctx && ctx.root && ctx.root.tagName,
+      _riot_id: ctx && ctx._riot_id  //eslint-disable-line camelcase
+    };
 
-      err.riotData = {
-        tagName: ctx && ctx.root && ctx.root.tagName,
-        _riot_id: ctx && ctx._riot_id  //eslint-disable-line camelcase
-      };
-      _tmpl.errorHandler(err);
+    if (_tmpl.errorHandler) { _tmpl.errorHandler(err); }
+
+    if (
+      typeof console !== 'undefined' &&
+      typeof console.error === 'function'
+    ) {
+      if (err.riotData.tagName) {
+        console.error('Riot template error thrown in the <%s> tag', err.riotData.tagName);
+      }
+      console.error(err);
     }
   }
 
@@ -776,7 +782,7 @@ var tmpl = (function () {
     return expr
   }
 
-  _tmpl.version = brackets.version = 'v2.4.2';
+  _tmpl.version = brackets.version = 'v3.0.0';
 
   return _tmpl
 
@@ -1799,6 +1805,8 @@ function Tag$1(el, opts) {
 
   // mount the tag using the class instance
   mountTo(el, name, opts, this);
+  // inject the component css
+  if (css) { styleManager.inject(); }
 
   return this
 }
@@ -2071,7 +2079,7 @@ function Tag$$1(impl, conf, innerHTML) {
    * @returns { Tag } the current tag instance
    */
   defineProperty(this, 'update', function tagUpdate(data) {
-    if (isFunction(this.shouldUpdate) && !this.shouldUpdate(data)) { return }
+    if (isFunction(this.shouldUpdate) && !this.shouldUpdate(data)) { return this }
 
     // make sure the data passed will not override
     // the component core methods
@@ -2643,7 +2651,7 @@ var riot$1 = Object.freeze({
 
 /**
  * Compiler for riot custom tags
- * @version v3.0.0-alpha.4
+ * @version v3.0.0
  */
 
 // istanbul ignore next
@@ -2739,15 +2747,7 @@ var parsers$1 = (function (win) {
     }
   };
   _p.js = {
-    es6: function (js, opts) {
-      opts = extend({
-        blacklist: ['useStrict', 'strict', 'react'],
-        sourceMaps: false,
-        comments: false
-      }, opts);
-      return _r('babel').transform(js, opts).code
-    },
-    babel: function (js, opts, url) {
+    es6: function (js, opts, url) {
       return _r('babel').transform(js, extend({ filename: url }, opts)).code
     },
     buble: function (js, opts, url) {
@@ -2808,7 +2808,7 @@ var PRE_TAGS = /<pre(?:\s+(?:[^">]*|"[^"]*")*)?>([\S\s]+?)<\/pre\s*>/gi;
 
 var SPEC_TYPES = /^"(?:number|date(?:time)?|time|month|email|color)\b/i;
 
-var IMPORT_STATEMENT = /^\s*import(?:(\s|\S)*)['|"]/gm;
+var IMPORT_STATEMENT = /^\s*import(?:(?:\s|[^\s'"])*)['|"].*\n?/gm;
 
 var TRIM_TRAIL = /[ \t]+$/gm;
 
@@ -3341,7 +3341,7 @@ function compile$1 (src, opts, url) {
   return src
 }
 
-var version = 'v3.0.0-alpha.4';
+var version = 'v3.0.0';
 
 var compiler = {
   compile: compile$1,
