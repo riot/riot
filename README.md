@@ -42,7 +42,7 @@ Riot is supported by all modern browsers and it does not require any additional 
 - Safari iOS
 - Android
 
-### Custom tags • Concise syntax • Virtual DOM • Full stack
+### Custom tags • Concise syntax • Simple API • Tiny Size
 
 Riot brings custom tags to all modern browsers. Think React + Polymer but with enjoyable syntax and a small learning curve.
 
@@ -91,7 +91,7 @@ Custom tags lets you build complex views with HTML.
 HTML syntax is the de facto language on the web and it's designed for building user interfaces. The syntax is explicit, nesting is inherent to the language and attributes offer a clean way to provide options for custom tags.
 
 
-### Virtual DOM
+### Expressions Bindings
 - Absolutely the smallest possible amount of DOM updates and reflows.
 - One way data flow: updates and unmounts are propagated downwards from parent to children.
 - Expressions are pre-compiled and cached for high performance.
