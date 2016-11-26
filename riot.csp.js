@@ -1,4 +1,4 @@
-/* Riot v3.0.0, @license MIT */
+/* Riot v3.0.1, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -7592,7 +7592,9 @@ function handleEvent(dom, handler, e) {
   handler.call(this, e);
 
   if (!e.preventUpdate) {
-    getImmediateCustomParentTag(this).update();
+    var p = getImmediateCustomParentTag(this);
+    // fixes #2083
+    if (p.isMounted) { p.update(); }
   }
 }
 
@@ -7629,11 +7631,11 @@ function setEventHandler(name, handler, dom, tag) {
 }
 
 /**
- * Update dynamically created riot-tag with changing expressions
+ * Update dynamically created data-is tags with changing expressions
  * @param { Object } expr - expression tag and expression info
  * @param { Tag } parent - parent for tag creation
  */
-function updateRtag(expr, parent) {
+function updateDataIs(expr, parent) {
   var tagName = tmpl(expr.value, parent),
     conf;
 
@@ -7644,12 +7646,11 @@ function updateRtag(expr, parent) {
 
   // sync _parent to accommodate changing tagnames
   if (expr.tag) {
-    var delName = expr.tag.opts.dataIs,
+    var delName = expr.value,
       tags = expr.tag._parent.tags;
 
     setAttr(expr.tag.root, RIOT_TAG_IS, tagName); // update for css
     arrayishRemove(tags, delName, expr.tag);
-
   }
 
   expr.impl = __TAG_IMPL[tagName];
@@ -7680,7 +7681,7 @@ function updateExpression(expr) {
   var dom = expr.dom,
     attrName = expr.attr,
     value = tmpl(expr.expr, this),
-    isValueAttr = attrName === 'value',
+    isValueAttr = attrName === 'riot-value',
     isVirtual = expr.root && expr.root.tagName === 'VIRTUAL',
     parent = dom && (expr.parent || dom.parentNode),
     old;
@@ -7716,7 +7717,7 @@ function updateExpression(expr) {
   }
 
   if (old === value) { return }
-  if (expr.isRtag && value) { return updateRtag(expr, this) }
+  if (expr.isRtag && value) { return updateDataIs(expr, this) }
   // no change, so nothing more to do
   if (isValueAttr && dom.value === value) { return }
 
@@ -7740,7 +7741,7 @@ function updateExpression(expr) {
   }
 
   // remove original attribute
-  if (!expr.isAttrRemoved) {
+  if (!expr.isAttrRemoved || !value) {
     remAttr(dom, attrName);
     expr.isAttrRemoved = true;
   }
@@ -7748,16 +7749,13 @@ function updateExpression(expr) {
   // event handler
   if (isFunction(value)) {
     setEventHandler(attrName, value, dom, this);
-
   // show / hide
   } else if (/^(show|hide)$/.test(attrName)) {
     if (attrName === 'hide') { value = !value; }
     dom.style.display = value ? '' : 'none';
-
   // field value
   } else if (isValueAttr) {
     dom.value = value;
-
   // <img src="{ expr }">
   } else if (startsWith(attrName, RIOT_PREFIX) && attrName !== RIOT_TAG_IS) {
     if (value != null)
@@ -7766,16 +7764,12 @@ function updateExpression(expr) {
     // <select> <option selected={true}> </select>
     if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value != null) {
       parent.value = dom.value;
-    }
-
-    if (expr.bool) {
+    } if (expr.bool) {
       dom[attrName] = value;
       if (!value) { return }
+    } if (value === 0 || value && typeof value !== T_OBJECT) {
+      setAttr(dom, attrName, value);
     }
-
-    if (value === 0 || value && typeof value !== T_OBJECT)
-      { setAttr(dom, attrName, value); }
-
   }
 }
 
@@ -7804,17 +7798,19 @@ var IfExpr = {
   },
   update: function update$1() {
     var newValue = tmpl(this.expr, this.parentTag);
+
     if (newValue && !this.current) { // insert
       this.current = this.pristine.cloneNode(true);
       this.stub.parentNode.insertBefore(this.current, this.stub);
 
       this.expressions = [];
       parseExpressions.apply(this.parentTag, [this.current, this.expressions, true]);
-    }
-
-    else if (!newValue && this.current) { // remove
+    } else if (!newValue && this.current) { // remove
       unmountAll(this.expressions);
-      this.current.parentNode.removeChild(this.current);
+      if (this.current._tag) {
+        this.current._tag.unmount();
+      } else if (this.current.parentNode)
+        { this.current.parentNode.removeChild(this.current); }
       this.current = null;
       this.expressions = [];
     }
@@ -8590,7 +8586,7 @@ function Tag$$1(impl, conf, innerHTML) {
     implAttrs = [], // expressions on this type of Tag
     expressions = [],
     root = conf.root,
-    tagName = conf.tagName || root.tagName.toLowerCase(),
+    tagName = conf.tagName || getTagName(root),
     isVirtual = tagName === 'virtual',
     propsInSyncWithParent = [],
     dom;
@@ -8896,7 +8892,6 @@ function moveChildTag(tagName, newPos) {
  * @param   { Object } opts - tag options containing the DOM node where the tag will be mounted
  * @param   { String } innerHTML - inner html of the child node
  * @param   { Object } parent - instance of the parent tag including the child custom tag
- * @param   { Boolean } skipName - hack to ignore the name attribute when attaching to parent
  * @returns { Object } instance of the new child tag just created
  */
 function initChildTag(child, opts, innerHTML, parent) {
@@ -8952,17 +8947,15 @@ function unmountAll(expressions) {
 /**
  * Get the tag name of any DOM node
  * @param   { Object } dom - DOM node we want to parse
- * @param   { Boolean } skipName - hack to ignore the name attribute when attaching to parent
+ * @param   { Boolean } skipDataIs - hack to ignore the data-is attribute when attaching to parent
  * @returns { String } name to identify this dom node in riot
  */
-function getTagName(dom, skipName) {
+function getTagName(dom, skipDataIs) {
   var child = getTag(dom),
-    namedTag = !skipName && getAttr(dom, 'name'),
-    tagName = namedTag && !tmpl.hasExpr(namedTag) ?
+    namedTag = !skipDataIs && getAttr(dom, RIOT_TAG_IS);
+  return namedTag && !tmpl.hasExpr(namedTag) ?
                 namedTag :
-              child ? child.name : dom.tagName.toLowerCase();
-
-  return tagName
+              child ? child.name : dom.tagName.toLowerCase()
 }
 
 /**
