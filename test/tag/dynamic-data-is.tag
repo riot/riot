@@ -6,12 +6,14 @@
   <input type="date" name="{ opts.name }" />
 </calendar>
 
-<dynamic-data-toggle>foo</dynamic-data-toggle>
+<dynamic-data-toggle>
+  <p>foo</p>
+</dynamic-data-toggle>
 
 <dynamic-data-is>
   <div each={inp in intags } data-is={ inp.tag } inpname={ inp.name }></div>
   <div data-is={single}></div>
-  <div if={ toggle } data-is={ toggleTag }></div>
+  <div data-is={ toggleTag } if={ toggle }></div>
 
   this.intags = [
     {name: 'aaa', tag: 'color'},
