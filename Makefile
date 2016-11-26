@@ -98,7 +98,7 @@ perf-leaks: riot
 
 watch:
 	# watch and rebuild riot and its testswatch:
-	@ $(CHOKIDAR) lib/**/*.js -c 'make raw & make tags'
+	@ $(CHOKIDAR) lib -c 'make raw & make tags'
 
 build:
 	# generate riot.js & riot.min.js

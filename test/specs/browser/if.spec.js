@@ -165,6 +165,36 @@ describe('Riot if', function() {
     tag.unmount()
   })
 
+  it('Custom tags with an if and multiple mixins will not throw (see #2100)', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    var myMixin = {}
+    var myMixin2 = {}
+
+    riot.tag('inner', '<div>I am child</div>', function() {
+      this.mixin(myMixin)
+      this.mixin(myMixin2)
+    })
+
+    riot.tag('riot-tmp', '<inner if="{cond}" />', function() {
+      this.cond = true
+    })
+
+    var tag = riot.mount('riot-tmp')[0]
+
+    expectHTML(tag).to.be.equal('<inner><div>I am child</div></inner>')
+
+    tag.update({cond: false})
+    expectHTML(tag).to.be.equal('')
+    expect(tag.tags.inner).to.be.equal(undefined)
+
+    tag.update({cond: true})
+    expectHTML(tag).to.be.equal('<inner><div>I am child</div></inner>')
+    expect(tag.tags.inner).not.to.be.equal(undefined)
+
+    tag.unmount()
+  })
+
 
   it('each anonymous with an if', function() {
     injectHTML('<riot-tmp></riot-tmp>')
