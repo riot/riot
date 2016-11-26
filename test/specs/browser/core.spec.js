@@ -1024,4 +1024,17 @@ describe('Riot core', function() {
     tag.unmount()
   })
 
+  it('unmounting a tag containing ref will not throw', function() {
+
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', '<div ref="child" onclick="{ unmount }"></div>', function() {
+      this.isFoo = true
+    })
+
+    var tag = riot.mount('riot-tmp')[0]
+    fireEvent(tag.refs.child, 'click')
+    expect(tag.isMounted).to.be.equal(false)
+  })
+
 })
