@@ -76,7 +76,7 @@
     "rollup-plugin-buble": "^0.14.0",
     "rollup-plugin-commonjs": "^5.0.5",
     "rollup-plugin-node-resolve": "^2.0.0",
-    "rollup-plugin-riot": "^1.0.0-alpha.1",
+    "rollup-plugin-riot": "^1.0.0",
     "sinon": "^1.17.6",
     "sinon-chai": "^2.8.0",
     "uglify-js": "latest"
@@ -95,7 +95,7 @@
     "riot": "node_modules/riot-cli/lib/index.js"
   },
   "main": "lib/server/index.js",
-  "jsnext:main": "lib/riot.js",
+  "jsnext:main": "lib/index.js",
   "browser": "riot.js",
   "spm": {
     "main": "riot.js",
