@@ -25,6 +25,7 @@ import '../../tag/multi-named.tag'
 import '../../tag/named-data-ref.tag'
 import '../../tag/input-number.tag'
 import '../../tag/input-values.tag'
+import '../../tag/input-updated.tag'
 import '../../tag/nested-riot.tag'
 import '../../tag/treeview.tag'
 import '../../tag/events.tag'
@@ -737,6 +738,19 @@ describe('Riot core', function() {
     tag.update()
 
     expect(getCarrotPos(tag.refs.i)).to.be.equal(4)
+
+    tag.unmount()
+  })
+
+  it('updates the value of input which has been changed from initial one', function() {
+
+    injectHTML('<input-updated></input-updated>')
+
+    var tag = riot.mount('input-updated')[0]
+    expect(tag.refs.i.value).to.be.equal('Hello, Riot!')
+    tag.refs.i.value = 'Hi!'
+    fireEvent(tag.refs.b, 'click')
+    expect(tag.refs.i.value).to.be.equal('Can you hear me?')
 
     tag.unmount()
   })
