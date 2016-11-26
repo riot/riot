@@ -896,6 +896,26 @@ describe('Riot core', function() {
 
   })
 
+  it('the class attributes get properly removed in case of falsy values', function() {
+
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', '<p class="{ foo: isFoo }"></p>', function() {
+      this.isFoo = true
+    })
+
+    var tag = riot.mount('riot-tmp')[0],
+      p = $('p', tag.root)
+
+    expect(p.hasAttribute('class')).to.be.equal(true)
+    tag.isFoo = false
+    tag.update()
+    expect(p.hasAttribute('class')).to.be.equal(false)
+
+    tag.unmount()
+
+  })
+
   it('make sure the tag context is preserved during updates', function(done) {
     injectHTML('<update-context></update-context>')
 
