@@ -310,17 +310,22 @@ describe('Riot core', function() {
     expect($('input', divs[1]).getAttribute('type')).to.be.equal('color')
     expect($('input', divs[2]).getAttribute('type')).to.be.equal('date')
     expect($('input', divs[3]).getAttribute('type')).to.be.equal('date')
+    expect(tag.tags['dynamic-data-toggle']).to.be.an('object')
 
     tag.single = 'color'
+    tag.toggle = false
     tag.update()
     expect($('input', divs[3]).getAttribute('type')).to.be.equal('color')
+    expect(tag.tags['dynamic-data-toggle']).to.be.equal(undefined)
 
     tag.intags.reverse()
+    tag.toggle = true
     tag.update()
     divs = $$('div', tag.root)
     expect($('input', divs[0]).getAttribute('type')).to.be.equal('date')
     expect($('input', divs[1]).getAttribute('type')).to.be.equal('color')
     expect($('input', divs[2]).getAttribute('type')).to.be.equal('color')
+    expect(tag.tags['dynamic-data-toggle']).to.be.an('object')
 
     tag.intags.splice(1, 1)
     tag.update()

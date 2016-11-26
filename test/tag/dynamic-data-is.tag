@@ -6,9 +6,12 @@
   <input type="date" name="{ opts.name }" />
 </calendar>
 
+<dynamic-data-toggle>foo</dynamic-data-toggle>
+
 <dynamic-data-is>
   <div each={inp in intags } data-is={ inp.tag } inpname={ inp.name }></div>
   <div data-is={single}></div>
+  <div if={ toggle } data-is={ toggleTag }></div>
 
   this.intags = [
     {name: 'aaa', tag: 'color'},
@@ -16,7 +19,8 @@
     {name: 'ccc', tag: 'calendar'}
   ]
 
+  this.toggle = true
+  this.toggleTag = 'dynamic-data-toggle'
+
   this.single = 'calendar'
-
-
 </dynamic-data-is>
