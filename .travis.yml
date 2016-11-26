@@ -16,5 +16,9 @@ sudo: false
 after_success:
   test $TRAVIS_PULL_REQUEST == "false" && make test-sauce && make test-coveralls
 
+cache:
+  directories:
+    - node_modules
+
 notifications:
     email: false
