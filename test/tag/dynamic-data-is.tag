@@ -1,9 +1,9 @@
 <color>
-  <input type="color" name="{ opts.name }" />
+  <input type="color" name="{ opts.inpname }" />
 </color>
 
 <calendar>
-  <input type="date" name="{ opts.name }" />
+  <input type="date" name="{ opts.inpname }" />
 </calendar>
 
 <dynamic-data-toggle>

@@ -307,6 +307,7 @@ describe('Riot core', function() {
     var tag = riot.mount('dynamic-data-is')[0]
     var divs = $$('div', tag.root)
     expect($('input', divs[0]).getAttribute('type')).to.be.equal('color')
+    expect($('input', divs[0]).getAttribute('name')).to.be.equal('aaa')
     expect($('input', divs[1]).getAttribute('type')).to.be.equal('color')
     expect($('input', divs[2]).getAttribute('type')).to.be.equal('date')
     expect($('input', divs[3]).getAttribute('type')).to.be.equal('date')
@@ -314,9 +315,11 @@ describe('Riot core', function() {
 
     tag.single = 'color'
     tag.toggle = false
+    tag.intags[0].name = 'ddd'
     tag.update()
     expect($('input', divs[3]).getAttribute('type')).to.be.equal('color')
     expect(tag.tags['dynamic-data-toggle']).to.be.equal(undefined)
+    expect($('input', divs[0]).getAttribute('name')).to.be.equal('ddd')
 
     tag.intags.reverse()
     tag.toggle = true
