@@ -27,7 +27,7 @@
 | Web Components Polyfill                        | 0.7.22          | 33.66kb              |
 | Vue                                            | 1.0.28          | 26.83kb              |
 | Vue                                            | 2.1.0           | 25.44kb              |
-| Riot                                           | 3.0.0           | 9.73kb               |
+| Riot                                           | 3.0.1           | 9.75kb               |
 
 ### Browsers support
 
