@@ -750,7 +750,7 @@ describe('Riot core', function() {
     tag.unmount()
   })
 
-  it('updates the value of input which has been changed from initial one', function() {
+  it('updates the value of input which has been changed from initial one #2096', function() {
 
     injectHTML('<input-updated></input-updated>')
 
@@ -759,6 +759,23 @@ describe('Riot core', function() {
     tag.refs.i.value = 'Hi!'
     fireEvent(tag.refs.b, 'click')
     expect(tag.refs.i.value).to.be.equal('Can you hear me?')
+
+    tag.unmount()
+  })
+
+  it('fails to update the value of input which has the same internal value #1642 #2112', function() {
+
+    injectHTML('<input-updated></input-updated>')
+
+    var tag = riot.mount('input-updated')[0]
+    fireEvent(tag.refs.b, 'click')
+    expect(tag.refs.i.value).to.be.equal('Can you hear me?')
+
+    tag.refs.i.value = 'Yeah.'
+    fireEvent(tag.refs.b, 'click')
+    expect(tag.refs.i.value).not.to.be.equal('Can you hear me?')
+    // IT MAY SEEM WEIRD AT FIRST, BUT THIS IS SPEC.
+    // See more detail on #1642
 
     tag.unmount()
   })
