@@ -111,6 +111,22 @@ describe('Riot core', function() {
 
   })
 
+  it('node should not preserve attributes from tag mounted on it when it is unmounted', function() {
+    injectHTML('<div id="node"></div>')
+
+    var tag = riot.mount('#node', 'top-attributes', { cls: 'test' })[0]
+
+    expect(tag.root.hasAttribute('class')).to.be.equal(true)
+    expect(tag.root.hasAttribute('style')).to.be.equal(true)
+    expect(tag.root.hasAttribute('data-nqlast')).to.be.equal(true)
+
+    tag.unmount()
+
+    expect(tag.root.hasAttribute('class')).to.be.equal(false)
+    expect(tag.root.hasAttribute('style')).to.be.equal(false)
+    expect(tag.root.hasAttribute('data-nqlast')).to.be.equal(false)
+  })
+
   it('mount a tag mutiple times', function() {
 
     injectHTML([
