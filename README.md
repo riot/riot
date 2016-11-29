@@ -6,6 +6,7 @@
 [![Build Status][travis-image]][travis-url]
 [![Riot Forum][riot-forum-image]][riot-forum-url]
 [![Join the chat at https://gitter.im/riot/riot][gitter-image]][gitter-url]
+[![Join the chat (ja) at https://riot-jp-slackin.herokuapp.com/][slack-ja-image]][slack-ja-url]
 
 [![NPM version][npm-version-image]][npm-url]
 [![NPM downloads][npm-downloads-image]][npm-url]
@@ -311,6 +312,9 @@ http://riotjs.com/
 
 [gitter-image]:https://img.shields.io/badge/GITTER-JOIN_CHAT_%E2%86%92-1dce73.svg?style=flat-square
 [gitter-url]:https://gitter.im/riot/riot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
+[slack-ja-image]:https://img.shields.io/badge/SLACK_(ja)-JOIN_CHAT_%E2%86%92-551a8b.svg?style=flat-square
+[slack-ja-url]:https://riot-jp-slackin.herokuapp.com/
 
 [codeclimate-image]:https://img.shields.io/codeclimate/github/riot/riot.svg?style=flat-square
 [codeclimate-url]:https://codeclimate.com/github/riot/riot
