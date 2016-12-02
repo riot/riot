@@ -94,8 +94,7 @@ export function setCarrotPos(dom, pos) {
   range.select()
 }
 
-export function fireEvent(el, name) {
-  var e = document.createEvent('HTMLEvents')
-  e.initEvent(name, false, true)
+export function fireEvent(el, name, bubbles = false, cancelable = true) {
+  var e = new Event(name, {'bubbles': bubbles, 'cancelable': cancelable})
   el.dispatchEvent(e)
 }
