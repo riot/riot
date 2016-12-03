@@ -96,13 +96,5 @@
   },
   "main": "lib/server/index.js",
   "jsnext:main": "lib/index.js",
-  "browser": "riot.js",
-  "spm": {
-    "main": "riot.js",
-    "ignore": [
-      "test",
-      "lib",
-      "make"
-    ]
-  }
+  "browser": "riot.js"
 }
