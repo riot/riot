@@ -190,6 +190,8 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot Routehandler](https://github.com/crisward/riot-routehandler)-[(Demo)](http://codepen.io/crisward/pen/xwGJpM?editors=101)
 - [Riot Flipcard](https://github.com/crisward/riot-flipcard) - [(Demo)](https://crisward.github.io/riot-flipcard/)
 - [Riot Grid](https://github.com/crisward/riot-grid) - [(Demo)](http://codepen.io/crisward/pen/rxepMX?editors=101)
+- [Riot Grid2](https://github.com/crisward/riot-grid2) - [(Demo)](http://crisward.github.io/riot-grid2/)
+- [Riot Subtag](https://github.com/crisward/riot-subtag) - faster than lots of if's
 - [ESLint Riot Plugin](https://github.com/txchen/eslint-plugin-riot)
 - [riot-animate](https://github.com/sartaj/riot-animate)
 - [Nest UI](https://github.com/fengzilong/Nest) - [(Demo)](https://fengzilong.github.io/Nest/)
