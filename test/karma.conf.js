@@ -62,19 +62,15 @@ module.exports = function(conf) {
     rollupPreprocessor: {
       // use our default rollup plugins adding also the riot plugin
       // to import dinamically the tags
-      rollup: {
-        external: ['riot', 'external-helpers'],
-        plugins: [
-          require('rollup-plugin-riot')()
-        ].concat(require('../config/defaults').plugins)
+      external: ['riot', 'external-helpers'],
+      plugins: [
+        require('rollup-plugin-riot')()
+      ].concat(require('../config/defaults').plugins),
+      globals: {
+        riot: 'riot'
       },
-      bundle: {
-        globals: {
-          riot: 'riot'
-        },
-        format: 'iife'
-        // sourceMap: 'inline' TODO: enable the sourcemaps in the compiler
-      }
+      format: 'iife'
+      // sourceMap: 'inline' TODO: enable the sourcemaps in the compiler
     },
 
     client: {
