@@ -21,14 +21,13 @@
 | Framework                                      | Version         | Minified Size (gzip) |
 |------------------------------------------------|-----------------|----------------------|
 | Angular2                                       | 2               | too much             |
-| Ember                                          | 2.9.1           | 110.30kb             |
+| Ember                                          | 2.10.0          | 130.52kb             |
 | Angular                                        | 1.5.8           | 56.28kb              |
 | Polymer + Web Components Polyfill Lite         | 1.7.0           | 50.25kb              |
-| React                                          | 15.4.0          | 45.05kb              |
-| Web Components Polyfill                        | 0.7.22          | 33.66kb              |
-| Vue                                            | 1.0.28          | 26.83kb              |
-| Vue                                            | 2.1.0           | 25.44kb              |
-| Riot                                           | 3.0.1           | 9.75kb               |
+| React                                          | 15.4.1          | 45.11kb              |
+| Web Components Polyfill                        | 0.7.22          | 33.68kb              |
+| Vue                                            | 2.1.4           | 25.55kb              |
+| Riot                                           | 3.0.2           | 9.81kb               |
 
 ### Browsers support
 
