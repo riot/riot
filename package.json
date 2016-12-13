@@ -46,11 +46,11 @@
   ],
   "dependencies": {
     "riot-cli": "^3.0.0",
-    "riot-compiler": "^3.1.0",
+    "riot-compiler": "^3.1.1",
     "riot-observable": "^3.0.0",
     "riot-tmpl": "^3.0.1",
     "simple-dom": "0.3.2",
-    "simple-html-tokenizer": "^0.2.5"
+    "simple-html-tokenizer": "^0.2.6"
   },
   "devDependencies": {
     "benchmark": "^2.1.2",
@@ -58,7 +58,7 @@
     "cheerio": "^0.22.0",
     "chokidar-cli": "^1.2.0",
     "coveralls": "^2.11.15",
-    "eslint": "^3.11.1",
+    "eslint": "^3.12.1",
     "glob": "^7.1.1",
     "istanbul": "^0.4.5",
     "jsdom": "^9.8.3",
@@ -70,8 +70,8 @@
     "karma-rollup-preprocessor": "^3.0.1",
     "karma-sauce-launcher": "^1.1.0",
     "mocha": "^3.2.0",
-    "phantomjs-prebuilt": "^2.1.13",
-    "rollup": "^0.36.4",
+    "phantomjs-prebuilt": "^2.1.14",
+    "rollup": "^0.37.0",
     "rollup-plugin-alias": "^1.2.0",
     "rollup-plugin-buble": "^0.14.0",
     "rollup-plugin-commonjs": "^5.0.5",
