@@ -1,4 +1,4 @@
-/* Riot v3.0.2, @license MIT */
+/* Riot v3.0.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -311,6 +311,7 @@ var styleNode;
 var cssTextProp;
 var byName = {};
 var remainder = [];
+var needsInject = false;
 
 // skip the following code on the server
 if (WIN) {
@@ -345,13 +346,15 @@ var styleManager = {
   add: function add(css, name) {
     if (name) { byName[name] = css; }
     else { remainder.push(css); }
+    needsInject = true;
   },
   /**
    * Inject all previously saved tag styles into DOM
    * innerHTML seems slow: http://jsperf.com/riot-insert-style
    */
   inject: function inject() {
-    if (!WIN) { return }
+    if (!WIN || !needsInject) { return }
+    needsInject = false;
     var style = Object.keys(byName)
       .map(function(k) { return byName[k] })
       .concat(remainder).join('\n');
@@ -1128,7 +1131,8 @@ function updateDataIs(expr, parent) {
 function updateExpression(expr) {
   var dom = expr.dom,
     attrName = expr.attr,
-    value = tmpl(expr.expr, this),
+    isToggle = /^(show|hide)$/.test(attrName),
+    value = isToggle || tmpl(expr.expr, this),
     isValueAttr = attrName === 'riot-value',
     isVirtual = expr.root && expr.root.tagName === 'VIRTUAL',
     parent = dom && (expr.parent || dom.parentNode),
@@ -1198,7 +1202,8 @@ function updateExpression(expr) {
   if (isFunction(value)) {
     setEventHandler(attrName, value, dom, this);
   // show / hide
-  } else if (/^(show|hide)$/.test(attrName)) {
+  } else if (isToggle) {
+    value = tmpl(expr.expr, extend({}, this, this.parent));
     if (attrName === 'hide') { value = !value; }
     dom.style.display = value ? '' : 'none';
   // field value
