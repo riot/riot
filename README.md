@@ -22,12 +22,12 @@
 |------------------------------------------------|-----------------|----------------------|
 | Angular2                                       | 2               | too much             |
 | Ember                                          | 2.10.0          | 130.52kb             |
-| Angular                                        | 1.5.8           | 56.28kb              |
+| Angular                                        | 1.6.0           | 57.80kb              |
 | Polymer + Web Components Polyfill Lite         | 1.7.0           | 50.25kb              |
 | React                                          | 15.4.1          | 45.11kb              |
 | Web Components Polyfill                        | 0.7.22          | 33.68kb              |
-| Vue                                            | 2.1.4           | 25.55kb              |
-| Riot                                           | 3.0.2           | 9.81kb               |
+| Vue                                            | 2.1.6           | 25.93kb              |
+| Riot                                           | 3.0.3           | 9.84kb               |
 
 ### Browsers support
 
