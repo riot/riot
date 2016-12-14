@@ -1,4 +1,4 @@
-/* Riot v3.0.3, @license MIT */
+/* Riot v3.0.4, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1169,7 +1169,7 @@ function updateExpression(expr) {
   }
 
   if (expr.isRtag && value) { return updateDataIs(expr, this) }
-  if (old === value) { return }
+  if (old === value && !isToggle) { return }
   // no change, so nothing more to do
   if (isValueAttr && dom.value === value) { return }
 
