@@ -32,6 +32,9 @@ it('the show directive works as expected', function() {
   tag.isVisible = true
   tag.update()
   expect(p.style.display).to.be.not.equal('none')
+  tag.isVisible = false
+  tag.update()
+  expect(p.style.display).to.be.equal('none')
 
   // teardown
   riot.unregister('riot-show-tmp')
