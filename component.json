@@ -1,6 +1,6 @@
 {
   "name": "riot",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "description": "A React-like user interface micro-library",
   "repository": "riot/riot",
   "license": "MIT",

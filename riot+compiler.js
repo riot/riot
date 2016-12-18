@@ -1,4 +1,4 @@
-/* Riot v3.0.4, @license MIT */
+/* Riot v3.0.5, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1132,7 +1132,8 @@ function updateExpression(expr) {
   var dom = expr.dom,
     attrName = expr.attr,
     isToggle = /^(show|hide)$/.test(attrName),
-    value = isToggle || tmpl(expr.expr, this),
+    // the value for the toggle must consider also the parent tag
+    value = isToggle ? tmpl(expr.expr, extend({}, this, this.parent)) : tmpl(expr.expr, this),
     isValueAttr = attrName === 'riot-value',
     isVirtual = expr.root && expr.root.tagName === 'VIRTUAL',
     parent = dom && (expr.parent || dom.parentNode),
@@ -1169,7 +1170,7 @@ function updateExpression(expr) {
   }
 
   if (expr.isRtag && value) { return updateDataIs(expr, this) }
-  if (old === value && !isToggle) { return }
+  if (old === value) { return }
   // no change, so nothing more to do
   if (isValueAttr && dom.value === value) { return }
 
@@ -1203,7 +1204,6 @@ function updateExpression(expr) {
     setEventHandler(attrName, value, dom, this);
   // show / hide
   } else if (isToggle) {
-    value = tmpl(expr.expr, extend({}, this, this.parent));
     if (attrName === 'hide') { value = !value; }
     dom.style.display = value ? '' : 'none';
   // field value
@@ -1218,7 +1218,7 @@ function updateExpression(expr) {
       { setAttr(dom, attrName, value); }
   } else {
     // <select> <option selected={true}> </select>
-    if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value != null) {
+    if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value) {
       parent.value = dom.value;
     } if (expr.bool) {
       dom[attrName] = value;
@@ -1234,7 +1234,7 @@ function updateExpression(expr) {
  * @this Tag
  * @param { Array } expressions - expression that must be re evaluated
  */
-function update$1$1(expressions) {
+function updateAllExpressions(expressions) {
   each(expressions, updateExpression.bind(this));
 }
 
@@ -1252,7 +1252,7 @@ var IfExpr = {
 
     return this
   },
-  update: function update$1() {
+  update: function update() {
     var newValue = tmpl(this.expr, this.parentTag);
 
     if (newValue && !this.current) { // insert
@@ -1271,7 +1271,7 @@ var IfExpr = {
       this.expressions = [];
     }
 
-    if (newValue) { update$1$1.call(this.parentTag, this.expressions); }
+    if (newValue) { updateAllExpressions.call(this.parentTag, this.expressions); }
   },
   unmount: function unmount() {
     unmountAll(this.expressions || []);
@@ -1448,7 +1448,7 @@ function _each(dom, parent, expr) {
     tagName = getTagName(dom),
     impl = __TAG_IMPL[tagName] || { tmpl: getOuterHTML(dom) },
     useRoot = RE_SPECIAL_TAGS.test(tagName),
-    root = dom.parentNode,
+    parentNode = dom.parentNode,
     ref = createDOMPlaceholder(),
     child = getTag(dom),
     ifExpr = getAttr(dom, 'if'),
@@ -1466,27 +1466,15 @@ function _each(dom, parent, expr) {
   if (ifExpr) { remAttr(dom, 'if'); }
 
   // insert a marked where the loop tags will be injected
-  root.insertBefore(ref, dom);
-  root.removeChild(dom);
+  parentNode.insertBefore(ref, dom);
+  parentNode.removeChild(dom);
 
   expr.update = function updateEach() {
 
     // get the new items collection
     var items = tmpl(expr.val, parent),
-      parentNode,
-      frag,
-      placeholder;
-
-
-    root = ref.parentNode;
-
-    if (parentNode) {
-      placeholder = createDOMPlaceholder('');
-      parentNode.insertBefore(placeholder, root);
-      parentNode.removeChild(root);
-    } else {
-      frag = createFrag();
-    }
+      frag = createFrag(),
+      root = ref.parentNode;
 
     // object loop. any changes cause full redraw
     if (!isArray(items)) {
@@ -1584,13 +1572,7 @@ function _each(dom, parent, expr) {
     // clone the items array
     oldItems = items.slice();
 
-    if (frag) {
-      root.insertBefore(frag, ref);
-    } else {
-      parentNode.insertBefore(root, placeholder);
-      parentNode.removeChild(placeholder);
-    }
-
+    root.insertBefore(frag, ref);
   };
 
   expr.unmount = function() {
@@ -1989,7 +1971,7 @@ function mixin$$1(name, mix, g) {
  * Update all the tags instances created
  * @returns { Array } all the tags instances
  */
-function update$2() {
+function update$1() {
   return each(__TAGS_CACHE, function (tag$$1) { return tag$$1.update(); })
 }
 
@@ -2018,7 +2000,7 @@ function updateOpts(isLoop, parent, isAnonymous, opts, instAttrs) {
 
   var ctx = !isAnonymous && isLoop ? this : parent || this;
   each(instAttrs, function (attr) {
-    if (attr.expr) { update$1$1.call(ctx, [attr.expr]); }
+    if (attr.expr) { updateAllExpressions.call(ctx, [attr.expr]); }
     opts[toCamel(attr.name)] = attr.expr ? attr.expr.value : attr.value;
   });
 }
@@ -2070,7 +2052,8 @@ function Tag$$1(impl, conf, innerHTML) {
   // it could be handy to use it also to improve the virtual dom rendering speed
   defineProperty(this, '_riot_id', ++__uid); // base 1 allows test !t._riot_id
 
-  extend(this, { parent: parent, root: root, opts: opts }, item);
+  extend(this, { root: root, opts: opts }, item);
+  defineProperty(this, 'parent', parent || false);
   // protect the "tags" and "refs" property from being overridden
   defineProperty(this, 'tags', {});
   defineProperty(this, 'refs', {});
@@ -2094,7 +2077,7 @@ function Tag$$1(impl, conf, innerHTML) {
     extend(this, data);
     updateOpts.apply(this, [isLoop, parent, isAnonymous, opts, instAttrs]);
     if (this.isMounted) { this.trigger('update', data); }
-    update$1$1.call(this, expressions);
+    updateAllExpressions.call(this, expressions);
     if (this.isMounted) { this.trigger('updated'); }
 
     return this
@@ -2362,7 +2345,7 @@ function initChildTag(child, opts, innerHTML, parent) {
     tagName = opts.tagName || getTagName(opts.root, true),
     ptag = getImmediateCustomParentTag(parent);
   // fix for the parent attribute in the looped elements
-  tag.parent = ptag;
+  defineProperty(tag, 'parent', ptag);
   // store the real parent tag
   // in some cases this could be different from the custom parent tag
   // for example in nested loops
@@ -2653,7 +2636,7 @@ var riot$1 = Object.freeze({
 	tag2: tag2$$1,
 	mount: mount$1,
 	mixin: mixin$$1,
-	update: update$2,
+	update: update$1,
 	unregister: unregister$$1
 });
 
