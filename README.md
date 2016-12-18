@@ -27,7 +27,7 @@
 | React                                          | 15.4.1          | 45.11kb              |
 | Web Components Polyfill                        | 0.7.22          | 33.68kb              |
 | Vue                                            | 2.1.6           | 25.93kb              |
-| Riot                                           | 3.0.4           | 9.85kb               |
+| Riot                                           | 3.0.5           | 9.81kb               |
 
 ### Browsers support
 
