@@ -207,6 +207,27 @@ describe('Riot core', function() {
 
   })
 
+  it('an <option> tag having the attribute "selected" should be the value of the parent <select> tag', function() {
+    injectHTML('<tmp-select-tag></tmp-select-tag>')
+
+    riot.tag('tmp-select-tag', `
+    <select ref='select'>
+      <option value="1" selected="{v == 1}">1</option>
+      <option value="2" selected="{v == 2}">2</option>
+      <option value="3" selected="{v == 3}">3</option>
+    </select>`,
+    function() {
+      this.v = 2
+    })
+
+    var tag = riot.mount('tmp-select-tag')[0]
+
+    expect(tag.refs.select.selectedIndex).to.be.equal(1)
+
+    tag.unmount()
+    riot.unregister('tmp-select-tag')
+  })
+
   it('the mount method could be triggered also on several tags using a NodeList instance', function() {
 
     injectHTML([
