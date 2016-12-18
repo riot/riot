@@ -6,9 +6,9 @@
     <button onclick={reorder}>Reorder</button>
     <script>
         this.items = [
-            {name: "item 1", tags: null},
-            {name: "item 2", tags: ["a", "b", "c"]},
-            {name: "item3"}
+            {refs: "item 1", tags: null, parent: 'foo'},
+            {refs: "item 2", tags: ["a", "b", "c"]},
+            {refs: "item3"}
         ]
 
         reorder() {
