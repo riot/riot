@@ -11,6 +11,7 @@ import '../../../tag/inner-html.tag'
 import '../../../tag/yield-no-slash.tag'
 import '../../../tag/yield-multi.tag'
 import '../../../tag/yield-multi2.tag'
+import '../../../tag/yield-multi3.tag'
 import '../../../tag/yield-from-default.tag'
 import '../../../tag/yield-nested.tag'
 
@@ -70,11 +71,9 @@ describe('Riot transclusion', function() {
       '      <li>Option 2</li>',
       '    </ul>',
       '  </yield>',
-      '  <div>',
       '    <yield to="toggle"><span class="icon"></span></yield>',
       '    <yield to="hello">Hello</yield><yield to="world">World</yield>',
       '    <yield to="hello">dummy</yield>',
-      '  </div>',
       '</yield-multi2>'
     ]
     injectHTML(html.join('\n'))
@@ -85,6 +84,35 @@ describe('Riot transclusion', function() {
     tag.unmount()
   })
 
+  it('<yield> from/to multi-transclusion nested ', function() {
+    var html = [
+      '<yield-multi3>',
+      '  <yield to="header">',
+      '    <span>header1</span>',
+      '  </yield>',
+      '  <yield-multi3>',
+      '    <yield to="header">',
+      '      <span>header2</span>',
+      '    </yield>',
+      '    <span>content</span>',
+      '  </yield-multi3>',
+      '</yield-multi3>'
+    ]
+    injectHTML(html.join('\n'))
+    expect($('yield-multi3')).not.to.be.equal(null)
+    var tag = riot.mount('yield-multi3', {})[0]
+    html = [
+      '<div class="header"><span>header1</span></div>',
+      '<div class="content">',
+      '<yield-multi3>',
+      '<div class="header"><span>header2</span></div>',
+      '<div class="content"><span>content</span></div>',
+      '</yield-multi3>',
+      '</div>'
+    ].join('')
+    expect(normalizeHTML(tag.root.innerHTML)).to.be.equal(html)
+    tag.unmount()
+  })
 
   it('<yield from> name can be unquoted, without <yield to> default to its content', function () {
     var html = [
