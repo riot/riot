@@ -364,6 +364,7 @@ describe('Riot core', function() {
     expect($('input', divs[1]).getAttribute('type')).to.be.equal('color')
     expect($('input', divs[2]).getAttribute('type')).to.be.equal('date')
     expect($('input', divs[3]).getAttribute('type')).to.be.equal('date')
+    expect($('input', divs[3]).getAttribute('name')).to.be.equal('calendar')
     expect(tag.tags['dynamic-data-toggle']).to.be.an('object')
 
     tag.single = 'color'
@@ -371,6 +372,7 @@ describe('Riot core', function() {
     tag.intags[0].name = 'ddd'
     tag.update()
     expect($('input', divs[3]).getAttribute('type')).to.be.equal('color')
+    expect($('input', divs[3]).getAttribute('name')).to.be.equal('color')
     expect(tag.tags['dynamic-data-toggle']).to.be.equal(undefined)
     expect($('input', divs[0]).getAttribute('name')).to.be.equal('ddd')
 
