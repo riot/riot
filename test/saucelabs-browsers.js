@@ -50,11 +50,11 @@ module.exports = {
       platform: 'Windows 8.1',
       version: '11'
     },
-/*    slEdge: {
+    slEdge: {
       base: 'SauceLabs',
       browserName: 'MicrosoftEdge',
       platform: 'Windows 10'
-    },*/
+    },
     slChrome: {
       base: 'SauceLabs',
       browserName: 'chrome'
@@ -62,11 +62,6 @@ module.exports = {
     slFirefox: {
       base: 'SauceLabs',
       browserName: 'firefox'
-    },
-    slAndroid4: {
-      base: 'SauceLabs',
-      browserName: 'android',
-      version: '4.0'
     },
     slAndroid5: {
       base: 'SauceLabs',
