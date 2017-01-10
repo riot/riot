@@ -4,19 +4,18 @@
   </ul>
 
   <script>
-    this.items = generateInitial()
 
-    function generateInitial() {
+    generateInitial() {
       var i;
       var list = [];
-      for (i = 0; i < 5; i++)
+      for (i = 0; i < this.itemsAmount; i++)
         list.push({ name: i });
       return list;
     }
 
     addEditList() {
       this.items.splice(2, 1);
-      this.items.splice(3, 1);
+      this.items.splice(4, 1);
 
       this.items.push({ name: "new" });
       this.items.push({ name: "new" });
@@ -30,6 +29,9 @@
         return 0
       })
     }
+
+    this.itemsAmount = 10
+    this.items = this.generateInitial()
 
   </script>
 </loop-bug-2205>

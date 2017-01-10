@@ -1386,17 +1386,28 @@ describe('Riot each', function() {
     injectHTML('<loop-bug-2205></loop-bug-2205>')
     var tag = riot.mount('loop-bug-2205')[0]
 
-    expect(tag.items).to.have.length(5)
-    expect(tag.refs.items).to.have.length(5)
+    expect(tag.items).to.have.length(tag.itemsAmount)
+    expect(tag.refs.items).to.have.length(tag.itemsAmount)
 
     tag.addEditList()
     tag.update()
 
-    expect(tag.items).to.have.length(5)
-    expect(tag.refs.items).to.have.length(5)
+    expect(tag.items).to.have.length(tag.itemsAmount)
+    expect(tag.refs.items).to.have.length(tag.itemsAmount)
 
-    expect(tag.refs.items[3].textContent).to.be.equal('new')
-    expect(tag.refs.items[4].textContent).to.be.equal('new')
+    expect(tag.refs.items[tag.itemsAmount - 1].textContent).to.be.equal('new')
+    expect(tag.refs.items[tag.itemsAmount - 2].textContent).to.be.equal('new')
+
+    tag.addEditList()
+    tag.update()
+
+    expect(tag.items).to.have.length(tag.itemsAmount)
+    expect(tag.refs.items).to.have.length(tag.itemsAmount)
+
+    expect(tag.refs.items[tag.itemsAmount - 1].textContent).to.be.equal('new')
+    expect(tag.refs.items[tag.itemsAmount - 2].textContent).to.be.equal('new')
+    expect(tag.refs.items[tag.itemsAmount - 3].textContent).to.be.equal('new')
+    expect(tag.refs.items[tag.itemsAmount - 4].textContent).to.be.equal('new')
 
     tag.unmount()
   })
