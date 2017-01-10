@@ -1,4 +1,4 @@
-/* Riot v3.0.6, @license MIT */
+/* Riot v3.0.7, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -8039,8 +8039,10 @@ function _each(dom, parent, expr) {
 
     if (ifExpr) {
       items = items.filter(function(item, i) {
-        if (expr.key && !isObject$$1) { return !!csp_tmpl_1(ifExpr, mkitem(expr, item, i, parent)) }
-        return !!csp_tmpl_1(ifExpr, item)
+        if (expr.key && !isObject$$1)
+          { return !!csp_tmpl_1(ifExpr, mkitem(expr, item, i, parent)) }
+
+        return !!csp_tmpl_1(ifExpr, extend(Object.create(parent), item))
       });
     }
 

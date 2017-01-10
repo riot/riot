@@ -1,4 +1,4 @@
-/* Riot v3.0.6, @license MIT */
+/* Riot v3.0.7, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1489,8 +1489,10 @@ function _each(dom, parent, expr) {
 
     if (ifExpr) {
       items = items.filter(function(item, i) {
-        if (expr.key && !isObject$$1) { return !!tmpl(ifExpr, mkitem(expr, item, i, parent)) }
-        return !!tmpl(ifExpr, item)
+        if (expr.key && !isObject$$1)
+          { return !!tmpl(ifExpr, mkitem(expr, item, i, parent)) }
+
+        return !!tmpl(ifExpr, extend(Object.create(parent), item))
       });
     }
 
