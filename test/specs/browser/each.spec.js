@@ -48,6 +48,7 @@ import '../../tag/loop-sync-options.tag'
 import '../../tag/outer.tag'
 import '../../tag/reserved-names.tag'
 import '../../tag/loop-bug-1649.tag'
+import '../../tag/loop-bug-2205.tag'
 
 import '../../tag/select-test.tag'
 import '../../tag/named-select.tag'
@@ -1367,5 +1368,22 @@ describe('Riot each', function() {
 
     children = $$('.list', tag.root)
     expect(children.length).to.be.equal(1)
+  })
+
+  it('looped items will be rendered keeping the right order when sorted', function() {
+    injectHTML('<loop-bug-2205></loop-bug-2205>')
+    var tag = riot.mount('loop-bug-2205')[0]
+
+    expect(tag.items).to.have.length(5)
+    expect(tag.refs.items).to.have.length(5)
+
+    tag.addEditList()
+    tag.update()
+
+    expect(tag.items).to.have.length(5)
+    expect(tag.refs.items).to.have.length(5)
+
+    expect(tag.refs.items[3].textContent).to.be.equal('new')
+    expect(tag.refs.items[4].textContent).to.be.equal('new')
   })
 })
