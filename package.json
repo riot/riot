@@ -95,6 +95,6 @@
     "riot": "node_modules/riot-cli/lib/index.js"
   },
   "main": "lib/server/index.js",
-  "jsnext:main": "lib/index.js",
+  "jsnext:main": "lib/riot.js",
   "browser": "riot.js"
 }
