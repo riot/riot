@@ -757,6 +757,8 @@ describe('Riot each', function() {
       expect(tag.root.getElementsByTagName('div').length).to.be.equal(2)
       expect(tag.root.getElementsByTagName('loop-conditional-item').length).to.be.equal(2)
       expect(tag.tags['loop-conditional-item'].length).to.be.equal(2)
+      expect(tag.refs.article).to.have.length(tag.items.length)
+
       tag.items = []
       tag.update()
       expect(tag.root.getElementsByTagName('div').length).to.be.equal(0)

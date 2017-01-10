@@ -2,6 +2,9 @@
   <div onclick={ change } each={ items } if={ value <= 2 }>
     <loop-conditional-nested-item value={value} ></loop-conditional-nested-item>
   </div>
+  <article ref="article" each={ items } if={ items.length }>
+    item
+  </article>
   <loop-conditional-item onclick={ change } each={ items } if={ value <= 2 } value={ value }>
   </loop-conditional-item>
 
