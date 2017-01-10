@@ -30,6 +30,7 @@ import '../../tag/loop-reorder.tag'
 import '../../tag/loop-swap-type.tag'
 import '../../tag/loop-manip.tag'
 import '../../tag/loop-object.tag'
+import '../../tag/loop-object-conditional.tag'
 import '../../tag/loop-tag-instances.tag'
 import '../../tag/loop-numbers-nested.tag'
 import '../../tag/loop-nested-strings-array.tag'
@@ -404,6 +405,13 @@ describe('Riot each', function() {
     expect(normalizeHTML(root.getElementsByTagName('div')[0].innerHTML))
       .to.be.equal('<p>zero = 0</p><p>one = 2</p><p>two = 4</p><p>three = 6</p>')
 
+    tag.unmount()
+  })
+
+  it('conditional directives work also on object loops', function() {
+    injectHTML('<loop-object-conditional></loop-object-conditional>')
+    var tag = riot.mount('loop-object-conditional')[0]
+    expect(tag.refs.items).to.have.length(4)
     tag.unmount()
   })
 
@@ -1368,6 +1376,8 @@ describe('Riot each', function() {
 
     children = $$('.list', tag.root)
     expect(children.length).to.be.equal(1)
+
+    tag.unmount()
   })
 
   it('looped items will be rendered keeping the right order when sorted', function() {
@@ -1385,5 +1395,7 @@ describe('Riot each', function() {
 
     expect(tag.refs.items[3].textContent).to.be.equal('new')
     expect(tag.refs.items[4].textContent).to.be.equal('new')
+
+    tag.unmount()
   })
 })
