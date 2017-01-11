@@ -1131,6 +1131,8 @@ describe('Riot core', function() {
     first = tag.root.firstElementChild
     expect(first.tagName).to.be.equal('SPAN')
     expect(first.innerHTML).to.be.equal('virtual data-is')
+
+    tag.unmount()
   })
 
 })
