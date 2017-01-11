@@ -38,6 +38,7 @@ import '../../tag/data-is.tag'
 import '../../tag/virtual-nested-component.tag'
 import '../../tag/dynamic-data-is.tag'
 import '../../tag/update-context.tag'
+import '../../tag/dynamic-virtual.tag'
 
 const expect = chai.expect,
   defaultBrackets = riot.settings.brackets
@@ -1115,6 +1116,21 @@ describe('Riot core', function() {
     var tag = riot.mount('riot-tmp')[0]
     fireEvent(tag.refs.child, 'click')
     expect(tag.isMounted).to.be.equal(false)
+  })
+
+  it('virtual tags can be used with dynamic data-is', function() {
+    injectHTML('<dynamic-virtual></dynamic-virtual')
+
+    var tag = riot.mount('dynamic-virtual')[0]
+    var first = tag.root.firstElementChild
+    expect(first.tagName).to.be.equal('P')
+    expect(first.innerHTML).to.be.equal('yielded data')
+
+    tag.render = 'xtag'
+    tag.update()
+    first = tag.root.firstElementChild
+    expect(first.tagName).to.be.equal('SPAN')
+    expect(first.innerHTML).to.be.equal('virtual data-is')
   })
 
 })
