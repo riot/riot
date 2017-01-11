@@ -39,6 +39,7 @@ import '../../tag/virtual-nested-component.tag'
 import '../../tag/dynamic-data-is.tag'
 import '../../tag/update-context.tag'
 import '../../tag/dynamic-virtual.tag'
+import '../../tag/dynamic-nested.tag'
 
 const expect = chai.expect,
   defaultBrackets = riot.settings.brackets
@@ -1131,6 +1132,21 @@ describe('Riot core', function() {
     first = tag.root.firstElementChild
     expect(first.tagName).to.be.equal('SPAN')
     expect(first.innerHTML).to.be.equal('virtual data-is')
+
+    tag.unmount()
+  })
+
+  it('nested dynamic tags retain data-is attribute', function() {
+    injectHTML('<dynamic-nested></dynamic-nested')
+    var tag = riot.mount('dynamic-nested')[0]
+
+    expect(tag.refs.dynamic.root.getAttribute('data-is')).to.be.equal('page-a')
+    expect(tag.tags['page-a'].root.querySelector('h1').innerHTML).to.be.equal('page-a')
+
+    tag.page = 'page-b'
+    tag.update()
+    expect(tag.refs.dynamic.root.getAttribute('data-is')).to.be.equal('page-b')
+    expect(tag.tags['page-b'].root.querySelector('h1').innerHTML).to.be.equal('page-b')
 
     tag.unmount()
   })
