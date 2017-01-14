@@ -16,6 +16,11 @@ describe('Node', function() {
     return js.replace(/@version/, '1.0.0')
   }
 
+  it('has default.render', function(done) {
+    expect(typeof riot.default.render).to.be.equal('function')
+    done()
+  })
+
   it('require tags', function(done) {
     glob('../../tag/*.tag', { cwd: __dirname }, function (err, tags) {
       expect(err).to.be.equal(null)
