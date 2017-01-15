@@ -38,6 +38,8 @@ import '../../tag/data-is.tag'
 import '../../tag/virtual-nested-component.tag'
 import '../../tag/dynamic-data-is.tag'
 import '../../tag/update-context.tag'
+import '../../tag/dynamic-virtual.tag'
+import '../../tag/dynamic-nested.tag'
 
 const expect = chai.expect,
   defaultBrackets = riot.settings.brackets
@@ -1115,6 +1117,38 @@ describe('Riot core', function() {
     var tag = riot.mount('riot-tmp')[0]
     fireEvent(tag.refs.child, 'click')
     expect(tag.isMounted).to.be.equal(false)
+  })
+
+  it('virtual tags can be used with dynamic data-is', function() {
+    injectHTML('<dynamic-virtual></dynamic-virtual')
+
+    var tag = riot.mount('dynamic-virtual')[0]
+    var first = tag.root.firstElementChild
+    expect(first.tagName).to.be.equal('P')
+    expect(first.innerHTML).to.be.equal('yielded data')
+
+    tag.render = 'xtag'
+    tag.update()
+    first = tag.root.firstElementChild
+    expect(first.tagName).to.be.equal('SPAN')
+    expect(first.innerHTML).to.be.equal('virtual data-is')
+
+    tag.unmount()
+  })
+
+  it('nested dynamic tags retain data-is attribute', function() {
+    injectHTML('<dynamic-nested></dynamic-nested')
+    var tag = riot.mount('dynamic-nested')[0]
+
+    expect(tag.refs.dynamic.root.getAttribute('data-is')).to.be.equal('page-a')
+    expect(tag.tags['page-a'].root.querySelector('h1').innerHTML).to.be.equal('page-a')
+
+    tag.page = 'page-b'
+    tag.update()
+    expect(tag.refs.dynamic.root.getAttribute('data-is')).to.be.equal('page-b')
+    expect(tag.tags['page-b'].root.querySelector('h1').innerHTML).to.be.equal('page-b')
+
+    tag.unmount()
   })
 
 })
