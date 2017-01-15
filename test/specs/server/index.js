@@ -27,6 +27,10 @@ describe('Node', function() {
     })
   })
 
+  it('riot.default should not be exported in commonjs envirnonments', function() {
+    expect(riot.default).to.be.not.ok
+  })
+
   it('render tag: timer', function() {
     var tmr = riot.render('timer', { start: 42 })
     expect(tmr).to.be.equal('<timer><p>Seconds Elapsed: 42</p></timer>')
