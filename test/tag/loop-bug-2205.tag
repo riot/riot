@@ -4,12 +4,21 @@
   </ul>
 
   <script>
+    function generateString() {
+        var text;
+        var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+
+      for(var i=0; i < 4; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length))
+
+      return text
+    }
 
     generateInitial() {
       var i;
       var list = [];
       for (i = 0; i < this.itemsAmount; i++)
-        list.push({ name: i });
+        list.push({ name: i + generateString() });
       return list;
     }
 
@@ -17,8 +26,8 @@
       this.items.splice(2, 1);
       this.items.splice(4, 1);
 
-      this.items.push({ name: "new" });
-      this.items.push({ name: "new" });
+      this.items.push({ name: 'new' + generateString() });
+      this.items.push({ name: 'new' + generateString() });
 
       this.items.sort(function(a, b) {
         if (a.name < b.name) {

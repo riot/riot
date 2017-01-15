@@ -1395,8 +1395,8 @@ describe('Riot each', function() {
     expect(tag.items).to.have.length(tag.itemsAmount)
     expect(tag.refs.items).to.have.length(tag.itemsAmount)
 
-    expect(tag.refs.items[tag.itemsAmount - 1].textContent).to.be.equal('new')
-    expect(tag.refs.items[tag.itemsAmount - 2].textContent).to.be.equal('new')
+    expect(tag.refs.items[tag.itemsAmount - 1].textContent).to.be.equal(tag.items[tag.itemsAmount - 1].name)
+    expect(tag.refs.items[tag.itemsAmount - 2].textContent).to.be.equal(tag.items[tag.itemsAmount - 2].name)
 
     tag.addEditList()
     tag.update()
@@ -1404,10 +1404,10 @@ describe('Riot each', function() {
     expect(tag.items).to.have.length(tag.itemsAmount)
     expect(tag.refs.items).to.have.length(tag.itemsAmount)
 
-    expect(tag.refs.items[tag.itemsAmount - 1].textContent).to.be.equal('new')
-    expect(tag.refs.items[tag.itemsAmount - 2].textContent).to.be.equal('new')
-    expect(tag.refs.items[tag.itemsAmount - 3].textContent).to.be.equal('new')
-    expect(tag.refs.items[tag.itemsAmount - 4].textContent).to.be.equal('new')
+    expect(tag.refs.items[tag.itemsAmount - 1].textContent).to.be.equal(tag.items[tag.itemsAmount - 1].name)
+    expect(tag.refs.items[tag.itemsAmount - 2].textContent).to.be.equal(tag.items[tag.itemsAmount - 2].name)
+    expect(tag.refs.items[tag.itemsAmount - 3].textContent).to.be.equal(tag.items[tag.itemsAmount - 3].name)
+    expect(tag.refs.items[tag.itemsAmount - 4].textContent).to.be.equal(tag.items[tag.itemsAmount - 4].name)
 
     tag.unmount()
   })
