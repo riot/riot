@@ -67,11 +67,6 @@ module.exports = {
       base: 'SauceLabs',
       browserName: 'android',
       version: '5.1'
-    },
-    slAndroid6: {
-      base: 'SauceLabs',
-      browserName: 'android',
-      version: '6.0'
     }
   }
 }

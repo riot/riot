@@ -145,6 +145,8 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [An express, riot, jade, webpack simple boilerplate](https://github.com/revington/frontend-boilerplate)
 - [Riot.js vs React.js comparison of a simple comment box](https://github.com/vitogit/riot.js-vs-react.js-comment-box)
 - [Riot Seed project - webpack, routing, ava tests, dispatcher](https://github.com/continuata/riot-seed)
+- [Riot-Redux League Table example](https://github.com/drewmiley/PoolLeague)
+- [Riot vs React vs Ractive Counters using Redux store](https://github.com/drewmiley/ractive-react-riot-redux-counters-example)
 
 ### Tutorials
 - [Building Apps with Riot, ES6 and Webpack](http://blog.srackham.com/posts/riot-es6-webpack-apps/)
