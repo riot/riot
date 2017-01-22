@@ -191,6 +191,7 @@ describe('Riot each', function() {
         el = root.getElementsByTagName('dt')[0]
 
       el.dispatchEvent(ev)
+      console.log(ev.item, curItem)
       expect(curItem).to.be.equal(ev.item)
     }
 
@@ -1404,10 +1405,12 @@ describe('Riot each', function() {
     expect(tag.items).to.have.length(tag.itemsAmount)
     expect(tag.refs.items).to.have.length(tag.itemsAmount)
 
-    expect(tag.refs.items[tag.itemsAmount - 1].textContent).to.be.equal(tag.items[tag.itemsAmount - 1].name)
-    expect(tag.refs.items[tag.itemsAmount - 2].textContent).to.be.equal(tag.items[tag.itemsAmount - 2].name)
-    expect(tag.refs.items[tag.itemsAmount - 3].textContent).to.be.equal(tag.items[tag.itemsAmount - 3].name)
-    expect(tag.refs.items[tag.itemsAmount - 4].textContent).to.be.equal(tag.items[tag.itemsAmount - 4].name)
+    var lis = $$('li', tag.root)
+
+    expect(lis[tag.itemsAmount - 1].textContent).to.be.equal(tag.items[tag.itemsAmount - 1].name)
+    expect(lis[tag.itemsAmount - 2].textContent).to.be.equal(tag.items[tag.itemsAmount - 2].name)
+    expect(lis[tag.itemsAmount - 3].textContent).to.be.equal(tag.items[tag.itemsAmount - 3].name)
+    expect(lis[tag.itemsAmount - 4].textContent).to.be.equal(tag.items[tag.itemsAmount - 4].name)
 
     tag.unmount()
   })
