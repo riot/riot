@@ -192,7 +192,6 @@ describe('Riot each', function() {
         el = root.getElementsByTagName('dt')[0]
 
       el.dispatchEvent(ev)
-      console.log(ev.item, curItem)
       expect(curItem).to.be.equal(ev.item)
     }
 
