@@ -6,6 +6,7 @@
 
   <virtual if={false} data-is="vtest-tag" msg={attr}>{ parent.message }</virtual>
 
+  <virtual if={true}><p>{attr}</p></virtual>
 
   this.message = 'hello there'
   this.attr = 'text'
