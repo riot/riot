@@ -1,10 +1,8 @@
 
 var i = 0,
   input = document.querySelector('form input'),
-  submitEvent = document.createEvent('Event'),
+  submitEvent = new Event('submit', {'bubbles': true, 'cancelable': true}),
   start = Date.now()
-
-submitEvent.initEvent('submit', true, true)
 
 for (; i < 50; i++) {
   var inputEvent = document.createEvent('Event')
