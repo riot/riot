@@ -163,7 +163,6 @@ describe('Riot each', function() {
       removeItemClick = function(e) {
         var index = tag.removes.indexOf(e.item)
         if (index < 0) return
-        console.log(e.item)
         tag.removes.splice(index, 1)
       },
       tag = riot.mount('loop', { onItemClick: onItemClick, removeItemClick: removeItemClick })[0],
