@@ -1409,6 +1409,8 @@ describe('Riot each', function() {
 
     var lis = $$('li', tag.root)
 
+    // TODO: it seems that the ref here are not in sync we need to fix this as well!
+
     expect(lis[tag.itemsAmount - 1].textContent).to.be.equal(tag.items[tag.itemsAmount - 1].name)
     expect(lis[tag.itemsAmount - 2].textContent).to.be.equal(tag.items[tag.itemsAmount - 2].name)
     expect(lis[tag.itemsAmount - 3].textContent).to.be.equal(tag.items[tag.itemsAmount - 3].name)
