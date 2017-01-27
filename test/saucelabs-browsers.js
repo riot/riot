@@ -7,7 +7,7 @@ module.exports = {
       version: '8.4'
     },
     */
-    slIphone6: {
+/*    slIphone6: {
       base: 'SauceLabs',
       browserName: 'iphone',
       version: '9.3'
@@ -16,7 +16,7 @@ module.exports = {
       base: 'SauceLabs',
       browserName: 'ipad',
       version: '9.3'
-    },
+    },*/
     slSafari7: {
       base: 'SauceLabs',
       browserName: 'safari',
@@ -50,11 +50,11 @@ module.exports = {
       platform: 'Windows 8.1',
       version: '11'
     },
-    slEdge: {
+/*    slEdge: {
       base: 'SauceLabs',
       browserName: 'MicrosoftEdge',
       platform: 'Windows 10'
-    },
+    },*/
     slChrome: {
       base: 'SauceLabs',
       browserName: 'chrome'
