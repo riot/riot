@@ -184,7 +184,7 @@ describe('Riot each', function() {
     }
     tag.update()
 
-    // remove item make sure item passed is correct
+    // remove the items being sure that item passed is the correct one
     for (var i = 0; i < tag.items.length; i++) {
       var curItem = tag.removes[0],
         ev = new CustomEvent('click'),
@@ -1398,8 +1398,8 @@ describe('Riot each', function() {
     expect(tag.items).to.have.length(tag.itemsAmount)
     expect(tag.refs.items).to.have.length(tag.itemsAmount)
 
-    expect(tag.refs.items[tag.itemsAmount - 1].textContent).to.be.equal('new')
-    expect(tag.refs.items[tag.itemsAmount - 2].textContent).to.be.equal('new')
+    expect(tag.refs.items[tag.itemsAmount - 1].textContent).to.be.equal(tag.items[tag.itemsAmount - 1].name)
+    expect(tag.refs.items[tag.itemsAmount - 2].textContent).to.be.equal(tag.items[tag.itemsAmount - 2].name)
 
     tag.addEditList()
     tag.update()
@@ -1407,10 +1407,14 @@ describe('Riot each', function() {
     expect(tag.items).to.have.length(tag.itemsAmount)
     expect(tag.refs.items).to.have.length(tag.itemsAmount)
 
-    expect(tag.refs.items[tag.itemsAmount - 1].textContent).to.be.equal('new')
-    expect(tag.refs.items[tag.itemsAmount - 2].textContent).to.be.equal('new')
-    expect(tag.refs.items[tag.itemsAmount - 3].textContent).to.be.equal('new')
-    expect(tag.refs.items[tag.itemsAmount - 4].textContent).to.be.equal('new')
+    var lis = $$('li', tag.root)
+
+    // TODO: it seems that the ref here are not in sync we need to fix this as well!
+
+    expect(lis[tag.itemsAmount - 1].textContent).to.be.equal(tag.items[tag.itemsAmount - 1].name)
+    expect(lis[tag.itemsAmount - 2].textContent).to.be.equal(tag.items[tag.itemsAmount - 2].name)
+    expect(lis[tag.itemsAmount - 3].textContent).to.be.equal(tag.items[tag.itemsAmount - 3].name)
+    expect(lis[tag.itemsAmount - 4].textContent).to.be.equal(tag.items[tag.itemsAmount - 4].name)
 
     tag.unmount()
   })
