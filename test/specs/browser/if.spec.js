@@ -10,6 +10,7 @@ import '../../tag/if-mount.tag'
 import '../../tag/nested-child.tag'
 import '../../tag/if-unmount.tag'
 import '../../tag/named-unmount.tag'
+import '../../tag/bug-2229.tag'
 
 const expect = chai.expect
 
@@ -208,6 +209,21 @@ describe('Riot if', function() {
     tag.items[1].cond = true
     tag.update()
     expectHTML(tag).to.be.equal('<div>0</div><div>1</div>')
+    tag.unmount()
+  })
+
+  it('if directive on a select should update properly the dom', function() {
+    injectHTML('<bug-2229></bug-2229>')
+    var tag = riot.mount('bug-2229')[0]
+
+    expectHTML(tag.root).to.be.equal('<div><select><option value="1">One</option><option value="2">Two</option></select></div>')
+    tag.flag = false
+    tag.update()
+    expectHTML(tag.root).to.be.equal('<div></div>')
+    tag.flag = true
+    tag.update()
+    expectHTML(tag.root).to.be.equal('<div><select><option value="1">One</option><option value="2">Two</option></select></div>')
+
     tag.unmount()
   })
 
