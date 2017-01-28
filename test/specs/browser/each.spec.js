@@ -1407,14 +1407,10 @@ describe('Riot each', function() {
     expect(tag.items).to.have.length(tag.itemsAmount)
     expect(tag.refs.items).to.have.length(tag.itemsAmount)
 
-    var lis = $$('li', tag.root)
-
-    // TODO: it seems that the ref here are not in sync we need to fix this as well!
-
-    expect(lis[tag.itemsAmount - 1].textContent).to.be.equal(tag.items[tag.itemsAmount - 1].name)
-    expect(lis[tag.itemsAmount - 2].textContent).to.be.equal(tag.items[tag.itemsAmount - 2].name)
-    expect(lis[tag.itemsAmount - 3].textContent).to.be.equal(tag.items[tag.itemsAmount - 3].name)
-    expect(lis[tag.itemsAmount - 4].textContent).to.be.equal(tag.items[tag.itemsAmount - 4].name)
+    expect(tag.refs.items[tag.itemsAmount - 1].textContent).to.be.equal(tag.items[tag.itemsAmount - 1].name)
+    expect(tag.refs.items[tag.itemsAmount - 2].textContent).to.be.equal(tag.items[tag.itemsAmount - 2].name)
+    expect(tag.refs.items[tag.itemsAmount - 3].textContent).to.be.equal(tag.items[tag.itemsAmount - 3].name)
+    expect(tag.refs.items[tag.itemsAmount - 4].textContent).to.be.equal(tag.items[tag.itemsAmount - 4].name)
 
     tag.unmount()
   })
