@@ -90,6 +90,7 @@ perf: riot
 	# run the performance tests
 	@ node test/performance/benchmarks ../riot.2.2.0 --expose-gc
 	@ node test/performance/benchmarks ../riot.2.6.1 --expose-gc
+	@ node test/performance/benchmarks ../riot.3.0.7 --expose-gc
 	@ node test/performance/benchmarks ../../../dist/riot/riot --expose-gc
 
 perf-leaks: riot
