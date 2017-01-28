@@ -1,6 +1,6 @@
 <loop-bug-2205>
   <ul>
-    <li ref="items" each="{ items }">{ name }</li>
+    <li ref={ refAttr } each="{ items }">{ name }</li>
   </ul>
 
   <script>
@@ -40,6 +40,7 @@
     }
 
     this.itemsAmount = 10
+    this.refAttr = 'items'
     this.items = this.generateInitial()
 
   </script>
