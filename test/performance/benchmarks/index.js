@@ -11,16 +11,18 @@ const
   riot = require(riotPath),
   ifBench = require('./if.bench'),
   loopBench = require('./loop.bench'),
+  loopBenchReverse = require('./loop-reverse.bench'),
   loopNoReorderBench = require('./loop-no-reorder.bench'),
   mountBench = require('./mount.bench')
 
 console.log(`Testing: ${ riotPath }`)
 
 // brand new
+mountBench(suite, 'mount', riot)
 ifBench(suite, 'if', riot)
 loopBench(suite, 'loop', riot)
-if (!/2.2/.test(riotPath)) loopNoReorderBench(suite, 'loop-no-reorder', riot)
-mountBench(suite, 'mount', riot)
+loopBenchReverse(suite, 'loop-reverse', riot)
+loopNoReorderBench(suite, 'loop-no-reorder', riot)
 
 suite
   .on('cycle', function(event) {
@@ -30,4 +32,4 @@ suite
   .on('error', function(e) {
     console.log(e.target.error)
   })
-  .run({async: true})
+  .run({async: false})

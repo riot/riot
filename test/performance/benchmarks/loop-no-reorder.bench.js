@@ -1,9 +1,11 @@
 const tmpl = `
-  <div each="{ item in items }" no-reorder>
-    { item.name }
-    <p if="{ item.props }" each="{ prop in item.props }" no-reorder>
-      { prop.name }
-    </p>
+  <div>
+    <div each="{ item in items }" no-reorder>
+      { item.name }
+      <p each="{ prop in item.props }" no-reorder>
+        { prop.name }
+      </p>
+    </div>
   </div>
 `
 
@@ -13,21 +15,33 @@ module.exports = function(suite, testName, riot) {
     while (amount--) {
       items.push({
         name: 'foo',
-        props: hasChildren ? generateItems(10, false) : false
+        props: hasChildren ? generateItems(5, false) : []
       })
     }
     return items
   }
-  // setup
-  var loopTag = document.createElement('loop-tag-no-reorder')
-  body.appendChild(loopTag)
-  riot.tag('loop-tag-no-reorder', tmpl, function() {
-    this.items = generateItems(10, true)
-  })
 
-  suite.add(testName, () => {
-    var tag = riot.mount('loop-tag-no-reorder')[0]
-    tag.items.push(generateItems(10, true))
+  let tag
+  suite
+  .on('start', function() {
+    var loopTag = document.createElement('loop-tag-no-reorder')
+    body.appendChild(loopTag)
+    riot.tag('loop-tag-no-reorder', tmpl, function() {
+      this.items = []
+    })
+    tag = riot.mount('loop-tag-no-reorder')[0]
+  })
+  .on('complete', function() {
+    tag.unmount()
+  })
+  .add(testName, () => {
+    tag.items = generateItems(10, true)
+    tag.update()
+    tag.items.splice(2, 1)
+    tag.items.splice(4, 1)
+    tag.items.splice(6, 1)
+    tag.items.splice(9, 1)
+    tag.items = tag.items.concat(generateItems(5, true))
     tag.update()
   })
 

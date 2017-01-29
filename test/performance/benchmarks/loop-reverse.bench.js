@@ -2,7 +2,7 @@ const tmpl = `
   <div>
     <div each="{ item in items }">
       { item.name }
-      <p each="{ prop in item.props }">
+      <p if="{ item.props }" each="{ prop in item.props }">
         { prop.name }
       </p>
     </div>
@@ -15,20 +15,19 @@ module.exports = function(suite, testName, riot) {
     while (amount--) {
       items.push({
         name: `foo ${ Math.random() }`,
-        props: hasChildren ? generateItems(5, false) : []
+        props: hasChildren ? generateItems(10, false) : false
       })
     }
     return items
   }
   let tag
-
   suite
   .on('start', function() {
     // setup
     var loopTag = document.createElement('loop-tag')
     body.appendChild(loopTag)
     riot.tag('loop-tag', tmpl, function() {
-      this.items = []
+      this.items = generateItems(10, true)
     })
     tag = riot.mount('loop-tag')[0]
   })
@@ -36,13 +35,7 @@ module.exports = function(suite, testName, riot) {
     tag.unmount()
   })
   .add(testName, () => {
-    tag.items = generateItems(10, true)
-    tag.update()
-    tag.items.splice(2, 1)
-    tag.items.splice(4, 1)
-    tag.items.splice(6, 1)
-    tag.items.splice(9, 1)
-    tag.items = tag.items.concat(generateItems(5, true))
+    tag.items.reverse()
     tag.update()
   })
 

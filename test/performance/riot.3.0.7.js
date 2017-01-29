@@ -1567,7 +1567,6 @@ function _each(dom, parent, expr) {
 
     // clone the items array
     oldItems = items.slice();
-
     root.insertBefore(frag, ref);
   };
 
