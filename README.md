@@ -7,6 +7,7 @@
 [![Riot Forum][riot-forum-image]][riot-forum-url]
 [![Join the chat at https://gitter.im/riot/riot][gitter-image]][gitter-url]
 [![Join the chat (ja) at https://riot-jp-slackin.herokuapp.com/][slack-ja-image]][slack-ja-url]
+[![OpenCollective Backers][backer-badge]][backer-url] [![OpenCollective Sponsors][sponsor-badge]][sponsor-url]
 
 [![NPM version][npm-version-image]][npm-url]
 [![NPM downloads][npm-downloads-image]][npm-url]
@@ -288,17 +289,59 @@ $ make perf
 
 Riot is made with :heart: by many smart people from all over the world. Thanks to all the contributors<br>
 It's actively maintained by:
- - [Richard Bondi](https://github.com/rsbondi)
- - [Gianluca Guarini](https://github.com/GianlucaGuarini)
- - [Tsutomu Kawamura](https://github.com/cognitom)
- - [Alberto Martínez](https://github.com/aMarCruz)
- - [Grant Marvin](https://github.com/rogueg)
- - [Tero Piirainen](https://github.com/tipiirai)
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top">
+        <img width="125" height="125" src="https://github.com/rsbondi.png?s=125">
+        <br>
+        <a href="https://github.com/rsbondi">Richard Bondi</a>
+      </td>
+      <td align="center" valign="top">
+        <img width="125" height="125" src="https://github.com/GianlucaGuarini.png?s=125?s=125">
+        <br>
+        <a href="https://github.com/GianlucaGuarini">Gianluca Guarini</a>
+      </td>
+      <td align="center" width="20%" valign="top">
+        <img width="125" height="125" src="https://github.com/cognitom.png?s=125">
+        <br>
+        <a href="https://github.com/cognitom">Tsutomu Kawamura</a>
+      </td>
+      <td align="center" valign="top">
+        <img width="125" height="125" src="https://github.com/aMarCruz.png?s=125">
+        <br>
+        <a href="https://github.com/aMarCruz">Alberto Martínez</a>
+      </td>
+      <td align="center" valign="top">
+        <img width="125" height="125" src="https://github.com/rogueg.png?s=125">
+        <br>
+        <a href="https://github.com/rogueg">Grant Marvin</a>
+      </td>
+      <td align="center" valign="top">
+        <img width="125" height="125" src="https://github.com/tipiirai.png?s=125">
+        <br>
+        <a href="https://github.com/tipiirai">Tero Piirainen</a>
+      </td>
+     </tr>
+  </tbody>
+</table>
 
-### Buy us a coffee :coffee:
-[![Click here to lend your support to: Riot and make a donation at pledgie.com !][donations-campaign-image]][donations-campaign-url]
+## Official Website
 
 http://riotjs.com/
+
+## Backers
+
+Support us with a monthly donation and help us continue our activities. [[Become a backer][backers-image]][support-url]
+
+[![Backers][backers-image]][support-url]
+
+## Sponsors
+
+Become a sponsor to get your logo on our README. [[Become a sponsor][sponsors-image]][support-url]
+
+[![Sponsors][sponsors-image]][support-url]
+
 
 [travis-image]:https://img.shields.io/travis/riot/riot.svg?style=flat-square
 [travis-url]:https://travis-ci.org/riot/riot
@@ -330,3 +373,14 @@ http://riotjs.com/
 
 [donations-campaign-url]:https://pledgie.com/campaigns/31139
 [donations-campaign-image]:https://pledgie.com/campaigns/31139.png?skin_name=chrome
+
+
+[backer-url]: #backers
+[backer-badge]: https://opencollective.com/riot/backers/badge.svg?color=blue
+[sponsor-url]: #sponsors
+[sponsor-badge]: https://opencollective.com/riot/sponsors/badge.svg?color=blue
+
+[support-url]: https://opencollective.com/riot#support
+
+[backers-image]: https://opencollective.com/riot/backers.svg
+[sponsors-image]: https://opencollective.com/riot/sponsors.svg
