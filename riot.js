@@ -1,4 +1,4 @@
-/* Riot v3.1.0, @license MIT */
+/* Riot v3.1.1, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1125,14 +1125,14 @@ function updateDataIs(expr, parent) {
     { makeReplaceVirtual(expr.tag, ref || expr.tag.root); } // root exist first time, after use placeholder
 
   // parent is the placeholder tag, not the dynamic tag so clean up
-  parent.on('unmount', function () {
+  parent.__.onUnmount = function() {
     var delName = expr.tag.opts.dataIs,
       tags = expr.tag.parent.tags,
       _tags = expr.tag.__.parent.tags;
     arrayishRemove(tags, delName, expr.tag);
     arrayishRemove(_tags, delName, expr.tag);
     expr.tag.unmount();
-  });
+  };
 }
 
 /**
@@ -1324,10 +1324,18 @@ var RefExpr = {
       remAttr(this.dom, this.attr);
     } else {
       // add it to the refs of parent tag (this behavior was changed >=3.0)
-      if (customParent) { arrayishAdd(customParent.refs, value, tagOrDom); }
+      if (customParent) { arrayishAdd(
+        customParent.refs,
+        value,
+        tagOrDom,
+        // use an array if it's a looped node and the ref is not an expression
+        null,
+        this.parent.__.index
+      ); }
       // set the actual DOM attr
       setAttr(this.dom, this.attr, value);
     }
+
     this.value = value;
     this.firstRun = false;
   },
@@ -1467,13 +1475,11 @@ function _each(dom, parent, expr) {
     parentNode = dom.parentNode,
     placeholder = createDOMPlaceholder(),
     child = getTag(dom),
-    refExpr = getRefAttr(dom),
     ifExpr = getAttr(dom, CONDITIONAL_DIRECTIVE),
     tags = [],
     oldItems = [],
     hasKeys,
     isLoop = true,
-    hasRefExpr = false,
     isAnonymous = !__TAG_IMPL[tagName],
     isVirtual = dom.tagName === 'VIRTUAL';
 
@@ -1483,13 +1489,6 @@ function _each(dom, parent, expr) {
 
   if (ifExpr) { remAttr(dom, CONDITIONAL_DIRECTIVE); }
 
-  // check if the loop tag has a ref attribute
-  if (refExpr) {
-    // detect if the ref attribute is an expression
-    hasRefExpr = tmpl.hasExpr(refExpr);
-    remRefAttr(dom);
-  }
-
   // insert a marked where the loop tags will be injected
   parentNode.insertBefore(placeholder, dom);
   parentNode.removeChild(dom);
@@ -1498,7 +1497,6 @@ function _each(dom, parent, expr) {
     // get the new items collection
     var items = tmpl(expr.val, parent),
       frag = createFrag(),
-      refAttr = refExpr,
       isObject$$1 = !isArray(items) && !isString(items),
       root = placeholder.parentNode;
 
@@ -1522,13 +1520,6 @@ function _each(dom, parent, expr) {
       });
     }
 
-    if (refAttr && hasRefExpr) {
-      refAttr = tmpl(refExpr, parent);
-    }
-
-    // reset the parent ref
-    if (refAttr) { parent.refs[refAttr] = []; }
-
     // loop all the new items
     each(items, function(item, i) {
       // reorder only if the items are objects
@@ -1550,8 +1541,10 @@ function _each(dom, parent, expr) {
           parent: parent,
           isLoop: isLoop,
           isAnonymous: isAnonymous,
+          tagName: tagName,
           root: dom.cloneNode(),
-          item: item
+          item: item,
+          index: i,
         }, dom.innerHTML);
 
         // mount the tag
@@ -1567,7 +1560,7 @@ function _each(dom, parent, expr) {
         if (child) { arrayishAdd(parent.tags, tagName, tag, true); }
       } else if (pos !== i && doReorder) {
         // move
-        if (contains(items, oldItems[i])) {
+        if (contains(items, oldItems[pos])) {
           move.apply(tag, [root, tags[i], isVirtual]);
           // move the old tag instance
           tags.splice(i, 0, tags.splice(pos, 1)[0]);
@@ -1584,19 +1577,15 @@ function _each(dom, parent, expr) {
         // if the loop tags are not custom
         // we need to move all their custom tags into the right position
         if (!child && tag.tags) { moveNestedTags.call(tag, i); }
-
-        // update the parent ref
-        if (refAttr) {
-          parent.refs[refAttr].push(isAnonymous ? tag.root : tag);
-        }
       }
-
-      if (!mustCreate) { tag.update(item); }
 
       // cache the original item to use it in the events bound to this node
       // and its children
       tag.__.item = item;
+      tag.__.index = i;
       tag.__.parent = parent;
+
+      if (!mustCreate) { tag.update(item); }
     });
 
     // remove the redundant tags
@@ -1815,8 +1804,6 @@ function mkdom(tmpl, html, checkSvg) {
     { el = specialTags(el, tmpl, tagName); }
   else
     { setInnerHTML(el, tmpl); }
-
-  el.stub = true;
 
   return el
 }
@@ -2084,6 +2071,7 @@ function Tag$1(impl, conf, innerHTML) {
     isLoop = conf.isLoop,
     isAnonymous = conf.isAnonymous,
     item = cleanUpData(conf.item),
+    index = conf.index, // available only for the looped nodes
     instAttrs = [], // All attributes on the Tag when it's first parsed
     implAttrs = [], // expressions on this type of Tag
     expressions = [],
@@ -2094,19 +2082,20 @@ function Tag$1(impl, conf, innerHTML) {
     dom;
 
   // make this tag observable
-  observable$1(this);
+  if (!isAnonymous) { observable$1(this); }
   // only call unmount if we have a valid __TAG_IMPL (has name property)
   if (impl.name && root._tag) { root._tag.unmount(true); }
 
   // not yet mounted
   this.isMounted = false;
-  root.isLoop = isLoop;
 
   defineProperty(this, '__', {
     isAnonymous: isAnonymous,
     instAttrs: instAttrs,
     innerHTML: innerHTML,
     tagName: tagName,
+    index: index,
+    isLoop: isLoop,
     // these vars will be needed only for the virtual tags
     virts: [],
     tail: null,
@@ -2134,6 +2123,7 @@ function Tag$1(impl, conf, innerHTML) {
    */
   defineProperty(this, 'update', function tagUpdate(data) {
     if (isFunction(this.shouldUpdate) && !this.shouldUpdate(data)) { return this }
+    var canTrigger = this.isMounted && !isAnonymous;
 
     // make sure the data passed will not override
     // the component core methods
@@ -2143,9 +2133,9 @@ function Tag$1(impl, conf, innerHTML) {
     if (isLoop && isAnonymous) { inheritFrom.apply(this, [this.parent, propsInSyncWithParent]); }
     extend(this, data);
     updateOpts.apply(this, [isLoop, parent, isAnonymous, opts, instAttrs]);
-    if (this.isMounted) { this.trigger('update', data); }
+    if (canTrigger) { this.trigger('update', data); }
     updateAllExpressions.call(this, expressions);
-    if (this.isMounted) { this.trigger('updated'); }
+    if (canTrigger) { this.trigger('updated'); }
 
     return this
 
@@ -2212,7 +2202,6 @@ function Tag$1(impl, conf, innerHTML) {
     var this$1 = this;
 
     var _parent = this.__.parent;
-
     root._tag = this; // keep a reference to the tag just created
 
     // Read all the attrs on this instance. This give us the info we need for updateOpts
@@ -2249,7 +2238,7 @@ function Tag$1(impl, conf, innerHTML) {
 
     if (impl.fn) { impl.fn.call(this, opts); }
 
-    this.trigger('before-mount');
+    if (!isAnonymous) { this.trigger('before-mount'); }
 
     // parse layout after init. fn may calculate args for nested custom tags
     parseExpressions.apply(this, [dom, expressions, false]);
@@ -2261,20 +2250,23 @@ function Tag$1(impl, conf, innerHTML) {
       this.root = root = dom.firstChild;
     } else {
       while (dom.firstChild) { root.appendChild(dom.firstChild); }
-      if (root.stub) { root = parent.root; }
     }
 
     defineProperty(this, 'root', root);
     defineProperty(this, 'isMounted', true);
 
+    if (isAnonymous) { return }
+
     // if it's not a child tag we can trigger its mount event
-    if (!this.parent || this.parent.isMounted) {
+    if (!this.parent) {
       this.trigger('mount');
     }
-    // otherwise we need to wait that the parent event gets triggered
-    else { this.parent.one('mount', function () {
-      this$1.trigger('mount');
-    }); }
+    // otherwise we need to wait that the parent "mount" or "updated" event gets triggered
+    else {
+      getImmediateCustomParentTag(this.parent).one(!this.parent.isMounted ? 'mount' : 'updated', function () {
+        this$1.trigger('mount');
+      });
+    }
 
     return this
 
@@ -2293,7 +2285,7 @@ function Tag$1(impl, conf, innerHTML) {
       ptag,
       tagIndex = __TAGS_CACHE.indexOf(this);
 
-    this.trigger('before-unmount');
+    if (!isAnonymous) { this.trigger('before-unmount'); }
 
     // clear all attributes coming from the mounted tag
     walkAttrs(impl.attrs, function (name) {
@@ -2341,8 +2333,14 @@ function Tag$1(impl, conf, innerHTML) {
     unmountAll(expressions);
     each(instAttrs, function (a) { return a.expr && a.expr.unmount && a.expr.unmount(); });
 
-    this.trigger('unmount');
-    this.off('*');
+    // custom internal unmount function to avoid relying on the observable
+    if (this.__.onUnmount) { this.__.onUnmount(); }
+
+    if (!isAnonymous) {
+      this.trigger('unmount');
+      this.off('*');
+    }
+
     defineProperty(this, 'isMounted', false);
 
     delete this.root._tag;
@@ -2382,23 +2380,6 @@ function inheritFrom(target, propsInSyncWithParent) {
       this$1[k] = target[k];
     }
   });
-}
-
-/**
- * Returns the ref or data-ref value of any dom node
- * @param   { Object } dom - DOM node we want to parse
- * @returns { String|Null } the attribute value if found
- */
-function getRefAttr(dom) {
-  return getAttr(dom, REF_DIRECTIVES[0]) || getAttr(dom, REF_DIRECTIVES[1])
-}
-
-/**
- * Remove all the ref directives from a dom node
- * @param   { Object } dom - DOM node we want to update
- */
-function remRefAttr(dom) {
-  REF_DIRECTIVES.forEach(function (dir) { return remAttr(dom, dir); });
 }
 
 /**
@@ -2515,10 +2496,12 @@ function cleanUpData(data) {
  * @param { String } key - property name
  * @param { Object } value - the value of the property to be set
  * @param { Boolean } ensureArray - ensure that the property remains an array
+ * @param { Number } index - add the new item in a certain array position
  */
-function arrayishAdd(obj, key, value, ensureArray) {
+function arrayishAdd(obj, key, value, ensureArray, index) {
   var dest = obj[key];
   var isArr = isArray(dest);
+  var hasIndex = !isUndefined(index);
 
   if (dest && dest === value) { return }
 
@@ -2526,9 +2509,20 @@ function arrayishAdd(obj, key, value, ensureArray) {
   if (!dest && ensureArray) { obj[key] = [value]; }
   else if (!dest) { obj[key] = value; }
   // if it was an array and not yet set
-  else if (!isArr || isArr && !contains(dest, value)) {
-    if (isArr) { dest.push(value); }
-    else { obj[key] = [dest, value]; }
+  else {
+    if (isArr) {
+      var oldIndex = dest.indexOf(value);
+      // this item never changed its position
+      if (oldIndex === index) { return }
+      // remove the item from its old position
+      if (~oldIndex) { dest.splice(oldIndex, 1); }
+      // move or add the item
+      if (hasIndex) {
+        dest.splice(index, 0, value);
+      } else {
+        dest.push(value);
+      }
+    } else { obj[key] = [dest, value]; }
   }
 }
 
@@ -2542,9 +2536,8 @@ function arrayishAdd(obj, key, value, ensureArray) {
 */
 function arrayishRemove(obj, key, value, ensureArray) {
   if (isArray(obj[key])) {
-    each(obj[key], function(item, i) {
-      if (item === value) { obj[key].splice(i, 1); }
-    });
+    var index = obj[key].indexOf(value);
+    if (~index) { obj[key].splice(index, 1); }
     if (!obj[key].length) { delete obj[key]; }
     else if (obj[key].length === 1 && !ensureArray) { obj[key] = obj[key][0]; }
   } else
@@ -2690,8 +2683,6 @@ function selectTags(tags) {
 var tags = Object.freeze({
 	getTag: getTag,
 	inheritFrom: inheritFrom,
-	getRefAttr: getRefAttr,
-	remRefAttr: remRefAttr,
 	moveChildTag: moveChildTag,
 	initChildTag: initChildTag,
 	getImmediateCustomParentTag: getImmediateCustomParentTag,
