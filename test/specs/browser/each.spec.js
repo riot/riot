@@ -50,6 +50,7 @@ import '../../tag/outer.tag'
 import '../../tag/reserved-names.tag'
 import '../../tag/loop-bug-1649.tag'
 import '../../tag/loop-bug-2205.tag'
+import '../../tag/loop-bug-2240.tag'
 
 import '../../tag/select-test.tag'
 import '../../tag/named-select.tag'
@@ -1381,6 +1382,21 @@ describe('Riot each', function() {
 
     children = $$('.list', tag.root)
     expect(children.length).to.be.equal(1)
+
+    tag.unmount()
+  })
+
+  it('looped items get removed properly see https://github.com/riot/riot/issues/2240', function() {
+    injectHTML('<loop-bug-2240></loop-bug-2240>')
+    var tag = riot.mount('loop-bug-2240')[0]
+
+    expect(tag.refs.items).to.have.length(tag.items.length)
+    tag.items = [tag.items[tag.items.length - 1]]
+    tag.update()
+    expect(tag.items).to.have.length(1)
+    // TODO: the refs in a list should be always an array!
+    //expect(tag.refs.items).to.have.length(1)
+    expect(tag.refs.items.innerHTML).to.be.equal(tag.items[0].value)
 
     tag.unmount()
   })
