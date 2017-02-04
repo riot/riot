@@ -1294,7 +1294,6 @@ var IfExpr = {
 var RefExpr = {
   init: function init(dom, parent, attrName, attrValue) {
     this.dom = dom;
-    console.log(dom._tag)
     this.attr = attrName;
     this.rawValue = attrValue;
     this.parent = parent;
