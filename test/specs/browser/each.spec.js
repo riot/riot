@@ -51,6 +51,7 @@ import '../../tag/reserved-names.tag'
 import '../../tag/loop-bug-1649.tag'
 import '../../tag/loop-bug-2205.tag'
 import '../../tag/loop-bug-2240.tag'
+import '../../tag/loop-bug-2242.tag'
 
 import '../../tag/select-test.tag'
 import '../../tag/named-select.tag'
@@ -1429,5 +1430,14 @@ describe('Riot each', function() {
     expect(tag.refs.items[tag.itemsAmount - 4].textContent).to.be.equal(tag.items[tag.itemsAmount - 4].name)
 
     tag.unmount()
+  })
+
+  it('looped tags should be in the DOM when their "mount" event gets triggered', function() {
+    injectHTML('<loop-bug-2242></loop-bug-2242>')
+    var tag = riot.mount('loop-bug-2242')[0]
+    tag.tags['loop-bug-2242-child'].forEach((t) => expect(t.inDOM).to.be.ok)
+    tag.items = tag.items.concat([4, 5, 6])
+    tag.update()
+    tag.tags['loop-bug-2242-child'].forEach((t) => expect(t.inDOM).to.be.ok)
   })
 })
