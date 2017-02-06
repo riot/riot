@@ -969,7 +969,11 @@ describe('Riot core', function() {
   it('multiple select will be properly rendered', function() {
     injectHTML('<multiple-select></multiple-select>')
     const tag = riot.mount('multiple-select')[0]
-    expect($('select', tag.root).selectedOptions).to.have.length(2)
+    const values = []
+    ;[].forEach.call(tag.refs.sel.options, function(option) {
+      if (option.selected) values.push(option.value)
+    })
+    expect(values).to.have.length(2)
     tag.unmount()
   })
 
