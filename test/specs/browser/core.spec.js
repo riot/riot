@@ -39,6 +39,7 @@ import '../../tag/virtual-nested-component.tag'
 import '../../tag/dynamic-data-is.tag'
 import '../../tag/update-context.tag'
 import '../../tag/dynamic-virtual.tag'
+import '../../tag/multiple-select.tag'
 import '../../tag/dynamic-nested.tag'
 
 const expect = chai.expect,
@@ -962,6 +963,13 @@ describe('Riot core', function() {
     expect($('textarea[name="txta2"]', root).value).to.be.equal('')
     if (IE_VERSION !== 9) expect($('textarea[name="txta2"]', root).placeholder).to.be.equal(val)
 
+    tag.unmount()
+  })
+
+  it('multiple select will be properly rendered', function() {
+    injectHTML('<multiple-select></multiple-select>')
+    const tag = riot.mount('multiple-select')[0]
+    expect($('select', tag.root).selectedOptions).to.have.length(2)
     tag.unmount()
   })
 
