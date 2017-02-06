@@ -1,4 +1,4 @@
-/* Riot v3.1.1, @license MIT */
+/* Riot v3.2.0, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -1021,6 +1021,10 @@ var misc = Object.freeze({
 	extend: extend
 });
 
+var settings$1 = extend(Object.create(brackets.settings), {
+  skipAnonymousTags: true
+});
+
 var EVENTS_PREFIX_REGEX = /^on/;
 
 /**
@@ -1227,13 +1231,12 @@ function updateExpression(expr) {
     if (value != null)
       { setAttr(dom, attrName, value); }
   } else {
-    // <select> <option selected={true}> </select>
-    if (attrName === 'selected' && parent && /^(SELECT|OPTGROUP)$/.test(parent.tagName) && value) {
-      parent.value = dom.value;
-    } if (expr.bool) {
+    if (expr.bool) {
       dom[attrName] = value;
       if (!value) { return }
-    } if (value === 0 || value && typeof value !== T_OBJECT) {
+    }
+
+    if (value === 0 || value && typeof value !== T_OBJECT) {
       setAttr(dom, attrName, value);
     }
   }
@@ -1471,7 +1474,7 @@ function _each(dom, parent, expr) {
 
   var mustReorder = typeof getAttr(dom, LOOP_NO_REORDER_DIRECTIVE) !== T_STRING || remAttr(dom, LOOP_NO_REORDER_DIRECTIVE),
     tagName = getTagName(dom),
-    impl = __TAG_IMPL[tagName] || { tmpl: getOuterHTML(dom) },
+    impl = __TAG_IMPL[tagName],
     parentNode = dom.parentNode,
     placeholder = createDOMPlaceholder(),
     child = getTag(dom),
@@ -1542,7 +1545,7 @@ function _each(dom, parent, expr) {
           isLoop: isLoop,
           isAnonymous: isAnonymous,
           tagName: tagName,
-          root: dom.cloneNode(),
+          root: dom.cloneNode(isAnonymous),
           item: item,
           index: i,
         }, dom.innerHTML);
@@ -2065,11 +2068,15 @@ function updateOpts(isLoop, parent, isAnonymous, opts, instAttrs) {
  * @param { String } innerHTML - html that eventually we need to inject in the tag
  */
 function Tag$1(impl, conf, innerHTML) {
+  if ( impl === void 0 ) impl = {};
+  if ( conf === void 0 ) conf = {};
+
 
   var opts = extend({}, conf.opts),
     parent = conf.parent,
     isLoop = conf.isLoop,
-    isAnonymous = conf.isAnonymous,
+    isAnonymous = !!conf.isAnonymous,
+    skipAnonymous = settings$1.skipAnonymousTags && isAnonymous,
     item = cleanUpData(conf.item),
     index = conf.index, // available only for the looped nodes
     instAttrs = [], // All attributes on the Tag when it's first parsed
@@ -2082,7 +2089,7 @@ function Tag$1(impl, conf, innerHTML) {
     dom;
 
   // make this tag observable
-  if (!isAnonymous) { observable$1(this); }
+  if (!skipAnonymous) { observable$1(this); }
   // only call unmount if we have a valid __TAG_IMPL (has name property)
   if (impl.name && root._tag) { root._tag.unmount(true); }
 
@@ -2114,7 +2121,7 @@ function Tag$1(impl, conf, innerHTML) {
   defineProperty(this, 'tags', {});
   defineProperty(this, 'refs', {});
 
-  dom = mkdom(impl.tmpl, innerHTML, isLoop);
+  dom = isLoop && isAnonymous ? root : mkdom(impl.tmpl, innerHTML, isLoop);
 
   /**
    * Update the tag expressions and options
@@ -2123,7 +2130,7 @@ function Tag$1(impl, conf, innerHTML) {
    */
   defineProperty(this, 'update', function tagUpdate(data) {
     if (isFunction(this.shouldUpdate) && !this.shouldUpdate(data)) { return this }
-    var canTrigger = this.isMounted && !isAnonymous;
+    var canTrigger = this.isMounted && !skipAnonymous;
 
     // make sure the data passed will not override
     // the component core methods
@@ -2228,7 +2235,7 @@ function Tag$1(impl, conf, innerHTML) {
     // add global mixins
     var globalMixin = mixin$1(GLOBAL_MIXIN);
 
-    if (globalMixin) {
+    if (globalMixin && !skipAnonymous) {
       for (var i in globalMixin) {
         if (globalMixin.hasOwnProperty(i)) {
           this$1.mixin(globalMixin[i]);
@@ -2238,24 +2245,21 @@ function Tag$1(impl, conf, innerHTML) {
 
     if (impl.fn) { impl.fn.call(this, opts); }
 
-    if (!isAnonymous) { this.trigger('before-mount'); }
+    if (!skipAnonymous) { this.trigger('before-mount'); }
 
     // parse layout after init. fn may calculate args for nested custom tags
-    parseExpressions.apply(this, [dom, expressions, false]);
+    parseExpressions.apply(this, [dom, expressions, isAnonymous]);
 
     this.update(item);
 
-    if (isLoop && isAnonymous) {
-      // update the root attribute for the looped elements
-      this.root = root = dom.firstChild;
-    } else {
+    if (!isAnonymous) {
       while (dom.firstChild) { root.appendChild(dom.firstChild); }
     }
 
     defineProperty(this, 'root', root);
     defineProperty(this, 'isMounted', true);
 
-    if (isAnonymous) { return }
+    if (skipAnonymous) { return }
 
     // if it's not a child tag we can trigger its mount event
     if (!this.parent) {
@@ -2263,7 +2267,8 @@ function Tag$1(impl, conf, innerHTML) {
     }
     // otherwise we need to wait that the parent "mount" or "updated" event gets triggered
     else {
-      getImmediateCustomParentTag(this.parent).one(!this.parent.isMounted ? 'mount' : 'updated', function () {
+      var p = getImmediateCustomParentTag(this.parent);
+      p.one(!p.isMounted ? 'mount' : 'updated', function () {
         this$1.trigger('mount');
       });
     }
@@ -2285,7 +2290,7 @@ function Tag$1(impl, conf, innerHTML) {
       ptag,
       tagIndex = __TAGS_CACHE.indexOf(this);
 
-    if (!isAnonymous) { this.trigger('before-unmount'); }
+    if (!skipAnonymous) { this.trigger('before-unmount'); }
 
     // clear all attributes coming from the mounted tag
     walkAttrs(impl.attrs, function (name) {
@@ -2298,7 +2303,7 @@ function Tag$1(impl, conf, innerHTML) {
     if (~tagIndex)
       { __TAGS_CACHE.splice(tagIndex, 1); }
 
-    if (p) {
+    if (p || isVirtual) {
       if (parent) {
         ptag = getImmediateCustomParentTag(parent);
 
@@ -2315,12 +2320,13 @@ function Tag$1(impl, conf, innerHTML) {
         while (el.firstChild) { el.removeChild(el.firstChild); }
       }
 
-      if (!mustKeepRoot) {
-        p.removeChild(el);
-      } else {
-        // the riot-tag and the data-is attributes aren't needed anymore, remove them
-        remAttr(p, IS_DIRECTIVE);
-      }
+      if (p)
+        { if (!mustKeepRoot) {
+          p.removeChild(el);
+        } else {
+          // the riot-tag and the data-is attributes aren't needed anymore, remove them
+          remAttr(p, IS_DIRECTIVE);
+        } }
     }
 
     if (this.__.virts) {
@@ -2336,7 +2342,7 @@ function Tag$1(impl, conf, innerHTML) {
     // custom internal unmount function to avoid relying on the observable
     if (this.__.onUnmount) { this.__.onUnmount(); }
 
-    if (!isAnonymous) {
+    if (!skipAnonymous) {
       this.trigger('unmount');
       this.off('*');
     }
@@ -2702,8 +2708,7 @@ var tags = Object.freeze({
 /**
  * Riot public api
  */
-var settings = Object.create(brackets.settings);
-
+var settings = settings$1;
 var util = {
   tmpl: tmpl,
   brackets: brackets,
