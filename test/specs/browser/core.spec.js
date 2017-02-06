@@ -696,6 +696,25 @@ describe('Riot core', function() {
 
   })
 
+  it('don t\' skip the anonymous tags using the "riot.settings.skipAnonymousTags = false" option' , function(done) {
+    riot.settings.skipAnonymousTags = false
+    injectHTML('<anonymous-test></anonymous-test>')
+    riot.mixin({
+      init() {
+        if (this.__.isAnonymous) {
+          expect(this.on).to.be.ok
+          done()
+        }
+      }
+    })
+    riot.tag('anonymous-test', '<div each="{ items }"></div>', function() {
+      this.items = [1]
+    })
+    var tag = riot.mount('anonymous-test')[0]
+    tag.unmount()
+    riot.settings.skipAnonymousTags = true
+  })
+
   it('the "updated" event gets properly triggered in a nested child', function(done) {
     injectHTML('<div id="updated-events-tester"></div>')
     var tag = riot.mount('#updated-events-tester', 'named-child-parent')[0],
