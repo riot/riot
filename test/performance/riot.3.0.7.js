@@ -1256,7 +1256,7 @@ var IfExpr = {
   update: function update() {
     var newValue = tmpl(this.expr, this.tag);
 
-    if (newValue && !this.current) { // insert
+    if (newValue && !this.current && this.pristine) { // insert
       this.current = this.pristine.cloneNode(true);
       this.stub.parentNode.insertBefore(this.current, this.stub);
 
