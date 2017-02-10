@@ -1,4 +1,4 @@
-/* Riot v3.2.0, @license MIT */
+/* Riot v3.2.1, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -7696,6 +7696,8 @@ function updateDataIs(expr, parent) {
  * @returns { undefined }
  */
 function updateExpression(expr) {
+  if (this.root && getAttr(this.root,'virtualized')) { return }
+
   var dom = expr.dom,
     attrName = expr.attr,
     isToggle = contains([SHOW_DIRECTIVE, HIDE_DIRECTIVE], attrName),
@@ -8664,8 +8666,8 @@ function Tag$1(impl, conf, innerHTML) {
   // create a unique id to this tag
   // it could be handy to use it also to improve the virtual dom rendering speed
   defineProperty(this, '_riot_id', ++__uid); // base 1 allows test !t._riot_id
-
-  extend(this, { root: root, opts: opts }, item);
+  defineProperty(this, 'root', root);
+  extend(this, { opts: opts }, item);
   // protect the "tags" and "refs" property from being overridden
   defineProperty(this, 'parent', parent || null);
   defineProperty(this, 'tags', {});
