@@ -1,6 +1,6 @@
 {
   "name": "riot",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "A React-like user interface micro-library",
   "homepage": "http://riotjs.com/",
   "repository": "riot/riot",
@@ -95,6 +95,7 @@
     "riot": "node_modules/riot-cli/lib/index.js"
   },
   "main": "lib/server/index.js",
+  "module": "lib/riot.js",
   "jsnext:main": "lib/riot.js",
   "browser": "riot.js"
 }
