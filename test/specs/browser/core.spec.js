@@ -33,6 +33,7 @@ import '../../tag/runtime-event-listener-switch.tag'
 import '../../tag/should-update.tag'
 import '../../tag/observable-attr.tag'
 import '../../tag/virtual-nested-unmount.tag'
+import '../../tag/virtual-conditional.tag'
 import '../../tag/form-controls.tag'
 import '../../tag/data-is.tag'
 import '../../tag/virtual-nested-component.tag'
@@ -1180,6 +1181,24 @@ describe('Riot core', function() {
     expect(tag.tags['page-b'].root.querySelector('h1').innerHTML).to.be.equal('page-b')
 
     tag.unmount()
+  })
+
+  it('virtual tags with conditional will mount their children tags properly', function() {
+    injectHTML('<virtual-conditional></virtual-conditional')
+    var tag = riot.mount('virtual-conditional')[0]
+
+    riot.util.tmpl.errorHandler = function () {
+      throw new Error('It should render without errors')
+    }
+
+    expect(tag.childMountCount).to.be.equal(0)
+    tag.user = { name: 'foo' }
+
+    tag.update()
+    expect(tag.childMountCount).to.be.equal(1)
+
+    riot.util.tmpl.errorHandler = null
+
   })
 
 })
