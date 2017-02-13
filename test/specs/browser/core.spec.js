@@ -31,6 +31,7 @@ import '../../tag/treeview.tag'
 import '../../tag/events.tag'
 import '../../tag/runtime-event-listener-switch.tag'
 import '../../tag/should-update.tag'
+import '../../tag/should-update-opts.tag'
 import '../../tag/observable-attr.tag'
 import '../../tag/virtual-nested-unmount.tag'
 import '../../tag/virtual-conditional.tag'
@@ -900,6 +901,16 @@ describe('Riot core', function() {
     expect(tag.update()).to.be.ok
     expect(tag.count).to.be.equal(0)
     tag.update(true)
+    expect(tag.count).to.be.equal(1)
+    tag.unmount()
+  })
+
+  it('the "shouldUpdate" accepts nextOpts', function() {
+    injectHTML('<should-update-opts should-update="{ count === 0 }"></should-update-opts>')
+    var tag = riot.mount('should-update-opts')[0]
+    expect(tag.update()).to.be.ok
+    expect(tag.count).to.be.equal(1)
+    tag.update()
     expect(tag.count).to.be.equal(1)
     tag.unmount()
   })
