@@ -7820,7 +7820,7 @@ var IfExpr = {
   update: function update() {
     var newValue = csp_tmpl_1(this.expr, this.tag);
 
-    if (newValue && !this.current) { // insert
+    if (newValue && !this.current && this.pristine) { // insert
       this.current = this.pristine.cloneNode(true);
       this.stub.parentNode.insertBefore(this.current, this.stub);
 
