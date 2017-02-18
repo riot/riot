@@ -1,4 +1,4 @@
-/* Riot v3.2.1, @license MIT */
+/* Riot v3.3.0, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -948,7 +948,7 @@ function each(list, fn) {
  * @returns { Boolean } -
  */
 function contains(array, item) {
-  return !!(~array.indexOf(item))
+  return array.indexOf(item) !== -1
 }
 
 /**
@@ -1531,7 +1531,7 @@ function _each(dom, parent, expr) {
       var
         doReorder = mustReorder && typeof item === T_OBJECT && !hasKeys,
         oldPos = oldItems.indexOf(item),
-        isNew = !~oldPos,
+        isNew = oldPos === -1,
         pos = !isNew && doReorder ? oldPos : i,
         // does a tag exist in this position?
         tag = tags[pos],
@@ -2131,7 +2131,9 @@ function Tag$1(impl, conf, innerHTML) {
    * @returns { Tag } the current tag instance
    */
   defineProperty(this, 'update', function tagUpdate(data) {
-    if (isFunction(this.shouldUpdate) && !this.shouldUpdate(data)) { return this }
+    var nextOpts = {};
+    updateOpts.apply(this, [isLoop, parent, isAnonymous, nextOpts, instAttrs]);
+    if (isFunction(this.shouldUpdate) && !this.shouldUpdate(data, nextOpts)) { return this }
     var canTrigger = this.isMounted && !skipAnonymous;
 
     // make sure the data passed will not override
@@ -2141,7 +2143,7 @@ function Tag$1(impl, conf, innerHTML) {
     // inherit properties from the parent, but only for isAnonymous tags
     if (isLoop && isAnonymous) { inheritFrom.apply(this, [this.parent, propsInSyncWithParent]); }
     extend(this, data);
-    updateOpts.apply(this, [isLoop, parent, isAnonymous, opts, instAttrs]);
+    extend(opts, nextOpts);
     if (canTrigger) { this.trigger('update', data); }
     updateAllExpressions.call(this, expressions);
     if (canTrigger) { this.trigger('updated'); }
@@ -2302,7 +2304,7 @@ function Tag$1(impl, conf, innerHTML) {
     });
 
     // remove this tag instance from the global virtualDom variable
-    if (~tagIndex)
+    if (tagIndex !== -1)
       { __TAGS_CACHE.splice(tagIndex, 1); }
 
     if (p || isVirtual) {
@@ -2523,7 +2525,7 @@ function arrayishAdd(obj, key, value, ensureArray, index) {
       // this item never changed its position
       if (oldIndex === index) { return }
       // remove the item from its old position
-      if (~oldIndex) { dest.splice(oldIndex, 1); }
+      if (oldIndex !== -1) { dest.splice(oldIndex, 1); }
       // move or add the item
       if (hasIndex) {
         dest.splice(index, 0, value);
@@ -2545,7 +2547,7 @@ function arrayishAdd(obj, key, value, ensureArray, index) {
 function arrayishRemove(obj, key, value, ensureArray) {
   if (isArray(obj[key])) {
     var index = obj[key].indexOf(value);
-    if (~index) { obj[key].splice(index, 1); }
+    if (index !== -1) { obj[key].splice(index, 1); }
     if (!obj[key].length) { delete obj[key]; }
     else if (obj[key].length === 1 && !ensureArray) { obj[key] = obj[key][0]; }
   } else

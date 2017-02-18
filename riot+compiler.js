@@ -1,4 +1,4 @@
-/* Riot v3.2.1, @license MIT */
+/* Riot v3.3.0, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -948,7 +948,7 @@ function each(list, fn) {
  * @returns { Boolean } -
  */
 function contains(array, item) {
-  return !!(~array.indexOf(item))
+  return array.indexOf(item) !== -1
 }
 
 /**
@@ -1531,7 +1531,7 @@ function _each(dom, parent, expr) {
       var
         doReorder = mustReorder && typeof item === T_OBJECT && !hasKeys,
         oldPos = oldItems.indexOf(item),
-        isNew = !~oldPos,
+        isNew = oldPos === -1,
         pos = !isNew && doReorder ? oldPos : i,
         // does a tag exist in this position?
         tag = tags[pos],
@@ -2131,7 +2131,9 @@ function Tag$1(impl, conf, innerHTML) {
    * @returns { Tag } the current tag instance
    */
   defineProperty(this, 'update', function tagUpdate(data) {
-    if (isFunction(this.shouldUpdate) && !this.shouldUpdate(data)) { return this }
+    var nextOpts = {};
+    updateOpts.apply(this, [isLoop, parent, isAnonymous, nextOpts, instAttrs]);
+    if (isFunction(this.shouldUpdate) && !this.shouldUpdate(data, nextOpts)) { return this }
     var canTrigger = this.isMounted && !skipAnonymous;
 
     // make sure the data passed will not override
@@ -2141,7 +2143,7 @@ function Tag$1(impl, conf, innerHTML) {
     // inherit properties from the parent, but only for isAnonymous tags
     if (isLoop && isAnonymous) { inheritFrom.apply(this, [this.parent, propsInSyncWithParent]); }
     extend(this, data);
-    updateOpts.apply(this, [isLoop, parent, isAnonymous, opts, instAttrs]);
+    extend(opts, nextOpts);
     if (canTrigger) { this.trigger('update', data); }
     updateAllExpressions.call(this, expressions);
     if (canTrigger) { this.trigger('updated'); }
@@ -2302,7 +2304,7 @@ function Tag$1(impl, conf, innerHTML) {
     });
 
     // remove this tag instance from the global virtualDom variable
-    if (~tagIndex)
+    if (tagIndex !== -1)
       { __TAGS_CACHE.splice(tagIndex, 1); }
 
     if (p || isVirtual) {
@@ -2523,7 +2525,7 @@ function arrayishAdd(obj, key, value, ensureArray, index) {
       // this item never changed its position
       if (oldIndex === index) { return }
       // remove the item from its old position
-      if (~oldIndex) { dest.splice(oldIndex, 1); }
+      if (oldIndex !== -1) { dest.splice(oldIndex, 1); }
       // move or add the item
       if (hasIndex) {
         dest.splice(index, 0, value);
@@ -2545,7 +2547,7 @@ function arrayishAdd(obj, key, value, ensureArray, index) {
 function arrayishRemove(obj, key, value, ensureArray) {
   if (isArray(obj[key])) {
     var index = obj[key].indexOf(value);
-    if (~index) { obj[key].splice(index, 1); }
+    if (index !== -1) { obj[key].splice(index, 1); }
     if (!obj[key].length) { delete obj[key]; }
     else if (obj[key].length === 1 && !ensureArray) { obj[key] = obj[key][0]; }
   } else
@@ -2757,7 +2759,7 @@ var riot$2 = Object.freeze({
 
 /**
  * Compiler for riot custom tags
- * @version v3.1.4
+ * @version v3.2.0
  */
 
 // istanbul ignore next
@@ -2943,7 +2945,7 @@ var PRE_TAGS = /<pre(?:\s+(?:[^">]*|"[^"]*")*)?>([\S\s]+?)<\/pre\s*>/gi;
 
 var SPEC_TYPES = /^"(?:number|date(?:time)?|time|month|email|color)\b/i;
 
-var IMPORT_STATEMENT = /^\s*import(?:(?:\s|[^\s'"])*)['|"].*\n?/gm;
+var IMPORT_STATEMENT = /^\s*import(?!\w)(?:(?:\s|[^\s'"])*)['|"].*\n?/gm;
 
 var TRIM_TRAIL = /[ \t]+$/gm;
 
@@ -3101,7 +3103,7 @@ function compileHTML (html, opts, pcex) {
   return _compileHTML(cleanSource(html), opts, pcex)
 }
 
-var JS_ES6SIGN = /^[ \t]*([$_A-Za-z][$\w]*)\s*\([^()]*\)\s*{/m;
+var JS_ES6SIGN = /^[ \t]*(((?:async)\s*)?([$_A-Za-z][$\w]*))\s*\([^()]*\)\s*{/m;
 
 var JS_ES6END = RegExp('[{}]|' + brackets.S_QBLOCKS, 'g');
 
@@ -3113,6 +3115,8 @@ function riotjs (js) {
     match,
     toes5,
     pos,
+    method,
+    prefix,
     name,
     RE = RegExp;
 
@@ -3124,9 +3128,18 @@ function riotjs (js) {
     js  = RE.rightContext;
     pos = skipBody(js, JS_ES6END);
 
-    name  = match[1];
+    method = match[1];
+    prefix = match[2] || '';
+    name  = match[3];
+
     toes5 = !/^(?:if|while|for|switch|catch|function)$/.test(name);
-    name  = toes5 ? match[0].replace(name, 'this.' + name + ' = function') : match[0];
+
+    if (toes5) {
+      name = match[0].replace(method, 'this.' + name + ' =' + prefix + ' function');
+    } else {
+      name = match[0];
+    }
+
     parts.push(name, js.slice(0, pos));
     js = js.slice(pos);
 
@@ -3476,7 +3489,7 @@ function compile$1 (src, opts, url) {
   return src
 }
 
-var version = 'v3.1.4';
+var version = 'v3.2.0';
 
 var compiler = {
   compile: compile$1,
