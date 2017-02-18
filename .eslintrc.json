@@ -12,6 +12,7 @@
   "rules": {
     "eqeqeq": ["error", "smart"],
     "indent": ["error", 2],
+    "no-bitwise": ["error", { "allow": ["|"] }],
     "linebreak-style": ["error", "unix"],
     "no-cond-assign": "off",
     "no-console": "off",
