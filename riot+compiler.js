@@ -1,4 +1,4 @@
-/* Riot v3.3.0, @license MIT */
+/* Riot v3.3.1, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -2131,10 +2131,11 @@ function Tag$1(impl, conf, innerHTML) {
    * @returns { Tag } the current tag instance
    */
   defineProperty(this, 'update', function tagUpdate(data) {
-    var nextOpts = {};
+    var nextOpts = {},
+      canTrigger = this.isMounted && !skipAnonymous;
+
     updateOpts.apply(this, [isLoop, parent, isAnonymous, nextOpts, instAttrs]);
-    if (isFunction(this.shouldUpdate) && !this.shouldUpdate(data, nextOpts)) { return this }
-    var canTrigger = this.isMounted && !skipAnonymous;
+    if (this.isMounted && isFunction(this.shouldUpdate) && !this.shouldUpdate(data, nextOpts)) { return this }
 
     // make sure the data passed will not override
     // the component core methods
@@ -2759,7 +2760,7 @@ var riot$2 = Object.freeze({
 
 /**
  * Compiler for riot custom tags
- * @version v3.2.0
+ * @version v3.2.1
  */
 
 // istanbul ignore next
@@ -3103,7 +3104,7 @@ function compileHTML (html, opts, pcex) {
   return _compileHTML(cleanSource(html), opts, pcex)
 }
 
-var JS_ES6SIGN = /^[ \t]*(((?:async)\s*)?([$_A-Za-z][$\w]*))\s*\([^()]*\)\s*{/m;
+var JS_ES6SIGN = /^[ \t]*(((?:async|\*)\s*)?([$_A-Za-z][$\w]*))\s*\([^()]*\)\s*{/m;
 
 var JS_ES6END = RegExp('[{}]|' + brackets.S_QBLOCKS, 'g');
 
@@ -3489,7 +3490,7 @@ function compile$1 (src, opts, url) {
   return src
 }
 
-var version = 'v3.2.0';
+var version = 'v3.2.1';
 
 var compiler = {
   compile: compile$1,

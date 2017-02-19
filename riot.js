@@ -1,4 +1,4 @@
-/* Riot v3.3.0, @license MIT */
+/* Riot v3.3.1, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2131,10 +2131,11 @@ function Tag$1(impl, conf, innerHTML) {
    * @returns { Tag } the current tag instance
    */
   defineProperty(this, 'update', function tagUpdate(data) {
-    var nextOpts = {};
+    var nextOpts = {},
+      canTrigger = this.isMounted && !skipAnonymous;
+
     updateOpts.apply(this, [isLoop, parent, isAnonymous, nextOpts, instAttrs]);
-    if (isFunction(this.shouldUpdate) && !this.shouldUpdate(data, nextOpts)) { return this }
-    var canTrigger = this.isMounted && !skipAnonymous;
+    if (this.isMounted && isFunction(this.shouldUpdate) && !this.shouldUpdate(data, nextOpts)) { return this }
 
     // make sure the data passed will not override
     // the component core methods

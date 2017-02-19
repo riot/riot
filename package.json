@@ -1,6 +1,6 @@
 {
   "name": "riot",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "description": "A React-like user interface micro-library",
   "homepage": "http://riotjs.com/",
   "repository": "riot/riot",
@@ -46,7 +46,7 @@
   ],
   "dependencies": {
     "riot-cli": "^3.0.0",
-    "riot-compiler": "^3.2.0",
+    "riot-compiler": "^3.2.1",
     "riot-observable": "^3.0.0",
     "riot-tmpl": "^3.0.2",
     "simple-dom": "0.3.2",
