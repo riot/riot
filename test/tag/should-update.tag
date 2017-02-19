@@ -1,5 +1,5 @@
 <should-update>
-  <p>{ count }</p>
+  <p ref="count">{ count }</p>
 
   this.count = 0
 

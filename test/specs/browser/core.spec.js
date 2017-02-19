@@ -899,6 +899,7 @@ describe('Riot core', function() {
     injectHTML('<should-update></should-update>')
     var tag = riot.mount('should-update')[0]
     expect(tag.update()).to.be.ok
+    expect(tag.refs.count.innerHTML).to.be.equal('0')
     expect(tag.count).to.be.equal(0)
     tag.update(true)
     expect(tag.count).to.be.equal(1)
