@@ -45,7 +45,7 @@ module.exports = function(conf) {
     sauceLabs: {
       build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
-      testName: `riotjs${needsCompiler ? '+compiler' : ''}`,
+      testName: `riotjs${ needsCompiler ? '+compiler' : ''}`,
       startConnect: true,
       recordVideo: false,
       recordScreenshots: false
