@@ -12,6 +12,16 @@ module.exports = {
       include: 'node_modules/**',
       ignoreGlobal: true
     }),
+    // ignore the coverage of riot external modules like riot-tmpl
+    {
+      transform (code) {
+        return {
+          code: code.replace(/export\nvar (brackets|tmpl) =/g, function(m) {
+            return ['/* istanbul ignore next */', m].join('\n')
+          })
+        }
+      }
+    },
     buble()
   ]
 }
