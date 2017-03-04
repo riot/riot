@@ -229,6 +229,7 @@ describe('Mixin', function() {
     const tag = riot.mount('my-mixin', { foo: 'foo', bar: 'bar'})[0]
 
     expect(tag.__optsKeys__).to.be.deep.equal(['foo', 'bar', 'baz'])
+    tag.unmount()
   })
 
   it('Will mount a tag with multiple mixins mixed-in', function() {
@@ -347,5 +348,9 @@ describe('Mixin', function() {
     var tag = riot.mount('my-mixin')[0]
     expect(tag.type).to.be.equal('func')
     tag.unmount()
+  })
+
+  it('Unregistered mixins will throw an error', function() {
+    expect(riot.mixin).to.throw(Error)
   })
 })

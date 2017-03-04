@@ -209,7 +209,6 @@ describe('Riot core', function() {
     expect(subTags.length).to.be.equal(3)
 
     subTags.forEach(tag => tag.unmount())
-
   })
 
   it('an <option> tag having the attribute "selected" should be the value of the parent <select> tag', function() {
@@ -1210,6 +1209,8 @@ describe('Riot core', function() {
     expect(tag.childMountCount).to.be.equal(1)
 
     riot.util.tmpl.errorHandler = null
+
+    tag.unmount()
 
   })
 

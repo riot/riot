@@ -32,6 +32,7 @@ import '../../tag/loop-manip.tag'
 import '../../tag/loop-object.tag'
 import '../../tag/loop-object-conditional.tag'
 import '../../tag/loop-tag-instances.tag'
+import '../../tag/loop-nested.tag'
 import '../../tag/loop-numbers-nested.tag'
 import '../../tag/loop-nested-strings-array.tag'
 import '../../tag/loop-events.tag'
@@ -736,6 +737,8 @@ describe('Riot each', function() {
     var tag = riot.mount('loop-noloop-option')[0]
     var options = $$('option', tag.root)
     expect(options[1].value).to.be.equal('1')
+
+    tag.unmount()
   })
 
   it('children in a loop inherit properties from the parent', function() {
@@ -1439,5 +1442,23 @@ describe('Riot each', function() {
     tag.items = tag.items.concat([4, 5, 6])
     tag.update()
     tag.tags['loop-bug-2242-child'].forEach((t) => expect(t.inDOM).to.be.ok)
+
+    tag.unmount()
   })
+
+/*
+  TODO: nested refs and tags should be in sync
+  it('nested tags get properly moved', function() {
+    injectHTML('<loop-nested></loop-nested>')
+    var tag = riot.mount('loop-nested')[0]
+    expect(tag.tags['loop-nested-item'][0].val).to.be.equal(1)
+    expect(tag.refs.p[0].innerHTML).to.be.equal('1')
+    tag.items.reverse()
+    tag.update()
+    expect(tag.refs.p[0].innerHTML).to.be.equal('3')
+    expect(tag.tags['loop-nested-item'][0].val).to.be.equal(3)
+    tag.unmount()
+  })
+
+*/
 })
