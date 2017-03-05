@@ -127,6 +127,13 @@ describe('Node', function() {
     expect($('textarea[name="txta2"]').val()).to.be.equal('')
   })
 
+  it('render tag: looped virtual tags get properly rendered', function() {
+    var tag = riot.render('loop-virtual')
+    var $ = cheerio.load(tag)
+    expect($('dt')).to.have.length(2)
+    expect($('dd')).to.have.length(2)
+  })
+
   it('load tag with custom options', function() {
     var tag = riot.require(path.resolve(__dirname, '../../tag/~custom-parsers.tag'), { exclude: ['html', 'css'] })
     var tmpl = riot.render('custom-parsers')
