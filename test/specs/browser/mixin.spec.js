@@ -350,6 +350,33 @@ describe('Mixin', function() {
     tag.unmount()
   })
 
+  it('class mixins don\'t destroy the tag classes __proto__', function(done) {
+    class ClassTag extends riot.Tag {
+      // mandatory in order to use and identify this component
+      get name() {
+        return 'class-tag'
+      }
+      get tmpl() {
+        return '<p onclick="{someclickfunction}">hi { message }</p>'
+      }
+      get attrs() {
+        return ''
+      }
+      get css() {
+        return ''
+      }
+      onCreate() {
+        this.mixin(FunctMixin)
+        expect(this.someclickfunction).to.be.a('function')
+        done()
+      }
+      someclickfunction() {
+        this.message = 'goodbye'
+      }
+    }
+    new ClassTag(document.createElement('div'))
+  })
+
   it('Unregistered mixins will throw an error', function() {
     expect(riot.mixin).to.throw(Error)
   })
