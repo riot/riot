@@ -43,6 +43,7 @@ import '../../tag/loop-double-curly-brackets.tag'
 import '../../tag/loop-conditional.tag'
 import '../../tag/loop-protect-internal-attrs.tag'
 import '../../tag/loop-noloop-option.tag'
+import '../../tag/loop-items-attrs.tag'
 import '../../tag/ploop-tag.tag'
 import '../../tag/table-loop-extra-row.tag'
 import '../../tag/obj-key-loop.tag'
@@ -1443,6 +1444,24 @@ describe('Riot each', function() {
     tag.update()
     tag.tags['loop-bug-2242-child'].forEach((t) => expect(t.inDOM).to.be.ok)
 
+    tag.unmount()
+  })
+
+  it('looped custom tags can update properly their root node attributes', function() {
+    injectHTML('<loop-items-attrs></loop-items-attrs>')
+    var tag = riot.mount('loop-items-attrs')[0]
+    let subtag1, subtag2
+
+    ;[subtag1, subtag2] = tag.tags['loop-items-attrs-item']
+    expect(subtag1.root.getAttribute('data-color')).to.be.equal(subtag1.color)
+    expect(subtag2.root.getAttribute('data-color')).to.be.equal(subtag2.color)
+
+    tag.items.forEach(item => item.color = item.color === 'orange' ? 'red' : 'orange')
+    tag.update()
+
+    ;[subtag1, subtag2] = tag.tags['loop-items-attrs-item']
+    expect(subtag1.root.getAttribute('data-color')).to.be.equal(subtag1.color)
+    expect(subtag2.root.getAttribute('data-color')).to.be.equal(subtag2.color)
     tag.unmount()
   })
 
