@@ -24,7 +24,7 @@
 | Angular                                        | 4.0.0           | 363kb                |
 | Ember                                          | 2.11.2          | 130.99kb             |
 | Polymer + Web Components Polyfill Lite         | 1.8.0           | 66.3kb               |
-| Angular                                        | 1.6.1           | 57.99kb              |
+| AngularJS                                      | 1.6.1           | 57.99kb              |
 | React                                          | 15.4.2          | 45.06kb              |
 | Web Components Polyfill                        | 0.7.22          | 33.68kb              |
 | Vue                                            | 2.2.1           | 27.52kb              |
