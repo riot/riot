@@ -1227,7 +1227,15 @@ describe('Riot core', function() {
     expect(tag.tags['riot-tmp'].opts.value).to.be.equal('foo')
     expect(tag.tags['riot-tmp'].opts.riotValue).to.be.not.ok
     tag.unmount()
+  })
 
+  it('the null attributes should be not transformed to empty strings', function() {
+    injectHTML('<riot-tmp-value></riot-tmp-value>')
+    riot.tag('riot-tmp-value', '<riot-tmp value="{ null }" value2="{ undefined }"></riot-tmp>')
+    var tag = riot.mount('riot-tmp-value')[0]
+    expect(tag.tags['riot-tmp'].opts.value).to.be.equal(null)
+    expect(tag.tags['riot-tmp'].opts.value2).to.be.equal(undefined)
+    tag.unmount()
   })
 
 })
