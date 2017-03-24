@@ -1167,7 +1167,7 @@ describe('Riot core', function() {
   })
 
   it('virtual tags can be used with dynamic data-is', function() {
-    injectHTML('<dynamic-virtual></dynamic-virtual')
+    injectHTML('<dynamic-virtual></dynamic-virtual>')
 
     var tag = riot.mount('dynamic-virtual')[0]
     var first = tag.root.firstElementChild
@@ -1184,7 +1184,7 @@ describe('Riot core', function() {
   })
 
   it('nested dynamic tags retain data-is attribute', function() {
-    injectHTML('<dynamic-nested></dynamic-nested')
+    injectHTML('<dynamic-nested></dynamic-nested>')
     var tag = riot.mount('dynamic-nested')[0]
 
     expect(tag.refs.dynamic.root.getAttribute('data-is')).to.be.equal('page-a')
@@ -1199,7 +1199,7 @@ describe('Riot core', function() {
   })
 
   it('virtual tags with conditional will mount their children tags properly', function() {
-    injectHTML('<virtual-conditional></virtual-conditional')
+    injectHTML('<virtual-conditional></virtual-conditional>')
     var tag = riot.mount('virtual-conditional')[0]
 
     riot.util.tmpl.errorHandler = function () {
@@ -1214,6 +1214,18 @@ describe('Riot core', function() {
 
     riot.util.tmpl.errorHandler = null
 
+    tag.unmount()
+
+  })
+
+  it('the value attribute on a riot tag gets properly passed as option', function() {
+    injectHTML('<riot-tmp-value></riot-tmp-value>')
+    riot.tag('riot-tmp-value', '<riot-tmp value="{ value }"></riot-tmp>', function() {
+      this.value = 'foo'
+    })
+    var tag = riot.mount('riot-tmp-value')[0]
+    expect(tag.tags['riot-tmp'].opts.value).to.be.equal('foo')
+    expect(tag.tags['riot-tmp'].opts.riotValue).to.be.not.ok
     tag.unmount()
 
   })
