@@ -61,6 +61,10 @@ describe('Riot core', function() {
     riot.tag('test', '<p>val: { opts.val }<\/p>')
   })
 
+  it('it should export the current riot build version as string', function() {
+    expect(riot.version).to.be.a('string')
+  })
+
   it('populates the vdom property correctly on riot global', function() {
     injectHTML('<v-dom-1></v-dom-1>')
     injectHTML('<v-dom-2></v-dom-2>')
