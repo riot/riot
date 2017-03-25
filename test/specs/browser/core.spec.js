@@ -23,6 +23,7 @@ import '../../tag/prevent-update.tag'
 import '../../tag/expression-eval-count.tag'
 import '../../tag/multi-named.tag'
 import '../../tag/named-data-ref.tag'
+import '../../tag/nested-ref.tag'
 import '../../tag/input-number.tag'
 import '../../tag/input-values.tag'
 import '../../tag/input-updated.tag'
@@ -1149,6 +1150,15 @@ describe('Riot core', function() {
     injectHTML('<named-data-ref></named-data-ref>')
     var tag = riot.mount('named-data-ref')[0]
     expect(tag.refs.greeting.value).to.be.equal('Hello')
+
+    tag.unmount()
+  })
+
+  it('gets the reference by nested', function() {
+    injectHTML('<nested-ref></nested-ref>')
+    var tag = riot.mount('nested-ref')[0]
+    expect(tag.refs.greeting1.value).to.be.equal('Hello1')
+    expect(tag.refs.greeting2.value).to.be.equal('Hello2')
 
     tag.unmount()
   })
