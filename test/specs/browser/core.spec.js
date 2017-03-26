@@ -1238,4 +1238,34 @@ describe('Riot core', function() {
     tag.unmount()
   })
 
+  it('style properties could be passed also as object', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+    riot.tag('riot-tmp', '<p style="{ style }">hi</p>')
+    var tag = riot.mount('riot-tmp')[0],
+      p = $('p', this.root)
+
+    tag.style = { color: 'red', height: '10px'}
+    tag.update()
+
+    expect(p.style.color).to.be.equal('red')
+    expect(p.style.height).to.be.equal('10px')
+
+    tag.unmount()
+  })
+
+
+  it('class properties could be passed also as object', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+    riot.tag('riot-tmp', '<p class="{ classes }">hi</p>')
+    var tag = riot.mount('riot-tmp')[0],
+      p = $('p', this.root)
+
+    tag.classes = { foo: true, bar: false }
+    tag.update()
+    expect(p.getAttribute('class')).to.be.equal('foo')
+    tag.classes = { foo: true, bar: true }
+    tag.update()
+    expect(p.getAttribute('class')).to.be.equal('foo bar')
+    tag.unmount()
+  })
 })
