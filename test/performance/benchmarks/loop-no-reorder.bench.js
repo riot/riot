@@ -1,6 +1,6 @@
 const tmpl = `
   <div>
-    <div each="{ item in items }" no-reorder>
+    <div ref="items" each="{ item in items }" no-reorder>
       { item.name }
       <p each="{ prop in item.props }" no-reorder>
         { prop.name }
