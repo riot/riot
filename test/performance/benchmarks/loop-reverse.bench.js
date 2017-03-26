@@ -1,6 +1,6 @@
 const tmpl = `
   <div>
-    <div each="{ item in items }">
+    <div ref="items" each="{ item in items }">
       { item.name }
       <p if="{ item.props }" each="{ prop in item.props }">
         { prop.name }
