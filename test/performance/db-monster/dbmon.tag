@@ -35,7 +35,7 @@
       this.databasesArray = ENV.generateData().toArray()
       this.update()
       Monitoring.renderRate.ping()
-      setTimeout(this.loadSamples, ENV.timeout)
+      requestAnimationFrame(this.loadSamples)
     }
 
     this.loadSamples()
