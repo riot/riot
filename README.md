@@ -331,13 +331,13 @@ http://riotjs.com/
 
 ## Backers
 
-Support us with a monthly donation and help us continue our activities. [[Become a backer][backers-image]][support-url]
+Support us with a monthly donation and help us continue our activities. [Become a backer][support-url]
 
 [![Backers][backers-image]][support-url]
 
 ## Sponsors
 
-Become a sponsor to get your logo on our README. [[Become a sponsor][sponsors-image]][support-url]
+Become a sponsor to get your logo on our README. [Become a sponsor][support-url]
 
 [![Sponsors][sponsors-image]][support-url]
 
