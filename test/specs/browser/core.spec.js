@@ -1240,7 +1240,7 @@ describe('Riot core', function() {
 
   it('style properties could be passed also as object', function() {
     injectHTML('<riot-tmp></riot-tmp>')
-    riot.tag('riot-tmp', '<p style="{ style }">hi</p>')
+    riot.tag('riot-tmp', '<p riot-style="{ style }">hi</p>')
     var tag = riot.mount('riot-tmp')[0],
       p = $('p', this.root)
 

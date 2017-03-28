@@ -37,7 +37,7 @@ describe('Riot show/hide', function() {
   })
 
   it('the show directive gets preserved also in case of style expressions updates', function() {
-    riot.tag('riot-show-tmp', '<p show="{ isVisible }" style="{ \'color:red\' }">foo</p>')
+    riot.tag('riot-show-tmp', '<p show="{ isVisible }" riot-style="{ \'color:red\' }">foo</p>')
     injectHTML('<riot-show-tmp></riot-show-tmp>')
     var tag = riot.mount('riot-show-tmp')[0],
       p = $('p', tag.root)
@@ -51,5 +51,7 @@ describe('Riot show/hide', function() {
     expect(p.style.display).to.be.not.equal('none')
     expect(p.hidden).to.be.not.ok
     expect(p.style.color).to.be.equal('red')
+
+    tag.unmount()
   })
 })
