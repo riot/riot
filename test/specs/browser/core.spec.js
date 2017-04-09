@@ -1277,4 +1277,16 @@ describe('Riot core', function() {
     expect(p.getAttribute('class')).to.be.equal('foo bar')
     tag.unmount()
   })
+
+  it('undefined text node should not be rendered', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+    riot.tag('riot-tmp', '<p>{ message }</p>')
+
+    var tag = riot.mount('riot-tmp')[0],
+      p = $('p', this.root)
+
+    expect(p.innerHTML).to.be.not.equal('undefined')
+
+    tag.unmount()
+  })
 })
