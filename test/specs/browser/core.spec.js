@@ -55,6 +55,7 @@ describe('Riot core', function() {
   beforeEach(function() {
     riot.unregister('riot-tmp')
     riot.unregister('riot-tmp-value')
+    riot.unregister('riot-tmp-sub')
   })
 
   afterEach(function() {
@@ -1286,6 +1287,32 @@ describe('Riot core', function() {
       p = $('p', this.root)
 
     expect(p.innerHTML).to.be.not.equal('undefined')
+
+    tag.unmount()
+  })
+
+  it('subtags created via is get properly unmounted', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+    riot.tag('riot-tmp-sub', '<p>hi</p>')
+    riot.tag('riot-tmp', '<div if="{ showSub }"><div data-is="{ subTag }"></div></div>')
+
+    var tag = riot.mount('riot-tmp')[0],
+      unmount = sinon.spy()
+
+    expect(tag.tags['riot-tmp-sub']).to.be.not.ok
+
+    tag.showSub = true
+    tag.subTag = 'riot-tmp-sub'
+    tag.update()
+
+    expect(tag.tags['riot-tmp-sub']).to.be.ok
+    tag.tags['riot-tmp-sub'].on('unmount', unmount)
+
+    tag.showSub = false
+    tag.update()
+
+    expect(tag.tags['riot-tmp-sub']).to.be.not.ok
+    expect(unmount).to.have.been.called
 
     tag.unmount()
   })
