@@ -52,6 +52,11 @@ describe('Riot core', function() {
     expect(riot).to.be.not.undefined
   })
 
+  beforeEach(function() {
+    riot.unregister('riot-tmp')
+    riot.unregister('riot-tmp-value')
+  })
+
   afterEach(function() {
     riot.settings.brackets = defaultBrackets
   })
@@ -1035,6 +1040,8 @@ describe('Riot core', function() {
     expect(tag.updateCount).to.be.equal(0)
     fireEvent(tag.tags.inner[0].refs.btn, 'click')
     expect(tag.updateCount).to.be.equal(0)
+
+
     tag.unmount()
 
   })
@@ -1220,6 +1227,7 @@ describe('Riot core', function() {
 
   it('the value attribute on a riot tag gets properly passed as option', function() {
     injectHTML('<riot-tmp-value></riot-tmp-value>')
+    riot.tag('riot-tmp', '<p>{ opts.value }</p>')
     riot.tag('riot-tmp-value', '<riot-tmp value="{ value }"></riot-tmp>', function() {
       this.value = 'foo'
     })
@@ -1231,6 +1239,7 @@ describe('Riot core', function() {
 
   it('the null attributes should be not transformed to empty strings', function() {
     injectHTML('<riot-tmp-value></riot-tmp-value>')
+    riot.tag('riot-tmp', '<p>{ opts.value }</p>')
     riot.tag('riot-tmp-value', '<riot-tmp value="{ null }" value2="{ undefined }"></riot-tmp>')
     var tag = riot.mount('riot-tmp-value')[0]
     expect(tag.tags['riot-tmp'].opts.value).to.be.equal(null)
