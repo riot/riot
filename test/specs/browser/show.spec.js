@@ -9,7 +9,7 @@ const expect = chai.expect
 
 describe('Riot show/hide', function() {
 
-  beforeEach(function() {
+  afterEach(function() {
     riot.unregister('riot-tmp')
   })
 

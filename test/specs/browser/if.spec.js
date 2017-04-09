@@ -16,7 +16,7 @@ const expect = chai.expect
 
 describe('Riot if', function() {
 
-  beforeEach(function() {
+  afterEach(function() {
     riot.unregister('riot-tmp')
   })
 

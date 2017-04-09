@@ -14,9 +14,6 @@ import '../../tag/scoped.tag'
 const expect = chai.expect
 
 describe('Riot style', function() {
-
-
-
   it('style injection to single style tag', function() {
     injectHTML('<style-tag></style-tag><style-tag2></style-tag2>')
     var tags = riot.mount('style-tag, style-tag2')
