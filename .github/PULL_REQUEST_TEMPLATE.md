@@ -11,7 +11,7 @@
 
   Post the link using one of our bug report templates:
   - [Bug Report Template](http://riotjs.com/examples/plunker/?app=bug-reporter) on plnkr (preferred)
-  - [Bug Report Template](http://jsfiddle.net/cognitom/wf7bkvur/) on jsFiddle
+  - [Bug Report Template](http://jsfiddle.net/gianlucaguarini/86m9uepL/) on jsFiddle
 
 
 3. Is this a breaking change?
