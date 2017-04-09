@@ -52,6 +52,29 @@ describe('Riot show/hide', function() {
     expect(p.hidden).to.be.not.ok
     expect(p.style.color).to.be.equal('red')
 
+    riot.unregister('riot-show-tmp')
+    tag.unmount()
+  })
+
+  it('the show directive works properly also against objects', function() {
+    riot.tag('riot-show-tmp', '<p show="{ obj1 || obj2 }">foo</p>')
+    injectHTML('<riot-show-tmp></riot-show-tmp>')
+    var tag = riot.mount('riot-show-tmp')[0],
+      p = $('p', tag.root)
+
+    tag.obj1 = undefined
+    tag.obj2 = undefined
+
+    expect(p.hidden).to.be.ok
+
+    tag.obj1 = { a: 'foo' }
+    tag.obj2 = false
+
+    tag.update()
+
+    expect(p.hidden).to.be.not.ok
+
+    riot.unregister('riot-show-tmp')
     tag.unmount()
   })
 })
