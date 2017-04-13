@@ -2,6 +2,12 @@ const expect = chai.expect
 
 export const IE_VERSION = (window && window.document || {}).documentMode | 0
 
+export function makeTag(name, tmpl, css, attrs, fn) {
+  riot.tag2(name, tmpl, css, attrs, fn)
+  injectHTML(`<${name} />`)
+  return riot.mount(name)[0]
+}
+
 // this export function is needed to run the tests also on ie8
 // ie8 returns some weird strings when we try to get the innerHTML of a tag
 export function normalizeHTML(html) {
@@ -38,6 +44,15 @@ export function getRiotStyles(riot) {
   // util.injectStyle must add <style> in head, not in body -- corrected
   var stag = riot.util.styleNode || document.querySelector('style')
   return normalizeHTML(stag.styleSheet ? stag.styleSheet.cssText : stag.innerHTML)
+}
+
+export function removeAllTags() {
+  var curr = document.body.children[0]
+  while(curr) {
+    var nxt = curr.nextSibling
+    if(curr._tag) curr._tag.unmount()
+    curr = nxt
+  }
 }
 
 /**

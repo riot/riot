@@ -5,6 +5,7 @@ const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
   // split the riot+compiler tests from the normal riot core tests
   testFiles = `./specs/${process.env.TEST_FOLDER}/**/*.spec.js`,
   needsCompiler = process.env.TEST_FOLDER === 'compiler',
+  needsHotReload = process.env.TEST_FOLDER === 'hot-reload',
   preprocessors = {}
 
 var browsers = ['PhantomJS'] // this is not a constant
@@ -38,8 +39,9 @@ module.exports = function(conf) {
         included: false
       },
       needsCompiler ? RIOT_WITH_COMPILER_PATH : RIOT_PATH,
+      needsHotReload ? '../dist/riot/riot-hot-reload.js' : null,
       testFiles
-    ],
+    ].filter(s => !!s),
     // logLevel: conf.LOG_DEBUG,
     concurrency: 2,
     sauceLabs: {

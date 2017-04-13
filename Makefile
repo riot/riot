@@ -44,6 +44,7 @@ test-karma:
 	@ TEST_FOLDER=compiler $(KARMA) start test/karma.conf.js
 	# Test only riot.js and generate the coverage
 	@ TEST_FOLDER=browser $(KARMA) start test/karma.conf.js
+	@ TEST_FOLDER=hot-reload $(KARMA) start test/karma.conf.js
 
 test-coveralls:
 	@ RIOT_COV=1 cat ./coverage/report-lcov/lcov.info | $(COVERALLS)
@@ -66,6 +67,7 @@ raw:
 	# Default builds UMD
 	@ $(ROLLUP) lib/riot.js --config $(CONFIG)rollup.config.js > $(DIST)riot.js
 	@ $(ROLLUP) lib/riot+compiler.js --config $(CONFIG)rollup.config.js > $(DIST)riot+compiler.js
+	@ $(ROLLUP) lib/riot-hot-reload.js --config $(CONFIG)rollup.config.js > $(DIST)riot-hot-reload.js
 	# Chrome Security Policy build
 	@ $(ROLLUP) lib/riot.js --config $(CONFIG)rollup.config.csp.js > $(DIST)riot.csp.js
 
