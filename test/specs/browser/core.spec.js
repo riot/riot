@@ -355,7 +355,6 @@ describe('Riot core', function() {
   })
 
   it('data-is attribute', function() {
-
     injectHTML('<div id="rtag" data-is="rtag"><\/div>')
     riot.tag('rtag', '<p>val: { opts.val }</p>')
 
@@ -366,7 +365,18 @@ describe('Riot core', function() {
     expect($$('rtag').length).to.be.equal(0)
 
     tag.unmount()
+  })
 
+  it('the data-is attribute is preserved in case of unmount', function() {
+    injectHTML('<div id="rtag" data-is="rtag"><\/div>')
+    riot.tag('rtag', '<p>val: { opts.val }</p>')
+
+    var tag = riot.mount('#rtag', { val: 10 })[0]
+    expect(normalizeHTML(tag.root.innerHTML)).to.be.equal('<p>val: 10</p>')
+
+    tag.unmount(true)
+    expect(tag.root.getAttribute('data-is')).to.be.ok
+    tag.root.parentNode.removeChild(tag.root)
   })
 
   it('data-is can be dynamically created by expression', function() {
