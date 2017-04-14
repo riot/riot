@@ -2,13 +2,13 @@ import {
   injectHTML,
   getRiotStyles,
   $
-} from '../../helpers/index'
+} from '../../../helpers/index'
 
 // include special tags to test specific features
-import '../../tag/style-tag.tag'
-import '../../tag/style-tag2.tag'
-import '../../tag/style-tag4.tag'
-import '../../tag/scoped.tag'
+import '../../../tag/style-tag.tag'
+import '../../../tag/style-tag2.tag'
+import '../../../tag/style-tag4.tag'
+import '../../../tag/scoped.tag'
 
 describe('Riot style', function() {
   it('style injection to single style tag', function() {

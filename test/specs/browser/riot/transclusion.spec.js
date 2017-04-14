@@ -3,16 +3,16 @@ import {
   $,
   normalizeHTML,
   fireEvent
-} from '../../helpers/index'
+} from '../../../helpers/index'
 
 
 // include special tags to test specific features
-import '../../tag/inner-html.tag'
-import '../../tag/yield-no-slash.tag'
-import '../../tag/yield-multi.tag'
-import '../../tag/yield-multi2.tag'
-import '../../tag/yield-from-default.tag'
-import '../../tag/yield-nested.tag'
+import '../../../tag/inner-html.tag'
+import '../../../tag/yield-no-slash.tag'
+import '../../../tag/yield-multi.tag'
+import '../../../tag/yield-multi2.tag'
+import '../../../tag/yield-from-default.tag'
+import '../../../tag/yield-nested.tag'
 
 
 describe('Riot transclusion', function() {

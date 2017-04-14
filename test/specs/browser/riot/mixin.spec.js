@@ -1,4 +1,4 @@
-import { injectHTML } from '../../helpers/index'
+import { injectHTML } from '../../../helpers/index'
 
 describe('Mixin', function() {
 

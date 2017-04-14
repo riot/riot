@@ -2,15 +2,15 @@ import {
   injectHTML,
   expectHTML,
   $$
-} from '../../helpers/index'
+} from '../../../helpers/index'
 
 
 // include special tags to test specific features
-import '../../tag/if-mount.tag'
-import '../../tag/nested-child.tag'
-import '../../tag/if-unmount.tag'
-import '../../tag/named-unmount.tag'
-import '../../tag/bug-2229.tag'
+import '../../../tag/if-mount.tag'
+import '../../../tag/nested-child.tag'
+import '../../../tag/if-unmount.tag'
+import '../../../tag/named-unmount.tag'
+import '../../../tag/bug-2229.tag'
 
 describe('Riot if', function() {
   it('child tags are only rendered when if-condition is truthy', function() {

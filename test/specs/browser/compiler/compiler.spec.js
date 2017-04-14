@@ -1,17 +1,15 @@
+/* global defaultBrackets */
+
 import {
   injectHTML,
   $,
   getRiotStyles
-} from '../../helpers/index'
+} from '../../../helpers/index'
 
-// include special tags to test specific features
-
-const expect = chai.expect,
-  defaultBrackets = riot.settings.brackets
 
 describe('Riot compiler', function() {
 
-  before(function() {
+  beforeEach(function() {
     // adding some custom riot parsers
     // css
     riot.parsers.css.myparser = function(tag, css) {

@@ -3,9 +3,9 @@ const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
   RIOT_PATH = '../dist/riot/riot.js',
   isDebug = process.env.DEBUG,
   // split the riot+compiler tests from the normal riot core tests
-  testsSetup = `./specs/${process.env.TEST_FOLDER}/index.js`,
+  testsSetup = './specs/browser/index.js',
   testFiles = `./specs/${process.env.TEST_FOLDER}/**/*.spec.js`,
-  needsCompiler = process.env.TEST_FOLDER === 'compiler',
+  needsCompiler = /compiler/.test(process.env.TEST_FOLDER),
   preprocessors = {}
 
 var browsers = ['PhantomJS'] // this is not a constant

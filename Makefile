@@ -41,9 +41,9 @@ tags:
 
 test-karma:
   # Test riot+compiler.js
-	@ TEST_FOLDER=compiler $(KARMA) start test/karma.conf.js
+	@ TEST_FOLDER=browser/compiler $(KARMA) start test/karma.conf.js
 	# Test only riot.js and generate the coverage
-	@ TEST_FOLDER=browser $(KARMA) start test/karma.conf.js
+	@ TEST_FOLDER=browser/riot $(KARMA) start test/karma.conf.js
 
 test-coveralls:
 	@ RIOT_COV=1 cat ./coverage/report-lcov/lcov.info | $(COVERALLS)

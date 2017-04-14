@@ -3,7 +3,7 @@ import {
   injectHTML,
   $,
   $$
-} from '../../helpers/index'
+} from '../../../helpers/index'
 
 describe('Riot show/hide', function() {
   it('the show directive works as expected', function() {
