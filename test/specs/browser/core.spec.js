@@ -897,7 +897,6 @@ describe('Riot core', function() {
   })
 
   it('camelize the options passed via dom attributes', function() {
-
     injectHTML('<top-attributes></top-attributes>')
     var node = document.createElement('top-attributes'),
       tag
@@ -910,7 +909,19 @@ describe('Riot core', function() {
     expect(tag.opts['another-random-option']).to.be.equal('hello')
 
     tag.unmount()
+  })
 
+  it('expressions object attributes get removed once used', function() {
+    injectHTML('<top-attributes></top-attributes>')
+    var node = document.createElement('top-attributes'),
+      tag
+
+    node.setAttribute('data', '{ opts }')
+    tag = riot.mount(node, { message: 'hello' })[0]
+    expect(tag.opts.data.message).to.be.equal('hello')
+    expect(tag.root.getAttribute('data')).to.be.not.ok
+
+    tag.unmount()
   })
 
 
