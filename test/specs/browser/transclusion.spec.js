@@ -14,11 +14,10 @@ import '../../tag/yield-multi2.tag'
 import '../../tag/yield-from-default.tag'
 import '../../tag/yield-nested.tag'
 
-const expect = chai.expect
 
 describe('Riot transclusion', function() {
 
-  before(function() {
+  beforeEach(function() {
     // tag used in multiple tests
     riot.tag('inner', '<p>{opts.value}</p>')
   })

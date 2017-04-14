@@ -5,14 +5,7 @@ import {
   $$
 } from '../../helpers/index'
 
-const expect = chai.expect
-
 describe('Riot show/hide', function() {
-
-  afterEach(function() {
-    riot.unregister('riot-tmp')
-  })
-
   it('the show directive works as expected', function() {
     riot.tag('riot-tmp', '<p show="{ isVisible }">foo</p><p hide="{ isVisible }">foo</p>')
     injectHTML('<riot-tmp></riot-tmp>')

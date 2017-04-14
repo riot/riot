@@ -66,8 +66,6 @@ import '../../tag/table-test.tag'
 import '../../tag/virtual-no-loop.tag'
 import '../../tag/virtual-yield-loop.tag'
 
-const expect = chai.expect
-
 describe('Riot each', function() {
   it('the loop elements keep their position in the DOM', function() {
     injectHTML('<loop-position></loop-position>')

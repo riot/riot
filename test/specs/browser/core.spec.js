@@ -44,22 +44,9 @@ import '../../tag/dynamic-virtual.tag'
 import '../../tag/multiple-select.tag'
 import '../../tag/dynamic-nested.tag'
 
-const expect = chai.expect,
-  defaultBrackets = riot.settings.brackets
-
 describe('Riot core', function() {
   it('Riot exists', function () {
     expect(riot).to.be.not.undefined
-  })
-
-  beforeEach(function() {
-    riot.unregister('riot-tmp')
-    riot.unregister('riot-tmp-value')
-    riot.unregister('riot-tmp-sub')
-  })
-
-  afterEach(function() {
-    riot.settings.brackets = defaultBrackets
   })
 
   before(function() {

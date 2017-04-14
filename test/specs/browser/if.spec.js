@@ -12,14 +12,7 @@ import '../../tag/if-unmount.tag'
 import '../../tag/named-unmount.tag'
 import '../../tag/bug-2229.tag'
 
-const expect = chai.expect
-
 describe('Riot if', function() {
-
-  afterEach(function() {
-    riot.unregister('riot-tmp')
-  })
-
   it('child tags are only rendered when if-condition is truthy', function() {
 
     injectHTML('<if-mount></if-mount>')

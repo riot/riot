@@ -1,7 +1,5 @@
 import { injectHTML } from '../../helpers/index'
 
-const expect = chai.expect
-
 describe('Mixin', function() {
 
   const IdMixin = {
