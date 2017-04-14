@@ -1,4 +1,4 @@
-/* Riot v3.4.1, @license MIT */
+/* Riot v3.4.2, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -7734,6 +7734,12 @@ function updateExpression(expr) {
     }
   }
 
+  // remove original attribute
+  if (expr.attr && (!expr.isAttrRemoved || !value)) {
+    remAttr(dom, expr.attr);
+    expr.isAttrRemoved = true;
+  }
+
   // for the boolean attributes we don't need the value
   // we can convert it to checked=true to checked=checked
   if (expr.bool) { value = value ? attrName : false; }
@@ -7768,11 +7774,6 @@ function updateExpression(expr) {
     return
   }
 
-  // remove original attribute
-  if (!expr.isAttrRemoved || !value) {
-    remAttr(dom, expr.attr);
-    expr.isAttrRemoved = true;
-  }
 
   // event handler
   if (isFunction(value)) {
@@ -8555,7 +8556,7 @@ function unregister$1(name) {
   delete __TAG_IMPL[name];
 }
 
-var version$1 = 'v3.4.1';
+var version$1 = 'v3.4.2';
 
 
 var core = Object.freeze({
@@ -8871,9 +8872,6 @@ function Tag$1(impl, conf, innerHTML) {
       }
 
       if (p && !mustKeepRoot) { p.removeChild(el); }
-
-      // the data-is attributes isn't needed anymore, remove it
-      remAttr(el, IS_DIRECTIVE);
     }
 
     if (this.__.virts) {

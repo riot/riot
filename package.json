@@ -1,6 +1,6 @@
 {
   "name": "riot",
-  "version": "3.4.1",
+  "version": "3.4.2",
   "description": "A React-like user interface micro-library",
   "homepage": "http://riotjs.com/",
   "repository": "riot/riot",
