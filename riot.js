@@ -1,8 +1,8 @@
-/* Riot v2.6.7, @license MIT */
+/* Riot v2.6.8, @license MIT */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.6.7', settings: {} },
+var riot = { version: 'v2.6.8', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -1502,6 +1502,7 @@ function Tag(impl, conf, innerHTML) {
 
     // update opts from current DOM attributes
     each(root.attributes, function(el) {
+      if (el.name in attr) return
       var val = el.value
       opts[toCamel(el.name)] = tmpl.hasExpr(val) ? tmpl(val, ctx) : val
     })

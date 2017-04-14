@@ -1,8 +1,8 @@
-/* Riot v2.6.7, @license MIT */
+/* Riot v2.6.8, @license MIT */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.6.7', settings: {} },
+var riot = { version: 'v2.6.8', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -1502,6 +1502,7 @@ function Tag(impl, conf, innerHTML) {
 
     // update opts from current DOM attributes
     each(root.attributes, function(el) {
+      if (el.name in attr) return
       var val = el.value
       opts[toCamel(el.name)] = tmpl.hasExpr(val) ? tmpl(val, ctx) : val
     })
@@ -2812,7 +2813,7 @@ riot.parsers = parsers
 
 /**
  * Compiler for riot custom tags
- * @version v2.5.5
+ * @version v2.5.7
  */
 var compile = (function () {
 
@@ -2845,7 +2846,7 @@ var compile = (function () {
 
   var SPEC_TYPES = /^"(?:number|date(?:time)?|time|month|email|color)\b/i
 
-  var IMPORT_STATEMENT = /^\s*import(?:\s*[*{]|\s+[$_a-zA-Z'"]).*\n?/gm
+  var IMPORT_STATEMENT = /^\s*import(?:(?:\s|[^\s'"])*)['|"].*\n?/gm
 
   var TRIM_TRAIL = /[ \t]+$/gm
 
@@ -3395,7 +3396,7 @@ var compile = (function () {
     html: compileHTML,
     css: compileCSS,
     js: compileJS,
-    version: 'v2.5.5'
+    version: 'v2.5.7'
   }
   return compile
 
