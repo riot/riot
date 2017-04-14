@@ -27,8 +27,8 @@
 | React                                          | 15.4.2          | 45.06kb              |
 | Web Components Polyfill                        | 0.7.22          | 33.68kb              |
 | Vue                                            | 2.2.6           | 27.87kb              |
-| __Riot__                                       | 3.4.1           | 9.87kb               |
-| Inferno                                        | 1.6.2           | 8.92kb               |
+| __Riot__                                       | 3.4.2           | 9.87kb               |
+| Inferno                                        | 3.0.4           | 9.04kb               |
 | Preact                                         | 8.1.0           | 3.33kb               |
 
 ### Browsers support
