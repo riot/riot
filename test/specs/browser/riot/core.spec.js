@@ -429,6 +429,21 @@ describe('Riot core', function() {
     tag.unmount()
   })
 
+  it('`data-is` expressions will be evaluated only if they return a string', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', `
+      <div data-is="{ tag }">
+        <p>hello</p>
+      </div>
+    `)
+    var tag = riot.mount('riot-tmp')[0]
+
+    expect($('p', tag.root).innerHTML).to.be.equal('hello')
+
+    tag.unmount()
+  })
+
   it('tag names are case insensitive (converted to lowercase) in `riot.mount`', function() {
     var i, els = $$('tag-data-is,[data-is="tag-data-is"]')
     for (i = 0; i < els.length; i++) {
