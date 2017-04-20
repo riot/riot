@@ -29,8 +29,6 @@ describe('Riot show/hide', function() {
     expect(p[1].style.display).to.be.not.equal('none')
     expect(p[1].hidden).to.be.not.ok
 
-    // teardown
-    riot.unregister('riot-tmp')
     tag.unmount()
   })
 
@@ -50,7 +48,6 @@ describe('Riot show/hide', function() {
     expect(p.hidden).to.be.not.ok
     expect(p.style.color).to.be.equal('red')
 
-    riot.unregister('riot-tmp')
     tag.unmount()
   })
 
@@ -71,8 +68,26 @@ describe('Riot show/hide', function() {
     tag.update()
 
     expect(p.hidden).to.be.not.ok
-
-    riot.unregister('riot-tmp')
     tag.unmount()
+  })
+
+  it('the show directive evaluates also the parent values', function() {
+    riot.tag('riot-tmp', `
+      <riot-tmp-sub each="{ item in items }" show="{selected === item}"></riot-tmp-sub>
+    `, function() {
+      this.items = ['uno', 'due']
+      this.selected = 'uno'
+    })
+    riot.tag('riot-tmp-sub', '<p>{ opts.item }</p>')
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    var tag = riot.mount('riot-tmp')[0]
+
+    expect(tag.tags['riot-tmp-sub'].length).to.be.equal(2)
+
+    expect(tag.tags['riot-tmp-sub'][0].root.hidden).to.be.not.ok
+    expect(tag.tags['riot-tmp-sub'][1].root.hidden).to.be.ok
+
+    //tag.unmount()
   })
 })

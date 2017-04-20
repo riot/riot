@@ -224,5 +224,4 @@ describe('Riot if', function() {
 
     tag.unmount()
   })
-
 })
