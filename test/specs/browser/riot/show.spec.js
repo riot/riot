@@ -88,6 +88,6 @@ describe('Riot show/hide', function() {
     expect(tag.tags['riot-tmp-sub'][0].root.hidden).to.be.not.ok
     expect(tag.tags['riot-tmp-sub'][1].root.hidden).to.be.ok
 
-    //tag.unmount()
+    tag.unmount()
   })
 })
