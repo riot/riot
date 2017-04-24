@@ -1,4 +1,4 @@
-/* Riot v3.4.2, @license MIT */
+/* Riot v3.4.3, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -7640,7 +7640,6 @@ function updateDataIs(expr, parent, tagName) {
   isVirtual = expr.dom.tagName === 'VIRTUAL';
   // sync _parent to accommodate changing tagnames
   if (expr.tag) {
-
     // need placeholder before unmount
     if(isVirtual) {
       head = expr.tag.__.head;
@@ -7650,6 +7649,8 @@ function updateDataIs(expr, parent, tagName) {
 
     expr.tag.unmount(true);
   }
+
+  if (!isString(tagName)) { return }
 
   expr.impl = __TAG_IMPL[tagName];
   conf = {root: expr.dom, parent: parent, hasImpl: true, tagName: tagName};
@@ -7721,7 +7722,7 @@ function updateExpression(expr) {
   if (expr.update) { return expr.update() }
 
   // ...it seems to be a simple expression so we try to calculat its value
-  value = csp_tmpl_1(expr.expr, this);
+  value = csp_tmpl_1(expr.expr, isToggle ? extend(Object.create(this.parent), this) : this);
   isObj = isObject(value);
 
   // convert the style/class objects to strings
@@ -8556,7 +8557,7 @@ function unregister$1(name) {
   delete __TAG_IMPL[name];
 }
 
-var version$1 = 'v3.4.2';
+var version$1 = 'v3.4.3';
 
 
 var core = Object.freeze({
