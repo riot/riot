@@ -34,13 +34,13 @@ module.exports = {
     slIE10: {
       base: 'SauceLabs',
       browserName: 'internet explorer',
-      platform: 'Windows 8',
+      platform: 'Windows 7',
       version: '10'
     },
     slIE11: {
       base: 'SauceLabs',
       browserName: 'internet explorer',
-      platform: 'Windows 8.1',
+      platform: 'Windows 7',
       version: '11'
     },
     slEdge: {
