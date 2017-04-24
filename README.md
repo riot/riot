@@ -21,13 +21,13 @@
 
 | Framework                                      | Version         | Minified Size (gzip) |
 |------------------------------------------------|-----------------|----------------------|
-| Angular                                        | 4               | too much             |
+| Angular                                        | 4               | 230.65kb             |
 | Ember                                          | 2.12.0          | 131.92kb             |
 | Polymer + Web Components Polyfill Lite         | 1.8.0           | 66.3kb               |
 | React                                          | 15.4.2          | 45.06kb              |
 | Web Components Polyfill                        | 0.7.22          | 33.68kb              |
 | Vue                                            | 2.2.6           | 27.87kb              |
-| __Riot__                                       | 3.4.2           | 9.87kb               |
+| __Riot__                                       | 3.4.3           | 9.88kb               |
 | Inferno                                        | 3.0.4           | 9.04kb               |
 | Preact                                         | 8.1.0           | 3.33kb               |
 
