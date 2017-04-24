@@ -1,6 +1,6 @@
-window.defaultBrackets = riot.settings.brackets
+const defaultBrackets = riot.settings.brackets
 // make expect globally available
-window.expect = chai.expect // eslint-disable-line
+const expect = chai.expect // eslint-disable-line
 
 before(function() {
   riot.unregister('riot-tmp')
@@ -9,5 +9,5 @@ before(function() {
 })
 
 after(function() {
-  riot.settings.brackets = window.defaultBrackets
+  riot.settings.brackets = defaultBrackets
 })
