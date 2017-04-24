@@ -9,5 +9,5 @@ before(function() {
 })
 
 after(function() {
-  riot.settings.brackets = defaultBrackets
+  riot.settings.brackets = window.defaultBrackets
 })
