@@ -53,7 +53,7 @@ test-sauce:
 	@ SAUCELABS=1 make test-karma
 
 test-chrome:
-	@ DEBUG=1 TEST_FOLDER=browser ${KARMA} start test/karma.conf.js --browsers=Chrome --no-single-run --watch
+	@ DEBUG=1 TEST_FOLDER=browser/riot ${KARMA} start test/karma.conf.js --browsers=Chrome --no-single-run --watch
 
 compare:
 	# compare the current release with the previous one
