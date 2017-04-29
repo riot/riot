@@ -50,8 +50,6 @@ module.exports = function(conf) {
       build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
       testName: `riotjs${ needsCompiler ? '+compiler' : ''}`,
-      startConnect: false,
-      recordVideo: false,
       recordScreenshots: false
     },
     captureTimeout: 300000,
