@@ -111,6 +111,8 @@ describe('Riot core', function() {
     expect(tag2.root._tag).to.be.equal(undefined)
     expect(tag3.root._tag).to.be.equal(undefined)
 
+    tag3.root.parentNode.removeChild(tag3.root)
+
   })
 
   it('node should not preserve attributes from tag mounted on it when it is unmounted', function() {
@@ -197,15 +199,17 @@ describe('Riot core', function() {
     riot.tag('test-l', '<p>{ x }</p>', function() { this.x = 'ok'})
     riot.tag('test-m', '<p>{ x }</p>', function() { this.x = 'ok'})
 
+    const container = $('#multi-mount-container-2')
     var subTags = riot.mount('#multi-mount-container-2', '*')
 
     expect(subTags.length).to.be.equal(3)
 
-    subTags = riot.mount($('#multi-mount-container-2'), '*')
+    subTags = riot.mount(container, '*')
 
     expect(subTags.length).to.be.equal(3)
 
     subTags.forEach(tag => tag.unmount())
+    container.parentNode.removeChild(container)
   })
 
   it('an <option> tag having the attribute "selected" should be the value of the parent <select> tag', function() {
@@ -1042,7 +1046,6 @@ describe('Riot core', function() {
 
     components = $$('not-virtual-component2', tag.root)
     expect(components.length).to.be.equal(0)
-
   })
 
   it('event handler on each custom tag doesnt update parent', function() {
@@ -1101,6 +1104,7 @@ describe('Riot core', function() {
       expect($('p', this.root).textContent).to.be.equal('goodbye')
       expect(tag.unmount()).to.be.an('object')
       done()
+      tag.unmount()
     })
   })
 
@@ -1195,7 +1199,27 @@ describe('Riot core', function() {
     var tag = riot.mount('riot-tmp')[0]
     fireEvent(tag.refs.child, 'click')
     expect(tag.isMounted).to.be.equal(false)
+    tag.unmount()
   })
+
+  it('ref attributes get removed and ref dom nodes upgraded to tags do not appeart twice in the parent', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+    riot.tag('riot-tmp-sub', '<p>hi</p>')
+
+    riot.tag('riot-tmp', '<div ref="child"></div>', function() {
+      this.on('mount', () => {
+        riot.mount(this.refs.child, 'riot-tmp-sub', { parent: this })
+      })
+    })
+
+    var tag = riot.mount('riot-tmp')[0]
+
+    expect(tag.refs.child).to.be.not.an('array')
+    expect(tag.refs.child.getAttribute('ref')).to.be.not.ok
+
+    tag.unmount()
+  })
+
 
   it('virtual tags can be used with dynamic data-is', function() {
     injectHTML('<dynamic-virtual></dynamic-virtual>')

@@ -113,6 +113,8 @@ describe('Riot style', function() {
 
     // test remount does not duplicate rule
     expect(styles.match(/\bparsed-style\s*\{/g)).to.have.length(1)
+
+    tag.unmount()
   })
 
 
