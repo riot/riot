@@ -1,6 +1,6 @@
 // we will re-enable the broken browsers once saucelabs will fix all the timeout issues
 module.exports = {
-  browsers: {
+  group0: {
     slIphone5: {
       base: 'SauceLabs',
       browserName: 'iphone',
@@ -20,7 +20,9 @@ module.exports = {
       base: 'SauceLabs',
       browserName: 'safari',
       platform: 'OS X 10.9'
-    },
+    }
+  },
+  group1: {
     slSafari8: {
       base: 'SauceLabs',
       browserName: 'safari',
@@ -43,6 +45,8 @@ module.exports = {
       platform: 'Windows 7',
       version: '11'
     },
+  },
+  group2: {
     slEdge: {
       base: 'SauceLabs',
       browserName: 'MicrosoftEdge',

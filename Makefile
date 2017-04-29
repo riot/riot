@@ -50,7 +50,9 @@ test-coveralls:
 
 test-sauce:
 	# run the riot tests on saucelabs
-	@ SAUCELABS=1 make test-karma
+	@ SAUCELABS=1 GROUP=0 make test-karma
+	@ SAUCELABS=1 GROUP=1 make test-karma
+	@ SAUCELABS=1 GROUP=2 make test-karma
 
 test-chrome:
 	@ DEBUG=1 TEST_FOLDER=browser/riot ${KARMA} start test/karma.conf.js --browsers=Chrome --no-single-run --watch

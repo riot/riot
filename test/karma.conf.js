@@ -1,7 +1,8 @@
-const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
+const saucelabsBrowsers = require('./saucelabs-browsers'),
   RIOT_WITH_COMPILER_PATH = '../dist/riot/riot+compiler.js',
   RIOT_PATH = '../dist/riot/riot.js',
   isDebug = process.env.DEBUG,
+  customLaunchers = { browsers: {} },
   // split the riot+compiler tests from the normal riot core tests
   testsSetup = './specs/browser/index.js',
   testFiles = `./specs/${process.env.TEST_FOLDER}/**/*.spec.js`,
@@ -12,7 +13,8 @@ var browsers = ['PhantomJS'] // this is not a constant
 
 // run the tests only on the saucelabs browsers
 if (process.env.SAUCELABS) {
-  browsers = Object.keys(saucelabsBrowsers)
+  customLaunchers.browsers = saucelabsBrowsers[`group${process.env.GROUP}`]
+  browsers = Object.keys(customLaunchers.browsers)
 }
 
 
@@ -48,14 +50,14 @@ module.exports = function(conf) {
       build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
       testName: `riotjs${ needsCompiler ? '+compiler' : ''}`,
-      startConnect: true,
+      startConnect: false,
       recordVideo: false,
       recordScreenshots: false
     },
     captureTimeout: 300000,
     browserNoActivityTimeout: 300000,
     browserDisconnectTolerance: 2,
-    customLaunchers: saucelabsBrowsers,
+    customLaunchers: customLaunchers.browsers,
     browsers: browsers,
 
     reporters: ['progress', 'saucelabs', 'coverage'],
