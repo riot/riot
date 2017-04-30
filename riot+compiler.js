@@ -1,4 +1,4 @@
-/* Riot v3.4.3, @license MIT */
+/* Riot v3.4.4, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -136,7 +136,7 @@ var check = Object.freeze({
  * @returns { Object } dom nodes found
  */
 function $$(selector, ctx) {
-  return (ctx || document).querySelectorAll(selector)
+  return Array.prototype.slice.call((ctx || document).querySelectorAll(selector))
 }
 
 /**
@@ -1071,6 +1071,10 @@ function setEventHandler(name, handler, dom, tag) {
   var eventName,
     cb = handleEvent.bind(tag, dom, handler);
 
+  // avoid to bind twice the same event
+  // possible fix for #2332
+  dom[name] = null;
+
   // normalize event name
   eventName = name.replace(RE_EVENTS_PREFIX, '');
 
@@ -1162,6 +1166,7 @@ function updateExpression(expr) {
     // detect the style attributes
     isStyleAttr = attrName === 'style',
     isClassAttr = attrName === 'class',
+    hasValue,
     isObj,
     value;
 
@@ -1183,6 +1188,7 @@ function updateExpression(expr) {
 
   // ...it seems to be a simple expression so we try to calculat its value
   value = tmpl(expr.expr, isToggle ? extend(Object.create(this.parent), this) : this);
+  hasValue = !isBlank(value);
   isObj = isObject(value);
 
   // convert the style/class objects to strings
@@ -1196,7 +1202,7 @@ function updateExpression(expr) {
   }
 
   // remove original attribute
-  if (expr.attr && (!expr.isAttrRemoved || !value)) {
+  if (expr.attr && (!expr.isAttrRemoved || !hasValue)) {
     remAttr(dom, expr.attr);
     expr.isAttrRemoved = true;
   }
@@ -1252,7 +1258,7 @@ function updateExpression(expr) {
       dom.value = value;
     }
 
-    if (!isBlank(value) && value !== false) {
+    if (hasValue && value !== false) {
       setAttr(dom, attrName, value);
     }
 
@@ -1333,11 +1339,7 @@ var RefExpr = {
 
     // the name changed, so we need to remove it from the old key (if present)
     if (!isBlank(old) && customParent) { arrayishRemove(customParent.refs, old, tagOrDom); }
-
-    if (isBlank(this.value)) {
-      // if the value is blank, we remove it
-      remAttr(this.dom, this.attr);
-    } else {
+    if (!isBlank(this.value)) {
       // add it to the refs of parent tag (this behavior was changed >=3.0)
       if (customParent) { arrayishAdd(
         customParent.refs,
@@ -1347,9 +1349,11 @@ var RefExpr = {
         null,
         this.parent.__.index
       ); }
-      // set the actual DOM attr
-      setAttr(this.dom, this.attr, this.value);
     }
+
+    // if it's the first time we pass here let's remove the ref attribute
+    // #2329
+    if (!old) { remAttr(this.dom, this.attr); }
   },
   unmount: function unmount() {
     var tagOrDom = this.tag || this.dom;
@@ -1508,6 +1512,10 @@ function _each(dom, parent, expr) {
       isObject$$1 = !isArray(items) && !isString(items),
       root = placeholder.parentNode;
 
+    // if this DOM was removed the update here is useless
+    // this condition fixes also a weird async issue on IE in our unit test
+    if (!root) { return }
+
     // object loop. any changes cause full redraw
     if (isObject$$1) {
       hasKeys = items || false;
@@ -1599,6 +1607,7 @@ function _each(dom, parent, expr) {
     // clone the items array
     oldItems = items.slice();
 
+    // this condition is weird u
     root.insertBefore(frag, placeholder);
   };
 
@@ -2017,7 +2026,7 @@ function unregister$1(name) {
   delete __TAG_IMPL[name];
 }
 
-var version$1 = 'v3.4.3';
+var version$1 = 'v3.4.4';
 
 
 var core = Object.freeze({
