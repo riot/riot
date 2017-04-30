@@ -1093,6 +1093,21 @@ describe('Riot core', function() {
 
   })
 
+  it('custom attributes should not be removed if not falsy', function() {
+
+    injectHTML('<riot-tmp data-index="{ index }"></riot-tmp>')
+
+    riot.tag('riot-tmp', '<p></p>', function() {
+      this.index = 0
+    })
+
+    var tag = riot.mount('riot-tmp')[0]
+
+    expect(tag.opts.dataIndex).to.be.equal(0)
+
+    tag.unmount()
+  })
+
   it('make sure the tag context is preserved during updates', function(done) {
     injectHTML('<update-context></update-context>')
 
