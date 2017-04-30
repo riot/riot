@@ -46,8 +46,8 @@ export function getRiotStyles(riot) {
  * @param   { Object } ctx - DOM node where the targets of our search will is located
  * @returns { Object } dom nodes found
  */
-export function $$(selector, ctx) {
-  return (ctx || document).querySelectorAll(selector)
+export function $$() {
+  return riot.util.dom.$$.apply(this, arguments)
 }
 
 /**
@@ -56,8 +56,8 @@ export function $$(selector, ctx) {
  * @param   { Object } ctx - DOM node where the target of our search will is located
  * @returns { Object } dom node found
  */
-export function $(selector, ctx) {
-  return (ctx || document).querySelector(selector)
+export function $() {
+  return riot.util.dom.$.apply(this, arguments)
 }
 
 
