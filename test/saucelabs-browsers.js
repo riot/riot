@@ -21,7 +21,7 @@ module.exports = {
       browserName: 'safari',
       platform: 'OS X 10.9'
     },
-    slSafari8: {
+/*    slSafari8: {
       base: 'SauceLabs',
       browserName: 'safari',
       platform: 'OS X 10.10'
@@ -30,7 +30,7 @@ module.exports = {
       base: 'SauceLabs',
       browserName: 'safari',
       platform: 'OS X 10.11'
-    },
+    },*/
     slIE10: {
       base: 'SauceLabs',
       browserName: 'internet explorer',
@@ -43,11 +43,11 @@ module.exports = {
       platform: 'Windows 7',
       version: '11'
     },
-    slEdge: {
+/*    slEdge: {
       base: 'SauceLabs',
       browserName: 'MicrosoftEdge',
       platform: 'Windows 10'
-    },
+    },*/
     slChrome: {
       base: 'SauceLabs',
       browserName: 'chrome'
