@@ -1,8 +1,8 @@
-const saucelabsBrowsers = require('./saucelabs-browsers'),
+const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
   RIOT_WITH_COMPILER_PATH = '../dist/riot/riot+compiler.js',
   RIOT_PATH = '../dist/riot/riot.js',
   isDebug = process.env.DEBUG,
-  customLaunchers = { browsers: {} },
+  isSaucelabs = process.env.SAUCELABS,
   // split the riot+compiler tests from the normal riot core tests
   testsSetup = './specs/browser/index.js',
   testFiles = `./specs/${process.env.TEST_FOLDER}/**/*.spec.js`,
@@ -12,9 +12,8 @@ const saucelabsBrowsers = require('./saucelabs-browsers'),
 var browsers = ['PhantomJS'] // this is not a constant
 
 // run the tests only on the saucelabs browsers
-if (process.env.SAUCELABS) {
-  customLaunchers.browsers = saucelabsBrowsers[`group${process.env.GROUP}`]
-  browsers = Object.keys(customLaunchers.browsers)
+if (isSaucelabs) {
+  browsers = Object.keys(saucelabsBrowsers)
 }
 
 
@@ -44,18 +43,15 @@ module.exports = function(conf) {
       testsSetup,
       testFiles
     ],
-    // logLevel: conf.LOG_DEBUG,
-    concurrency: 2,
     sauceLabs: {
       build: 'TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')',
       tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
       testName: `riotjs${ needsCompiler ? '+compiler' : ''}`,
-      recordScreenshots: false
     },
     captureTimeout: 300000,
     browserNoActivityTimeout: 300000,
     browserDisconnectTolerance: 2,
-    customLaunchers: customLaunchers.browsers,
+    customLaunchers: saucelabsBrowsers,
     browsers: browsers,
 
     reporters: ['progress', 'saucelabs', 'coverage'],
@@ -77,6 +73,7 @@ module.exports = function(conf) {
 
     client: {
       mocha: {
+        timeout: isSaucelabs ? 30000 : 3000, // saucelab tests can be really really slow
         // change Karma's debug.html to the mocha web reporter
         reporter: 'html'
       }

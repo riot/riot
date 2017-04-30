@@ -1,16 +1,17 @@
 
 <loop-child>
 
-  <looped-child el={ this } each={ items }></looped-child>
+  <looped-child each={ item in items } el={item}></looped-child>
 
   this.items = [ {name: 'one'}, {name: 'two'} ]
   this.childrenMountWidths = []
 
   getWidth(el) {
-    if (el.root.getBoundingClientRect)
+    if (el.root.getBoundingClientRect) {
       return el.root.getBoundingClientRect().width
-    else
-      return 0
+    } else {
+      return false
+    }
   }
 
   this.on('mount', function() {
