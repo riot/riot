@@ -59,6 +59,7 @@
     "chokidar-cli": "^1.2.0",
     "coveralls": "^2.13.0",
     "eslint": "^3.19.0",
+    "eslint-config-riot": "^1.0.0",
     "glob": "^7.1.1",
     "istanbul": "^0.4.5",
     "jsdom": "^10.0.0",
