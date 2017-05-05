@@ -1,8 +1,11 @@
 
-global.window = require('jsdom').jsdom().defaultView
-global.document = window.document
-global.body = window.document.body
-global.history = {}
+const jsdom = require('jsdom')
+const { JSDOM } = jsdom
+const dom = new JSDOM('<body></body>')
+global.document = dom.window.document
+global.window = dom.window
+global.body = dom.window.document.body
+global.history = false
 
 const
   Benchmark = require('benchmark'),

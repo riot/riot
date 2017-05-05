@@ -1378,4 +1378,19 @@ describe('Riot core', function() {
 
     tag.unmount()
   })
+
+  it('riot can mount also inline templates', function() {
+    injectHTML('<riot-tmp><p>{ message }</p></riot-tmp>')
+
+    riot.tag('riot-tmp', '', function() {
+      this.message = 'hello'
+    })
+
+    var tag = riot.mount('riot-tmp')[0],
+      p = $('p', this.root)
+
+    expect(p.innerHTML).to.be.equal(tag.message)
+
+    tag.unmount()
+  })
 })
