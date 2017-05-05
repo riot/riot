@@ -90,4 +90,22 @@ describe('Riot show/hide', function() {
 
     tag.unmount()
   })
+
+  it('the show directive gives priority to the child values (see #2333)', function() {
+    riot.tag('riot-tmp', `
+      <riot-tmp-sub show="{number === 1}"></riot-tmp-sub>
+    `, function() {
+      this.number = 1
+    })
+    riot.tag('riot-tmp-sub', '<p ref="p" if={number === 2}>{ opts.item }</p>', function() {
+      this.number = 2
+    })
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    var tag = riot.mount('riot-tmp')[0]
+
+    expect(tag.tags['riot-tmp-sub'].refs.p.hidden).to.be.not.ok
+
+    tag.unmount()
+  })
 })
