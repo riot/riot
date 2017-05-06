@@ -1393,4 +1393,18 @@ describe('Riot core', function() {
 
     tag.unmount()
   })
+
+  it('tags in an svg context are automatically detected and properly created see #2290', function() {
+    injectHTML('<svg id="tmpsvg"><g data-is="riot-tmp"></g></svg>')
+
+    riot.tag('riot-tmp', '<circle riot-cx="{ 10 + 5 }" riot-cy="{ 10 + 5 }" r="2" fill="black"></circle>')
+
+    var tag = riot.mount('riot-tmp')[0],
+      circle = $('circle', this.root)
+
+    expect(circle instanceof HTMLElement).to.be.equal(false)
+
+    tag.unmount()
+    document.body.removeChild(window.tmpsvg)
+  })
 })
