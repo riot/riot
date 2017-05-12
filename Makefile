@@ -80,8 +80,8 @@ min:
 	@ for f in $(GENERATED_FILES); do \
 		$(UGLIFY) $(DIST)$$f \
 			--comments \
+			--toplevel \
 			--mangle \
-			--screw-ie8 \
 			--compress  \
 			-o $(DIST)$${f%.*}.min.js; \
 		done
