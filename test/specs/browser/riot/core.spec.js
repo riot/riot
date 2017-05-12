@@ -1094,7 +1094,6 @@ describe('Riot core', function() {
   })
 
   it('custom attributes should not be removed if not falsy', function() {
-
     injectHTML('<riot-tmp data-index="{ index }"></riot-tmp>')
 
     riot.tag('riot-tmp', '<p></p>', function() {
@@ -1104,6 +1103,10 @@ describe('Riot core', function() {
     var tag = riot.mount('riot-tmp')[0]
 
     expect(tag.opts.dataIndex).to.be.equal(0)
+    expect(tag.root.getAttribute('data-index')).to.be.ok
+    tag.index = false
+    tag.update()
+    expect(tag.root.getAttribute('data-index')).to.be.not.ok
 
     tag.unmount()
   })

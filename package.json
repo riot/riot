@@ -45,7 +45,7 @@
     "riot.js"
   ],
   "dependencies": {
-    "riot-cli": "^3.0.1",
+    "riot-cli": "^3.0.2",
     "riot-compiler": "^3.2.1",
     "riot-observable": "^3.0.0",
     "riot-tmpl": "^3.0.4",
@@ -80,7 +80,7 @@
     "rollup-plugin-riot": "^1.1.0",
     "sinon": "^2.2.0",
     "sinon-chai": "^2.10.0",
-    "uglify-js": "^3.0.0"
+    "uglify-js": "^3.0.4"
   },
   "preferGlobal": true,
   "files": [
