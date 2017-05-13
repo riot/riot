@@ -1220,7 +1220,7 @@ describe('Riot core', function() {
     tag.unmount()
   })
 
-  it('ref attributes get removed and ref dom nodes upgraded to tags do not appeart twice in the parent', function() {
+  it('dom nodes  having "ref" attributes and upgraded to tags do not appeart twice in the parent', function() {
     injectHTML('<riot-tmp></riot-tmp>')
     riot.tag('riot-tmp-sub', '<p>hi</p>')
 
@@ -1233,7 +1233,35 @@ describe('Riot core', function() {
     var tag = riot.mount('riot-tmp')[0]
 
     expect(tag.refs.child).to.be.not.an('array')
-    expect(tag.refs.child.getAttribute('ref')).to.be.not.ok
+    expect(tag.refs.child.hasAttribute('ref')).to.be.ok
+
+    tag.unmount()
+  })
+
+  it('ref attributes will be removed only if falsy or not strings', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', `
+      <div ref='child'></div>
+      <div ref="{ expr }"></div>
+      <div ref="{ null }"></div>
+      <div ref="{ false }"></div>
+      <div ref="{ '' }"></div>
+    `, function() {
+      this.expr = 'expr'
+    })
+
+    var tag = riot.mount('riot-tmp')[0],
+      divs = $$('div', tag.root)
+
+    expect(tag.refs.child).to.be.ok
+    expect(tag.refs.expr).to.be.ok
+
+    expect(divs[0].hasAttribute('ref')).to.be.ok
+    expect(divs[1].hasAttribute('ref')).to.be.ok
+    expect(divs[2].hasAttribute('ref')).to.be.not.ok
+    expect(divs[3].hasAttribute('ref')).to.be.not.ok
+    expect(divs[4].hasAttribute('ref')).to.be.not.ok
 
     tag.unmount()
   })
