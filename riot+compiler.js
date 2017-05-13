@@ -1,4 +1,4 @@
-/* Riot v3.4.4, @license MIT */
+/* Riot v3.5.0, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -22,6 +22,7 @@ var T_OBJECT = 'object';
 var T_UNDEF  = 'undefined';
 var T_FUNCTION = 'function';
 var XLINK_NS = 'http://www.w3.org/1999/xlink';
+var SVG_NS = 'http://www.w3.org/2000/svg';
 var XLINK_REGEX = /^xlink:(\w+)/;
 var WIN = typeof window === T_UNDEF ? undefined : window;
 var RE_SPECIAL_TAGS = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?|opt(?:ion|group))$/;
@@ -166,12 +167,22 @@ function createDOMPlaceholder() {
 }
 
 /**
+ * Check if a DOM node is an svg tag
+ * @param   { HTMLElement }  el - node we want to test
+ * @returns {Boolean} true if it's an svg node
+ */
+function isSvg(el) {
+  return !!el.ownerSVGElement
+}
+
+/**
  * Create a generic DOM node
  * @param   { String } name - name of the DOM node we want to create
+ * @param   { Boolean } isSvg - true if we need to use an svg node
  * @returns { Object } DOM node just created
  */
 function mkEl(name) {
-  return document.createElement(name)
+  return name === 'svg' ? document.createElementNS(SVG_NS, name) : document.createElement(name)
 }
 
 /**
@@ -299,6 +310,7 @@ var dom = Object.freeze({
 	$: $,
 	createFrag: createFrag,
 	createDOMPlaceholder: createDOMPlaceholder,
+	isSvg: isSvg,
 	mkEl: mkEl,
 	setInnerHTML: setInnerHTML,
 	toggleVisibility: toggleVisibility,
@@ -371,7 +383,7 @@ var styleManager = {
 
 /**
  * The riot template engine
- * @version v3.0.3
+ * @version v3.0.4
  */
 /**
  * riot.util.brackets
@@ -597,7 +609,12 @@ var tmpl = (function () {
   function _tmpl (str, data) {
     if (!str) { return str }
 
-    return (_cache[str] || (_cache[str] = _create(str))).call(data, _logErr)
+    return (_cache[str] || (_cache[str] = _create(str))).call(
+      data, _logErr.bind({
+        data: data,
+        tmpl: str
+      })
+    )
   }
 
   _tmpl.hasExpr = brackets.hasExpr;
@@ -621,10 +638,9 @@ var tmpl = (function () {
       typeof console !== 'undefined' &&
       typeof console.error === 'function'
     ) {
-      if (err.riotData.tagName) {
-        console.error('Riot template error thrown in the <%s> tag', err.riotData.tagName);
-      }
-      console.error(err);
+      console.error(err.message);
+      console.log('<%s> %s', err.riotData.tagName || 'Unknown tag', this.tmpl); // eslint-disable-line
+      console.log(this.data); // eslint-disable-line
     }
   }
 
@@ -793,7 +809,7 @@ var tmpl = (function () {
     return expr
   }
 
-  _tmpl.version = brackets.version = 'v3.0.3';
+  _tmpl.version = brackets.version = 'v3.0.4';
 
   return _tmpl
 
@@ -1187,7 +1203,7 @@ function updateExpression(expr) {
   if (expr.update) { return expr.update() }
 
   // ...it seems to be a simple expression so we try to calculat its value
-  value = tmpl(expr.expr, isToggle ? extend(Object.create(this.parent), this) : this);
+  value = tmpl(expr.expr, isToggle ? extend({}, Object.create(this.parent), this) : this);
   hasValue = !isBlank(value);
   isObj = isObject(value);
 
@@ -1202,7 +1218,7 @@ function updateExpression(expr) {
   }
 
   // remove original attribute
-  if (expr.attr && (!expr.isAttrRemoved || !hasValue)) {
+  if (expr.attr && (!expr.isAttrRemoved || !hasValue || value === false)) {
     remAttr(dom, expr.attr);
     expr.isAttrRemoved = true;
   }
@@ -1314,9 +1330,6 @@ var IfExpr = {
   },
   unmount: function unmount() {
     unmountAll(this.expressions || []);
-    delete this.pristine;
-    delete this.parentNode;
-    delete this.stub;
   }
 };
 
@@ -1333,13 +1346,13 @@ var RefExpr = {
     var old = this.value;
     var customParent = this.parent && getImmediateCustomParentTag(this.parent);
     // if the referenced element is a custom tag, then we set the tag itself, rather than DOM
-    var tagOrDom = this.tag || this.dom;
+    var tagOrDom = this.dom.__ref || this.tag || this.dom;
 
     this.value = this.hasExp ? tmpl(this.rawValue, this.parent) : this.rawValue;
 
     // the name changed, so we need to remove it from the old key (if present)
     if (!isBlank(old) && customParent) { arrayishRemove(customParent.refs, old, tagOrDom); }
-    if (!isBlank(this.value)) {
+    if (!isBlank(this.value) && isString(this.value)) {
       // add it to the refs of parent tag (this behavior was changed >=3.0)
       if (customParent) { arrayishAdd(
         customParent.refs,
@@ -1349,19 +1362,23 @@ var RefExpr = {
         null,
         this.parent.__.index
       ); }
+
+      if (this.value !== old) {
+        setAttr(this.dom, this.attr, this.value);
+      }
+    } else {
+      remAttr(this.dom, this.attr);
     }
 
-    // if it's the first time we pass here let's remove the ref attribute
-    // #2329
-    if (!old) { remAttr(this.dom, this.attr); }
+    // cache the ref bound to this dom node
+    // to reuse it in future (see also #2329)
+    if (!this.dom.__ref) { this.dom.__ref = tagOrDom; }
   },
   unmount: function unmount() {
     var tagOrDom = this.tag || this.dom;
     var customParent = this.parent && getImmediateCustomParentTag(this.parent);
     if (!isBlank(this.value) && customParent)
       { arrayishRemove(customParent.refs, this.value, tagOrDom); }
-    delete this.dom;
-    delete this.parent;
   }
 };
 
@@ -1714,6 +1731,8 @@ function parseAttributes(dom, attrs, fn) {
   var this$1 = this;
 
   each(attrs, function (attr) {
+    if (!attr) { return false }
+
     var name = attr.name, bool = isBoolAttr(name), expr;
 
     if (contains(REF_DIRECTIVES, name)) {
@@ -1739,6 +1758,7 @@ var reYieldDest = /<yield\s+from=['"]?([-\w]+)['"]?\s*(?:\/>|>([\S\s]*?)<\/yield
 var rootEls = { tr: 'tbody', th: 'tr', td: 'tr', col: 'colgroup' };
 var tblTags = IE_VERSION && IE_VERSION < 10 ? RE_SPECIAL_TAGS : RE_SPECIAL_TAGS_NO_OPTION;
 var GENERIC = 'div';
+var SVG = 'svg';
 
 
 /*
@@ -1801,12 +1821,13 @@ function replaceYield(tmpl, html) {
  * @param   { String } tmpl  - The template coming from the custom tag definition
  * @param   { String } html - HTML content that comes from the DOM element where you
  *           will mount the tag, mostly the original tag in the page
+ * @param   { Boolean } isSvg - true if the root node is an svg
  * @returns { HTMLElement } DOM element with _tmpl_ merged through `YIELD` with the _html_.
  */
-function mkdom(tmpl, html) {
+function mkdom(tmpl, html, isSvg$$1) {
   var match   = tmpl && tmpl.match(/^\s*<([-\w]+)/),
     tagName = match && match[1].toLowerCase(),
-    el = mkEl(GENERIC);
+    el = mkEl(isSvg$$1 ? SVG : GENERIC);
 
   // replace all the yield tags with the tag inner html
   tmpl = replaceYield(tmpl, html);
@@ -1908,10 +1929,11 @@ function tag2$1(name, tmpl, css, attrs, fn) {
  */
 function mount$2(selector, tagName, opts) {
   var tags = [];
+  var elem, allTags;
 
   function pushTagsTo(root) {
     if (root.tagName) {
-      var riotTag = getAttr(root, IS_DIRECTIVE);
+      var riotTag = getAttr(root, IS_DIRECTIVE), tag;
 
       // have tagName? force riot-tag to be the same
       if (tagName && riotTag !== tagName) {
@@ -1919,7 +1941,7 @@ function mount$2(selector, tagName, opts) {
         setAttr(root, IS_DIRECTIVE, tagName);
       }
 
-      var tag = mountTo(root, riotTag || root.tagName.toLowerCase(), opts);
+      tag = mountTo(root, riotTag || root.tagName.toLowerCase(), opts);
 
       if (tag)
         { tags.push(tag); }
@@ -1934,9 +1956,6 @@ function mount$2(selector, tagName, opts) {
     opts = tagName;
     tagName = 0;
   }
-
-  var elem;
-  var allTags;
 
   // crawl the DOM to find the tag
   if (isString(selector)) {
@@ -1994,7 +2013,7 @@ var mixins_id = 0;
 function mixin$1(name, mix, g) {
   // Unnamed global
   if (isObject(name)) {
-    mixin$1(("__unnamed_" + (mixins_id++)), name, true);
+    mixin$1(("__" + (mixins_id++) + "__"), name, true);
     return
   }
 
@@ -2003,7 +2022,7 @@ function mixin$1(name, mix, g) {
   // Getter
   if (!mix) {
     if (isUndefined(store[name]))
-      { throw new Error('Unregistered mixin: ' + name) }
+      { throw new Error(("Unregistered mixin: " + name)) }
 
     return store[name]
   }
@@ -2023,10 +2042,10 @@ function update$1() {
 }
 
 function unregister$1(name) {
-  delete __TAG_IMPL[name];
+  __TAG_IMPL[name] = null;
 }
 
-var version$1 = 'v3.4.4';
+var version$1 = 'v3.5.0';
 
 
 var core = Object.freeze({
@@ -2092,6 +2111,7 @@ function Tag$1(impl, conf, innerHTML) {
     root = conf.root,
     tagName = conf.tagName || getTagName(root),
     isVirtual = tagName === 'virtual',
+    isInline = !isVirtual && !impl.tmpl,
     propsInSyncWithParent = [],
     dom;
 
@@ -2110,6 +2130,7 @@ function Tag$1(impl, conf, innerHTML) {
     tagName: tagName,
     index: index,
     isLoop: isLoop,
+    isInline: isInline,
     // tags having event listeners
     // it would be better to use weak maps here but we can not introduce breaking changes now
     listeners: [],
@@ -2131,7 +2152,12 @@ function Tag$1(impl, conf, innerHTML) {
   defineProperty(this, 'tags', {});
   defineProperty(this, 'refs', {});
 
-  dom = isLoop && isAnonymous ? root : mkdom(impl.tmpl, innerHTML, isLoop);
+  if (isInline || isLoop && isAnonymous) {
+    dom = root;
+  } else {
+    if (!isVirtual) { root.innerHTML = ''; }
+    dom = mkdom(impl.tmpl, innerHTML, isSvg(root));
+  }
 
   /**
    * Update the tag expressions and options
@@ -2265,7 +2291,7 @@ function Tag$1(impl, conf, innerHTML) {
 
     this.update(item);
 
-    if (!isAnonymous) {
+    if (!isAnonymous && !isInline) {
       while (dom.firstChild) { root.appendChild(dom.firstChild); }
     }
 
@@ -2309,6 +2335,7 @@ function Tag$1(impl, conf, innerHTML) {
     walkAttrs(impl.attrs, function (name) {
       if (startsWith(name, ATTRS_PREFIX))
         { name = name.slice(ATTRS_PREFIX.length); }
+
       remAttr(root, name);
     });
 
@@ -2333,8 +2360,10 @@ function Tag$1(impl, conf, innerHTML) {
           });
         } else {
           arrayishRemove(ptag.tags, tagName, this);
-          if(parent !== ptag) // remove from _parent too
-            { arrayishRemove(parent.tags, tagName, this); }
+          // remove from _parent too
+          if(parent !== ptag) {
+            arrayishRemove(parent.tags, tagName, this);
+          }
         }
       } else {
         // remove the tag contents
@@ -2580,9 +2609,6 @@ function mountTo(root, tagName, opts, ctx) {
     tag = ctx || (implClass ? Object.create(implClass.prototype) : {}),
     // cache the inner HTML to fix #855
     innerHTML = root._innerHTML = root._innerHTML || root.innerHTML;
-
-  // clear the inner html
-  root.innerHTML = '';
 
   var conf = extend({ root: root, opts: opts }, { parent: opts ? opts.parent : null });
 
