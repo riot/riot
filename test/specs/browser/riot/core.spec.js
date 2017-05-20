@@ -1411,19 +1411,30 @@ describe('Riot core', function() {
   })
 
   it('riot can mount also inline templates', function() {
-    injectHTML('<riot-tmp><p>{ message }</p></riot-tmp>')
+    injectHTML(`
+      <riot-tmp>
+        <p ref="mes">{ message }</p>
+        <riot-tmp-sub ref="sub" message="{ message }">
+          <p ref="mes">{ message }</p>
+        </riot-tmp-sub>
+      </riot-tmp>`)
 
-    riot.tag('riot-tmp', '', function() {
+    riot.tag('riot-tmp', false, function() {
       this.message = 'hello'
     })
 
-    var tag = riot.mount('riot-tmp')[0],
-      p = $('p', this.root)
+    riot.tag('riot-tmp-sub', false, function(opts) {
+      this.message = opts.message
+    })
 
-    expect(p.innerHTML).to.be.equal(tag.message)
+    var tag = riot.mount('riot-tmp')[0]
+
+    expect(tag.refs.mes.innerHTML).to.be.equal(tag.message)
+    expect(tag.refs.sub.refs.mes.innerHTML).to.be.equal(tag.message)
 
     tag.unmount()
   })
+
 
   it('tags in an svg context are automatically detected and properly created see #2290', function() {
     injectHTML('<svg id="tmpsvg"><g data-is="riot-tmp"></g></svg>')
