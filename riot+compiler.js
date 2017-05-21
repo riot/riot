@@ -1,4 +1,4 @@
-/* Riot v3.5.0, @license MIT */
+/* Riot v3.5.1, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -383,7 +383,7 @@ var styleManager = {
 
 /**
  * The riot template engine
- * @version v3.0.4
+ * @version v3.0.5
  */
 /**
  * riot.util.brackets
@@ -408,7 +408,7 @@ var brackets = (function (UNDEF) {
 
     S_QBLOCKS = R_STRINGS.source + '|' +
       /(?:\breturn\s+|(?:[$\w\)\]]|\+\+|--)\s*(\/)(?![*\/]))/.source + '|' +
-      /\/(?=[^*\/])[^[\/\\]*(?:(?:\[(?:\\.|[^\]\\]*)*\]|\\.)[^[\/\\]*)*?(\/)[gim]*/.source,
+      /\/(?=[^*\/])[^[\/\\]*(?:(?:\[(?:\\.|[^\]\\]*)*\]|\\.)[^[\/\\]*)*?([^<]\/)[gim]*/.source,
 
     UNSUPPORTED = RegExp('[\\' + 'x00-\\x1F<>a-zA-Z0-9\'",;\\\\]'),
 
@@ -809,7 +809,7 @@ var tmpl = (function () {
     return expr
   }
 
-  _tmpl.version = brackets.version = 'v3.0.4';
+  _tmpl.version = brackets.version = 'v3.0.5';
 
   return _tmpl
 
@@ -2045,7 +2045,7 @@ function unregister$1(name) {
   __TAG_IMPL[name] = null;
 }
 
-var version$1 = 'v3.5.0';
+var version$1 = 'v3.5.1';
 
 
 var core = Object.freeze({
@@ -2477,10 +2477,6 @@ function initChildTag(child, opts, innerHTML, parent) {
   if (ptag !== parent)
     { arrayishAdd(parent.tags, tagName, tag); }
 
-  // empty the child node once we got its template
-  // to avoid that its children get compiled multiple times
-  opts.root.innerHTML = '';
-
   return tag
 }
 
@@ -2784,7 +2780,7 @@ var riot$2 = Object.freeze({
 
 /**
  * Compiler for riot custom tags
- * @version v3.2.1
+ * @version v3.2.2
  */
 
 // istanbul ignore next
@@ -3514,7 +3510,7 @@ function compile$1 (src, opts, url) {
   return src
 }
 
-var version$2 = 'v3.2.1';
+var version$2 = 'v3.2.2';
 
 var compiler = {
   compile: compile$1,
