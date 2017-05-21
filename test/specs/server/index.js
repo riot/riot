@@ -16,6 +16,10 @@ describe('Node', function() {
     return js.replace(/@version/, '1.0.0')
   }
 
+  it("default is not present (compatibility with rollup's _interopDefault)", function() {
+    expect(typeof riot.default).to.be.equal('undefined')
+  })
+
   it('require tags', function(done) {
     glob('../../tag/*.tag', { cwd: __dirname }, function (err, tags) {
       expect(err).to.be.equal(null)
