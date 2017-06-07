@@ -6,6 +6,8 @@ import {
   getRiotStyles
 } from '../../../helpers/index'
 
+import '../../../tag/bug-2369.tag'
+
 
 describe('Riot compiler', function() {
 
@@ -148,4 +150,12 @@ describe('Riot compiler', function() {
     tag.unmount()
   })
 
+  it('tags containing regex get properly compiled', function() {
+    injectHTML('<bug-2369></bug-2369>')
+    const tag = riot.mount('bug-2369')[0]
+
+    expect(tag.root).to.be.ok
+
+    tag.unmount()
+  })
 })
