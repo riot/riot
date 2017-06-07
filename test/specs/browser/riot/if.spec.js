@@ -95,9 +95,9 @@ describe('Riot if', function() {
 
     tag.update({cond: true, items: ['third']})
 
-    expect(tag.refs.first).to.be.an.instanceof(HTMLElement)
-    expect(tag.refs.second).to.be.an.instanceof(HTMLElement)
-    expect(tag.refs.third).to.be.an.instanceof(HTMLElement)
+    expect(tag.refs.first).to.be.ok
+    expect(tag.refs.second).to.be.ok
+    expect(tag.refs.third).to.be.ok
 
     tag.update({cond: false, items: []})
 
