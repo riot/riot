@@ -630,7 +630,7 @@ describe('Riot core', function() {
 
     expect(tag.refs['fancy-name'].innerHTML).to.be.equal('john')
 
-    fireEvent($$('p')[0], 'click', tag.root)
+    fireEvent($$('p')[0], 'click')
 
     expect(tag.refs['fancy-name'].innerHTML).to.be.equal('john')
 
@@ -1448,5 +1448,28 @@ describe('Riot core', function() {
 
     tag.unmount()
     document.body.removeChild(window.tmpsvg)
+  })
+
+  it('disable the auto updates via settings.autoUpdate = false', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', '<p ref="p" onclick="{ updateMessage }">{ message }</p>', function() {
+      this.message = 'hi'
+      this.updateMessage = function() {
+        this.message = 'goodbye'
+      }
+    })
+
+    riot.settings.autoUpdate = false
+    var tag = riot.mount('riot-tmp')[0]
+
+    expect(tag.refs.p.innerHTML).to.be.equal(tag.message)
+
+    fireEvent(tag.refs.p, 'click')
+
+    expect(tag.refs.p.innerHTML).to.be.not.equal(tag.message)
+
+    tag.unmount()
+    riot.settings.autoUpdate = true
   })
 })
