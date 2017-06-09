@@ -201,6 +201,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [rGrid](https://github.com/limodou/rgrid) - [(Demo)](https://limodou.github.io/rgrid/examples.html)
 
 ### Resources
+- [create-riot-app](https://github.com/alexstep/create-riot-app-ejected) dev environment
 - [Riot + AngularJS](https://github.com/lucasbrigida/angular-riot)
 - [Module loader for WebPack](https://www.npmjs.com/package/riotjs-loader)
 - [Riot + Meteor]( https://atmospherejs.com/baysao/riotjs)
