@@ -1,10 +1,6 @@
 {
   "name": "riot",
-<<<<<<< HEAD
-  "version": "3.5.1",
-=======
   "version": "3.6.0",
->>>>>>> master
   "description": "A React-like user interface micro-library",
   "homepage": "http://riotjs.com/",
   "repository": { "type": "git", "url": "git://github.com/riot/riot.git" },
