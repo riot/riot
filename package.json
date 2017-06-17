@@ -45,12 +45,6 @@
     "riot.js"
   ],
   "dependencies": {
-    "riot-cli": "^3.0.2",
-    "riot-compiler": "^3.2.3",
-    "riot-observable": "^3.0.0",
-    "riot-tmpl": "^3.0.8",
-    "simple-dom": "0.3.2",
-    "simple-html-tokenizer": "^0.4.1"
   },
   "devDependencies": {
     "benchmark": "^2.1.4",

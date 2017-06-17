@@ -12,12 +12,10 @@ MINOR_VERSION = `echo $(VERSION) | sed 's/\.[^.]*$$//'`
 KARMA = ./node_modules/karma/bin/karma
 ESLINT = ./node_modules/eslint/bin/eslint.js
 MOCHA = ./node_modules/mocha/bin/_mocha
-SMASH = ./node_modules/.bin/smash
 ROLLUP = ./node_modules/.bin/rollup
 UGLIFY = ./node_modules/uglify-js/bin/uglifyjs
 COVERALLS = ./node_modules/coveralls/bin/coveralls.js
 RIOT_CLI = ./node_modules/.bin/riot
-CHOKIDAR = ./node_modules/.bin/chokidar
 
 # folders
 DIST = dist/riot/
@@ -27,23 +25,14 @@ CONFIG = config/
 GENERATED_FILES = riot.js riot.csp.js riot+compiler.js
 
 
-test: eslint test-mocha test-karma
+test: eslint
 
 eslint:
 	# check code style
 	@ $(ESLINT) -c ./.eslintrc.json lib test
 
-test-mocha:
-	RIOT=../../dist/riot/riot.js $(MOCHA) -- test/specs/server
-
-tags:
-	@ $(RIOT_CLI) --silent test/tag dist/tags.js
-
-test-karma:
-  # Test riot+compiler.js
-	@ TEST_FOLDER=browser/compiler $(KARMA) start test/karma.conf.js
-	# Test only riot.js and generate the coverage
-	@ TEST_FOLDER=browser/riot $(KARMA) start test/karma.conf.js
+test:
+	@ exit 0
 
 test-coveralls:
 	@ RIOT_COV=1 cat ./coverage/report-lcov/lcov.info | $(COVERALLS)
@@ -51,14 +40,6 @@ test-coveralls:
 test-sauce:
 	# run the riot tests on saucelabs
 	@ SAUCELABS=1 make test-karma
-
-test-chrome:
-	@ DEBUG=1 TEST_FOLDER=browser/riot ${KARMA} start test/karma.conf.js --browsers=Chrome --no-single-run --watch
-
-compare:
-	# compare the current release with the previous one
-	du -h riot.min.js riot+compiler.min.js
-	du -h dist/riot/riot.min.js dist/riot/riot+compiler.min.js
 
 raw:
 	# build riot
@@ -85,20 +66,6 @@ min:
 			--compress  \
 			-o $(DIST)$${f%.*}.min.js; \
 		done
-
-perf: riot
-	# run the performance tests
-	@ node test/performance/benchmarks ../riot.2.6.1 --expose-gc
-	@ node test/performance/benchmarks ../../../riot --expose-gc
-	@ node test/performance/benchmarks ../../../dist/riot/riot --expose-gc
-
-perf-leaks: riot
-	# detect memory leaks
-	@ node --expose-gc test/performance/memory
-
-watch:
-	# watch and rebuild riot and its testswatch:
-	@ $(CHOKIDAR) lib -c 'make raw & make tags'
 
 build:
 	# generate riot.js & riot.min.js
@@ -141,13 +108,11 @@ version-undo:
 	@ git reset HEAD^
 	@ git log --oneline -2
 
-
 release: bump version
 
 release-undo:
 	make version-undo
 	make bump-undo
-
 
 publish:
 	# push new version to npm and github
@@ -156,4 +121,4 @@ publish:
 	@ git push origin master
 	@ git push origin master --tags
 
-.PHONY: test min eslint test-mocha test-compiler test-coveralls test-sauce compare raw riot perf watch tags perf-leaks build bump bump-undo version version-undo release-undo publish
+.PHONY: test min eslint test-coveralls test-sauce compare raw riot perf watch tags perf-leaks build bump bump-undo version version-undo release-undo publish

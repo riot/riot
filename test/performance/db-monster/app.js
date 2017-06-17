@@ -1,1 +1,0 @@
-riot.mount('dbmon')
