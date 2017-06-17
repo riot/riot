@@ -26,15 +26,9 @@
 | Polymer + Web Components Polyfill Lite         | 1.8.0           | 66.3kb               |
 | React                                          | 15.5.4          | 46.45kb              |
 | Web Components Polyfill                        | 0.7.24          | 33.68kb              |
-<<<<<<< HEAD
-| Vue                                            | 2.3.3           | 28.85kb              |
-| __Riot__                                       | 3.5.1           | 10.02kb              |
-| Inferno                                        | 3.2.0           | 9.06kb               |
-=======
 | Vue                                            | 2.3.4           | 28.90kb              |
 | __Riot__                                       | 3.6.0           | 10.44kb              |
 | Inferno                                        | 3.2.0           | 9.14kb               |
->>>>>>> master
 | Preact                                         | 8.1.0           | 3.33kb               |
 
 ### Browsers support
