@@ -1,4 +1,4 @@
-/* Riot v3.5.1, @license MIT */
+/* Riot v3.6.0, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -3986,11 +3986,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.errors = [];
 	        this.tolerant = false;
 	    }
-	    
+
 	    ErrorHandler.prototype.recordError = function (error) {
 	        this.errors.push(error);
 	    };
-	    
+
 	    ErrorHandler.prototype.tolerate = function (error) {
 	        if (this.tolerant) {
 	            this.recordError(error);
@@ -3999,7 +3999,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            throw error;
 	        }
 	    };
-	    
+
 	    ErrorHandler.prototype.constructError = function (msg, column) {
 	        var error = new Error(msg);
 	        try {
@@ -4016,7 +4016,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return error;
 	        }
 	    };
-	    
+
 	    ErrorHandler.prototype.createError = function (index, line, col, description) {
 	        var msg = 'Line ' + line + ': ' + description;
 	        var error = this.constructError(msg, col);
@@ -4025,11 +4025,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        error.description = description;
 	        return error;
 	    };
-	    
+
 	    ErrorHandler.prototype.throwError = function (index, line, col, description) {
 	        throw this.createError(index, line, col, description);
 	    };
-	    
+
 	    ErrorHandler.prototype.tolerateError = function (index, line, col, description) {
 	        var error = this.createError(index, line, col, description);
 	        if (this.tolerant) {
@@ -4039,7 +4039,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            throw error;
 	        }
 	    };
-	    
+
 	    return ErrorHandler;
 	}());
 	exports.ErrorHandler = ErrorHandler;
@@ -4063,7 +4063,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Token[Token["Template"] = 10] = "Template";
 	})(exports.Token || (exports.Token = {}));
 	var Token = exports.Token;
-	
+
 	exports.TokenName = {};
 	exports.TokenName[Token.BooleanLiteral] = 'Boolean';
 	exports.TokenName[Token.EOF] = '<end>';
@@ -4103,20 +4103,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.lineStart = 0;
 	        this.curlyStack = [];
 	    }
-	    
+
 	    Scanner.prototype.eof = function () {
 	        return this.index >= this.length;
 	    };
-	    
+
 	    Scanner.prototype.throwUnexpectedToken = function (message) {
 	        if (message === void 0) { message = messages_1.Messages.UnexpectedTokenIllegal; }
 	        this.errorHandler.throwError(this.index, this.lineNumber, this.index - this.lineStart + 1, message);
 	    };
-	    
+
 	    Scanner.prototype.tolerateUnexpectedToken = function () {
 	        this.errorHandler.tolerateError(this.index, this.lineNumber, this.index - this.lineStart + 1, messages_1.Messages.UnexpectedTokenIllegal);
 	    };
-	    
+
 	    // ECMA-262 11.4 Comments
 	    Scanner.prototype.skipSingleLineComment = function (offset) {
 	        var this$1 = this;
@@ -4174,7 +4174,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return comments;
 	    };
-	    
+
 	    Scanner.prototype.skipMultiLineComment = function () {
 	        var this$1 = this;
 
@@ -4243,7 +4243,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.tolerateUnexpectedToken();
 	        return comments;
 	    };
-	    
+
 	    Scanner.prototype.scanComments = function () {
 	        var this$1 = this;
 
@@ -4319,7 +4319,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return comments;
 	    };
-	    
+
 	    // ECMA-262 11.6.2.2 Future Reserved Words
 	    Scanner.prototype.isFutureReservedWord = function (id) {
 	        switch (id) {
@@ -4332,7 +4332,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return false;
 	        }
 	    };
-	    
+
 	    Scanner.prototype.isStrictModeReservedWord = function (id) {
 	        switch (id) {
 	            case 'implements':
@@ -4349,11 +4349,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return false;
 	        }
 	    };
-	    
+
 	    Scanner.prototype.isRestrictedWord = function (id) {
 	        return id === 'eval' || id === 'arguments';
 	    };
-	    
+
 	    // ECMA-262 11.6.2.1 Keywords
 	    Scanner.prototype.isKeyword = function (id) {
 	        switch (id.length) {
@@ -4382,7 +4382,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return false;
 	        }
 	    };
-	    
+
 	    Scanner.prototype.codePointAt = function (i) {
 	        var cp = this.source.charCodeAt(i);
 	        if (cp >= 0xD800 && cp <= 0xDBFF) {
@@ -4394,7 +4394,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return cp;
 	    };
-	    
+
 	    Scanner.prototype.scanHexEscape = function (prefix) {
 	        var this$1 = this;
 
@@ -4410,7 +4410,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return String.fromCharCode(code);
 	    };
-	    
+
 	    Scanner.prototype.scanUnicodeCodePointEscape = function () {
 	        var this$1 = this;
 
@@ -4432,7 +4432,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return character_1.Character.fromCodePoint(code);
 	    };
-	    
+
 	    Scanner.prototype.getIdentifier = function () {
 	        var this$1 = this;
 
@@ -4458,7 +4458,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.source.slice(start, this.index);
 	    };
-	    
+
 	    Scanner.prototype.getComplexIdentifier = function () {
 	        var this$1 = this;
 
@@ -4516,7 +4516,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return id;
 	    };
-	    
+
 	    Scanner.prototype.octalToDecimal = function (ch) {
 	        // \0 is not octal escape sequence
 	        var octal = (ch !== '0');
@@ -4535,7 +4535,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            octal: octal
 	        };
 	    };
-	    
+
 	    // ECMA-262 11.6 Names and Keywords
 	    Scanner.prototype.scanIdentifier = function () {
 	        var type;
@@ -4568,7 +4568,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            end: this.index
 	        };
 	    };
-	    
+
 	    // ECMA-262 11.7 Punctuators
 	    Scanner.prototype.scanPunctuator = function () {
 	        var token = {
@@ -4651,7 +4651,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        token.value = str;
 	        return token;
 	    };
-	    
+
 	    // ECMA-262 11.8.3 Numeric Literals
 	    Scanner.prototype.scanHexLiteral = function (start) {
 	        var this$1 = this;
@@ -4678,7 +4678,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            end: this.index
 	        };
 	    };
-	    
+
 	    Scanner.prototype.scanBinaryLiteral = function (start) {
 	        var this$1 = this;
 
@@ -4711,7 +4711,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            end: this.index
 	        };
 	    };
-	    
+
 	    Scanner.prototype.scanOctalLiteral = function (prefix, start) {
 	        var this$1 = this;
 
@@ -4747,7 +4747,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            end: this.index
 	        };
 	    };
-	    
+
 	    Scanner.prototype.isImplicitOctalLiteral = function () {
 	        var this$1 = this;
 
@@ -4764,7 +4764,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return true;
 	    };
-	    
+
 	    Scanner.prototype.scanNumericLiteral = function () {
 	        var this$1 = this;
 
@@ -4836,7 +4836,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            end: this.index
 	        };
 	    };
-	    
+
 	    // ECMA-262 11.8.4 String Literals
 	    Scanner.prototype.scanStringLiteral = function () {
 	        var this$1 = this;
@@ -4935,7 +4935,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            end: this.index
 	        };
 	    };
-	    
+
 	    // ECMA-262 11.8.6 Template Literal Lexical Components
 	    Scanner.prototype.scanTemplate = function () {
 	        var this$1 = this;
@@ -5062,7 +5062,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            end: this.index
 	        };
 	    };
-	    
+
 	    // ECMA-262 11.8.5 Regular Expression Literals
 	    Scanner.prototype.testRegExp = function (pattern, flags) {
 	        // The BMP character to use as a replacement for astral symbols when
@@ -5106,7 +5106,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return null;
 	        }
 	    };
-	    
+
 	    Scanner.prototype.scanRegExpBody = function () {
 	        var this$1 = this;
 
@@ -5154,7 +5154,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            literal: str
 	        };
 	    };
-	    
+
 	    Scanner.prototype.scanRegExpFlags = function () {
 	        var this$1 = this;
 
@@ -5200,7 +5200,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            literal: str
 	        };
 	    };
-	    
+
 	    Scanner.prototype.scanRegExp = function () {
 	        var start = this.index;
 	        var body = this.scanRegExpBody();
@@ -5220,7 +5220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            end: this.index
 	        };
 	    };
-	    
+
 	    Scanner.prototype.lex = function () {
 	        if (this.eof()) {
 	            return {
@@ -5267,7 +5267,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.scanPunctuator();
 	    };
-	    
+
 	    return Scanner;
 	}());
 	exports.Scanner = Scanner;
@@ -6901,7 +6901,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.values = [];
 	        this.curly = this.paren = -1;
 	    }
-	    
+
 	    // A function following one of those tokens is an expression.
 	    Reader.prototype.beforeFunctionExpression = function (t) {
 	        return ['(', '{', '[', 'in', 'typeof', 'instanceof', 'new',
@@ -6914,7 +6914,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            '|', '^', '!', '~', '&&', '||', '?', ':', '===', '==', '>=',
 	            '<=', '<', '>', '!=', '!=='].indexOf(t) >= 0;
 	    };
-	    
+
 	    // Determine if forward slash (/) is an operator or part of a regular expression
 	    // https://github.com/mozilla/sweet.js/wiki/design
 	    Reader.prototype.isRegexStart = function () {
@@ -6946,7 +6946,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return regex;
 	    };
-	    
+
 	    Reader.prototype.push = function (token) {
 	        if (token.type === token_1.Token.Punctuator || token.type === token_1.Token.Keyword) {
 	            if (token.value === '{') {
@@ -6961,7 +6961,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.values.push(null);
 	        }
 	    };
-	    
+
 	    return Reader;
 	}());
 	var Tokenizer = (function () {
@@ -6975,11 +6975,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.buffer = [];
 	        this.reader = new Reader();
 	    }
-	    
+
 	    Tokenizer.prototype.errors = function () {
 	        return this.errorHandler.errors;
 	    };
-	    
+
 	    Tokenizer.prototype.getNextToken = function () {
 	        var this$1 = this;
 
@@ -7045,7 +7045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.buffer.shift();
 	    };
-	    
+
 	    return Tokenizer;
 	}());
 	exports.Tokenizer = Tokenizer;
@@ -7069,7 +7069,7 @@ function hoist(ast){
 
     walkAll(ast);
     prependScope(ast, variables, functions);
-    
+
   } else {
     walk(ast);
   }
@@ -7142,15 +7142,15 @@ function prependScope(nodes, variables, functions){
     var declarations = [];
     for (var i=0;i<variables.length;i++){
       declarations.push({
-        type: 'VariableDeclarator', 
+        type: 'VariableDeclarator',
         id: variables[i].id,
         init: null
       });
     }
-    
+
     nodes.unshift({
-      type: 'VariableDeclaration', 
-      kind: 'var', 
+      type: 'VariableDeclaration',
+      kind: 'var',
       declarations: declarations
     });
 
@@ -7158,7 +7158,7 @@ function prependScope(nodes, variables, functions){
 
   if (functions && functions.length){
     for (var i=0;i<functions.length;i++){
-      nodes.unshift(functions[i]); 
+      nodes.unshift(functions[i]);
     }
   }
 }
@@ -7685,8 +7685,87 @@ function ReturnValue(type, value){
 
 /**
  * The riot template engine
- * @version v3.0.5
+ * @version v3.0.8
  */
+
+var skipRegex = (function () { //eslint-disable-line no-unused-vars
+
+  var beforeReChars = '[{(,;:?=|&!^~>%*/';
+
+  var beforeReWords = [
+    'case',
+    'default',
+    'do',
+    'else',
+    'in',
+    'instanceof',
+    'prefix',
+    'return',
+    'typeof',
+    'void',
+    'yield'
+  ];
+
+  var wordsLastChar = beforeReWords.reduce(function (s, w) {
+    return s + w.slice(-1)
+  }, '');
+
+  var RE_REGEX = /^\/(?=[^*>/])[^[/\\]*(?:(?:\\.|\[(?:\\.|[^\]\\]*)*\])[^[\\/]*)*?\/[gimuy]*/;
+  var RE_VN_CHAR = /[$\w]/;
+
+  function prev (code, pos) {
+    while (--pos >= 0 && /\s/.test(code[pos])){  }
+    return pos
+  }
+
+  function _skipRegex (code, start) {
+
+    var re = /.*/g;
+    var pos = re.lastIndex = start++;
+    var match = re.exec(code)[0].match(RE_REGEX);
+
+    if (match) {
+      var next = pos + match[0].length;
+
+      pos = prev(code, pos);
+      var c = code[pos];
+
+      if (pos < 0 || ~beforeReChars.indexOf(c)) {
+        return next
+      }
+
+      if (c === '.') {
+
+        if (code[pos - 1] === '.') {
+          start = next;
+        }
+
+      } else if (c === '+' || c === '-') {
+
+        if (code[--pos] !== c ||
+            (pos = prev(code, pos)) < 0 ||
+            !RE_VN_CHAR.test(code[pos])) {
+          start = next;
+        }
+
+      } else if (~wordsLastChar.indexOf(c)) {
+
+        var end = pos + 1;
+
+        while (--pos >= 0 && RE_VN_CHAR.test(code[pos])){  }
+        if (~beforeReWords.indexOf(code.slice(pos + 1, end))) {
+          start = next;
+        }
+      }
+    }
+
+    return start
+  }
+
+  return _skipRegex
+
+})();
+
 /**
  * riot.util.brackets
  *
@@ -7715,10 +7794,12 @@ var brackets = (function (UNDEF) {
 
     NEED_ESCAPE = /(?=[[\]()*+?.^$|])/g,
 
+    S_QBLOCK2 = R_STRINGS.source + '|' + /(\/)(?![*\/])/.source,
+
     FINDBRACES = {
-      '(': RegExp('([()])|'   + S_QBLOCKS, REGLOB),
-      '[': RegExp('([[\\]])|' + S_QBLOCKS, REGLOB),
-      '{': RegExp('([{}])|'   + S_QBLOCKS, REGLOB)
+      '(': RegExp('([()])|'   + S_QBLOCK2, REGLOB),
+      '[': RegExp('([[\\]])|' + S_QBLOCK2, REGLOB),
+      '{': RegExp('([{}])|'   + S_QBLOCK2, REGLOB)
     },
 
     DEFAULT = '{ }';
@@ -7729,7 +7810,7 @@ var brackets = (function (UNDEF) {
     /{[^}]*}/,
     /\\([{}])/g,
     /\\({)|{/g,
-    RegExp('\\\\(})|([[({])|(})|' + S_QBLOCKS, REGLOB),
+    RegExp('\\\\(})|([[({])|(})|' + S_QBLOCK2, REGLOB),
     DEFAULT,
     /^\s*{\^?\s*([$\w]+)(?:\s*,\s*(\S+))?\s+in\s+(\S.*)\s*}/,
     /(^|[^\\]){=[\S\s]*?}/
@@ -7763,7 +7844,7 @@ var brackets = (function (UNDEF) {
     arr[4] = _rewrite(arr[1].length > 1 ? /{[\S\s]*?}/ : _pairs[4], arr);
     arr[5] = _rewrite(pair.length > 3 ? /\\({|})/g : _pairs[5], arr);
     arr[6] = _rewrite(_pairs[6], arr);
-    arr[7] = RegExp('\\\\(' + arr[3] + ')|([[({])|(' + arr[3] + ')|' + S_QBLOCKS, REGLOB);
+    arr[7] = RegExp('\\\\(' + arr[3] + ')|([[({])|(' + arr[3] + ')|' + S_QBLOCK2, REGLOB);
     arr[8] = pair;
     return arr
   }
@@ -7784,19 +7865,40 @@ var brackets = (function (UNDEF) {
       pos,
       re = _bp[6];
 
+    var qblocks = [];
+    var prevStr = '';
+    var mark, lastIndex;
+
     isexpr = start = re.lastIndex = 0;
 
     while ((match = re.exec(str))) {
 
+      lastIndex = re.lastIndex;
       pos = match.index;
 
       if (isexpr) {
 
         if (match[2]) {
-          re.lastIndex = skipBraces(str, match[2], re.lastIndex);
+
+          var ch = match[2];
+          var rech = FINDBRACES[ch];
+          var ix = 1;
+
+          rech.lastIndex = lastIndex;
+          while ((match = rech.exec(str))) {
+            if (match[1]) {
+              if (match[1] === ch) { ++ix; }
+              else if (!--ix) { break }
+            } else {
+              rech.lastIndex = pushQBlock(match.index, rech.lastIndex, match[2]);
+            }
+          }
+          re.lastIndex = ix ? str.length : rech.lastIndex;
           continue
         }
+
         if (!match[3]) {
+          re.lastIndex = pushQBlock(pos, lastIndex, match[4]);
           continue
         }
       }
@@ -7813,9 +7915,15 @@ var brackets = (function (UNDEF) {
       unescapeStr(str.slice(start));
     }
 
+    parts.qblocks = qblocks;
+
     return parts
 
     function unescapeStr (s) {
+      if (prevStr) {
+        s = prevStr + s;
+        prevStr = '';
+      }
       if (tmpl || isexpr) {
         parts.push(s && s.replace(_bp[5], '$1'));
       } else {
@@ -7823,18 +7931,18 @@ var brackets = (function (UNDEF) {
       }
     }
 
-    function skipBraces (s, ch, ix) {
-      var
-        match,
-        recch = FINDBRACES[ch];
-
-      recch.lastIndex = ix;
-      ix = 1;
-      while ((match = recch.exec(s))) {
-        if (match[1] &&
-          !(match[1] === ch ? ++ix : --ix)) { break }
+    function pushQBlock(_pos, _lastIndex, slash) { //eslint-disable-line
+      if (slash) {
+        _lastIndex = skipRegex(str, _pos);
       }
-      return ix ? s.length : recch.lastIndex
+
+      if (tmpl && _lastIndex > _pos + 2) {
+        mark = '\u2057' + qblocks.length + '~';
+        qblocks.push(str.slice(_pos, _lastIndex));
+        prevStr += str.slice(start, _pos) + mark;
+        start = _lastIndex;
+      }
+      return _lastIndex
     }
   };
 
@@ -7885,10 +7993,12 @@ var brackets = (function (UNDEF) {
   /* istanbul ignore next: in the browser riot is always in the scope */
   _brackets.settings = typeof riot !== 'undefined' && riot.settings || {};
   _brackets.set = _reset;
+  _brackets.skipRegex = skipRegex;
 
   _brackets.R_STRINGS = R_STRINGS;
   _brackets.R_MLCOMMS = R_MLCOMMS;
   _brackets.S_QBLOCKS = S_QBLOCKS;
+  _brackets.S_QBLOCK2 = S_QBLOCK2;
 
   return _brackets
 
@@ -7952,18 +8062,13 @@ var tmpl = (function () {
     return safeEval.func('E', expr + ';')
   }
 
-  var
-    CH_IDEXPR = String.fromCharCode(0x2057),
-    RE_CSNAME = /^(?:(-?[_A-Za-z\xA0-\xFF][-\w\xA0-\xFF]*)|\u2057(\d+)~):/,
-    RE_QBLOCK = RegExp(brackets.S_QBLOCKS, 'g'),
-    RE_DQUOTE = /\u2057/g,
-    RE_QBMARK = /\u2057(\d+)~/g;
+  var RE_DQUOTE = /\u2057/g;
+  var RE_QBMARK = /\u2057(\d+)~/g;
 
   function _getTmpl (str) {
-    var
-      qstr = [],
-      expr,
-      parts = brackets.split(str.replace(RE_DQUOTE, '"'), 1);
+    var parts = brackets.split(str.replace(RE_DQUOTE, '"'), 1);
+    var qstr = parts.qblocks;
+    var expr;
 
     if (parts.length > 2 || parts[0]) {
       var i, j, list = [];
@@ -7994,7 +8099,7 @@ var tmpl = (function () {
       expr = _parseExpr(parts[1], 0, qstr);
     }
 
-    if (qstr[0]) {
+    if (qstr.length) {
       expr = expr.replace(RE_QBMARK, function (_, pos) {
         return qstr[pos]
           .replace(/\r/g, '\\r')
@@ -8004,6 +8109,7 @@ var tmpl = (function () {
     return expr
   }
 
+  var RE_CSNAME = /^(?:(-?[_A-Za-z\xA0-\xFF][-\w\xA0-\xFF]*)|\u2057(\d+)~):/;
   var
     RE_BREND = {
       '(': /[()]/g,
@@ -8014,11 +8120,8 @@ var tmpl = (function () {
   function _parseExpr (expr, asText, qstr) {
 
     expr = expr
-          .replace(RE_QBLOCK, function (s, div) {
-            return s.length > 2 && !div ? CH_IDEXPR + (qstr.push(s) - 1) + '~' : s
-          })
-          .replace(/\s+/g, ' ').trim()
-          .replace(/\ ?([[\({},?\.:])\ ?/g, '$1');
+      .replace(/\s+/g, ' ').trim()
+      .replace(/\ ?([[\({},?\.:])\ ?/g, '$1');
 
     if (expr) {
       var
@@ -8109,7 +8212,7 @@ var tmpl = (function () {
     return expr
   }
 
-  _tmpl.version = brackets.version = 'v3.0.5';
+  _tmpl.version = brackets.version = 'v3.0.8';
 
   return _tmpl
 
@@ -8348,7 +8451,9 @@ var misc = Object.freeze({
 });
 
 var settings$1 = extend(Object.create(csp_tmpl_2.settings), {
-  skipAnonymousTags: true
+  skipAnonymousTags: true,
+  // handle the auto updates on any DOM event
+  autoUpdate: true
 });
 
 /**
@@ -8378,6 +8483,9 @@ function handleEvent(dom, handler, e) {
   e.item = item;
 
   handler.call(this, e);
+
+  // avoid auto updates
+  if (!settings$1.autoUpdate) { return }
 
   if (!e.preventUpdate) {
     var p = getImmediateCustomParentTag(this);
@@ -8608,7 +8716,7 @@ var IfExpr = {
     remAttr(dom, CONDITIONAL_DIRECTIVE);
     this.tag = tag;
     this.expr = expr;
-    this.stub = document.createTextNode('');
+    this.stub = createDOMPlaceholder();
     this.pristine = dom;
 
     var p = dom.parentNode;
@@ -9355,7 +9463,11 @@ function unregister$1(name) {
   __TAG_IMPL[name] = null;
 }
 
+<<<<<<< HEAD
 var version$1 = 'v3.5.1';
+=======
+var version$1 = 'v3.6.0';
+>>>>>>> master
 
 
 var core = Object.freeze({
