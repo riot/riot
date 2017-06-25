@@ -10,7 +10,7 @@ export function normalizeHTML(html) {
     // change all the tags properties and names to lowercase because a <li> for ie8 is a <LI>
     .replace(/<([^>]*)>/g, function(tag) { return tag.toLowerCase() })
     .replace(/[\r\n\t]+/g, '')
-    .replace(/\>\s+\</g, '><')
+    .replace(/>\s+</g, '><')
 }
 
 export function expectHTML(tagOrDom) {

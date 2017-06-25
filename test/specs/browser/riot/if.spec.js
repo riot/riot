@@ -200,8 +200,8 @@ describe('Riot if', function() {
     riot.tag('riot-tmp', `
       <div each="{item, i in items}" if="{item.cond}">{i}</div>
     `, function() {
-      this.items = [{cond: true}, {cond: false}]
-    })
+        this.items = [{cond: true}, {cond: false}]
+      })
     var tag = riot.mount('riot-tmp')[0]
     expectHTML(tag).to.be.equal('<div>0</div>')
     tag.items[1].cond = true

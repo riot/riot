@@ -22,22 +22,22 @@ module.exports = function(suite, testName, riot) {
   }
   let tag
   suite
-  .on('start', function() {
+    .on('start', function() {
     // setup
-    var loopTag = document.createElement('loop-tag')
-    body.appendChild(loopTag)
-    riot.tag('loop-tag', tmpl, function() {
-      this.items = generateItems(10, true)
+      var loopTag = document.createElement('loop-tag')
+      body.appendChild(loopTag)
+      riot.tag('loop-tag', tmpl, function() {
+        this.items = generateItems(10, true)
+      })
+      tag = riot.mount('loop-tag')[0]
     })
-    tag = riot.mount('loop-tag')[0]
-  })
-  .on('complete', function() {
-    tag.unmount()
-  })
-  .add(testName, () => {
-    tag.items.reverse()
-    tag.update()
-  })
+    .on('complete', function() {
+      tag.unmount()
+    })
+    .add(testName, () => {
+      tag.items.reverse()
+      tag.update()
+    })
 
 }
 

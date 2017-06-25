@@ -38,7 +38,7 @@ describe('Riot compiler', function() {
 
       '   this.times = [ 1, 3, 5 ]',
       '   this.kama = "jooo"',
-      '<\/timetable>'
+      '</timetable>'
     ].join('\n')
 
     // check compile is actually compiling the source
@@ -66,7 +66,7 @@ describe('Riot compiler', function() {
 
       expect(tag).to.be.an('object')
       expect(tag.version).to.be.equal('1.0.0')
-      expect(styles).to.match(/\bcustom-parsers\ ?\{\s*color: red;}/)
+      expect(styles).to.match(/\bcustom-parsers ?\{\s*color: red;}/)
 
       tag.unmount()
       done()
@@ -93,7 +93,7 @@ describe('Riot compiler', function() {
   })
 
   it('Passing options to the compiler through compile (v2.3.12)', function () {
-    var str = '<passing-options>\n  <p>\n  <\/p>\nclick(e){}\n<\/passing-options>',
+    var str = '<passing-options>\n  <p>\n  </p>\nclick(e){}\n</passing-options>',
       result = riot.compile(str, true, {compact: true, type: 'none'})
     expect(result).to.contain('<p></p>')          // compact: true
     expect(result).to.contain('\nclick(e){}\n')   // type: none

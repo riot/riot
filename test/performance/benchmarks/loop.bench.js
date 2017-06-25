@@ -23,28 +23,28 @@ module.exports = function(suite, testName, riot) {
   let tag
 
   suite
-  .on('start', function() {
+    .on('start', function() {
     // setup
-    var loopTag = document.createElement('loop-tag')
-    body.appendChild(loopTag)
-    riot.tag('loop-tag', tmpl, function() {
-      this.items = []
+      var loopTag = document.createElement('loop-tag')
+      body.appendChild(loopTag)
+      riot.tag('loop-tag', tmpl, function() {
+        this.items = []
+      })
+      tag = riot.mount('loop-tag')[0]
     })
-    tag = riot.mount('loop-tag')[0]
-  })
-  .on('complete', function() {
-    tag.unmount()
-  })
-  .add(testName, () => {
-    tag.items = generateItems(10, true)
-    tag.update()
-    tag.items.splice(2, 1)
-    tag.items.splice(4, 1)
-    tag.items.splice(6, 1)
-    tag.items.splice(9, 1)
-    tag.items = tag.items.concat(generateItems(5, true))
-    tag.update()
-  })
+    .on('complete', function() {
+      tag.unmount()
+    })
+    .add(testName, () => {
+      tag.items = generateItems(10, true)
+      tag.update()
+      tag.items.splice(2, 1)
+      tag.items.splice(4, 1)
+      tag.items.splice(6, 1)
+      tag.items.splice(9, 1)
+      tag.items = tag.items.concat(generateItems(5, true))
+      tag.update()
+    })
 
 }
 
