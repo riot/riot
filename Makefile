@@ -24,7 +24,7 @@ DIST = dist/riot/
 LIB = lib/
 CONFIG = config/
 
-GENERATED_FILES = riot.js riot.csp.js riot+compiler.js
+GENERATED_FILES = riot.js riot+compiler.js
 
 
 test: eslint test-mocha test-karma

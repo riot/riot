@@ -88,7 +88,6 @@
     "riot.js",
     "riot.min.js",
     "riot.csp.js",
-    "riot.csp.min.js",
     "riot+compiler.js",
     "riot+compiler.min.js"
   ],
