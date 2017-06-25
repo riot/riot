@@ -1,4 +1,4 @@
-/* Riot v3.6.0, @license MIT */
+/* Riot v3.6.1, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -2153,7 +2153,7 @@ function unregister$1(name) {
   __TAG_IMPL[name] = null;
 }
 
-var version$1 = 'v3.6.0';
+var version$1 = 'v3.6.1';
 
 
 var core = Object.freeze({
@@ -3620,11 +3620,7 @@ function compile$1 (src, opts, url) {
   return src
 }
 
-<<<<<<< HEAD
-var version$2 = 'v3.2.2';
-=======
 var version$2 = 'v3.2.3';
->>>>>>> master
 
 var compiler = {
   compile: compile$1,
