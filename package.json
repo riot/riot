@@ -55,14 +55,14 @@
   "devDependencies": {
     "benchmark": "^2.1.4",
     "chai": "^4.0.2",
-    "cheerio": "^1.0.0-rc.1",
+    "cheerio": "^1.0.0-rc.2",
     "chokidar-cli": "^1.2.0",
     "coveralls": "^2.13.1",
-    "eslint": "^4.0.0",
+    "eslint": "^4.1.1",
     "eslint-config-riot": "^1.0.0",
     "glob": "^7.1.2",
     "istanbul": "^0.4.5",
-    "jsdom": "^11.0.0",
+    "jsdom": "^11.1.0",
     "karma": "^1.7.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-coverage": "^1.1.1",
@@ -78,9 +78,9 @@
     "rollup-plugin-commonjs": "^8.0.2",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-riot": "^1.1.0",
-    "sinon": "^2.3.5",
+    "sinon": "^2.3.6",
     "sinon-chai": "^2.11.0",
-    "uglify-js": "^3.0.18"
+    "uglify-js": "^3.0.23"
   },
   "preferGlobal": true,
   "files": [
