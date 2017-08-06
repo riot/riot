@@ -69,7 +69,7 @@ import '../../../tag/virtual-yield-loop.tag'
 describe('Riot each', function() {
   it('the loop elements keep their position in the DOM', function() {
     injectHTML('<loop-position></loop-position>')
-    var tag = riot.mount('loop-position')[0],
+    const tag = riot.mount('loop-position')[0],
       h3 = $('h3', tag.root)
 
     expect(getPreviousSibling(h3).tagName.toLowerCase()).to.be.equal('p')
@@ -83,7 +83,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-svg-nodes></loop-svg-nodes>')
 
-    var tag = riot.mount('loop-svg-nodes')[0]
+    const tag = riot.mount('loop-svg-nodes')[0]
 
     expect($$('svg circle', tag.root).length).to.be.equal(3)
     expect($('svg circle',  tag.root) instanceof HTMLElement).to.be.equal(false)
@@ -95,7 +95,7 @@ describe('Riot each', function() {
   it('the root keyword should be protected also in the loops', function() {
 
     injectHTML('<loop-root></loop-root>')
-    var tag = riot.mount('loop-root')[0]
+    const tag = riot.mount('loop-root')[0]
 
     expect($$('li', tag.root).length).to.be.equal(3)
 
@@ -246,14 +246,16 @@ describe('Riot each', function() {
 
     injectHTML('<loop-events></loop-events>')
 
-    var tag = riot.mount('loop-events', {
-        cb: function(e, item) {
-          eventsCounter++
-          if (e.stopPropagation)
-            e.stopPropagation()
-          expect(JSON.stringify(item)).to.be.equal(JSON.stringify(testItem))
-        }
-      })[0],
+    const tag = riot.mount('loop-events', {
+      cb: function(e, item) {
+        eventsCounter++
+        if (e.stopPropagation)
+          e.stopPropagation()
+        expect(JSON.stringify(item)).to.be.equal(JSON.stringify(testItem))
+      }
+    })[0]
+
+    let
       eventsCounter = 0,
       testItem
 
@@ -275,7 +277,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-null-items></loop-null-items>')
 
-    var tag = riot.mount('loop-null-items')[0]
+    const tag = riot.mount('loop-null-items')[0]
     expect($$('li', tag.root).length).to.be.equal(7)
     tag.unmount()
   })
@@ -284,7 +286,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-child></loop-child>')
 
-    var tag = riot.mount('loop-child')[0],
+    const tag = riot.mount('loop-child')[0],
       root = tag.root,
       children = root.getElementsByTagName('looped-child')
 
@@ -314,7 +316,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-child></loop-child>')
 
-    var tag = tag = riot.mount('loop-child')[0]
+    const tag = riot.mount('loop-child')[0]
 
     setTimeout(function() {
       tag.tags['looped-child'].forEach(function(child) {
@@ -336,7 +338,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-unshift></loop-unshift>')
 
-    var tag = riot.mount('loop-unshift')[0]
+    const tag = riot.mount('loop-unshift')[0]
 
     expect(tag.tags['loop-unshift-item'].length).to.be.equal(2)
     expect(normalizeHTML(tag.root.getElementsByTagName('loop-unshift-item')[0].innerHTML)).to.be.equal('<p>woo</p>')
@@ -352,7 +354,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-manip></loop-manip>')
 
-    var tag = riot.mount('loop-manip')[0],
+    const tag = riot.mount('loop-manip')[0],
       root = tag.root
 
     tag.top()
@@ -375,7 +377,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-combo></loop-combo>')
 
-    var tag = riot.mount('loop-combo')[0]
+    const tag = riot.mount('loop-combo')[0]
 
     expect(normalizeHTML(tag.root.innerHTML))
       .to.be.equal('<lci x="a"></lci><div><lci x="y"></lci></div>')
@@ -393,7 +395,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-object></loop-object>')
 
-    var tag = riot.mount('loop-object')[0]
+    const tag = riot.mount('loop-object')[0]
     var root = tag.root
 
     expect(normalizeHTML(root.getElementsByTagName('div')[0].innerHTML))
@@ -412,7 +414,7 @@ describe('Riot each', function() {
 
   it('conditional directives work also on object loops', function() {
     injectHTML('<loop-object-conditional></loop-object-conditional>')
-    var tag = riot.mount('loop-object-conditional')[0]
+    const tag = riot.mount('loop-object-conditional')[0]
     expect(tag.refs.items).to.have.length(4)
     tag.unmount()
   })
@@ -421,7 +423,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-ids></loop-ids>')
 
-    var tag = riot.mount('loop-ids')[0],
+    const tag = riot.mount('loop-ids')[0],
       thirdItemId = tag.tags['loop-ids-item'][2]._riot_id
 
     tag.items.splice(0, 1)
@@ -439,7 +441,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-single-tags></loop-single-tags>')
 
-    var tag = riot.mount('loop-single-tags')[0]
+    const tag = riot.mount('loop-single-tags')[0]
 
     expect($$('ul li', tag.root).length).to.be.equal(4)
 
@@ -450,7 +452,7 @@ describe('Riot each', function() {
   it('loop option tag', function() {
     injectHTML('<loop-option></loop-option>')
 
-    var tag = riot.mount('loop-option')[0],
+    const tag = riot.mount('loop-option')[0],
       root = tag.root,
       options = root.getElementsByTagName('select')[0]
 
@@ -468,7 +470,7 @@ describe('Riot each', function() {
 
     injectHTML('<named-select></named-select>')
 
-    var tag = riot.mount('named-select')[0]
+    const tag = riot.mount('named-select')[0]
 
     expect(tag.refs.daSelect).to.not.be.equal(undefined)
     expect(tag.refs.daSelect.length).to.be.equal(2)
@@ -480,7 +482,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-optgroup></loop-optgroup>')
 
-    var tag = riot.mount('loop-optgroup')[0],
+    const tag = riot.mount('loop-optgroup')[0],
       root = tag.root,
       select = $('select', root)
 
@@ -498,7 +500,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-optgroup2></loop-optgroup2>')
 
-    var tag = riot.mount('loop-optgroup2')[0],
+    const tag = riot.mount('loop-optgroup2')[0],
       root = tag.root,
       select = $('select', root)
 
@@ -516,7 +518,7 @@ describe('Riot each', function() {
 
     injectHTML('<table-data></table-data>')
 
-    var tag = riot.mount('table-data')[0],
+    const tag = riot.mount('table-data')[0],
       root = tag.root
 
     expect(normalizeHTML(root.innerHTML)).to.match(/<h3>Cells<\/h3><table border="1"><tbody><tr><th>One<\/th><th>Two<\/th><th>Three<\/th><\/tr><tr><td>One<\/td><td>Two<\/td><td>Three<\/td><\/tr><\/tbody><\/table><h3>Rows<\/h3><table border="1"><tbody><tr><td>One<\/td><td>One another<\/td><\/tr><tr><td>Two<\/td><td>Two another<\/td><\/tr><tr><td>Three<\/td><td>Three another<\/td><\/tr><\/tbody><\/table>/)
@@ -529,7 +531,7 @@ describe('Riot each', function() {
 
     injectHTML('<table-loop-extra-row></table-loop-extra-row>')
 
-    var tag = riot.mount('table-loop-extra-row')[0],
+    const tag = riot.mount('table-loop-extra-row')[0],
       root = tag.root,
       tr = $$('table tr', root)
 
@@ -544,7 +546,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-reorder></loop-reorder>')
 
-    var tag = riot.mount('loop-reorder')[0]
+    const tag = riot.mount('loop-reorder')[0]
     expect($$('span', tag.root)[0].className).to.be.equal('nr-0')
     expect($$('div', tag.root)[0].className).to.be.equal('nr-0')
     tag.items.reverse()
@@ -564,7 +566,7 @@ describe('Riot each', function() {
       '<ploop3-tag></ploop3-tag>'
     ])
 
-    var tag = riot.mount('ploop-tag, ploop1-tag, ploop2-tag, ploop3-tag', {
+    const tag = riot.mount('ploop-tag, ploop1-tag, ploop2-tag, ploop3-tag', {
       elements: [{
         foo: 'foo',
         id: 0
@@ -590,7 +592,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-named></loop-named>')
 
-    var tag = riot.mount('loop-named')[0]
+    const tag = riot.mount('loop-named')[0]
     tag.on('mount', function () {
       expect(tag.first).name.to.be.equal('first')
       expect(tag.two).name.to.be.equal('two')
@@ -601,7 +603,7 @@ describe('Riot each', function() {
 
   it('protect the internal "tags" attribute from external overrides', function() {
     injectHTML('<loop-protect-internal-attrs></loop-protect-internal-attrs>')
-    var tag = riot.mount('loop-protect-internal-attrs')[0]
+    const tag = riot.mount('loop-protect-internal-attrs')[0]
     expect(tag.tags['loop-protect-internal-attrs-child'].length).to.be.equal(4)
     tag.unmount()
   })
@@ -609,8 +611,8 @@ describe('Riot each', function() {
   it('the "updated" gets properly triggered also from the children tags in a loop', function(done) {
 
     injectHTML('<div id="updated-events-in-loop"></div>')
-    var tag = riot.mount('#updated-events-in-loop', 'loop-unshift')[0],
-      counter = 0
+    const tag = riot.mount('#updated-events-in-loop', 'loop-unshift')[0]
+    let counter = 0
 
     tag.tags['loop-unshift-item'][0].on('updated', function() {
       counter ++
@@ -627,7 +629,7 @@ describe('Riot each', function() {
   it('the loops children sync correctly their internal data with their options', function() {
 
     injectHTML('<loop-sync-options></loop-sync-options>')
-    var tag = riot.mount('loop-sync-options')[0]
+    const tag = riot.mount('loop-sync-options')[0]
 
     function ch(idx) {
       return tag.root.getElementsByTagName('loop-sync-options-child')[idx]._tag
@@ -679,7 +681,7 @@ describe('Riot each', function() {
   it('the loops children sync correctly their internal data even when they are nested', function() {
 
     injectHTML('<loop-sync-options-nested></loop-sync-options-nested>')
-    var tag = riot.mount('loop-sync-options-nested')[0]
+    const tag = riot.mount('loop-sync-options-nested')[0]
 
     expect(tag.tags['loop-sync-options-nested-child'][0].parent.root.tagName.toLowerCase()).to.be.equal('loop-sync-options-nested')
     expect(tag.tags['loop-sync-options-nested-child'][0].val).to.be.equal('foo')
@@ -725,7 +727,7 @@ describe('Riot each', function() {
   it('the children tags are in sync also in multiple nested tags', function() {
 
     injectHTML('<loop-sync-options-nested-wrapper></loop-sync-options-nested-wrapper>')
-    var tag = riot.mount('loop-sync-options-nested-wrapper')[0]
+    const tag = riot.mount('loop-sync-options-nested-wrapper')[0]
     expect(tag.tags['loop-sync-options-nested'].tags['loop-sync-options-nested-child'].length).to.be.equal(3)
     tag.unmount()
   })
@@ -733,7 +735,7 @@ describe('Riot each', function() {
   it('looped options between other options get inserted correctly', function() {
     injectHTML('<loop-noloop-option></loop-noloop-option>')
 
-    var tag = riot.mount('loop-noloop-option')[0]
+    const tag = riot.mount('loop-noloop-option')[0]
     var options = $$('option', tag.root)
     expect(options[1].value).to.be.equal('1')
 
@@ -742,7 +744,7 @@ describe('Riot each', function() {
 
   it('children in a loop inherit properties from the parent', function() {
     injectHTML('<loop-inherit></loop-inherit>')
-    var tag = riot.mount('loop-inherit')[0]
+    const tag = riot.mount('loop-inherit')[0]
     expect(tag.refs.me.opts.nice).to.be.equal(tag.isFun)
     tag.isFun = false
     tag.update()
@@ -755,7 +757,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-conditional></loop-conditional>')
 
-    var tag = riot.mount('loop-conditional')[0]
+    const tag = riot.mount('loop-conditional')[0]
 
     setTimeout(function() {
       expect(tag.root.getElementsByTagName('div').length).to.be.equal(2)
@@ -783,7 +785,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-inherit></loop-inherit>')
 
-    var tag = riot.mount('loop-inherit')[0]
+    const tag = riot.mount('loop-inherit')[0]
 
     expect(tag.tags['loop-inherit-item'].length).to.be.equal(4)
     expect(tag.tags['loop-inherit-item'][1].opts.name).to.be.equal(tag.items[0])
@@ -809,7 +811,7 @@ describe('Riot each', function() {
 
   it('the DOM events get executed in the right context', function() {
     injectHTML('<loop-inherit></loop-inherit>')
-    var tag = riot.mount('loop-inherit')[0]
+    const tag = riot.mount('loop-inherit')[0]
     fireEvent(tag.tags['loop-inherit-item'][0].root, 'mouseenter')
     expect(tag.wasHovered).to.be.equal(true)
     expect(tag.root.getElementsByTagName('div').length).to.be.equal(4)
@@ -821,7 +823,7 @@ describe('Riot each', function() {
 
   it('loops over other tag instances do not override their internal properties', function() {
     injectHTML('<loop-tag-instances></loop-tag-instances>')
-    var tag = riot.mount('loop-tag-instances')[0]
+    const tag = riot.mount('loop-tag-instances')[0]
 
     tag.start()
 
@@ -837,8 +839,8 @@ describe('Riot each', function() {
 
   it('nested loops using non object data get correctly rendered', function() {
     injectHTML('<loop-nested-strings-array></loop-nested-strings-array>')
-    var tag = riot.mount('loop-nested-strings-array')[0],
-      children = $$('loop-nested-strings-array-item', tag.root)
+    const tag = riot.mount('loop-nested-strings-array')[0]
+    let children = $$('loop-nested-strings-array-item', tag.root)
     expect(children.length).to.be.equal(4)
     children = $$('loop-nested-strings-array-item', tag.root)
     fireEvent(children[0], 'click')
@@ -851,7 +853,7 @@ describe('Riot each', function() {
 
   it('any DOM event in a loop updates the whole parent tag', function() {
     injectHTML('<loop-numbers-nested></loop-numbers-nested>')
-    var tag = riot.mount('loop-numbers-nested')[0]
+    const tag = riot.mount('loop-numbers-nested')[0]
     expect(tag.root.getElementsByTagName('ul')[0].getElementsByTagName('li').length).to.be.equal(4)
     fireEvent(tag.root.getElementsByTagName('ul')[0].getElementsByTagName('li')[0], 'click')
     expect(tag.root.getElementsByTagName('ul')[0].getElementsByTagName('li').length).to.be.equal(2)
@@ -860,7 +862,7 @@ describe('Riot each', function() {
 
   it('riot.observable instances could be also used in a loop', function() {
     injectHTML('<loop-child></loop-child>')
-    var tag = riot.mount('loop-child')[0]
+    const tag = riot.mount('loop-child')[0]
 
     tag.items = [riot.observable({name: 1}), {name: 2}]
     tag.update()
@@ -872,7 +874,7 @@ describe('Riot each', function() {
 
   it('the update event returns the tag instance', function() {
     injectHTML('<loop-child></loop-child>')
-    var tag = riot.mount('loop-child')[0]
+    const tag = riot.mount('loop-child')[0]
     expect(tag.update()).to.not.be.equal(undefined)
     tag.unmount()
   })
@@ -882,7 +884,7 @@ describe('Riot each', function() {
 
     injectHTML('<table-multibody></table-multibody>')
 
-    var tag = riot.mount('table-multibody')[0],
+    const tag = riot.mount('table-multibody')[0],
       bodies = $$('tbody', tag.root)
 
     expect(bodies.length).to.be.equal(3)
@@ -902,7 +904,7 @@ describe('Riot each', function() {
 
     injectHTML('<table-thead-tfoot-nested></table-thead-tfoot-nested>')
 
-    var tag = riot.mount('table-thead-tfoot-nested')[0],
+    const tag = riot.mount('table-thead-tfoot-nested')[0],
       bodies = $$('tbody', tag.root),
       heads = $$('thead', tag.root),
       foots = $$('tfoot', tag.root)
@@ -940,8 +942,8 @@ describe('Riot each', function() {
         ['Jkl', '40', 'E 1C', 'France', 'Balbina']
       ]
     }
-    var tag = riot.mount('loop-cols')[0],
-      el, i, k
+    const tag = riot.mount('loop-cols')[0]
+    let el, i, k
 
     tag.update()
 
@@ -1180,7 +1182,7 @@ describe('Riot each', function() {
 
     // change the brackets
     riot.settings.brackets = '{{ }}'
-    var tag = riot.mount('loop-double-curly-brackets')[0],
+    const tag = riot.mount('loop-double-curly-brackets')[0],
       ps = $$('p', tag.root)
 
     expect(ps.length).to.be.equal(2)
@@ -1198,7 +1200,7 @@ describe('Riot each', function() {
 
   it('loops correctly on array subclasses', function() {
     injectHTML('<loop-arraylike></loop-arraylike>')
-    var tag = riot.mount('loop-arraylike')[0],
+    const tag = riot.mount('loop-arraylike')[0],
       root = tag.root
     expect(normalizeHTML(root.getElementsByTagName('div')[0].innerHTML))
       .to.be.equal('<p>0 = zero</p><p>1 = one</p><p>2 = two</p><p>3 = three</p>')
@@ -1208,7 +1210,7 @@ describe('Riot each', function() {
 
   it('virtual tags mount inner content and not the virtual tag root', function() {
     injectHTML('<loop-virtual></loop-virtual>') // no-reorder
-    var tag = riot.mount('loop-virtual')[0],
+    const tag = riot.mount('loop-virtual')[0],
       els = tag.root.children
 
     els[0].setAttribute('test', 'ok')
@@ -1244,7 +1246,7 @@ describe('Riot each', function() {
 
     injectHTML('<loop-virtual-reorder></loop-virtual-reorder>')
 
-    var tag2 = riot.mount('loop-virtual-reorder')[0],
+    const tag2 = riot.mount('loop-virtual-reorder')[0],
       els2 = tag2.root.children
 
     els2[0].setAttribute('test', 'ok')
@@ -1276,7 +1278,7 @@ describe('Riot each', function() {
 
   it('redraws correctly after items type is swapped from array to object and back', function () {
     injectHTML('<loop-swap-type></loop-swap-type>')
-    var tag = riot.mount('loop-swap-type')[0]
+    const tag = riot.mount('loop-swap-type')[0]
 
     tag.swap()
     tag.update()
@@ -1294,7 +1296,7 @@ describe('Riot each', function() {
 
   it('still loops with reserved property names #1526', function() {
     injectHTML('<reserved-names></reserved-names>')
-    var tag = riot.mount('reserved-names')[0]
+    const tag = riot.mount('reserved-names')[0]
     tag.reorder()
     tag.update()
     tag.reorder()
@@ -1306,7 +1308,7 @@ describe('Riot each', function() {
 
     injectHTML('<obj-key-loop></obj-key-loop>')
 
-    var tag = riot.mount('obj-key-loop')[0]
+    const tag = riot.mount('obj-key-loop')[0]
 
     expect(tag.refs.x.value).to.be.equal('3')
     expect(tag.refs.y.value).to.be.equal('44')
@@ -1322,7 +1324,7 @@ describe('Riot each', function() {
 
   it('non looped and conditional virtual tags mount content', function() {
     injectHTML('<virtual-no-loop></virtual-no-loop>')
-    var tag = riot.mount('virtual-no-loop')[0]
+    const tag = riot.mount('virtual-no-loop')[0]
 
     var virts = $$('virtual', tag.root)
     expect(virts.length).to.be.equal(0)
@@ -1344,7 +1346,7 @@ describe('Riot each', function() {
 
   it('virtual tags with yielded content function in a loop', function() {
     injectHTML('<virtual-yield-loop></virtual-yield-loop>')
-    var tag = riot.mount('virtual-yield-loop')[0]
+    const tag = riot.mount('virtual-yield-loop')[0]
     var spans = $$('span', tag.root)
 
     expect(spans[0].innerHTML).to.be.equal('one')
@@ -1365,7 +1367,7 @@ describe('Riot each', function() {
 
   it('looped items with conditional get properly inserted into the DOM', function() {
     injectHTML('<loop-bug-1649></loop-bug-1649>')
-    var tag = riot.mount('loop-bug-1649')[0]
+    const tag = riot.mount('loop-bug-1649')[0]
     var children
 
     children = $$('.list', tag.root)
@@ -1391,7 +1393,7 @@ describe('Riot each', function() {
 
   it('looped items get removed properly see https://github.com/riot/riot/issues/2240', function() {
     injectHTML('<loop-bug-2240></loop-bug-2240>')
-    var tag = riot.mount('loop-bug-2240')[0]
+    const tag = riot.mount('loop-bug-2240')[0]
 
     expect(tag.refs.items).to.have.length(tag.items.length)
     tag.items = [tag.items[tag.items.length - 1]]
@@ -1406,7 +1408,7 @@ describe('Riot each', function() {
 
   it('looped items will be rendered keeping the right order when sorted', function() {
     injectHTML('<loop-bug-2205></loop-bug-2205>')
-    var tag = riot.mount('loop-bug-2205')[0]
+    const tag = riot.mount('loop-bug-2205')[0]
 
     expect(tag.items).to.have.length(tag.itemsAmount)
     expect(tag.refs.items).to.have.length(tag.itemsAmount)
@@ -1436,7 +1438,7 @@ describe('Riot each', function() {
 
   it('looped tags should be in the DOM when their "mount" event gets triggered', function() {
     injectHTML('<loop-bug-2242></loop-bug-2242>')
-    var tag = riot.mount('loop-bug-2242')[0]
+    const tag = riot.mount('loop-bug-2242')[0]
     tag.tags['loop-bug-2242-child'].forEach((t) => expect(t.inDOM).to.be.ok)
     tag.items = tag.items.concat([4, 5, 6])
     tag.update()
@@ -1447,7 +1449,7 @@ describe('Riot each', function() {
 
   it('looped custom tags can update properly their root node attributes', function() {
     injectHTML('<loop-items-attrs></loop-items-attrs>')
-    var tag = riot.mount('loop-items-attrs')[0]
+    const tag = riot.mount('loop-items-attrs')[0]
     let subtag1, subtag2
 
     ;[subtag1, subtag2] = tag.tags['loop-items-attrs-item']
@@ -1463,11 +1465,33 @@ describe('Riot each', function() {
     tag.unmount()
   })
 
+  it('looped custom tags shouldn\'t dispatch the "update" and "updated" events while mounted', () => {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    const updateEvent = sinon.spy(),
+      mountEvent = sinon.spy()
+
+    riot.tag('riot-tmp', '<riot-tmp-sub ref="children" each="{ opts.items }"/>')
+    riot.tag('riot-tmp-sub', '<p>subtag</p>', function() {
+      this.on('update', updateEvent)
+      this.on('mount', mountEvent)
+    })
+
+    const tag = riot.mount('riot-tmp', {
+      items: [{}, {}, {}]
+    })[0]
+
+    expect(updateEvent).to.have.not.been.called
+    expect(mountEvent).to.have.been.calledThrice
+
+    tag.unmount()
+  })
+
 /*
   TODO: nested refs and tags should be in sync
   it('nested tags get properly moved', function() {
     injectHTML('<loop-nested></loop-nested>')
-    var tag = riot.mount('loop-nested')[0]
+    const tag = riot.mount('loop-nested')[0]
     expect(tag.tags['loop-nested-item'][0].val).to.be.equal(1)
     expect(tag.refs.p[0].innerHTML).to.be.equal('1')
     tag.items.reverse()
