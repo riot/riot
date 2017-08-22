@@ -1472,4 +1472,20 @@ describe('Riot core', function() {
     tag.unmount()
     riot.settings.autoUpdate = true
   })
+
+  it('updates during the mount event should properly update the DOM', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', '<p ref="p">{ message }</p>', function() {
+      this.message = 'hi'
+      this.on('mount', () => {
+        this.message = 'goodbye'
+        this.update()
+      })
+    })
+
+    var tag = riot.mount('riot-tmp')[0]
+    expect(tag.refs.p.innerHTML).to.be.equal('goodbye')
+    tag.unmount()
+  })
 })

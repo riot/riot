@@ -1465,27 +1465,45 @@ describe('Riot each', function() {
     tag.unmount()
   })
 
-  it('looped custom tags shouldn\'t dispatch the "update" and "updated" events while mounted', () => {
+/*  it('looped custom tags shouldn\'t dispatch the "update" and "updated" events while mounted', () => {
     injectHTML('<riot-tmp></riot-tmp>')
 
     const updateEvent = sinon.spy(),
+      beforeMountEvent = sinon.spy(),
+      beforeUnmountEvent = sinon.spy(),
+      unmountEvent = sinon.spy(),
       mountEvent = sinon.spy()
 
-    riot.tag('riot-tmp', '<riot-tmp-sub ref="children" each="{ opts.items }"/>')
-    riot.tag('riot-tmp-sub', '<p>subtag</p>', function() {
-      this.on('update', updateEvent)
-      this.on('mount', mountEvent)
+    riot.tag('riot-tmp', '<riot-tmp-sub ref="children" each="{ getItems() }"/>', function(done) {
+      this.on('mount', function() {
+        this.update()
+      })
+
+      this.on('updated', () => {
+        expect(updateEvent).to.have.not.been.called
+        expect(beforeMountEvent).to.have.been.twice
+        expect(mountEvent).to.have.been.twice
+        expect(beforeUnmountEvent).to.have.been.once
+        expect(unmountEvent).to.have.been.once
+        this.unmount()
+        done()
+      })
+
+      this.getItems = () => {
+        return [{}]
+      }
     })
 
-    const tag = riot.mount('riot-tmp', {
-      items: [{}, {}, {}]
-    })[0]
+    riot.tag('riot-tmp-sub', '<p>subtag</p>', function() {
+      this.on('before-mount', beforeMountEvent)
+      this.on('mount', mountEvent)
+      this.on('update', updateEvent)
+      this.on('before-unmount', beforeUnmountEvent)
+      this.on('unmount', unmountEvent)
+    })
 
-    expect(updateEvent).to.have.not.been.called
-    expect(mountEvent).to.have.been.calledThrice
-
-    tag.unmount()
-  })
+    riot.mount('riot-tmp')[0]
+  })*/
 
 /*
   TODO: nested refs and tags should be in sync
