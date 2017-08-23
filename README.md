@@ -275,7 +275,7 @@ $ make raw
 # To build anytime you change a src file
 $ make watch
 
-# To bench riot ( it requires ctrl+c to exit )
+# To bench riot
 $ make perf
 ```
 
