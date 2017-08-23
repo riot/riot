@@ -68,3 +68,6 @@ make.js
 
 !.gitmodules
 !.travis.yml
+
+# avoid to lock the dependencies for now
+package-lock.json
