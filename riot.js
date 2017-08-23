@@ -1,8 +1,8 @@
-/* Riot v3.6.2, @license MIT */
+/* Riot v3.6.3, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.riot = global.riot || {})));
+	(factory((global.riot = {})));
 }(this, (function (exports) { 'use strict';
 
 var __TAGS_CACHE = [];
@@ -1302,7 +1302,7 @@ function updateExpression(expr) {
 
   // if it's a tag we could totally skip the rest
   if (expr._riot_id) {
-    if (expr.isMounted) {
+    if (expr.__.wasCreated) {
       expr.update();
     // if it hasn't been mounted yet, do that now.
     } else {
@@ -2176,7 +2176,7 @@ function unregister$1(name) {
   __TAG_IMPL[name] = null;
 }
 
-var version$1 = 'v3.6.2';
+var version$1 = 'v3.6.3';
 
 
 var core = Object.freeze({
@@ -2217,6 +2217,15 @@ function updateOpts(isLoop, parent, isAnonymous, opts, instAttrs) {
   });
 }
 
+/**
+ * Toggle the isMounted flag
+ * @this Tag
+ * @param { Boolean } value - ..of the isMounted flag
+ */
+function setIsMounted(value) {
+  defineProperty(this, 'isMounted', value);
+}
+
 
 /**
  * Tag class
@@ -2252,7 +2261,7 @@ function Tag$1(impl, conf, innerHTML) {
   if (impl.name && root._tag) { root._tag.unmount(true); }
 
   // not yet mounted
-  this.isMounted = false;
+  setIsMounted.call(this, false);
 
   defineProperty(this, '__', {
     isAnonymous: isAnonymous,
@@ -2267,6 +2276,7 @@ function Tag$1(impl, conf, innerHTML) {
     listeners: [],
     // these vars will be needed only for the virtual tags
     virts: [],
+    wasCreated: false,
     tail: null,
     head: null,
     parent: null,
@@ -2429,23 +2439,20 @@ function Tag$1(impl, conf, innerHTML) {
 
     defineProperty(this, 'root', root);
 
-
-    if (skipAnonymous) { return }
-
-    // set the isMounted flag asynchronously
-    this.one('mount', function () { return defineProperty(this$1, 'isMounted', true); });
-
-    // if it's not a child tag we can trigger its mount event
-    if (!this.parent) {
-      this.trigger('mount');
-    }
-    // otherwise we need to wait that the parent "mount" or "updated" event gets triggered
-    else {
+    // if we need to wait that the parent "mount" or "updated" event gets triggered
+    if (!skipAnonymous && this.parent) {
       var p = getImmediateCustomParentTag(this.parent);
       p.one(!p.isMounted ? 'mount' : 'updated', function () {
+        setIsMounted.call(this$1, true);
         this$1.trigger('mount');
       });
+    } else {
+      // otherwise it's not a child tag we can trigger its mount event
+      setIsMounted.call(this, true);
+      if (!skipAnonymous) { this.trigger('mount'); }
     }
+
+    this.__.wasCreated = true;
 
     return this
 
@@ -2522,11 +2529,14 @@ function Tag$1(impl, conf, innerHTML) {
     if (this.__.onUnmount) { this.__.onUnmount(); }
 
     if (!skipAnonymous) {
+      // weird fix for a weird edge case #2409
+      if (!this.isMounted) { this.trigger('mount'); }
       this.trigger('unmount');
       this.off('*');
     }
 
     defineProperty(this, 'isMounted', false);
+    this.__.wasCreated = false;
 
     delete this.root._tag;
 
