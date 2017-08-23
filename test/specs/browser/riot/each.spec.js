@@ -1465,28 +1465,32 @@ describe('Riot each', function() {
     tag.unmount()
   })
 
-/*  it('looped custom tags shouldn\'t dispatch the "update" and "updated" events while mounted', () => {
+  it('looped custom tags shouldn\'t dispatch the "update" and "updated" events while mounted', (done) => {
     injectHTML('<riot-tmp></riot-tmp>')
 
     const updateEvent = sinon.spy(),
+      updatedEvent = sinon.spy(),
       beforeMountEvent = sinon.spy(),
       beforeUnmountEvent = sinon.spy(),
       unmountEvent = sinon.spy(),
       mountEvent = sinon.spy()
 
-    riot.tag('riot-tmp', '<riot-tmp-sub ref="children" each="{ getItems() }"/>', function(done) {
+    riot.tag('riot-tmp', '<riot-tmp-sub ref="children" each="{ getItems() }"/>', function() {
       this.on('mount', function() {
         this.update()
       })
 
       this.on('updated', () => {
-        expect(updateEvent).to.have.not.been.called
-        expect(beforeMountEvent).to.have.been.twice
-        expect(mountEvent).to.have.been.twice
-        expect(beforeUnmountEvent).to.have.been.once
-        expect(unmountEvent).to.have.been.once
-        this.unmount()
-        done()
+        setTimeout(() => {
+          expect(updateEvent, 'update event').to.have.not.been.called
+          expect(updatedEvent, 'update event').to.have.not.been.called
+          expect(beforeMountEvent, 'before mount event').to.have.been.calledTwice
+          expect(mountEvent, 'mount event').to.have.been.calledTwice
+          expect(beforeUnmountEvent, 'before unmount event').to.have.been.calledOnce
+          expect(unmountEvent, 'unmount event').to.have.been.calledOnce
+          this.unmount()
+          done()
+        }, 10)
       })
 
       this.getItems = () => {
@@ -1498,12 +1502,13 @@ describe('Riot each', function() {
       this.on('before-mount', beforeMountEvent)
       this.on('mount', mountEvent)
       this.on('update', updateEvent)
+      this.on('updated', updatedEvent)
       this.on('before-unmount', beforeUnmountEvent)
       this.on('unmount', unmountEvent)
     })
 
     riot.mount('riot-tmp')[0]
-  })*/
+  })
 
 /*
   TODO: nested refs and tags should be in sync
