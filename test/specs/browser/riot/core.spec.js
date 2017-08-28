@@ -853,6 +853,20 @@ describe('Riot core', function() {
 
     tag.unmount()
   })
+  
+  it('does not set value attribute', function() {
+    
+    injectHTML('<input-values></input-values>')
+
+    var tag = riot.mount('input-values')[0]
+    expect(tag.refs.i.value).to.be.equal('hi')
+    expect(tag.refs.i.hasAttribute('value')).to.be.false
+    tag.update()
+    expect(tag.refs.i.value).to.be.equal('foo')
+    expect(tag.refs.i.hasAttribute('value')).to.be.false
+
+    tag.unmount()
+  });
 
   it('updates the value of input which has been changed from initial one #2096', function() {
 
