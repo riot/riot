@@ -1502,4 +1502,14 @@ describe('Riot core', function() {
     expect(tag.refs.p.innerHTML).to.be.equal('goodbye')
     tag.unmount()
   })
+
+  it('avoid to get ref attributes on yield tags', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', '<yield ref="foo"/>')
+
+    var tag = riot.mount('riot-tmp')[0]
+    expect(tag.refs.foo).to.be.undefined
+    tag.unmount()
+  })
 })
