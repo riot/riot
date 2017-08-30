@@ -1,4 +1,14 @@
 language: node_js
+
+sudo: required
+dist: trusty
+
+addons:
+  apt:
+    sources:
+      - google-chrome
+    packages:
+      - google-chrome-stable
 node_js:
   - 8
 
@@ -10,8 +20,6 @@ branches:
 
 script:
   make riot
-
-sudo: false
 
 after_success:
   test $TRAVIS_PULL_REQUEST == "false" && make test-sauce && make test-coveralls
