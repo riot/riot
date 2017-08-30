@@ -1121,6 +1121,7 @@ describe('Riot each', function() {
 
   it('select as root element of custom riot tag', function () {
     injectHTML('<select-test></select-test>')
+
     var
       CHOOSE = 0,     // option alone
       OPTION = 1,     // looped option
@@ -1138,8 +1139,8 @@ describe('Riot each', function() {
       sel, dat, tag = riot.mount('select-test')[0]
 
     expect(tag).to.not.be.empty
-    for (var name in list) {                 // eslint-disable-line guard-for-in
-      //console.log('Testing ' + name)
+
+    for (const name in list) {
       dat = list[name]
       sel = $('select[data-is=' + name + ']', tag.root)
       expect(sel).to.not.be.empty
@@ -1151,16 +1152,20 @@ describe('Riot each', function() {
 
     function listFromDat(dat) {
       var op = [], s = 'Opt1,Opt2,Opt3'
+
       for (var i = 1; i < dat.length; i++) {
         if (dat[i] === OPTGRP) op.push('G,' + s)
         else if (dat[i] === OPTION) op.push(s)
         else op.push('(choose)')
       }
+
       return op.join(',')
     }
+
     function listFromSel(el) {
       var op = []
       el = el.firstChild
+
       while (el) {
         if (el.tagName === 'OPTGROUP') {
           op.push('G')
@@ -1170,6 +1175,7 @@ describe('Riot each', function() {
         }
         el = el.nextSibling
       }
+
       return op.join(',')
     }
 
