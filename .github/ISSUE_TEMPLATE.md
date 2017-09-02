@@ -1,6 +1,6 @@
 # IMPORTANT
 
-Your issue might be labeled invalid and eventually closed if:
+Your issue might be labeled as `invalid` and eventually closed if:
 
 - You have deleted completely the issue template for no reason
 - You can not reproduce the issue
