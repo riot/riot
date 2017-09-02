@@ -128,6 +128,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Demos
 - [**Riot Examples** - Community's Official](https://github.com/riot/examples)
+- [**Riot Animore** - Official Tags Animations Library](https://github.com/riot/animore)
 - [Riot Todo MVC](http://todomvc.com/examples/riotjs/)
 - [Hackernews reader](http://git.io/riot-hn)
 - [Vuejs examples by Riotjs](https://github.com/txchen/feplay/tree/gh-pages/riot_vue)

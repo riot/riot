@@ -1,9 +1,14 @@
+# IMPORTANT
+
+Your issue might be labeled invalid and eventually closed if:
+
+- You have deleted completely the issue template for no reason
+- You can not reproduce the issue
+- Your post is violates our [code of conduct](https://github.com/riot/riot/blob/master/.github/CODE_OF_CONDUCT.md)
+
 ## Help us to manage our issues by answering the following:
 
 1. Describe your issue:
-
-
-
 
 2. Can you reproduce the issue?
 
