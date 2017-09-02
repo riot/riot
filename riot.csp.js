@@ -1,4 +1,4 @@
-/* Riot v3.6.3, @license MIT */
+/* Riot v3.7.0, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -7,6 +7,7 @@
 
 var __TAGS_CACHE = [];
 var __TAG_IMPL = {};
+var YIELD_TAG = 'yield';
 var GLOBAL_MIXIN = '__global_mixin';
 var ATTRS_PREFIX = 'riot-';
 var REF_DIRECTIVES = ['ref', 'data-ref'];
@@ -16,6 +17,7 @@ var LOOP_DIRECTIVE = 'each';
 var LOOP_NO_REORDER_DIRECTIVE = 'no-reorder';
 var SHOW_DIRECTIVE = 'show';
 var HIDE_DIRECTIVE = 'hide';
+var KEY_DIRECTIVE = 'key';
 var RIOT_EVENTS_KEY = '__riot-events__';
 var T_STRING = 'string';
 var T_OBJECT = 'object';
@@ -381,7 +383,7 @@ function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
 
-var csp_tmpl = createCommonjsModule(function (module, exports) {
+var csp_tmpl$1 = createCommonjsModule(function (module, exports) {
 (function (global, factory) {
 	factory(exports);
 }(commonjsGlobal, (function (exports) { 'use strict';
@@ -1013,12 +1015,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	    }
 	    Parser.prototype.throwError = function (messageFormat) {
-	        var arguments$1 = arguments;
-
-	        var values = [];
-	        for (var _i = 1; _i < arguments.length; _i++) {
-	            values[_i - 1] = arguments$1[_i];
-	        }
 	        var args = Array.prototype.slice.call(arguments, 1);
 	        var msg = messageFormat.replace(/%(\d)/g, function (whole, idx) {
 	            assert_1.assert(idx < args.length, 'Message reference must be in range');
@@ -1030,12 +1026,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        throw this.errorHandler.createError(index, line, column, msg);
 	    };
 	    Parser.prototype.tolerateError = function (messageFormat) {
-	        var arguments$1 = arguments;
-
-	        var values = [];
-	        for (var _i = 1; _i < arguments.length; _i++) {
-	            values[_i - 1] = arguments$1[_i];
-	        }
 	        var args = Array.prototype.slice.call(arguments, 1);
 	        var msg = messageFormat.replace(/%(\d)/g, function (whole, idx) {
 	            assert_1.assert(idx < args.length, 'Message reference must be in range');
@@ -5080,7 +5070,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        // First, detect invalid regular expressions.
 	        try {
-	            RegExp(tmp);
+	            
 	        }
 	        catch (e) {
 	            this.throwUnexpectedToken(messages_1.Messages.InvalidRegExp);
@@ -8216,8 +8206,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
 })));
 });
 
-var csp_tmpl_1 = csp_tmpl.tmpl;
-var csp_tmpl_2 = csp_tmpl.brackets;
+var csp_tmpl_1 = csp_tmpl$1.tmpl;
+var csp_tmpl_2 = csp_tmpl$1.brackets;
 
 var observable$1 = function(el) {
 
@@ -8696,9 +8686,7 @@ function updateExpression(expr) {
 
     if (attrName === 'value' && dom.value !== value) {
       dom.value = value;
-    }
-
-    if (hasValue && value !== false) {
+    } else if (hasValue && value !== false) {
       setAttr(dom, attrName, value);
     }
 
@@ -8909,6 +8897,22 @@ function append(root, isVirtual) {
 }
 
 /**
+ * Return the value we want to use to lookup the postion of our items in the collection
+ * @param   { String }  keyAttr         - lookup string or expression
+ * @param   { * }       originalItem    - original item from the collection
+ * @param   { Object }  keyedItem       - object created by riot via { item, i in collection }
+ * @param   { Boolean } hasKeyAttrExpr  - flag to check whether the key is an expression
+ * @returns { * } value that we will use to figure out the item position via collection.indexOf
+ */
+function getItemId(keyAttr, originalItem, keyedItem, hasKeyAttrExpr) {
+  if (keyAttr) {
+    return hasKeyAttrExpr ?  csp_tmpl_1(keyAttr, keyedItem) :  originalItem[keyAttr]
+  }
+
+  return originalItem
+}
+
+/**
  * Manage tags having the 'each'
  * @param   { HTMLElement } dom - DOM node we need to loop
  * @param   { Tag } parent - parent tag instance where the dom node is contained
@@ -8917,6 +8921,8 @@ function append(root, isVirtual) {
  */
 function _each(dom, parent, expr) {
   var mustReorder = typeof getAttr(dom, LOOP_NO_REORDER_DIRECTIVE) !== T_STRING || remAttr(dom, LOOP_NO_REORDER_DIRECTIVE);
+  var keyAttr = getAttr(dom, KEY_DIRECTIVE);
+  var hasKeyAttrExpr = keyAttr ? csp_tmpl_1.hasExpr(keyAttr) : false;
   var tagName = getTagName(dom);
   var impl = __TAG_IMPL[tagName];
   var parentNode = dom.parentNode;
@@ -8932,6 +8938,7 @@ function _each(dom, parent, expr) {
 
   // remove the each property from the original tag
   remAttr(dom, LOOP_DIRECTIVE);
+  remAttr(dom, KEY_DIRECTIVE);
 
   // parse the each expression
   expr = csp_tmpl_1.loopKeys(expr);
@@ -8951,6 +8958,7 @@ function _each(dom, parent, expr) {
     var frag = createFrag();
     var isObject$$1 = !isArray(items) && !isString(items);
     var root = placeholder.parentNode;
+    var tmpItems = [];
 
     // if this DOM was removed the update here is useless
     // this condition fixes also a weird async issue on IE in our unit test
@@ -8975,18 +8983,18 @@ function _each(dom, parent, expr) {
     }
 
     // loop all the new items
-    each(items, function (item, i) {
+    each(items, function (_item, i) {
+      var item = !hasKeys && expr.key ? mkitem(expr, _item, i) : _item;
+      var itemId = getItemId(keyAttr, _item, item, hasKeyAttrExpr);
       // reorder only if the items are objects
-      var doReorder = mustReorder && typeof item === T_OBJECT && !hasKeys;
-      var oldPos = oldItems.indexOf(item);
+      var doReorder = mustReorder && typeof _item === T_OBJECT && !hasKeys;
+      var oldPos = oldItems.indexOf(itemId);
       var isNew = oldPos === -1;
       var pos = !isNew && doReorder ? oldPos : i;
       // does a tag exist in this position?
       var tag = tags[pos];
       var mustAppend = i >= oldItems.length;
       var mustCreate =  doReorder && isNew || !doReorder && !tag;
-
-      item = !hasKeys && expr.key ? mkitem(expr, item, i) : item;
 
       // new tag
       if (mustCreate) {
@@ -9013,7 +9021,7 @@ function _each(dom, parent, expr) {
         if (child) { arrayishAdd(parent.tags, tagName, tag, true); }
       } else if (pos !== i && doReorder) {
         // move
-        if (contains(items, oldItems[pos])) {
+        if (keyAttr || contains(items, oldItems[pos])) {
           move.apply(tag, [root, tags[i], isVirtual]);
           // move the old tag instance
           tags.splice(i, 0, tags.splice(pos, 1)[0]);
@@ -9035,6 +9043,8 @@ function _each(dom, parent, expr) {
       tag.__.index = i;
       tag.__.parent = parent;
 
+      tmpItems[i] = itemId;
+
       if (!mustCreate) { tag.update(item); }
     });
 
@@ -9042,7 +9052,7 @@ function _each(dom, parent, expr) {
     unmountRedundant(items, tags);
 
     // clone the items array
-    oldItems = items.slice();
+    oldItems = tmpItems.slice();
 
     root.insertBefore(frag, placeholder);
   };
@@ -9176,7 +9186,7 @@ function parseAttributes(dom, attrs, fn) {
     var bool = isBoolAttr(name);
     var expr;
 
-    if (contains(REF_DIRECTIVES, name)) {
+    if (contains(REF_DIRECTIVES, name) && dom.tagName.toLowerCase() !== YIELD_TAG) {
       expr =  Object.create(RefExpr).init(dom, this$1, name, attr.value);
     } else if (csp_tmpl_1.hasExpr(attr.value)) {
       expr = {dom: dom, expr: attr.value, attr: name, bool: bool};
@@ -9486,7 +9496,7 @@ function unregister$1(name) {
   __TAG_IMPL[name] = null;
 }
 
-var version$1 = 'v3.6.3';
+var version$1 = 'v3.7.0';
 
 
 var core = Object.freeze({
@@ -9528,12 +9538,24 @@ function updateOpts(isLoop, parent, isAnonymous, opts, instAttrs) {
 }
 
 /**
- * Toggle the isMounted flag
+ * Manage the mount state of a tag triggering also the observable events
  * @this Tag
  * @param { Boolean } value - ..of the isMounted flag
  */
-function setIsMounted(value) {
+function setMountState(value) {
+  var ref = this.__;
+  var isAnonymous = ref.isAnonymous;
+
   defineProperty(this, 'isMounted', value);
+
+  if (!isAnonymous) {
+    if (value) { this.trigger('mount'); }
+    else {
+      this.trigger('unmount');
+      this.off('*');
+      this.__.wasCreated = false;
+    }
+  }
 }
 
 
@@ -9571,7 +9593,7 @@ function Tag$1(impl, conf, innerHTML) {
   if (impl.name && root._tag) { root._tag.unmount(true); }
 
   // not yet mounted
-  setIsMounted.call(this, false);
+  defineProperty(this, 'isMounted', false);
 
   defineProperty(this, '__', {
     isAnonymous: isAnonymous,
@@ -9691,7 +9713,7 @@ function Tag$1(impl, conf, innerHTML) {
 
       // init method will be called automatically
       if (instance.init)
-        { instance.init.bind(this$1)(); }
+        { instance.init.bind(this$1)(opts); }
     });
     return this
   }.bind(this));
@@ -9753,13 +9775,11 @@ function Tag$1(impl, conf, innerHTML) {
     if (!skipAnonymous && this.parent) {
       var p = getImmediateCustomParentTag(this.parent);
       p.one(!p.isMounted ? 'mount' : 'updated', function () {
-        setIsMounted.call(this$1, true);
-        this$1.trigger('mount');
+        setMountState.call(this$1, true);
       });
     } else {
       // otherwise it's not a child tag we can trigger its mount event
-      setIsMounted.call(this, true);
-      if (!skipAnonymous) { this.trigger('mount'); }
+      setMountState.call(this, true);
     }
 
     this.__.wasCreated = true;
@@ -9838,15 +9858,12 @@ function Tag$1(impl, conf, innerHTML) {
     // custom internal unmount function to avoid relying on the observable
     if (this.__.onUnmount) { this.__.onUnmount(); }
 
-    if (!skipAnonymous) {
-      // weird fix for a weird edge case #2409
-      if (!this.isMounted) { this.trigger('mount'); }
-      this.trigger('unmount');
-      this.off('*');
-    }
+    // weird fix for a weird edge case #2409 and #2436
+    // some users might use your software not as you've expected
+    // so I need to add these dirty hacks to mitigate unexpected issues
+    if (!this.isMounted) { setMountState.call(this, true); }
 
-    defineProperty(this, 'isMounted', false);
-    this.__.wasCreated = false;
+    setMountState.call(this, false);
 
     delete this.root._tag;
 
