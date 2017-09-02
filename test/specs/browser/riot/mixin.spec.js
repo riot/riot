@@ -378,4 +378,21 @@ describe('Mixin', function() {
   it('Unregistered mixins will throw an error', function() {
     expect(riot.mixin).to.throw(Error)
   })
+
+  it('riot mixins should receive the riot options via init method', function(done) {
+    injectHTML('<my-mixin></my-mixin>')
+
+    riot.mixin('init-with-opts', {
+      init(opts) {
+        expect(opts).to.be.not.undefined
+        done()
+      }
+    }) // register mixin
+    riot.tag('my-mixin', '<span>some tag</span>', function() {
+      this.mixin('init-with-opts') // load mixin
+    })
+
+    var tag = riot.mount('my-mixin')[0]
+    tag.unmount()
+  })
 })
