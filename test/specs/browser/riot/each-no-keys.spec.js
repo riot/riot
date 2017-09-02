@@ -66,7 +66,7 @@ import '../../../tag/table-test.tag'
 import '../../../tag/virtual-no-loop.tag'
 import '../../../tag/virtual-yield-loop.tag'
 
-describe('Riot each', function() {
+describe('Riot each not keyed', function() {
   it('the loop elements keep their position in the DOM', function() {
     injectHTML('<loop-position></loop-position>')
     const tag = riot.mount('loop-position')[0],
