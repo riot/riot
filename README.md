@@ -27,9 +27,9 @@
 | React                                          | 15.6.1          | 47.60kb              |
 | Web Components Polyfill                        | 0.7.24          | 33.68kb              |
 | Vue                                            | 2.4.2           | 29.71kb              |
-| __Riot__                                       | 3.6.3           | 10.31kb              |
-| Inferno                                        | 3.7.1           | 9.18kb               |
-| Preact                                         | 8.2.1           | 3.45kb               |
+| __Riot__                                       | 3.7.0           | 10.39kb              |
+| Inferno                                        | 3.8.1           | 9.24kb               |
+| Preact                                         | 8.2.5           | 3.45kb               |
 
 ### Browsers support
 
@@ -104,7 +104,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - Event normalization.
 - The rendered DOM can be freely manipulated with other tools.
 - No extra HTML root elements or `data-` attributes.
-- Plays well with jQuery.
+- Plays well with any frontend framework.
 
 
 ### Use your dearest language and tools
@@ -135,7 +135,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Timer](http://jsfiddle.net/gnumanth/h9kuozp5/)
 - [Another flux demo comparable to React ones](http://txchen.github.io/feplay/riot_flux)
 - [Various experiments](http://richardbondi.net/programming/riot)
-- [Isomorphic application](https://github.com/ListnPlay/riot-isomorphic)
+- [Isomorphic application](https://github.com/Avnerus/riot-isomorphic)
 - [Isomorphic proof of concept](https://github.com/PabloSichert/isomorphic-proof-of-concept)
 - [flux-riot todo](http://mingliangfeng.me/flux-riot)
 - [Another Riot Todo MVC](http://nippur72.github.io/riotjs-todomvc/#/)
