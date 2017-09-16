@@ -331,7 +331,7 @@ describe('Riot core', function() {
 
   it('the case of attributes prefixed with riot should be leaved untouched', function() {
     riot.tag('crazy-svg', `
-      <svg riot-viewBox="{'0 0 300 300'}">
+      <svg preserveAspectRatio="none" riot-viewBox="{'0 0 300 300'}">
         <circle riot-cx="{ 5 }" riot-cy="{ 5 }" r="2" fill="black"></circle>
       </svg>
     `)
@@ -341,6 +341,7 @@ describe('Riot core', function() {
     var tag = riot.mount('crazy-svg')[0]
 
     expect($('svg', tag.root).getAttribute('viewBox')).to.be.equal('0 0 300 300')
+    expect($('svg', tag.root).getAttribute('preserveAspectRatio')).to.be.equal('none')
 
     tag.unmount()
   })
