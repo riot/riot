@@ -3,9 +3,11 @@ const commonjs = require('rollup-plugin-commonjs'),
   buble = require('rollup-plugin-buble')
 
 module.exports = {
-  format: 'umd',
-  moduleName: 'riot',
+  name: 'riot',
   banner: '/* Riot WIP, @license MIT */',
+  output: {
+    format: 'umd'
+  },
   plugins: [
     nodeResolve({ jsnext: true, main: true }),
     commonjs({
