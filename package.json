@@ -46,7 +46,7 @@
   ],
   "dependencies": {
     "riot-cli": "^3.0.2",
-    "riot-compiler": "^3.2.4",
+    "riot-compiler": "^3.2.5",
     "riot-observable": "^3.0.0",
     "riot-tmpl": "^3.0.8",
     "simple-dom": "1.1.1",
