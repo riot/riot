@@ -57,7 +57,7 @@ module.exports = function(conf) {
     customLaunchers: saucelabsBrowsers,
     browsers: browsers,
 
-    reporters: ['progress', 'saucelabs', 'coverage'],
+    reporters: ['progress', 'saucelabs'].concat(isSaucelabs ? [] : ['coverage']),
     preprocessors: preprocessors,
 
     rollupPreprocessor: {
