@@ -1,4 +1,4 @@
-/* Riot v3.7.2, @license MIT */
+/* Riot v3.7.3, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -203,7 +203,16 @@ function isString(value) {
  * @returns { Boolean } -
  */
 function isBlank(value) {
-  return isUndefined(value) || value === null || value === ''
+  return isNil(value) || value === ''
+}
+
+/**
+ * Check against the null and undefined values
+ * @param   { * }  value -
+ * @returns {Boolean} -
+ */
+function isNil(value) {
+  return isUndefined(value) || value === null
 }
 
 /**
@@ -234,6 +243,7 @@ var check = Object.freeze({
 	isUndefined: isUndefined,
 	isString: isString,
 	isBlank: isBlank,
+	isNil: isNil,
 	isArray: isArray,
 	isWritable: isWritable
 });
@@ -1319,8 +1329,7 @@ function updateExpression(expr) {
   // detect the style attributes
   var isStyleAttr = attrName === 'style';
   var isClassAttr = attrName === 'class';
-  var hasValue;
-  var isObj;
+
   var value;
 
   // if it's a tag we could totally skip the rest
@@ -1336,19 +1345,20 @@ function updateExpression(expr) {
     }
     return
   }
+
   // if this expression has the update method it means it can handle the DOM changes by itself
   if (expr.update) { return expr.update() }
 
   var context = isToggle && !isAnonymous ? extend(Object.create(this), this.parent) : this;
 
-  // ...it seems to be a simple expression so we try to calculat its value
+  // ...it seems to be a simple expression so we try to calculate its value
   value = tmpl(expr.expr, context);
-  hasValue = !isBlank(value);
-  isObj = isObject(value);
+
+  var hasValue = !isBlank(value);
+  var isObj = isObject(value);
 
   // convert the style/class objects to strings
   if (isObj) {
-    isObj = !isClassAttr && !isStyleAttr;
     if (isClassAttr) {
       value = tmpl(JSON.stringify(value), this);
     } else if (isStyleAttr) {
@@ -1357,9 +1367,9 @@ function updateExpression(expr) {
   }
 
   // remove original attribute
-  if (expr.attr && (!expr.isAttrRemoved || !hasValue || value === false)) {
-    remAttr(dom, expr.attr);
-    expr.isAttrRemoved = true;
+  if (expr.attr && (!expr.wasParsedOnce || !hasValue || value === false)) {
+    // remove either riot-* attributes or just the attribute name
+    remAttr(dom, getAttr(dom, expr.attr) ? expr.attr : attrName);
   }
 
   // for the boolean attributes we don't need the value
@@ -1372,10 +1382,10 @@ function updateExpression(expr) {
   expr.value = value;
   expr.wasParsedOnce = true;
 
-  // if the value is an object we can not do much more with it
-  if (isObj && !isToggle) { return }
+  // if the value is an object (and it's not a style or class attribute) we can not do much more with it
+  if (isObj && !isClassAttr && !isStyleAttr && !isToggle) { return }
   // avoid to render undefined/null values
-  if (isBlank(value)) { value = ''; }
+  if (!hasValue) { value = ''; }
 
   // textarea and text nodes have no attribute name
   if (!attrName) {
@@ -2222,7 +2232,7 @@ function unregister$1(name) {
   __TAG_IMPL[name] = null;
 }
 
-var version$1 = 'v3.7.2';
+var version$1 = 'v3.7.3';
 
 
 var core = Object.freeze({
