@@ -1513,4 +1513,20 @@ describe('Riot core', function() {
     expect(tag.refs.foo).to.be.undefined
     tag.unmount()
   })
+
+  it('remove style attributes if they contain blank values', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', "<p ref='p' riot-style=\"{changed ? 'background-color: green' : ''}\"></p>", function() {
+      this.changed = true
+    })
+
+    var tag = riot.mount('riot-tmp')[0]
+    expect(tag.refs.p.hasAttribute('style')).to.be.ok
+    tag.changed = false
+    tag.update()
+    expect(tag.refs.p.hasAttribute('style')).to.be.not.ok
+
+    tag.unmount()
+  })
 })
