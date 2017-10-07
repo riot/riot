@@ -1108,6 +1108,20 @@ describe('Riot core', function() {
 
   })
 
+  it('`data-is` expressions will be ignored when the expression evaluates to a falsy value', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', `
+      <div data-is="{ null }" some-attribute="{ 1 + 5 }"></div>
+    `)
+    var tag = riot.mount('riot-tmp')[0]
+
+    expect($('div', tag.root).getAttribute('data-is')).to.be.equal(null)
+    expect($('div', tag.root).getAttribute('some-attribute')).to.be.equal('6')
+
+    tag.unmount()
+  })
+
   it('custom attributes should not be removed if not falsy', function() {
     injectHTML('<riot-tmp data-index="{ index }"></riot-tmp>')
 
