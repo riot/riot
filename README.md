@@ -11,6 +11,7 @@
 
 [![NPM version][npm-version-image]][npm-url]
 [![NPM downloads][npm-downloads-image]][npm-url]
+[![jsDelivr Hits][jsdelivr-image]][jsdelivr-url]
 [![MIT License][license-image]][license-url]
 [![Coverage Status][coverage-image]][coverage-url]
 [![Code Quality][codeclimate-image]][codeclimate-url]
@@ -373,6 +374,9 @@ Become a sponsor to get your logo on our README. [Become a sponsor][support-url]
 
 [donations-campaign-url]:https://pledgie.com/campaigns/31139
 [donations-campaign-image]:https://pledgie.com/campaigns/31139.png?skin_name=chrome
+
+[jsdelivr-image]: https://data.jsdelivr.com/v1/package/npm/riot/badge
+[jsdelivr-url]: https://www.jsdelivr.com/package/npm/riot
 
 
 [backer-url]: #backers
