@@ -331,7 +331,7 @@ describe('Riot core', function() {
 
   it('the case of attributes prefixed with riot should be leaved untouched', function() {
     riot.tag('crazy-svg', `
-      <svg riot-viewBox="{'0 0 300 300'}">
+      <svg preserveAspectRatio="xMinYMax meet" riot-viewBox="{'0 0 300 300'}">
         <circle riot-cx="{ 5 }" riot-cy="{ 5 }" r="2" fill="black"></circle>
       </svg>
     `)
@@ -341,6 +341,7 @@ describe('Riot core', function() {
     var tag = riot.mount('crazy-svg')[0]
 
     expect($('svg', tag.root).getAttribute('viewBox')).to.be.equal('0 0 300 300')
+    expect($('svg', tag.root).getAttribute('preserveAspectRatio')).to.be.equal('xMinYMax meet')
 
     tag.unmount()
   })
@@ -1510,6 +1511,22 @@ describe('Riot core', function() {
 
     var tag = riot.mount('riot-tmp')[0]
     expect(tag.refs.foo).to.be.undefined
+    tag.unmount()
+  })
+
+  it('remove style attributes if they contain blank values', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', "<p ref='p' riot-style=\"{changed ? 'background-color: green' : ''}\"></p>", function() {
+      this.changed = true
+    })
+
+    var tag = riot.mount('riot-tmp')[0]
+    expect(tag.refs.p.hasAttribute('style')).to.be.ok
+    tag.changed = false
+    tag.update()
+    expect(tag.refs.p.hasAttribute('style')).to.be.not.ok
+
     tag.unmount()
   })
 })

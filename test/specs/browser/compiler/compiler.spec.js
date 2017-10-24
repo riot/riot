@@ -159,4 +159,10 @@ describe('Riot compiler', function() {
       done()
     })
   })
+
+  it('throw compile.error in case a file will be not found', function(done) {
+    // override the compile error function
+    riot.compile.error = () => done()
+    riot.compile('./foo/bar.tag')
+  })
 })
