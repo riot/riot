@@ -11,8 +11,8 @@
 </dynamic-data-toggle>
 
 <dynamic-data-is>
-  <div each={inp in intags } data-is={ inp.tag } inpname={ inp.name }></div>
-  <div data-is={single} inpname="{single}"></div>
+  <div each={ inp in intags } data-is={ inp.tag } inpname={ inp.name }></div>
+  <div data-is={ single } inpname={ single }></div>
   <div data-is={ toggleTag } if={ toggle }></div>
 
   this.intags = [
