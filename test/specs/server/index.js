@@ -109,7 +109,7 @@ describe('Node', function() {
   it('render tag: svg loops', function() {
     var svg = riot.render('loop-svg-nodes')
     var $ = cheerio.load(svg)
-    expect($('circle').length).to.be.equal(3)
+    expect($('circle').length).to.be.equal(5)
   })
 
   it('render tag: loops having conditional directives', function() {

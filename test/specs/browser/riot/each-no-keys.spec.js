@@ -85,8 +85,9 @@ describe('Riot each not keyed', function() {
 
     const tag = riot.mount('loop-svg-nodes')[0]
 
-    expect($$('svg circle', tag.root).length).to.be.equal(3)
+    expect($$('svg circle', tag.root).length).to.be.equal(5)
     expect($('svg circle',  tag.root) instanceof HTMLElement).to.be.equal(false)
+    expect($('svg .nested-circle',  tag.root) instanceof HTMLElement).to.be.equal(false)
     expect($('p',  tag.root) instanceof HTMLElement).to.be.equal(true)
 
     tag.unmount()
