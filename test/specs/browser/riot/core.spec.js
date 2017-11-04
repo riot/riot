@@ -383,6 +383,7 @@ describe('Riot core', function() {
     expect($('input', divs[3]).getAttribute('name')).to.be.equal('calendar')
     expect(tag.tags['dynamic-data-toggle']).to.be.an('object')
 
+
     tag.single = 'color'
     tag.toggle = false
     tag.intags[0].name = 'ddd'
@@ -416,8 +417,10 @@ describe('Riot core', function() {
     expect(tag.tags.color.length).to.be.equal(2)
 
     // single tags as tag object and not array after delete
+
     tag.intags.splice(1, 1)
     tag.update()
+
     expect(tag.tags.color).to.be.an('object')
 
     tag.unmount()
@@ -1528,5 +1531,27 @@ describe('Riot core', function() {
     expect(tag.refs.p.hasAttribute('style')).to.be.not.ok
 
     tag.unmount()
+  })
+
+  it('avoid to clean the DOM for the default riot.unmount call', function(done) {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp-sub', '<p id="{ id }">foo</p>', function() {
+      this.id = `id-${ this._riot_id }`
+
+      this.on('before-unmount', () => {
+        expect(document.getElementById(this.id)).to.be.ok
+        done()
+      })
+    })
+
+    riot.tag('riot-tmp', '<riot-tmp-sub></riot-tmp-sub>')
+
+    var tag = riot.mount('riot-tmp')[0]
+
+    setTimeout(() => {
+      expect(document.getElementById(tag.tags['riot-tmp-sub'].id)).to.be.ok
+      tag.unmount()
+    }, 100)
   })
 })
