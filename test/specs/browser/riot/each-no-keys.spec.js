@@ -1517,6 +1517,25 @@ describe('Riot each not keyed', function() {
     riot.mount('riot-tmp')[0]
   })
 
+  it('looped tags can properly receive parent properties via attributes', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', '<riot-tmp-sub func={func} each="{items}"/>', function(opts) {
+      this.func = opts.func
+      this.items = [1, 2, 3]
+    })
+
+    riot.tag('riot-tmp-sub', '', function(opts) {
+      this.on('mount', opts.func)
+    })
+
+    const cb = sinon.spy()
+    const tag = riot.mount('riot-tmp', { func: cb })[0]
+
+    expect(cb).to.have.been.calledThrice
+    tag.unmount()
+  })
+
 /*
   TODO: nested refs and tags should be in sync
   it('nested tags get properly moved', function() {
