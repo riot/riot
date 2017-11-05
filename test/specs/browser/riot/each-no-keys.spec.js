@@ -87,11 +87,11 @@ describe('Riot each not keyed', function() {
     const tag = riot.mount('loop-svg-nodes')[0]
 
     expect($$('svg circle', tag.root).length).to.be.equal(5)
-    expect($('svg circle',  tag.root) instanceof HTMLElement).to.be.equal(false)
-    expect($('svg .nested-circle',  tag.root) instanceof HTMLElement).to.be.equal(false)
+    expect($('svg circle',  tag.root).ownerSVGElement).to.be.ok
+    expect(tag.tags['loop-svg-nodes-custom-circle'][0].refs.circle.ownerSVGElement).to.be.ok
     expect($('p',  tag.root) instanceof HTMLElement).to.be.equal(true)
 
-    tag.unmount()
+    //tag.unmount()
   })
 
   it('the root keyword should be protected also in the loops', function() {
