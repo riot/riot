@@ -31,6 +31,12 @@ module.exports = {
       browserName: 'safari',
       platform: 'OS X 10.11'
     },
+    slIE9: {
+      base: 'SauceLabs',
+      browserName: 'internet explorer',
+      platform: 'Windows 7',
+      version: '9'
+    },
     slIE10: {
       base: 'SauceLabs',
       browserName: 'internet explorer',
