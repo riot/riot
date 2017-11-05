@@ -1,4 +1,4 @@
-/* Riot v3.7.3, @license MIT */
+/* Riot v3.7.4, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -39,223 +39,13 @@ var RE_BOOL_ATTRS = /^(?:disabled|checked|readonly|required|allowfullscreen|auto
 var IE_VERSION = (WIN && WIN.document || {}).documentMode | 0;
 
 /**
- * Specialized function for looping an array-like collection with `each={}`
- * @param   { Array } list - collection of items
- * @param   {Function} fn - callback function
- * @returns { Array } the array looped
- */
-function each(list, fn) {
-  var len = list ? list.length : 0;
-  var i = 0;
-  for (; i < len; i++) { fn(list[i], i); }
-  return list
-}
-
-/**
- * Check whether an array contains an item
- * @param   { Array } array - target array
- * @param   { * } item - item to test
- * @returns { Boolean } -
- */
-function contains(array, item) {
-  return array.indexOf(item) !== -1
-}
-
-/**
- * Convert a string containing dashes to camel case
- * @param   { String } str - input string
- * @returns { String } my-string -> myString
- */
-function toCamel(str) {
-  return str.replace(/-(\w)/g, function (_, c) { return c.toUpperCase(); })
-}
-
-/**
- * Faster String startsWith alternative
- * @param   { String } str - source string
- * @param   { String } value - test string
- * @returns { Boolean } -
- */
-function startsWith(str, value) {
-  return str.slice(0, value.length) === value
-}
-
-/**
- * Helper function to set an immutable property
- * @param   { Object } el - object where the new property will be set
- * @param   { String } key - object key where the new property will be stored
- * @param   { * } value - value of the new property
- * @param   { Object } options - set the propery overriding the default options
- * @returns { Object } - the initial object
- */
-function defineProperty(el, key, value, options) {
-  Object.defineProperty(el, key, extend({
-    value: value,
-    enumerable: false,
-    writable: false,
-    configurable: true
-  }, options));
-  return el
-}
-
-/**
- * Function returning always a unique identifier
- * @returns { Number } - number from 0...n
- */
-var uid = (function() {
-  var i = 0;
-  return function () { return ++i; }
-})();
-
-/**
- * Short alias for Object.getOwnPropertyDescriptor
- */
-var getPropDescriptor = function (o, k) { return Object.getOwnPropertyDescriptor(o, k); };
-
-/**
- * Extend any object with other properties
- * @param   { Object } src - source object
- * @returns { Object } the resulting extended object
- *
- * var obj = { foo: 'baz' }
- * extend(obj, {bar: 'bar', foo: 'bar'})
- * console.log(obj) => {bar: 'bar', foo: 'bar'}
- *
- */
-function extend(src) {
-  var obj;
-  var i = 1;
-  var args = arguments;
-  var l = args.length;
-
-  for (; i < l; i++) {
-    if (obj = args[i]) {
-      for (var key in obj) {
-        // check if this property of the source object could be overridden
-        if (isWritable(src, key))
-          { src[key] = obj[key]; }
-      }
-    }
-  }
-  return src
-}
-
-var misc = Object.freeze({
-	each: each,
-	contains: contains,
-	toCamel: toCamel,
-	startsWith: startsWith,
-	defineProperty: defineProperty,
-	uid: uid,
-	getPropDescriptor: getPropDescriptor,
-	extend: extend
-});
-
-/**
- * Check if the passed argument is a boolean attribute
- * @param   { String } value -
- * @returns { Boolean } -
- */
-function isBoolAttr(value) {
-  return RE_BOOL_ATTRS.test(value)
-}
-
-/**
- * Check if passed argument is a function
- * @param   { * } value -
- * @returns { Boolean } -
- */
-function isFunction(value) {
-  return typeof value === T_FUNCTION
-}
-
-/**
- * Check if passed argument is an object, exclude null
- * NOTE: use isObject(x) && !isArray(x) to excludes arrays.
- * @param   { * } value -
- * @returns { Boolean } -
- */
-function isObject(value) {
-  return value && typeof value === T_OBJECT // typeof null is 'object'
-}
-
-/**
- * Check if passed argument is undefined
- * @param   { * } value -
- * @returns { Boolean } -
- */
-function isUndefined(value) {
-  return typeof value === T_UNDEF
-}
-
-/**
- * Check if passed argument is a string
- * @param   { * } value -
- * @returns { Boolean } -
- */
-function isString(value) {
-  return typeof value === T_STRING
-}
-
-/**
- * Check if passed argument is empty. Different from falsy, because we dont consider 0 or false to be blank
- * @param { * } value -
- * @returns { Boolean } -
- */
-function isBlank(value) {
-  return isNil(value) || value === ''
-}
-
-/**
- * Check against the null and undefined values
- * @param   { * }  value -
- * @returns {Boolean} -
- */
-function isNil(value) {
-  return isUndefined(value) || value === null
-}
-
-/**
- * Check if passed argument is a kind of array
- * @param   { * } value -
- * @returns { Boolean } -
- */
-function isArray(value) {
-  return Array.isArray(value) || value instanceof Array
-}
-
-/**
- * Check whether object's property could be overridden
- * @param   { Object }  obj - source object
- * @param   { String }  key - object property
- * @returns { Boolean } true if writable
- */
-function isWritable(obj, key) {
-  var descriptor = getPropDescriptor(obj, key);
-  return isUndefined(obj[key]) || descriptor && descriptor.writable
-}
-
-
-var check = Object.freeze({
-	isBoolAttr: isBoolAttr,
-	isFunction: isFunction,
-	isObject: isObject,
-	isUndefined: isUndefined,
-	isString: isString,
-	isBlank: isBlank,
-	isNil: isNil,
-	isArray: isArray,
-	isWritable: isWritable
-});
-
-/**
  * Shorter and fast way to select multiple nodes in the DOM
  * @param   { String } selector - DOM selector
  * @param   { Object } ctx - DOM node where the targets of our search will is located
  * @returns { Object } dom nodes found
  */
 function $$(selector, ctx) {
-  return Array.prototype.slice.call((ctx || document).querySelectorAll(selector))
+  return [].slice.call((ctx || document).querySelectorAll(selector))
 }
 
 /**
@@ -285,18 +75,18 @@ function createDOMPlaceholder() {
 }
 
 /**
- * Check if a DOM node is an svg tag
+ * Check if a DOM node is an svg tag or part of an svg
  * @param   { HTMLElement }  el - node we want to test
  * @returns {Boolean} true if it's an svg node
  */
 function isSvg(el) {
-  return !!el.ownerSVGElement
+  var owner = el.ownerSVGElement;
+  return !!owner || owner === null
 }
 
 /**
  * Create a generic DOM node
  * @param   { String } name - name of the DOM node we want to create
- * @param   { Boolean } isSvg - true if we need to use an svg node
  * @returns { Object } DOM node just created
  */
 function mkEl(name) {
@@ -307,16 +97,22 @@ function mkEl(name) {
  * Set the inner html of any DOM node SVGs included
  * @param { Object } container - DOM node where we'll inject new html
  * @param { String } html - html to inject
+ * @param { Boolean } isSvg - svg tags should be treated a bit differently
  */
 /* istanbul ignore next */
-function setInnerHTML(container, html) {
-  if (!isUndefined(container.innerHTML))
-    { container.innerHTML = html; }
-    // some browsers do not support innerHTML on the SVGs tags
-  else {
-    var doc = new DOMParser().parseFromString(html, 'application/xml');
-    var node = container.ownerDocument.importNode(doc.documentElement, true);
+function setInnerHTML(container, html, isSvg) {
+  // innerHTML is not supported on svg tags so we neet to treat them differently
+  if (isSvg) {
+    var node = container.ownerDocument.importNode(
+      new DOMParser()
+        .parseFromString(("<svg xmlns=\"" + SVG_NS + "\">" + html + "</svg>"), 'application/xml')
+        .documentElement,
+      true
+    );
+
     container.appendChild(node);
+  } else {
+    container.innerHTML = html;
   }
 }
 
@@ -460,7 +256,7 @@ if (WIN) {
     if (userNode) {
       if (userNode.id) { newNode.id = userNode.id; }
       userNode.parentNode.replaceChild(newNode, userNode);
-    } else { document.getElementsByTagName('head')[0].appendChild(newNode); }
+    } else { document.head.appendChild(newNode); }
 
     return newNode
   }))();
@@ -1162,6 +958,216 @@ var observable$1 = function(el) {
 
 };
 
+/**
+ * Check if the passed argument is a boolean attribute
+ * @param   { String } value -
+ * @returns { Boolean } -
+ */
+function isBoolAttr(value) {
+  return RE_BOOL_ATTRS.test(value)
+}
+
+/**
+ * Check if passed argument is a function
+ * @param   { * } value -
+ * @returns { Boolean } -
+ */
+function isFunction(value) {
+  return typeof value === T_FUNCTION
+}
+
+/**
+ * Check if passed argument is an object, exclude null
+ * NOTE: use isObject(x) && !isArray(x) to excludes arrays.
+ * @param   { * } value -
+ * @returns { Boolean } -
+ */
+function isObject(value) {
+  return value && typeof value === T_OBJECT // typeof null is 'object'
+}
+
+/**
+ * Check if passed argument is undefined
+ * @param   { * } value -
+ * @returns { Boolean } -
+ */
+function isUndefined(value) {
+  return typeof value === T_UNDEF
+}
+
+/**
+ * Check if passed argument is a string
+ * @param   { * } value -
+ * @returns { Boolean } -
+ */
+function isString(value) {
+  return typeof value === T_STRING
+}
+
+/**
+ * Check if passed argument is empty. Different from falsy, because we dont consider 0 or false to be blank
+ * @param { * } value -
+ * @returns { Boolean } -
+ */
+function isBlank(value) {
+  return isNil(value) || value === ''
+}
+
+/**
+ * Check against the null and undefined values
+ * @param   { * }  value -
+ * @returns {Boolean} -
+ */
+function isNil(value) {
+  return isUndefined(value) || value === null
+}
+
+/**
+ * Check if passed argument is a kind of array
+ * @param   { * } value -
+ * @returns { Boolean } -
+ */
+function isArray(value) {
+  return Array.isArray(value) || value instanceof Array
+}
+
+/**
+ * Check whether object's property could be overridden
+ * @param   { Object }  obj - source object
+ * @param   { String }  key - object property
+ * @returns { Boolean } true if writable
+ */
+function isWritable(obj, key) {
+  var descriptor = getPropDescriptor(obj, key);
+  return isUndefined(obj[key]) || descriptor && descriptor.writable
+}
+
+
+var check = Object.freeze({
+	isBoolAttr: isBoolAttr,
+	isFunction: isFunction,
+	isObject: isObject,
+	isUndefined: isUndefined,
+	isString: isString,
+	isBlank: isBlank,
+	isNil: isNil,
+	isArray: isArray,
+	isWritable: isWritable
+});
+
+/**
+ * Specialized function for looping an array-like collection with `each={}`
+ * @param   { Array } list - collection of items
+ * @param   {Function} fn - callback function
+ * @returns { Array } the array looped
+ */
+function each(list, fn) {
+  var len = list ? list.length : 0;
+  var i = 0;
+  for (; i < len; i++) { fn(list[i], i); }
+  return list
+}
+
+/**
+ * Check whether an array contains an item
+ * @param   { Array } array - target array
+ * @param   { * } item - item to test
+ * @returns { Boolean } -
+ */
+function contains(array, item) {
+  return array.indexOf(item) !== -1
+}
+
+/**
+ * Convert a string containing dashes to camel case
+ * @param   { String } str - input string
+ * @returns { String } my-string -> myString
+ */
+function toCamel(str) {
+  return str.replace(/-(\w)/g, function (_, c) { return c.toUpperCase(); })
+}
+
+/**
+ * Faster String startsWith alternative
+ * @param   { String } str - source string
+ * @param   { String } value - test string
+ * @returns { Boolean } -
+ */
+function startsWith(str, value) {
+  return str.slice(0, value.length) === value
+}
+
+/**
+ * Helper function to set an immutable property
+ * @param   { Object } el - object where the new property will be set
+ * @param   { String } key - object key where the new property will be stored
+ * @param   { * } value - value of the new property
+ * @param   { Object } options - set the propery overriding the default options
+ * @returns { Object } - the initial object
+ */
+function defineProperty(el, key, value, options) {
+  Object.defineProperty(el, key, extend({
+    value: value,
+    enumerable: false,
+    writable: false,
+    configurable: true
+  }, options));
+  return el
+}
+
+/**
+ * Function returning always a unique identifier
+ * @returns { Number } - number from 0...n
+ */
+var uid = (function() {
+  var i = -1;
+  return function () { return ++i; }
+})();
+
+/**
+ * Short alias for Object.getOwnPropertyDescriptor
+ */
+var getPropDescriptor = function (o, k) { return Object.getOwnPropertyDescriptor(o, k); };
+
+/**
+ * Extend any object with other properties
+ * @param   { Object } src - source object
+ * @returns { Object } the resulting extended object
+ *
+ * var obj = { foo: 'baz' }
+ * extend(obj, {bar: 'bar', foo: 'bar'})
+ * console.log(obj) => {bar: 'bar', foo: 'bar'}
+ *
+ */
+function extend(src) {
+  var obj;
+  var i = 1;
+  var args = arguments;
+  var l = args.length;
+
+  for (; i < l; i++) {
+    if (obj = args[i]) {
+      for (var key in obj) {
+        // check if this property of the source object could be overridden
+        if (isWritable(src, key))
+          { src[key] = obj[key]; }
+      }
+    }
+  }
+  return src
+}
+
+var misc = Object.freeze({
+	each: each,
+	contains: contains,
+	toCamel: toCamel,
+	startsWith: startsWith,
+	defineProperty: defineProperty,
+	uid: uid,
+	getPropDescriptor: getPropDescriptor,
+	extend: extend
+});
+
 var settings$1 = extend(Object.create(brackets.settings), {
   skipAnonymousTags: true,
   // handle the auto updates on any DOM event
@@ -1349,7 +1355,7 @@ function updateExpression(expr) {
   // if this expression has the update method it means it can handle the DOM changes by itself
   if (expr.update) { return expr.update() }
 
-  var context = isToggle && !isAnonymous ? extend(Object.create(this), this.parent) : this;
+  var context = isToggle && !isAnonymous ? inheritParentProps.call(this) : this;
 
   // ...it seems to be a simple expression so we try to calculate its value
   value = tmpl(expr.expr, context);
@@ -1460,8 +1466,7 @@ var IfExpr = {
     if (this.value && !this.current) { // insert
       this.current = this.pristine.cloneNode(true);
       this.stub.parentNode.insertBefore(this.current, this.stub);
-      this.expressions = [];
-      parseExpressions.apply(this.tag, [this.current, this.expressions, true]);
+      this.expressions = parseExpressions.apply(this.tag, [this.current, true]);
     } else if (!this.value && this.current) { // remove
       unmountAll(this.expressions);
       if (this.current._tag) {
@@ -1804,54 +1809,52 @@ function _each(dom, parent, expr) {
  * Walk the tag DOM to detect the expressions to evaluate
  * @this Tag
  * @param   { HTMLElement } root - root tag where we will start digging the expressions
- * @param   { Array } expressions - empty array where the expressions will be added
  * @param   { Boolean } mustIncludeRoot - flag to decide whether the root must be parsed as well
- * @returns { Object } an object containing the root noode and the dom tree
+ * @returns { Array } all the expressions found
  */
-function parseExpressions(root, expressions, mustIncludeRoot) {
+function parseExpressions(root, mustIncludeRoot) {
   var this$1 = this;
 
-  var tree = {parent: {children: expressions}};
+  var expressions = [];
 
-  walkNodes(root, function (dom, ctx) {
+  walkNodes(root, function (dom) {
     var type = dom.nodeType;
-    var parent = ctx.parent;
     var attr;
-    var expr;
     var tagImpl;
 
-    if (!mustIncludeRoot && dom === root) { return {parent: parent} }
+    if (!mustIncludeRoot && dom === root) { return }
 
     // text node
     if (type === 3 && dom.parentNode.tagName !== 'STYLE' && tmpl.hasExpr(dom.nodeValue))
-      { parent.children.push({dom: dom, expr: dom.nodeValue}); }
+      { expressions.push({dom: dom, expr: dom.nodeValue}); }
 
-    if (type !== 1) { return ctx } // not an element
+    if (type !== 1) { return }
 
     var isVirtual = dom.tagName === 'VIRTUAL';
 
     // loop. each does it's own thing (for now)
     if (attr = getAttr(dom, LOOP_DIRECTIVE)) {
       if(isVirtual) { setAttr(dom, 'loopVirtual', true); } // ignore here, handled in _each
-      parent.children.push(_each(dom, this$1, attr));
+      expressions.push(_each(dom, this$1, attr));
       return false
     }
 
     // if-attrs become the new parent. Any following expressions (either on the current
     // element, or below it) become children of this expression.
     if (attr = getAttr(dom, CONDITIONAL_DIRECTIVE)) {
-      parent.children.push(Object.create(IfExpr).init(dom, this$1, attr));
+      expressions.push(Object.create(IfExpr).init(dom, this$1, attr));
       return false
     }
 
-    if (expr = getAttr(dom, IS_DIRECTIVE)) {
-      if (tmpl.hasExpr(expr)) {
-        parent.children.push({
+    if (attr = getAttr(dom, IS_DIRECTIVE)) {
+      if (tmpl.hasExpr(attr)) {
+        expressions.push({
           isRtag: true,
-          expr: expr,
+          expr: attr,
           dom: dom,
           attrs: [].slice.call(dom.attributes)
         });
+
         return false
       }
     }
@@ -1859,6 +1862,7 @@ function parseExpressions(root, expressions, mustIncludeRoot) {
     // if this is a tag, stop traversing here.
     // we ignore the root, since parseExpressions is called while we're mounting that root
     tagImpl = getTag(dom);
+
     if(isVirtual) {
       if(getAttr(dom, 'virtualized')) {dom.parentElement.removeChild(dom); } // tag created, remove from dom
       if(!tagImpl && !getAttr(dom, 'virtualized') && !getAttr(dom, 'loopVirtual'))  // ok to create virtual tag
@@ -1875,9 +1879,10 @@ function parseExpressions(root, expressions, mustIncludeRoot) {
           {root: dom, parent: this$1},
           dom.innerHTML
         );
-        parent.children.push(tag); // no return, anonymous tag, keep parsing
+
+        expressions.push(tag); // no return, anonymous tag, keep parsing
       } else {
-        parent.children.push(
+        expressions.push(
           initChildTag(
             tagImpl,
             {
@@ -1895,13 +1900,11 @@ function parseExpressions(root, expressions, mustIncludeRoot) {
     // attribute expressions
     parseAttributes.apply(this$1, [dom, dom.attributes, function (attr, expr) {
       if (!expr) { return }
-      parent.children.push(expr);
+      expressions.push(expr);
     }]);
+  });
 
-    // whatever the parent is, all child elements get the same parent.
-    // If this element had an if-attr, that's the parent for all child elements
-    return {parent: parent}
-  }, tree);
+  return expressions
 }
 
 /**
@@ -2023,7 +2026,7 @@ function mkdom(tmpl, html, isSvg$$1) {
   if (tblTags.test(tagName))
     { el = specialTags(el, tmpl, tagName); }
   else
-    { setInnerHTML(el, tmpl); }
+    { setInnerHTML(el, tmpl, isSvg$$1); }
 
   return el
 }
@@ -2232,7 +2235,7 @@ function unregister$1(name) {
   __TAG_IMPL[name] = null;
 }
 
-var version$1 = 'v3.7.3';
+var version$1 = 'v3.7.4';
 
 
 var core = Object.freeze({
@@ -2261,10 +2264,10 @@ function updateOpts(isLoop, parent, isAnonymous, opts, instAttrs) {
   // (and only this case) we don't need to do updateOpts, because the regular parse
   // will update those attrs. Plus, isAnonymous tags don't need opts anyway
   if (isLoop && isAnonymous) { return }
-  var ctx = !isAnonymous && isLoop ? this : parent || this;
+  var ctx = isLoop ? inheritParentProps.call(this) : parent || this;
 
   each(instAttrs, function (attr) {
-    if (attr.expr) { updateAllExpressions.call(ctx, [attr.expr]); }
+    if (attr.expr) { updateExpression.call(ctx, attr.expr); }
     // normalize the attribute names
     opts[toCamel(attr.name).replace(ATTRS_PREFIX, '')] = attr.expr ? attr.expr.value : attr.value;
   });
@@ -2495,7 +2498,7 @@ function createTag(impl, conf, innerHTML) {
     if (!skipAnonymous) { tag.trigger('before-mount'); }
 
     // parse layout after init. fn may calculate args for nested custom tags
-    parseExpressions.apply(tag, [dom, expressions, isAnonymous]);
+    each(parseExpressions.apply(tag, [dom, isAnonymous]), function (e) { return expressions.push(e); });
 
     tag.update(item);
 
@@ -2531,7 +2534,6 @@ function createTag(impl, conf, innerHTML) {
     var el = tag.root;
     var p = el.parentNode;
     var tagIndex = __TAGS_CACHE.indexOf(tag);
-    var ptag;
 
     if (!skipAnonymous) { tag.trigger('before-unmount'); }
 
@@ -2550,33 +2552,23 @@ function createTag(impl, conf, innerHTML) {
       });
     });
 
-    // remove tag tag instance from the global virtualDom variable
-    if (tagIndex !== -1)
-      { __TAGS_CACHE.splice(tagIndex, 1); }
+    // remove tag instance from the global tags cache collection
+    if (tagIndex !== -1) { __TAGS_CACHE.splice(tagIndex, 1); }
 
-    if (p || isVirtual) {
-      if (parent) {
-        ptag = getImmediateCustomParentTag(parent);
+    // clean up the parent tags object
+    if (parent && !isAnonymous) {
+      var ptag = getImmediateCustomParentTag(parent);
 
-        if (isVirtual) {
-          Object.keys(tag.tags).forEach(function (tagName) {
-            arrayishRemove(ptag.tags, tagName, tag.tags[tagName]);
-          });
-        } else {
-          arrayishRemove(ptag.tags, tagName, tag);
-          // remove from _parent too
-          if(parent !== ptag) {
-            arrayishRemove(parent.tags, tagName, tag);
-          }
-        }
+      if (isVirtual) {
+        Object
+          .keys(tag.tags)
+          .forEach(function (tagName) { return arrayishRemove(ptag.tags, tagName, tag.tags[tagName]); });
       } else {
-        // remove the tag contents
-        setInnerHTML(el, '');
+        arrayishRemove(ptag.tags, tagName, tag);
       }
-
-      if (p && !mustKeepRoot) { p.removeChild(el); }
     }
 
+    // unmount all the virtual directives
     if (tag.__.virts) {
       each(tag.__.virts, function (v) {
         if (v.parentNode) { v.parentNode.removeChild(v); }
@@ -2586,6 +2578,11 @@ function createTag(impl, conf, innerHTML) {
     // allow expressions to unmount themselves
     unmountAll(expressions);
     each(instAttrs, function (a) { return a.expr && a.expr.unmount && a.expr.unmount(); });
+
+    // clear the tag html if it's necessary
+    if (mustKeepRoot) { setInnerHTML(el, ''); }
+    // otherwise detach the root tag from the DOM
+    else if (p) { p.removeChild(el); }
 
     // custom internal unmount function to avoid relying on the observable
     if (tag.__.onUnmount) { tag.__.onUnmount(); }
@@ -2753,7 +2750,7 @@ function arrayishRemove(obj, key, value, ensureArray) {
     if (index !== -1) { obj[key].splice(index, 1); }
     if (!obj[key].length) { delete obj[key]; }
     else if (obj[key].length === 1 && !ensureArray) { obj[key] = obj[key][0]; }
-  } else
+  } else if (obj[key] === value)
     { delete obj[key]; } // otherwise just delete the key
 }
 
@@ -2832,6 +2829,16 @@ function makeVirtual(src, target) {
 }
 
 /**
+ * Return a temporary context containing also the parent properties
+ * @this Tag
+ * @param { Tag } - temporary tag context containing all the parent properties
+ */
+function inheritParentProps() {
+  if (this.parent) { return extend(Object.create(this), this.parent) }
+  return this
+}
+
+/**
  * Move virtual tag and all child nodes
  * @this Tag
  * @param { Node } src  - the node that will do the inserting
@@ -2889,6 +2896,7 @@ var tags = Object.freeze({
 	mountTo: mountTo,
 	makeReplaceVirtual: makeReplaceVirtual,
 	makeVirtual: makeVirtual,
+	inheritParentProps: inheritParentProps,
 	moveVirtual: moveVirtual,
 	selectTags: selectTags
 });
