@@ -1,7 +1,7 @@
 <loop-svg-nodes>
   <svg>
-    <circle each={ points } riot-cx="{ x * 10 + 5 }" riot-cy="{ y * 10 + 5 }" r="2" fill="black"></circle>
-    <loop-svg-nodes-custom-circle each={data in circles}></loop-svg-nodes-custom-circle>
+    <g data-is='loop-svg-nodes-custom-circle' each={data in circles}></g>
+    <circle each={ points } riot-cx={ x * 10 + 5 } riot-cy={ y * 10 + 5 } r="2" fill="black"></circle>
   </svg>
   <p>Description</p>
 
@@ -14,7 +14,7 @@
 
 <loop-svg-nodes-custom-circle>
   <circle
-    class='nested-circle'
+    ref='circle'
     riot-cx={data.x}
     riot-cy={data.y}
     r="10"
