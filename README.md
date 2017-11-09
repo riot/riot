@@ -22,15 +22,15 @@
 
 | Framework                                      | Version         | Minified Size (gzip) |
 |------------------------------------------------|-----------------|----------------------|
-| Ember                                          | 2.15.0          | 123.14kb             |
+| Ember                                          | 2.16.2          | 122.85kb             |
 | Polymer + Web Components Polyfill Lite         | 1.8.0           | 66.3kb               |
-| @angular/core                                  | 4.4.4           | 43.61kb              |
-| React                                          | 16.0.0          | 34.89kb              |
+| @angular/core                                  | 5.0.1           | 43.14kb              |
 | Web Components Polyfill                        | 0.7.24          | 33.68kb              |
-| Vue                                            | 2.4.4           | 30.06kb              |
-| __Riot__                                       | 3.7.3           | 10.38kb              |
-| Inferno                                        | 3.9.0           | 9.17kb               |
-| Preact                                         | 8.2.5           | 3.45kb               |
+| React                                          | 16.1.0          | 33.43kb              |
+| Vue                                            | 2.5.3           | 31.35kb              |
+| __Riot__                                       | 3.7.4           | 10.38kb              |
+| Inferno                                        | 3.10.1          | 9.19kb               |
+| Preact                                         | 8.2.6           | 3.45kb               |
 
 ### Browsers support
 
