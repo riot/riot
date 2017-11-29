@@ -370,7 +370,7 @@ Become a sponsor to get your logo on our README. [Become a sponsor][support-url]
 [slack-ja-image]:https://img.shields.io/badge/SLACK_(ja)-JOIN_CHAT_%E2%86%92-551a8b.svg?style=flat-square
 [slack-ja-url]:https://riot-jp-slackin.herokuapp.com/
 
-[codeclimate-image]:https://img.shields.io/codeclimate/github/riot/riot.svg?style=flat-square
+[codeclimate-image]:https://api.codeclimate.com/v1/badges/b81ddf3c77e8189876da/maintainability
 [codeclimate-url]:https://codeclimate.com/github/riot/riot
 
 [donations-campaign-url]:https://pledgie.com/campaigns/31139
