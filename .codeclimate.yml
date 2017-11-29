@@ -9,6 +9,7 @@ ratings:
 exclude_paths:
   - "riot+compiler.js"
   - "riot+compiler.min.js"
+  - "riot.csp.js"
   - "riot.js"
   - "riot.min.js"
   - "test/**"
