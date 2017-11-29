@@ -99,3 +99,7 @@ export function fireEvent(el, name) {
   e.initEvent(name, false, true)
   el.dispatchEvent(e)
 }
+
+export function supportArrayFrom() {
+  return Array.from !== 'function'
+}
