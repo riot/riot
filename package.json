@@ -70,7 +70,6 @@
     "karma-rollup-preprocessor": "^5.0.2",
     "karma-sauce-launcher": "^1.2.0",
     "mocha": "^4.0.1",
-    "puppeteer": "^0.13.0",
     "rollup": "^0.52.0",
     "rollup-plugin-alias": "1.4.0",
     "rollup-plugin-buble": "^0.18.0",

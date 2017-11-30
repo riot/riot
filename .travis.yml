@@ -3,6 +3,9 @@ language: node_js
 sudo: false
 dist: trusty
 
+addons:
+  chrome: stable
+
 node_js:
   - 8
 
