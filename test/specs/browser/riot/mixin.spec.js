@@ -379,17 +379,20 @@ describe('Mixin', function() {
     expect(riot.mixin).to.throw(Error)
   })
 
-  it('riot mixins should receive the riot options via init method', function(done) {
+  it('riot mixins should receive the mixin options via init method', function(done) {
     injectHTML('<my-mixin></my-mixin>')
 
     riot.mixin('init-with-opts', {
-      init(opts) {
-        expect(opts).to.be.not.undefined
+      init(first, second) {
+        expect(first).to.equal(143)
+        expect(second).to.equal(123)
+        expect(this.opts).to.equal(341)
         done()
       }
     }) // register mixin
     riot.tag('my-mixin', '<span>some tag</span>', function() {
-      this.mixin('init-with-opts') // load mixin
+      this.opts = 341
+      this.mixin(['init-with-opts', 143, 123]) // load mixin
     })
 
     var tag = riot.mount('my-mixin')[0]
