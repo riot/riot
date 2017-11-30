@@ -8,17 +8,8 @@ const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
   testFiles = `./specs/${process.env.TEST_FOLDER}/**/*.spec.js`,
   needsCompiler = /compiler/.test(process.env.TEST_FOLDER),
   preprocessors = {},
-  ChromiumRevision = require('puppeteer/package.json').puppeteer.chromium_revision,
-  Downloader = require('puppeteer/utils/ChromiumDownloader'),
-  revisionInfo = Downloader.revisionInfo(Downloader.currentPlatform(), ChromiumRevision)
+  browsers = isSaucelabs ? Object.keys(saucelabsBrowsers) : ['ChromeHeadless']
 
-process.env.CHROME_BIN = revisionInfo.executablePath
-var browsers = ['ChromeHeadless'] // this is not a constant
-
-// run the tests only on the saucelabs browsers
-if (isSaucelabs) {
-  browsers = Object.keys(saucelabsBrowsers)
-}
 
 module.exports = function(conf) {
   preprocessors[testFiles] = ['rollup']
