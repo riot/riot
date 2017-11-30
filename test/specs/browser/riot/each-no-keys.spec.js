@@ -7,7 +7,6 @@ import {
   getPreviousSibling,
   normalizeHTML,
   fireEvent,
-  supportArrayFrom
 } from '../../../helpers/index'
 
 // include special tags to test specific features

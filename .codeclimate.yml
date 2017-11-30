@@ -6,7 +6,7 @@ ratings:
   paths:
   - "lib/**.js"
 
-exclude_paths:
+exclude_patterns:
   - "riot+compiler.js"
   - "riot+compiler.min.js"
   - "riot.csp.js"
