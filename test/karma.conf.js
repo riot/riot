@@ -3,13 +3,13 @@ const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
   RIOT_PATH = '../dist/riot/riot.js',
   isDebug = process.env.DEBUG,
   isSaucelabs = process.env.SAUCELABS,
+  isTravis = !!process.env.TRAVIS_BUILD_NUMBER,
   // split the riot+compiler tests from the normal riot core tests
   testsSetup = './specs/browser/index.js',
   testFiles = `./specs/${process.env.TEST_FOLDER}/**/*.spec.js`,
   needsCompiler = /compiler/.test(process.env.TEST_FOLDER),
   preprocessors = {},
-  browsers = isSaucelabs ? Object.keys(saucelabsBrowsers) : ['ChromeHeadless']
-
+  browsers = isSaucelabs ? Object.keys(saucelabsBrowsers) : ['ChromeHeadlessNoSandbox']
 
 module.exports = function(conf) {
   preprocessors[testFiles] = ['rollup']
@@ -45,10 +45,21 @@ module.exports = function(conf) {
     captureTimeout: 300000,
     browserNoActivityTimeout: 300000,
     browserDisconnectTolerance: 2,
-    customLaunchers: saucelabsBrowsers,
+    customLaunchers: Object.assign(
+      {
+        ChromeHeadlessNoSandbox: {
+          base: 'ChromeHeadless',
+          flags: ['--no-sandbox'],
+        }
+      },
+      saucelabsBrowsers
+    ),
     browsers: browsers,
 
-    reporters: ['progress', 'saucelabs'].concat(isSaucelabs ? [] : ['coverage']),
+    reporters: ['saucelabs']
+      .concat(isSaucelabs ? [] : ['coverage'])
+      .concat(isTravis ? [] : 'progress'),
+
     preprocessors: preprocessors,
 
     rollupPreprocessor: {
