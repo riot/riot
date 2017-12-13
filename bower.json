@@ -5,9 +5,7 @@
   "homepage": "http://riotjs.com/",
   "repository": { "type": "git", "url": "git://github.com/riot/riot.git" },
   "authors": [
-    "Gianluca Guarini https://github.com/GianlucaGuarini",
-    "Tsutomu Kawamura https://github.com/cognitom",
-    "Alberto Martínez https://github.com/aMarCruz"
+    "Gianluca Guarini https://github.com/GianlucaGuarini"
   ],
   "license": "MIT",
   "keywords": [

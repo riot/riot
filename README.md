@@ -294,20 +294,10 @@ It's actively maintained by:
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top">
+      <td valign="top">
         <img width="125" height="125" src="https://github.com/GianlucaGuarini.png?s=125?s=125">
         <br>
         <a href="https://github.com/GianlucaGuarini">Gianluca Guarini</a>
-      </td>
-      <td align="center" width="20%" valign="top">
-        <img width="125" height="125" src="https://github.com/cognitom.png?s=125">
-        <br>
-        <a href="https://github.com/cognitom">Tsutomu Kawamura</a>
-      </td>
-      <td align="center" valign="top">
-        <img width="125" height="125" src="https://github.com/aMarCruz.png?s=125">
-        <br>
-        <a href="https://github.com/aMarCruz">Alberto Martínez</a>
       </td>
      </tr>
   </tbody>
