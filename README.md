@@ -295,11 +295,6 @@ It's actively maintained by:
   <tbody>
     <tr>
       <td align="center" valign="top">
-        <img width="125" height="125" src="https://github.com/rsbondi.png?s=125">
-        <br>
-        <a href="https://github.com/rsbondi">Richard Bondi</a>
-      </td>
-      <td align="center" valign="top">
         <img width="125" height="125" src="https://github.com/GianlucaGuarini.png?s=125?s=125">
         <br>
         <a href="https://github.com/GianlucaGuarini">Gianluca Guarini</a>
@@ -313,16 +308,6 @@ It's actively maintained by:
         <img width="125" height="125" src="https://github.com/aMarCruz.png?s=125">
         <br>
         <a href="https://github.com/aMarCruz">Alberto Martínez</a>
-      </td>
-      <td align="center" valign="top">
-        <img width="125" height="125" src="https://github.com/rogueg.png?s=125">
-        <br>
-        <a href="https://github.com/rogueg">Grant Marvin</a>
-      </td>
-      <td align="center" valign="top">
-        <img width="125" height="125" src="https://github.com/tipiirai.png?s=125">
-        <br>
-        <a href="https://github.com/tipiirai">Tero Piirainen</a>
       </td>
      </tr>
   </tbody>

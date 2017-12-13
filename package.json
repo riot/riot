@@ -6,12 +6,9 @@
   "repository": "riot/riot",
   "author": "Riot maintainers team + smart people from all over the world",
   "contributors": [
-    "Richard Bondi https://github.com/rsbondi",
     "Gianluca Guarini https://github.com/GianlucaGuarini",
     "Tsutomu Kawamura https://github.com/cognitom",
-    "Alberto Martínez https://github.com/aMarCruz",
-    "Grant Marvin     https://github.com/rogueg",
-    "Tero Piirainen   https://github.com/tipiirai"
+    "Alberto Martínez https://github.com/aMarCruz"
   ],
   "license": "MIT",
   "engines": {
