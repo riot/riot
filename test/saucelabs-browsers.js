@@ -52,6 +52,7 @@ module.exports = {
     slEdge: {
       base: 'SauceLabs',
       browserName: 'MicrosoftEdge',
+      version: '15',
       platform: 'Windows 10'
     },
     slChrome: {
