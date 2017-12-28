@@ -4,6 +4,7 @@
 ## Simple and elegant component-based UI library
 
 [![Build Status][travis-image]][travis-url]
+[![MIT License][license-image]][license-url]
 [![Riot Forum][riot-forum-image]][riot-forum-url]
 [![Join the chat at https://gitter.im/riot/riot][gitter-image]][gitter-url]
 [![Join the chat (ja) at https://riot-jp-slackin.herokuapp.com/][slack-ja-image]][slack-ja-url]
@@ -12,8 +13,8 @@
 [![NPM version][npm-version-image]][npm-url]
 [![NPM downloads][npm-downloads-image]][npm-url]
 [![jsDelivr Hits][jsdelivr-image]][jsdelivr-url]
-[![MIT License][license-image]][license-url]
 [![Coverage Status][coverage-image]][coverage-url]
+![Riot Size][lib-size]
 [![Code Quality][codeclimate-image]][codeclimate-url]
 
 [![Sauce Test Status][saucelabs-image]][saucelabs-url]
@@ -22,15 +23,17 @@
 
 | Framework                                      | Version         | Minified Size (gzip) |
 |------------------------------------------------|-----------------|----------------------|
-| Ember                                          | 2.16.2          | 122.85kb             |
+| Ember                                          | 2.17.0          | 122.39kb             |
+| @angular/core + Polyfills                      | 5.1.2           | 87.46kb              |
 | Polymer + Web Components Polyfill Lite         | 1.8.0           | 66.3kb               |
-| @angular/core                                  | 5.0.1           | 43.14kb              |
+| React + Map and Set Polyfills                  | 16.1.0          | 41.817kb             |
 | Web Components Polyfill                        | 0.7.24          | 33.68kb              |
-| React                                          | 16.1.0          | 33.43kb              |
-| Vue                                            | 2.5.3           | 31.35kb              |
-| __Riot__                                       | 3.7.4           | 10.38kb              |
-| Inferno                                        | 3.10.1          | 9.19kb               |
+| Vue                                            | 2.5.13          | 31.41kb              |
+| Inferno + Map, Set, WeakMap, Promise Polyfills | 3.10.1          | 25.83kb              |
+| __Riot__                                       | 3.8.0           | 10.36kb              |
 | Preact                                         | 8.2.6           | 3.45kb               |
+
+The above comparison includes polyfills to support old browsers like IE9 that in Riot.js is supported by default
 
 ### Browsers support
 
@@ -361,6 +364,8 @@ Become a sponsor to get your logo on our README. [Become a sponsor][support-url]
 [sponsor-badge]: https://opencollective.com/riot/sponsors/badge.svg?color=blue
 
 [support-url]: https://opencollective.com/riot#support
+
+[lib-size]: http://img.badgesize.io/https://unpkg.com/riot/riot.min.js?compression=gzip
 
 [backers-image]: https://opencollective.com/riot/backers.svg
 [sponsors-image]: https://opencollective.com/riot/sponsors.svg

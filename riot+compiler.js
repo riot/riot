@@ -1,4 +1,4 @@
-/* Riot v3.7.4, @license MIT */
+/* Riot v3.8.0, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define(factory) :
@@ -1870,7 +1870,9 @@ function parseExpressions(root, mustIncludeRoot) {
     }
 
     if (tagImpl && (dom !== root || mustIncludeRoot)) {
-      if(isVirtual && !getAttr(dom, IS_DIRECTIVE)) { // handled in update
+      if(isVirtual) { // handled in update
+        if (getAttr(dom, IS_DIRECTIVE))
+          { throw new Error(("Virtual tags can't be used together with the \"" + IS_DIRECTIVE + "\" attribute")) }
         // can not remove attribute like directives
         // so flag for removal after creation to prevent maximum stack error
         setAttr(dom, 'virtualized', true);
@@ -2235,7 +2237,7 @@ function unregister$1(name) {
   __TAG_IMPL[name] = null;
 }
 
-var version$1 = 'v3.7.4';
+var version$1 = 'v3.8.0';
 
 
 var core = Object.freeze({
@@ -2953,7 +2955,7 @@ var riot$2 = Object.freeze({
 
 /**
  * Compiler for riot custom tags
- * @version v3.2.6
+ * @version v3.4.0
  */
 
 // istanbul ignore next
@@ -3688,6 +3690,7 @@ function compile$1 (src, opts, url) {
   var
     parts = [],
     included,
+    output = src,
     defaultParserptions = {
 
       template: {},
@@ -3707,10 +3710,10 @@ function compile$1 (src, opts, url) {
   var _bp = brackets.array(opts.brackets);
 
   if (opts.template) {
-    src = compileTemplate(src, url, opts.template, opts.parserOptions.template);
+    output = compileTemplate(output, url, opts.template, opts.parserOptions.template);
   }
 
-  src = cleanSource(src)
+  output = cleanSource(output)
     .replace(CUST_TAG, function (_, indent, tagName, attribs, body, body2) {
       var
         jscode = '',
@@ -3791,10 +3794,10 @@ function compile$1 (src, opts, url) {
 
   if (opts.entities) { return parts }
 
-  return src
+  return output
 }
 
-var version$2 = 'v3.2.6';
+var version$2 = 'v3.4.0';
 
 var compiler = {
   compile: compile$1,
