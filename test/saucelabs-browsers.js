@@ -49,10 +49,21 @@ module.exports = {
       platform: 'Windows 7',
       version: '11'
     },
-    slEdge: {
+    slEdge14: {
+      base: 'SauceLabs',
+      browserName: 'MicrosoftEdge',
+      version: '14',
+      platform: 'Windows 10'
+    },
+    slEdge15: {
       base: 'SauceLabs',
       browserName: 'MicrosoftEdge',
       version: '15',
+      platform: 'Windows 10'
+    },
+    slEdge: {
+      base: 'SauceLabs',
+      browserName: 'MicrosoftEdge',
       platform: 'Windows 10'
     },
     slChrome: {
