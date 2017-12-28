@@ -1091,11 +1091,11 @@ describe('Riot core', function() {
 
   })
 
-  it('the class attributes get properly removed in case of falsy values', function() {
+  it('the class attributes get properly removed in case of falsy values', function(done) {
 
     injectHTML('<riot-tmp></riot-tmp>')
 
-    riot.tag('riot-tmp', '<p class="{ foo: isFoo }"></p>', function() {
+    riot.tag('riot-tmp', '<p class="{ foo: isFoo }">foo</p>', function() {
       this.isFoo = true
     })
 
@@ -1103,12 +1103,15 @@ describe('Riot core', function() {
       p = $('p', tag.root)
 
     expect(p.hasAttribute('class')).to.be.equal(true)
-    tag.isFoo = false
-    tag.update()
-    expect(p.hasAttribute('class')).to.be.equal(false)
 
-    tag.unmount()
-
+    // Edge 16 has some race condition issues so we need to defer this check
+    setTimeout(() => {
+      tag.isFoo = false
+      tag.update()
+      expect(p.hasAttribute('class')).to.be.equal(false)
+      tag.unmount()
+      done()
+    }, 100)
   })
 
   it('custom attributes should not be removed if not falsy', function() {
