@@ -1,4 +1,4 @@
-/* Riot v3.7.4, @license MIT */
+/* Riot v3.8.0, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1870,7 +1870,9 @@ function parseExpressions(root, mustIncludeRoot) {
     }
 
     if (tagImpl && (dom !== root || mustIncludeRoot)) {
-      if(isVirtual && !getAttr(dom, IS_DIRECTIVE)) { // handled in update
+      if(isVirtual) { // handled in update
+        if (getAttr(dom, IS_DIRECTIVE))
+          { throw new Error(("Virtual tags can't be used together with the \"" + IS_DIRECTIVE + "\" attribute")) }
         // can not remove attribute like directives
         // so flag for removal after creation to prevent maximum stack error
         setAttr(dom, 'virtualized', true);
@@ -2235,7 +2237,7 @@ function unregister$1(name) {
   __TAG_IMPL[name] = null;
 }
 
-var version$1 = 'v3.7.4';
+var version$1 = 'v3.8.0';
 
 
 var core = Object.freeze({
