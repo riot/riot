@@ -1557,9 +1557,4 @@ describe('Riot core', function() {
       tag.unmount()
     }, 100)
   })
-
-  it('virtual tag with data-is directive are not allowed', function() {
-    riot.tag('riot-tmp', '<virtual data-is="foo">foo</virtual>')
-    expect(function() {riot.mount(document.createElement('div'), 'riot-tmp')}).to.throw
-  })
 })
