@@ -33,7 +33,7 @@
 | __Riot__                                       | 3.8.0           | 10.36kb              |
 | Preact                                         | 8.2.6           | 3.45kb               |
 
-The above comparison includes polyfills to support old browsers like IE9 that is
+The above comparison includes polyfills to support old browsers like IE9 that in Riot.js is supported by default
 
 ### Browsers support
 
