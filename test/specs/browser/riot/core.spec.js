@@ -864,9 +864,13 @@ describe('Riot core', function() {
 
     var tag = riot.mount('input-values')[0]
     expect(tag.refs.i.value).to.be.equal('hi')
-    expect(tag.refs.i.hasAttribute('value')).to.be.false
+    expect(tag.refs.i.hasAttribute('value')).to.be.ok
     tag.update()
     expect(tag.refs.i.value).to.be.equal('foo')
+    expect(tag.refs.i.hasAttribute('value')).to.be.ok
+    tag.message = ''
+    tag.update()
+    expect(tag.refs.i.value).to.be.equal('')
     expect(tag.refs.i.hasAttribute('value')).to.be.false
 
     tag.unmount()
