@@ -1,4 +1,4 @@
-/* Riot v3.8.1, @license MIT */
+/* Riot v3.8.2, @license MIT */
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 	typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1437,7 +1437,9 @@ function updateExpression(expr) {
 
     if (attrName === 'value' && dom.value !== value) {
       dom.value = value;
-    } else if (hasValue && value !== false) {
+    }
+
+    if (hasValue && value !== false) {
       setAttr(dom, attrName, value);
     }
 
@@ -2247,7 +2249,7 @@ function unregister$1(name) {
   __TAG_IMPL[name] = null;
 }
 
-var version$1 = 'v3.8.1';
+var version$1 = 'v3.8.2';
 
 
 var core = Object.freeze({
