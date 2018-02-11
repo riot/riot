@@ -201,8 +201,8 @@ describe('Riot if', function() {
     riot.tag('riot-tmp', `
       <div each="{item, i in items}" if="{item.cond}">{i}</div>
     `, function() {
-        this.items = [{cond: true}, {cond: false}]
-      })
+      this.items = [{cond: true}, {cond: false}]
+    })
     var tag = riot.mount('riot-tmp')[0]
     expectHTML(tag).to.be.equal('<div>0</div>')
     tag.items[1].cond = true
@@ -234,12 +234,12 @@ describe('Riot if', function() {
       <riot-tmp-sub if="{ showChild }"></riot-tmp-sub>
       <button ref="button" onclick="{ toggle }">btn</button>
     `, function() {
-        this.showChild = true
-        this.on('mount', () => {
-          this.update()
-        })
-        this.toggle = () => this.update()
+      this.showChild = true
+      this.on('mount', () => {
+        this.update()
       })
+      this.toggle = () => this.update()
+    })
 
     riot.tag('riot-tmp-sub', '<p>subtag</p>', function() {
       this.on('mount', mountEvent)

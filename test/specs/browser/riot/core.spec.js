@@ -221,9 +221,9 @@ describe('Riot core', function() {
       <option value="2" selected="{v == 2}">2</option>
       <option value="3" selected="{v == 3}">3</option>
     </select>`,
-      function() {
-        this.v = 2
-      })
+    function() {
+      this.v = 2
+    })
 
     var tag = riot.mount('tmp-select-tag')[0]
 
@@ -661,11 +661,11 @@ describe('Riot core', function() {
     riot.tag('riot-tmp', `
       <p>{ flag }<p>
     `, function() {
-        this.flag = true
-        this.on('before-mount', () => {
-          this.flag = false
-        })
+      this.flag = true
+      this.on('before-mount', () => {
+        this.flag = false
       })
+    })
 
     var tag = riot.mount('riot-tmp')[0]
 
@@ -1269,8 +1269,8 @@ describe('Riot core', function() {
       <div ref="{ false }"></div>
       <div ref="{ '' }"></div>
     `, function() {
-        this.expr = 'expr'
-      })
+      this.expr = 'expr'
+    })
 
     var tag = riot.mount('riot-tmp')[0],
       divs = $$('div', tag.root)

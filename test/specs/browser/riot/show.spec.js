@@ -1,4 +1,3 @@
-
 import {
   injectHTML,
   $,
@@ -75,9 +74,9 @@ describe('Riot show/hide', function() {
     riot.tag('riot-tmp', `
       <riot-tmp-sub each="{ item in items }" show="{selected === item}"></riot-tmp-sub>
     `, function() {
-        this.items = ['uno', 'due']
-        this.selected = 'uno'
-      })
+      this.items = ['uno', 'due']
+      this.selected = 'uno'
+    })
     riot.tag('riot-tmp-sub', '<p>{ opts.item }</p>')
     injectHTML('<riot-tmp></riot-tmp>')
 
@@ -95,8 +94,8 @@ describe('Riot show/hide', function() {
     riot.tag('riot-tmp', `
       <riot-tmp-sub show="{number === 1}"></riot-tmp-sub>
     `, function() {
-        this.number = 1
-      })
+      this.number = 1
+    })
     riot.tag('riot-tmp-sub', '<p ref="p" if={number === 2}>{ opts.item }</p>', function() {
       this.number = 2
     })
@@ -114,9 +113,9 @@ describe('Riot show/hide', function() {
         <h1 if='{parent.doIt}'>show</h1>
         <h2 show='{parent.doIt}'>show</h2>
       </riot-tmp-sub>`,
-      function() {
-        this.doIt = true
-      })
+    function() {
+      this.doIt = true
+    })
 
     riot.tag('riot-tmp-sub', '<yield/>')
 
