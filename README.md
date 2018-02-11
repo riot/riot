@@ -29,8 +29,8 @@
 | React + Map and Set Polyfills                  | 16.1.0          | 41.817kb             |
 | Web Components Polyfill                        | 0.7.24          | 33.68kb              |
 | Vue                                            | 2.5.13          | 31.41kb              |
-| Inferno                                        | 4.0.2           | 7.98kb               |
 | __Riot__                                       | 3.8.1           | 10.42kb              |
+| Inferno                                        | 4.0.2           | 7.98kb               |
 | Preact                                         | 8.2.6           | 3.45kb               |
 
 The above comparison includes polyfills to support old browsers like IE9 that in Riot.js is supported by default
