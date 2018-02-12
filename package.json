@@ -87,46 +87,6 @@
   "bin": {
     "riot": "node_modules/riot-cli/lib/index.js"
   },
-  "jspm": {
-    "main": "lib/server/index.js",
-    "format": "cjs",
-    "meta": {
-      "*": {
-        "globals": {
-          "process": "process"
-        }
-      },
-      "*.json": {
-        "format": "json"
-      },
-      "lib/browser/*": {
-        "format": "esm"
-      },
-      "lib/riot+compiler.js": {
-        "format": "esm"
-      },
-      "lib/riot.js": {
-        "format": "esm"
-      },
-      "lib/settings.js": {
-        "format": "esm"
-      },
-      "riot.min.js": {
-        "format": "amd"
-      },
-      "lib/server/index.js": {
-        "deps": [
-          "../../riot"
-        ]
-      }
-    },
-    "map": {
-      "./lib/server": "./lib/server/index.js",
-      "./lib/server/index.js": {
-        "browser": "./riot.js"
-      }
-    }
-  },
   "main": "lib/server/index.js",
   "module": "lib/riot.js",
   "jsnext:main": "lib/riot.js",
