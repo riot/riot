@@ -189,6 +189,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Minimal Flux dispatcher pattern](https://gist.github.com/continuata/c605846751c09a5e94d12ae8c91cbf05)
 - [riot-format: a format library for riotjs, like angular $filter](https://github.com/joylei/riot-format)
 - [riot-view-router: a simple state based router mixin](https://github.com/neetjn/riot-view-router)
+- [riotx - Centralized State Management for riot.js](https://github.com/cam-inc/riotx)
 
 ### Components
 - [Material UI](http://kysonic.github.io/riot-mui/)
