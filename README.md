@@ -182,13 +182,13 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Libraries / Frameworks
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
-- [riotux - Simple Event Controller for Riot.js](https://github.com/luisvinicius167/riotux)
 - [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
 - [Cheftjs - chinese framework for Riot](https://github.com/cheft/cheftjs)
 - [Veronica - flux adaption for Riot](https://www.npmjs.com/package/veronica-x)
 - [Minimal Flux dispatcher pattern](https://gist.github.com/continuata/c605846751c09a5e94d12ae8c91cbf05)
 - [riot-format: a format library for riotjs, like angular $filter](https://github.com/joylei/riot-format)
 - [riot-view-router: a simple state based router mixin](https://github.com/neetjn/riot-view-router)
+- [riotx - Centralized State Management for riot.js](https://github.com/cam-inc/riotx)
 
 ### Components
 - [Material UI](http://kysonic.github.io/riot-mui/)
