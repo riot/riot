@@ -29,7 +29,7 @@
 | React + Map and Set Polyfills                  | 16.1.0          | 41.817kb             |
 | Web Components Polyfill                        | 0.7.24          | 33.68kb              |
 | Vue                                            | 2.5.13          | 31.41kb              |
-| __Riot__                                       | 3.8.1           | 10.42kb              |
+| __Riot__                                       | 3.9.0           | 10.74kb              |
 | Inferno                                        | 4.0.2           | 7.98kb               |
 | Preact                                         | 8.2.6           | 3.45kb               |
 
@@ -182,13 +182,13 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 ### Libraries / Frameworks
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
-- [riotux - Simple Event Controller for Riot.js](https://github.com/luisvinicius167/riotux)
 - [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
 - [Cheftjs - chinese framework for Riot](https://github.com/cheft/cheftjs)
 - [Veronica - flux adaption for Riot](https://www.npmjs.com/package/veronica-x)
 - [Minimal Flux dispatcher pattern](https://gist.github.com/continuata/c605846751c09a5e94d12ae8c91cbf05)
 - [riot-format: a format library for riotjs, like angular $filter](https://github.com/joylei/riot-format)
 - [riot-view-router: a simple state based router mixin](https://github.com/neetjn/riot-view-router)
+- [riotx - Centralized State Management for riot.js](https://github.com/cam-inc/riotx)
 
 ### Components
 - [Material UI](http://kysonic.github.io/riot-mui/)
