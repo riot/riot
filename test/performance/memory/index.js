@@ -5,7 +5,7 @@
  */
 
 var riot = require('../../../dist/riot/riot'),
-  jsdom = require('jsdom').jsdom,
+  jsdom = require('jsdom').JSDOM,
   myComponent = 'my-component',
   myComponentHTML = `
     '<h1>{ opts.title }</h1>',
@@ -96,9 +96,9 @@ function mount() {
 
 
 // Initialize the test
-var doc = jsdom(`<${myComponent}/>`)
+var doc = new jsdom(`<${myComponent}/>`)
 global.window = doc.defaultView
-global.document = window.document
+global.document = doc.window.document
 
 setupTags()
 mount()
