@@ -8,6 +8,9 @@ module.exports = {
     format: 'umd',
     banner: '/* Riot WIP, @license MIT */',
   },
+  onwarn(warning) {
+    if (warning.code === 'CIRCULAR_DEPENDENCY') return
+  },
   plugins: [
     nodeResolve({ jsnext: true, main: true }),
     commonjs({
