@@ -69,11 +69,12 @@ module.exports = function(conf) {
       plugins: [
         require('rollup-plugin-riot')()
       ].concat(require('../config/defaults').plugins),
-      globals: {
-        riot: 'riot'
+      output: {
+        format: 'iife',
+        globals: {
+          riot: 'riot'
+        }
       },
-      format: 'iife'
-      // sourceMap: 'inline' TODO: enable the sourcemaps in the compiler
     },
 
     client: {
