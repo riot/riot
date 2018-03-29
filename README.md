@@ -152,6 +152,9 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot-Redux League Table example](https://github.com/drewmiley/PoolLeague)
 - [Riot vs React vs Ractive Counters using Redux store](https://github.com/drewmiley/ractive-react-riot-redux-counters-example)
 
+### Books
+- [Building Apps with Riot](https://bleedingedgepress.com/building-apps-with-riot/)
+
 ### Tutorials
 - [Building Apps with Riot, ES6 and Webpack](http://blog.srackham.com/posts/riot-es6-webpack-apps/)
 - [Building Apps with Riot, Babel, RiotControl and Webpack](https://github.com/txchen/feplay/tree/gh-pages/riot_webpack)
