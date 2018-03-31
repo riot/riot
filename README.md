@@ -23,15 +23,15 @@
 
 | Framework                                      | Version         | Minified Size (gzip) |
 |------------------------------------------------|-----------------|----------------------|
-| Ember                                          | 2.17.0          | 122.39kb             |
-| @angular/core + Polyfills                      | 5.1.2           | 87.46kb              |
+| Ember                                          | 2.18.2          | 121.84kb             |
+| @angular/core + Polyfills                      | 5.2.9           | 91.06kb              |
 | Polymer + Web Components Polyfill Lite         | 1.8.0           | 66.3kb               |
-| React + Map and Set Polyfills                  | 16.1.0          | 41.817kb             |
+| React + Map and Set Polyfills                  | 16.1.0          | 43.25kb              |
 | Web Components Polyfill                        | 0.7.24          | 33.68kb              |
-| Vue                                            | 2.5.13          | 31.41kb              |
-| __Riot__                                       | 3.9.0           | 10.74kb              |
-| Inferno                                        | 4.0.2           | 7.98kb               |
-| Preact                                         | 8.2.6           | 3.45kb               |
+| Vue                                            | 2.5.16          | 31.64kb              |
+| __Riot__                                       | 3.9.1           | 10.71kb              |
+| Inferno                                        | 5.0.1           | 8.01kb               |
+| Preact                                         | 8.2.7           | 3.45kb               |
 
 The above comparison includes polyfills to support old browsers like IE9 that in Riot.js is supported by default
 
