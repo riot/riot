@@ -1336,16 +1336,26 @@ describe('Riot each not keyed', function() {
 
   it('non looped and conditional virtual tags mount content', function() {
     injectHTML('<virtual-no-loop></virtual-no-loop>')
-    const tag = riot.mount('virtual-no-loop')[0]
+    var tag = riot.mount('virtual-no-loop')[0]
 
     var virts = $$('virtual', tag.root)
     expect(virts.length).to.be.equal(0)
 
-    var p = $('p', tag.root)
-    expect(p.innerHTML).to.be.equal('text')
+    var spans = $$('span', tag.root)
+    var divs = $$('div', tag.root)
+    var ps = $$('p', tag.root)
+    expect(spans.length).to.be.equal(2)
+    expect(divs.length).to.be.equal(2)
+    expect(spans[0].innerHTML).to.be.equal('if works text')
+    expect(divs[0].innerHTML).to.be.equal('yielded text')
+    expect(spans[1].innerHTML).to.be.equal('virtuals yields expression')
+    expect(divs[1].innerHTML).to.be.equal('hello there')
+    expect(ps.length).to.be.equal(1)
+    expect(ps[0].innerHTML).to.be.equal('text')
 
     tag.unmount()
   })
+
 
   it('virtual tags with yielded content function in a loop', function() {
     injectHTML('<virtual-yield-loop></virtual-yield-loop>')
