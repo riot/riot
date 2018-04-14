@@ -1,4 +1,4 @@
-/* Riot v3.9.1, @license MIT */
+/* Riot v3.9.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -9300,10 +9300,10 @@
   }
 
   function unregister(name) {
-    __TAG_IMPL[name] = null;
+    delete __TAG_IMPL[name];
   }
 
-  var version = 'v3.9.1';
+  var version = 'v3.9.2';
 
   var core = /*#__PURE__*/Object.freeze({
     Tag: Tag,
