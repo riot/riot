@@ -212,6 +212,21 @@ describe('Riot core', function() {
     container.parentNode.removeChild(container)
   })
 
+  it('avoid to mount unregistered tags', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', '<p>hello</p>')
+    riot.unregister('riot-tmp')
+
+    const tags = riot.mount('*')
+
+    expect(tags).to.be.have.length(0)
+
+    const node = $('riot-tmp')
+
+    node.parentNode.removeChild(node)
+  })
+
   it('an <option> tag having the attribute "selected" should be the value of the parent <select> tag', function() {
     injectHTML('<tmp-select-tag></tmp-select-tag>')
 
