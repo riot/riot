@@ -124,4 +124,16 @@ describe('Riot each keyed', () => {
 
     tag.unmount()
   })
+
+  it('conditional and loop with strings (issue 2574)', () => {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', '<p ref="letter" each="{ letter in \'string\' }" if="{ /s|t/.test(letter) }">{letter}</p>')
+
+    const [tag] = riot.mount('riot-tmp')
+
+    expect(tag.refs.letter).to.have.length(2)
+
+    tag.unmount()
+  })
 })

@@ -747,6 +747,7 @@ describe('Riot each not keyed', function() {
   it('children in a loop inherit properties from the parent', function() {
     injectHTML('<loop-inherit></loop-inherit>')
     const tag = riot.mount('loop-inherit')[0]
+
     expect(tag.refs.me.opts.nice).to.be.equal(tag.isFun)
     tag.isFun = false
     tag.update()
