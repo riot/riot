@@ -1,4 +1,4 @@
-/* Riot v3.9.2, @license MIT */
+/* Riot v3.9.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -9300,10 +9300,10 @@
   }
 
   function unregister(name) {
-    delete __TAG_IMPL[name];
+    return delete __TAG_IMPL[name]
   }
 
-  var version = 'v3.9.2';
+  var version = 'v3.9.3';
 
   var core = /*#__PURE__*/Object.freeze({
     Tag: Tag,
@@ -9423,7 +9423,6 @@
    * @param   { Object } expr - object containing the keys used to extend the children tags
    * @param   { * } key - value to assign to the new object returned
    * @param   { * } val - value containing the position of the item in the array
-   * @param   { Object } base - prototype object for the new item
    * @returns { Object } - new object containing the values of the original item
    *
    * The variables 'key' and 'val' are arbitrary.
@@ -9431,8 +9430,8 @@
    * and on the expression used on the each tag
    *
    */
-  function mkitem(expr, key, val, base) {
-    var item = base ? create(base) : {};
+  function mkitem(expr, key, val) {
+    var item = {};
     item[expr.key] = key;
     if (expr.pos) { item[expr.pos] = val; }
     return item
@@ -9443,9 +9442,9 @@
    * @param   { Array } items - array containing the current items to loop
    * @param   { Array } tags - array containing all the children tags
    */
-  function unmountRedundant(items, tags) {
+  function unmountRedundant(items, tags, filteredItemsCount) {
     var i = tags.length;
-    var j = items.length;
+    var j = items.length - filteredItemsCount;
 
     while (i > j) {
       i--;
@@ -9598,18 +9597,21 @@
         hasKeys = false;
       }
 
-      if (ifExpr) {
-        items = items.filter(function (item, i) {
-          if (expr.key && !isObject)
-            { return !!csp_tmpl_1(ifExpr, mkitem(expr, item, i, parent)) }
-
-          return !!csp_tmpl_1(ifExpr, extend(create(parent), item))
-        });
-      }
+      // store the amount of filtered items
+      var filteredItemsCount = 0;
 
       // loop all the new items
       each(items, function (_item, i) {
+        i -= filteredItemsCount;
+
         var item = !hasKeys && expr.key ? mkitem(expr, _item, i) : _item;
+
+        // skip this item because it must be filtered
+        if (ifExpr && !csp_tmpl_1(ifExpr, extend(create(parent), item))) {
+          filteredItemsCount ++;
+          return
+        }
+
         var itemId = getItemId(keyAttr, _item, item, hasKeyAttrExpr);
         // reorder only if the items are objects
         var doReorder = mustReorder && typeof _item === T_OBJECT && !hasKeys;
@@ -9676,7 +9678,7 @@
       });
 
       // remove the redundant tags
-      unmountRedundant(items, tags);
+      unmountRedundant(items, tags, filteredItemsCount);
 
       // clone the items array
       oldItems = tmpItems.slice();
