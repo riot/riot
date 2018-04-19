@@ -1,4 +1,4 @@
-/* Riot v3.9.3, @license MIT */
+/* Riot v3.9.4, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -102,7 +102,6 @@
   // Create cache and shortcut to the correct property
   var cssTextProp;
   var byName = {};
-  var remainder = [];
   var needsInject = false;
 
   // skip the following code on the server
@@ -136,8 +135,7 @@
      * @param { String } name - if it's passed we will map the css to a tagname
      */
     add: function add(css, name) {
-      if (name) { byName[name] = css; }
-      else { remainder.push(css); }
+      byName[name] = css;
       needsInject = true;
     },
     /**
@@ -149,10 +147,19 @@
       needsInject = false;
       var style = Object.keys(byName)
         .map(function (k) { return byName[k]; })
-        .concat(remainder).join('\n');
+        .join('\n');
       /* istanbul ignore next */
       if (cssTextProp) { cssTextProp.cssText = style; }
       else { styleNode.innerHTML = style; }
+    },
+
+    /**
+     * Remove a tag style of injected DOM later.
+     * @param {String} name a registered tagname
+     */
+    remove: function remove(name) {
+      delete byName[name];
+      needsInject = true;
     }
   }
 
@@ -1903,7 +1910,7 @@
       if (isFunction(css))
         { fn = css; }
       else
-        { styleManager.add(css); }
+        { styleManager.add(css, name); }
     }
 
     name = name.toLowerCase();
@@ -2051,10 +2058,11 @@
   }
 
   function unregister(name) {
+    styleManager.remove(name);
     return delete __TAG_IMPL[name]
   }
 
-  var version = 'v3.9.3';
+  var version = 'v3.9.4';
 
   var core = /*#__PURE__*/Object.freeze({
     Tag: Tag,
