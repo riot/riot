@@ -227,6 +227,27 @@ describe('Riot core', function() {
     node.parentNode.removeChild(node)
   })
 
+  it('remove style of unregistered tags out of document', function() {
+    injectHTML('<riot-tmp-with-style></riot-tmp-with-style>')
+
+    try {
+      riot.tag('riot-tmp-with-style', '<p>hello</p>', 'riot-tmp-with-style { font-size: 1rem; }')
+
+      riot.mount('*') // ensure <style> updated
+
+      riot.unregister('riot-tmp-with-style')
+
+      riot.mount('*') // ensure <style> updated
+
+      $$('head style').forEach(style => {
+        expect(style.textContent).not.to.contain('riot-tmp-with-style')
+      })
+    } finally {
+      const node = $('riot-tmp-with-style')
+      node.parentNode.removeChild(node)
+    }
+  })
+
   it('an <option> tag having the attribute "selected" should be the value of the parent <select> tag', function() {
     injectHTML('<tmp-select-tag></tmp-select-tag>')
 
