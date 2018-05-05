@@ -21,7 +21,7 @@ module.exports = {
     {
       transform (code) {
         return {
-          code: code.replace(/(export\nvar (brackets|tmpl)|var (observable)) =/g, function(m) {
+          code: code.replace(/(export\nvar (brackets|tmpl)|var (observable)|var (skipRegex)) =/g, function(m) {
             return ['/* istanbul ignore next */', m].join('\n')
           })
         }
