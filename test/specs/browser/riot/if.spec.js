@@ -251,4 +251,26 @@ describe('Riot if', function() {
     expect(mountEvent, 'mount event').to.have.been.calledOnce
     tag.unmount()
   })
+
+  it('nested if in a virtual tag should render properly (issue 2575)', () => {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', `
+      <virtual if="{ cond }">
+        <p if="{ cond2 }">Hello</p>
+      </virtual>
+    `)
+
+    const [tag] = riot.mount('riot-tmp')
+
+    tag.cond = true
+    tag.cond2 = true
+    tag.update()
+    tag.cond = false
+    tag.update()
+    tag.cond = true
+    tag.update()
+    expect($$('p', tag.root)).to.have.length(1)
+    tag.unmount()
+  })
 })
