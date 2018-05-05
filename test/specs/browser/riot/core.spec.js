@@ -971,6 +971,15 @@ describe('Riot core', function() {
     tag.unmount()
   })
 
+  it('opts could be also an observable object (issue 2581)', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+    riot.tag('riot-tmp', '<p>hello</p>')
+    const [tag] = riot.mount('riot-tmp', riot.observable())
+
+    expect(tag.opts.on).to.be.ok
+    tag.unmount()
+  })
+
   it('expressions object attributes get removed once used', function() {
     injectHTML('<top-attributes></top-attributes>')
     var node = document.createElement('top-attributes'),
