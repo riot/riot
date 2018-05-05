@@ -1,4 +1,4 @@
-/* Riot v3.9.4, @license MIT */
+/* Riot v3.9.5, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -53,7 +53,7 @@
     SVG_NS = 'http://www.w3.org/2000/svg',
     XLINK_REGEX = /^xlink:(\w+)/,
 
-    WIN = typeof window === T_UNDEF ? undefined : window,
+    WIN = typeof window === T_UNDEF ? /* istanbul ignore next */ undefined : window,
 
     // special native tags that cannot be treated like the others
     RE_SPECIAL_TAGS = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?|opt(?:ion|group))$/,
@@ -73,7 +73,7 @@
      */
     RE_BOOL_ATTRS = /^(?:disabled|checked|readonly|required|allowfullscreen|auto(?:focus|play)|compact|controls|default|formnovalidate|hidden|ismap|itemscope|loop|multiple|muted|no(?:resize|shade|validate|wrap)?|open|reversed|seamless|selected|sortable|truespeed|typemustmatch)$/,
     // version# for IE 8-11, 0 for others
-    IE_VERSION = (WIN && WIN.document || {}).documentMode | 0;
+    IE_VERSION = (WIN && WIN.document || /* istanbul ignore next */ {}).documentMode | 0;
 
   /**
    * Create a generic DOM node
@@ -9311,7 +9311,7 @@
     return delete __TAG_IMPL[name]
   }
 
-  var version = 'v3.9.4';
+  var version = 'v3.9.5';
 
   var core = /*#__PURE__*/Object.freeze({
     Tag: Tag,
@@ -9566,7 +9566,6 @@
     var isAnonymous = !__TAG_IMPL[tagName];
     var isVirtual = dom.tagName === 'VIRTUAL';
     var oldItems = [];
-    var hasKeys;
 
     // remove the each property from the original tag
     removeAttribute(dom, LOOP_DIRECTIVE);
@@ -9591,6 +9590,7 @@
       var isObject = !isArray(items) && !isString(items);
       var root = placeholder.parentNode;
       var tmpItems = [];
+      var hasKeys = isObject && !!items;
 
       // if this DOM was removed the update here is useless
       // this condition fixes also a weird async issue on IE in our unit test
@@ -9598,11 +9598,7 @@
 
       // object loop. any changes cause full redraw
       if (isObject) {
-        hasKeys = items || false;
-        items = hasKeys ?
-          Object.keys(items).map(function (key) { return mkitem(expr, items[key], key); }) : [];
-      } else {
-        hasKeys = false;
+        items = items ? Object.keys(items).map(function (key) { return mkitem(expr, items[key], key); }) : [];
       }
 
       // store the amount of filtered items
@@ -9622,7 +9618,7 @@
 
         var itemId = getItemId(keyAttr, _item, item, hasKeyAttrExpr);
         // reorder only if the items are objects
-        var doReorder = mustReorder && typeof _item === T_OBJECT && !hasKeys;
+        var doReorder = mustReorder && typeof _item === T_OBJECT;
         var oldPos = oldItems.indexOf(itemId);
         var isNew = oldPos === -1;
         var pos = !isNew && doReorder ? oldPos : i;
@@ -9792,12 +9788,7 @@
         this.stub.parentNode.insertBefore(this.current, this.stub);
         this.expressions = parseExpressions.apply(this.tag, [this.current, true]);
       } else if (!this.value && this.current) { // remove
-        unmountAll(this.expressions);
-        if (this.current._tag) {
-          this.current._tag.unmount();
-        } else if (this.current.parentNode) {
-          this.current.parentNode.removeChild(this.current);
-        }
+        this.unmount();
         this.current = null;
         this.expressions = [];
       }
@@ -9805,6 +9796,14 @@
       if (this.value) { update.call(this.tag, this.expressions); }
     },
     unmount: function unmount() {
+      if (this.current) {
+        if (this.current._tag) {
+          this.current._tag.unmount();
+        } else if (this.current.parentNode) {
+          this.current.parentNode.removeChild(this.current);
+        }
+      }
+
       unmountAll(this.expressions || []);
     }
   }
