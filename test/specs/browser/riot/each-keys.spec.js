@@ -136,4 +136,32 @@ describe('Riot each keyed', () => {
 
     tag.unmount()
   })
+
+  it('object loop should unmount child nodes properly (issue 2580)', () => {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp-sub', '<div>{opts.identifier}</div>', function(opts) {
+      this.id = opts.identifier
+    })
+
+    riot.tag('riot-tmp', '<riot-tmp-sub key="{ item.id }" each="{item in items}" ref="children" identifier="{ item.id }" />', function() {
+      this.items = {
+        1: { id: 1 },
+        2: { id: 2 },
+        3: { id: 3 },
+      }
+    })
+
+    const [tag] = riot.mount('riot-tmp')
+    const [firstTag, secondTag, thirdTag] = tag.refs.children // eslint-disable-line
+
+    delete tag.items[2]
+
+    tag.update()
+
+    expect(firstTag._riot_id).to.be.equal(tag.refs.children[0]._riot_id)
+    expect(thirdTag._riot_id).to.be.equal(tag.refs.children[1]._riot_id)
+
+    tag.unmount()
+  })
 })
