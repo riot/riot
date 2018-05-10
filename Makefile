@@ -112,7 +112,9 @@ bump:
 	# grab all latest changes to master
 	# (if there's any uncommited changes, it will stop here)
 	# bump version in *.json files
+	@ mv package-lock.json package-lock.tmp
 	@ sed -i '' 's/\("version": "\)[^"]*/\1'$(VERSION)'/' *.json
+	@ mv package-lock.tmp package-lock.json
 	@ make build
 	@ git status --short
 
