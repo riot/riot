@@ -1,4 +1,4 @@
-/* Riot v3.9.5, @license MIT */
+/* Riot v3.10.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -2063,7 +2063,7 @@
     return delete __TAG_IMPL[name]
   }
 
-  var version = 'v3.9.5';
+  var version = 'v3.10.0';
 
   var core = /*#__PURE__*/Object.freeze({
     Tag: Tag,
@@ -2881,7 +2881,7 @@
     if ( conf === void 0 ) conf = {};
 
     var tag = conf.context || {};
-    var opts = extend({}, conf.opts);
+    var opts = conf.opts || {};
     var parent = conf.parent;
     var isLoop = conf.isLoop;
     var isAnonymous = !!conf.isAnonymous;
@@ -2893,20 +2893,26 @@
     var instAttrs = [];
     // expressions on this type of Tag
     var implAttrs = [];
+    var tmpl = impl.tmpl;
     var expressions = [];
     var root = conf.root;
     var tagName = conf.tagName || getName(root);
     var isVirtual = tagName === 'virtual';
-    var isInline = !isVirtual && !impl.tmpl;
+    var isInline = !isVirtual && !tmpl;
     var dom;
+
+    if (isInline || isLoop && isAnonymous) {
+      dom = root;
+    } else {
+      if (!isVirtual) { root.innerHTML = ''; }
+      dom = mkdom(tmpl, innerHTML, isSvg(root));
+    }
 
     // make this tag observable
     if (!skipAnonymous) { observable(tag); }
+
     // only call unmount if we have a valid __TAG_IMPL (has name property)
     if (impl.name && root._tag) { root._tag.unmount(true); }
-
-    // not yet mounted
-    define(tag, 'isMounted', false);
 
     define(tag, '__', {
       impl: impl,
@@ -2932,34 +2938,35 @@
       head: null
     });
 
-    // create a unique id to this tag
-    // it could be handy to use it also to improve the virtual dom rendering speed
-    define(tag, '_riot_id', uid()); // base 1 allows test !t._riot_id
-    define(tag, 'root', root);
-    extend(tag, { opts: opts }, item);
-    // protect the "tags" and "refs" property from being overridden
-    define(tag, 'parent', parent || null);
-    define(tag, 'tags', {});
-    define(tag, 'refs', {});
+    // tag protected properties
+    return [
+      ['isMounted', false],
+      // create a unique id to this tag
+      // it could be handy to use it also to improve the virtual dom rendering speed
+      ['_riot_id', uid()],
+      ['root', root],
+      ['opts', opts, { writable: true, enumerable: true }],
+      ['parent', parent || null],
+      // protect the "tags" and "refs" property from being overridden
+      ['tags', {}],
+      ['refs', {}],
+      ['update', function (data) { return componentUpdate(tag, data, expressions); }],
+      ['mixin', function () {
+        var mixins = [], len = arguments.length;
+        while ( len-- ) mixins[ len ] = arguments[ len ];
 
-    if (isInline || isLoop && isAnonymous) {
-      dom = root;
-    } else {
-      if (!isVirtual) { root.innerHTML = ''; }
-      dom = mkdom(impl.tmpl, innerHTML, isSvg(root));
-    }
+        return componentMixin.apply(void 0, [ tag ].concat( mixins ));
+    }],
+      ['mount', function () { return componentMount(tag, dom, expressions, opts); }],
+      ['unmount', function (mustKeepRoot) { return tagUnmount(tag, mustKeepRoot, expressions); }]
+    ].reduce(function (acc, ref) {
+      var key = ref[0];
+      var value = ref[1];
+      var opts = ref[2];
 
-    define(tag, 'update', function (data) { return componentUpdate(tag, data, expressions); });
-    define(tag, 'mixin', function () {
-      var mixins = [], len = arguments.length;
-      while ( len-- ) mixins[ len ] = arguments[ len ];
-
-      return componentMixin.apply(void 0, [ tag ].concat( mixins ));
-    });
-    define(tag, 'mount', function () { return componentMount(tag, dom, expressions, opts); });
-    define(tag, 'unmount', function (mustKeepRoot) { return tagUnmount(tag, mustKeepRoot, expressions); });
-
-    return tag
+      define(tag, key, value, opts);
+      return acc
+    }, extend(tag, item))
   }
 
   /**

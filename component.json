@@ -1,6 +1,6 @@
 {
   "name": "riot",
-  "version": "3.9.5",
+  "version": "3.10.0",
   "description": "Simple and elegant component-based UI library",
   "repository": "riot/riot",
   "license": "MIT",
