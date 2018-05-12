@@ -1,5 +1,5 @@
 
-[![Riot logo](http://riotjs.com/img/logo/riot480x.png)](http://riotjs.com/)
+[![Riot logo](https://riot.js.org/img/logo/riot480x.png)](https://riot.js.org)
 
 ## Simple and elegant component-based UI library
 
@@ -311,7 +311,7 @@ It's actively maintained by:
 
 ## Official Website
 
-http://riotjs.com/
+https://riot.js.org
 
 ## Backers
 
