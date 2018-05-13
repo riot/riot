@@ -1,5 +1,5 @@
 
-[![Riot logo](http://riotjs.com/img/logo/riot480x.png)](http://riotjs.com/)
+[![Riot logo](http://riot.js.org/img/logo/riot480x.png)](http://riot.js.org/)
 
 ## Simple and elegant component-based UI library
 
@@ -73,7 +73,7 @@ Riot brings custom tags to all modern browsers. Think React + Polymer but with e
 </timer>
 ```
 
-[Open this example on Plunker](http://riotjs.com/examples/plunker/?app=timer)
+[Open this example on Plunker](http://riot.js.org/examples/plunker/?app=timer)
 
 #### Mounting
 
@@ -112,7 +112,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 
 ### Use your dearest language and tools
-- Create tags with CoffeeScript, Jade, LiveScript, Typescript, ES6 or [any pre-processor](http://riotjs.com/guide/compiler/#pre-processors) you want.
+- Create tags with CoffeeScript, Jade, LiveScript, Typescript, ES6 or [any pre-processor](http://riot.js.org/guide/compiler/#pre-processors) you want.
 - Integrate with NPM, CommonJS, AMD, Bower or Component
 - Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot), [Wintersmith](https://github.com/collingreen/wintersmith-riot), [webpack*](https://github.com/riot/tag-loader), [Rollup*](https://github.com/riot/rollup-plugin-riot), [Browserify*](https://github.com/riot/riotify), [Babel*](https://github.com/riot/babel-preset-es2015-riot) or Bublé
 - Test with [Karma*](https://github.com/riot/karma-riot), Mocha or whatever you like
@@ -311,7 +311,7 @@ It's actively maintained by:
 
 ## Official Website
 
-http://riotjs.com/
+http://riot.js.org/
 
 ## Backers
 
@@ -337,7 +337,7 @@ Become a sponsor to get your logo on our README. [Become a sponsor][support-url]
 [npm-url]:https://npmjs.org/package/riot
 
 [riot-forum-image]:https://img.shields.io/badge/muut-JOIN_FORUM%E2%86%92-ff0044.svg?style=flat-square
-[riot-forum-url]:http://riotjs.com/forum/
+[riot-forum-url]:http://riot.js.org/forum/
 
 [coverage-image]:https://img.shields.io/coveralls/riot/riot/dev.svg?style=flat-square
 [coverage-url]:https://coveralls.io/r/riot/riot?branch=dev

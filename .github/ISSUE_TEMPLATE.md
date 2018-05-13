@@ -14,7 +14,7 @@ Your issue might be labeled as `invalid` and eventually closed if:
 2. Can you reproduce the issue?
 
   Post the link using one of our bug report templates:
-  - [Bug Report Template](http://riotjs.com/examples/plunker/?app=bug-reporter) on plnkr (preferred)
+  - [Bug Report Template](http://riot.js.org/examples/plunker/?app=bug-reporter) on plnkr (preferred)
   - [Bug Report Template](http://jsfiddle.net/gianlucaguarini/86m9uepL/) on jsFiddle
 
 3. On which browser/OS does the issue appear?

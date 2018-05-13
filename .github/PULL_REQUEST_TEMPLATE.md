@@ -10,7 +10,7 @@
 2. Can you provide an example of your patch in use?
 
   Post the link using one of our bug report templates:
-  - [Bug Report Template](http://riotjs.com/examples/plunker/?app=bug-reporter) on plnkr (preferred)
+  - [Bug Report Template](http://riot.js.org/examples/plunker/?app=bug-reporter) on plnkr (preferred)
   - [Bug Report Template](http://jsfiddle.net/gianlucaguarini/86m9uepL/) on jsFiddle
 
 
