@@ -1543,6 +1543,29 @@ describe('Riot each not keyed', function() {
     tag.unmount()
   })
 
+  it('objects iterations without any "key" attribute will avoid unecessary rerender (issue #2585)', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', '<p ref="p" each="{ items }"></p>', function() {
+      this.items = {
+        a: {},
+        b: {},
+        c: {},
+        d: {}
+      }
+    })
+    const tag = riot.mount('riot-tmp')[0]
+    const ps = tag.refs.p
+
+    ps[0].setAttribute('hello', 'world')
+    tag.items = Object.assign({}, tag.items)
+    tag.update()
+
+    expect(ps[0].getAttribute('hello')).to.be.equal('world')
+
+    tag.unmount()
+  })
+
 /*
   TODO: nested refs and tags should be in sync
   it('nested tags get properly moved', function() {
