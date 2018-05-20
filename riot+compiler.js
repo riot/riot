@@ -1,4 +1,4 @@
-/* Riot v3.10.0, @license MIT */
+/* Riot v3.10.1, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1400,6 +1400,17 @@
     return el
   }
 
+  var EVENT_ATTR_RE = /^on/;
+
+  /**
+   * True if the event attribute starts with 'on'
+   * @param   { String } attribute - event attribute
+   * @returns { Boolean }
+   */
+  function isEventAttribute(attribute) {
+    return EVENT_ATTR_RE.test(attribute)
+  }
+
   /**
    * Loop backward all the parents tree to detect the first custom parent tag
    * @param   { Object } tag - a Tag instance
@@ -1745,15 +1756,19 @@
       return
     }
 
-
-    // event handler
-    if (isFunction(value)) {
-      setEventHandler(attrName, value, dom, this);
+    switch (true) {
+    // handle events binding
+    case isFunction(value):
+      if (isEventAttribute(attrName)) {
+        setEventHandler(attrName, value, dom, this);
+      }
+      break
     // show / hide
-    } else if (isToggle) {
+    case isToggle:
       toggleVisibility(dom, attrName === HIDE_DIRECTIVE ? !value : value);
+      break
     // handle attributes
-    } else {
+    default:
       if (expr.bool) {
         dom[attrName] = value;
       }
@@ -2063,7 +2078,7 @@
     return delete __TAG_IMPL[name]
   }
 
-  var version = 'v3.10.0';
+  var version = 'v3.10.1';
 
   var core = /*#__PURE__*/Object.freeze({
     Tag: Tag,
@@ -2369,15 +2384,16 @@
         }
 
         var itemId = getItemId(keyAttr, _item, item, hasKeyAttrExpr);
-        // reorder only if the items are objects
-        var doReorder = mustReorder && typeof _item === T_OBJECT;
+        // reorder only if the items are not objects
+        // or a key attribute has been provided
+        var doReorder = !isObject && mustReorder && typeof _item === T_OBJECT || keyAttr;
         var oldPos = oldItems.indexOf(itemId);
         var isNew = oldPos === -1;
         var pos = !isNew && doReorder ? oldPos : i;
         // does a tag exist in this position?
         var tag = tags[pos];
         var mustAppend = i >= oldItems.length;
-        var mustCreate =  doReorder && isNew || !doReorder && !tag;
+        var mustCreate = doReorder && isNew || !doReorder && !tag;
 
         // new tag
         if (mustCreate) {
