@@ -1558,7 +1558,7 @@ describe('Riot each not keyed', function() {
     const ps = tag.refs.p
 
     ps[0].setAttribute('hello', 'world')
-    tag.items = Object.assign({}, tag.items)
+    tag.items = riot.util.misc.extend({}, tag.items)
     tag.update()
 
     expect(ps[0].getAttribute('hello')).to.be.equal('world')
