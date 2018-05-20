@@ -1543,7 +1543,7 @@ describe('Riot each not keyed', function() {
     tag.unmount()
   })
 
-  it('objects iterations without any "key" attribute will avoid unecessary rerender (issue #2585)', function() {
+  it('objects iterations without any "key" attribute will not trigger unecessary rerenders (issue #2585)', function() {
     injectHTML('<riot-tmp></riot-tmp>')
 
     riot.tag('riot-tmp', '<p ref="p" each="{ items }"></p>', function() {
