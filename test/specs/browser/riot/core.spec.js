@@ -1602,4 +1602,23 @@ describe('Riot core', function() {
       tag.unmount()
     }, 100)
   })
+
+  it('avoid to bind wrong named events handlers (issue #2592)', function() {
+    const click = sinon.spy()
+
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', '<p ref="p" click="{onClick}"></p>',function() {
+      this.onClick = click
+    })
+
+    const tag = riot.mount('riot-tmp')[0]
+    const p = tag.refs.p
+
+    fireEvent(p, 'click')
+
+    expect(click).to.have.not.been.called
+
+    tag.unmount()
+  })
 })
