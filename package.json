@@ -52,12 +52,12 @@
     "chai": "^4.1.2",
     "cheerio": "^1.0.0-rc.2",
     "chokidar-cli": "^1.2.0",
-    "coveralls": "^3.0.0",
+    "coveralls": "^3.0.1",
     "eslint": "^4.19.1",
     "eslint-config-riot": "^1.0.0",
     "glob": "^7.1.2",
     "istanbul": "^0.4.5",
-    "jsdom": "^11.7.0",
+    "jsdom": "^11.10.0",
     "karma": "^2.0.2",
     "karma-chrome-launcher": "^2.2.0",
     "karma-coverage": "^1.1.2",
@@ -73,7 +73,7 @@
     "rollup-plugin-riot": "^2.0.0",
     "sinon": "^4.5.0",
     "sinon-chai": "^3.0.0",
-    "uglify-js": "^3.3.20"
+    "uglify-js": "^3.3.25"
   },
   "preferGlobal": true,
   "files": [
