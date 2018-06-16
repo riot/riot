@@ -1566,6 +1566,25 @@ describe('Riot each not keyed', function() {
     tag.unmount()
   })
 
+  it('the same object can be properly re-added to a collection (issue #2600)', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    const item = {}
+
+    riot.tag('riot-tmp', '<p ref="p" each="{ items }">hello</p>', function() {
+      this.items = [item]
+    })
+
+    const tag = riot.mount('riot-tmp')[0]
+
+    tag.items.push(item)
+    tag.update()
+
+    expect(tag.refs.p).to.have.length(2)
+
+    tag.unmount()
+  })
+
 /*
   TODO: nested refs and tags should be in sync
   it('nested tags get properly moved', function() {
