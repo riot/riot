@@ -1,4 +1,4 @@
-/* Riot v3.10.1, @license MIT */
+/* Riot v3.10.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -9326,7 +9326,7 @@
     return delete __TAG_IMPL[name]
   }
 
-  var version = 'v3.10.1';
+  var version = 'v3.10.2';
 
   var core = /*#__PURE__*/Object.freeze({
     Tag: Tag,
@@ -9641,7 +9641,7 @@
         // does a tag exist in this position?
         var tag = tags[pos];
         var mustAppend = i >= oldItems.length;
-        var mustCreate = doReorder && isNew || !doReorder && !tag;
+        var mustCreate = doReorder && isNew || !doReorder && !tag || !tags[i];
 
         // new tag
         if (mustCreate) {

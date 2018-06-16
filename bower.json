@@ -1,6 +1,6 @@
 {
   "name": "riot",
-  "version": "3.10.1",
+  "version": "3.10.2",
   "description": "Simple and elegant component-based UI library",
   "homepage": "http://riot.js.org/",
   "repository": { "type": "git", "url": "git://github.com/riot/riot.git" },
