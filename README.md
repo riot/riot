@@ -326,6 +326,13 @@ Become a sponsor to get your logo on our README. [Become a sponsor][support-url]
 
 [![Sponsors][sponsors-image]][support-url]
 
+## Thanks
+
+Special thanks to Browserstack for their support
+
+<a href='https://www.browserstack.com/'>
+  <img width='70px' src="https://cdn.worldvectorlogo.com/logos/browserstack.svg" alt="browser stack">
+</a>
 
 [travis-image]:https://img.shields.io/travis/riot/riot.svg?style=flat-square
 [travis-url]:https://travis-ci.org/riot/riot
