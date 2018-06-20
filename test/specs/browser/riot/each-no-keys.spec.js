@@ -1585,6 +1585,22 @@ describe('Riot each not keyed', function() {
     tag.unmount()
   })
 
+
+  it('All the items indexes are incrementally generated also in case of if statements in a loop (issue #2603)', function() {
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.tag('riot-tmp', '<p ref="p" each="{ item, i in items }" if="{ i !== 0 }">{i}</p>', function() {
+      this.items = [{}, {}, {}]
+    })
+
+    const tag = riot.mount('riot-tmp')[0]
+
+    expect(tag.refs.p[0].innerHTML).to.be.equal('1')
+    expect(tag.refs.p[1].innerHTML).to.be.equal('2')
+
+    tag.unmount()
+  })
+
 /*
   TODO: nested refs and tags should be in sync
   it('nested tags get properly moved', function() {
