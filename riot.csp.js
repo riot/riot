@@ -1,4 +1,4 @@
-/* Riot v3.10.1, @license MIT */
+/* Riot v3.10.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -9326,7 +9326,7 @@
     return delete __TAG_IMPL[name]
   }
 
-  var version = 'v3.10.1';
+  var version = 'v3.10.3';
 
   var core = /*#__PURE__*/Object.freeze({
     Tag: Tag,
@@ -9620,10 +9620,9 @@
       var filteredItemsCount = 0;
 
       // loop all the new items
-      each(items, function (_item, i) {
-        i -= filteredItemsCount;
-
-        var item = !hasKeys && expr.key ? mkitem(expr, _item, i) : _item;
+      each(items, function (_item, index) {
+        var i = index - filteredItemsCount;
+        var item = !hasKeys && expr.key ? mkitem(expr, _item, index) : _item;
 
         // skip this item because it must be filtered
         if (ifExpr && !csp_tmpl_1(ifExpr, extend(create(parent), item))) {
@@ -9641,7 +9640,7 @@
         // does a tag exist in this position?
         var tag = tags[pos];
         var mustAppend = i >= oldItems.length;
-        var mustCreate = doReorder && isNew || !doReorder && !tag;
+        var mustCreate = doReorder && isNew || !doReorder && !tag || !tags[i];
 
         // new tag
         if (mustCreate) {

@@ -1,4 +1,4 @@
-/* Riot v3.10.1, @license MIT */
+/* Riot v3.10.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -2078,7 +2078,7 @@
     return delete __TAG_IMPL[name]
   }
 
-  var version = 'v3.10.1';
+  var version = 'v3.10.3';
 
   var core = /*#__PURE__*/Object.freeze({
     Tag: Tag,
@@ -2372,10 +2372,9 @@
       var filteredItemsCount = 0;
 
       // loop all the new items
-      each(items, function (_item, i) {
-        i -= filteredItemsCount;
-
-        var item = !hasKeys && expr.key ? mkitem(expr, _item, i) : _item;
+      each(items, function (_item, index) {
+        var i = index - filteredItemsCount;
+        var item = !hasKeys && expr.key ? mkitem(expr, _item, index) : _item;
 
         // skip this item because it must be filtered
         if (ifExpr && !tmpl(ifExpr, extend(create(parent), item))) {
@@ -2393,7 +2392,7 @@
         // does a tag exist in this position?
         var tag = tags[pos];
         var mustAppend = i >= oldItems.length;
-        var mustCreate = doReorder && isNew || !doReorder && !tag;
+        var mustCreate = doReorder && isNew || !doReorder && !tag || !tags[i];
 
         // new tag
         if (mustCreate) {
@@ -3085,7 +3084,7 @@
 
   /**
    * Compiler for riot custom tags
-   * @version v3.4.0
+   * @version v3.5.1
    */
 
   // istanbul ignore next
@@ -3523,7 +3522,7 @@
 
       html = html.trim().replace(/\s+/g, ' ');
 
-      if (p.length) { html = html.replace(/\u0002/g, function () { return p.shift() }); }
+      if (p.length) { html = html.replace(/\u0002/g, function () { return p.shift() }); } // eslint-disable-line
     }
 
     if (opts.compact) { html = html.replace(HTML_PACK, '><$1'); }
@@ -3933,7 +3932,7 @@
     return output
   }
 
-  var version$2 = 'v3.4.0';
+  var version$2 = 'v3.5.1';
 
   var compiler = {
     compile: compile,
