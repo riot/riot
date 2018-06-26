@@ -209,6 +209,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [riot-animate](https://github.com/sartaj/riot-animate)
 - [Nest UI](https://github.com/fengzilong/Nest) - [(Demo)](https://fengzilong.github.io/Nest/)
 - [rGrid](https://github.com/limodou/rgrid) - [(Demo)](https://limodou.github.io/rgrid/examples.html)
+- [typewriter](https://github.com/amitguptagwl/web-snippets/tree/master/riotjs-components/typewriter) - [(Demo)](http://amitkumargupta.work)
 
 ### Resources
 - [create-riot-app](https://github.com/alexstep/create-riot-app-ejected) dev environment
