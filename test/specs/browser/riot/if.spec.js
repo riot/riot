@@ -12,6 +12,7 @@ import '../../../tag/nested-child.tag'
 import '../../../tag/if-unmount.tag'
 import '../../../tag/named-unmount.tag'
 import '../../../tag/bug-2229.tag'
+import '../../../tag/bug-2609.tag'
 
 describe('Riot if', function() {
   it('child tags are only rendered when if-condition is truthy', function() {
@@ -271,6 +272,16 @@ describe('Riot if', function() {
     tag.cond = true
     tag.update()
     expect($$('p', tag.root)).to.have.length(1)
+    tag.unmount()
+  })
+
+  it('nested if should not cause race condition rendering issues (issue 2609)', () => {
+    injectHTML('<bug-2609></bug-2609>')
+
+    const [tag] = riot.mount('bug-2609')
+
+    expect(tag.onClick).to.not.throw()
+
     tag.unmount()
   })
 })
