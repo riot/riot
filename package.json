@@ -76,8 +76,13 @@
     "uglify-js": "^3.3.25"
   },
   "preferGlobal": true,
+  "directories": {
+    "bin": "bin",
+    "lib": "lib"
+  },
   "files": [
     "lib",
+    "bin",
     "riot.js",
     "riot.min.js",
     "riot.csp.js",
