@@ -1,4 +1,4 @@
-/* Riot v3.10.3, @license MIT */
+/* Riot v3.11.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -2078,7 +2078,7 @@
     return delete __TAG_IMPL[name]
   }
 
-  var version = 'v3.10.3';
+  var version = 'v3.11.0';
 
   var core = /*#__PURE__*/Object.freeze({
     Tag: Tag,
@@ -2549,6 +2549,8 @@
     },
     update: function update$$1() {
       this.value = tmpl(this.expr, this.tag);
+
+      if (!this.stub.parentNode) { return }
 
       if (this.value && !this.current) { // insert
         this.current = this.pristine.cloneNode(true);
