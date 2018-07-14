@@ -40,7 +40,7 @@
     "riot.js"
   ],
   "dependencies": {
-    "riot-cli": "^4.0.1",
+    "riot-cli": "^4.0.2",
     "riot-compiler": "^3.5.1",
     "riot-observable": "^3.0.0",
     "riot-tmpl": "^3.0.8",
@@ -85,7 +85,7 @@
     "riot+compiler.min.js"
   ],
   "bin": {
-    "riot": "node_modules/riot-cli/lib/index.js"
+    "riot": "bin/index.js"
   },
   "main": "lib/server/index.js",
   "module": "lib/riot.js",
