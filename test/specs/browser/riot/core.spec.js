@@ -1621,4 +1621,18 @@ describe('Riot core', function() {
 
     tag.unmount()
   })
+
+  it('does not attempt to makeReplaceVirtual when parentNode no longer exists in DOM (issue 2614)', function () {
+    riot.tag('riot-unmountable', '<virtual ref="virtual">Hi</virtual>')
+    injectHTML('<riot-unmountable></riot-unmountable>')
+    const tag = riot.mount('riot-unmountable')[0]
+    const virt = tag.refs.virtual
+
+    // unmount the tag; virt.root.parentNode will now be null
+    tag.unmount()
+    riot.util.tags.makeReplaceVirtual(virt, virt.root)
+
+    // getting to this point proves makeReplaceVirtual returned early (i.e., did not error)
+    expect(true).to.be.true
+  })
 })
