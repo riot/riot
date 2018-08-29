@@ -1,4 +1,4 @@
-/* Riot v3.11.1, @license MIT */
+/* Riot v3.11.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1578,6 +1578,7 @@
    * @param { ref } the dom reference location
    */
   function makeReplaceVirtual(tag, ref) {
+    if (!ref.parentNode) { return }
     var frag = createFragment();
     makeVirtual.call(tag, frag);
     ref.parentNode.replaceChild(frag, ref);
@@ -2078,7 +2079,7 @@
     return delete __TAG_IMPL[name]
   }
 
-  var version = 'v3.11.1';
+  var version = 'v3.11.2';
 
   var core = /*#__PURE__*/Object.freeze({
     Tag: Tag,
