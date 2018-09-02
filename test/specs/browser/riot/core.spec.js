@@ -1635,4 +1635,19 @@ describe('Riot core', function() {
     // getting to this point proves makeReplaceVirtual returned early (i.e., did not error)
     expect(true).to.be.true
   })
+
+  it('make sure options will be not shared between components via riot.mount (issue 2613)', function () {
+    injectHTML('<riot-tmp title="Bar"></riot-tmp>')
+    injectHTML('<riot-tmp></riot-tmp>')
+    riot.tag('riot-tmp', '{opts.title}')
+
+    const tags = riot.mount('riot-tmp', function() {
+      return { title: 'Baz' }
+    })
+
+    expect(tags[0].opts.title).to.be.equal('Bar')
+    expect(tags[1].opts.title).to.be.equal('Baz')
+
+    tags.forEach(tag => tag.unmount())
+  })
 })
