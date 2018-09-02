@@ -30,7 +30,7 @@
 | React + Map and Set Polyfills                  | 16.4.0          | 41.60kb              |
 | Web Components Polyfill                        | 0.7.24          | 33.68kb              |
 | Vue                                            | 2.5.17          | 31.65kb              |
-| __Riot__                                       | 3.11.2          | 10.79kb              |
+| __Riot__                                       | 3.12.0          | 10.80kb              |
 | Inferno                                        | 5.4.2           | 7.79kb               |
 | Preact                                         | 8.3.1           | 3.48kb               |
 
