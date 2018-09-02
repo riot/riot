@@ -1,4 +1,4 @@
-/* Riot v3.11.2, @license MIT */
+/* Riot v3.12.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1974,7 +1974,11 @@
           setAttribute(root, IS_DIRECTIVE, tagName);
         }
 
-        tag = mount$1(root, riotTag || root.tagName.toLowerCase(), opts);
+        tag = mount$1(
+          root,
+          riotTag || root.tagName.toLowerCase(),
+          isFunction(opts) ? opts() : opts
+        );
 
         if (tag)
           { tags.push(tag); }
@@ -1985,7 +1989,7 @@
     // inject styles into DOM
     styleManager.inject();
 
-    if (isObject(tagName)) {
+    if (isObject(tagName) || isFunction(tagName)) {
       opts = tagName;
       tagName = 0;
     }
@@ -2079,7 +2083,7 @@
     return delete __TAG_IMPL[name]
   }
 
-  var version = 'v3.11.2';
+  var version = 'v3.12.0';
 
   var core = /*#__PURE__*/Object.freeze({
     Tag: Tag,
