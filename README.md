@@ -185,6 +185,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 
 ### Libraries / Frameworks
+- [EdenJS - MVC Application Framework with Riot](https://github.com/eden-js/eden)
 - [Flux- like event controller for Riot](https://github.com/jimsparkman/RiotControl)
 - [flux-riot framework](https://github.com/mingliangfeng/flux-riot)
 - [Cheftjs - chinese framework for Riot](https://github.com/cheft/cheftjs)
