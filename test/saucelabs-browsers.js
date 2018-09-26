@@ -11,20 +11,20 @@ module.exports = {
       browserName: 'iphone',
       version: '10.3'
     },
-    slSafari7: {
-      base: 'SauceLabs',
-      browserName: 'safari',
-      platform: 'OS X 10.9'
-    },
     slSafari8: {
       base: 'SauceLabs',
       browserName: 'safari',
       platform: 'OS X 10.10'
     },
-    slSafari9: {
+    slSafari10: {
       base: 'SauceLabs',
       browserName: 'safari',
       platform: 'OS X 10.11'
+    },
+    slSafari11: {
+      base: 'SauceLabs',
+      browserName: 'safari',
+      platform: 'OS X 10.13'
     },
     slIE9: {
       base: 'SauceLabs',
