@@ -43,6 +43,7 @@ import '../../../tag/update-context.tag'
 import '../../../tag/dynamic-virtual.tag'
 import '../../../tag/multiple-select.tag'
 import '../../../tag/dynamic-nested.tag'
+import '../../../tag/dont-remove-attr-with-empty-string-vals.tag'
 
 describe('Riot core', function() {
   it('Riot exists', function () {
@@ -1649,5 +1650,15 @@ describe('Riot core', function() {
     expect(tags[1].opts.title).to.be.equal('Baz')
 
     tags.forEach(tag => tag.unmount())
+  })
+
+  it('Dont remove attributes with empty string as the value (#2629', function(){
+    injectHTML('<the-tag></the-tag>')
+    const tag = riot.mount('the-tag')[0]
+    tag.update()
+    expect(tag.refs.option.childNodes[2].getAttribute('value')).to.be.equal('')
+    expect(tag.refs.check[2].value).to.be.equal('')
+    expect(tag.refs.radio[2].value).to.be.equal('')
+    tag.unmount()
   })
 })
