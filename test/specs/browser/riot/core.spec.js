@@ -1652,13 +1652,29 @@ describe('Riot core', function() {
     tags.forEach(tag => tag.unmount())
   })
 
-  it('Dont remove attributes with empty string as the value (#2629', function(){
+  it('Don\'t remove value attributes with the settings keepValueAttributes=true #2629', function(){
     injectHTML('<bug-2629></bug-2629>')
+    riot.settings.keepValueAttributes = true
     const tag = riot.mount('bug-2629')[0]
+
     tag.update()
-    expect(tag.refs.option.childNodes[1].getAttribute('value')).to.be.equal('')
-    expect(tag.refs.check[1].value).to.be.equal('')
-    expect(tag.refs.radio[1].value).to.be.equal('')
+    expect(tag.refs.option.childNodes[1].hasAttribute('value')).to.be.ok
+    expect(tag.refs.check[1].hasAttribute('value')).to.be.ok
+    expect(tag.refs.radio[1].hasAttribute('value')).to.be.ok
+    tag.unmount()
+    riot.settings.keepValueAttributes = false
+  })
+
+  it('Remove empty attributes with the settings keepValueAttributes=false #2629', function(){
+    injectHTML('<bug-2629></bug-2629>')
+    riot.settings.keepValueAttributes = false
+
+    const tag = riot.mount('bug-2629')[0]
+
+    tag.update()
+    expect(tag.refs.option.childNodes[1].hasAttribute('value')).to.be.not.ok
+    expect(tag.refs.check[1].hasAttribute('value')).to.be.not.ok
+    expect(tag.refs.radio[1].hasAttribute('value')).to.be.not.ok
     tag.unmount()
   })
 })
