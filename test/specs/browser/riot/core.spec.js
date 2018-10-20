@@ -1659,8 +1659,8 @@ describe('Riot core', function() {
 
     tag.update()
     expect(tag.refs.option.childNodes[1].hasAttribute('value')).to.be.ok
-    expect(tag.refs.check[1].hasAttribute('value')).to.be.ok
-    expect(tag.refs.radio[1].hasAttribute('value')).to.be.ok
+    expect(tag.refs.check[1].value).to.be.equal('')
+    expect(tag.refs.radio[1].value).to.be.equal('')
     tag.unmount()
     riot.settings.keepValueAttributes = false
   })
@@ -1673,8 +1673,8 @@ describe('Riot core', function() {
 
     tag.update()
     expect(tag.refs.option.childNodes[1].hasAttribute('value')).to.be.not.ok
-    expect(tag.refs.check[1].hasAttribute('value')).to.be.not.ok
-    expect(tag.refs.radio[1].hasAttribute('value')).to.be.not.ok
+    expect(tag.refs.check[1].value).to.be.a('string')
+    expect(tag.refs.radio[1].value).to.be.a('string')
     tag.unmount()
   })
 })
