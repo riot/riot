@@ -784,6 +784,29 @@ describe('Riot core', function() {
     riot.settings.skipAnonymousTags = true
   })
 
+  it('the "riot.settings.skipAnonymousTags = false" option will let trigger the "mount" event on anonymous tags' , function() {
+    riot.settings.skipAnonymousTags = false
+    const spy = sinon.spy()
+
+    injectHTML('<riot-tmp></riot-tmp>')
+
+    riot.mixin({
+      init() {
+        this.on('mount', spy)
+      }
+    })
+
+    riot.tag('riot-tmp', '<div each="{ items }"></div>', function() {
+      this.items = [1]
+    })
+
+    var tag = riot.mount('riot-tmp')[0]
+    tag.unmount()
+    expect(spy).to.have.been.calledTwice
+
+    riot.settings.skipAnonymousTags = true
+  })
+
   it('the "updated" event gets properly triggered in a nested child', function(done) {
     injectHTML('<div id="updated-events-tester"></div>')
     var tag = riot.mount('#updated-events-tester', 'named-child-parent')[0],
