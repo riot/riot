@@ -153,6 +153,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - [Riot Seed project - webpack, routing, ava tests, dispatcher](https://github.com/continuata/riot-seed)
 - [Riot-Redux League Table example](https://github.com/drewmiley/PoolLeague)
 - [Riot vs React vs Ractive Counters using Redux store](https://github.com/drewmiley/ractive-react-riot-redux-counters-example)
+- [Riot Chrome Extension Boilerplate](https://github.com/acesmndr/chrome-extension-boilerplate-riot)
 
 ### Books
 - [Building Apps with Riot](https://bleedingedgepress.com/building-apps-with-riot/)
