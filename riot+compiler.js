@@ -1,4 +1,4 @@
-/* Riot v3.13.0, @license MIT */
+/* Riot v3.13.1, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -2098,7 +2098,7 @@
     return delete __TAG_IMPL[name]
   }
 
-  var version = 'v3.13.0';
+  var version = 'v3.13.1';
 
   var core = /*#__PURE__*/Object.freeze({
     Tag: Tag,
@@ -2750,10 +2750,11 @@
   function setMountState(value) {
     var ref = this.__;
     var isAnonymous = ref.isAnonymous;
+    var skipAnonymous = ref.skipAnonymous;
 
     define(this, 'isMounted', value);
 
-    if (!isAnonymous) {
+    if (!isAnonymous || !skipAnonymous) {
       if (value) { this.trigger('mount'); }
       else {
         this.trigger('unmount');
