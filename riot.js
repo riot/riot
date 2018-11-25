@@ -1,4 +1,4 @@
-/* Riot v3.13.1, @license MIT */
+/* Riot v3.13.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -161,7 +161,7 @@
       delete byName[name];
       needsInject = true;
     }
-  }
+  };
 
   /**
    * The riot template engine
@@ -896,7 +896,7 @@
     keepValueAttributes: false,
     // handle the auto updates on any DOM event
     autoUpdate: true
-  })
+  });
 
   /**
    * Shorter and fast way to select multiple nodes in the DOM
@@ -1183,7 +1183,7 @@
   var uid = (function uid() {
     var i = -1;
     return function () { return ++i; }
-  })()
+  })();
 
   /**
    * Helper function to set an immutable property
@@ -2098,7 +2098,7 @@
     return delete __TAG_IMPL[name]
   }
 
-  var version = 'v3.13.1';
+  var version = 'v3.13.2';
 
   var core = /*#__PURE__*/Object.freeze({
     Tag: Tag,
@@ -2531,7 +2531,7 @@
       if (!isBlank(this.value) && customParent)
         { arrayishRemove(customParent.refs, this.value, tagOrDom); }
     }
-  }
+  };
 
   /**
    * Create a new ref directive
@@ -2595,7 +2595,7 @@
 
       unmountAll(this.expressions || []);
     }
-  }
+  };
 
   /**
    * Create a new if directive
@@ -3088,7 +3088,7 @@
     observable: observable,
     settings: settings$1,
     util: util,
-  })
+  });
 
   exports.settings = settings$1;
   exports.util = util;
