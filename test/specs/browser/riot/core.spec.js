@@ -767,19 +767,22 @@ describe('Riot core', function() {
 
   it('don t\' skip the anonymous tags using the "riot.settings.skipAnonymousTags = false" option' , function(done) {
     riot.settings.skipAnonymousTags = false
-    injectHTML('<anonymous-test></anonymous-test>')
+    let called = false
+
+    injectHTML('<riot-tmp></riot-tmp>')
     riot.mixin({
       init() {
-        if (this.__.isAnonymous) {
+        if (this.__.isAnonymous && !called) {
           expect(this.on).to.be.ok
           done()
+          called = true
         }
       }
     })
-    riot.tag('anonymous-test', '<div each="{ items }"></div>', function() {
+    riot.tag('riot-tmp', '<div each="{ items }"></div>', function() {
       this.items = [1]
     })
-    var tag = riot.mount('anonymous-test')[0]
+    var tag = riot.mount('riot-tmp')[0]
     tag.unmount()
     riot.settings.skipAnonymousTags = true
   })
