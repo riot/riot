@@ -13,23 +13,22 @@ KARMA = ./node_modules/karma/bin/karma
 ESLINT = ./node_modules/eslint/bin/eslint.js
 MOCHA = ./node_modules/mocha/bin/_mocha
 ROLLUP = ./node_modules/.bin/rollup
-UGLIFY = ./node_modules/uglify-js/bin/uglifyjs
+MINIFY = ./node_modules/.bin/minify
 COVERALLS = ./node_modules/coveralls/bin/coveralls.js
 RIOT_CLI = ./node_modules/.bin/riot
 
 # folders
 DIST = dist/riot/
-LIB = lib/
+SRC = src
 CONFIG = config/
 
-GENERATED_FILES = riot.js riot.csp.js riot+compiler.js
-
+GENERATED_FILES = riot.js riot+compiler.js
 
 test: eslint
 
 eslint:
 	# check code style
-	@ $(ESLINT) -c ./.eslintrc.json lib test
+	@ $(ESLINT) -c ./.eslintrc src test
 
 test:
 	@ exit 0
@@ -45,10 +44,8 @@ raw:
 	# build riot
 	@ mkdir -p $(DIST)
 	# Default builds UMD
-	@ $(ROLLUP) lib/riot.js --config $(CONFIG)rollup.config.js > $(DIST)riot.js
-	@ $(ROLLUP) lib/riot+compiler.js --config $(CONFIG)rollup.config.js > $(DIST)riot+compiler.js
-	# Chrome Security Policy build
-	@ $(ROLLUP) lib/riot.js --config $(CONFIG)rollup.config.csp.js > $(DIST)riot.csp.js
+	@ $(ROLLUP) src/riot.js --config rollup.config.js > $(DIST)riot.js
+	@ $(ROLLUP) src/riot+compiler.js --config rollup.config.js > $(DIST)riot+compiler.js
 
 clean:
 	# clean $(DIST)
@@ -59,12 +56,7 @@ riot: clean raw test
 min:
 	# minify riot
 	@ for f in $(GENERATED_FILES); do \
-		$(UGLIFY) $(DIST)$$f \
-			--comments \
-			--toplevel \
-			--mangle \
-			--compress  \
-			-o $(DIST)$${f%.*}.min.js; \
+		$(MINIFY) $(DIST)$$f -o $(DIST)$${f%.*}.min.js; \
 		done
 
 build:

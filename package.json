@@ -1,18 +1,10 @@
 {
   "name": "riot",
-  "version": "3.6.0",
-  "description": "A React-like user interface micro-library",
-  "homepage": "http://riotjs.com/",
+  "version": "4.0.0-alpha.0",
+  "description": "Simple and elegant component-based UI library",
+  "homepage": "http://riot.js.org/",
   "repository": "riot/riot",
-  "author": "Riot maintainers team + smart people from all over the world",
-  "contributors": [
-    "Richard Bondi https://github.com/rsbondi",
-    "Gianluca Guarini https://github.com/GianlucaGuarini",
-    "Tsutomu Kawamura https://github.com/cognitom",
-    "Alberto Martínez https://github.com/aMarCruz",
-    "Grant Marvin     https://github.com/rogueg",
-    "Tero Piirainen   https://github.com/tipiirai"
-  ],
+  "author": "Gianluca Guarini <gianluca.guarini@gmail.com> (http://gianlucaguarini.com)",
   "license": "MIT",
   "engines": {
     "node": ">=4.0.0"
@@ -45,52 +37,33 @@
     "riot.js"
   ],
   "dependencies": {
+    "@riotjs/dom-bindings": "^0.5.0",
+    "curri": "^1.0.0"
   },
   "devDependencies": {
-    "benchmark": "^2.1.4",
-    "chai": "^4.0.0",
-    "cheerio": "^1.0.0-rc.1",
-    "chokidar-cli": "^1.2.0",
-    "coveralls": "^2.13.1",
-    "eslint": "^3.19.0",
-    "eslint-config-riot": "^1.0.0",
-    "glob": "^7.1.2",
-    "istanbul": "^0.4.5",
-    "jsdom": "^11.0.0",
-    "karma": "^1.7.0",
-    "karma-chrome-launcher": "^2.1.1",
-    "karma-coverage": "^1.1.1",
-    "karma-mocha": "^1.3.0",
-    "karma-phantomjs-launcher": "^1.0.4",
-    "karma-rollup-preprocessor": "^4.0.0",
-    "karma-sauce-launcher": "^1.1.0",
-    "mocha": "^3.4.2",
-    "phantomjs-prebuilt": "^2.1.14",
-    "rollup": "^0.41.6",
-    "rollup-plugin-alias": "1.3.1",
-    "rollup-plugin-buble": "^0.15.0",
-    "rollup-plugin-commonjs": "^8.0.2",
-    "rollup-plugin-node-resolve": "^3.0.0",
-    "rollup-plugin-riot": "^1.1.0",
-    "sinon": "^2.3.2",
-    "sinon-chai": "^2.10.0",
-    "uglify-js": "^3.0.10"
+    "babel-minify": "^0.5.0",
+    "chai": "^4.2.0",
+    "coveralls": "^3.0.2",
+    "eslint": "^5.8.0",
+    "eslint-config-riot": "^2.0.0",
+    "jsdom": "^12.2.0",
+    "mocha": "^5.2.0",
+    "rollup": "^0.66.6",
+    "rollup-plugin-node-resolve": "^3.4.0",
+    "sinon": "^7.1.1",
+    "sinon-chai": "^3.2.0"
   },
-  "preferGlobal": true,
   "files": [
-    "lib",
+    "src",
     "riot.js",
     "riot.min.js",
-    "riot.csp.js",
-    "riot.csp.min.js",
     "riot+compiler.js",
     "riot+compiler.min.js"
   ],
   "bin": {
     "riot": "node_modules/riot-cli/lib/index.js"
   },
-  "main": "lib/server/index.js",
-  "module": "lib/riot.js",
-  "jsnext:main": "lib/riot.js",
-  "browser": "riot.js"
+  "main": "riot.js",
+  "module": "src/riot.js",
+  "jsnext:main": "src/riot.js"
 }
