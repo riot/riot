@@ -12,7 +12,7 @@ MINOR_VERSION = `echo $(VERSION) | sed 's/\.[^.]*$$//'`
 KARMA = ./node_modules/karma/bin/karma
 ESLINT = ./node_modules/eslint/bin/eslint.js
 MOCHA = ./node_modules/mocha/bin/_mocha
-ROLLUP = ./node_modules/.bin/rollup
+ROLLUP = ./node_modules/rollup/bin/rollup
 MINIFY = ./node_modules/.bin/minify
 COVERALLS = ./node_modules/coveralls/bin/coveralls.js
 RIOT_CLI = ./node_modules/.bin/riot
@@ -44,8 +44,8 @@ raw:
 	# build riot
 	@ mkdir -p $(DIST)
 	# Default builds UMD
-	@ $(ROLLUP) src/riot.js --config rollup.config.js > $(DIST)riot.js
-	@ $(ROLLUP) src/riot+compiler.js --config rollup.config.js > $(DIST)riot+compiler.js
+	@ $(ROLLUP) src/riot.js --config rollup.config.js --format umd --name riot > $(DIST)riot.js
+	@ $(ROLLUP) src/riot+compiler.js --config rollup.config.js --format umd --name riot > $(DIST)riot+compiler.js
 
 clean:
 	# clean $(DIST)

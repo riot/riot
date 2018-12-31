@@ -49,8 +49,8 @@ export function defineComponent({css, template, tag}) {
     css,
     template: tag.render || template(
       createTemplate,
-      bindingTypes,
       expressionTypes,
+      bindingTypes,
       {
         ...COMPONENTS_IMPLEMENTATION_MAP,
         ...(componentAPI.components || {})
@@ -58,7 +58,7 @@ export function defineComponent({css, template, tag}) {
     )
   })
 
-  return curry(createComponent)(componentImplementation, {})
+  return curry(createComponent)(componentImplementation)
 }
 
 /**
@@ -77,27 +77,23 @@ function evaluateProps(element, attributeExpressions = [], scope) {
 /**
  * Component creation factory function
  * @param   {Object} component - a component implementation previously defined
- * @param   {Object|Function} initialState - initial component state
  * @param   {Array} options.slots - component slots generated via riot compiler
  * @param   {Array} options.attributes - attribute expressions generated via riot compiler
  * @returns {Riot.Component} a riot component instance
  */
-export function createComponent(component, initialState, {slots, attributes}) {
+export function createComponent(component, {slots, attributes}) {
   // if this component was manually mounted its DOM attributes are likely not attribute expressions
   // generated via riot compiler
   const shouldSetAttributes = attributes && attributes.length
 
   return defineProperties(Object.create(component), {
     slots,
-    state: callOrAssign(initialState),
+    state: {},
     props: {},
     mount(element, scope, state = {}) {
       defineProperties(this, {
         props: evaluateProps(element, attributes, scope),
-        state: {
-          ...this.state,
-          ...state
-        },
+        state: callOrAssign(state),
         root: element
       })
 
@@ -105,6 +101,8 @@ export function createComponent(component, initialState, {slots, attributes}) {
       shouldSetAttributes && setAttributes(this.root, this.props)
       this.template.mount(element, this)
       this.onMounted()
+
+      return this
     },
     update(scope, state = {}) {
       const newProps = evaluateProps(this.root, attributes, scope)
@@ -124,11 +122,15 @@ export function createComponent(component, initialState, {slots, attributes}) {
       shouldSetAttributes && setAttributes(this.root, this.props)
       this.template.update(this)
       this.onUpdated()
+
+      return this
     },
     unmount() {
       this.onBeforeUnmount()
       this.template.unmount()
       this.onUnmounted()
+
+      return this
     }
   })
 }
@@ -143,24 +145,8 @@ export function createComponent(component, initialState, {slots, attributes}) {
 export function mountComponent(element, componentName, initialState) {
   const name = componentName || getName(element)
   if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component named "${name}" was never registered`)
-  const component = createComponent(
-    COMPONENTS_IMPLEMENTATION_MAP.get(name),
-    initialState,
-    {}
-  )
+  const component = COMPONENTS_IMPLEMENTATION_MAP.get(name)({})
   COMPONENTS_CREATION_MAP.set(element, component)
 
-  // wrapper around the default component API
-  // in this case the component was mounted manually
-  return {
-    mount(element, state) {
-      return component.mount(element, {}, state)
-    },
-    update(state) {
-      return component.update(element, {}, state)
-    },
-    unmount() {
-      return component.unmount()
-    }
-  }
+  return component.mount(element, {}, initialState)
 }

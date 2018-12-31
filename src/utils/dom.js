@@ -50,7 +50,7 @@ export function setAttribute(element, name, value) {
  * @returns {Object} all the attributes found as a key value pairs
  */
 export function getAttributes(element) {
-  Array.from(element.attributes).reduce((acc, attribute) => {
+  return Array.from(element.attributes).reduce((acc, attribute) => {
     acc[attribute.name] = attribute.value
     return acc
   }, {})

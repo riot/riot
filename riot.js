@@ -5,113 +5,1822 @@
   (factory((global.riot = {})));
 }(this, (function (exports) { 'use strict';
 
-  var assign = Object.assign;
-  var create = Object.create;
-  var toArray = Array.from;
-
-  /**
-   * Throw an error
-   * @param {string} error - error message
-   */
-  function panic(error) {
-    throw new Error(error)
-  }
-
-  var
+  const
     COMPONENTS_IMPLEMENTATION_MAP = new Map(),
     COMPONENTS_CREATION_MAP = new WeakMap(),
     MIXINS_MAP = new Map(),
     IS_DIRECTIVE = 'is';
 
   /**
-   * Shorter and fast way to select multiple nodes in the DOM
-   * @param   {string} selector - DOM selector
-   * @param   {object} context - DOM node where the targets of our search will is located
-   * @returns {array} dom nodes found
-   */
-  function $$(selector, context) {
-    return toArray((context || document).querySelectorAll(selector))
-  }
-
-  /**
-   * Get the value of any DOM attribute on a node
-   * @param   {object} element - DOM node we want to inspect
-   * @param   {string} name - name of the attribute we want to get
-   * @returns {string|undefined} the node attribute if it exists
-   */
-  function getAttr(element, name) {
-    return element.getAttribute(name)
-  }
-
-  /**
-   * Get the tag name of any DOM node
-   * @param   {object} element - DOM node we want to inspect
-   * @returns {string} name to identify this dom node in riot
-   */
-  function getName(element) {
-    return getAttr(element, IS_DIRECTIVE) || element.tagName.toLowerCase()
-  }
-
-  var COMPONENT_STRUCT = {
-    update: function update() {
-
-    },
-    render: function render() {
-
-    },
-    mixin: function mixin() {
-
-    },
-    unmount: function unmount() {
-
-    }
-  };
-
-  /**
-   * Component definition factory function
-   * @param   {object} implementation - component custom implementation
-   * @returns {object} a new component implementation object
-   */
-  function define(implementation) {
-    var component = assign({}, create(COMPONENT_STRUCT), implementation);
-    return component
-  }
-
-  /**
-   * Component initialization function
-   * @param   {HTMLElement} element - element to upgrade
-   * @param   {object} options - [description]
-   * @returns {object} a new component instance bound to a DOM node
-   */
-  function initialize(element, options) {
-    var name = getName(element);
-    if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) { panic(("The component named \"" + name + "\" was never registered")); }
-    var component = assign(
-      create(COMPONENTS_IMPLEMENTATION_MAP.get(name)),
-      {
-        options: options
-      }
-    );
-    COMPONENTS_CREATION_MAP.set(element, component);
-    return component
-  }
-
-  /**
    * Quick type checking
    * @param   {*} element - anything
    * @param   {string} type - type definition
-   * @returns {boolean}
+   * @returns {boolean} true if the type corresponds
    */
   function checkType(element, type) {
     return typeof element === type
   }
+
   /**
-   * Check if passed argument is a function
-   * @param   { * } value -
-   * @returns { Boolean } -
+   * Check that will be passed if its argument is a function
+   * @param   {*} value - value to check
+   * @returns {boolean} - true if the value is a function
    */
   function isFunction(value) {
     return checkType(value, 'function')
+  }
+
+  /**
+   * Check that will be passed if its argument is a string
+   * @param   {*} value - value to check
+   * @returns {boolean} - true if the value is a string
+   */
+  function isString(value) {
+    return checkType(value, 'string')
+  }
+
+  /* eslint-disable fp/no-mutating-methods */
+  /**
+   * Throw an error
+   * @param {string} error - error message
+   * @returns {undefined} it's a IO void function
+   */
+  function panic(error) {
+    throw new Error(error)
+  }
+
+  /**
+   * Call the first argument received only if it's a function otherwise return it as it is
+   * @param   {*} source - anything
+   * @returns {*} anything
+   */
+  function callOrAssign(source) {
+    return isFunction(source) ? source() : source
+  }
+
+  /**
+   * Helper function to set an immutable property
+   * @param   {Object} source - object where the new property will be set
+   * @param   {string} key - object key where the new property will be stored
+   * @param   {*} value - value of the new property
+   * @param   {Object} options - set the propery overriding the default options
+   * @returns {Object} - the original object modified
+   */
+  function defineProperty(source, key, value, options = {}) {
+    Object.defineProperty(source, key, {
+      value,
+      enumerable: false,
+      writable: false,
+      configurable: true,
+      ...options
+    });
+
+    return source
+  }
+
+  /**
+   * Define multiple properties on a target object
+   * @param   {Object} source - object where the new properties will be set
+   * @param   {Object} properties - object containing as key pair the key + value properties
+   * @param   {Object} options - set the propery overriding the default options
+   * @returns {Object} the original object modified
+   */
+  function defineProperties(source, properties, options) {
+    Object.entries(properties).forEach(([key, value]) => {
+      defineProperty(source, key, value, options);
+    });
+
+    return source
+  }
+
+  /**
+   * Evaluate a list of attribute expressions
+   * @param   {Array} attributes - attribute expressions generated by the riot compiler
+   * @param   {Object} scope - current scope
+   * @returns {Object} key value pairs with the result of the computation
+   */
+  function evaluateAttributeExpressions(attributes, scope) {
+    return attributes.reduce((acc, attribute) => {
+      const value = attribute.evaluate(scope);
+
+      if (attribute.name) {
+        acc[name] = value;
+      } else {
+        Object.assign(acc, value);
+      }
+
+      return acc
+    }, {})
+  }
+
+  /**
+   * Shorter and fast way to select multiple nodes in the DOM
+   * @param   {string} selector - DOM selector
+   * @param   {Object} context - DOM node where the targets of our search will is located
+   * @returns {Array} dom nodes found
+   */
+  function $$(selector, context) {
+    return Array.from((context || document).querySelectorAll(selector))
+  }
+
+  /**
+   * Select a single DOM element
+   * @param   {string} selector - DOM selector
+   * @param   {Object} context - DOM node where the targets of our search will is located
+   * @returns {HTMLElement} DOM node found
+   */
+  function $(selector, context) {
+    return (context || document).querySelector(selector)
+  }
+
+  /**
+   * Get the value of any DOM attribute on a node
+   * @param   {HTMLElement} element - DOM node we want to inspect
+   * @param   {string} name - name of the attribute we want to get
+   * @returns {string|undefined} the node attribute if it exists
+   */
+  function getAttribute(element, name) {
+    return element.getAttribute(name)
+  }
+
+  /**
+   * Set the value of any DOM attribute
+   * @param   {HTMLElement} element - DOM node we to update
+   * @param   {string} name - name of the attribute we want to set
+   * @param   {string} value - the value of the atribute to set
+   * @returns {undefined} void function
+   */
+  function setAttribute(element, name, value) {
+    if (isString(value)) {
+      element.setAttribute(name, value);
+    }
+  }
+
+  /**
+   * Get all the element attributes as object
+   * @param   {HTMLElement} element - DOM node we want to parse
+   * @returns {Object} all the attributes found as a key value pairs
+   */
+  function getAttributes(element) {
+    Array.from(element.attributes).reduce((acc, attribute) => {
+      acc[attribute.name] = attribute.value;
+      return acc
+    }, {});
+  }
+
+  /**
+   * Set multiple DOM attributes
+   * @param   {HTMLElement} element target element
+   * @param   {Object} attributes - object containing the attributes key values
+   * @returns {HTMLElement} - the original element received
+   */
+  function setAttributes(element, attributes) {
+    Object.entries(attributes).forEach(([key, value]) => {
+      setAttribute(element, key, value);
+    });
+    return element
+  }
+
+  /**
+   * Get the tag name of any DOM node
+   * @param   {HTMLElement} element - DOM node we want to inspect
+   * @returns {string} name to identify this dom node in riot
+   */
+  function getName(element) {
+    return getAttribute(element, IS_DIRECTIVE) || element.tagName.toLowerCase()
+  }
+
+  /**
+   * Remove the child nodes from any DOM node
+   * @param   {HTMLElement} node - target node
+   * @returns {undefined}
+   */
+  function cleanNode(node) {
+    const children = node.childNodes;
+    children.forEach(n => node.removeChild(n));
+  }
+
+  const EACH = 0;
+  const IF = 1;
+  const SIMPLE = 2;
+  const TAG = 3;
+
+  var bindingTypes = {
+    EACH,
+    IF,
+    SIMPLE,
+    TAG
+  };
+
+  /*! (c) Andrea Giammarchi - ISC */
+  var self = null || /* istanbul ignore next */ {};
+  try { self.Map = Map; }
+  catch (Map) {
+    self.Map = function Map() {
+      var i = 0;
+      var k = [];
+      var v = [];
+      return {
+        delete: function (key) {
+          var had = contains(key);
+          if (had) {
+            k.splice(i, 1);
+            v.splice(i, 1);
+          }
+          return had;
+        },
+        get: function get(key) {
+          return contains(key) ? v[i] : void 0;
+        },
+        has: function has(key) {
+          return contains(key);
+        },
+        set: function set(key, value) {
+          v[contains(key) ? i : (k.push(key) - 1)] = value;
+          return this;
+        }
+      };
+      function contains(v) {
+        i = k.indexOf(v);
+        return -1 < i;
+      }
+    };
+  }
+  var Map$1 = self.Map;
+
+  const append = (get, parent, children, start, end, before) => {
+    if ((end - start) < 2)
+      parent.insertBefore(get(children[start], 1), before);
+    else {
+      const fragment = parent.ownerDocument.createDocumentFragment();
+      while (start < end)
+        fragment.appendChild(get(children[start++], 1));
+      parent.insertBefore(fragment, before);
+    }
+  };
+
+  const eqeq = (a, b) => a == b;
+
+  const identity = O => O;
+
+  const indexOf = (
+    moreNodes,
+    moreStart,
+    moreEnd,
+    lessNodes,
+    lessStart,
+    lessEnd,
+    compare
+  ) => {
+    const length = lessEnd - lessStart;
+    /* istanbul ignore if */
+    if (length < 1)
+      return -1;
+    while ((moreEnd - moreStart) >= length) {
+      let m = moreStart;
+      let l = lessStart;
+      while (
+        m < moreEnd &&
+        l < lessEnd &&
+        compare(moreNodes[m], lessNodes[l])
+      ) {
+        m++;
+        l++;
+      }
+      if (l === lessEnd)
+        return moreStart;
+      moreStart = m + 1;
+    }
+    return -1;
+  };
+
+  const isReversed = (
+    futureNodes,
+    futureEnd,
+    currentNodes,
+    currentStart,
+    currentEnd,
+    compare
+  ) => {
+    while (
+      currentStart < currentEnd &&
+      compare(
+        currentNodes[currentStart],
+        futureNodes[futureEnd - 1]
+      )) {
+        currentStart++;
+        futureEnd--;
+      }  return futureEnd === 0;
+  };
+
+  const next = (get, list, i, length, before) => i < length ?
+                get(list[i], 0) :
+                (0 < i ?
+                  get(list[i - 1], -0).nextSibling :
+                  before);
+
+  const remove = (get, parent, children, start, end) => {
+    if ((end - start) < 2)
+      parent.removeChild(get(children[start], -1));
+    else {
+      const range = parent.ownerDocument.createRange();
+      range.setStartBefore(get(children[start], -1));
+      range.setEndAfter(get(children[end - 1], -1));
+      range.deleteContents();
+    }
+  };
+
+  // - - - - - - - - - - - - - - - - - - -
+  // diff related constants and utilities
+  // - - - - - - - - - - - - - - - - - - -
+
+  const DELETION = -1;
+  const INSERTION = 1;
+  const SKIP = 0;
+  const SKIP_OND = 50;
+
+  const HS = (
+    futureNodes,
+    futureStart,
+    futureEnd,
+    futureChanges,
+    currentNodes,
+    currentStart,
+    currentEnd,
+    currentChanges
+  ) => {
+
+    let k = 0;
+    /* istanbul ignore next */
+    let minLen = futureChanges < currentChanges ? futureChanges : currentChanges;
+    const link = Array(minLen++);
+    const tresh = Array(minLen);
+    tresh[0] = -1;
+
+    for (let i = 1; i < minLen; i++)
+      tresh[i] = currentEnd;
+
+    const keymap = new Map$1;
+    for (let i = currentStart; i < currentEnd; i++)
+      keymap.set(currentNodes[i], i);
+
+    for (let i = futureStart; i < futureEnd; i++) {
+      const idxInOld = keymap.get(futureNodes[i]);
+      if (idxInOld != null) {
+        k = findK(tresh, minLen, idxInOld);
+        /* istanbul ignore else */
+        if (-1 < k) {
+          tresh[k] = idxInOld;
+          link[k] = {
+            newi: i,
+            oldi: idxInOld,
+            prev: link[k - 1]
+          };
+        }
+      }
+    }
+
+    k = --minLen;
+    --currentEnd;
+    while (tresh[k] > currentEnd) --k;
+
+    minLen = currentChanges + futureChanges - k;
+    const diff = Array(minLen);
+    let ptr = link[k];
+    --futureEnd;
+    while (ptr) {
+      const {newi, oldi} = ptr;
+      while (futureEnd > newi) {
+        diff[--minLen] = INSERTION;
+        --futureEnd;
+      }
+      while (currentEnd > oldi) {
+        diff[--minLen] = DELETION;
+        --currentEnd;
+      }
+      diff[--minLen] = SKIP;
+      --futureEnd;
+      --currentEnd;
+      ptr = ptr.prev;
+    }
+    while (futureEnd >= futureStart) {
+      diff[--minLen] = INSERTION;
+      --futureEnd;
+    }
+    while (currentEnd >= currentStart) {
+      diff[--minLen] = DELETION;
+      --currentEnd;
+    }
+    return diff;
+  };
+
+  // this is pretty much the same petit-dom code without the delete map part
+  // https://github.com/yelouafi/petit-dom/blob/bd6f5c919b5ae5297be01612c524c40be45f14a7/src/vdom.js#L556-L561
+  const OND = (
+    futureNodes,
+    futureStart,
+    rows,
+    currentNodes,
+    currentStart,
+    cols,
+    compare
+  ) => {
+    const length = rows + cols;
+    const v = [];
+    let d, k, r, c, pv, cv, pd;
+    outer: for (d = 0; d <= length; d++) {
+      /* istanbul ignore if */
+      if (d > SKIP_OND)
+        return null;
+      pd = d - 1;
+      /* istanbul ignore next */
+      pv = d ? v[d - 1] : [0, 0];
+      cv = v[d] = [];
+      for (k = -d; k <= d; k += 2) {
+        if (k === -d || (k !== d && pv[pd + k - 1] < pv[pd + k + 1])) {
+          c = pv[pd + k + 1];
+        } else {
+          c = pv[pd + k - 1] + 1;
+        }
+        r = c - k;
+        while (
+          c < cols &&
+          r < rows &&
+          compare(
+            currentNodes[currentStart + c],
+            futureNodes[futureStart + r]
+          )
+        ) {
+          c++;
+          r++;
+        }
+        if (c === cols && r === rows) {
+          break outer;
+        }
+        cv[d + k] = c;
+      }
+    }
+
+    const diff = Array(d / 2 + length / 2);
+    let diffIdx = diff.length - 1;
+    for (d = v.length - 1; d >= 0; d--) {
+      while (
+        c > 0 &&
+        r > 0 &&
+        compare(
+          currentNodes[currentStart + c - 1],
+          futureNodes[futureStart + r - 1]
+        )
+      ) {
+        // diagonal edge = equality
+        diff[diffIdx--] = SKIP;
+        c--;
+        r--;
+      }
+      if (!d)
+        break;
+      pd = d - 1;
+      /* istanbul ignore next */
+      pv = d ? v[d - 1] : [0, 0];
+      k = c - r;
+      if (k === -d || (k !== d && pv[pd + k - 1] < pv[pd + k + 1])) {
+        // vertical edge = insertion
+        r--;
+        diff[diffIdx--] = INSERTION;
+      } else {
+        // horizontal edge = deletion
+        c--;
+        diff[diffIdx--] = DELETION;
+      }
+    }
+    return diff;
+  };
+
+  const applyDiff = (
+    diff,
+    get,
+    parentNode,
+    futureNodes,
+    futureStart,
+    currentNodes,
+    currentStart,
+    currentLength,
+    before
+  ) => {
+    const live = new Map$1;
+    const length = diff.length;
+    let currentIndex = currentStart;
+    let i = 0;
+    while (i < length) {
+      switch (diff[i++]) {
+        case SKIP:
+          futureStart++;
+          currentIndex++;
+          break;
+        case INSERTION:
+          // TODO: bulk appends for sequential nodes
+          live.set(futureNodes[futureStart], 1);
+          append(
+            get,
+            parentNode,
+            futureNodes,
+            futureStart++,
+            futureStart,
+            currentIndex < currentLength ?
+              get(currentNodes[currentIndex], 1) :
+              before
+          );
+          break;
+        case DELETION:
+          currentIndex++;
+          break;
+      }
+    }
+    i = 0;
+    while (i < length) {
+      switch (diff[i++]) {
+        case SKIP:
+          currentStart++;
+          break;
+        case DELETION:
+          // TODO: bulk removes for sequential nodes
+          if (live.has(currentNodes[currentStart]))
+            currentStart++;
+          else
+            remove(
+              get,
+              parentNode,
+              currentNodes,
+              currentStart++,
+              currentStart
+            );
+          break;
+      }
+    }
+  };
+
+  const findK = (ktr, length, j) => {
+    let lo = 1;
+    let hi = length;
+    while (lo < hi) {
+      const mid = ((lo + hi) / 2) >>> 0;
+      if (j < ktr[mid])
+        hi = mid;
+      else
+        lo = mid + 1;
+    }
+    return lo;
+  };
+
+  const smartDiff = (
+    get,
+    parentNode,
+    futureNodes,
+    futureStart,
+    futureEnd,
+    futureChanges,
+    currentNodes,
+    currentStart,
+    currentEnd,
+    currentChanges,
+    currentLength,
+    compare,
+    before
+  ) => {
+    applyDiff(
+      OND(
+        futureNodes,
+        futureStart,
+        futureChanges,
+        currentNodes,
+        currentStart,
+        currentChanges,
+        compare
+      ) ||
+      HS(
+        futureNodes,
+        futureStart,
+        futureEnd,
+        futureChanges,
+        currentNodes,
+        currentStart,
+        currentEnd,
+        currentChanges
+      ),
+      get,
+      parentNode,
+      futureNodes,
+      futureStart,
+      currentNodes,
+      currentStart,
+      currentLength,
+      before
+    );
+  };
+
+  /*! (c) 2018 Andrea Giammarchi (ISC) */
+
+  const domdiff = (
+    parentNode,     // where changes happen
+    currentNodes,   // Array of current items/nodes
+    futureNodes,    // Array of future items/nodes
+    options         // optional object with one of the following properties
+                    //  before: domNode
+                    //  compare(generic, generic) => true if same generic
+                    //  node(generic) => Node
+  ) => {
+    if (!options)
+      options = {};
+
+    const compare = options.compare || eqeq;
+    const get = options.node || identity;
+    const before = options.before == null ? null : get(options.before, 0);
+
+    const currentLength = currentNodes.length;
+    let currentEnd = currentLength;
+    let currentStart = 0;
+
+    let futureEnd = futureNodes.length;
+    let futureStart = 0;
+
+    // common prefix
+    while (
+      currentStart < currentEnd &&
+      futureStart < futureEnd &&
+      compare(currentNodes[currentStart], futureNodes[futureStart])
+    ) {
+      currentStart++;
+      futureStart++;
+    }
+
+    // common suffix
+    while (
+      currentStart < currentEnd &&
+      futureStart < futureEnd &&
+      compare(currentNodes[currentEnd - 1], futureNodes[futureEnd - 1])
+    ) {
+      currentEnd--;
+      futureEnd--;
+    }
+
+    const currentSame = currentStart === currentEnd;
+    const futureSame = futureStart === futureEnd;
+
+    // same list
+    if (currentSame && futureSame)
+      return futureNodes;
+
+    // only stuff to add
+    if (currentSame && futureStart < futureEnd) {
+      append(
+        get,
+        parentNode,
+        futureNodes,
+        futureStart,
+        futureEnd,
+        next(get, currentNodes, currentStart, currentLength, before)
+      );
+      return futureNodes;
+    }
+
+    // only stuff to remove
+    if (futureSame && currentStart < currentEnd) {
+      remove(
+        get,
+        parentNode,
+        currentNodes,
+        currentStart,
+        currentEnd
+      );
+      return futureNodes;
+    }
+
+    const currentChanges = currentEnd - currentStart;
+    const futureChanges = futureEnd - futureStart;
+    let i = -1;
+
+    // 2 simple indels: the shortest sequence is a subsequence of the longest
+    if (currentChanges < futureChanges) {
+      i = indexOf(
+        futureNodes,
+        futureStart,
+        futureEnd,
+        currentNodes,
+        currentStart,
+        currentEnd,
+        compare
+      );
+      // inner diff
+      if (-1 < i) {
+        append(
+          get,
+          parentNode,
+          futureNodes,
+          futureStart,
+          i,
+          get(currentNodes[currentStart], 0)
+        );
+        append(
+          get,
+          parentNode,
+          futureNodes,
+          i + currentChanges,
+          futureEnd,
+          next(get, currentNodes, currentEnd, currentLength, before)
+        );
+        return futureNodes;
+      }
+    }
+    /* istanbul ignore else */
+    else if (futureChanges < currentChanges) {
+      i = indexOf(
+        currentNodes,
+        currentStart,
+        currentEnd,
+        futureNodes,
+        futureStart,
+        futureEnd,
+        compare
+      );
+      // outer diff
+      if (-1 < i) {
+        remove(
+          get,
+          parentNode,
+          currentNodes,
+          currentStart,
+          i
+        );
+        remove(
+          get,
+          parentNode,
+          currentNodes,
+          i + futureChanges,
+          currentEnd
+        );
+        return futureNodes;
+      }
+    }
+
+    // common case with one replacement for many nodes
+    // or many nodes replaced for a single one
+    /* istanbul ignore else */
+    if ((currentChanges < 2 || futureChanges < 2)) {
+      append(
+        get,
+        parentNode,
+        futureNodes,
+        futureStart,
+        futureEnd,
+        get(currentNodes[currentStart], 0)
+      );
+      remove(
+        get,
+        parentNode,
+        currentNodes,
+        currentStart,
+        currentEnd
+      );
+      return futureNodes;
+    }
+
+    // the half match diff part has been skipped in petit-dom
+    // https://github.com/yelouafi/petit-dom/blob/bd6f5c919b5ae5297be01612c524c40be45f14a7/src/vdom.js#L391-L397
+    // accordingly, I think it's safe to skip in here too
+    // if one day it'll come out like the speediest thing ever to do
+    // then I might add it in here too
+
+    // Extra: before going too fancy, what about reversed lists ?
+    //        This should bail out pretty quickly if that's not the case.
+    if (
+      currentChanges === futureChanges &&
+      isReversed(
+        futureNodes,
+        futureEnd,
+        currentNodes,
+        currentStart,
+        currentEnd,
+        compare
+      )
+    ) {
+      append(
+        get,
+        parentNode,
+        futureNodes,
+        futureStart,
+        futureEnd,
+        next(get, currentNodes, currentEnd, currentLength, before)
+      );
+      return futureNodes;
+    }
+
+    // last resort through a smart diff
+    smartDiff(
+      get,
+      parentNode,
+      futureNodes,
+      futureStart,
+      futureEnd,
+      futureChanges,
+      currentNodes,
+      currentStart,
+      currentEnd,
+      currentChanges,
+      currentLength,
+      compare,
+      before
+    );
+
+    return futureNodes;
+  };
+
+  const EachBinding = Object.seal({
+    // dynamic binding properties
+    childrenMap: null,
+    node: null,
+    root: null,
+    condition: null,
+    evaluate: null,
+    template: null,
+    tags: [],
+    getKey: null,
+    indexName: null,
+    itemName: null,
+    afterPlaceholder: null,
+    placeholder: null,
+
+    // API methods
+    mount(scope) {
+      return this.update(scope)
+    },
+    update(scope) {
+      const { placeholder } = this;
+      const collection = this.evaluate(scope);
+      const items = collection ? Array.from(collection) : [];
+      const parent = placeholder.parentNode;
+
+      // prepare the diffing
+      const { newChildrenMap, batches, futureNodes } = loopItems(items, scope, this);
+
+      /**
+       * DOM Updates
+       */
+      const before = this.tags[this.tags.length - 1];
+      domdiff(parent, this.tags, futureNodes, {
+        before: before ? before.nextSibling : placeholder.nextSibling
+      });
+
+      // trigger the mounts and the updates
+      batches.forEach(fn => fn());
+
+      // update the children map
+      this.childrenMap = newChildrenMap;
+      this.tags = futureNodes;
+
+      return this
+    },
+    unmount() {
+      Array
+        .from(this.childrenMap.values())
+        .forEach(({tag, context}) => {
+          tag.unmount(context, true);
+        });
+
+      this.childrenMap = new Map();
+      this.tags = [];
+
+      return this
+    }
+  });
+
+  /**
+   * Check whether a tag must be filtered from a loop
+   * @param   {Function} condition - filter function
+   * @param   {Object} context - argument passed to the filter function
+   * @returns {boolean} true if this item should be skipped
+   */
+  function mustFilterItem(condition, context) {
+    return condition ? condition(context) : false
+  }
+
+  /**
+   * Get the context of the looped tag
+   * @param   {string} options.itemName - key to identify the looped item in the new context
+   * @param   {string} options.indexName - key to identify the index of the looped item
+   * @param   {number} options.index - current index
+   * @param   {*} options.item - collection item looped
+   * @param   {*} options.scope - current parent scope
+   * @returns {Object} enhanced scope object
+   */
+  function getContext({itemName, indexName, index, item, scope}) {
+    const context = {
+      [itemName]: item,
+      ...scope
+    };
+
+    if (indexName) {
+      return {
+        [indexName]: index,
+        ...context
+      }
+    }
+
+    return context
+  }
+
+
+  /**
+   * Loop the current tag items
+   * @param   { Array } items - tag collection
+   * @param   { * } scope - tag scope
+   * @param   { EeachBinding } binding - each binding object instance
+   * @returns { Object } data
+   * @returns { Map } data.newChildrenMap - a Map containing the new children tags structure
+   * @returns { Array } data.batches - array containing functions the tags lifecycle functions to trigger
+   * @returns { Array } data.futureNodes - array containing the nodes we need to diff
+   */
+  function loopItems(items, scope, binding) {
+    const { condition, template, childrenMap, itemName, getKey, indexName, root } = binding;
+    const filteredItems = new Set();
+    const newChildrenMap = new Map();
+    const batches = [];
+    const futureNodes = [];
+
+    items.forEach((item, i) => {
+      // the real item index should be subtracted to the items that were filtered
+      const index = i - filteredItems.size;
+      const context = getContext({itemName, indexName, index, item, scope});
+      const key = getKey ? getKey(context) : index;
+      const oldItem = childrenMap.get(key);
+
+      if (mustFilterItem(condition, context)) {
+        filteredItems.add(oldItem);
+        return
+      }
+
+      const tag = oldItem ? oldItem.tag : template.clone();
+      const el = oldItem ? tag.el : root.cloneNode();
+
+      if (!oldItem) {
+        batches.push(() => tag.mount(el, context));
+      } else {
+        batches.push(() => tag.update(context));
+      }
+
+      futureNodes.push(el);
+
+      // update the children map
+      newChildrenMap.set(key, {
+        tag,
+        context,
+        index
+      });
+    });
+
+    return {
+      newChildrenMap,
+      batches,
+      futureNodes
+    }
+  }
+
+  function create(node, { evaluate, condition, itemName, indexName, getKey, template }) {
+    const placeholder = document.createTextNode('');
+    const parent = node.parentNode;
+    const root = node.cloneNode();
+    const offset = Array.from(parent.childNodes).indexOf(node);
+
+    parent.insertBefore(placeholder, node);
+    parent.removeChild(node);
+
+    return {
+      ...EachBinding,
+      childrenMap: new Map(),
+      node,
+      root,
+      offset,
+      condition,
+      evaluate,
+      template,
+      getKey,
+      indexName,
+      itemName,
+      placeholder
+    }
+  }
+
+  /**
+   * Binding responsible for the `if` directive
+   */
+  const IfBinding = Object.seal({
+    // dynamic binding properties
+    node: null,
+    evaluate: null,
+    placeholder: null,
+    template: '',
+
+    // API methods
+    mount(scope) {
+      swap(this.placeholder, this.node);
+      return this.update(scope)
+    },
+    update(scope) {
+      const value = !!this.evaluate(scope);
+      const mustMount = !this.value && value;
+      const mustUnmount = this.value && !value;
+
+      switch (true) {
+      case mustMount:
+        swap(this.node, this.placeholder);
+        if (this.template) {
+          this.template = this.template.clone();
+          this.template.mount(this.node, scope);
+        }
+        break
+      case mustUnmount:
+        swap(this.placeholder, this.node);
+        this.unmount(scope);
+        break
+      default:
+        if (value) this.template.update(scope);
+      }
+
+      this.value = value;
+
+      return this
+    },
+    unmount(scope) {
+      const { template } = this;
+
+      if (template) {
+        template.unmount(scope);
+      }
+
+      return this
+    }
+  });
+
+  function swap(inNode, outNode) {
+    const parent = outNode.parentNode;
+    parent.insertBefore(inNode, outNode);
+    parent.removeChild(outNode);
+  }
+
+  function create$1(node, { evaluate, template }) {
+    return {
+      ...IfBinding,
+      node,
+      evaluate,
+      placeholder: document.createTextNode(''),
+      template
+    }
+  }
+
+  const ATTRIBUTE = 0;
+  const EVENT = 1;
+  const TEXT = 2;
+  const VALUE = 3;
+
+  var expressionTypes = {
+    ATTRIBUTE,
+    EVENT,
+    TEXT,
+    VALUE
+  };
+
+  const REMOVE_ATTRIBUTE = 'removeAttribute';
+  const SET_ATTIBUTE = 'setAttribute';
+
+  /**
+   * Add all the attributes provided
+   * @param   {HTMLElement} node - target node
+   * @param   {Object} attributes - object containing the attributes names and values
+   * @returns {undefined} sorry it's a void function :(
+   */
+  function setAllAttributes(node, attributes) {
+    Object
+      .entries(attributes)
+      .forEach(([name, value]) => attributeExpression(node, { name }, value));
+  }
+
+  /**
+   * Remove all the attributes provided
+   * @param   {HTMLElement} node - target node
+   * @param   {Object} attributes - object containing all the attribute names
+   * @returns {undefined} sorry it's a void function :(
+   */
+  function removeAllAttributes(node, attributes) {
+    Object
+      .keys(attributes)
+      .forEach(attribute => node.removeAttribute(attribute));
+  }
+
+  /**
+   * This methods handles the DOM attributes updates
+   * @param   {HTMLElement} node - target node
+   * @param   {Object} expression - expression object
+   * @param   {string} expression.name - attribute name
+   * @param   {*} value - new expression value
+   * @param   {*} oldValue - the old expression cached value
+   * @returns {undefined}
+   */
+  function attributeExpression(node, { name }, value, oldValue) {
+    // is it a spread operator? {...attributes}
+    if (!name) {
+      // is the value still truthy?
+      if (value) {
+        setAllAttributes(node, value);
+      } else if (oldValue) {
+        // otherwise remove all the old attributes
+        removeAllAttributes(node, oldValue);
+      }
+
+      return
+    }
+
+    // handle boolean attributes
+    if (typeof value === 'boolean') {
+      node[name] = value;
+    }
+
+    node[getMethod(value)](name, normalizeValue(name, value));
+  }
+
+  /**
+   * Get the attribute modifier method
+   * @param   {*} value - if truthy we return `setAttribute` othewise `removeAttribute`
+   * @returns {string} the node attribute modifier method name
+   */
+  function getMethod(value) {
+    return value ? SET_ATTIBUTE : REMOVE_ATTRIBUTE
+  }
+
+  /**
+   * Get the value as string
+   * @param   {string} name - attribute name
+   * @param   {*} value - user input value
+   * @returns {string} input value as string
+   */
+  function normalizeValue(name, value) {
+    // be sure that expressions like selected={ true } will be always rendered as selected='selected'
+    if (value === true) return name
+
+    // array values will be joined with spaces
+    return Array.isArray(value) ? value.join(' ') : value
+  }
+
+  /**
+   * Set a new event listener
+   * @param   {HTMLElement} node - target node
+   * @param   {Object} expression - expression object
+   * @param   {string} expression.name - event name
+   * @param   {*} value - new expression value
+   * @returns {undefined}
+   */
+  function eventExpression(node, { name }, value) {
+    node[name] = value;
+  }
+
+  /**
+   * This methods handles a simple text expression update
+   * @param   {HTMLElement} node - target node
+   * @param   {Object} expression - expression object
+   * @param   {number} expression.childNodeIndex - index to find the text node to update
+   * @param   {*} value - new expression value
+   * @returns {undefined}
+   */
+  function textExpression(node, { childNodeIndex }, value) {
+    const target = node.childNodes[childNodeIndex];
+    const val = normalizeValue$1(value);
+
+    // replace the target if it's a placeholder comment
+    if (target.nodeType === Node.COMMENT_NODE) {
+      const textNode = document.createTextNode(val);
+      node.replaceChild(textNode, target);
+    } else {
+      target.data = normalizeValue$1(val);
+    }
+  }
+
+  /**
+   * Normalize the user value in order to render a empty string in case of falsy values
+   * @param   {*} value - user input value
+   * @returns {string} hopefully a string
+   */
+  function normalizeValue$1(value) {
+    return value != null ? value : ''
+  }
+
+  /**
+   * This methods handles the input fileds value updates
+   * @param   {HTMLElement} node - target node
+   * @param   {Object} expression - expression object
+   * @param   {*} value - new expression value
+   * @returns {undefined}
+   */
+  function valueExpression(node, expression, value) {
+    node.value = value;
+  }
+
+  var expressions = {
+    [ATTRIBUTE]: attributeExpression,
+    [EVENT]: eventExpression,
+    [TEXT]: textExpression,
+    [VALUE]: valueExpression
+  };
+
+  const Expression = Object.seal({
+    // Static props
+    node: null,
+    value: null,
+
+    // API methods
+    /**
+     * Mount the expression evaluating its initial value
+     * @param   {*} scope - argument passed to the expression to evaluate its current values
+     * @returns {Expression} self
+     */
+    mount(scope) {
+      // hopefully a pure function
+      this.value = this.evaluate(scope);
+
+      // IO() DOM updates
+      apply(this, this.value);
+
+      return this
+    },
+    /**
+     * Update the expression if its value changed
+     * @param   {*} scope - argument passed to the expression to evaluate its current values
+     * @returns {Expression} self
+     */
+    update(scope) {
+      // pure function
+      const value = this.evaluate(scope);
+
+      if (this.value !== value) {
+        // IO() DOM updates
+        apply(this, value);
+        this.value = value;
+      }
+
+      return this
+    },
+    /**
+     * Expression teardown method
+     * @returns {Expression} self
+     */
+    unmount() {
+      return this
+    }
+  });
+
+  /**
+   * IO() function to handle the DOM updates
+   * @param {Expression} expression - expression object
+   * @param {*} value - current expression value
+   * @returns {undefined}
+   */
+  function apply(expression, value) {
+    return expressions[expression.type](expression.node, expression, value, expression.value)
+  }
+
+  function create$2(node, data) {
+    return {
+      ...Expression,
+      ...data,
+      node
+    }
+  }
+
+  /**
+   * Create a flat object having as keys a list of methods that if dispatched will propagate
+   * on the whole collection
+   * @param   {Array} collection - collection to iterate
+   * @param   {Array<string>} methods - methods to execute on each item of the collection
+   * @param   {*} context - context returned by the new methods created
+   * @returns {Object} a new object to simplify the the nested methods dispatching
+   */
+  function flattenCollectionMethods(collection, methods, context) {
+    return methods.reduce((acc, method) => {
+      return {
+        ...acc,
+        [method]: (scope) => {
+          return collection.map(item => item[method](scope)) && context
+        }
+      }
+    }, {})
+  }
+
+  function create$3(node, { expressions }) {
+    return {
+      ...flattenCollectionMethods(
+        expressions.map(expression => create$2(node, expression)),
+        ['mount', 'update', 'unmount']
+      )
+    }
+  }
+
+  /**
+   * Function to curry any javascript method
+   * @param   {Function}  fn - the target function we want to curry
+   * @param   {...[args]} acc - initial arguments
+   * @returns {Function|*} it will return a function until the target function
+   *                       will receive all of its arguments
+   */
+  function curry(fn, ...acc) {
+    return (...args) => {
+      args = [...acc, ...args];
+
+      return args.length < fn.length ?
+        curry(fn, ...args) :
+        fn(...args)
+    }
+  }
+
+  /**
+   * Create a new tag object if it was registered before, otherwise fallback to the simple
+   * template chunk
+   * @param   {Function} component - component factory function
+   * @param   {Array<Object>} slots - array containing the slots markup
+   * @param   {Array} attributes - dynamic attributes that will be received by the tag element
+   * @returns {TagImplementation|TemplateChunk} a tag implementation or a template chunk as fallback
+   */
+  function getTag(component, slots = [], attributes = []) {
+    // if this tag was registered before we will return its implementation
+    if (component) {
+      return component({ slots, attributes })
+    }
+
+    // otherwise we return a template chunk
+    return create$6(slotsToMarkup(slots), [
+      ...slotBindings(slots), {
+      // the attributes should be registered as binding
+      // if we fallback to a normal template chunk
+        expressions: attributes.map(attr => {
+          return {
+            type: ATTRIBUTE,
+            ...attr
+          }
+        })
+      }
+    ])
+  }
+
+
+  /**
+   * Merge all the slots bindings into a single array
+   * @param   {Array<Object>} slots - slots collection
+   * @returns {Array<Bindings>} flatten bindings array
+   */
+  function slotBindings(slots) {
+    return slots.reduce((acc, { bindings }) => acc.concat(bindings), [])
+  }
+
+  /**
+   * Merge all the slots together in a single markup string
+   * @param   {Array<Object>} slots - slots collection
+   * @returns {string} markup of all the slots in a single string
+   */
+  function slotsToMarkup(slots) {
+    return slots.reduce((acc, slot) => {
+      return acc + slot.html
+    }, '')
+  }
+
+  function create$4(node, { component, slots, attributes }) {
+    const tag = getTag(component, slots, attributes);
+
+    return {
+      ...tag,
+      mount: curry(tag.mount.bind(tag))(node)
+    }
+  }
+
+  var bindings = {
+    [IF]: create$1,
+    [SIMPLE]: create$3,
+    [EACH]: create,
+    [TAG]: create$4
+  };
+
+  /**
+   * Bind a new expression object to a DOM node
+   * @param   {HTMLElement} root - DOM node where to bind the expression
+   * @param   {Object} binding - binding data
+   * @returns {Expression} Expression object
+   */
+  function create$5(root, binding) {
+    const { selector, type, redundantAttribute, expressions } = binding;
+    // find the node to apply the bindings
+    const node = selector ? root.querySelector(selector) : root;
+    // remove eventually additional attributes created only to select this node
+    if (redundantAttribute) node.removeAttribute(redundantAttribute);
+
+    // init the binding
+    return (bindings[type] || bindings[SIMPLE])(
+      node,
+      {
+        ...binding,
+        expressions: expressions || []
+      }
+    )
+  }
+
+  /**
+   * Check if an element is part of an svg
+   * @param   {HTMLElement}  el - element to check
+   * @returns {boolean} true if we are in an svg context
+   */
+  function isSvg(el) {
+    const owner = el.ownerSVGElement;
+
+    return !!owner || owner === null
+  }
+
+  // in this case a simple innerHTML is enough
+  function createHTMLTree(html) {
+    const template = document.createElement('template');
+    template.innerHTML = html;
+    return template.content
+  }
+
+  // for svg nodes we need a bit more work
+  function creteSVGTree(html, container) {
+    // create the SVGNode
+    const svgNode = container.ownerDocument.importNode(
+      new window.DOMParser()
+        .parseFromString(
+          `<svg xmlns="http://www.w3.org/2000/svg">${html}</svg>`,
+          'application/xml'
+        )
+        .documentElement,
+      true
+    );
+
+    return svgNode
+  }
+
+  /**
+   * Create the DOM that will be injected
+   * @param {Object} root - DOM node to find out the context where the fragment will be created
+   * @param   {string} html - DOM to create as string
+   * @returns {HTMLDocumentFragment|HTMLElement} a new html fragment
+   */
+  function createDOMTree(root, html) {
+    if (isSvg(root)) return creteSVGTree(html, root)
+
+    return createHTMLTree(html)
+  }
+
+  /**
+   * Move all the child nodes from a source tag to another
+   * @param   {HTMLElement} source - source node
+   * @param   {HTMLElement} target - target node
+   * @returns {undefined} it's a void method ¯\_(ツ)_/¯
+   */
+
+  // Ignore this helper because it's needed only for svg tags
+  /* istanbul ignore next */
+  function moveChildren(source, target) {
+    if (source.firstChild) {
+      target.appendChild(source.firstChild);
+      moveChildren(source, target);
+    }
+  }
+
+  const SVG_RE = /svg/i;
+
+  /**
+   * Inject the DOM tree into a target node
+   * @param   {HTMLElement} el - target element
+   * @param   {HTMLFragment|SVGElement} dom - dom tree to inject
+   * @returns {undefined}
+   */
+  function injectDOM(el, dom) {
+    const clone = dom.cloneNode(true);
+
+    if (SVG_RE.test(el.tagName)) {
+      moveChildren(clone, el);
+    } else {
+      el.appendChild(clone);
+    }
+  }
+
+  /**
+   * Template Chunk model
+   * @type {Object}
+   */
+  const TemplateChunk = Object.freeze({
+    // Static props
+    bindings: null,
+    bindingsData: null,
+    html: null,
+    dom: null,
+    el: null,
+
+    // API methods
+    /**
+     * Attach the template to a DOM node
+     * @param   {HTMLElement} el - target DOM node
+     * @param   {*} scope - template data
+     * @returns {TemplateChunk} self
+     */
+    mount(el, scope) {
+      if (!el) throw new Error('Please provide DOM node to mount properly your template')
+
+      if (this.el) this.unmount(scope);
+
+      this.el = el;
+
+      // create lazily the template fragment only once if it hasn't been created before
+      if (this.html && !this.dom) {
+        this.dom = typeof this.html === 'string' ?
+          createDOMTree(el, this.html) :
+          this.html;
+      }
+
+      if (this.dom) injectDOM(el, this.dom);
+
+      // create the bindings
+      this.bindings = this.bindingsData.map(binding => create$5(this.el, binding));
+      this.bindings.forEach(b => b.mount(scope));
+
+      return this
+    },
+    /**
+     * Update the template with fresh data
+     * @param   {*} scope - template data
+     * @returns {TemplateChunk} self
+     */
+    update(scope) {
+      this.bindings.forEach(b => b.update(scope));
+
+      return this
+    },
+    /**
+     * Remove the template from the node where it was initially mounted
+     * @param   {*} scope - template data
+     * @param   {boolean} mustRemoveRoot - if true remove the root element
+     * @returns {TemplateChunk} self
+     */
+    unmount(scope, mustRemoveRoot) {
+      if (this.el) {
+        this.bindings.forEach(b => b.unmount(scope));
+        cleanNode(this.el);
+
+        if (mustRemoveRoot) {
+          this.el.parentNode.removeChild(this.el);
+        }
+
+        this.el = null;
+      }
+
+      return this
+    },
+    /**
+     * Clone the template chunk
+     * @returns {TemplateChunk} a clone of this object resetting the this.el property
+     */
+    clone() {
+      return {
+        ...this,
+        el: null
+      }
+    }
+  });
+
+  /**
+   * Create a template chunk wiring also the bindings
+   * @param   {string|HTMLElement} html - template string
+   * @param   {Array} bindings - bindings collection
+   * @returns {TemplateChunk} a new TemplateChunk copy
+   */
+  function create$6(html, bindings = []) {
+    return {
+      ...TemplateChunk,
+      html,
+      bindingsData: bindings
+    }
+  }
+
+  /**
+   * Method used to bind expressions to a DOM node
+   * @param   {string|HTMLElement} html - your static template html structure
+   * @param   {Array} bindings - list of the expressions to bind to update the markup
+   * @returns {TemplateChunk} a new TemplateChunk object having the `update`,`mount`, `unmount` and `clone` methods
+   *
+   * @example
+   *
+   * riotDOMBindings
+   *  .template(
+   *   `<div expr0><!----></div><div><p expr1><!----><section expr2></section></p>`,
+   *   [
+   *     {
+   *       selector: '[expr0]',
+   *       redundantAttribute: 'expr0',
+   *       expressions: [
+   *         {
+   *           type: 'text',
+   *           childNodeIndex: 0,
+   *           evaluate(scope) {
+   *             return scope.time;
+   *           },
+   *         },
+   *       ],
+   *     },
+   *     {
+   *       selector: '[expr1]',
+   *       redundantAttribute: 'expr1',
+   *       expressions: [
+   *         {
+   *           type: 'text',
+   *           childNodeIndex: 0,
+   *           evaluate(scope) {
+   *             return scope.name;
+   *           },
+   *         },
+   *         {
+   *           type: 'attribute',
+   *           name: 'style',
+   *           evaluate(scope) {
+   *             return scope.style;
+   *           },
+   *         },
+   *       ],
+   *     },
+   *     {
+   *       selector: '[expr2]',
+   *       redundantAttribute: 'expr2',
+   *       type: 'if',
+   *       evaluate(scope) {
+   *         return scope.isVisible;
+   *       },
+   *       template: riotDOMBindings.template('hello there'),
+   *     },
+   *   ]
+   * )
+   */
+
+  const COMPONENT_CORE = Object.freeze({
+    // component helpers
+    $(selector){ return $(this.root, selector) },
+    $$(selector){ return $$(this.root, selector) },
+    mixin(name) {
+      // extend this component with this mixin
+      Object.assing(this, MIXINS_MAP.get(name));
+    },
+    // defined during the component creation
+    css: null,
+    template: null
+  });
+
+  const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
+    onBeforeMount() {},
+    onMounted() {},
+    onBeforeUpdate() {},
+    onUpdated() {},
+    onBeforeUnmount() {},
+    onUnmounted() {}
+  });
+
+  /**
+   * Component definition function
+   * @param   {Object} implementation - the componen implementation will be generated via compiler
+   * @param   {Object} component - the component initial properties
+   * @returns {Object} a new component implementation object
+   */
+  function defineComponent({css, template: template$$1, tag}) {
+    const componentAPI = callOrAssign(tag);
+
+    const componentImplementation = defineProperties({
+      ...COMPONENT_LIFECYCLE_METHODS,
+      ...componentAPI,
+      // defined during the component creation
+      slots: null,
+      state: null,
+      props: null,
+      root: null
+    }, {
+      // these properties should not be overriden
+      ...COMPONENT_CORE,
+      css,
+      template: tag.render || template$$1(
+        create$6,
+        bindingTypes,
+        expressionTypes,
+        {
+          ...COMPONENTS_IMPLEMENTATION_MAP,
+          ...(componentAPI.components || {})
+        }
+      )
+    });
+
+    return curry(createComponent)(componentImplementation, {})
+  }
+
+  /**
+   * Evaluate the component properties either from its real attributes or from its attribute expressions
+   * @param   {HTMLElement} element - component root
+   * @param   {Array}  attributeExpressions - attribute expressions generated by the riot compiler
+   * @param   {Object} scope - current scope
+   * @returns {Object} attributes key value pairs
+   */
+  function evaluateProps(element, attributeExpressions = [], scope) {
+    return attributeExpressions.length ?
+      evaluateAttributeExpressions(attributeExpressions, scope) :
+      getAttributes(element)
+  }
+
+  /**
+   * Component creation factory function
+   * @param   {Object} component - a component implementation previously defined
+   * @param   {Object|Function} initialState - initial component state
+   * @param   {Array} options.slots - component slots generated via riot compiler
+   * @param   {Array} options.attributes - attribute expressions generated via riot compiler
+   * @returns {Riot.Component} a riot component instance
+   */
+  function createComponent(component, initialState, {slots, attributes}) {
+    // if this component was manually mounted its DOM attributes are likely not attribute expressions
+    // generated via riot compiler
+    const shouldSetAttributes = attributes && attributes.length;
+
+    return defineProperties(Object.create(component), {
+      slots,
+      state: callOrAssign(initialState),
+      props: {},
+      mount(element, scope, state = {}) {
+        defineProperties(this, {
+          props: evaluateProps(element, attributes, scope),
+          state: {
+            ...this.state,
+            ...state
+          },
+          root: element
+        });
+
+        this.onBeforeMount();
+        shouldSetAttributes && setAttributes(this.root, this.props);
+        this.template.mount(element, this);
+        this.onMounted();
+      },
+      update(scope, state = {}) {
+        const newProps = evaluateProps(this.root, attributes, scope);
+
+        if (this.onBeforeUpdate(newProps, state) === false) return
+        defineProperties(this, {
+          props: {
+            ...this.props,
+            ...newProps
+          },
+          state: {
+            ...this.state,
+            ...state
+          }
+        });
+
+        shouldSetAttributes && setAttributes(this.root, this.props);
+        this.template.update(this);
+        this.onUpdated();
+      },
+      unmount() {
+        this.onBeforeUnmount();
+        this.template.unmount();
+        this.onUnmounted();
+      }
+    })
+  }
+
+  /**
+   * Component initialization function starting from a DOM node
+   * @param   {HTMLElement} element - element to upgrade
+   * @param   {string} componentName - component id
+   * @param   {Object} initialState - initial component state
+   * @returns {Object} a new component instance bound to a DOM node
+   */
+  function mountComponent(element, componentName, initialState) {
+    const name = componentName || getName(element);
+    if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component named "${name}" was never registered`);
+    const component = createComponent(
+      COMPONENTS_IMPLEMENTATION_MAP.get(name),
+      initialState,
+      {}
+    );
+    COMPONENTS_CREATION_MAP.set(element, component);
+
+    // wrapper around the default component API
+    // in this case the component was mounted manually
+    return {
+      mount(element, state) {
+        return component.mount(element, {}, state)
+      },
+      update(state) {
+        return component.update(element, {}, state)
+      },
+      unmount() {
+        return component.unmount()
+      }
+    }
   }
 
   /**
@@ -121,12 +1830,12 @@
   /**
    * Register a custom tag by name
    * @param   {string} name - component name
-   * @param   {object} implementation - tag implementation
-   * @returns {object} object representing our tag implementation
+   * @param   {Object} implementation - tag implementation
+   * @returns {Object} object representing our tag implementation
    */
   function register(name, implementation) {
-    if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) { panic(("The component \"" + name + "\" was already registered")); }
-    return COMPONENTS_IMPLEMENTATION_MAP.set(name, define(implementation))
+    if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component "${name}" was already registered`);
+    return COMPONENTS_IMPLEMENTATION_MAP.set(name, defineComponent(implementation))
   }
 
   /**
@@ -135,27 +1844,28 @@
    * @returns {boolean} true if deleted
    */
   function unregister(name) {
-    if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) { return COMPONENTS_IMPLEMENTATION_MAP.delete(name) }
+    if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) return COMPONENTS_IMPLEMENTATION_MAP.delete(name)
     return false
   }
 
   /**
-   * Mounting function
+   * Mounting function that will work only for the components that were globally registered
    * @param   {string|HTMLElement} selector - query for the selection or a DOM element
-   * @param   {object} options - options that will be passed to the element instance
-   * @returns {array} list of nodes upgraded
+   * @param   {string} name - optional component name
+   * @param   {Object} initialState - the initial component state
+   * @returns {Array} list of nodes upgraded
    */
-  function mount(selector, options) {
-    return $$(selector).map(function (element) { return initialize(element, options); })
+  function mount(selector, name, initialState = {}) {
+    return $$(selector).map((element) => mountComponent(element, name, initialState))
   }
 
   /**
-   * Unmounting function
+   * Sweet unmounting helper function for the DOM node mounted manually by the user
    * @param   {string|HTMLElement} selector - query for the selection or a DOM element
-   * @returns {array} list of nodes unmounted
+   * @returns {Array} list of nodes unmounted
    */
   function unmount(selector) {
-    return $$(selector).map(function (element) {
+    return $$(selector).map((element) => {
       if (COMPONENTS_CREATION_MAP.has(element)) {
         COMPONENTS_CREATION_MAP.get(element).unmount();
       }
@@ -166,29 +1876,41 @@
   /**
    * Define a mixin
    * @param   {string} name - mixin id
-   * @param   {object|function} mixin - mixin logic
-   * @returns {object} a copy of the mixin just created
+   * @param   {Object|Function} mixin - mixin logic
+   * @returns {Map} the map containing all the mixins
    */
   function mixin(name, mixin) {
-    if (MIXINS_MAP.has(name)) { panic(("The mixin \"" + name + "\" was already defined")); }
-    var mix;
+    if (MIXINS_MAP.has(name)) panic(`The mixin "${name}" was already defined`);
 
-    if (isFunction(mixin)) {
-      mix = create(mixin());
-    } else {
-      mix = create(mixin);
-    }
+    MIXINS_MAP.set(name, callOrAssign(mixin));
 
-    MIXINS_MAP.set(name, mix);
-
-    return mix
+    return MIXINS_MAP
   }
+
+  /**
+   * Function to define an anonymous component
+   * @param   {Object} component - this object should contain the component implementation,
+   * like css and/or template/render function
+   * @param   {Object} slotsAndAttributes - object containing the slots or attribute expressions
+   * you shouldn't normally need it but it might be handy for testing
+   * @returns {Riot.Component} a riot component instance
+   */
+  const component = ({css, template, ...rest}, slotsAndAttributes = {}) => defineComponent({
+    css,
+    template,
+    tag: rest
+  })(slotsAndAttributes);
+
+  /** @type {string} current riot version */
+  const version = 'v4.0.0-alpha.0';
 
   exports.register = register;
   exports.unregister = unregister;
   exports.mount = mount;
   exports.unmount = unmount;
   exports.mixin = mixin;
+  exports.component = component;
+  exports.version = version;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

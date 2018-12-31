@@ -41,14 +41,19 @@
     "curri": "^1.0.0"
   },
   "devDependencies": {
+    "@riotjs/compiler": "^4.0.0-alpha.2",
     "babel-minify": "^0.5.0",
     "chai": "^4.2.0",
     "coveralls": "^3.0.2",
     "eslint": "^5.8.0",
     "eslint-config-riot": "^2.0.0",
     "jsdom": "^12.2.0",
+    "lodash.camelcase": "^4.3.0",
+    "lodash.kebabcase": "^4.1.1",
     "mocha": "^5.2.0",
-    "rollup": "^0.66.6",
+    "rollup": "^1.0.0",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-json": "^3.1.0",
     "rollup-plugin-node-resolve": "^3.4.0",
     "sinon": "^7.1.1",
     "sinon-chai": "^3.2.0"
