@@ -44,8 +44,8 @@ raw:
 	# build riot
 	@ mkdir -p $(DIST)
 	# Default builds UMD
-	@ $(ROLLUP) src/riot.js --config rollup.config.js --format umd --name riot > $(DIST)riot.js
-	@ $(ROLLUP) src/riot+compiler.js --config rollup.config.js --format umd --name riot > $(DIST)riot+compiler.js
+	@ $(ROLLUP) src/riot.js --config rollup.config.js > $(DIST)riot.js
+	@ $(ROLLUP) src/riot+compiler.js --config rollup.config.js > $(DIST)riot+compiler.js
 
 clean:
 	# clean $(DIST)

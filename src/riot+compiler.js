@@ -1,18 +1,12 @@
 import * as riot from './riot'
 import {$$,getAttribute} from './utils/dom'
 import {compile as compiler, registerPostprocessor} from '@riotjs/compiler'
-import camelcase from 'lodash.camelcase'
-import kebabcase from 'lodash.kebabcase'
+import camelCase from 'lodash/camelcase'
+import kebabCase from 'lodash/kebabcase'
 
 const GLOBAL_REGISTRY = '__riot_registry__'
 const TMP_TAG_NAME_VARIABLE = '__CURRENT_RIOT_TAG_NAME__'
 window[GLOBAL_REGISTRY] = {}
-// Patch to let the compiler work also in the browser
-/* eslint-disable */
-window.os = {EOL: '\n'}
-window.assert = function() {}
-window.assert.ok = window.assert.strictEqual = window.assert.deepEqual = function() {}
-/* eslint-enable */
 
 // evaluates a compiled tag within the global context
 function globalEval(js, url) {
@@ -33,7 +27,7 @@ registerPostprocessor(async function(code, { tagName }){
   return {
     code: `${TMP_TAG_NAME_VARIABLE}=${tagName};(function (global){${code}})(window)`
       .replace('export default',
-        `global['${GLOBAL_REGISTRY}']['${camelcase(tagName)}'] =`
+        `global['${GLOBAL_REGISTRY}']['${camelCase(tagName)}'] =`
       ),
     map: {}
   }
@@ -61,7 +55,7 @@ async function compile() {
     const tagName = tagNameRe.exec(code)[1]
 
     globalEval(code.replace(tagNameRe, ''), url)
-    riot.register(kebabcase(tagName), window[GLOBAL_REGISTRY][camelcase(tagName)])
+    riot.register(kebabCase(tagName), window[GLOBAL_REGISTRY][camelCase(tagName)])
   })
 }
 
