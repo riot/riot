@@ -51,7 +51,7 @@ async function compile() {
 
   tags.forEach(({code}, i) => {
     const url = urls[i]
-    const tagNameRe = new RegExp(`${TMP_TAG_NAME_VARIABLE}=(.*);`)
+    const tagNameRe = new RegExp(`${TMP_TAG_NAME_VARIABLE}=((.*?);)`)
     const tagName = tagNameRe.exec(code)[1]
 
     globalEval(code.replace(tagNameRe, ''), url)

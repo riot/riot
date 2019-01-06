@@ -10,3 +10,4 @@ globals:
 
 rules:
   fp/no-rest-parameters: false
+  fp/no-proxy: false

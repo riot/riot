@@ -64,7 +64,7 @@ export function evaluateAttributeExpressions(attributes, scope) {
     const value = attribute.evaluate(scope)
 
     if (attribute.name) {
-      acc[name] = value
+      acc[attribute.name] = value
     } else {
       Object.assign(acc, value)
     }

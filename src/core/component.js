@@ -6,8 +6,8 @@ import curry from 'curri'
 
 const COMPONENT_CORE = Object.freeze({
   // component helpers
-  $(selector){ return $(this.root, selector) },
-  $$(selector){ return $$(this.root, selector) },
+  $(selector){ return $(selector, this.root) },
+  $$(selector){ return $$(selector, this.root) },
   mixin(name) {
     // extend this component with this mixin
     Object.assing(this, MIXINS_MAP.get(name))
@@ -35,13 +35,13 @@ const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
 export function defineComponent({css, template, tag}) {
   const componentAPI = callOrAssign(tag)
 
-  const componentImplementation = defineProperties({
+  return curry(createComponent)(defineProperties({
     ...COMPONENT_LIFECYCLE_METHODS,
     ...componentAPI,
     // defined during the component creation
+    state: {},
+    props: {},
     slots: null,
-    state: null,
-    props: null,
     root: null
   }, {
     // these properties should not be overriden
@@ -51,14 +51,11 @@ export function defineComponent({css, template, tag}) {
       createTemplate,
       expressionTypes,
       bindingTypes,
-      {
-        ...COMPONENTS_IMPLEMENTATION_MAP,
-        ...(componentAPI.components || {})
+      function(name) {
+        return (componentAPI.components || {})[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
       }
     )
-  })
-
-  return curry(createComponent)(componentImplementation)
+  }))
 }
 
 /**
@@ -88,13 +85,13 @@ export function createComponent(component, {slots, attributes}) {
 
   return defineProperties(Object.create(component), {
     slots,
-    state: {},
-    props: {},
-    mount(element, scope, state = {}) {
+    mount(element, state = {}, props = {}) {
+      this.props = evaluateProps(element, attributes, props)
+      this.state = callOrAssign(state)
+
       defineProperties(this, {
-        props: evaluateProps(element, attributes, scope),
-        state: callOrAssign(state),
-        root: element
+        root: element,
+        template: this.template.clone(element)
       })
 
       this.onBeforeMount()
@@ -104,20 +101,20 @@ export function createComponent(component, {slots, attributes}) {
 
       return this
     },
-    update(scope, state = {}) {
-      const newProps = evaluateProps(this.root, attributes, scope)
+    update(state = {}, props = {}) {
+      const newProps = evaluateProps(this.root, attributes, props)
 
       if (this.onBeforeUpdate(newProps, state) === false) return
-      defineProperties(this, {
-        props: {
-          ...this.props,
-          ...newProps
-        },
-        state: {
-          ...this.state,
-          ...state
-        }
-      })
+
+      this.props = {
+        ...this.props,
+        ...newProps
+      }
+
+      this.state = {
+        ...this.state,
+        ...state
+      }
 
       shouldSetAttributes && setAttributes(this.root, this.props)
       this.template.update(this)
@@ -125,9 +122,9 @@ export function createComponent(component, {slots, attributes}) {
 
       return this
     },
-    unmount() {
+    unmount(removeRoot) {
       this.onBeforeUnmount()
-      this.template.unmount()
+      this.template.unmount(this, removeRoot === true)
       this.onUnmounted()
 
       return this
@@ -138,11 +135,11 @@ export function createComponent(component, {slots, attributes}) {
 /**
  * Component initialization function starting from a DOM node
  * @param   {HTMLElement} element - element to upgrade
- * @param   {string} componentName - component id
  * @param   {Object} initialState - initial component state
+ * @param   {string} componentName - component id
  * @returns {Object} a new component instance bound to a DOM node
  */
-export function mountComponent(element, componentName, initialState) {
+export function mountComponent(element, initialState, componentName) {
   const name = componentName || getName(element)
   if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component named "${name}" was never registered`)
   const component = COMPONENTS_IMPLEMENTATION_MAP.get(name)({})

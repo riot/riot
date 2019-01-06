@@ -7,7 +7,7 @@
   "author": "Gianluca Guarini <gianluca.guarini@gmail.com> (http://gianlucaguarini.com)",
   "license": "MIT",
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=8.0.0"
   },
   "scripts": {
     "test": "make riot"
@@ -18,9 +18,6 @@
     "web components",
     "virtual dom",
     "shadow dom",
-    "polymer",
-    "react",
-    "jsx",
     "minimal",
     "minimalist",
     "client-side",
@@ -37,11 +34,11 @@
     "riot.js"
   ],
   "dependencies": {
-    "@riotjs/dom-bindings": "^0.5.0",
+    "@riotjs/dom-bindings": "^0.8.0",
     "curri": "^1.0.0"
   },
   "devDependencies": {
-    "@riotjs/compiler": "^4.0.0-alpha.3",
+    "@riotjs/compiler": "^4.0.0-alpha.6",
     "babel-minify": "^0.5.0",
     "chai": "^4.2.0",
     "coveralls": "^3.0.2",
@@ -67,9 +64,6 @@
     "riot+compiler.js",
     "riot+compiler.min.js"
   ],
-  "bin": {
-    "riot": "node_modules/riot-cli/lib/index.js"
-  },
   "main": "riot.js",
   "module": "src/riot.js",
   "jsnext:main": "src/riot.js"

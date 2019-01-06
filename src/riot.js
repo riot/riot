@@ -15,7 +15,25 @@ import { $$ } from './utils/dom'
  */
 export function register(name, implementation) {
   if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component "${name}" was already registered`)
-  return COMPONENTS_IMPLEMENTATION_MAP.set(name, defineComponent(implementation))
+
+  return COMPONENTS_IMPLEMENTATION_MAP.set(name, (...args) => {
+    const tag = defineComponent(implementation)(...args)
+
+    // this object will be provided to the tag bindings generated via compiler
+    // the bindings will not be able to update the components state, they will only pass down
+    // the parentScope updates
+    return {
+      mount(element, parentScope, state) {
+        return tag.mount(element, state, parentScope)
+      },
+      update(parentScope, state) {
+        return tag.update(state, parentScope)
+      },
+      unmount() {
+        return tag.unmount()
+      }
+    }
+  })
 }
 
 /**
@@ -31,12 +49,12 @@ export function unregister(name) {
 /**
  * Mounting function that will work only for the components that were globally registered
  * @param   {string|HTMLElement} selector - query for the selection or a DOM element
- * @param   {string} name - optional component name
  * @param   {Object} initialState - the initial component state
+ * @param   {string} name - optional component name
  * @returns {Array} list of nodes upgraded
  */
-export function mount(selector, name, initialState = {}) {
-  return $$(selector).map((element) => mountComponent(element, name, initialState))
+export function mount(selector, initialState, name) {
+  return $$(selector).map((element) => mountComponent(element, initialState, name))
 }
 
 /**

@@ -2,8 +2,8 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (factory((global.riot = {})));
-}(this, (function (exports) { 'use strict';
+  (global = global || self, factory(global.riot = {}));
+}(this, function (exports) { 'use strict';
 
   const
     COMPONENTS_IMPLEMENTATION_MAP = new Map(),
@@ -104,7 +104,7 @@
       const value = attribute.evaluate(scope);
 
       if (attribute.name) {
-        acc[name] = value;
+        acc[attribute.name] = value;
       } else {
         Object.assign(acc, value);
       }
@@ -120,7 +120,8 @@
    * @returns {Array} dom nodes found
    */
   function $$(selector, context) {
-    return Array.from((context || document).querySelectorAll(selector))
+    if (isString(selector)) return Array.from((context || document).querySelectorAll(selector))
+    return domToArray(selector)
   }
 
   /**
@@ -130,7 +131,32 @@
    * @returns {HTMLElement} DOM node found
    */
   function $(selector, context) {
-    return (context || document).querySelector(selector)
+    if (isString(selector)) return (context || document).querySelector(selector)
+    return selector
+  }
+
+  /**
+   * Converts any DOM node/s to a loopable array
+   * @param   { HTMLElement|NodeList } els - single html element or a node list
+   * @returns { Array } always a loopable object
+   */
+  function domToArray(els) {
+    // can this object be already looped?
+    if (!Array.isArray(els)) {
+      // is it a node list?
+      if (
+        /^\[object (HTMLCollection|NodeList|Object)\]$/
+          .test(Object.prototype.toString.call(els))
+          && typeof els.length === 'number'
+      )
+        return Array.from(els)
+      else
+        // if it's a single node
+        // it will be returned as "array" with one single entry
+        return [els]
+    }
+    // this object could be looped out of the box
+    return els
   }
 
   /**
@@ -162,10 +188,10 @@
    * @returns {Object} all the attributes found as a key value pairs
    */
   function getAttributes(element) {
-    Array.from(element.attributes).reduce((acc, attribute) => {
+    return Array.from(element.attributes).reduce((acc, attribute) => {
       acc[attribute.name] = attribute.value;
       return acc
-    }, {});
+    }, {})
   }
 
   /**
@@ -834,6 +860,26 @@
     return futureNodes;
   };
 
+  /**
+   * Safe expression/bindings value evaluation, in case of errors we return a fallback value
+   * @param   {Function} fn  - function to evaluate
+   * @param   {*}        fallback - a fallback return value
+   * @param   {boolean}  debug - if true the error will be logged
+   * @returns {*} result of the computation or a fallback value
+   */
+
+  function evalOrFallback(fn, fallback, debug) {
+    try {
+      return fn()
+    } catch (error) {
+      if (debug) {
+        console.error(debug); // eslint-disable-line
+      }
+
+      return fallback
+    }
+  }
+
   const EachBinding = Object.seal({
     // dynamic binding properties
     childrenMap: null,
@@ -855,7 +901,7 @@
     },
     update(scope) {
       const { placeholder } = this;
-      const collection = this.evaluate(scope);
+      const collection = evalOrFallback(() => this.evaluate(scope), []);
       const items = collection ? Array.from(collection) : [];
       const parent = placeholder.parentNode;
 
@@ -900,7 +946,7 @@
    * @returns {boolean} true if this item should be skipped
    */
   function mustFilterItem(condition, context) {
-    return condition ? condition(context) : false
+    return condition ? (condition(context) === false) : false
   }
 
   /**
@@ -958,7 +1004,7 @@
         return
       }
 
-      const tag = oldItem ? oldItem.tag : template.clone();
+      const tag = oldItem ? oldItem.tag : template.clone(root);
       const el = oldItem ? tag.el : root.cloneNode();
 
       if (!oldItem) {
@@ -1025,7 +1071,7 @@
       return this.update(scope)
     },
     update(scope) {
-      const value = !!this.evaluate(scope);
+      const value = !!evalOrFallback(() => this.evaluate(scope), false);
       const mustMount = !this.value && value;
       const mustUnmount = this.value && !value;
 
@@ -1033,7 +1079,7 @@
       case mustMount:
         swap(this.node, this.placeholder);
         if (this.template) {
-          this.template = this.template.clone();
+          this.template = this.template.clone(this.node);
           this.template.mount(this.node, scope);
         }
         break
@@ -1322,23 +1368,6 @@
   }
 
   /**
-   * Function to curry any javascript method
-   * @param   {Function}  fn - the target function we want to curry
-   * @param   {...[args]} acc - initial arguments
-   * @returns {Function|*} it will return a function until the target function
-   *                       will receive all of its arguments
-   */
-  function curry(fn, ...acc) {
-    return (...args) => {
-      args = [...acc, ...args];
-
-      return args.length < fn.length ?
-        curry(fn, ...args) :
-        fn(...args)
-    }
-  }
-
-  /**
    * Create a new tag object if it was registered before, otherwise fallback to the simple
    * template chunk
    * @param   {Function} component - component factory function
@@ -1388,12 +1417,19 @@
     }, '')
   }
 
-  function create$4(node, { component, slots, attributes }) {
-    const tag = getTag(component, slots, attributes);
+  function create$4(node, { name, getComponent, slots, attributes }) {
+    const tag = getTag(getComponent(name), slots, attributes);
 
     return {
-      ...tag,
-      mount: curry(tag.mount.bind(tag))(node)
+      mount(scope) {
+        return tag.mount(node, scope)
+      },
+      update(scope) {
+        return tag.update(scope)
+      },
+      unmount(scope) {
+        return tag.unmount(scope)
+      }
     }
   }
 
@@ -1498,13 +1534,23 @@
    * @returns {undefined}
    */
   function injectDOM(el, dom) {
-    const clone = dom.cloneNode(true);
-
     if (SVG_RE.test(el.tagName)) {
-      moveChildren(clone, el);
+      moveChildren(dom, el);
     } else {
-      el.appendChild(clone);
+      el.appendChild(dom);
     }
+  }
+
+  /**
+   * Create the Template DOM skeleton
+   * @param   {HTMLElement} el - root node where the DOM will be injected
+   * @param   {string} html - markup that will be injected into the root node
+   * @returns {HTMLFragment} fragment that will be injected into the root node
+   */
+  function createTemplateDOM(el, html) {
+    return html && (typeof html === 'string' ?
+      createDOMTree(el, html) :
+      html)
   }
 
   /**
@@ -1534,13 +1580,9 @@
       this.el = el;
 
       // create lazily the template fragment only once if it hasn't been created before
-      if (this.html && !this.dom) {
-        this.dom = typeof this.html === 'string' ?
-          createDOMTree(el, this.html) :
-          this.html;
-      }
+      this.dom = this.dom || createTemplateDOM(el, this.html);
 
-      if (this.dom) injectDOM(el, this.dom);
+      if (this.dom) injectDOM(el, this.dom.cloneNode(true));
 
       // create the bindings
       this.bindings = this.bindingsData.map(binding => create$5(this.el, binding));
@@ -1580,9 +1622,13 @@
     },
     /**
      * Clone the template chunk
+     * @param   {HTMLElement} el - template target DOM node
      * @returns {TemplateChunk} a clone of this object resetting the this.el property
      */
-    clone() {
+    clone(el) {
+      // make sure that the DOM gets created before cloning the template
+      this.dom = this.dom || createTemplateDOM(el, this.html);
+
       return {
         ...this,
         el: null
@@ -1621,7 +1667,7 @@
    *       redundantAttribute: 'expr0',
    *       expressions: [
    *         {
-   *           type: 'text',
+   *           type: expressionTypes.TEXT,
    *           childNodeIndex: 0,
    *           evaluate(scope) {
    *             return scope.time;
@@ -1634,7 +1680,7 @@
    *       redundantAttribute: 'expr1',
    *       expressions: [
    *         {
-   *           type: 'text',
+   *           type: expressionTypes.TEXT,
    *           childNodeIndex: 0,
    *           evaluate(scope) {
    *             return scope.name;
@@ -1652,7 +1698,7 @@
    *     {
    *       selector: '[expr2]',
    *       redundantAttribute: 'expr2',
-   *       type: 'if',
+   *       type: bindingTypes.IF,
    *       evaluate(scope) {
    *         return scope.isVisible;
    *       },
@@ -1662,10 +1708,27 @@
    * )
    */
 
+  /**
+   * Function to curry any javascript method
+   * @param   {Function}  fn - the target function we want to curry
+   * @param   {...[args]} acc - initial arguments
+   * @returns {Function|*} it will return a function until the target function
+   *                       will receive all of its arguments
+   */
+  function curry(fn, ...acc) {
+    return (...args) => {
+      args = [...acc, ...args];
+
+      return args.length < fn.length ?
+        curry(fn, ...args) :
+        fn(...args)
+    }
+  }
+
   const COMPONENT_CORE = Object.freeze({
     // component helpers
-    $(selector){ return $(this.root, selector) },
-    $$(selector){ return $$(this.root, selector) },
+    $(selector){ return $(selector, this.root) },
+    $$(selector){ return $$(selector, this.root) },
     mixin(name) {
       // extend this component with this mixin
       Object.assing(this, MIXINS_MAP.get(name));
@@ -1693,13 +1756,13 @@
   function defineComponent({css, template: template$$1, tag}) {
     const componentAPI = callOrAssign(tag);
 
-    const componentImplementation = defineProperties({
+    return curry(createComponent)(defineProperties({
       ...COMPONENT_LIFECYCLE_METHODS,
       ...componentAPI,
       // defined during the component creation
+      state: {},
+      props: {},
       slots: null,
-      state: null,
-      props: null,
       root: null
     }, {
       // these properties should not be overriden
@@ -1707,16 +1770,13 @@
       css,
       template: tag.render || template$$1(
         create$6,
-        bindingTypes,
         expressionTypes,
-        {
-          ...COMPONENTS_IMPLEMENTATION_MAP,
-          ...(componentAPI.components || {})
+        bindingTypes,
+        function(name) {
+          return (componentAPI.components || {})[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
         }
       )
-    });
-
-    return curry(createComponent)(componentImplementation, {})
+    }))
   }
 
   /**
@@ -1735,58 +1795,60 @@
   /**
    * Component creation factory function
    * @param   {Object} component - a component implementation previously defined
-   * @param   {Object|Function} initialState - initial component state
    * @param   {Array} options.slots - component slots generated via riot compiler
    * @param   {Array} options.attributes - attribute expressions generated via riot compiler
    * @returns {Riot.Component} a riot component instance
    */
-  function createComponent(component, initialState, {slots, attributes}) {
+  function createComponent(component, {slots, attributes}) {
     // if this component was manually mounted its DOM attributes are likely not attribute expressions
     // generated via riot compiler
     const shouldSetAttributes = attributes && attributes.length;
 
     return defineProperties(Object.create(component), {
       slots,
-      state: callOrAssign(initialState),
-      props: {},
-      mount(element, scope, state = {}) {
+      mount(element, state = {}, props = {}) {
+        this.props = evaluateProps(element, attributes, props);
+        this.state = callOrAssign(state);
+
         defineProperties(this, {
-          props: evaluateProps(element, attributes, scope),
-          state: {
-            ...this.state,
-            ...state
-          },
-          root: element
+          root: element,
+          template: this.template.clone(element)
         });
 
         this.onBeforeMount();
         shouldSetAttributes && setAttributes(this.root, this.props);
         this.template.mount(element, this);
         this.onMounted();
+
+        return this
       },
-      update(scope, state = {}) {
-        const newProps = evaluateProps(this.root, attributes, scope);
+      update(state = {}, props = {}) {
+        const newProps = evaluateProps(this.root, attributes, props);
 
         if (this.onBeforeUpdate(newProps, state) === false) return
-        defineProperties(this, {
-          props: {
-            ...this.props,
-            ...newProps
-          },
-          state: {
-            ...this.state,
-            ...state
-          }
-        });
+
+        this.props = {
+          ...this.props,
+          ...newProps
+        };
+
+        this.state = {
+          ...this.state,
+          ...state
+        };
 
         shouldSetAttributes && setAttributes(this.root, this.props);
         this.template.update(this);
         this.onUpdated();
+
+        return this
       },
-      unmount() {
+      unmount(removeRoot) {
         this.onBeforeUnmount();
-        this.template.unmount();
+        this.template.unmount(this, removeRoot === true);
         this.onUnmounted();
+
+        return this
       }
     })
   }
@@ -1794,33 +1856,17 @@
   /**
    * Component initialization function starting from a DOM node
    * @param   {HTMLElement} element - element to upgrade
-   * @param   {string} componentName - component id
    * @param   {Object} initialState - initial component state
+   * @param   {string} componentName - component id
    * @returns {Object} a new component instance bound to a DOM node
    */
-  function mountComponent(element, componentName, initialState) {
+  function mountComponent(element, initialState, componentName) {
     const name = componentName || getName(element);
     if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component named "${name}" was never registered`);
-    const component = createComponent(
-      COMPONENTS_IMPLEMENTATION_MAP.get(name),
-      initialState,
-      {}
-    );
+    const component = COMPONENTS_IMPLEMENTATION_MAP.get(name)({});
     COMPONENTS_CREATION_MAP.set(element, component);
 
-    // wrapper around the default component API
-    // in this case the component was mounted manually
-    return {
-      mount(element, state) {
-        return component.mount(element, {}, state)
-      },
-      update(state) {
-        return component.update(element, {}, state)
-      },
-      unmount() {
-        return component.unmount()
-      }
-    }
+    return component.mount(element, {}, initialState)
   }
 
   /**
@@ -1835,7 +1881,25 @@
    */
   function register(name, implementation) {
     if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component "${name}" was already registered`);
-    return COMPONENTS_IMPLEMENTATION_MAP.set(name, defineComponent(implementation))
+
+    return COMPONENTS_IMPLEMENTATION_MAP.set(name, (...args) => {
+      const tag = defineComponent(implementation)(...args);
+
+      // this object will be provided to the tag bindings generated via compiler
+      // the bindings will not be able to update the components state, they will only pass down
+      // the parentScope updates
+      return {
+        mount(element, parentScope, state) {
+          return tag.mount(element, state, parentScope)
+        },
+        update(parentScope, state) {
+          return tag.update(state, parentScope)
+        },
+        unmount() {
+          return tag.unmount()
+        }
+      }
+    })
   }
 
   /**
@@ -1851,12 +1915,12 @@
   /**
    * Mounting function that will work only for the components that were globally registered
    * @param   {string|HTMLElement} selector - query for the selection or a DOM element
-   * @param   {string} name - optional component name
    * @param   {Object} initialState - the initial component state
+   * @param   {string} name - optional component name
    * @returns {Array} list of nodes upgraded
    */
-  function mount(selector, name, initialState = {}) {
-    return $$(selector).map((element) => mountComponent(element, name, initialState))
+  function mount(selector, initialState, name) {
+    return $$(selector).map((element) => mountComponent(element, initialState, name))
   }
 
   /**
@@ -1914,4 +1978,4 @@
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
-})));
+}));
