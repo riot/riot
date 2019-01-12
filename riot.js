@@ -11,6 +11,13 @@
     MIXINS_MAP = new Map(),
     IS_DIRECTIVE = 'is';
 
+  var globals = /*#__PURE__*/Object.freeze({
+    COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
+    COMPONENTS_CREATION_MAP: COMPONENTS_CREATION_MAP,
+    MIXINS_MAP: MIXINS_MAP,
+    IS_DIRECTIVE: IS_DIRECTIVE
+  });
+
   /**
    * Quick type checking
    * @param   {*} element - anything
@@ -56,6 +63,25 @@
    */
   function callOrAssign(source) {
     return isFunction(source) ? source() : source
+  }
+
+  // doese simply nothing
+  function noop() {
+    return this
+  }
+
+  /**
+   * Autobind the methods of a source object to itself
+   * @param   {Object} source - probably a riot tag instance
+   * @param   {Array<string>} methods - list of the methods to autobind
+   * @returns {Object} the original object received
+   */
+  function autobindMethods(source, methods) {
+    methods.forEach(method => {
+      source[method] = source[method].bind(source);
+    });
+
+    return source
   }
 
   /**
@@ -133,6 +159,14 @@
   function $(selector, context) {
     if (isString(selector)) return (context || document).querySelector(selector)
     return selector
+  }
+
+  /**
+   * Get the document window
+   * @returns {Object} window object
+   */
+  function getWindow() {
+    return typeof window === 'undefined' ? /* istanbul ignore next */ undefined : window
   }
 
   /**
@@ -1417,19 +1451,57 @@
     }, '')
   }
 
-  function create$4(node, { name, getComponent, slots, attributes }) {
-    const tag = getTag(getComponent(name), slots, attributes);
 
-    return {
-      mount(scope) {
-        return tag.mount(node, scope)
-      },
-      update(scope) {
-        return tag.update(scope)
-      },
-      unmount(scope) {
-        return tag.unmount(scope)
+  const TagBinding = Object.seal({
+    // dynamic binding properties
+    node: null,
+    evaluate: null,
+    name: null,
+    slots: null,
+    tag: null,
+    attributes: null,
+    getComponent: null,
+
+    mount(scope) {
+      return this.update(scope)
+    },
+    update(scope) {
+      const name = this.evaluate(scope);
+
+      // simple update
+      if (name === this.name) {
+        this.tag.update(scope);
+      } else {
+        // unmount the old tag if it exists
+        if (this.tag) {
+          this.tag.unmount(scope);
+        }
+
+        // mount the new tag
+        this.name = name;
+        this.tag = getTag(this.getComponent(name), this.slots, this.attributes);
+        this.tag.mount(this.node, scope);
       }
+
+      return this
+    },
+    unmount(scope) {
+      if (this.tag) {
+        this.tag.unmount(scope);
+      }
+
+      return this
+    }
+  });
+
+  function create$4(node, { evaluate, getComponent, slots, attributes }) {
+    return {
+      ...TagBinding,
+      node,
+      evaluate,
+      slots,
+      attributes,
+      getComponent
     }
   }
 
@@ -1708,6 +1780,60 @@
    * )
    */
 
+  const WIN = getWindow();
+  const CSS_BY_NAME = new Map();
+
+  // skip the following code on the server
+  const styleNode = WIN && ((() => {
+    // create a new style element with the correct type
+    const newNode = document.createElement('style');
+    setAttribute(newNode, 'type', 'text/css');
+    document.head.appendChild(newNode);
+
+    return newNode
+  }))();
+
+  /**
+   * Object that will be used to inject and manage the css of every tag instance
+   */
+  var cssManager = {
+    /**
+     * Save a tag style to be later injected into DOM
+     * @param { string } name - if it's passed we will map the css to a tagname
+     * @param { string } css - css string
+     * @returns {Object} self
+     */
+    add(name, css) {
+      CSS_BY_NAME.set(name, css);
+      this.inject();
+      return this
+    },
+    /**
+     * Inject all previously saved tag styles into DOM
+     * innerHTML seems slow: http://jsperf.com/riot-insert-style
+     * @returns {Object} self
+     */
+    inject() {
+      if (!styleNode) return this
+      styleNode.innerHTML = [...CSS_BY_NAME.values()].join('\n');
+      return this
+    },
+
+    /**
+     * Remove a tag style from the DOM
+     * @param {string} name a registered tagname
+     * @returns {Object} self
+     */
+    remove(name) {
+      if (CSS_BY_NAME.has(name)) {
+        CSS_BY_NAME.delete(name);
+        this.inject();
+      }
+
+      return this
+    }
+  };
+
   /**
    * Function to curry any javascript method
    * @param   {Function}  fn - the target function we want to curry
@@ -1739,13 +1865,20 @@
   });
 
   const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
-    onBeforeMount() {},
-    onMounted() {},
-    onBeforeUpdate() {},
-    onUpdated() {},
-    onBeforeUnmount() {},
-    onUnmounted() {}
+    onBeforeMount: noop,
+    onMounted: noop,
+    onBeforeUpdate: noop,
+    onUpdated: noop,
+    onBeforeUnmount: noop,
+    onUnmounted: noop
   });
+
+  const EMPTY_TEMPLATE_INTERFACE = {
+    update: noop,
+    mount: noop,
+    unmount: noop,
+    clone: noop
+  };
 
   /**
    * Component definition function
@@ -1753,8 +1886,11 @@
    * @param   {Object} component - the component initial properties
    * @returns {Object} a new component implementation object
    */
-  function defineComponent({css, template: template$$1, tag}) {
-    const componentAPI = callOrAssign(tag);
+  function defineComponent({css, template: template$$1, tag, name}) {
+    const componentAPI = callOrAssign(tag) || {};
+
+    // add the component css into the DOM
+    if (css && name) cssManager.add(name, css);
 
     return curry(createComponent)(defineProperties({
       ...COMPONENT_LIFECYCLE_METHODS,
@@ -1768,14 +1904,14 @@
       // these properties should not be overriden
       ...COMPONENT_CORE,
       css,
-      template: tag.render || template$$1(
+      template: template$$1 ? template$$1(
         create$6,
         expressionTypes,
         bindingTypes,
         function(name) {
           return (componentAPI.components || {})[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
         }
-      )
+      ) : EMPTY_TEMPLATE_INTERFACE
     }))
   }
 
@@ -1804,53 +1940,56 @@
     // generated via riot compiler
     const shouldSetAttributes = attributes && attributes.length;
 
-    return defineProperties(Object.create(component), {
-      slots,
-      mount(element, state = {}, props = {}) {
-        this.props = evaluateProps(element, attributes, props);
-        this.state = callOrAssign(state);
+    return autobindMethods(
+      defineProperties(Object.create(component), {
+        slots,
+        mount(element, state = {}, props = {}) {
+          this.props = evaluateProps(element, attributes, props);
+          this.state = callOrAssign(state);
 
-        defineProperties(this, {
-          root: element,
-          template: this.template.clone(element)
-        });
+          defineProperties(this, {
+            root: element,
+            template: this.template.clone(element)
+          });
 
-        this.onBeforeMount();
-        shouldSetAttributes && setAttributes(this.root, this.props);
-        this.template.mount(element, this);
-        this.onMounted();
+          this.onBeforeMount();
+          shouldSetAttributes && setAttributes(this.root, this.props);
+          this.template.mount(element, this);
+          this.onMounted();
 
-        return this
-      },
-      update(state = {}, props = {}) {
-        const newProps = evaluateProps(this.root, attributes, props);
+          return this
+        },
+        update(state = {}, props = {}) {
+          const newProps = evaluateProps(this.root, attributes, props);
 
-        if (this.onBeforeUpdate(newProps, state) === false) return
+          if (this.onBeforeUpdate(newProps, state) === false) return
 
-        this.props = {
-          ...this.props,
-          ...newProps
-        };
+          this.props = {
+            ...this.props,
+            ...newProps
+          };
 
-        this.state = {
-          ...this.state,
-          ...state
-        };
+          this.state = {
+            ...this.state,
+            ...state
+          };
 
-        shouldSetAttributes && setAttributes(this.root, this.props);
-        this.template.update(this);
-        this.onUpdated();
+          shouldSetAttributes && setAttributes(this.root, this.props);
+          this.template.update(this);
+          this.onUpdated();
 
-        return this
-      },
-      unmount(removeRoot) {
-        this.onBeforeUnmount();
-        this.template.unmount(this, removeRoot === true);
-        this.onUnmounted();
+          return this
+        },
+        unmount(removeRoot) {
+          this.onBeforeUnmount();
+          this.template.unmount(this, removeRoot === true);
+          this.onUnmounted();
 
-        return this
-      }
-    })
+          return this
+        }
+      }),
+      Object.keys(component).filter(prop => isFunction(component[prop]))
+    )
   }
 
   /**
@@ -1869,6 +2008,8 @@
     return component.mount(element, {}, initialState)
   }
 
+  const { COMPONENTS_CREATION_MAP: COMPONENTS_CREATION_MAP$1, COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP$1, MIXINS_MAP: MIXINS_MAP$1 } = globals;
+
   /**
    * Riot public api
    */
@@ -1879,24 +2020,29 @@
    * @param   {Object} implementation - tag implementation
    * @returns {Object} object representing our tag implementation
    */
-  function register(name, implementation) {
-    if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component "${name}" was already registered`);
+  function register(name, {css, template, tag}) {
+    if (COMPONENTS_IMPLEMENTATION_MAP$1.has(name)) panic(`The component "${name}" was already registered`);
 
-    return COMPONENTS_IMPLEMENTATION_MAP.set(name, (...args) => {
-      const tag = defineComponent(implementation)(...args);
+    return COMPONENTS_IMPLEMENTATION_MAP$1.set(name, (...args) => {
+      const component = defineComponent({
+        css,
+        template,
+        tag,
+        name
+      })(...args);
 
       // this object will be provided to the tag bindings generated via compiler
       // the bindings will not be able to update the components state, they will only pass down
       // the parentScope updates
       return {
         mount(element, parentScope, state) {
-          return tag.mount(element, state, parentScope)
+          return component.mount(element, state, parentScope)
         },
         update(parentScope, state) {
-          return tag.update(state, parentScope)
+          return component.update(state, parentScope)
         },
         unmount() {
-          return tag.unmount()
+          return component.unmount()
         }
       }
     })
@@ -1908,7 +2054,8 @@
    * @returns {boolean} true if deleted
    */
   function unregister(name) {
-    if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) return COMPONENTS_IMPLEMENTATION_MAP.delete(name)
+    if (COMPONENTS_IMPLEMENTATION_MAP$1.has(name)) return COMPONENTS_IMPLEMENTATION_MAP$1.delete(name)
+    cssManager.remove(name);
     return false
   }
 
@@ -1930,8 +2077,8 @@
    */
   function unmount(selector) {
     return $$(selector).map((element) => {
-      if (COMPONENTS_CREATION_MAP.has(element)) {
-        COMPONENTS_CREATION_MAP.get(element).unmount();
+      if (COMPONENTS_CREATION_MAP$1.has(element)) {
+        COMPONENTS_CREATION_MAP$1.get(element).unmount();
       }
       return element
     })
@@ -1944,11 +2091,11 @@
    * @returns {Map} the map containing all the mixins
    */
   function mixin(name, mixin) {
-    if (MIXINS_MAP.has(name)) panic(`The mixin "${name}" was already defined`);
+    if (MIXINS_MAP$1.has(name)) panic(`The mixin "${name}" was already defined`);
 
-    MIXINS_MAP.set(name, callOrAssign(mixin));
+    MIXINS_MAP$1.set(name, callOrAssign(mixin));
 
-    return MIXINS_MAP
+    return MIXINS_MAP$1
   }
 
   /**
@@ -1968,6 +2115,12 @@
   /** @type {string} current riot version */
   const version = 'v4.0.0-alpha.0';
 
+  // expose some internal stuff that might be used from external tools
+  const __ = {
+    cssManager,
+    globals
+  };
+
   exports.register = register;
   exports.unregister = unregister;
   exports.mount = mount;
@@ -1975,6 +2128,7 @@
   exports.mixin = mixin;
   exports.component = component;
   exports.version = version;
+  exports.__ = __;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

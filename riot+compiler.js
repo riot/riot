@@ -11,6 +11,13 @@
     MIXINS_MAP = new Map(),
     IS_DIRECTIVE = 'is';
 
+  var globals = /*#__PURE__*/Object.freeze({
+    COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
+    COMPONENTS_CREATION_MAP: COMPONENTS_CREATION_MAP,
+    MIXINS_MAP: MIXINS_MAP,
+    IS_DIRECTIVE: IS_DIRECTIVE
+  });
+
   /**
    * Quick type checking
    * @param   {*} element - anything
@@ -56,6 +63,25 @@
    */
   function callOrAssign(source) {
     return isFunction(source) ? source() : source
+  }
+
+  // doese simply nothing
+  function noop() {
+    return this
+  }
+
+  /**
+   * Autobind the methods of a source object to itself
+   * @param   {Object} source - probably a riot tag instance
+   * @param   {Array<string>} methods - list of the methods to autobind
+   * @returns {Object} the original object received
+   */
+  function autobindMethods(source, methods) {
+    methods.forEach(method => {
+      source[method] = source[method].bind(source);
+    });
+
+    return source
   }
 
   /**
@@ -133,6 +159,14 @@
   function $(selector, context) {
     if (isString(selector)) return (context || document).querySelector(selector)
     return selector
+  }
+
+  /**
+   * Get the document window
+   * @returns {Object} window object
+   */
+  function getWindow() {
+    return typeof window === 'undefined' ? /* istanbul ignore next */ undefined : window
   }
 
   /**
@@ -1417,19 +1451,57 @@
     }, '')
   }
 
-  function create$4(node, { name, getComponent, slots, attributes }) {
-    const tag = getTag(getComponent(name), slots, attributes);
 
-    return {
-      mount(scope) {
-        return tag.mount(node, scope)
-      },
-      update(scope) {
-        return tag.update(scope)
-      },
-      unmount(scope) {
-        return tag.unmount(scope)
+  const TagBinding = Object.seal({
+    // dynamic binding properties
+    node: null,
+    evaluate: null,
+    name: null,
+    slots: null,
+    tag: null,
+    attributes: null,
+    getComponent: null,
+
+    mount(scope) {
+      return this.update(scope)
+    },
+    update(scope) {
+      const name = this.evaluate(scope);
+
+      // simple update
+      if (name === this.name) {
+        this.tag.update(scope);
+      } else {
+        // unmount the old tag if it exists
+        if (this.tag) {
+          this.tag.unmount(scope);
+        }
+
+        // mount the new tag
+        this.name = name;
+        this.tag = getTag(this.getComponent(name), this.slots, this.attributes);
+        this.tag.mount(this.node, scope);
       }
+
+      return this
+    },
+    unmount(scope) {
+      if (this.tag) {
+        this.tag.unmount(scope);
+      }
+
+      return this
+    }
+  });
+
+  function create$4(node, { evaluate, getComponent, slots, attributes }) {
+    return {
+      ...TagBinding,
+      node,
+      evaluate,
+      slots,
+      attributes,
+      getComponent
     }
   }
 
@@ -1708,6 +1780,60 @@
    * )
    */
 
+  const WIN = getWindow();
+  const CSS_BY_NAME = new Map();
+
+  // skip the following code on the server
+  const styleNode = WIN && ((() => {
+    // create a new style element with the correct type
+    const newNode = document.createElement('style');
+    setAttribute(newNode, 'type', 'text/css');
+    document.head.appendChild(newNode);
+
+    return newNode
+  }))();
+
+  /**
+   * Object that will be used to inject and manage the css of every tag instance
+   */
+  var cssManager = {
+    /**
+     * Save a tag style to be later injected into DOM
+     * @param { string } name - if it's passed we will map the css to a tagname
+     * @param { string } css - css string
+     * @returns {Object} self
+     */
+    add(name, css) {
+      CSS_BY_NAME.set(name, css);
+      this.inject();
+      return this
+    },
+    /**
+     * Inject all previously saved tag styles into DOM
+     * innerHTML seems slow: http://jsperf.com/riot-insert-style
+     * @returns {Object} self
+     */
+    inject() {
+      if (!styleNode) return this
+      styleNode.innerHTML = [...CSS_BY_NAME.values()].join('\n');
+      return this
+    },
+
+    /**
+     * Remove a tag style from the DOM
+     * @param {string} name a registered tagname
+     * @returns {Object} self
+     */
+    remove(name) {
+      if (CSS_BY_NAME.has(name)) {
+        CSS_BY_NAME.delete(name);
+        this.inject();
+      }
+
+      return this
+    }
+  };
+
   /**
    * Function to curry any javascript method
    * @param   {Function}  fn - the target function we want to curry
@@ -1739,13 +1865,20 @@
   });
 
   const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
-    onBeforeMount() {},
-    onMounted() {},
-    onBeforeUpdate() {},
-    onUpdated() {},
-    onBeforeUnmount() {},
-    onUnmounted() {}
+    onBeforeMount: noop,
+    onMounted: noop,
+    onBeforeUpdate: noop,
+    onUpdated: noop,
+    onBeforeUnmount: noop,
+    onUnmounted: noop
   });
+
+  const EMPTY_TEMPLATE_INTERFACE = {
+    update: noop,
+    mount: noop,
+    unmount: noop,
+    clone: noop
+  };
 
   /**
    * Component definition function
@@ -1753,8 +1886,11 @@
    * @param   {Object} component - the component initial properties
    * @returns {Object} a new component implementation object
    */
-  function defineComponent({css, template: template$$1, tag}) {
-    const componentAPI = callOrAssign(tag);
+  function defineComponent({css, template: template$$1, tag, name}) {
+    const componentAPI = callOrAssign(tag) || {};
+
+    // add the component css into the DOM
+    if (css && name) cssManager.add(name, css);
 
     return curry(createComponent)(defineProperties({
       ...COMPONENT_LIFECYCLE_METHODS,
@@ -1768,14 +1904,14 @@
       // these properties should not be overriden
       ...COMPONENT_CORE,
       css,
-      template: tag.render || template$$1(
+      template: template$$1 ? template$$1(
         create$6,
         expressionTypes,
         bindingTypes,
         function(name) {
           return (componentAPI.components || {})[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
         }
-      )
+      ) : EMPTY_TEMPLATE_INTERFACE
     }))
   }
 
@@ -1804,53 +1940,56 @@
     // generated via riot compiler
     const shouldSetAttributes = attributes && attributes.length;
 
-    return defineProperties(Object.create(component), {
-      slots,
-      mount(element, state = {}, props = {}) {
-        this.props = evaluateProps(element, attributes, props);
-        this.state = callOrAssign(state);
+    return autobindMethods(
+      defineProperties(Object.create(component), {
+        slots,
+        mount(element, state = {}, props = {}) {
+          this.props = evaluateProps(element, attributes, props);
+          this.state = callOrAssign(state);
 
-        defineProperties(this, {
-          root: element,
-          template: this.template.clone(element)
-        });
+          defineProperties(this, {
+            root: element,
+            template: this.template.clone(element)
+          });
 
-        this.onBeforeMount();
-        shouldSetAttributes && setAttributes(this.root, this.props);
-        this.template.mount(element, this);
-        this.onMounted();
+          this.onBeforeMount();
+          shouldSetAttributes && setAttributes(this.root, this.props);
+          this.template.mount(element, this);
+          this.onMounted();
 
-        return this
-      },
-      update(state = {}, props = {}) {
-        const newProps = evaluateProps(this.root, attributes, props);
+          return this
+        },
+        update(state = {}, props = {}) {
+          const newProps = evaluateProps(this.root, attributes, props);
 
-        if (this.onBeforeUpdate(newProps, state) === false) return
+          if (this.onBeforeUpdate(newProps, state) === false) return
 
-        this.props = {
-          ...this.props,
-          ...newProps
-        };
+          this.props = {
+            ...this.props,
+            ...newProps
+          };
 
-        this.state = {
-          ...this.state,
-          ...state
-        };
+          this.state = {
+            ...this.state,
+            ...state
+          };
 
-        shouldSetAttributes && setAttributes(this.root, this.props);
-        this.template.update(this);
-        this.onUpdated();
+          shouldSetAttributes && setAttributes(this.root, this.props);
+          this.template.update(this);
+          this.onUpdated();
 
-        return this
-      },
-      unmount(removeRoot) {
-        this.onBeforeUnmount();
-        this.template.unmount(this, removeRoot === true);
-        this.onUnmounted();
+          return this
+        },
+        unmount(removeRoot) {
+          this.onBeforeUnmount();
+          this.template.unmount(this, removeRoot === true);
+          this.onUnmounted();
 
-        return this
-      }
-    })
+          return this
+        }
+      }),
+      Object.keys(component).filter(prop => isFunction(component[prop]))
+    )
   }
 
   /**
@@ -1869,6 +2008,8 @@
     return component.mount(element, {}, initialState)
   }
 
+  const { COMPONENTS_CREATION_MAP: COMPONENTS_CREATION_MAP$1, COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP$1, MIXINS_MAP: MIXINS_MAP$1 } = globals;
+
   /**
    * Riot public api
    */
@@ -1879,24 +2020,29 @@
    * @param   {Object} implementation - tag implementation
    * @returns {Object} object representing our tag implementation
    */
-  function register(name, implementation) {
-    if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component "${name}" was already registered`);
+  function register(name, {css, template, tag}) {
+    if (COMPONENTS_IMPLEMENTATION_MAP$1.has(name)) panic(`The component "${name}" was already registered`);
 
-    return COMPONENTS_IMPLEMENTATION_MAP.set(name, (...args) => {
-      const tag = defineComponent(implementation)(...args);
+    return COMPONENTS_IMPLEMENTATION_MAP$1.set(name, (...args) => {
+      const component = defineComponent({
+        css,
+        template,
+        tag,
+        name
+      })(...args);
 
       // this object will be provided to the tag bindings generated via compiler
       // the bindings will not be able to update the components state, they will only pass down
       // the parentScope updates
       return {
         mount(element, parentScope, state) {
-          return tag.mount(element, state, parentScope)
+          return component.mount(element, state, parentScope)
         },
         update(parentScope, state) {
-          return tag.update(state, parentScope)
+          return component.update(state, parentScope)
         },
         unmount() {
-          return tag.unmount()
+          return component.unmount()
         }
       }
     })
@@ -1908,7 +2054,8 @@
    * @returns {boolean} true if deleted
    */
   function unregister(name) {
-    if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) return COMPONENTS_IMPLEMENTATION_MAP.delete(name)
+    if (COMPONENTS_IMPLEMENTATION_MAP$1.has(name)) return COMPONENTS_IMPLEMENTATION_MAP$1.delete(name)
+    cssManager.remove(name);
     return false
   }
 
@@ -1930,8 +2077,8 @@
    */
   function unmount(selector) {
     return $$(selector).map((element) => {
-      if (COMPONENTS_CREATION_MAP.has(element)) {
-        COMPONENTS_CREATION_MAP.get(element).unmount();
+      if (COMPONENTS_CREATION_MAP$1.has(element)) {
+        COMPONENTS_CREATION_MAP$1.get(element).unmount();
       }
       return element
     })
@@ -1944,11 +2091,11 @@
    * @returns {Map} the map containing all the mixins
    */
   function mixin(name, mixin) {
-    if (MIXINS_MAP.has(name)) panic(`The mixin "${name}" was already defined`);
+    if (MIXINS_MAP$1.has(name)) panic(`The mixin "${name}" was already defined`);
 
-    MIXINS_MAP.set(name, callOrAssign(mixin));
+    MIXINS_MAP$1.set(name, callOrAssign(mixin));
 
-    return MIXINS_MAP
+    return MIXINS_MAP$1
   }
 
   /**
@@ -1968,6 +2115,12 @@
   /** @type {string} current riot version */
   const version = 'v4.0.0-alpha.0';
 
+  // expose some internal stuff that might be used from external tools
+  const __ = {
+    cssManager,
+    globals
+  };
+
   var riot = /*#__PURE__*/Object.freeze({
     register: register,
     unregister: unregister,
@@ -1975,7 +2128,8 @@
     unmount: unmount,
     mixin: mixin,
     component: component,
-    version: version
+    version: version,
+    __: __
   });
 
   var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -29241,7 +29395,7 @@
   	unmonitorEvents: false,
   	values: false
   };
-  var globals = {
+  var globals$1 = {
   	builtin: builtin,
   	es5: es5,
   	es2015: es2015,
@@ -29285,7 +29439,7 @@
   	devtools: devtools
   };
 
-  var globals$1 = /*#__PURE__*/Object.freeze({
+  var globals$2 = /*#__PURE__*/Object.freeze({
     builtin: builtin,
     es5: es5,
     es2015: es2015,
@@ -29318,12 +29472,12 @@
     webextensions: webextensions,
     greasemonkey: greasemonkey,
     devtools: devtools,
-    default: globals
+    default: globals$1
   });
 
-  var require$$0 = getCjsExportFromNamespace(globals$1);
+  var require$$0 = getCjsExportFromNamespace(globals$2);
 
-  var globals$2 = require$$0;
+  var globals$3 = require$$0;
 
   /* Riot Compiler v4.0.0-alpha.0, @license MIT */
 
@@ -29583,6 +29737,66 @@
   const namedTypes$1 = types$3.namedTypes;
 
   /**
+   * Source for creating regexes matching valid quoted, single-line JavaScript strings.
+   * It recognizes escape characters, including nested quotes and line continuation.
+   * @const {string}
+   */
+  const S_LINESTR = /"[^"\n\\]*(?:\\[\S\s][^"\n\\]*)*"|'[^'\n\\]*(?:\\[\S\s][^'\n\\]*)*'/.source;
+
+  /**
+   * Matches CSS selectors, excluding those beginning with '@' and quoted strings.
+   * @const {RegExp}
+   */
+
+  const CSS_SELECTOR = RegExp(`([{}]|^)[; ]*((?:[^@ ;{}][^{}]*)?[^@ ;{}:] ?)(?={)|${S_LINESTR}`, 'g');
+
+  /**
+   * Parses styles enclosed in a "scoped" tag
+   * The "css" string is received without comments or surrounding spaces.
+   *
+   * @param   {string} tag - Tag name of the root element
+   * @param   {string} css - The CSS code
+   * @returns {string} CSS with the styles scoped to the root element
+   */
+  function scopedCSS(tag, css) {
+    const host = ':host';
+    const selectorsBlacklist = ['from', 'to'];
+
+    return css.replace(CSS_SELECTOR, function(m, p1, p2) {
+      // skip quoted strings
+      if (!p2) return m
+
+      // we have a selector list, parse each individually
+      p2 = p2.replace(/[^,]+/g, function(sel) {
+        const s = sel.trim();
+
+        // skip selectors already using the tag name
+        if (s.indexOf(tag) === 0) {
+          return sel
+        }
+
+        // skips the keywords and percents of css animations
+        if (!s || selectorsBlacklist.indexOf(s) > -1 || s.slice(-1) === '%') {
+          return sel
+        }
+
+        // replace the `:host` pseudo-selector, where it is, with the root tag name;
+        // if `:host` was not included, add the tag name as prefix, and mirror all
+        // `[data-is]`
+        if (s.indexOf(host) < 0) {
+          return `${tag} ${s},[is="${tag}"] ${s}`
+        } else {
+          return `${s.replace(host, tag)},${
+          s.replace(host, `[is="${tag}"]`)}`
+        }
+      });
+
+      // add the danling bracket char and return the processed selector list
+      return p1 ? `${p1} ${p2}` : p2
+    })
+  }
+
+  /**
    * Generate the component css
    * @param   { Object } sourceNode - node generated by the riot compiler
    * @param   { string } source - original component source code
@@ -29594,7 +29808,12 @@
     const preprocessorName = getPreprocessorTypeByAttribute(sourceNode);
     const cssNode = sourceNode.text;
     const preprocessorOutput = await preprocess('css', preprocessorName, options, source, cssNode);
-    const generatedCss = main$1.parse(`\`${preprocessorOutput.code.trim()}\``, {
+    const cssCode = (options.scopedCss ?
+      scopedCSS(options.tagName, preprocessorOutput.code) :
+      preprocessorOutput.code
+    ).trim();
+
+    const generatedCss = main$1.parse(`\`${cssCode}\``, {
       sourceFileName: options.file,
       inputSourceMap: composeSourcemaps(map, preprocessorOutput.map)
     });
@@ -29750,8 +29969,8 @@
   const IS_BOOLEAN_ATTRIBUTE = 'isBoolean';
   const IS_SPREAD_ATTRIBUTE = 'isSpread';
 
-  const browserAPIs = Object.keys(globals$2.browser);
-  const builtinAPIs = Object.keys(globals$2.builtin);
+  const browserAPIs = Object.keys(globals$3.browser);
+  const builtinAPIs = Object.keys(globals$3.builtin);
 
   const isIdentifier = namedTypes$1.Identifier.check;
   const isLiteral = namedTypes$1.Literal.check;
@@ -30155,13 +30374,22 @@
     return node.attributes ? node.attributes : []
   }
   /**
-   * Get the name of a custom node
+   * Get the name of a custom node transforming it into an expression node
    * @param   {RiotParser.Node} node - riot parser node
-   * @returns {string} the value of the is attribute or of the tag name
+   * @returns {RiotParser.Node.Attr} the node name as expression attribute
    */
-  function getCustomNodeName(node) {
+  function getCustomNodeNameAsExpression(node) {
     const isAttribute = findIsAttribute(node);
-    return isAttribute ? isAttribute.value : getName$1(node)
+    const toRawString = val => `'${val}'`;
+
+    if (isAttribute) {
+      return isAttribute.expressions ? isAttribute.expressions[0] : {
+        ...isAttribute,
+        text: toRawString(isAttribute.value)
+      }
+    }
+
+    return { ...node, text: toRawString(getName$1(node)) }
   }
 
   /**
@@ -30465,7 +30693,10 @@
         ),
       ),
       simplePropertyNode(BINDING_GET_COMPONENT_KEY, builders.identifier(GET_COMPONENT_FN)),
-      simplePropertyNode(BINDING_NAME_KEY, builders.literal(getCustomNodeName(sourceNode))),
+      simplePropertyNode(
+        BINDING_EVALUATE_KEY,
+        toScopedFunction(getCustomNodeNameAsExpression(sourceNode), sourceFile, sourceCode)
+      ),
       simplePropertyNode(BINDING_SLOTS_KEY, builders.arrayExpression([
         ...Object.entries(groupSlots(sourceNode))
           .filter(([,value]) => value)
@@ -30884,6 +31115,12 @@
     return { ast: output, map, code: main$1.print(output).code }
   }
 
+  const DEFAULT_OPTIONS = {
+    template: 'default',
+    file: '[unknown-source-file]',
+    scopedCss: true
+  };
+
   /**
    * Create the initial output
    * @param { Sourcemap } map - initial sourcemap
@@ -30907,23 +31144,26 @@
    * @param { string } options - compiling options
    * @returns { Promise<Output> } object containing output code and source map
    */
-  async function compile(source, options = {
-    template: 'default',
-    file: '[unknown-source-file]'
-  }) {
-    const { code, map } = await execute$1('template', options.template || 'default', options, source);
-    const { template: template$$1, css: css$$1, javascript: javascript$$1 } = parser$1(options).parse(code).output;
+  async function compile(source, options = {}) {
+    const opts = {
+      ...DEFAULT_OPTIONS,
+      ...options
+    };
+
+    const { code, map } = await execute$1('template', opts.template, opts, source);
+    const { template: template$$1, css: css$$1, javascript: javascript$$1 } = parser$1(opts).parse(code).output;
+
     // generate the tag name in runtime
-    Object.assign(options, {
+    Object.assign(opts, {
       tagName: template$$1.name
     });
 
     return ruit(createInitialInput(map),
-      hookGenerator(css, css$$1, code, options),
-      hookGenerator(javascript, javascript$$1, code, options),
-      hookGenerator(template, template$$1, code, options),
+      hookGenerator(css, css$$1, code, opts),
+      hookGenerator(javascript, javascript$$1, code, opts),
+      hookGenerator(template, template$$1, code, opts),
       ({ ast }) => main$1.prettyPrint(ast),
-      (result) => execute(result, options),
+      (result) => execute(result, opts),
     )
   }
 
