@@ -19,7 +19,9 @@ export function callOrAssign(source) {
 }
 
 // doese simply nothing
-export function noop() {}
+export function noop() {
+  return this
+}
 
 /**
  * Autobind the methods of a source object to itself
