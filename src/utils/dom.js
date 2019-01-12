@@ -24,6 +24,14 @@ export function $(selector, context) {
 }
 
 /**
+ * Get the document window
+ * @returns {Object} window object
+ */
+export function getWindow() {
+  return typeof window === 'undefined' ? /* istanbul ignore next */ undefined : window
+}
+
+/**
  * Converts any DOM node/s to a loopable array
  * @param   { HTMLElement|NodeList } els - single html element or a node list
  * @returns { Array } always a loopable object

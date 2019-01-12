@@ -1,7 +1,10 @@
-import { COMPONENTS_CREATION_MAP, COMPONENTS_IMPLEMENTATION_MAP, MIXINS_MAP } from './globals'
+import * as globals from './globals'
 import { callOrAssign, panic } from './utils/misc'
 import { defineComponent, mountComponent } from './core/component'
 import { $$ } from './utils/dom'
+import cssManager from './core/css-manager'
+
+const { COMPONENTS_CREATION_MAP, COMPONENTS_IMPLEMENTATION_MAP, MIXINS_MAP } = globals
 
 /**
  * Riot public api
@@ -13,24 +16,29 @@ import { $$ } from './utils/dom'
  * @param   {Object} implementation - tag implementation
  * @returns {Object} object representing our tag implementation
  */
-export function register(name, implementation) {
+export function register(name, {css, template, tag}) {
   if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component "${name}" was already registered`)
 
   return COMPONENTS_IMPLEMENTATION_MAP.set(name, (...args) => {
-    const tag = defineComponent(implementation)(...args)
+    const component = defineComponent({
+      css,
+      template,
+      tag,
+      name
+    })(...args)
 
     // this object will be provided to the tag bindings generated via compiler
     // the bindings will not be able to update the components state, they will only pass down
     // the parentScope updates
     return {
       mount(element, parentScope, state) {
-        return tag.mount(element, state, parentScope)
+        return component.mount(element, state, parentScope)
       },
       update(parentScope, state) {
-        return tag.update(state, parentScope)
+        return component.update(state, parentScope)
       },
       unmount() {
-        return tag.unmount()
+        return component.unmount()
       }
     }
   })
@@ -43,6 +51,7 @@ export function register(name, implementation) {
  */
 export function unregister(name) {
   if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) return COMPONENTS_IMPLEMENTATION_MAP.delete(name)
+  cssManager.remove(name)
   return false
 }
 
@@ -101,3 +110,9 @@ export const component = ({css, template, ...rest}, slotsAndAttributes = {}) => 
 
 /** @type {string} current riot version */
 export const version = 'WIP'
+
+// expose some internal stuff that might be used from external tools
+export const __ = {
+  cssManager,
+  globals
+}

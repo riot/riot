@@ -18,6 +18,23 @@ export function callOrAssign(source) {
   return isFunction(source) ? source() : source
 }
 
+// doese simply nothing
+export function noop() {}
+
+/**
+ * Autobind the methods of a source object to itself
+ * @param   {Object} source - probably a riot tag instance
+ * @param   {Array<string>} methods - list of the methods to autobind
+ * @returns {Object} the original object received
+ */
+export function autobindMethods(source, methods) {
+  methods.forEach(method => {
+    source[method] = source[method].bind(source)
+  })
+
+  return source
+}
+
 /**
  * Helper function to set an immutable property
  * @param   {Object} source - object where the new property will be set

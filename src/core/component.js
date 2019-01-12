@@ -1,8 +1,10 @@
 import {$, $$, getAttributes, getName, setAttributes} from '../utils/dom'
 import {COMPONENTS_CREATION_MAP, COMPONENTS_IMPLEMENTATION_MAP, MIXINS_MAP} from '../globals'
+import {autobindMethods, callOrAssign, defineProperties, evaluateAttributeExpressions, noop, panic} from '../utils/misc'
 import {bindingTypes, template as createTemplate, expressionTypes} from '@riotjs/dom-bindings'
-import {callOrAssign, defineProperties, evaluateAttributeExpressions, panic} from '../utils/misc'
+import cssManager from './css-manager'
 import curry from 'curri'
+import {isFunction} from '../utils/checks'
 
 const COMPONENT_CORE = Object.freeze({
   // component helpers
@@ -18,13 +20,20 @@ const COMPONENT_CORE = Object.freeze({
 })
 
 const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
-  onBeforeMount() {},
-  onMounted() {},
-  onBeforeUpdate() {},
-  onUpdated() {},
-  onBeforeUnmount() {},
-  onUnmounted() {}
+  onBeforeMount: noop,
+  onMounted: noop,
+  onBeforeUpdate: noop,
+  onUpdated: noop,
+  onBeforeUnmount: noop,
+  onUnmounted: noop
 })
+
+const EMPTY_TEMPLATE_INTERFACE = {
+  update: noop,
+  mount: noop,
+  unmount: noop,
+  clone: noop
+}
 
 /**
  * Component definition function
@@ -32,8 +41,11 @@ const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
  * @param   {Object} component - the component initial properties
  * @returns {Object} a new component implementation object
  */
-export function defineComponent({css, template, tag}) {
-  const componentAPI = callOrAssign(tag)
+export function defineComponent({css, template, tag, name}) {
+  const componentAPI = callOrAssign(tag) || {}
+
+  // add the component css into the DOM
+  if (css && name) cssManager.add(name, css)
 
   return curry(createComponent)(defineProperties({
     ...COMPONENT_LIFECYCLE_METHODS,
@@ -47,14 +59,14 @@ export function defineComponent({css, template, tag}) {
     // these properties should not be overriden
     ...COMPONENT_CORE,
     css,
-    template: tag.render || template(
+    template: template ? template(
       createTemplate,
       expressionTypes,
       bindingTypes,
       function(name) {
         return (componentAPI.components || {})[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
       }
-    )
+    ) : EMPTY_TEMPLATE_INTERFACE
   }))
 }
 
@@ -83,53 +95,56 @@ export function createComponent(component, {slots, attributes}) {
   // generated via riot compiler
   const shouldSetAttributes = attributes && attributes.length
 
-  return defineProperties(Object.create(component), {
-    slots,
-    mount(element, state = {}, props = {}) {
-      this.props = evaluateProps(element, attributes, props)
-      this.state = callOrAssign(state)
+  return autobindMethods(
+    defineProperties(Object.create(component), {
+      slots,
+      mount(element, state = {}, props = {}) {
+        this.props = evaluateProps(element, attributes, props)
+        this.state = callOrAssign(state)
 
-      defineProperties(this, {
-        root: element,
-        template: this.template.clone(element)
-      })
+        defineProperties(this, {
+          root: element,
+          template: this.template.clone(element)
+        })
 
-      this.onBeforeMount()
-      shouldSetAttributes && setAttributes(this.root, this.props)
-      this.template.mount(element, this)
-      this.onMounted()
+        this.onBeforeMount()
+        shouldSetAttributes && setAttributes(this.root, this.props)
+        this.template.mount(element, this)
+        this.onMounted()
 
-      return this
-    },
-    update(state = {}, props = {}) {
-      const newProps = evaluateProps(this.root, attributes, props)
+        return this
+      },
+      update(state = {}, props = {}) {
+        const newProps = evaluateProps(this.root, attributes, props)
 
-      if (this.onBeforeUpdate(newProps, state) === false) return
+        if (this.onBeforeUpdate(newProps, state) === false) return
 
-      this.props = {
-        ...this.props,
-        ...newProps
+        this.props = {
+          ...this.props,
+          ...newProps
+        }
+
+        this.state = {
+          ...this.state,
+          ...state
+        }
+
+        shouldSetAttributes && setAttributes(this.root, this.props)
+        this.template.update(this)
+        this.onUpdated()
+
+        return this
+      },
+      unmount(removeRoot) {
+        this.onBeforeUnmount()
+        this.template.unmount(this, removeRoot === true)
+        this.onUnmounted()
+
+        return this
       }
-
-      this.state = {
-        ...this.state,
-        ...state
-      }
-
-      shouldSetAttributes && setAttributes(this.root, this.props)
-      this.template.update(this)
-      this.onUpdated()
-
-      return this
-    },
-    unmount(removeRoot) {
-      this.onBeforeUnmount()
-      this.template.unmount(this, removeRoot === true)
-      this.onUnmounted()
-
-      return this
-    }
-  })
+    }),
+    Object.keys(component).filter(prop => isFunction(component[prop]))
+  )
 }
 
 /**
