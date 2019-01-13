@@ -6,7 +6,7 @@ parserOptions:
 
 globals:
   sinon: true
-  expect: true
+  chai: true
 
 rules:
   fp/no-rest-parameters: false

@@ -1,10 +1,11 @@
 import * as globals from './globals'
-import { callOrAssign, panic } from './utils/misc'
-import { defineComponent, mountComponent } from './core/component'
-import { $$ } from './utils/dom'
+import {callOrAssign, panic} from './utils/misc'
+import {defineComponent, mountComponent} from './core/component'
+import {$$} from './utils/dom'
 import cssManager from './core/css-manager'
+import {isFunction} from './utils/checks'
 
-const { COMPONENTS_CREATION_MAP, COMPONENTS_IMPLEMENTATION_MAP, MIXINS_MAP } = globals
+const { COMPONENTS_CREATION_MAP, COMPONENTS_IMPLEMENTATION_MAP, MIXINS_MAP, PLUGINS_SET } = globals
 
 /**
  * Riot public api
@@ -92,6 +93,20 @@ export function mixin(name, mixin) {
   MIXINS_MAP.set(name, callOrAssign(mixin))
 
   return MIXINS_MAP
+}
+
+/**
+ * Define a riot plugin
+ * @param   {Function} plugin - function that will receive all the components created
+ * @returns {Set} the set containing all the plugins installed
+ */
+export function install(plugin) {
+  if (!isFunction(plugin)) panic('Plugins must be of type function')
+  if (PLUGINS_SET.has(name)) panic('This plugin was already install')
+
+  PLUGINS_SET.add(plugin)
+
+  return PLUGINS_SET
 }
 
 /**

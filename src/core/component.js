@@ -1,22 +1,19 @@
-import {$, $$, getAttributes, getName, setAttributes} from '../utils/dom'
-import {COMPONENTS_CREATION_MAP, COMPONENTS_IMPLEMENTATION_MAP, MIXINS_MAP} from '../globals'
+import {$, $$, getAttributes, getName} from '../utils/dom'
+import {COMPONENTS_CREATION_MAP, COMPONENTS_IMPLEMENTATION_MAP, DOM_COMPONENT_INSTANCE_PROPERTY, MIXINS_MAP, PLUGINS_SET} from '../globals'
 import {autobindMethods, callOrAssign, defineProperties, evaluateAttributeExpressions, noop, panic} from '../utils/misc'
 import {bindingTypes, template as createTemplate, expressionTypes} from '@riotjs/dom-bindings'
 import cssManager from './css-manager'
 import curry from 'curri'
 import {isFunction} from '../utils/checks'
 
-const COMPONENT_CORE = Object.freeze({
+const COMPONENT_CORE_HELPERS = Object.freeze({
   // component helpers
   $(selector){ return $(selector, this.root) },
   $$(selector){ return $$(selector, this.root) },
   mixin(name) {
     // extend this component with this mixin
     Object.assing(this, MIXINS_MAP.get(name))
-  },
-  // defined during the component creation
-  css: null,
-  template: null
+  }
 })
 
 const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
@@ -28,7 +25,7 @@ const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
   onUnmounted: noop
 })
 
-const EMPTY_TEMPLATE_INTERFACE = {
+const MOCK_TEMPLATE_INTERFACE = {
   update: noop,
   mount: noop,
   unmount: noop,
@@ -49,15 +46,15 @@ export function defineComponent({css, template, tag, name}) {
 
   return curry(createComponent)(defineProperties({
     ...COMPONENT_LIFECYCLE_METHODS,
-    ...componentAPI,
-    // defined during the component creation
     state: {},
     props: {},
+    ...componentAPI,
+    // defined during the component creation
     slots: null,
     root: null
   }, {
     // these properties should not be overriden
-    ...COMPONENT_CORE,
+    ...COMPONENT_CORE_HELPERS,
     css,
     template: template ? template(
       createTemplate,
@@ -66,7 +63,7 @@ export function defineComponent({css, template, tag, name}) {
       function(name) {
         return (componentAPI.components || {})[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
       }
-    ) : EMPTY_TEMPLATE_INTERFACE
+    ) : MOCK_TEMPLATE_INTERFACE
   }))
 }
 
@@ -84,6 +81,29 @@ function evaluateProps(element, attributeExpressions = [], scope) {
 }
 
 /**
+ * Create the bindings to update the component attributes
+ * @param   {Array} attributes - list of attribute bindings
+ * @returns {TemplateChunk} - template bindings object
+ */
+function createAttributeBindings(attributes) {
+  return createTemplate(null, (attributes || []).map(attr => {
+    return {
+      type: expressionTypes.ATTRIBUTE,
+      ...attr
+    }
+  }))
+}
+
+/**
+ * Run the component instance through all the plugins set by the user
+ * @param   {Object} component - component instance
+ * @returns {Object} the component enhanced by the plugins
+ */
+function runPlugins(component) {
+  return [...PLUGINS_SET].forEach(fn => fn(component)) || component
+}
+
+/**
  * Component creation factory function
  * @param   {Object} component - a component implementation previously defined
  * @param   {Array} options.slots - component slots generated via riot compiler
@@ -91,58 +111,70 @@ function evaluateProps(element, attributeExpressions = [], scope) {
  * @returns {Riot.Component} a riot component instance
  */
 export function createComponent(component, {slots, attributes}) {
-  // if this component was manually mounted its DOM attributes are likely not attribute expressions
-  // generated via riot compiler
-  const shouldSetAttributes = attributes && attributes.length
+  const attributeBindings = createAttributeBindings(attributes)
 
   return autobindMethods(
-    defineProperties(Object.create(component), {
-      slots,
-      mount(element, state = {}, props = {}) {
-        this.props = evaluateProps(element, attributes, props)
-        this.state = callOrAssign(state)
+    runPlugins(
+      defineProperties(Object.create(component), {
+        slots,
+        mount(element, state = {}, props = {}) {
+          this.props = {
+            ...this.props,
+            ...evaluateProps(element, attributes, props)
+          }
 
-        defineProperties(this, {
-          root: element,
-          template: this.template.clone(element)
-        })
+          this.state = {
+            ...this.state,
+            ...callOrAssign(state)
+          }
 
-        this.onBeforeMount()
-        shouldSetAttributes && setAttributes(this.root, this.props)
-        this.template.mount(element, this)
-        this.onMounted()
+          defineProperties(this, {
+            root: element,
+            attributes: attributeBindings.createDOM(element).clone(),
+            template: this.template.createDOM(element).clone()
+          })
 
-        return this
-      },
-      update(state = {}, props = {}) {
-        const newProps = evaluateProps(this.root, attributes, props)
+          // link this object to the DOM node
+          element[DOM_COMPONENT_INSTANCE_PROPERTY] = this
 
-        if (this.onBeforeUpdate(newProps, state) === false) return
+          this.onBeforeMount()
+          this.attributes.mount(element, props)
+          this.template.mount(element, this)
+          this.onMounted()
 
-        this.props = {
-          ...this.props,
-          ...newProps
+          return this
+        },
+        update(state = {}, props = {}) {
+          const newProps = evaluateProps(this.root, attributes, props)
+
+          if (this.onBeforeUpdate(newProps, state) === false) return
+
+          this.props = {
+            ...this.props,
+            ...newProps
+          }
+
+          this.state = {
+            ...this.state,
+            ...state
+          }
+
+          this.attributes.update(props)
+          this.template.update(this)
+          this.onUpdated()
+
+          return this
+        },
+        unmount(removeRoot) {
+          this.onBeforeUnmount()
+          this.attributes.unmount()
+          this.template.unmount(this, removeRoot === true)
+          this.onUnmounted()
+
+          return this
         }
-
-        this.state = {
-          ...this.state,
-          ...state
-        }
-
-        shouldSetAttributes && setAttributes(this.root, this.props)
-        this.template.update(this)
-        this.onUpdated()
-
-        return this
-      },
-      unmount(removeRoot) {
-        this.onBeforeUnmount()
-        this.template.unmount(this, removeRoot === true)
-        this.onUnmounted()
-
-        return this
-      }
-    }),
+      })
+    ),
     Object.keys(component).filter(prop => isFunction(component[prop]))
   )
 }

@@ -91,19 +91,6 @@ export function getAttributes(element) {
 }
 
 /**
- * Set multiple DOM attributes
- * @param   {HTMLElement} element target element
- * @param   {Object} attributes - object containing the attributes key values
- * @returns {HTMLElement} - the original element received
- */
-export function setAttributes(element, attributes) {
-  Object.entries(attributes).forEach(([key, value]) => {
-    setAttribute(element, key, value)
-  })
-  return element
-}
-
-/**
  * Get the tag name of any DOM node
  * @param   {HTMLElement} element - DOM node we want to inspect
  * @returns {string} name to identify this dom node in riot
