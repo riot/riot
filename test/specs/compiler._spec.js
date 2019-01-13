@@ -1,8 +1,8 @@
-import * as riot from '../../src/riot'
 import {expect} from 'chai'
+import riot from '../../src/riot+compiler'
 
-describe('Riot core api', () => {
-  it('riot exports properly its public api', () => {
+describe('Riot compiler api', () => {
+  it('riot compiler exports properly its public api', () => {
     expect(riot).to.be.ok
     expect(riot).to.have.all.keys([
       'register',
@@ -13,7 +13,10 @@ describe('Riot core api', () => {
       'install',
       'component',
       'version',
-      '__'
+      '__',
+      'compile',
+      'compileFromString',
+      'compileFromUrl'
     ])
   })
 })

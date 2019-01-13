@@ -13,11 +13,15 @@ module.exports = {
     format: 'umd',
     name: 'riot'
   },
+  onwarn: function(error) {
+    if (/external dependency|Circular dependency/.test(error.message)) return
+    console.error(error.message) // eslint-disable-line
+  },
   plugins: [
     strip({
       debugger: true,
       // defaults to `[ 'console.*', 'assert.*' ]`
-      functions: [ 'assert.*', 'debug', 'alert' ],
+      functions: ['assert.*', 'debug', 'alert'],
       sourceMap: false
     }),
     ignore(builtinModules),

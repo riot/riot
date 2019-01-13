@@ -1,8 +1,7 @@
 import * as riot from './riot'
 import {$$,getAttribute} from './utils/dom'
+import {camelCase, kebabCase} from './utils/misc'
 import {compile as compiler, registerPostprocessor} from '@riotjs/compiler'
-import camelCase from 'lodash/camelcase'
-import kebabCase from 'lodash/kebabcase'
 
 const GLOBAL_REGISTRY = '__riot_registry__'
 const TMP_TAG_NAME_VARIABLE = '__CURRENT_RIOT_TAG_NAME__'

@@ -9,12 +9,16 @@
     COMPONENTS_IMPLEMENTATION_MAP = new Map(),
     COMPONENTS_CREATION_MAP = new WeakMap(),
     MIXINS_MAP = new Map(),
+    PLUGINS_SET = new Set(),
+    DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
     IS_DIRECTIVE = 'is';
 
   var globals = /*#__PURE__*/Object.freeze({
     COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
     COMPONENTS_CREATION_MAP: COMPONENTS_CREATION_MAP,
     MIXINS_MAP: MIXINS_MAP,
+    PLUGINS_SET: PLUGINS_SET,
+    DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY,
     IS_DIRECTIVE: IS_DIRECTIVE
   });
 
@@ -62,7 +66,7 @@
    * @returns {*} anything
    */
   function callOrAssign(source) {
-    return isFunction(source) ? source() : source
+    return isFunction(source) ? (source.constructor.name ? new source() : source()) : source
   }
 
   // doese simply nothing
@@ -226,19 +230,6 @@
       acc[attribute.name] = attribute.value;
       return acc
     }, {})
-  }
-
-  /**
-   * Set multiple DOM attributes
-   * @param   {HTMLElement} element target element
-   * @param   {Object} attributes - object containing the attributes key values
-   * @returns {HTMLElement} - the original element received
-   */
-  function setAttributes(element, attributes) {
-    Object.entries(attributes).forEach(([key, value]) => {
-      setAttribute(element, key, value);
-    });
-    return element
   }
 
   /**
@@ -1038,7 +1029,7 @@
         return
       }
 
-      const tag = oldItem ? oldItem.tag : template.clone(root);
+      const tag = oldItem ? oldItem.tag : template.clone();
       const el = oldItem ? tag.el : root.cloneNode();
 
       if (!oldItem) {
@@ -1081,7 +1072,7 @@
       offset,
       condition,
       evaluate,
-      template,
+      template: template.createDOM(node),
       getKey,
       indexName,
       itemName,
@@ -1113,7 +1104,7 @@
       case mustMount:
         swap(this.node, this.placeholder);
         if (this.template) {
-          this.template = this.template.clone(this.node);
+          this.template = this.template.clone();
           this.template.mount(this.node, scope);
         }
         break
@@ -1152,7 +1143,7 @@
       node,
       evaluate,
       placeholder: document.createTextNode(''),
-      template
+      template: template.createDOM(node)
     }
   }
 
@@ -1232,7 +1223,7 @@
    * @returns {string} the node attribute modifier method name
    */
   function getMethod(value) {
-    return value ? SET_ATTIBUTE : REMOVE_ATTRIBUTE
+    return value && typeof value !== 'object' ? SET_ATTIBUTE : REMOVE_ATTRIBUTE
   }
 
   /**
@@ -1245,8 +1236,7 @@
     // be sure that expressions like selected={ true } will be always rendered as selected='selected'
     if (value === true) return name
 
-    // array values will be joined with spaces
-    return Array.isArray(value) ? value.join(' ') : value
+    return value
   }
 
   /**
@@ -1637,6 +1627,18 @@
     dom: null,
     el: null,
 
+    /**
+     * Create the template DOM structure that will be cloned on each mount
+     * @param   {HTMLElement} el - the root node
+     * @returns {TemplateChunk} self
+     */
+    createDOM(el) {
+      // make sure that the DOM gets created before cloning the template
+      this.dom = this.dom || createTemplateDOM(el, this.html);
+
+      return this
+    },
+
     // API methods
     /**
      * Attach the template to a DOM node
@@ -1651,8 +1653,8 @@
 
       this.el = el;
 
-      // create lazily the template fragment only once if it hasn't been created before
-      this.dom = this.dom || createTemplateDOM(el, this.html);
+      // create the DOM if it wasn't created before
+      this.createDOM(el);
 
       if (this.dom) injectDOM(el, this.dom.cloneNode(true));
 
@@ -1694,13 +1696,9 @@
     },
     /**
      * Clone the template chunk
-     * @param   {HTMLElement} el - template target DOM node
      * @returns {TemplateChunk} a clone of this object resetting the this.el property
      */
-    clone(el) {
-      // make sure that the DOM gets created before cloning the template
-      this.dom = this.dom || createTemplateDOM(el, this.html);
-
+    clone() {
       return {
         ...this,
         el: null
@@ -1851,17 +1849,14 @@
     }
   }
 
-  const COMPONENT_CORE = Object.freeze({
+  const COMPONENT_CORE_HELPERS = Object.freeze({
     // component helpers
     $(selector){ return $(selector, this.root) },
     $$(selector){ return $$(selector, this.root) },
     mixin(name) {
       // extend this component with this mixin
       Object.assing(this, MIXINS_MAP.get(name));
-    },
-    // defined during the component creation
-    css: null,
-    template: null
+    }
   });
 
   const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
@@ -1873,7 +1868,7 @@
     onUnmounted: noop
   });
 
-  const EMPTY_TEMPLATE_INTERFACE = {
+  const MOCK_TEMPLATE_INTERFACE = {
     update: noop,
     mount: noop,
     unmount: noop,
@@ -1894,15 +1889,15 @@
 
     return curry(createComponent)(defineProperties({
       ...COMPONENT_LIFECYCLE_METHODS,
-      ...componentAPI,
-      // defined during the component creation
       state: {},
       props: {},
+      ...componentAPI,
+      // defined during the component creation
       slots: null,
       root: null
     }, {
       // these properties should not be overriden
-      ...COMPONENT_CORE,
+      ...COMPONENT_CORE_HELPERS,
       css,
       template: template$$1 ? template$$1(
         create$6,
@@ -1911,7 +1906,7 @@
         function(name) {
           return (componentAPI.components || {})[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
         }
-      ) : EMPTY_TEMPLATE_INTERFACE
+      ) : MOCK_TEMPLATE_INTERFACE
     }))
   }
 
@@ -1929,6 +1924,29 @@
   }
 
   /**
+   * Create the bindings to update the component attributes
+   * @param   {Array} attributes - list of attribute bindings
+   * @returns {TemplateChunk} - template bindings object
+   */
+  function createAttributeBindings(attributes) {
+    return create$6(null, (attributes || []).map(attr => {
+      return {
+        type: expressionTypes.ATTRIBUTE,
+        ...attr
+      }
+    }))
+  }
+
+  /**
+   * Run the component instance through all the plugins set by the user
+   * @param   {Object} component - component instance
+   * @returns {Object} the component enhanced by the plugins
+   */
+  function runPlugins(component) {
+    return [...PLUGINS_SET].forEach(fn => fn(component)) || component
+  }
+
+  /**
    * Component creation factory function
    * @param   {Object} component - a component implementation previously defined
    * @param   {Array} options.slots - component slots generated via riot compiler
@@ -1936,58 +1954,70 @@
    * @returns {Riot.Component} a riot component instance
    */
   function createComponent(component, {slots, attributes}) {
-    // if this component was manually mounted its DOM attributes are likely not attribute expressions
-    // generated via riot compiler
-    const shouldSetAttributes = attributes && attributes.length;
+    const attributeBindings = createAttributeBindings(attributes);
 
     return autobindMethods(
-      defineProperties(Object.create(component), {
-        slots,
-        mount(element, state = {}, props = {}) {
-          this.props = evaluateProps(element, attributes, props);
-          this.state = callOrAssign(state);
+      runPlugins(
+        defineProperties(Object.create(component), {
+          slots,
+          mount(element, state = {}, props = {}) {
+            this.props = {
+              ...this.props,
+              ...evaluateProps(element, attributes, props)
+            };
 
-          defineProperties(this, {
-            root: element,
-            template: this.template.clone(element)
-          });
+            this.state = {
+              ...this.state,
+              ...callOrAssign(state)
+            };
 
-          this.onBeforeMount();
-          shouldSetAttributes && setAttributes(this.root, this.props);
-          this.template.mount(element, this);
-          this.onMounted();
+            defineProperties(this, {
+              root: element,
+              attributes: attributeBindings.createDOM(element).clone(),
+              template: this.template.createDOM(element).clone()
+            });
 
-          return this
-        },
-        update(state = {}, props = {}) {
-          const newProps = evaluateProps(this.root, attributes, props);
+            // link this object to the DOM node
+            element[DOM_COMPONENT_INSTANCE_PROPERTY] = this;
 
-          if (this.onBeforeUpdate(newProps, state) === false) return
+            this.onBeforeMount();
+            this.attributes.mount(element, props);
+            this.template.mount(element, this);
+            this.onMounted();
 
-          this.props = {
-            ...this.props,
-            ...newProps
-          };
+            return this
+          },
+          update(state = {}, props = {}) {
+            const newProps = evaluateProps(this.root, attributes, props);
 
-          this.state = {
-            ...this.state,
-            ...state
-          };
+            if (this.onBeforeUpdate(newProps, state) === false) return
 
-          shouldSetAttributes && setAttributes(this.root, this.props);
-          this.template.update(this);
-          this.onUpdated();
+            this.props = {
+              ...this.props,
+              ...newProps
+            };
 
-          return this
-        },
-        unmount(removeRoot) {
-          this.onBeforeUnmount();
-          this.template.unmount(this, removeRoot === true);
-          this.onUnmounted();
+            this.state = {
+              ...this.state,
+              ...state
+            };
 
-          return this
-        }
-      }),
+            this.attributes.update(props);
+            this.template.update(this);
+            this.onUpdated();
+
+            return this
+          },
+          unmount(removeRoot) {
+            this.onBeforeUnmount();
+            this.attributes.unmount();
+            this.template.unmount(this, removeRoot === true);
+            this.onUnmounted();
+
+            return this
+          }
+        })
+      ),
       Object.keys(component).filter(prop => isFunction(component[prop]))
     )
   }
@@ -2008,7 +2038,7 @@
     return component.mount(element, {}, initialState)
   }
 
-  const { COMPONENTS_CREATION_MAP: COMPONENTS_CREATION_MAP$1, COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP$1, MIXINS_MAP: MIXINS_MAP$1 } = globals;
+  const { COMPONENTS_CREATION_MAP: COMPONENTS_CREATION_MAP$1, COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP$1, MIXINS_MAP: MIXINS_MAP$1, PLUGINS_SET: PLUGINS_SET$1 } = globals;
 
   /**
    * Riot public api
@@ -2099,6 +2129,20 @@
   }
 
   /**
+   * Define a riot plugin
+   * @param   {Function} plugin - function that will receive all the components created
+   * @returns {Set} the set containing all the plugins installed
+   */
+  function install(plugin) {
+    if (!isFunction(plugin)) panic('Plugins must be of type function');
+    if (PLUGINS_SET$1.has(name)) panic('This plugin was already install');
+
+    PLUGINS_SET$1.add(plugin);
+
+    return PLUGINS_SET$1
+  }
+
+  /**
    * Function to define an anonymous component
    * @param   {Object} component - this object should contain the component implementation,
    * like css and/or template/render function
@@ -2126,6 +2170,7 @@
   exports.mount = mount;
   exports.unmount = unmount;
   exports.mixin = mixin;
+  exports.install = install;
   exports.component = component;
   exports.version = version;
   exports.__ = __;

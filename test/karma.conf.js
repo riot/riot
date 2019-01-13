@@ -2,7 +2,8 @@ const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
   isSaucelabs = process.env.SAUCELABS,
   isTravis = !!process.env.TRAVIS_BUILD_NUMBER,
   TEST_FILES = './specs/**/*.spec.js',
-  browsers = isSaucelabs ? Object.keys(saucelabsBrowsers) : ['ChromeHeadlessNoSandbox']
+  browsers = isSaucelabs ? Object.keys(saucelabsBrowsers) : ['ChromeHeadlessNoSandbox'],
+  rollupConfig = require('../rollup.config')
 
 module.exports = function(conf) {
   conf.set({
@@ -51,7 +52,7 @@ module.exports = function(conf) {
     },
 
     rollupPreprocessor: {
-      ...require('../rollup.config'),
+      ...rollupConfig,
       external: ['chai', 'sinon'],
       output: {
         format: 'iife',
