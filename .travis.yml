@@ -6,7 +6,7 @@ branches:
   only:
     - master
     - dev
-    - next
+    # - next
 
 script:
   make riot
