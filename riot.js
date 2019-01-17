@@ -1,4 +1,4 @@
-/* Riot v4.0.0-alpha.1, @license MIT */
+/* Riot v4.0.0-alpha.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -7,7 +7,6 @@
 
   const
     COMPONENTS_IMPLEMENTATION_MAP = new Map(),
-    COMPONENTS_CREATION_MAP = new WeakMap(),
     MIXINS_MAP = new Map(),
     PLUGINS_SET = new Set(),
     DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
@@ -15,7 +14,6 @@
 
   var globals = /*#__PURE__*/Object.freeze({
     COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
-    COMPONENTS_CREATION_MAP: COMPONENTS_CREATION_MAP,
     MIXINS_MAP: MIXINS_MAP,
     PLUGINS_SET: PLUGINS_SET,
     DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY,
@@ -1759,7 +1757,7 @@
    */
 
   /**
-   * Binding responsible for the slots mounting
+   * Binding responsible for the slots
    */
   const Slot = Object.seal({
     // dynamic binding properties
@@ -1792,6 +1790,11 @@
     }
   });
 
+  /**
+   * Move the inner content of the slots outside of them
+   * @param   {HTMLNode} slot - slot node
+   * @returns {undefined} it's a void function
+   */
   function moveSlotInnerContent(slot) {
     if (slot.firstChild) {
       slot.parentNode.insertBefore(slot.firstChild, slot);
@@ -1803,6 +1806,14 @@
     }
   }
 
+  /**
+   * Create a single slot binding
+   * @param   {HTMLElement} root - component root
+   * @param   {HTMLElement} node - slot node
+   * @param   {string} options.name - slot id
+   * @param   {Array} options.slots - component slots
+   * @returns {Object} Slot binding object
+   */
   function createSlot(root, node, { name, slots }) {
     const templateData = slots.find(({id}) => id === name);
 
@@ -1810,10 +1821,19 @@
       ...Slot,
       node,
       name,
-      template: templateData && create$6(templateData.html, templateData.bindings).createDOM(root)
+      template: templateData && create$6(
+        templateData.html,
+        templateData.bindings
+      ).createDOM(root)
     }
   }
 
+  /**
+   * Create the object that will manage the slots
+   * @param   {HTMLElement} root - component root element
+   * @param   {Array} slots - slots objects containing html and bindings
+   * @return  {Object} tag like interface that will manage all the slots
+   */
   function createSlots(root, slots) {
     const slotNodes = $$('slot', root);
     const slotsBindings = slotNodes.map(node => {
@@ -1830,7 +1850,7 @@
         slotsBindings.forEach(s => s.update(scope));
         return this
       },
-      unmo(scope) {
+      unmount(scope) {
         slotsBindings.forEach(s => s.unmount(scope));
         return this
       }
@@ -1932,8 +1952,43 @@
     update: noop,
     mount: noop,
     unmount: noop,
-    clone: noop
+    clone: noop,
+    createDOM: noop
   };
+
+
+  /**
+   * Create the component interface needed for the compiled components
+   * @param   {string} options.css - component css
+   * @param   {Function} options.template - functon that will return the dom-bindings template function
+   * @param   {Object} options.tag - component interface
+   * @param   {string} options.name - component name
+   * @returns {Object} component like interface
+   */
+  function createComponent({css, template: template$$1, tag, name}) {
+    const component = defineComponent({
+      css,
+      template: template$$1,
+      tag,
+      name
+    });
+
+    return slotsAndAttributes => {
+      const instance = component(slotsAndAttributes);
+
+      return {
+        mount(element, parentScope, state) {
+          return instance.mount(element, state, parentScope)
+        },
+        update(parentScope, state) {
+          return instance.update(state, parentScope)
+        },
+        unmount() {
+          return instance.unmount()
+        }
+      }
+    }
+  }
 
   /**
    * Component definition function
@@ -1947,7 +2002,7 @@
     // add the component css into the DOM
     if (css && name) cssManager.add(name, css);
 
-    return curry(createComponent)(defineProperties({
+    return curry(enhanceComponentAPI)(defineProperties({
       ...COMPONENT_LIFECYCLE_METHODS,
       state: {},
       props: {},
@@ -2012,15 +2067,14 @@
   }
 
   /**
-   * Component creation factory function
+   * Component creation factory function that will enhance the user provided API
    * @param   {Object} component - a component implementation previously defined
    * @param   {Array} options.slots - component slots generated via riot compiler
    * @param   {Array} options.attributes - attribute expressions generated via riot compiler
    * @returns {Riot.Component} a riot component instance
    */
-  function createComponent(component, {slots, attributes}) {
+  function enhanceComponentAPI(component, {slots, attributes}) {
     const attributeBindings = createAttributeBindings(attributes);
-
 
     return autobindMethods(
       runPlugins(
@@ -2103,13 +2157,13 @@
   function mountComponent(element, initialState, componentName) {
     const name = componentName || getName(element);
     if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component named "${name}" was never registered`);
+
     const component = COMPONENTS_IMPLEMENTATION_MAP.get(name)({});
-    COMPONENTS_CREATION_MAP.set(element, component);
 
     return component.mount(element, {}, initialState)
   }
 
-  const { COMPONENTS_CREATION_MAP: COMPONENTS_CREATION_MAP$1, COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP$1, MIXINS_MAP: MIXINS_MAP$1, PLUGINS_SET: PLUGINS_SET$1 } = globals;
+  const { DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY$1, COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP$1, MIXINS_MAP: MIXINS_MAP$1, PLUGINS_SET: PLUGINS_SET$1 } = globals;
 
   /**
    * Riot public api
@@ -2124,29 +2178,7 @@
   function register(name, {css, template, tag}) {
     if (COMPONENTS_IMPLEMENTATION_MAP$1.has(name)) panic(`The component "${name}" was already registered`);
 
-    return COMPONENTS_IMPLEMENTATION_MAP$1.set(name, (...args) => {
-      const component = defineComponent({
-        css,
-        template,
-        tag,
-        name
-      })(...args);
-
-      // this object will be provided to the tag bindings generated via compiler
-      // the bindings will not be able to update the components state, they will only pass down
-      // the parentScope updates
-      return {
-        mount(element, parentScope, state) {
-          return component.mount(element, state, parentScope)
-        },
-        update(parentScope, state) {
-          return component.update(state, parentScope)
-        },
-        unmount() {
-          return component.unmount()
-        }
-      }
-    })
+    return COMPONENTS_IMPLEMENTATION_MAP$1.set(name, createComponent({name, css, template, tag}))
   }
 
   /**
@@ -2178,8 +2210,8 @@
    */
   function unmount(selector) {
     return $$(selector).map((element) => {
-      if (COMPONENTS_CREATION_MAP$1.has(element)) {
-        COMPONENTS_CREATION_MAP$1.get(element).unmount();
+      if (element[DOM_COMPONENT_INSTANCE_PROPERTY$1]) {
+        element[DOM_COMPONENT_INSTANCE_PROPERTY$1].unmount();
       }
       return element
     })
@@ -2213,26 +2245,14 @@
     return PLUGINS_SET$1
   }
 
-  /**
-   * Function to define an anonymous component
-   * @param   {Object} component - this object should contain the component implementation,
-   * like css and/or template/render function
-   * @param   {Object} slotsAndAttributes - object containing the slots or attribute expressions
-   * you shouldn't normally need it but it might be handy for testing
-   * @returns {Riot.Component} a riot component instance
-   */
-  const component = ({css, template, ...rest}, slotsAndAttributes = {}) => defineComponent({
-    css,
-    template,
-    tag: rest
-  })(slotsAndAttributes);
-
   /** @type {string} current riot version */
-  const version = 'v4.0.0-alpha.1';
+  const version = 'v4.0.0-alpha.2';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
     cssManager,
+    createComponent,
+    defineComponent,
     globals
   };
 
@@ -2242,7 +2262,6 @@
   exports.unmount = unmount;
   exports.mixin = mixin;
   exports.install = install;
-  exports.component = component;
   exports.version = version;
   exports.__ = __;
 
