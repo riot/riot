@@ -1,4 +1,4 @@
-/* Riot v4.0.0-alpha.3, @license MIT */
+/* Riot v4.0.0-alpha.4, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -2034,11 +2034,11 @@
    * @returns {Object} attributes key value pairs
    */
   function evaluateProps(element, attributeExpressions = [], scope, currentProps) {
-    return {
-      ...getAttributes(element),
-      ...(scope && attributeExpressions.length ?
-        evaluateAttributeExpressions(attributeExpressions, scope) : currentProps)
+    if (attributeExpressions.length) {
+      return scope ? evaluateAttributeExpressions(attributeExpressions, scope) : currentProps
     }
+
+    return getAttributes(element)
   }
 
   /**
@@ -2246,7 +2246,7 @@
   }
 
   /** @type {string} current riot version */
-  const version = 'v4.0.0-alpha.3';
+  const version = 'v4.0.0-alpha.4';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
@@ -29623,7 +29623,7 @@
 
   var globals$3 = require$$0;
 
-  /* Riot Compiler v4.0.0-alpha.3, @license MIT */
+  /* Riot Compiler v4.0.0-alpha.4, @license MIT */
 
   const TAG_LOGIC_PROPERTY = 'tag';
   const TAG_CSS_PROPERTY = 'css';
