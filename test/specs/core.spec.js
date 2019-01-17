@@ -11,7 +11,6 @@ describe('Riot core api', () => {
       'unmount',
       'mixin',
       'install',
-      'component',
       'version',
       '__'
     ])

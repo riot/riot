@@ -1,6 +1,5 @@
 import * as riot from './riot'
 import {$$,getAttribute} from './utils/dom'
-import {camelCase, kebabCase} from './utils/misc'
 import {compile as compiler, registerPostprocessor} from '@riotjs/compiler'
 
 const GLOBAL_REGISTRY = '__riot_registry__'
@@ -26,7 +25,7 @@ registerPostprocessor(async function(code, { tagName }){
   return {
     code: `${TMP_TAG_NAME_VARIABLE}=${tagName};(function (global){${code}})(window)`
       .replace('export default',
-        `global['${GLOBAL_REGISTRY}']['${camelCase(tagName)}'] =`
+        `global['${GLOBAL_REGISTRY}']['${tagName}'] =`
       ),
     map: {}
   }
@@ -50,11 +49,11 @@ async function compile() {
 
   tags.forEach(({code}, i) => {
     const url = urls[i]
-    const tagNameRe = new RegExp(`${TMP_TAG_NAME_VARIABLE}=((.*?);)`)
+    const tagNameRe = new RegExp(`${TMP_TAG_NAME_VARIABLE}=(.*?);`)
     const tagName = tagNameRe.exec(code)[1]
 
     globalEval(code.replace(tagNameRe, ''), url)
-    riot.register(kebabCase(tagName), window[GLOBAL_REGISTRY][camelCase(tagName)])
+    riot.register(tagName, window[GLOBAL_REGISTRY][tagName])
   })
 }
 

@@ -33,9 +33,6 @@ eslint:
 	# check code style
 	@ $(ESLINT) -c ./.eslintrc src test
 
-test:
-	@ exit 0
-
 test-coveralls:
 	@ RIOT_COV=1 cat ./coverage/report-lcov/lcov.info | $(COVERALLS)
 

@@ -34,7 +34,7 @@
     "riot.js"
   ],
   "dependencies": {
-    "@riotjs/dom-bindings": "^0.10.0",
+    "@riotjs/dom-bindings": "^0.10.1",
     "curri": "^1.0.0"
   },
   "devDependencies": {
@@ -48,7 +48,7 @@
     "karma-chrome-launcher": "^2.2.0",
     "karma-coverage": "^1.1.2",
     "karma-mocha": "^1.3.0",
-    "karma-rollup-preprocessor": "^7.0.0-rc.1",
+    "karma-rollup-preprocessor": "^7.0.0-rc.2",
     "karma-sauce-launcher": "^1.2.0",
     "mocha": "^5.2.0",
     "rollup": "^1.0.0",

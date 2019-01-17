@@ -11,7 +11,6 @@ describe('Riot compiler api', () => {
       'unmount',
       'mixin',
       'install',
-      'component',
       'version',
       '__',
       'compile',
