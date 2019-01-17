@@ -112,11 +112,11 @@ export function defineComponent({css, template, tag, name}) {
  * @returns {Object} attributes key value pairs
  */
 function evaluateProps(element, attributeExpressions = [], scope, currentProps) {
-  return {
-    ...getAttributes(element),
-    ...(scope && attributeExpressions.length ?
-      evaluateAttributeExpressions(attributeExpressions, scope) : currentProps)
+  if (attributeExpressions.length) {
+    return scope ? evaluateAttributeExpressions(attributeExpressions, scope) : currentProps
   }
+
+  return getAttributes(element)
 }
 
 /**
