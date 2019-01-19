@@ -1,5 +1,6 @@
 import * as riot from '../../src/riot'
 import {expect} from 'chai'
+import {spy} from 'sinon'
 
 describe('Riot core api', () => {
   it('riot exports properly its public api', () => {
@@ -14,5 +15,20 @@ describe('Riot core api', () => {
       'version',
       '__'
     ])
+  })
+
+  it('a custom component can be registered and unregistered properly', () => {
+    const createComponentSpy = spy()
+    riot.register('my-component', {
+      css: 'my-component { color: red; }',
+      tag: {
+        onMounted() {
+          createComponentSpy()
+        }
+      }
+    })
+    riot.mount(document.createElement('my-component'))
+    expect(createComponentSpy).to.have.been.calledOnce
+    riot.unregister('my-component')
   })
 })

@@ -82,6 +82,7 @@ module.exports = function(conf) {
       ],
       external: ['chai', 'sinon'],
       output: {
+        globals: {'chai': 'chai', 'sinon': 'sinon'},
         format: 'iife',
         sourcemap: 'inline'
       }

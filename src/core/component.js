@@ -44,25 +44,23 @@ const MOCK_TEMPLATE_INTERFACE = {
  * @returns {Object} component like interface
  */
 export function createComponent({css, template, tag, name}) {
-  const component = defineComponent({
-    css,
-    template,
-    tag,
-    name
-  })
-
   return slotsAndAttributes => {
-    const instance = component(slotsAndAttributes)
+    const component = defineComponent({
+      css,
+      template,
+      tag,
+      name
+    })(slotsAndAttributes)
 
     return {
       mount(element, parentScope, state) {
-        return instance.mount(element, state, parentScope)
+        return component.mount(element, state, parentScope)
       },
       update(parentScope, state) {
-        return instance.update(state, parentScope)
+        return component.update(state, parentScope)
       },
       unmount() {
-        return instance.unmount()
+        return component.unmount()
       }
     }
   }
