@@ -23,7 +23,7 @@ function globalEval(js, url) {
 registerPostprocessor(async function(code, { tagName }){
   // cheap transpilation
   return {
-    code: `${TMP_TAG_NAME_VARIABLE}=${tagName};(function (global){${code}})(window)`
+    code: `${TMP_TAG_NAME_VARIABLE}=${tagName};(function (global){${code}})(this)`
       .replace('export default',
         `global['${GLOBAL_REGISTRY}']['${tagName}'] =`
       ),

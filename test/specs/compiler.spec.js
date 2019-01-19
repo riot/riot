@@ -18,4 +18,10 @@ describe('Riot compiler api', () => {
       'compileFromUrl'
     ])
   })
+
+  it('compiler can load asynchronously tags via url', async function() {
+    const {code} = await riot.compileFromUrl('/tags/simple.riot')
+
+    expect(code).to.match(/scope\.state\.message/)
+  })
 })

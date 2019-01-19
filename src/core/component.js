@@ -157,8 +157,8 @@ export function enhanceComponentAPI(component, {slots, attributes}) {
   return autobindMethods(
     runPlugins(
       defineProperties(Object.create(component), {
-        mount(element, state = {}, props) {
-          this.props = evaluateProps(element, attributes, props, {})
+        mount(element, state = {}, parentScope) {
+          this.props = evaluateProps(element, attributes, parentScope, {})
 
           this.state = {
             ...this.state,
@@ -177,19 +177,19 @@ export function enhanceComponentAPI(component, {slots, attributes}) {
           this.onBeforeMount()
 
           // handlte the template and its attributes
-          this.attributes.mount(element, props)
+          this.attributes.mount(element, parentScope)
           this.template.mount(element, this)
 
           // create the slots and mount them
           defineProperty(this, 'slots', createSlots(element, slots || []))
-          this.slots.mount(props)
+          this.slots.mount(parentScope)
 
           this.onMounted()
 
           return this
         },
-        update(state = {}, props) {
-          const newProps = evaluateProps(this.root, attributes, props, this.props)
+        update(state = {}, parentScope) {
+          const newProps = evaluateProps(this.root, attributes, parentScope, this.props)
 
           if (this.onBeforeUpdate(newProps, state) === false) return
 
@@ -200,9 +200,9 @@ export function enhanceComponentAPI(component, {slots, attributes}) {
             ...state
           }
 
-          if (props) {
-            this.attributes.update(props)
-            this.slots.update(props)
+          if (parentScope) {
+            this.attributes.update(parentScope)
+            this.slots.update(parentScope)
           }
 
           this.template.update(this)

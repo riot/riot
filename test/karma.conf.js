@@ -1,4 +1,5 @@
 const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
+  babel = require('rollup-plugin-babel'),
   isSaucelabs = process.env.SAUCELABS,
   isTravis = !!process.env.TRAVIS_BUILD_NUMBER,
   TEST_FILES = './specs/**/*.spec.js',
@@ -48,11 +49,37 @@ module.exports = function(conf) {
       .concat(isTravis ? [] : 'progress'),
 
     preprocessors: {
-      [TEST_FILES]: 'rollup'
+      [TEST_FILES]: ['rollup']
     },
 
     rollupPreprocessor: {
       ...rollupConfig,
+      plugins: [
+        ...rollupConfig.plugins,
+        babel({
+          plugins: [
+            [
+              'istanbul',
+              {
+                exclude: [
+                  '**/*.spec.js'
+                ]
+              }
+            ]
+          ],
+          presets: [['@babel/env',
+            {
+              modules: false,
+              exclude: ['transform-regenerator'],
+              targets: {
+                browsers: [
+                  'last 2 versions',
+                  'safari >= 7'
+                ]
+              }
+            }]]
+        })
+      ],
       external: ['chai', 'sinon'],
       output: {
         format: 'iife',
