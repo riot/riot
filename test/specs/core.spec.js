@@ -1,4 +1,9 @@
 import * as riot from '../../src/riot'
+
+import GlobalComponents from '../tags/global-components.riot'
+import NestedImportsComponent from '../tags/nested-imports.riot'
+import SimpleComponent from '../tags/simple.riot'
+
 import {expect} from 'chai'
 import {spy} from 'sinon'
 import {template} from '@riotjs/dom-bindings'
@@ -204,5 +209,102 @@ describe('Riot core api', () => {
 
   it('uninstalling plugins never registered before must throw', () => {
     expect(() => riot.uninstall(function() {})).to.throw()
+  })
+
+  it('components will receive and update properly their state property', () => {
+    riot.register('simple-component', SimpleComponent)
+
+    const element = document.createElement('simple-component')
+
+    const [component] = riot.mount(element, {message: 'hello'})
+    expect(component.$('p').innerHTML).to.be.equal('hello')
+
+    component.update({message: 'goodbye'})
+
+    expect(component.$('p').innerHTML).to.be.equal('goodbye')
+
+    component.unmount()
+    riot.unregister('simple-component')
+  })
+
+  it('nested components can be loaded in runtime via imports statements', () => {
+    riot.register('nested-imports', NestedImportsComponent)
+
+    const element = document.createElement('nested-imports')
+
+    const [component] = riot.mount(element, {message: 'hello'})
+    expect(component.$('p').innerHTML).to.be.equal('hello')
+
+    component.update({message: 'goodbye'})
+
+    expect(component.$('p').innerHTML).to.be.equal('goodbye')
+
+    component.unmount()
+    riot.unregister('nested-imports')
+  })
+
+  it('nested global components can be loaded and mounted', () => {
+    riot.register('simple', SimpleComponent)
+    riot.register('global-components', GlobalComponents)
+
+    const element = document.createElement('global-components')
+
+    const [component] = riot.mount(element, {message: 'hello'})
+    expect(component.$('p').innerHTML).to.be.equal('hello')
+
+    component.update({message: 'goodbye'})
+
+    expect(component.$('p').innerHTML).to.be.equal('goodbye')
+
+    component.unmount()
+    riot.unregister('global-components')
+    riot.unregister('simple')
+  })
+
+  it('the ref method can be used to update children components', () => {
+    riot.register('simple', SimpleComponent)
+    riot.register('global-components', GlobalComponents)
+
+    const element = document.createElement('global-components')
+
+    const [component] = riot.mount(element, {message: 'hello'})
+    // ref could detect children component
+    const [child] = component.ref('simple')
+    // or it will fall back to normal DOM nodes
+    const [p] = component.ref('p')
+
+    expect(p.innerHTML).to.be.equal('hello')
+
+    child.update({message: 'goodbye'})
+
+    expect(p.innerHTML).to.be.equal('goodbye')
+
+    component.unmount()
+    riot.unregister('global-components')
+    riot.unregister('simple')
+  })
+
+  it('the shouldUpdate method can block all the components updates', () => {
+    const updatedSpy = spy()
+    riot.register('my-component', {
+      tag: {
+        onUpdated() {
+          updatedSpy()
+        },
+        shouldUpdate() {
+          return false
+        }
+      }
+    })
+
+    const element = document.createElement('my-component')
+    const [component] = riot.mount(element)
+
+    component.update()
+    component.update()
+    component.update()
+
+    expect(updatedSpy).to.not.have.been.called
+    riot.unregister('my-component')
   })
 })

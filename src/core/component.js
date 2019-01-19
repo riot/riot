@@ -23,10 +23,12 @@ import {isFunction} from '../utils/checks'
 const COMPONENT_CORE_HELPERS = Object.freeze({
   // component helpers
   $(selector){ return $(selector, this.root) },
-  $$(selector){ return $$(selector, this.root) }
+  $$(selector){ return $$(selector, this.root) },
+  ref(selector){ return $$(selector, this.root).map(el => el[DOM_COMPONENT_INSTANCE_PROPERTY] || el)}
 })
 
 const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
+  shouldUpdate: noop,
   onBeforeMount: noop,
   onMounted: noop,
   onBeforeUpdate: noop,
@@ -83,6 +85,12 @@ export function createComponent({css, template, tag, name}) {
  */
 export function defineComponent({css, template, tag, name}) {
   const componentAPI = callOrAssign(tag) || {}
+  const subComponents = Object.entries(
+    callOrAssign(componentAPI.components) || {}
+  ).reduce((acc, [key, value]) => {
+    acc[key] = createComponent({ name: key, ...value })
+    return acc
+  }, {})
 
   // add the component css into the DOM
   if (css && name) cssManager.add(name, css)
@@ -104,9 +112,7 @@ export function defineComponent({css, template, tag, name}) {
         expressionTypes,
         bindingTypes,
         name => {
-          const namedComponents = callOrAssign(componentAPI.components) || {}
-
-          return namedComponents[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
+          return subComponents[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
         }
       ) : MOCKED_TEMPLATE_INTERFACE
     })
@@ -201,8 +207,9 @@ export function enhanceComponentAPI(component, {slots, attributes}) {
         update(state = {}, parentScope) {
           const newProps = evaluateProps(this.root, attributes, parentScope, this.props)
 
-          if (this.onBeforeUpdate(newProps, state) === false) return
+          if (this.shouldUpdate(newProps, state) === false) return
 
+          this.onBeforeUpdate()
           this.props = newProps
 
           this.state = {

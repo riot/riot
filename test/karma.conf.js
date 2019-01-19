@@ -1,5 +1,6 @@
 const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
   babel = require('rollup-plugin-babel'),
+  riotRollup = require('./rollup-riot-plugin'),
   isSaucelabs = process.env.SAUCELABS,
   isTravis = !!process.env.TRAVIS_BUILD_NUMBER,
   TEST_FILES = './specs/**/*.spec.js',
@@ -55,6 +56,7 @@ module.exports = function(conf) {
     rollupPreprocessor: {
       ...rollupConfig,
       plugins: [
+        riotRollup(),
         ...rollupConfig.plugins,
         babel({
           plugins: [
