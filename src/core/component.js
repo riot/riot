@@ -1,6 +1,19 @@
 import {$, $$, getAttributes, getName} from '../utils/dom'
-import {COMPONENTS_IMPLEMENTATION_MAP, DOM_COMPONENT_INSTANCE_PROPERTY, MIXINS_MAP, PLUGINS_SET} from '../globals'
-import {autobindMethods, callOrAssign, defineProperties, defineProperty, evaluateAttributeExpressions, noop, panic} from '../utils/misc'
+import {
+  COMPONENTS_IMPLEMENTATION_MAP,
+  DOM_COMPONENT_INSTANCE_PROPERTY,
+  PLUGINS_SET
+} from '../globals'
+import {
+  autobindMethods,
+  callOrAssign,
+  defineDefaults,
+  defineProperties,
+  defineProperty,
+  evaluateAttributeExpressions,
+  noop,
+  panic
+} from '../utils/misc'
 import {bindingTypes, template as createTemplate, expressionTypes} from '@riotjs/dom-bindings'
 import createSlots from './slots'
 import cssManager from './css-manager'
@@ -10,11 +23,7 @@ import {isFunction} from '../utils/checks'
 const COMPONENT_CORE_HELPERS = Object.freeze({
   // component helpers
   $(selector){ return $(selector, this.root) },
-  $$(selector){ return $$(selector, this.root) },
-  mixin(name) {
-    // extend this component with this mixin
-    Object.assing(this, MIXINS_MAP.get(name))
-  }
+  $$(selector){ return $$(selector, this.root) }
 })
 
 const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
@@ -26,7 +35,7 @@ const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
   onUnmounted: noop
 })
 
-const MOCK_TEMPLATE_INTERFACE = {
+const MOCKED_TEMPLATE_INTERFACE = {
   update: noop,
   mount: noop,
   unmount: noop,
@@ -78,27 +87,30 @@ export function defineComponent({css, template, tag, name}) {
   // add the component css into the DOM
   if (css && name) cssManager.add(name, css)
 
-  return curry(enhanceComponentAPI)(defineProperties({
-    ...COMPONENT_LIFECYCLE_METHODS,
-    state: {},
-    props: {},
-    ...componentAPI,
-    // defined during the component creation
-    slots: null,
-    root: null
-  }, {
-    // these properties should not be overriden
-    ...COMPONENT_CORE_HELPERS,
-    css,
-    template: template ? template(
-      createTemplate,
-      expressionTypes,
-      bindingTypes,
-      function(name) {
-        return (componentAPI.components || {})[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
-      }
-    ) : MOCK_TEMPLATE_INTERFACE
-  }))
+  return curry(enhanceComponentAPI)(defineProperties(
+    // set the component defaults without overriding the original component API
+    defineDefaults(componentAPI, {
+      ...COMPONENT_LIFECYCLE_METHODS,
+      state: {}
+    }), {
+      // defined during the component creation
+      slots: null,
+      root: null,
+      // these properties should not be overriden
+      ...COMPONENT_CORE_HELPERS,
+      css,
+      template: template ? template(
+        createTemplate,
+        expressionTypes,
+        bindingTypes,
+        name => {
+          const namedComponents = callOrAssign(componentAPI.components) || {}
+
+          return namedComponents[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
+        }
+      ) : MOCKED_TEMPLATE_INTERFACE
+    })
+  )
 }
 
 /**
@@ -139,7 +151,7 @@ function createAttributeBindings(attributes) {
  * @returns {Object} the component enhanced by the plugins
  */
 function runPlugins(component) {
-  return [...PLUGINS_SET].forEach(fn => fn(component)) || component
+  return [...PLUGINS_SET].reduce((c, fn) => fn(c) || c, component)
 }
 
 /**

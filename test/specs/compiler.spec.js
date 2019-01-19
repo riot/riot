@@ -9,10 +9,11 @@ describe('Riot compiler api', () => {
       'unregister',
       'mount',
       'unmount',
-      'mixin',
       'install',
+      'uninstall',
       'version',
       '__',
+      // compiler API
       'compile',
       'compileFromString',
       'compileFromUrl'

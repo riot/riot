@@ -34,6 +34,8 @@ export default {
    * @returns {Object} self
    */
   inject() {
+    // a node environment can't rely on css
+    /* istanbul ignore next */
     if (!styleNode) return this
     styleNode.innerHTML = [...CSS_BY_NAME.values()].join('\n')
     return this
@@ -45,6 +47,9 @@ export default {
    * @returns {Object} self
    */
   remove(name) {
+    // a node environment can't rely on css
+    /* istanbul ignore next */
+    if (!styleNode) return this
     if (CSS_BY_NAME.has(name)) {
       CSS_BY_NAME.delete(name)
       this.inject()

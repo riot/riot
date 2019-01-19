@@ -18,6 +18,20 @@ export function callOrAssign(source) {
   return isFunction(source) ? (source.constructor.name ? new source() : source()) : source
 }
 
+/**
+ * Define default properties if they don't exist on the source object
+ * @param   {Object} source - object that will receive the default properties
+ * @param   {Object} defaults - object containing additional optional keys
+ * @returns {Object} the original object received enhanced
+ */
+export function defineDefaults(source, defaults) {
+  Object.entries(defaults).forEach(([key, value]) => {
+    if (!source[key]) source[key] = value
+  })
+
+  return source
+}
+
 // doese simply nothing
 export function noop() {
   return this
