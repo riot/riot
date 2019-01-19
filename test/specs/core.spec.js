@@ -31,4 +31,21 @@ describe('Riot core api', () => {
     expect(createComponentSpy).to.have.been.calledOnce
     riot.unregister('my-component')
   })
+
+  it('a custom component can be mounted and unmounted properly', () => {
+    const destroyComponentSpy = spy()
+    riot.register('my-component', {
+      css: 'my-component { color: red; }',
+      tag: {
+        onUnmounted() {
+          destroyComponentSpy()
+        }
+      }
+    })
+    const element = document.createElement('my-component')
+    riot.mount(element)
+    riot.unmount(element)
+    expect(destroyComponentSpy).to.have.been.calledOnce
+    riot.unregister('my-component')
+  })
 })

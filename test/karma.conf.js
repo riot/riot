@@ -101,6 +101,8 @@ module.exports = function(conf) {
       reporters: [{
         type: 'lcov',
         subdir: 'report-lcov'
+      }, {
+        type: 'text'
       }]
     },
 
