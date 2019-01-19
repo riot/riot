@@ -2,6 +2,7 @@ import * as riot from '../../src/riot'
 
 import GlobalComponents from '../tags/global-components.riot'
 import NestedImportsComponent from '../tags/nested-imports.riot'
+//import ParentWithSlotsComponent from '../tags/parent-with-slots.riot'
 import SimpleComponent from '../tags/simple.riot'
 
 import {expect} from 'chai'
@@ -305,6 +306,20 @@ describe('Riot core api', () => {
     component.update()
 
     expect(updatedSpy).to.not.have.been.called
+
+    component.unmount()
     riot.unregister('my-component')
   })
+/*
+  WIP
+  it('default slots will be properly rendered', () => {
+    riot.register('parent-with-slots', ParentWithSlotsComponent)
+    const element = document.createElement('parent-with-slots')
+    const [component] = riot.mount(element, { message: 'hello' })
+
+    expect(component.$('simple-slot').innerHTML).to.be.equal('hello')
+
+    component.unmount()
+    riot.unregister('parent-with-slots')
+  })*/
 })

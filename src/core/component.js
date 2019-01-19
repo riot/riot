@@ -45,7 +45,6 @@ const MOCKED_TEMPLATE_INTERFACE = {
   createDOM: noop
 }
 
-
 /**
  * Create the component interface needed for the compiled components
  * @param   {string} options.css - component css
@@ -85,12 +84,7 @@ export function createComponent({css, template, tag, name}) {
  */
 export function defineComponent({css, template, tag, name}) {
   const componentAPI = callOrAssign(tag) || {}
-  const subComponents = Object.entries(
-    callOrAssign(componentAPI.components) || {}
-  ).reduce((acc, [key, value]) => {
-    acc[key] = createComponent({ name: key, ...value })
-    return acc
-  }, {})
+  const components = createSubcomponents(componentAPI.components)
 
   // add the component css into the DOM
   if (css && name) cssManager.add(name, css)
@@ -112,7 +106,7 @@ export function defineComponent({css, template, tag, name}) {
         expressionTypes,
         bindingTypes,
         name => {
-          return subComponents[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
+          return components[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
         }
       ) : MOCKED_TEMPLATE_INTERFACE
     })
@@ -149,6 +143,19 @@ function createAttributeBindings(attributes) {
       }
     })
   }])
+}
+
+/**
+ * Create the subcomponents that can be included inside a tag in runtime
+ * @param   {Object} components - components imported in runtime
+ * @returns {Object} all the components transformed into Riot.Component factory functions
+ */
+function createSubcomponents(components = {}) {
+  return Object.entries(callOrAssign(components))
+    .reduce((acc, [key, value]) => {
+      acc[key] = createComponent({ name: key, ...value })
+      return acc
+    }, {})
 }
 
 /**
