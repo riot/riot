@@ -11,7 +11,7 @@ module.exports = () => ({
 
     return {
       code: result.code,
-      map: result.map.toJSON()
+      map: result.map
     }
   }
 })

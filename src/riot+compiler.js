@@ -1,9 +1,8 @@
 import * as riot from './riot'
 import {$$,getAttribute} from './utils/dom'
-import {compile as compiler, registerPostprocessor} from '@riotjs/compiler'
+import compiler from '@riotjs/compiler/dist/compiler'
 
 const GLOBAL_REGISTRY = '__riot_registry__'
-const TMP_TAG_NAME_VARIABLE = '__CURRENT_RIOT_TAG_NAME__'
 window[GLOBAL_REGISTRY] = {}
 
 // evaluates a compiled tag within the global context
@@ -20,13 +19,10 @@ function globalEval(js, url) {
   root.removeChild(node)
 }
 
-registerPostprocessor(async function(code, { tagName }){
+compiler.registerPostprocessor(async function(code){
   // cheap transpilation
   return {
-    code: `${TMP_TAG_NAME_VARIABLE}=${tagName};(function (global){${code}})(this)`
-      .replace('export default',
-        `global['${GLOBAL_REGISTRY}']['${tagName}'] =`
-      ),
+    code: `(function (global){${code}})(this)`.replace('export default', 'return'),
     map: {}
   }
 })
@@ -35,11 +31,11 @@ async function compileFromUrl(url) {
   const response = await fetch(url)
   const code = await response.text()
 
-  return await compiler(code, { file: url })
+  return await compiler.compile(code, { file: url })
 }
 
 async function compileFromString(string, options) {
-  return await compiler(string, options)
+  return await compiler.compile(string, options)
 }
 
 async function compile() {
@@ -47,12 +43,11 @@ async function compile() {
   const urls = scripts.map(s => getAttribute(s, 'src') || getAttribute(s, 'data-src'))
   const tags = await Promise.all(urls.map(compileFromUrl))
 
-  tags.forEach(({code}, i) => {
+  tags.forEach(({code, meta}, i) => {
     const url = urls[i]
-    const tagNameRe = new RegExp(`${TMP_TAG_NAME_VARIABLE}=(.*?);`)
-    const tagName = tagNameRe.exec(code)[1]
+    const {tagName} = meta
 
-    globalEval(code.replace(tagNameRe, ''), url)
+    globalEval(`window.${GLOBAL_REGISTRY}[${tagName}] = ${code}()`, url)
     riot.register(tagName, window[GLOBAL_REGISTRY][tagName])
   })
 }
