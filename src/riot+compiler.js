@@ -47,7 +47,7 @@ async function compile() {
     const url = urls[i]
     const {tagName} = meta
 
-    globalEval(`window.${GLOBAL_REGISTRY}[${tagName}] = ${code}()`, url)
+    globalEval(`window.${GLOBAL_REGISTRY}['${tagName}'] = ${code}`, url)
     riot.register(tagName, window[GLOBAL_REGISTRY][tagName])
   })
 }
