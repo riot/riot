@@ -1,6 +1,7 @@
 import * as riot from '../../src/riot'
 
 import GlobalComponents from '../tags/global-components.riot'
+import NamedSlotsParent from '../tags/named-slots-parent.riot'
 import NestedImportsComponent from '../tags/nested-imports.riot'
 import ParentWithSlotsComponent from '../tags/parent-with-slots.riot'
 import SimpleComponent from '../tags/simple.riot'
@@ -19,6 +20,7 @@ describe('Riot core api', () => {
       'unmount',
       'install',
       'uninstall',
+      'component',
       'version',
       '__'
     ])
@@ -224,7 +226,6 @@ describe('Riot core api', () => {
 
     expect(component.$('p').innerHTML).to.be.equal('goodbye')
 
-    component.unmount()
     riot.unregister('simple-component')
   })
 
@@ -311,15 +312,28 @@ describe('Riot core api', () => {
     riot.unregister('my-component')
   })
 
-  // WIP
   it.skip('default slots will be properly rendered', () => {
     riot.register('parent-with-slots', ParentWithSlotsComponent)
     const element = document.createElement('parent-with-slots')
+
     const [component] = riot.mount(element, { message: 'hello' })
 
     expect(component.$('simple-slot').innerHTML).to.be.equal('hello')
 
     component.unmount()
     riot.unregister('parent-with-slots')
+  })
+
+  it.skip('named slots will be properly rendered', () => {
+    riot.register('named-slots-parent', NamedSlotsParent)
+    const element = document.createElement('named-slots-parent')
+    const [component] = riot.mount(element)
+
+    expect(component.$('named-slots header').innerHTML).to.be.equal(component.state.header)
+    expect(component.$('named-slots footer').innerHTML).to.be.equal(component.state.footer)
+    expect(component.$('named-slots main').innerHTML).to.be.equal(component.state.main)
+
+    component.unmount()
+    riot.unregister('named-slots-parent')
   })
 })

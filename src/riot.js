@@ -91,13 +91,17 @@ export function uninstall(plugin) {
   return PLUGINS_SET
 }
 
+/**
+ * Helpter method to create an anonymous component without the need to register it
+ */
+export const component = createComponent
+
 /** @type {string} current riot version */
 export const version = 'WIP'
 
 // expose some internal stuff that might be used from external tools
 export const __ = {
   cssManager,
-  createComponent,
   defineComponent,
   globals
 }

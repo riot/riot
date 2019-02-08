@@ -1,0 +1,28 @@
+<named-slots-parent>
+  <named-slot>
+    <span slot='header'>
+      { state.header }
+    </span>
+
+    {state.main}
+
+    <span slot='footer'>
+      { state.footer }
+    </span>
+  </named-slot>
+
+  <script>
+    import NamedSlots from './named-slots.riot'
+
+    export default {
+      state: {
+        header: 'i am the header',
+        footer: 'i am the footer',
+        main: 'i am the main'
+      },
+      components: {
+        'named-slots': NamedSlots
+      }
+    }
+  </script>
+</named-slots-parent>
