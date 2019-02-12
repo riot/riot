@@ -26,6 +26,23 @@ describe('Riot core api', () => {
     ])
   })
 
+  it('riot.component can mount anonymous components', () => {
+    const mountedSpy = spy()
+    const component = riot.component({
+      tag:  {
+        onMounted() {
+          mountedSpy()
+        }
+      }
+    })
+
+    const element = document.createElement('div')
+    const tag = component.mount(element, {})
+    expect(tag.root).to.be.equal(element)
+    expect(mountedSpy).to.have.been.calledOnce
+    tag.unmount()
+  })
+
   it('custom components can be registered and unregistered properly', () => {
     const mountedSpy = spy()
     riot.register('my-component', {
@@ -41,11 +58,12 @@ describe('Riot core api', () => {
     riot.unregister('my-component')
   })
 
-  it('custom components have core helpers', () => {
+  it('custom components have core helpers and the root property', () => {
     riot.register('my-component', {
       css: 'my-component { color: red; }',
       tag: {
         onMounted() {
+          expect(this.root).to.be.ok
           expect(this.$('div')).to.be.ok
           expect(this.$$('div')).to.be.ok
         }
@@ -312,7 +330,7 @@ describe('Riot core api', () => {
     riot.unregister('my-component')
   })
 
-  it.skip('default slots will be properly rendered', () => {
+  it('default slots will be properly rendered', () => {
     riot.register('parent-with-slots', ParentWithSlotsComponent)
     const element = document.createElement('parent-with-slots')
 
@@ -324,13 +342,14 @@ describe('Riot core api', () => {
     riot.unregister('parent-with-slots')
   })
 
-  it.skip('named slots will be properly rendered', () => {
+  it('named slots will be properly rendered', () => {
     riot.register('named-slots-parent', NamedSlotsParent)
     const element = document.createElement('named-slots-parent')
+
     const [component] = riot.mount(element)
 
-    expect(component.$('named-slots header').innerHTML).to.be.equal(component.state.header)
-    expect(component.$('named-slots footer').innerHTML).to.be.equal(component.state.footer)
+    expect(component.$('named-slots header span').innerHTML).to.be.equal(component.state.header)
+    expect(component.$('named-slots footer span').innerHTML).to.be.equal(component.state.footer)
     expect(component.$('named-slots main').innerHTML).to.be.equal(component.state.main)
 
     component.unmount()

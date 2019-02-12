@@ -1,6 +1,7 @@
 import * as globals from './globals'
 import {createComponent, defineComponent, mountComponent} from './core/component'
 import {$$} from './utils/dom'
+import compose from '@riotjs/compiler/src/utils/compose'
 import cssManager from './core/css-manager'
 import {isFunction} from './utils/checks'
 import {panic} from './utils/misc'
@@ -94,7 +95,7 @@ export function uninstall(plugin) {
 /**
  * Helpter method to create an anonymous component without the need to register it
  */
-export const component = createComponent
+export const component = compose(c => c({}), createComponent)
 
 /** @type {string} current riot version */
 export const version = 'WIP'
