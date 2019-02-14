@@ -2194,6 +2194,10 @@
     return component.mount(element, {}, initialState)
   }
 
+  /* eslint-disable */
+  // source: https://30secondsofcode.org/function#compose
+  var compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));
+
   const { DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY$1, COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP$1, PLUGINS_SET: PLUGINS_SET$1 } = globals;
 
   /**
@@ -2283,7 +2287,7 @@
   /**
    * Helpter method to create an anonymous component without the need to register it
    */
-  const component = createComponent;
+  const component = compose(c => c({}), createComponent);
 
   /** @type {string} current riot version */
   const version = 'v4.0.0-alpha.4';
@@ -3332,7 +3336,7 @@
   	    Pp.insertAt = function insertAt(index) {
   	        var argc = arguments.length;
   	        var move = getMoves(this, argc - 1, index);
-  	        if (move === emptyMoves) {
+  	        if (move === emptyMoves && argc <= 1) {
   	            return this;
   	        }
   	        index = Math.max(index, 0);
@@ -5003,7 +5007,7 @@
   	        // always true for unary operators.
   	        .field("prefix", Boolean, defaults["true"]);
   	    var BinaryOperator = or("==", "!=", "===", "!==", "<", "<=", ">", ">=", "<<", ">>", ">>>", "+", "-", "*", "/", "%", "**", "&", // TODO Missing from the Parser API.
-  	    "|", "^", "in", "instanceof", "..");
+  	    "|", "^", "in", "instanceof");
   	    def("BinaryExpression")
   	        .bases("Expression")
   	        .build("operator", "left", "right")
@@ -6191,11 +6195,14 @@
   	    }, "StringLiteral");
   	    def("TSType")
   	        .bases("Node");
-  	    var IdOrQualifiedName = or(def("Identifier"), def("TSQualifiedName"));
+  	    var TSEntityName = or(def("Identifier"), def("TSQualifiedName"));
   	    def("TSTypeReference")
-  	        .bases("TSType")
+  	        .bases("TSType", "TSHasOptionalTypeParameterInstantiation")
   	        .build("typeName", "typeParameters")
-  	        .field("typeName", IdOrQualifiedName)
+  	        .field("typeName", TSEntityName);
+  	    // An abstract (non-buildable) base type that provide a commonly-needed
+  	    // optional .typeParameters field.
+  	    def("TSHasOptionalTypeParameterInstantiation")
   	        .field("typeParameters", or(def("TSTypeParameterInstantiation"), null), defaults["null"]);
   	    // An abstract (non-buildable) base type that provide a commonly-needed
   	    // optional .typeParameters field.
@@ -6208,8 +6215,8 @@
   	    def("TSQualifiedName")
   	        .bases("Node")
   	        .build("left", "right")
-  	        .field("left", IdOrQualifiedName)
-  	        .field("right", IdOrQualifiedName);
+  	        .field("left", TSEntityName)
+  	        .field("right", TSEntityName);
   	    def("TSAsExpression")
   	        .bases("Expression")
   	        .build("expression")
@@ -6222,6 +6229,7 @@
   	        .field("expression", def("Expression"));
   	    [
   	        "TSAnyKeyword",
+  	        "TSBigIntKeyword",
   	        "TSBooleanKeyword",
   	        "TSNeverKeyword",
   	        "TSNullKeyword",
@@ -6386,7 +6394,7 @@
   	    def("TSTypeQuery")
   	        .bases("TSType")
   	        .build("exprName")
-  	        .field("exprName", IdOrQualifiedName);
+  	        .field("exprName", or(TSEntityName, def("TSImportType")));
   	    // Inferred from Babylon's tsParseTypeMember method.
   	    var TSTypeMember = or(def("TSCallSignatureDeclaration"), def("TSConstructSignatureDeclaration"), def("TSIndexSignature"), def("TSMethodSignature"), def("TSPropertySignature"));
   	    def("TSTypeLiteral")
@@ -6434,16 +6442,21 @@
   	    def("TSModuleDeclaration")
   	        .bases("Declaration")
   	        .build("id", "body")
-  	        .field("id", or(StringLiteral, IdOrQualifiedName))
+  	        .field("id", or(StringLiteral, TSEntityName))
   	        .field("declare", Boolean, defaults["false"])
   	        .field("global", Boolean, defaults["false"])
   	        .field("body", or(def("TSModuleBlock"), def("TSModuleDeclaration"), null), defaults["null"]);
+  	    def("TSImportType")
+  	        .bases("TSType", "TSHasOptionalTypeParameterInstantiation")
+  	        .build("argument", "qualifier", "typeParameters")
+  	        .field("argument", StringLiteral)
+  	        .field("qualifier", or(TSEntityName, void 0), defaults["undefined"]);
   	    def("TSImportEqualsDeclaration")
   	        .bases("Declaration")
   	        .build("id", "moduleReference")
   	        .field("id", def("Identifier"))
   	        .field("isExport", Boolean, defaults["false"])
-  	        .field("moduleReference", or(IdOrQualifiedName, def("TSExternalModuleReference")));
+  	        .field("moduleReference", or(TSEntityName, def("TSExternalModuleReference")));
   	    def("TSExternalModuleReference")
   	        .bases("Declaration")
   	        .build("expression")
@@ -6461,14 +6474,13 @@
   	        .build("body")
   	        .field("body", [TSTypeMember]);
   	    def("TSExpressionWithTypeArguments")
-  	        .bases("TSType")
+  	        .bases("TSType", "TSHasOptionalTypeParameterInstantiation")
   	        .build("expression", "typeParameters")
-  	        .field("expression", IdOrQualifiedName)
-  	        .field("typeParameters", or(def("TSTypeParameterInstantiation"), null), defaults["null"]);
+  	        .field("expression", TSEntityName);
   	    def("TSInterfaceDeclaration")
   	        .bases("Declaration", "TSHasOptionalTypeParameters")
   	        .build("id", "body")
-  	        .field("id", IdOrQualifiedName)
+  	        .field("id", TSEntityName)
   	        .field("declare", Boolean, defaults["false"])
   	        .field("extends", or([def("TSExpressionWithTypeArguments")], null), defaults["null"])
   	        .field("body", def("TSInterfaceBody"));
@@ -13293,7 +13305,7 @@
   		var syntax_1 = __webpack_require__(2);
   		exports.Syntax = syntax_1.Syntax;
   		// Sync with *.json manifests.
-  		exports.version = '4.0.0';
+  		exports.version = '4.0.1';
 
 
   	/***/ },
@@ -15214,11 +15226,18 @@
   		            column: this.startMarker.column
   		        };
   		    };
-  		    Parser.prototype.startNode = function (token) {
+  		    Parser.prototype.startNode = function (token, lastLineStart) {
+  		        if (lastLineStart === void 0) { lastLineStart = 0; }
+  		        var column = token.start - token.lineStart;
+  		        var line = token.lineNumber;
+  		        if (column < 0) {
+  		            column += lastLineStart;
+  		            line--;
+  		        }
   		        return {
   		            index: token.start,
-  		            line: token.lineNumber,
-  		            column: token.start - token.lineStart
+  		            line: line,
+  		            column: column
   		        };
   		    };
   		    Parser.prototype.finalize = function (marker, node) {
@@ -15550,7 +15569,7 @@
   		        var isGenerator = false;
   		        var node = this.createNode();
   		        var previousAllowYield = this.context.allowYield;
-  		        this.context.allowYield = false;
+  		        this.context.allowYield = true;
   		        var params = this.parseFormalParameters();
   		        var method = this.parsePropertyMethod(params);
   		        this.context.allowYield = previousAllowYield;
@@ -15620,7 +15639,7 @@
   		            this.nextToken();
   		            computed = this.match('[');
   		            isAsync = !this.hasLineTerminator && (id === 'async') &&
-  		                !this.match(':') && !this.match('(') && !this.match('*');
+  		                !this.match(':') && !this.match('(') && !this.match('*') && !this.match(',');
   		            key = isAsync ? this.parseObjectPropertyKey() : this.finalize(node, new Node.Identifier(id));
   		        }
   		        else if (this.match('*')) {
@@ -16219,12 +16238,15 @@
   		            // Final reduce to clean-up the stack.
   		            var i = stack.length - 1;
   		            expr = stack[i];
-  		            markers.pop();
+  		            var lastMarker = markers.pop();
   		            while (i > 1) {
-  		                var node = this.startNode(markers.pop());
+  		                var marker = markers.pop();
+  		                var lastLineStart = lastMarker && lastMarker.lineStart;
+  		                var node = this.startNode(marker, lastLineStart);
   		                var operator = stack[i - 1];
   		                expr = this.finalize(node, new Node.BinaryExpression(operator, stack[i - 2], expr));
   		                i -= 2;
+  		                lastMarker = marker;
   		            }
   		        }
   		        return expr;
@@ -17006,8 +17028,10 @@
   		        }
   		        var node = this.createNode();
   		        this.expectKeyword('return');
-  		        var hasArgument = !this.match(';') && !this.match('}') &&
-  		            !this.hasLineTerminator && this.lookahead.type !== 2 /* EOF */;
+  		        var hasArgument = (!this.match(';') && !this.match('}') &&
+  		            !this.hasLineTerminator && this.lookahead.type !== 2 /* EOF */) ||
+  		            this.lookahead.type === 8 /* StringLiteral */ ||
+  		            this.lookahead.type === 10 /* Template */;
   		        var argument = hasArgument ? this.parseExpression() : null;
   		        this.consumeSemicolon();
   		        return this.finalize(node, new Node.ReturnStatement(argument));
@@ -17572,7 +17596,7 @@
   		        var node = this.createNode();
   		        var isGenerator = false;
   		        var previousAllowYield = this.context.allowYield;
-  		        this.context.allowYield = false;
+  		        this.context.allowYield = !isGenerator;
   		        var formalParameters = this.parseFormalParameters();
   		        if (formalParameters.params.length > 0) {
   		            this.tolerateError(messages_1.Messages.BadGetterArity);
@@ -17585,7 +17609,7 @@
   		        var node = this.createNode();
   		        var isGenerator = false;
   		        var previousAllowYield = this.context.allowYield;
-  		        this.context.allowYield = false;
+  		        this.context.allowYield = !isGenerator;
   		        var formalParameters = this.parseFormalParameters();
   		        if (formalParameters.params.length !== 1) {
   		            this.tolerateError(messages_1.Messages.BadSetterArity);
@@ -17686,13 +17710,8 @@
   		                    isAsync = true;
   		                    token = this.lookahead;
   		                    key = this.parseObjectPropertyKey();
-  		                    if (token.type === 3 /* Identifier */) {
-  		                        if (token.value === 'get' || token.value === 'set') {
-  		                            this.tolerateUnexpectedToken(token);
-  		                        }
-  		                        else if (token.value === 'constructor') {
-  		                            this.tolerateUnexpectedToken(token, messages_1.Messages.ConstructorIsAsync);
-  		                        }
+  		                    if (token.type === 3 /* Identifier */ && token.value === 'constructor') {
+  		                        this.tolerateUnexpectedToken(token, messages_1.Messages.ConstructorIsAsync);
   		                    }
   		                }
   		            }
@@ -17805,6 +17824,7 @@
   		    Parser.prototype.parseModule = function () {
   		        this.context.strict = true;
   		        this.context.isModule = true;
+  		        this.scanner.isModule = true;
   		        var node = this.createNode();
   		        var body = this.parseDirectivePrologues();
   		        while (this.lookahead.type !== 2 /* EOF */) {
@@ -18225,6 +18245,7 @@
   		        this.source = code;
   		        this.errorHandler = handler;
   		        this.trackComment = false;
+  		        this.isModule = false;
   		        this.length = code.length;
   		        this.index = 0;
   		        this.lineNumber = (code.length > 0) ? 1 : 0;
@@ -18430,7 +18451,7 @@
   		                    break;
   		                }
   		            }
-  		            else if (ch === 0x3C) {
+  		            else if (ch === 0x3C && !this.isModule) {
   		                if (this.source.slice(this.index + 1, this.index + 4) === '!--') {
   		                    this.index += 4; // `<!--`
   		                    var comment = this.skipSingleLineComment(4);
@@ -23588,6 +23609,7 @@
   	        case "FlowPredicate": // Supertype of InferredPredicate and DeclaredPredicate
   	        case "MemberTypeAnnotation": // Flow
   	        case "Type": // Flow
+  	        case "TSHasOptionalTypeParameterInstantiation":
   	        case "TSHasOptionalTypeParameters":
   	        case "TSHasOptionalTypeAnnotation":
   	            throw new Error("unprintable type: " + JSON.stringify(n.type));
@@ -23914,6 +23936,8 @@
   	            throw new Error("unprintable type: " + JSON.stringify(n.type));
   	        case "TSNumberKeyword":
   	            return lines.fromString("number", options$$1);
+  	        case "TSBigIntKeyword":
+  	            return lines.fromString("bigint", options$$1);
   	        case "TSObjectKeyword":
   	            return lines.fromString("object", options$$1);
   	        case "TSBooleanKeyword":
@@ -24201,6 +24225,15 @@
   	                lines$$1.indent(options$$1.tabWidth), ";",
   	                "\n}",
   	            ]);
+  	        case "TSImportType":
+  	            parts.push("import(", path$$1.call(print, "argument"), ")");
+  	            if (n.qualifier) {
+  	                parts.push(".", path$$1.call(print, "qualifier"));
+  	            }
+  	            if (n.typeParameters) {
+  	                parts.push(path$$1.call(print, "typeParameters"));
+  	            }
+  	            return lines.concat(parts);
   	        case "TSImportEqualsDeclaration":
   	            if (n.isExport) {
   	                parts.push("export ");
@@ -24821,6 +24854,17 @@
   	}
 
   	/**
+  	 * Return a source map as JSON, it it has not the toJSON method it means it can
+  	 * be used right the way
+  	 * @param   { SourceMapGenerator|Object } map - a sourcemap generator or simply an json object
+  	 * @returns { Object } the source map as JSON
+  	 */
+  	function sourcemapAsJSON(map) {
+  	  if (map && map.toJSON) return map.toJSON()
+  	  return map
+  	}
+
+  	/**
   	 * Detect node js environements
   	 * @returns { boolean } true if the runtime is node
   	 */
@@ -24828,16 +24872,6 @@
   	  return typeof process !== 'undefined'
   	}
 
-  	/**
-  	 * Return a source map as JSON, it it has not the toJSON method it means it can
-  	 * be used right the way
-  	 * @param   { SourceMapGenerator|Object } map - a sourcemap generator or simply an json object
-  	 * @returns { Object } the source map as JSON
-  	 */
-  	function asJSON(map) {
-  	  if (map.toJSON) return map.toJSON()
-  	  return map
-  	}
   	/**
   	 * Compose two sourcemaps
   	 * @param   { SourceMapGenerator } formerMap - original sourcemap
@@ -24849,9 +24883,9 @@
   	    isNode() &&
   	    formerMap && latterMap && latterMap.mappings
   	  ) {
-  	    return recastUtil.composeSourceMaps(asJSON(formerMap), asJSON(latterMap))
+  	    return recastUtil.composeSourceMaps(sourcemapAsJSON(formerMap), sourcemapAsJSON(latterMap))
   	  } else if (isNode() && formerMap) {
-  	    return asJSON(formerMap)
+  	    return sourcemapAsJSON(formerMap)
   	  }
 
   	  return {}
@@ -25163,6 +25197,29 @@
   	      curry(fn, ...args) :
   	      fn(...args)
   	  }
+  	}
+
+  	/**
+  	 * Generate the javascript from an ast source
+  	 * @param   {AST} ast - ast object
+  	 * @param   {Object} options - printer options
+  	 * @returns {Object} code + map
+  	 */
+  	function generateJavascript(ast, options) {
+  	  return recast.print(ast, {
+  	    ...options,
+  	    tabWidth: 2,
+  	    quote: 'single'
+  	  })
+  	}
+
+  	/**
+  	 * True if the sourcemap has no mappings, it is empty
+  	 * @param   {Object}  map - sourcemap json
+  	 * @returns {boolean} true if empty
+  	 */
+  	function isEmptySourcemap(map) {
+  	  return !map || !map.mappings || !map.mappings.length
   	}
 
   	const LINES_RE = /\r\n?|\n/g;
@@ -25701,7 +25758,7 @@
   		KeyframeEffectReadOnly: false,
   		length: false,
   		localStorage: false,
-  		location: false,
+  		location: true,
   		Location: false,
   		locationbar: false,
   		matchMedia: false,
@@ -25914,6 +25971,7 @@
   		PushManager: false,
   		PushSubscription: false,
   		PushSubscriptionOptions: false,
+  		queueMicrotask: false,
   		RadioNodeList: false,
   		Range: false,
   		ReadableStream: false,
@@ -26146,6 +26204,7 @@
   		XSLTProcessor: false
   	};
   	var worker = {
+  		addEventListener: false,
   		applicationCache: false,
   		atob: false,
   		Blob: false,
@@ -26200,6 +26259,8 @@
   		PerformanceTiming: false,
   		postMessage: true,
   		"Promise": false,
+  		queueMicrotask: false,
+  		removeEventListener: false,
   		Request: false,
   		Response: false,
   		self: true,
@@ -26228,10 +26289,13 @@
   		"Intl": false,
   		module: false,
   		process: false,
+  		queueMicrotask: false,
   		require: false,
   		setImmediate: false,
   		setInterval: false,
   		setTimeout: false,
+  		TextDecoder: false,
+  		TextEncoder: false,
   		URL: false,
   		URLSearchParams: false
   	};
@@ -26574,25 +26638,99 @@
   		Ref: false
   	};
   	var serviceworker = {
+  		addEventListener: false,
+  		applicationCache: false,
+  		atob: false,
+  		Blob: false,
+  		BroadcastChannel: false,
+  		btoa: false,
   		Cache: false,
   		caches: false,
   		CacheStorage: false,
+  		clearInterval: false,
+  		clearTimeout: false,
   		Client: false,
   		clients: false,
   		Clients: false,
+  		close: true,
+  		console: false,
   		ExtendableEvent: false,
   		ExtendableMessageEvent: false,
+  		fetch: false,
   		FetchEvent: false,
+  		FileReaderSync: false,
+  		FormData: false,
+  		Headers: false,
+  		IDBCursor: false,
+  		IDBCursorWithValue: false,
+  		IDBDatabase: false,
+  		IDBFactory: false,
+  		IDBIndex: false,
+  		IDBKeyRange: false,
+  		IDBObjectStore: false,
+  		IDBOpenDBRequest: false,
+  		IDBRequest: false,
+  		IDBTransaction: false,
+  		IDBVersionChangeEvent: false,
+  		ImageData: false,
   		importScripts: false,
+  		indexedDB: false,
+  		location: false,
+  		MessageChannel: false,
+  		MessagePort: false,
+  		name: false,
+  		navigator: false,
+  		Notification: false,
+  		onclose: true,
+  		onconnect: true,
+  		onerror: true,
+  		onfetch: true,
+  		oninstall: true,
+  		onlanguagechange: true,
+  		onmessage: true,
+  		onmessageerror: true,
+  		onnotificationclick: true,
+  		onnotificationclose: true,
+  		onoffline: true,
+  		ononline: true,
+  		onpush: true,
+  		onpushsubscriptionchange: true,
+  		onrejectionhandled: true,
+  		onsync: true,
+  		onunhandledrejection: true,
+  		performance: false,
+  		Performance: false,
+  		PerformanceEntry: false,
+  		PerformanceMark: false,
+  		PerformanceMeasure: false,
+  		PerformanceNavigation: false,
+  		PerformanceResourceTiming: false,
+  		PerformanceTiming: false,
+  		postMessage: true,
+  		"Promise": false,
+  		queueMicrotask: false,
   		registration: false,
+  		removeEventListener: false,
+  		Request: false,
+  		Response: false,
   		self: false,
   		ServiceWorker: false,
   		ServiceWorkerContainer: false,
   		ServiceWorkerGlobalScope: false,
   		ServiceWorkerMessageEvent: false,
   		ServiceWorkerRegistration: false,
+  		setInterval: false,
+  		setTimeout: false,
   		skipWaiting: false,
-  		WindowClient: false
+  		TextDecoder: false,
+  		TextEncoder: false,
+  		URL: false,
+  		URLSearchParams: false,
+  		WebSocket: false,
+  		WindowClient: false,
+  		Worker: false,
+  		WorkerGlobalScope: false,
+  		XMLHttpRequest: false
   	};
   	var atomtest = {
   		advanceClock: false,
@@ -26840,19 +26978,20 @@
   	 */
   	async function javascript(sourceNode, source, meta, ast) {
   	  const preprocessorName = getPreprocessorTypeByAttribute(sourceNode);
-  	  const javascriptNode = sourceNode.text;
+  	  const javascriptNode = addLineOffset(sourceNode.text.text, source, sourceNode);
   	  const { options } = meta;
-  	  const preprocessorOutput = await preprocess('js', preprocessorName, meta, source, javascriptNode);
-
-  	  const generatedAst = generateAST(
-  	    addLineOffset(preprocessorOutput.code, source, sourceNode), {
-  	      sourceFileName: options.file
-  	    });
-
+  	  const preprocessorOutput = await preprocess('javascript', preprocessorName, meta, source, {
+  	    ...sourceNode,
+  	    text: javascriptNode
+  	  });
+  	  const inputSourceMap = sourcemapAsJSON(preprocessorOutput.map);
+  	  const generatedAst = generateAST(preprocessorOutput.code, {
+  	    sourceFileName: options.file,
+  	    inputSourceMap: isEmptySourcemap(inputSourceMap) ? null : inputSourceMap
+  	  });
   	  const generatedAstBody = getProgramBody(generatedAst);
   	  const bodyWithoutExportDefault = filterNonExportDefaultStatements(generatedAstBody);
   	  const exportDefaultNode = findExportDefaultStatement(generatedAstBody);
-
   	  const outputBody = getProgramBody(ast);
 
   	  // add to the ast the "private" javascript content of our tag script node
@@ -28641,26 +28780,6 @@
   	// source: https://30secondsofcode.org/function#compose
   	var compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));
 
-  	/**
-  	 * Generate the pure immutable string chunks from a RiotParser.Node.Text
-  	 * @param   {RiotParser.Node.Text} node - riot parser text node
-  	 * @param   {string} sourceCode sourceCode - source code
-  	 * @returns {Array} array containing the immutable string chunks
-  	 */
-  	function generateLiteralStringChunksFromNode(node, sourceCode) {
-  	  return node.expressions.reduce((chunks, expression, index) => {
-  	    const start = index ? node.expressions[index - 1].end : node.start;
-
-  	    chunks.push(sourceCode.substring(start, expression.start));
-
-  	    // add the tail to the string
-  	    if (index === node.expressions.length - 1)
-  	      chunks.push(sourceCode.substring(expression.end, node.end));
-
-  	    return chunks
-  	  }, [])
-  	}
-
   	const scope$2 = builders.identifier(SCOPE);
   	const getName$1 = node => node && node.name ? node.name : node;
 
@@ -28799,52 +28918,6 @@
   	  })
   	}
 
-  	const getEachItemName = expression => isSequenceExpression(expression.left) ? expression.left.expressions[0] : expression.left;
-  	const getEachIndexName = expression => isSequenceExpression(expression.left) ? expression.left.expressions[1] : null;
-  	const getEachValue = expression => expression.right;
-  	const nameToliteral = compose(builders.literal, getName$1);
-
-  	/**
-  	 * Get the each expression properties to create properly the template binding
-  	 * @param   { DomBinding.Expression } eachExpression - original each expression data
-  	 * @param   { string } sourceFile - original tag file
-  	 * @param   { string } sourceCode - original tag source code
-  	 * @returns { Array } AST nodes that are needed to build an each binding
-  	 */
-  	function getEachExpressionProperties(eachExpression, sourceFile, sourceCode) {
-  	  const ast = createASTFromExpression(eachExpression, sourceFile, sourceCode);
-  	  const body = ast.program.body;
-  	  const firstNode = body[0];
-
-  	  if (!isExpressionStatement(firstNode)) {
-  	    panic(`The each directives supported should be of type "ExpressionStatement",you have provided a "${firstNode.type}"`);
-  	  }
-
-  	  const { expression } = firstNode;
-
-  	  return [
-  	    simplePropertyNode(
-  	      BINDING_ITEM_NAME_KEY,
-  	      compose(nameToliteral, getEachItemName)(expression)
-  	    ),
-  	    simplePropertyNode(
-  	      BINDING_INDEX_NAME_KEY,
-  	      compose(nameToliteral, getEachIndexName)(expression)
-  	    ),
-  	    simplePropertyNode(
-  	      BINDING_EVALUATE_KEY,
-  	      compose(
-  	        e => toScopedFunction(e, sourceFile, sourceCode),
-  	        e => ({
-  	          ...eachExpression,
-  	          text: recast.print(e).code
-  	        }),
-  	        getEachValue
-  	      )(expression)
-  	    )
-  	  ]
-  	}
-
   	/**
   	 * Create the bindings template property
   	 * @param   {Array} args - arguments to pass to the template function
@@ -28905,6 +28978,13 @@
   	  )(expression, sourceFile, sourceCode)
   	}
 
+  	/**
+  	 * Transform an expression node updating its global scope
+  	 * @param   {RiotParser.Node.Expr} expression - riot parser expression node
+  	 * @param   {string} sourceFile - source file
+  	 * @param   {string} sourceCode - source code
+  	 * @returns {ASTExpression} ast expression generated from the riot parser expression node
+  	 */
   	function transformExpression(expression, sourceFile, sourceCode) {
   	  return compose(
   	    getExpressionAST,
@@ -28922,26 +29002,6 @@
   	  const astBody = sourceAST.program.body;
 
   	  return astBody[0] ? astBody[0].expression : astBody
-  	}
-
-  	/**
-  	 * Simple bindings might contain multiple expressions like for example: "{foo} and {bar}"
-  	 * This helper aims to merge them in a template literal if it's necessary
-  	 * @param   {RiotParser.Node} node - riot parser node
-  	 * @param   {string} sourceFile - original tag file
-  	 * @param   {string} sourceCode - original tag source code
-  	 * @returns { Object } a FunctionExpression object
-  	 */
-  	function mergeNodeExpressions(node, sourceFile, sourceCode) {
-  	  if (node.expressions.length === 1)
-  	    return transformExpression(node.expressions[0], sourceFile, sourceCode)
-
-  	  const pureStringChunks = generateLiteralStringChunksFromNode(node, sourceCode);
-
-  	  return builders.templateLiteral(
-  	    pureStringChunks.map(str => builders.templateElement({ raw: str, cooked: '' }, false)),
-  	    node.expressions.map(expression => transformExpression(expression, sourceFile, sourceCode))
-  	  )
   	}
 
   	/**
@@ -29296,9 +29356,9 @@
   	    if (slotAttribute) {
   	      acc[slotAttribute.value] = node;
   	    } else {
-  	      acc.default = {
+  	      acc.default = createRootNode({
   	        nodes: [...getChildrenNodes(acc.default), node]
-  	      };
+  	      });
   	    }
 
   	    return acc
@@ -29375,6 +29435,59 @@
   	  ])
   	}
 
+  	const getEachItemName = expression => isSequenceExpression(expression.left) ? expression.left.expressions[0] : expression.left;
+  	const getEachIndexName = expression => isSequenceExpression(expression.left) ? expression.left.expressions[1] : null;
+  	const getEachValue = expression => expression.right;
+  	const nameToliteral = compose(builders.literal, getName$1);
+
+  	const generateEachItemNameKey = expression => simplePropertyNode(
+  	  BINDING_ITEM_NAME_KEY,
+  	  compose(nameToliteral, getEachItemName)(expression)
+  	);
+
+  	const generateEachIndexNameKey = expression => simplePropertyNode(
+  	  BINDING_INDEX_NAME_KEY,
+  	  compose(nameToliteral, getEachIndexName)(expression)
+  	);
+
+  	const generateEachEvaluateKey = (expression, eachExpression, sourceFile, sourceCode) => simplePropertyNode(
+  	  BINDING_EVALUATE_KEY,
+  	  compose(
+  	    e => toScopedFunction(e, sourceFile, sourceCode),
+  	    e => ({
+  	      ...eachExpression,
+  	      text: generateJavascript(e).code
+  	    }),
+  	    getEachValue
+  	  )(expression)
+  	);
+
+  	/**
+  	 * Get the each expression properties to create properly the template binding
+  	 * @param   { DomBinding.Expression } eachExpression - original each expression data
+  	 * @param   { string } sourceFile - original tag file
+  	 * @param   { string } sourceCode - original tag source code
+  	 * @returns { Array } AST nodes that are needed to build an each binding
+  	 */
+  	function generateEachExpressionProperties(eachExpression, sourceFile, sourceCode) {
+  	  const ast = createASTFromExpression(eachExpression, sourceFile, sourceCode);
+  	  const body = ast.program.body;
+  	  const firstNode = body[0];
+
+  	  if (!isExpressionStatement(firstNode)) {
+  	    panic(`The each directives supported should be of type "ExpressionStatement",you have provided a "${firstNode.type}"`);
+  	  }
+
+  	  const { expression } = firstNode;
+
+  	  return [
+  	    generateEachItemNameKey(expression),
+  	    generateEachIndexNameKey(expression),
+  	    generateEachEvaluateKey(expression, eachExpression, sourceFile, sourceCode)
+  	  ]
+  	}
+
+
   	/**
   	 * Transform a RiotParser.Node.Tag into an each binding
   	 * @param   { RiotParser.Node.Tag } sourceNode - tag containing the each attribute
@@ -29407,14 +29520,14 @@
   	        createTagBinding(
   	          cloneNodeWithoutSelectorAttribute(sourceNode),
   	          null,
-  	          sourceCode,
+  	          sourceFile,
   	          sourceCode
   	        )]
   	      ] :
   	      build(createRootNode(sourceNode), sourceFile, sourceCode)
   	    ),
   	    ...createSelectorProperties(selectorAttribute),
-  	    ...compose(getEachExpressionProperties, getAttributeExpression)(eachAttribute)
+  	    ...compose(generateEachExpressionProperties, getAttributeExpression)(eachAttribute)
   	  ])
   	}
 
@@ -29448,7 +29561,7 @@
   	        createTagBinding(
   	          cloneNodeWithoutSelectorAttribute(sourceNode),
   	          null,
-  	          sourceCode,
+  	          sourceFile,
   	          sourceCode
   	        )]
   	      ] :
@@ -29479,6 +29592,61 @@
   	      toScopedFunction(sourceNode.expressions[0], sourceFile, sourceCode)
   	    )
   	  ])
+  	}
+
+  	/**
+  	 * Generate the pure immutable string chunks from a RiotParser.Node.Text
+  	 * @param   {RiotParser.Node.Text} node - riot parser text node
+  	 * @param   {string} sourceCode sourceCode - source code
+  	 * @returns {Array} array containing the immutable string chunks
+  	 */
+  	function generateLiteralStringChunksFromNode(node, sourceCode) {
+  	  return node.expressions.reduce((chunks, expression, index) => {
+  	    const start = index ? node.expressions[index - 1].end : node.start;
+
+  	    chunks.push(sourceCode.substring(start, expression.start));
+
+  	    // add the tail to the string
+  	    if (index === node.expressions.length - 1)
+  	      chunks.push(sourceCode.substring(expression.end, node.end));
+
+  	    return chunks
+  	  }, [])
+  	}
+
+  	/**
+  	 * Simple bindings might contain multiple expressions like for example: "{foo} and {bar}"
+  	 * This helper aims to merge them in a template literal if it's necessary
+  	 * @param   {RiotParser.Node} node - riot parser node
+  	 * @param   {string} sourceFile - original tag file
+  	 * @param   {string} sourceCode - original tag source code
+  	 * @returns { Object } a template literal expression object
+  	 */
+  	function mergeNodeExpressions(node, sourceFile, sourceCode) {
+  	  if (node.expressions.length === 1)
+  	    return transformExpression(node.expressions[0], sourceFile, sourceCode)
+
+  	  const pureStringChunks = generateLiteralStringChunksFromNode(node, sourceCode);
+  	  const stringsArray = pureStringChunks.reduce((acc, str, index) => {
+  	    const expr = node.expressions[index];
+
+  	    return [
+  	      ...acc,
+  	      builders.literal(str),
+  	      expr ? transformExpression(expr, sourceFile, sourceCode) : nullNode()
+  	    ]
+  	  }, [])
+  	    // filter the empty literal expressions
+  	    .filter(expr => !isLiteral(expr) || expr.value); // eslint-disable-line
+
+  	  return builders.callExpression(
+  	    builders.memberExpression(
+  	      builders.arrayExpression(stringsArray),
+  	      builders.identifier('join'),
+  	      false
+  	    ),
+  	    [builders.literal('')],
+  	  )
   	}
 
   	/**
@@ -29810,6 +29978,29 @@
   	}
 
   	/**
+  	 * Make sure the input sourcemap is valid otherwise we ignore it
+  	 * @param   {SourceMapGenerator} map - preprocessor source map
+  	 * @returns {Object} sourcemap as json or nothing
+  	 */
+  	function normaliseInputSourceMap(map) {
+  	  const inputSourceMap = sourcemapAsJSON(map);
+  	  return isEmptySourcemap(inputSourceMap) ? null : inputSourceMap
+  	}
+
+  	/**
+  	 * Override the sourcemap content making sure it will always contain the tag source code
+  	 * @param   {Object} map - sourcemap as json
+  	 * @param   {string} source - component source code
+  	 * @returns {Object} original source map with the "sourcesContent" property overriden
+  	 */
+  	function overrideSourcemapContent(map, source) {
+  	  return {
+  	    ...map,
+  	    sourcesContent: [source]
+  	  }
+  	}
+
+  	/**
   	 * Generate the output code source together with the sourcemap
   	 * @param { string } source - source code of the tag we will need to compile
   	 * @param { string } options - compiling options
@@ -29843,9 +30034,13 @@
   	    hookGenerator(css, css$$1, code, meta),
   	    hookGenerator(javascript, javascript$$1, code, meta),
   	    hookGenerator(template, template$$1, code, meta),
-  	    ast => recast.print(ast, {
-  	      sourceMapName: 'map.json',
-  	      inputSourcemap: map
+  	    ast => meta.ast = ast && generateJavascript(ast, {
+  	      sourceMapName: `${options.file}.map`,
+  	      inputSourceMap: normaliseInputSourceMap(map)
+  	    }),
+  	    result => ({
+  	      ...result,
+  	      map: overrideSourcemapContent(result.map, source)
   	    }),
   	    result => execute(result, meta),
   	    result => ({

@@ -2194,6 +2194,10 @@
     return component.mount(element, {}, initialState)
   }
 
+  /* eslint-disable */
+  // source: https://30secondsofcode.org/function#compose
+  var compose = (...fns) => fns.reduce((f, g) => (...args) => f(g(...args)));
+
   const { DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY$1, COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP$1, PLUGINS_SET: PLUGINS_SET$1 } = globals;
 
   /**
@@ -2283,7 +2287,7 @@
   /**
    * Helpter method to create an anonymous component without the need to register it
    */
-  const component = createComponent;
+  const component = compose(c => c({}), createComponent);
 
   /** @type {string} current riot version */
   const version = 'v4.0.0-alpha.4';
