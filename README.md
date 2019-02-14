@@ -35,8 +35,8 @@ Riot brings custom tags to all modern browsers. Think React + Polymer but with e
       tick() {
         this.update({ time: ++this.state.time })
       },
-      onBeforeMount() {
-        this.state.time = this.props.start || this.state.start
+      onBeforeMount(state, props) {
+        this.state.time = props.start || state.start
         this.timer = setInterval(this.tick, 1000)
       },
       onUnmounted() {

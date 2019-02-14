@@ -201,7 +201,7 @@ export function enhanceComponentAPI(component, {slots, attributes}) {
           // link this object to the DOM node
           element[DOM_COMPONENT_INSTANCE_PROPERTY] = this
 
-          this.onBeforeMount()
+          this.onBeforeMount(this.state, this.props)
 
           // handlte the template and its attributes
           this.attributes.mount(element, parentScope)
@@ -211,7 +211,7 @@ export function enhanceComponentAPI(component, {slots, attributes}) {
           defineProperty(this, 'slots', createSlots(element, slots || []))
           this.slots.mount(parentScope)
 
-          this.onMounted()
+          this.onMounted(this.state, this.props)
 
           return this
         },
@@ -220,10 +220,10 @@ export function enhanceComponentAPI(component, {slots, attributes}) {
 
           if (this.shouldUpdate(newProps, this.props) === false) return
 
-          this.onBeforeUpdate()
-
           this.props = newProps
           this.state = computeState(this.state, state)
+
+          this.onBeforeUpdate(this.state, this.props)
 
           if (parentScope) {
             this.attributes.update(parentScope)
@@ -231,16 +231,16 @@ export function enhanceComponentAPI(component, {slots, attributes}) {
           }
 
           this.template.update(this)
-          this.onUpdated()
+          this.onUpdated(this.state, this.props)
 
           return this
         },
         unmount(removeRoot) {
-          this.onBeforeUnmount()
+          this.onBeforeUnmount(this.state, this.props)
           this.attributes.unmount()
           this.slots.unmount()
           this.template.unmount(this, removeRoot === true)
-          this.onUnmounted()
+          this.onUnmounted(this.state, this.props)
 
           return this
         }
