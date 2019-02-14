@@ -1,9 +1,11 @@
 
-[![Riot logo](http://riotjs.com/img/logo/riot480x.png)](http://riotjs.com/)
+[![Riot logo](https://riot.js.org/img/logo/riot480x.png)](https://riot.js.org)
+
 
 ## Simple and elegant component-based UI library
 
 [![Build Status][travis-image]][travis-url]
+[![MIT License][license-image]][license-url]
 [![Riot Forum][riot-forum-image]][riot-forum-url]
 [![Join the chat at https://gitter.im/riot/riot][gitter-image]][gitter-url]
 [![Join the chat (ja) at https://riot-jp-slackin.herokuapp.com/][slack-ja-image]][slack-ja-url]
@@ -11,15 +13,119 @@
 
 [![NPM version][npm-version-image]][npm-url]
 [![NPM downloads][npm-downloads-image]][npm-url]
-[![MIT License][license-image]][license-url]
+[![jsDelivr Hits][jsdelivr-image]][jsdelivr-url]
 [![Coverage Status][coverage-image]][coverage-url]
+![Riot Size][lib-size]
 [![Code Quality][codeclimate-image]][codeclimate-url]
 
 [![Sauce Test Status][saucelabs-image]][saucelabs-url]
 
-# Important
+### Framework Size Comparison
 
-This branch hosts the work for riot4 it's not stable and it's not meant to be used only by the riot core contributors
+| Framework                                      | Version         | Minified Size (gzip) |
+|------------------------------------------------|-----------------|----------------------|
+| @angular/core + Polyfills                      | 7.0.0           | 314.18kb             |
+| Ember                                          | 2.18.2          | 121.84kb             |
+| Polymer + Web Components Polyfill Lite         | 1.8.0           | 66.3kb               |
+| Polymer + webcomponents-loader.js + webcomponents-bundle.js |3.0.0           | 45.70kb                |
+| React + Map and Set Polyfills                  | 16.5.2          | 44.75kb              |
+| Web Components Polyfill                        | 0.7.24          | 33.68kb              |
+| Vue                                            | 2.5.17          | 31.65kb              |
+| __Riot__                                       | 3.13.2          | 10.85kb              |
+| Inferno                                        | 6.0.0           | 7.65kb               |
+| Preact                                         | 8.3.1           | 3.48kb               |
+
+The above comparison includes polyfills to support old browsers like IE9 that in Riot.js are supported by default.
+
+### Browsers support
+
+Riot is supported by all modern browsers and it does not require any additional polyfill
+
+- IE 9+
+- Edge
+- Chrome
+- Safari 7+
+- Firefox
+- Safari iOS
+- Android
+
+### Custom tags • Concise syntax • Simple API • Tiny Size
+
+Riot brings custom tags to all modern browsers. Think React + Polymer but with enjoyable syntax and a small learning curve.
+
+#### Tag definition
+
+``` javascript
+<timer>
+  <p>Seconds Elapsed: { state.time }</p>
+
+  <script>
+    export default {
+      tick() {
+        this.update({ time: ++this.state.time })
+      },
+      onBeforeMount() {
+        this.state.time = this.props.start || this.state.start
+        this.timer = setInterval(this.tick, 1000)
+      },
+      onUnmounted() {
+        clearInterval(this.timer)
+      }
+    }
+  </script>
+</timer>
+```
+
+[Open this example on Plunker](http://riot.js.org/examples/plunker/?app=timer)
+
+#### Mounting
+
+``` javascript
+// mount the timer with an initial state
+riot.mount('timer', { start: 0 })
+```
+
+#### Nesting
+
+Custom tags lets you build complex views with HTML.
+
+``` html
+<timetable>
+  <timer start="0"></timer>
+  <timer start="10"></timer>
+  <timer start="20"></timer>
+</timetable>
+```
+
+HTML syntax is the de facto language on the web and it's designed for building user interfaces. The syntax is explicit, nesting is inherent to the language and attributes offer a clean way to provide options for custom tags.
+
+
+### Expressions Bindings
+- Absolutely the smallest possible amount of DOM updates and reflows.
+- One way data flow: updates and unmounts are propagated downwards from parent to children.
+- Expressions are pre-compiled and cached for high performance.
+- Lifecycle events for more control.
+
+
+### Close to standards
+- No proprietary event system.
+- Event normalization.
+- The rendered DOM can be freely manipulated with other tools.
+- No extra HTML root elements or `data-` attributes.
+- Plays well with any frontend framework.
+
+
+### Use your dearest language and tools
+- Create tags with CoffeeScript, Jade, LiveScript, Typescript, ES6 or [any pre-processor](http://riot.js.org/guide/compiler/#pre-processors) you want.
+- Integrate with NPM, CommonJS, AMD, Bower or Component
+- Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot), [Wintersmith](https://github.com/collingreen/wintersmith-riot), [webpack*](https://github.com/riot/tag-loader), [Rollup*](https://github.com/riot/rollup-plugin-riot), [Browserify*](https://github.com/riot/riotify), [Babel*](https://github.com/riot/babel-preset-es2015-riot) or Bublé
+- Test with [Karma*](https://github.com/riot/karma-riot), Mocha or whatever you like
+
+*Note*: `*` officially maintained
+
+### CDN hosting
+- [jsDelivr](http://www.jsdelivr.com/projects/riot)
+- [cdnjs](https://cdnjs.com/libraries/riot)
 
 ### How to contribute
 
@@ -60,7 +166,7 @@ $ make raw
 # To build anytime you change a src file
 $ make watch
 
-# To bench riot ( it requires ctrl+c to exit )
+# To bench riot
 $ make perf
 ```
 
@@ -76,35 +182,10 @@ It's actively maintained by:
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top">
-        <img width="125" height="125" src="https://github.com/rsbondi.png?s=125">
-        <br>
-        <a href="https://github.com/rsbondi">Richard Bondi</a>
-      </td>
-      <td align="center" valign="top">
+      <td valign="top">
         <img width="125" height="125" src="https://github.com/GianlucaGuarini.png?s=125?s=125">
         <br>
         <a href="https://github.com/GianlucaGuarini">Gianluca Guarini</a>
-      </td>
-      <td align="center" width="20%" valign="top">
-        <img width="125" height="125" src="https://github.com/cognitom.png?s=125">
-        <br>
-        <a href="https://github.com/cognitom">Tsutomu Kawamura</a>
-      </td>
-      <td align="center" valign="top">
-        <img width="125" height="125" src="https://github.com/aMarCruz.png?s=125">
-        <br>
-        <a href="https://github.com/aMarCruz">Alberto Martínez</a>
-      </td>
-      <td align="center" valign="top">
-        <img width="125" height="125" src="https://github.com/rogueg.png?s=125">
-        <br>
-        <a href="https://github.com/rogueg">Grant Marvin</a>
-      </td>
-      <td align="center" valign="top">
-        <img width="125" height="125" src="https://github.com/tipiirai.png?s=125">
-        <br>
-        <a href="https://github.com/tipiirai">Tero Piirainen</a>
       </td>
      </tr>
   </tbody>
@@ -112,7 +193,7 @@ It's actively maintained by:
 
 ## Official Website
 
-http://riotjs.com/
+http://riot.js.org
 
 ## Backers
 
@@ -126,6 +207,13 @@ Become a sponsor to get your logo on our README. [Become a sponsor][support-url]
 
 [![Sponsors][sponsors-image]][support-url]
 
+## Thanks
+
+Special thanks to Browserstack for their support
+
+<a href='https://www.browserstack.com/'>
+  <img width='70px' src="https://cdn.worldvectorlogo.com/logos/browserstack.svg" alt="browser stack">
+</a>
 
 [travis-image]:https://img.shields.io/travis/riot/riot.svg?style=flat-square
 [travis-url]:https://travis-ci.org/riot/riot
@@ -138,7 +226,7 @@ Become a sponsor to get your logo on our README. [Become a sponsor][support-url]
 [npm-url]:https://npmjs.org/package/riot
 
 [riot-forum-image]:https://img.shields.io/badge/muut-JOIN_FORUM%E2%86%92-ff0044.svg?style=flat-square
-[riot-forum-url]:http://riotjs.com/forum/
+[riot-forum-url]:http://riot.js.org/forum/
 
 [coverage-image]:https://img.shields.io/coveralls/riot/riot/dev.svg?style=flat-square
 [coverage-url]:https://coveralls.io/r/riot/riot?branch=dev
@@ -152,11 +240,14 @@ Become a sponsor to get your logo on our README. [Become a sponsor][support-url]
 [slack-ja-image]:https://img.shields.io/badge/SLACK_(ja)-JOIN_CHAT_%E2%86%92-551a8b.svg?style=flat-square
 [slack-ja-url]:https://riot-jp-slackin.herokuapp.com/
 
-[codeclimate-image]:https://img.shields.io/codeclimate/github/riot/riot.svg?style=flat-square
+[codeclimate-image]:https://api.codeclimate.com/v1/badges/b81ddf3c77e8189876da/maintainability
 [codeclimate-url]:https://codeclimate.com/github/riot/riot
 
 [donations-campaign-url]:https://pledgie.com/campaigns/31139
 [donations-campaign-image]:https://pledgie.com/campaigns/31139.png?skin_name=chrome
+
+[jsdelivr-image]: https://data.jsdelivr.com/v1/package/npm/riot/badge
+[jsdelivr-url]: https://www.jsdelivr.com/package/npm/riot
 
 
 [backer-url]: #backers
@@ -165,6 +256,8 @@ Become a sponsor to get your logo on our README. [Become a sponsor][support-url]
 [sponsor-badge]: https://opencollective.com/riot/sponsors/badge.svg?color=blue
 
 [support-url]: https://opencollective.com/riot#support
+
+[lib-size]: http://img.badgesize.io/https://unpkg.com/riot/riot.min.js?compression=gzip
 
 [backers-image]: https://opencollective.com/riot/backers.svg
 [sponsors-image]: https://opencollective.com/riot/sponsors.svg

@@ -167,6 +167,14 @@ function runPlugins(component) {
   return [...PLUGINS_SET].reduce((c, fn) => fn(c) || c, component)
 }
 
+
+function computeState(oldState, newState) {
+  return {
+    ...oldState,
+    ...callOrAssign(newState)
+  }
+}
+
 /**
  * Component creation factory function that will enhance the user provided API
  * @param   {Object} component - a component implementation previously defined
@@ -182,11 +190,7 @@ export function enhanceComponentAPI(component, {slots, attributes}) {
       defineProperties(Object.create(component), {
         mount(element, state = {}, parentScope) {
           this.props = evaluateProps(element, attributes, parentScope, {})
-
-          this.state = {
-            ...this.state,
-            ...callOrAssign(state)
-          }
+          this.state = computeState(this.state, state)
 
           defineProperties(this, {
             root: element,
@@ -214,15 +218,12 @@ export function enhanceComponentAPI(component, {slots, attributes}) {
         update(state = {}, parentScope) {
           const newProps = evaluateProps(this.root, attributes, parentScope, this.props)
 
-          if (this.shouldUpdate(newProps, state) === false) return
+          if (this.shouldUpdate(newProps, this.props) === false) return
 
           this.onBeforeUpdate()
-          this.props = newProps
 
-          this.state = {
-            ...this.state,
-            ...state
-          }
+          this.props = newProps
+          this.state = computeState(this.state, state)
 
           if (parentScope) {
             this.attributes.update(parentScope)
