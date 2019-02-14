@@ -6,5 +6,7 @@ exclude_paths:
   - "riot+compiler.js"
   - "riot+compiler.min.js"
   - "riot.js"
+  - "riot.legacy.js"
+  - "riot.legacy.min.js"
   - "riot.min.js"
   - "test/**"
