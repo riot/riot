@@ -27,10 +27,7 @@ module.exports = {
             modules: false,
             exclude: ['transform-regenerator'],
             targets: {
-              browsers: [
-                'last 2 versions',
-                'safari >= 7'
-              ]
+              'ie': 11
             }
           }]]
     })

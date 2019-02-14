@@ -1,7 +1,6 @@
 
 [![Riot logo](https://riot.js.org/img/logo/riot480x.png)](https://riot.js.org)
 
-
 ## Simple and elegant component-based UI library
 
 [![Build Status][travis-image]][travis-url]
@@ -20,34 +19,6 @@
 
 [![Sauce Test Status][saucelabs-image]][saucelabs-url]
 
-### Framework Size Comparison
-
-| Framework                                      | Version         | Minified Size (gzip) |
-|------------------------------------------------|-----------------|----------------------|
-| @angular/core + Polyfills                      | 7.0.0           | 314.18kb             |
-| Ember                                          | 2.18.2          | 121.84kb             |
-| Polymer + Web Components Polyfill Lite         | 1.8.0           | 66.3kb               |
-| Polymer + webcomponents-loader.js + webcomponents-bundle.js |3.0.0           | 45.70kb                |
-| React + Map and Set Polyfills                  | 16.5.2          | 44.75kb              |
-| Web Components Polyfill                        | 0.7.24          | 33.68kb              |
-| Vue                                            | 2.5.17          | 31.65kb              |
-| __Riot__                                       | 3.13.2          | 10.85kb              |
-| Inferno                                        | 6.0.0           | 7.65kb               |
-| Preact                                         | 8.3.1           | 3.48kb               |
-
-The above comparison includes polyfills to support old browsers like IE9 that in Riot.js are supported by default.
-
-### Browsers support
-
-Riot is supported by all modern browsers and it does not require any additional polyfill
-
-- IE 9+
-- Edge
-- Chrome
-- Safari 7+
-- Firefox
-- Safari iOS
-- Android
 
 ### Custom tags • Concise syntax • Simple API • Tiny Size
 
@@ -55,7 +26,7 @@ Riot brings custom tags to all modern browsers. Think React + Polymer but with e
 
 #### Tag definition
 
-``` javascript
+```html
 <timer>
   <p>Seconds Elapsed: { state.time }</p>
 
@@ -80,7 +51,7 @@ Riot brings custom tags to all modern browsers. Think React + Polymer but with e
 
 #### Mounting
 
-``` javascript
+```javascript
 // mount the timer with an initial state
 riot.mount('timer', { start: 0 })
 ```
@@ -89,7 +60,7 @@ riot.mount('timer', { start: 0 })
 
 Custom tags lets you build complex views with HTML.
 
-``` html
+```html
 <timetable>
   <timer start="0"></timer>
   <timer start="10"></timer>
