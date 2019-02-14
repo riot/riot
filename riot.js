@@ -1,8 +1,8 @@
-/* Riot v2.6.8, @license MIT */
+/* Riot v2.6.9, @license MIT */
 
 ;(function(window, undefined) {
   'use strict';
-var riot = { version: 'v2.6.8', settings: {} },
+var riot = { version: 'v2.6.9', settings: {} },
   // be aware, internal usage
   // ATTENTION: prefix the global dynamic variables with `__`
 
@@ -1594,7 +1594,7 @@ function Tag(impl, conf, innerHTML) {
       each(props, function(key) {
         // bind methods to self
         // allow mixins to override other properties/parent mixins
-        if (key != 'init') {
+        if (key != 'init' && key != '__proto__') {
           // check for getters/setters
           var descriptor = Object.getOwnPropertyDescriptor(instance, key) || Object.getOwnPropertyDescriptor(proto, key)
           var hasGetterSetter = descriptor && (descriptor.get || descriptor.set)
