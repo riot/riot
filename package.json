@@ -67,6 +67,8 @@
     "src",
     "riot.js",
     "riot.min.js",
+    "riot.legacy.js",
+    "riot.legacy.min.js",
     "riot+compiler.js",
     "riot+compiler.min.js"
   ],
