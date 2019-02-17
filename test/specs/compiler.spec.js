@@ -28,7 +28,10 @@ describe('Riot compiler api', () => {
   })
 
   it('compiler can load asynchronously script tags', async function() {
-    document.write('<script type=\'riot\' data-src=\'/tags/simple.riot\'></script>')
+    const script = document.createElement('script')
+    script.setAttribute('type', 'riot')
+    script.setAttribute('data-src', 'tags/simple.riot')
+    document.body.appendChild(script)
     await riot.compile()
 
     expect(window['__riot_registry__']['simple']).to.be.ok
