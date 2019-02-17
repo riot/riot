@@ -26,4 +26,19 @@ describe('Riot compiler api', () => {
 
     expect(code).to.match(/scope\.props\.message/)
   })
+
+  it('compiler can load asynchronously script tags', async function() {
+    document.write('<script type=\'riot\' data-src=\'/tags/simple.riot\'></script>')
+    await riot.compile()
+
+    expect(window['__riot_registry__']['simple']).to.be.ok
+
+    riot.unregister('simple')
+  })
+
+  it('compiler can compile string tags', async function() {
+    const {code} = await riot.compileFromString('<my-tag></my-tag>')
+
+    expect(code).to.be.ok
+  })
 })

@@ -232,7 +232,7 @@ describe('Riot core api', () => {
     expect(() => riot.uninstall(function() {})).to.throw()
   })
 
-  it.skip('components will receive and update properly their state property', () => {
+  it('components will receive and update properly their state property', () => {
     riot.register('simple-component', SimpleComponent)
 
     const element = document.createElement('simple-component')

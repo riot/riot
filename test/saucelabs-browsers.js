@@ -1,6 +1,6 @@
 module.exports = {
   browsers: {
-    /*    slIpad: {
+    slIpad: {
       base: 'SauceLabs',
       browserName: 'ipad',
       version: '10.3'
@@ -9,17 +9,17 @@ module.exports = {
       base: 'SauceLabs',
       browserName: 'safari',
       platform: 'OS X 10.11'
-    },*/
+    },
     slSafari11: {
       base: 'SauceLabs',
       browserName: 'safari',
       platform: 'OS X 10.13'
     },
-    /*    slEdge: {
+    slEdge: {
       base: 'SauceLabs',
       browserName: 'MicrosoftEdge',
       platform: 'Windows 10'
-    },*/
+    },
     slChrome: {
       base: 'SauceLabs',
       browserName: 'chrome'
@@ -27,11 +27,11 @@ module.exports = {
     slFirefox: {
       base: 'SauceLabs',
       browserName: 'firefox'
-    }
-    /*    slAndroid5: {
+    },
+    slAndroid5: {
       base: 'SauceLabs',
       browserName: 'android',
       version: '5.1'
-    }*/
+    }
   }
 }

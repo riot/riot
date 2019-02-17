@@ -24,8 +24,8 @@ module.exports = {
       presets: [
         ['@babel/env',
           {
+            useBuiltIns: 'usage',
             modules: false,
-            exclude: ['transform-regenerator'],
             targets: {
               'ie': 11
             }
