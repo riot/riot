@@ -15,15 +15,9 @@ export function panic(error) {
  * @returns {*} anything
  */
 export function callOrAssign(source) {
-  if (isFunction(source)) {
-    try {
-      return new source()
-    } catch (e) {
-      return source()
-    }
-  }
-
-  return source
+  return isFunction(source) ? (source.prototype && source.prototype.constructor ?
+    new source() : source()
+  ) : source
 }
 
 /**
