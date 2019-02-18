@@ -1,7 +1,10 @@
 import {
+  ATTRIBUTES_KEY_SYMBOL,
   COMPONENTS_IMPLEMENTATION_MAP,
   DOM_COMPONENT_INSTANCE_PROPERTY,
-  PLUGINS_SET
+  PLUGINS_SET,
+  SLOTS_KEY_SYMBOL,
+  TEMPLATE_KEY_SYMBOL
 } from '../globals'
 import {DOMattributesToObject, getName} from '../utils/dom'
 import {
@@ -196,24 +199,22 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
           }
           this.state = computeState(this.state, state)
 
-          defineProperties(this, {
-            root: element,
-            attributes: attributeBindings.createDOM(element).clone(),
-            template: this.template.createDOM(element).clone()
-          })
+          this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone()
+          this[ATTRIBUTES_KEY_SYMBOL] = attributeBindings.createDOM(element).clone()
 
           // link this object to the DOM node
           element[DOM_COMPONENT_INSTANCE_PROPERTY] = this
+          // define the root element
+          defineProperty(this, 'root', element)
 
+          // before mount lifecycle event
           this.onBeforeMount(this.state, this.props)
 
           // handlte the template and its attributes
-          this.attributes.mount(element, parentScope)
-          this.template.mount(element, this)
-
+          this[ATTRIBUTES_KEY_SYMBOL].mount(element, parentScope)
+          this[TEMPLATE_KEY_SYMBOL].mount(element, this)
           // create the slots and mount them
-          defineProperty(this, 'slots', createSlots(element, slots || []))
-          this.slots.mount(parentScope)
+          this[SLOTS_KEY_SYMBOL] = createSlots(element, slots || []).mount(parentScope)
 
           this.onMounted(this.state, this.props)
 
@@ -230,20 +231,20 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
           this.onBeforeUpdate(this.state, this.props)
 
           if (parentScope) {
-            this.attributes.update(parentScope)
-            this.slots.update(parentScope)
+            this[ATTRIBUTES_KEY_SYMBOL].update(parentScope)
+            this[SLOTS_KEY_SYMBOL].update(parentScope)
           }
 
-          this.template.update(this)
+          this[TEMPLATE_KEY_SYMBOL].update(this)
           this.onUpdated(this.state, this.props)
 
           return this
         },
         unmount(removeRoot) {
           this.onBeforeUnmount(this.state, this.props)
-          this.attributes.unmount()
-          this.slots.unmount()
-          this.template.unmount(this, removeRoot === true)
+          this[ATTRIBUTES_KEY_SYMBOL].unmount()
+          this[SLOTS_KEY_SYMBOL].unmount()
+          this[TEMPLATE_KEY_SYMBOL].unmount(this, removeRoot === true)
           this.onUnmounted(this.state, this.props)
 
           return this
