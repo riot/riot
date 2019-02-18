@@ -1,9 +1,9 @@
-import {$, $$, getAttributes, getName} from '../utils/dom'
 import {
   COMPONENTS_IMPLEMENTATION_MAP,
   DOM_COMPONENT_INSTANCE_PROPERTY,
   PLUGINS_SET
 } from '../globals'
+import {DOMattributesToObject, getName} from '../utils/dom'
 import {
   autobindMethods,
   callOrAssign,
@@ -15,6 +15,7 @@ import {
   panic
 } from '../utils/misc'
 import {bindingTypes, template as createTemplate, expressionTypes} from '@riotjs/dom-bindings'
+import $ from 'bianco.query'
 import createSlots from './slots'
 import cssManager from './css-manager'
 import curry from 'curri'
@@ -22,9 +23,9 @@ import {isFunction} from '../utils/checks'
 
 const COMPONENT_CORE_HELPERS = Object.freeze({
   // component helpers
-  $(selector){ return $(selector, this.root) },
-  $$(selector){ return $$(selector, this.root) },
-  ref(selector){ return $$(selector, this.root).map(el => el[DOM_COMPONENT_INSTANCE_PROPERTY] || el)}
+  $(selector){ return $(selector, this.root)[0] },
+  $$(selector){ return $(selector, this.root) },
+  ref(selector){ return $(selector, this.root).map(el => el[DOM_COMPONENT_INSTANCE_PROPERTY] || el)}
 })
 
 const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
@@ -54,13 +55,13 @@ const MOCKED_TEMPLATE_INTERFACE = {
  * @returns {Object} component like interface
  */
 export function createComponent({css, template, tag, name}) {
-  return slotsAndAttributes => {
+  return ({slots, attributes, props}) => {
     const component = defineComponent({
       css,
       template,
       tag,
       name
-    })(slotsAndAttributes)
+    })({slots, attributes, props})
 
     return {
       mount(element, parentScope, state) {
@@ -121,12 +122,12 @@ export function defineComponent({css, template, tag, name}) {
  * @param   {Object} currentProps - current component properties
  * @returns {Object} attributes key value pairs
  */
-function evaluateProps(element, attributeExpressions = [], scope, currentProps) {
+function evaluateProps(element, attributeExpressions = [], scope, currentProps = {}) {
   if (attributeExpressions.length) {
     return scope ? evaluateAttributeExpressions(attributeExpressions, scope) : currentProps
   }
 
-  return getAttributes(element)
+  return DOMattributesToObject(element)
 }
 
 /**
@@ -182,14 +183,17 @@ function computeState(oldState, newState) {
  * @param   {Array} options.attributes - attribute expressions generated via riot compiler
  * @returns {Riot.Component} a riot component instance
  */
-export function enhanceComponentAPI(component, {slots, attributes}) {
+export function enhanceComponentAPI(component, {slots, attributes, props}) {
   const attributeBindings = createAttributeBindings(attributes)
 
   return autobindMethods(
     runPlugins(
       defineProperties(Object.create(component), {
         mount(element, state = {}, parentScope) {
-          this.props = evaluateProps(element, attributes, parentScope, {})
+          this.props = {
+            ...props,
+            ...evaluateProps(element, attributes, parentScope)
+          }
           this.state = computeState(this.state, state)
 
           defineProperties(this, {
@@ -253,15 +257,15 @@ export function enhanceComponentAPI(component, {slots, attributes}) {
 /**
  * Component initialization function starting from a DOM node
  * @param   {HTMLElement} element - element to upgrade
- * @param   {Object} initialState - initial component state
+ * @param   {Object} initialProps - initial component state
  * @param   {string} componentName - component id
  * @returns {Object} a new component instance bound to a DOM node
  */
-export function mountComponent(element, initialState, componentName) {
+export function mountComponent(element, initialProps, componentName) {
   const name = componentName || getName(element)
   if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component named "${name}" was never registered`)
 
-  const component = COMPONENTS_IMPLEMENTATION_MAP.get(name)({})
+  const component = COMPONENTS_IMPLEMENTATION_MAP.get(name)({ props: initialProps })
 
-  return component.mount(element, {}, initialState)
+  return component.mount(element)
 }

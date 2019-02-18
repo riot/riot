@@ -6,7 +6,7 @@ module.exports = {
   plugins: [
     ...config.plugins,
     babel({
-      ignore: [/[/\\]core-js/, /@babel[/\\]runtime/],
+      ignore: ['node_modules/**'],
       env: {
         test: {
           plugins: [
@@ -20,16 +20,7 @@ module.exports = {
             ]
           ]
         }
-      },
-      presets: [
-        ['@babel/env',
-          {
-            useBuiltIns: 'usage',
-            modules: false,
-            targets: {
-              'edge': 15
-            }
-          }]]
+      }
     })
   ]
 }

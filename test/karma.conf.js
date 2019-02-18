@@ -4,7 +4,7 @@ const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
   isTravis = !!process.env.TRAVIS_BUILD_NUMBER,
   TEST_FILES = './specs/**/*.spec.js',
   browsers = isSaucelabs ? Object.keys(saucelabsBrowsers) : ['ChromeHeadlessNoSandbox'],
-  rollupConfig = require('../build/rollup-legacy.config')
+  rollupConfig = require('../build/rollup-babel.config')
 
 // set the babel env in order to enable the babel istanbul plugin
 process.env.BABEL_ENV= 'test'

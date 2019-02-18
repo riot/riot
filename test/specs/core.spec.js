@@ -5,6 +5,8 @@ import NamedSlotsParent from '../tags/named-slots-parent.riot'
 import NestedImportsComponent from '../tags/nested-imports.riot'
 import ParentWithSlotsComponent from '../tags/parent-with-slots.riot'
 import SimpleComponent from '../tags/simple.riot'
+import SimpleSlot from '../tags/simple-slot.riot'
+import SpreadAttribute from '../tags/spread-attribute.riot'
 
 import {expect} from 'chai'
 import {spy} from 'sinon'
@@ -352,7 +354,41 @@ describe('Riot core api', () => {
     expect(component.$('named-slots footer span').innerHTML).to.be.equal(component.state.footer)
     expect(component.$('named-slots main').innerHTML).to.be.equal(component.state.main)
 
+    component.update({ header: 'hello' })
+
+    expect(component.$('named-slots header span').innerHTML).to.be.equal(component.state.header)
+
     component.unmount()
     riot.unregister('named-slots-parent')
+  })
+
+  it('<slot> tags will be removed if there will be no markup to inject', () => {
+    riot.register('simple-slot', SimpleSlot)
+    const element = document.createElement('simple-slot')
+
+    const [component] = riot.mount(element)
+
+    expect(component.$('slot')).to.be.not.ok
+    expect(component.root.innerHTML).to.be.not.ok
+
+    component.update({ header: 'hello' })
+
+    expect(component.$('slot')).to.be.not.ok
+    expect(component.root.innerHTML).to.be.not.ok
+
+    component.unmount()
+    riot.unregister('simple-slot')
+  })
+
+  it('spread attributes can be properly evaluated', () => {
+    riot.register('spread-attribute', SpreadAttribute)
+    const element = document.createElement('spread-attribute')
+
+    const [component] = riot.mount(element)
+
+    expect(component.$('p').getAttribute('hidden')).to.be.ok
+
+    component.unmount()
+    riot.unregister('spread-attribute')
   })
 })

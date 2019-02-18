@@ -98,11 +98,7 @@ export function evaluateAttributeExpressions(attributes, scope) {
   return attributes.reduce((acc, attribute) => {
     const value = attribute.evaluate(scope)
 
-    if (attribute.name) {
-      acc[attribute.name] = value
-    } else {
-      Object.assign(acc, value)
-    }
+    acc[attribute.name] = value
 
     return acc
   }, {})

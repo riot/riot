@@ -1,4 +1,5 @@
-import {$$, getAttribute} from '../utils/dom'
+import $ from 'bianco.query'
+import {get as getAttr} from 'bianco.attr'
 import {template} from '@riotjs/dom-bindings'
 
 /**
@@ -80,9 +81,9 @@ function createSlot(root, node, { name, slots }) {
  * @return  {Object} tag like interface that will manage all the slots
  */
 export default function createSlots(root, slots) {
-  const slotNodes = $$('slot', root)
+  const slotNodes = $('slot', root)
   const slotsBindings = slotNodes.map(node => {
-    const name = getAttribute(node, 'name') || 'default'
+    const name = getAttr(node, 'name') || 'default'
     return createSlot(root, node, { name, slots })
   })
 

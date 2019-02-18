@@ -16,12 +16,3 @@ export function checkType(element, type) {
 export function isFunction(value) {
   return checkType(value, 'function')
 }
-
-/**
- * Check that will be passed if its argument is a string
- * @param   {*} value - value to check
- * @returns {boolean} - true if the value is a string
- */
-export function isString(value) {
-  return checkType(value, 'string')
-}

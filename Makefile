@@ -22,7 +22,7 @@ DIST = dist/riot/
 SRC = src
 CONFIG = config/
 
-GENERATED_FILES = riot.js riot+compiler.js riot.legacy.js
+GENERATED_FILES = riot.js riot+compiler.js
 
 test: eslint test-karma
 
@@ -48,7 +48,6 @@ raw:
 	@ mkdir -p $(DIST)
 	# Default builds UMD
 	@ $(ROLLUP) src/riot.js --config build/rollup.config.js > $(DIST)riot.js
-	@ $(ROLLUP) src/riot.js --config build/rollup-legacy.config.js > $(DIST)riot.legacy.js
 	@ $(ROLLUP) src/riot+compiler.js --config build/rollup.config.js > $(DIST)riot+compiler.js
 
 clean:

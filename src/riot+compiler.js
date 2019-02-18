@@ -1,6 +1,7 @@
 import * as riot from './riot'
-import {$$,getAttribute} from './utils/dom'
+import $ from 'bianco.query'
 import compiler from '@riotjs/compiler/dist/compiler'
+import {get as getAttr} from 'bianco.attr'
 
 const GLOBAL_REGISTRY = '__riot_registry__'
 window[GLOBAL_REGISTRY] = {}
@@ -39,8 +40,8 @@ async function compileFromString(string, options) {
 }
 
 async function compile() {
-  const scripts = $$('script[type="riot"]')
-  const urls = scripts.map(s => getAttribute(s, 'src') || getAttribute(s, 'data-src'))
+  const scripts = $('script[type="riot"]')
+  const urls = scripts.map(s => getAttr(s, 'src') || getAttr(s, 'data-src'))
   const tags = await Promise.all(urls.map(compileFromUrl))
 
   tags.forEach(({code, meta}, i) => {

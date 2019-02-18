@@ -1,6 +1,6 @@
 import * as globals from './globals'
 import {createComponent, defineComponent, mountComponent} from './core/component'
-import {$$} from './utils/dom'
+import $ from 'bianco.query'
 import compose from '@riotjs/compiler/src/utils/compose'
 import cssManager from './core/css-manager'
 import {isFunction} from './utils/checks'
@@ -48,7 +48,7 @@ export function unregister(name) {
  * @returns {Array} list of nodes upgraded
  */
 export function mount(selector, initialState, name) {
-  return $$(selector).map(element => mountComponent(element, initialState, name))
+  return $(selector).map(element => mountComponent(element, initialState, name))
 }
 
 /**
@@ -57,7 +57,7 @@ export function mount(selector, initialState, name) {
  * @returns {Array} list of nodes unmounted
  */
 export function unmount(selector) {
-  return $$(selector).map(element => {
+  return $(selector).map(element => {
     if (element[DOM_COMPONENT_INSTANCE_PROPERTY]) {
       element[DOM_COMPONENT_INSTANCE_PROPERTY].unmount()
     }

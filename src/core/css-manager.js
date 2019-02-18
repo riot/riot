@@ -1,4 +1,5 @@
-import {getWindow, setAttribute} from '../utils/dom'
+import {getWindow} from '../utils/dom'
+import {set as setAttr} from 'bianco.attr'
 
 const WIN = getWindow()
 const CSS_BY_NAME = new Map()
@@ -7,7 +8,7 @@ const CSS_BY_NAME = new Map()
 const styleNode = WIN && ((() => {
   // create a new style element with the correct type
   const newNode = document.createElement('style')
-  setAttribute(newNode, 'type', 'text/css')
+  setAttr(newNode, 'type', 'text/css')
   document.head.appendChild(newNode)
 
   return newNode
