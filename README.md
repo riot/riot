@@ -75,12 +75,11 @@ HTML syntax is the de facto language on the web and it's designed for building u
 - Absolutely the smallest possible amount of DOM updates and reflows.
 - One way data flow: updates and unmounts are propagated downwards from parent to children.
 - Expressions are pre-compiled and cached for high performance.
-- Lifecycle events for more control.
+- Lifecycle methods for more control.
 
 
 ### Close to standards
 - No proprietary event system.
-- Event normalization.
 - The rendered DOM can be freely manipulated with other tools.
 - No extra HTML root elements or `data-` attributes.
 - Plays well with any frontend framework.

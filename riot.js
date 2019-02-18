@@ -1,4 +1,4 @@
-/* Riot v4.0.0-alpha.5, @license MIT */
+/* Riot v4.0.0-alpha.6, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -9,72 +9,20 @@
     COMPONENTS_IMPLEMENTATION_MAP = new Map(),
     DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
     PLUGINS_SET = new Set(),
-    IS_DIRECTIVE = 'is';
+    IS_DIRECTIVE = 'is',
+    ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
+    TEMPLATE_KEY_SYMBOL = Symbol('template'),
+    SLOTS_KEY_SYMBOL = Symbol('slots');
 
   var globals = /*#__PURE__*/Object.freeze({
     COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
     DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY,
     PLUGINS_SET: PLUGINS_SET,
-    IS_DIRECTIVE: IS_DIRECTIVE
+    IS_DIRECTIVE: IS_DIRECTIVE,
+    ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
+    TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL,
+    SLOTS_KEY_SYMBOL: SLOTS_KEY_SYMBOL
   });
-
-  /**
-   * Quick type checking
-   * @param   {*} element - anything
-   * @param   {string} type - type definition
-   * @returns {boolean} true if the type corresponds
-   */
-  function checkType(element, type) {
-    return typeof element === type
-  }
-
-  /**
-   * Check that will be passed if its argument is a function
-   * @param   {*} value - value to check
-   * @returns {boolean} - true if the value is a function
-   */
-  function isFunction(value) {
-    return checkType(value, 'function')
-  }
-
-  /**
-   * Check that will be passed if its argument is a string
-   * @param   {*} value - value to check
-   * @returns {boolean} - true if the value is a string
-   */
-  function isString(value) {
-    return checkType(value, 'string')
-  }
-
-  /**
-   * Shorter and fast way to select multiple nodes in the DOM
-   * @param   {string} selector - DOM selector
-   * @param   {Object} context - DOM node where the targets of our search will is located
-   * @returns {Array} dom nodes found
-   */
-  function $$(selector, context) {
-    if (isString(selector)) return Array.from((context || document).querySelectorAll(selector))
-    return domToArray(selector)
-  }
-
-  /**
-   * Select a single DOM element
-   * @param   {string} selector - DOM selector
-   * @param   {Object} context - DOM node where the targets of our search will is located
-   * @returns {HTMLElement} DOM node found
-   */
-  function $(selector, context) {
-    if (isString(selector)) return (context || document).querySelector(selector)
-    return selector
-  }
-
-  /**
-   * Get the document window
-   * @returns {Object} window object
-   */
-  function getWindow() {
-    return typeof window === 'undefined' ? /* istanbul ignore next */ undefined : window
-  }
 
   /**
    * Converts any DOM node/s to a loopable array
@@ -101,34 +49,100 @@
   }
 
   /**
-   * Get the value of any DOM attribute on a node
-   * @param   {HTMLElement} element - DOM node we want to inspect
-   * @param   {string} name - name of the attribute we want to get
-   * @returns {string|undefined} the node attribute if it exists
+   * Normalize the return values, in case of a single value we avoid to return an array
+   * @param   { Array } values - list of values we want to return
+   * @returns { Array|string|boolean } either the whole list of values or the single one found
+   * @private
    */
-  function getAttribute(element, name) {
-    return element.getAttribute(name)
+  const normalize = values => values.length === 1 ? values[0] : values;
+
+  /**
+   * Parse all the nodes received to get/remove/check their attributes
+   * @param   { HTMLElement|NodeList|Array } els    - DOM node/s to parse
+   * @param   { string|Array }               name   - name or list of attributes
+   * @param   { string }                     method - method that will be used to parse the attributes
+   * @returns { Array|string } result of the parsing in a list or a single value
+   * @private
+   */
+  function parseNodes(els, name, method) {
+    const names = typeof name === 'string' ? [name] : name;
+    return normalize(domToArray(els).map(el => {
+      return normalize(names.map(n => el[method](n)))
+    }))
   }
 
   /**
-   * Set the value of any DOM attribute
-   * @param   {HTMLElement} element - DOM node we to update
-   * @param   {string} name - name of the attribute we want to set
-   * @param   {string} value - the value of the atribute to set
-   * @returns {undefined} void function
+   * Set any attribute on a single or a list of DOM nodes
+   * @param   { HTMLElement|NodeList|Array } els   - DOM node/s to parse
+   * @param   { string|Object }              name  - either the name of the attribute to set
+   *                                                 or a list of properties as object key - value
+   * @param   { string }                     value - the new value of the attribute (optional)
+   * @returns { HTMLElement|NodeList|Array } the original array of elements passed to this function
+   *
+   * @example
+   *
+   * import { set } from 'bianco.attr'
+   *
+   * const img = document.createElement('img')
+   *
+   * set(img, 'width', 100)
+   *
+   * // or also
+   * set(img, {
+   *   width: 300,
+   *   height: 300
+   * })
+   *
    */
-  function setAttribute(element, name, value) {
-    if (isString(value)) {
-      element.setAttribute(name, value);
-    }
+  function set(els, name, value) {
+    const attrs = typeof name === 'object' ? name : { [name]: value };
+    const props = Object.keys(attrs);
+
+    domToArray(els).forEach(el => {
+      props.forEach(prop => el.setAttribute(prop, attrs[prop]));
+    });
+    return els
   }
+
+  /**
+   * Get any attribute from a single or a list of DOM nodes
+   * @param   { HTMLElement|NodeList|Array } els   - DOM node/s to parse
+   * @param   { string|Array }               name  - name or list of attributes to get
+   * @returns { Array|string } list of the attributes found
+   *
+   * @example
+   *
+   * import { get } from 'bianco.attr'
+   *
+   * const img = document.createElement('img')
+   *
+   * get(img, 'width') // => '200'
+   *
+   * // or also
+   * get(img, ['width', 'height']) // => ['200', '300']
+   *
+   * // or also
+   * get([img1, img2], ['width', 'height']) // => [['200', '300'], ['500', '200']]
+   */
+  function get(els, name) {
+    return parseNodes(els, name, 'getAttribute')
+  }
+
+  /**
+   * Get the document window
+   * @returns {Object} window object
+   */
+  function getWindow() {
+    return typeof window === 'undefined' ? /* istanbul ignore next */ undefined : window
+  }
+
 
   /**
    * Get all the element attributes as object
    * @param   {HTMLElement} element - DOM node we want to parse
    * @returns {Object} all the attributes found as a key value pairs
    */
-  function getAttributes(element) {
+  function DOMattributesToObject(element) {
     return Array.from(element.attributes).reduce((acc, attribute) => {
       acc[attribute.name] = attribute.value;
       return acc
@@ -141,7 +155,26 @@
    * @returns {string} name to identify this dom node in riot
    */
   function getName(element) {
-    return getAttribute(element, IS_DIRECTIVE) || element.tagName.toLowerCase()
+    return get(element, IS_DIRECTIVE) || element.tagName.toLowerCase()
+  }
+
+  /**
+   * Quick type checking
+   * @param   {*} element - anything
+   * @param   {string} type - type definition
+   * @returns {boolean} true if the type corresponds
+   */
+  function checkType(element, type) {
+    return typeof element === type
+  }
+
+  /**
+   * Check that will be passed if its argument is a function
+   * @param   {*} value - value to check
+   * @returns {boolean} - true if the value is a function
+   */
+  function isFunction(value) {
+    return checkType(value, 'function')
   }
 
   /* eslint-disable fp/no-mutating-methods */
@@ -160,7 +193,9 @@
    * @returns {*} anything
    */
   function callOrAssign(source) {
-    return isFunction(source) ? (source.constructor.name ? new source() : source()) : source
+    return isFunction(source) ? (source.prototype && source.prototype.constructor ?
+      new source() : source()
+    ) : source
   }
 
   /**
@@ -241,11 +276,7 @@
     return attributes.reduce((acc, attribute) => {
       const value = attribute.evaluate(scope);
 
-      if (attribute.name) {
-        acc[attribute.name] = value;
-      } else {
-        Object.assign(acc, value);
-      }
+      acc[attribute.name] = value;
 
       return acc
     }, {})
@@ -380,7 +411,7 @@
                   get(list[i - 1], -0).nextSibling :
                   before);
 
-  const remove = (get, parent, children, start, end) => {
+  const remove$1 = (get, parent, children, start, end) => {
     if ((end - start) < 2)
       parent.removeChild(get(children[start], -1));
     else {
@@ -608,7 +639,7 @@
           if (live.has(currentNodes[currentStart]))
             currentStart++;
           else
-            remove(
+            remove$1(
               get,
               parentNode,
               currentNodes,
@@ -746,7 +777,7 @@
 
     // only stuff to remove
     if (futureSame && currentStart < currentEnd) {
-      remove(
+      remove$1(
         get,
         parentNode,
         currentNodes,
@@ -805,14 +836,14 @@
       );
       // outer diff
       if (-1 < i) {
-        remove(
+        remove$1(
           get,
           parentNode,
           currentNodes,
           currentStart,
           i
         );
-        remove(
+        remove$1(
           get,
           parentNode,
           currentNodes,
@@ -835,7 +866,7 @@
         futureEnd,
         get(currentNodes[currentStart], 0)
       );
-      remove(
+      remove$1(
         get,
         parentNode,
         currentNodes,
@@ -1769,6 +1800,19 @@
    */
 
   /**
+   * Simple helper to find DOM nodes returning them as array like loopable object
+   * @param   { string|DOMNodeList } selector - either the query or the DOM nodes to arraify
+   * @param   { HTMLElement }        ctx      - context defining where the query will search for the DOM nodes
+   * @returns { Array } DOM nodes found as array
+   */
+  function $(selector, ctx) {
+    return domToArray(typeof selector === 'string' ?
+      (ctx || document).querySelectorAll(selector) :
+      selector
+    )
+  }
+
+  /**
    * Binding responsible for the slots
    */
   const Slot = Object.seal({
@@ -1847,9 +1891,9 @@
    * @return  {Object} tag like interface that will manage all the slots
    */
   function createSlots(root, slots) {
-    const slotNodes = $$('slot', root);
+    const slotNodes = $('slot', root);
     const slotsBindings = slotNodes.map(node => {
-      const name = getAttribute(node, 'name') || 'default';
+      const name = get(node, 'name') || 'default';
       return createSlot(root, node, { name, slots })
     });
 
@@ -1877,7 +1921,7 @@
   const styleNode = WIN && ((() => {
     // create a new style element with the correct type
     const newNode = document.createElement('style');
-    setAttribute(newNode, 'type', 'text/css');
+    set(newNode, 'type', 'text/css');
     document.head.appendChild(newNode);
 
     return newNode
@@ -1951,9 +1995,9 @@
 
   const COMPONENT_CORE_HELPERS = Object.freeze({
     // component helpers
-    $(selector){ return $(selector, this.root) },
-    $$(selector){ return $$(selector, this.root) },
-    ref(selector){ return $$(selector, this.root).map(el => el[DOM_COMPONENT_INSTANCE_PROPERTY] || el)}
+    $(selector){ return $(selector, this.root)[0] },
+    $$(selector){ return $(selector, this.root) },
+    ref(selector){ return $(selector, this.root).map(el => el[DOM_COMPONENT_INSTANCE_PROPERTY] || el)}
   });
 
   const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
@@ -1983,13 +2027,13 @@
    * @returns {Object} component like interface
    */
   function createComponent({css, template: template$$1, tag, name}) {
-    return slotsAndAttributes => {
+    return ({slots, attributes, props}) => {
       const component = defineComponent({
         css,
         template: template$$1,
         tag,
         name
-      })(slotsAndAttributes);
+      })({slots, attributes, props});
 
       return {
         mount(element, parentScope, state) {
@@ -2050,12 +2094,12 @@
    * @param   {Object} currentProps - current component properties
    * @returns {Object} attributes key value pairs
    */
-  function evaluateProps(element, attributeExpressions = [], scope, currentProps) {
+  function evaluateProps(element, attributeExpressions = [], scope, currentProps = {}) {
     if (attributeExpressions.length) {
       return scope ? evaluateAttributeExpressions(attributeExpressions, scope) : currentProps
     }
 
-    return getAttributes(element)
+    return DOMattributesToObject(element)
   }
 
   /**
@@ -2111,36 +2155,37 @@
    * @param   {Array} options.attributes - attribute expressions generated via riot compiler
    * @returns {Riot.Component} a riot component instance
    */
-  function enhanceComponentAPI(component, {slots, attributes}) {
+  function enhanceComponentAPI(component, {slots, attributes, props}) {
     const attributeBindings = createAttributeBindings(attributes);
 
     return autobindMethods(
       runPlugins(
         defineProperties(Object.create(component), {
           mount(element, state = {}, parentScope) {
-            this.props = evaluateProps(element, attributes, parentScope, {});
+            this.props = {
+              ...props,
+              ...evaluateProps(element, attributes, parentScope)
+            };
             this.state = computeState(this.state, state);
 
-            defineProperties(this, {
-              root: element,
-              attributes: attributeBindings.createDOM(element).clone(),
-              template: this.template.createDOM(element).clone()
-            });
+            this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone();
+            this[ATTRIBUTES_KEY_SYMBOL] = attributeBindings.createDOM(element).clone();
 
             // link this object to the DOM node
             element[DOM_COMPONENT_INSTANCE_PROPERTY] = this;
+            // define the root element
+            defineProperty(this, 'root', element);
 
-            this.onBeforeMount();
+            // before mount lifecycle event
+            this.onBeforeMount(this.state, this.props);
 
             // handlte the template and its attributes
-            this.attributes.mount(element, parentScope);
-            this.template.mount(element, this);
-
+            this[ATTRIBUTES_KEY_SYMBOL].mount(element, parentScope);
+            this[TEMPLATE_KEY_SYMBOL].mount(element, this);
             // create the slots and mount them
-            defineProperty(this, 'slots', createSlots(element, slots || []));
-            this.slots.mount(parentScope);
+            this[SLOTS_KEY_SYMBOL] = createSlots(element, slots || []).mount(parentScope);
 
-            this.onMounted();
+            this.onMounted(this.state, this.props);
 
             return this
           },
@@ -2149,27 +2194,27 @@
 
             if (this.shouldUpdate(newProps, this.props) === false) return
 
-            this.onBeforeUpdate();
-
             this.props = newProps;
             this.state = computeState(this.state, state);
 
+            this.onBeforeUpdate(this.state, this.props);
+
             if (parentScope) {
-              this.attributes.update(parentScope);
-              this.slots.update(parentScope);
+              this[ATTRIBUTES_KEY_SYMBOL].update(parentScope);
+              this[SLOTS_KEY_SYMBOL].update(parentScope);
             }
 
-            this.template.update(this);
-            this.onUpdated();
+            this[TEMPLATE_KEY_SYMBOL].update(this);
+            this.onUpdated(this.state, this.props);
 
             return this
           },
           unmount(removeRoot) {
-            this.onBeforeUnmount();
-            this.attributes.unmount();
-            this.slots.unmount();
-            this.template.unmount(this, removeRoot === true);
-            this.onUnmounted();
+            this.onBeforeUnmount(this.state, this.props);
+            this[ATTRIBUTES_KEY_SYMBOL].unmount();
+            this[SLOTS_KEY_SYMBOL].unmount();
+            this[TEMPLATE_KEY_SYMBOL].unmount(this, removeRoot === true);
+            this.onUnmounted(this.state, this.props);
 
             return this
           }
@@ -2182,17 +2227,17 @@
   /**
    * Component initialization function starting from a DOM node
    * @param   {HTMLElement} element - element to upgrade
-   * @param   {Object} initialState - initial component state
+   * @param   {Object} initialProps - initial component state
    * @param   {string} componentName - component id
    * @returns {Object} a new component instance bound to a DOM node
    */
-  function mountComponent(element, initialState, componentName) {
+  function mountComponent(element, initialProps, componentName) {
     const name = componentName || getName(element);
     if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component named "${name}" was never registered`);
 
-    const component = COMPONENTS_IMPLEMENTATION_MAP.get(name)({});
+    const component = COMPONENTS_IMPLEMENTATION_MAP.get(name)({ props: initialProps });
 
-    return component.mount(element, {}, initialState)
+    return component.mount(element)
   }
 
   /* eslint-disable */
@@ -2241,7 +2286,7 @@
    * @returns {Array} list of nodes upgraded
    */
   function mount(selector, initialState, name) {
-    return $$(selector).map(element => mountComponent(element, initialState, name))
+    return $(selector).map(element => mountComponent(element, initialState, name))
   }
 
   /**
@@ -2250,7 +2295,7 @@
    * @returns {Array} list of nodes unmounted
    */
   function unmount(selector) {
-    return $$(selector).map(element => {
+    return $(selector).map(element => {
       if (element[DOM_COMPONENT_INSTANCE_PROPERTY$1]) {
         element[DOM_COMPONENT_INSTANCE_PROPERTY$1].unmount();
       }
@@ -2291,7 +2336,7 @@
   const component = compose(c => c({}), createComponent);
 
   /** @type {string} current riot version */
-  const version = 'v4.0.0-alpha.5';
+  const version = 'v4.0.0-alpha.6';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
