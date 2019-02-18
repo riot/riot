@@ -62,15 +62,12 @@
     "rollup-plugin-json": "^3.1.0",
     "rollup-plugin-node-resolve": "^3.4.0",
     "sinon": "^7.1.1",
-    "sinon-chai": "^3.2.0",
-    "unassert-cli": "^1.0.0"
+    "sinon-chai": "^3.2.0"
   },
   "files": [
     "src",
     "riot.js",
     "riot.min.js",
-    "riot.legacy.js",
-    "riot.legacy.min.js",
     "riot+compiler.js",
     "riot+compiler.min.js"
   ],
