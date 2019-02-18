@@ -103,7 +103,7 @@ version-undo:
 	@ git reset HEAD^
 	@ git log --oneline -2
 
-release: raw bump version
+release: riot min bump version
 
 release-undo:
 	make version-undo
