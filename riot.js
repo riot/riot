@@ -1,4 +1,4 @@
-/* Riot v4.0.0-alpha.7, @license MIT */
+/* Riot v4.0.0-alpha.8, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1638,14 +1638,18 @@
     },
 
     update(scope) {
-      if (!this.template) return this;
-      this.template.update(scope);
+      if (this.template) {
+        this.template.update(scope);
+      }
+
       return this;
     },
 
     unmount(scope) {
-      if (!this.template) return this;
-      this.template.unmount(scope);
+      if (this.template) {
+        this.template.unmount(scope);
+      }
+
       return this;
     }
 
@@ -2188,7 +2192,7 @@
   const component = compose(c => c({}), createComponent);
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-alpha.7'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-alpha.8'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
