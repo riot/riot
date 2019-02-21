@@ -23,14 +23,16 @@ export const Slot = Object.seal({
     return this
   },
   update(scope) {
-    if (!this.template) return this
-    this.template.update(scope)
+    if (this.template) {
+      this.template.update(scope)
+    }
 
     return this
   },
   unmount(scope) {
-    if (!this.template) return this
-    this.template.unmount(scope)
+    if (this.template) {
+      this.template.unmount(scope)
+    }
 
     return this
   }

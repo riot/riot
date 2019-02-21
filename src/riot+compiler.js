@@ -13,30 +13,29 @@ function globalEval(js, url) {
 
   // make the source available in the "(no domain)" tab
   // of Chrome DevTools, with a .js extension
-  if (url) js += `\n//# sourceURL=${url}.js`
+  node.text =  `${js}\n//# sourceURL=${url}.js`
 
-  node.text = js
   root.appendChild(node)
   root.removeChild(node)
 }
 
-compiler.registerPostprocessor(async function(code){
-  // cheap transpilation
+// cheap module transpilation
+compiler.registerPostprocessor(function(code){
   return {
     code: `(function (global){${code}})(this)`.replace('export default', 'return'),
     map: {}
   }
 })
 
+function compileFromString(string, options) {
+  return compiler.compile(string, options)
+}
+
 async function compileFromUrl(url) {
   const response = await fetch(url)
   const code = await response.text()
 
-  return await compiler.compile(code, { file: url })
-}
-
-async function compileFromString(string, options) {
-  return await compiler.compile(string, options)
+  return compiler.compile(code, { file: url })
 }
 
 async function compile() {

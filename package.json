@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.2.0",
-    "@riotjs/compiler": "^4.0.0-alpha.15",
+    "@riotjs/compiler": "^4.0.0-alpha.17",
     "babel-minify": "^0.5.0",
     "babel-plugin-istanbul": "^5.1.0",
     "bianco.attr": "^1.0.0",
@@ -48,6 +48,8 @@
     "coveralls": "^3.0.2",
     "eslint": "^5.8.0",
     "eslint-config-riot": "^2.0.0",
+    "jsdom": "13.2.0",
+    "jsdom-global": "3.0.2",
     "karma": "^4.0.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-coverage": "^1.1.2",

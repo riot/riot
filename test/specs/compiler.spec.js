@@ -39,8 +39,8 @@ describe('Riot compiler api', () => {
     riot.unregister('simple')
   })
 
-  it('compiler can compile string tags', async function() {
-    const {code} = await riot.compileFromString('<my-tag></my-tag>')
+  it('compiler can compile string tags', () => {
+    const {code} = riot.compileFromString('<my-tag></my-tag>')
 
     expect(code).to.be.ok
   })
