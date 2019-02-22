@@ -1,5 +1,5 @@
 const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
-  riotRollup = require('./rollup-riot-plugin'),
+  riotRollup = require('rollup-plugin-riot'),
   isSaucelabs = process.env.SAUCELABS,
   isTravis = !!process.env.TRAVIS_BUILD_NUMBER,
   TEST_FILES = './specs/**/*.spec.js',
