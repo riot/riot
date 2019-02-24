@@ -2,8 +2,10 @@ import * as riot from '../../src/riot'
 
 import GlobalComponents from '../tags/global-components.riot'
 import NamedSlotsParent from '../tags/named-slots-parent.riot'
+import NestedAliasedImportsComponent from '../tags/nested-aliased-imports.riot'
 import NestedImportsComponent from '../tags/nested-imports.riot'
 import ParentWithSlotsComponent from '../tags/parent-with-slots.riot'
+import Simple from '../tags/Simple.riot'
 import SimpleComponent from '../tags/simple.riot'
 import SimpleSlot from '../tags/simple-slot.riot'
 import SpreadAttribute from '../tags/spread-attribute.riot'
@@ -42,6 +44,19 @@ describe('Riot core api', () => {
     const tag = component.mount(element, {})
     expect(tag.root).to.be.equal(element)
     expect(mountedSpy).to.have.been.calledOnce
+    tag.unmount()
+  })
+
+  it('riot.component will mount properly components with css', () => {
+    const component = riot.component(Simple)
+    const element = document.createElement('div')
+    document.body.appendChild(element)
+
+    const tag = component.mount(element, {})
+
+    expect(tag.root.getAttribute('is')).to.be.equal('simple')
+    expect(window.getComputedStyle(tag.root).color).to.be.equal('rgb(255, 0, 0)')
+
     tag.unmount()
   })
 
@@ -263,6 +278,27 @@ describe('Riot core api', () => {
 
     component.unmount()
     riot.unregister('nested-imports')
+  })
+
+  it('nested components can be properly styled', () => {
+    riot.register('nested-aliased-imports', NestedAliasedImportsComponent)
+
+    const element = document.createElement('nested-aliased-imports')
+
+    document.body.appendChild(element)
+
+    const [component] = riot.mount(element, {message: 'hello'})
+    const p = component.$('p')
+    expect(p.innerHTML).to.be.equal('hello')
+
+    component.update({message: 'goodbye'})
+
+    expect(p.innerHTML).to.be.equal('goodbye')
+
+    expect(window.getComputedStyle(p).color).to.be.equal('rgb(255, 0, 0)')
+
+    component.unmount()
+    riot.unregister('nested-aliased-imports')
   })
 
   it('nested global components can be loaded and mounted', () => {

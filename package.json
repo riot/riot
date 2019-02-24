@@ -34,8 +34,8 @@
     "riot.js"
   ],
   "dependencies": {
+    "@riotjs/compiler": "^4.0.0-alpha.18",
     "@riotjs/dom-bindings": "^0.10.2",
-    "@riotjs/compiler": "^4.0.0-alpha.17",
     "bianco.attr": "^1.0.0",
     "bianco.query": "^1.0.0",
     "curri": "^1.0.0"

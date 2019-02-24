@@ -24,6 +24,7 @@ import createSlots from './slots'
 import cssManager from './css-manager'
 import curry from 'curri'
 import {isFunction} from '../utils/checks'
+import {set as setAttr} from 'bianco.attr'
 
 const COMPONENT_CORE_HELPERS = Object.freeze({
   // component helpers
@@ -104,6 +105,7 @@ export function defineComponent({css, template, tag, name}) {
       root: null,
       // these properties should not be overriden
       ...COMPONENT_CORE_HELPERS,
+      name,
       css,
       template: template ? template(
         createTemplate,
@@ -171,11 +173,28 @@ function runPlugins(component) {
   return [...PLUGINS_SET].reduce((c, fn) => fn(c) || c, component)
 }
 
-
+/**
+ * Compute the component current state merging it with its previous state
+ * @param   {Object} oldState - previous state object
+ * @param   {Object} newState - new state givent to the `update` call
+ * @returns {Object} new object state
+ */
 function computeState(oldState, newState) {
   return {
     ...oldState,
     ...callOrAssign(newState)
+  }
+}
+
+/**
+ * Add eventually the "is" attribute to link this DOM node to its css
+ * @param {HTMLElement} element - target root node
+ * @param {string} name - name of the component mounted
+ * @returns {undefined} it's a void function
+ */
+function addCssHook(element, name) {
+  if (getName(element) !== name) {
+    setAttr(element, 'is', name)
   }
 }
 
@@ -197,6 +216,7 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
             ...props,
             ...evaluateProps(element, attributes, parentScope)
           }
+
           this.state = computeState(this.state, state)
 
           this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone()
@@ -204,6 +224,8 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
 
           // link this object to the DOM node
           element[DOM_COMPONENT_INSTANCE_PROPERTY] = this
+          // add eventually the 'is' attribute
+          component.name && addCssHook(element, component.name)
           // define the root element
           defineProperty(this, 'root', element)
 

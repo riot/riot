@@ -6,8 +6,6 @@ const resolve = require('rollup-plugin-node-resolve')
 const babel = require('rollup-plugin-babel')
 
 module.exports = {
-  context: 'null',
-  moduleContext: 'null',
   output: {
     banner: '/* Riot WIP, @license MIT */',
     format: 'umd',
