@@ -40,8 +40,9 @@ describe('Riot core api', () => {
     })
 
     const element = document.createElement('div')
-    const tag = component.mount(element, {})
+    const tag = component.mount(element, { isActive: true })
     expect(tag.root).to.be.equal(element)
+    expect(tag.props.isActive).to.be.ok
     expect(mountedSpy).to.have.been.calledOnce
     tag.unmount()
   })
@@ -51,9 +52,10 @@ describe('Riot core api', () => {
     const element = document.createElement('div')
     document.body.appendChild(element)
 
-    const tag = component.mount(element, {})
+    const tag = component.mount(element)
 
     expect(element.parentNode).to.be.ok
+
     tag.unmount()
     expect(element.parentNode).to.be.not.ok
   })

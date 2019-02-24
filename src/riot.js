@@ -93,9 +93,19 @@ export function uninstall(plugin) {
 }
 
 /**
- * Helpter method to create an anonymous component without the need to register it
+ * Helpter method to create component without relying on the registered ones
+ * @param   {Object} implementation - component implementation
+ * @returns {Riot.Component} riot component object
  */
-export const component = compose(c => c({}), createComponent)
+export function component(implementation) {
+  return {
+    mount: (el, props) => compose(
+      c => c.mount(el),
+      c => c({props}),
+      createComponent
+    )(implementation)
+  }
+}
 
 /** @type {string} current riot version */
 export const version = 'WIP'
