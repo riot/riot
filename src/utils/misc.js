@@ -21,6 +21,15 @@ export function callOrAssign(source) {
 }
 
 /**
+ * Convert a string from camel case to dash-case
+ * @param   {string} string - probably a component tag name
+ * @returns {string} component name normalized
+ */
+export function camelToDashCase(string) {
+  return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+}
+
+/**
  * Define default properties if they don't exist on the source object
  * @param   {Object} source - object that will receive the default properties
  * @param   {Object} defaults - object containing additional optional keys

@@ -10,6 +10,7 @@ import {DOMattributesToObject, getName} from '../utils/dom'
 import {
   autobindMethods,
   callOrAssign,
+  camelToDashCase,
   defineDefaults,
   defineProperties,
   defineProperty,
@@ -27,8 +28,7 @@ import {isFunction} from '../utils/checks'
 const COMPONENT_CORE_HELPERS = Object.freeze({
   // component helpers
   $(selector){ return $(selector, this.root)[0] },
-  $$(selector){ return $(selector, this.root) },
-  ref(selector){ return $(selector, this.root).map(el => el[DOM_COMPONENT_INSTANCE_PROPERTY] || el)}
+  $$(selector){ return $(selector, this.root) }
 })
 
 const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
@@ -157,7 +157,7 @@ function createAttributeBindings(attributes) {
 function createSubcomponents(components = {}) {
   return Object.entries(callOrAssign(components))
     .reduce((acc, [key, value]) => {
-      acc[key] = createComponent({ name: key, ...value })
+      acc[camelToDashCase(key)] = createComponent(value)
       return acc
     }, {})
 }

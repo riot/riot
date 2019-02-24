@@ -283,29 +283,6 @@ describe('Riot core api', () => {
     riot.unregister('simple')
   })
 
-  it('the ref method can be used to update children components', () => {
-    riot.register('simple', SimpleComponent)
-    riot.register('global-components', GlobalComponents)
-
-    const element = document.createElement('global-components')
-
-    const [component] = riot.mount(element, {message: 'hello'})
-    // ref could detect children component
-    const [child] = component.ref('simple')
-    // or it will fall back to normal DOM nodes
-    const [p] = component.ref('p')
-
-    expect(p.innerHTML).to.be.equal('hello')
-
-    child.update({message: 'goodbye'})
-
-    expect(p.innerHTML).to.be.equal('goodbye')
-
-    component.unmount()
-    riot.unregister('global-components')
-    riot.unregister('simple')
-  })
-
   it('the shouldUpdate method can block all the components updates', () => {
     const updatedSpy = spy()
     riot.register('my-component', {
