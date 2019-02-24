@@ -13,6 +13,10 @@ import {expect} from 'chai'
 import {spy} from 'sinon'
 import {template} from '@riotjs/dom-bindings'
 
+function normalizeInnerHTML(string) {
+  return string.replace(/\n/g, '').trim()
+}
+
 describe('Riot core api', () => {
   it('riot exports properly its public api', () => {
     expect(riot).to.be.ok
@@ -378,7 +382,7 @@ describe('Riot core api', () => {
 
     const [component] = riot.mount(element, { message: 'hello' })
 
-    expect(component.$('simple-slot').innerHTML).to.be.equal('hello')
+    expect(normalizeInnerHTML(component.$('simple-slot').innerHTML)).to.be.equal('hello')
 
     component.unmount()
     riot.unregister('parent-with-slots')
@@ -390,13 +394,13 @@ describe('Riot core api', () => {
 
     const [component] = riot.mount(element)
 
-    expect(component.$('named-slots header span').innerHTML).to.be.equal(component.state.header)
-    expect(component.$('named-slots footer span').innerHTML).to.be.equal(component.state.footer)
-    expect(component.$('named-slots main').innerHTML).to.be.equal(component.state.main)
+    expect(normalizeInnerHTML(component.$('named-slots header span').innerHTML)).to.be.equal(component.state.header)
+    expect(normalizeInnerHTML(component.$('named-slots footer span').innerHTML)).to.be.equal(component.state.footer)
+    expect(normalizeInnerHTML(component.$('named-slots main').innerHTML)).to.be.equal(component.state.main)
 
     component.update({ header: 'hello' })
 
-    expect(component.$('named-slots header span').innerHTML).to.be.equal(component.state.header)
+    expect(normalizeInnerHTML(component.$('named-slots header span').innerHTML)).to.be.equal(component.state.header)
 
     component.unmount()
     riot.unregister('named-slots-parent')
