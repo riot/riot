@@ -5,6 +5,7 @@ import NamedSlotsParent from '../tags/named-slots-parent.riot'
 import NestedAliasedImportsComponent from '../tags/nested-aliased-imports.riot'
 import NestedImportsComponent from '../tags/nested-imports.riot'
 import ParentWithSlotsComponent from '../tags/parent-with-slots.riot'
+import RuntimeIsDirective from '../tags/runtime-is-directive.riot'
 import SimpleComponent from '../tags/simple.riot'
 import SimpleSlot from '../tags/simple-slot.riot'
 import SpreadAttribute from '../tags/spread-attribute.riot'
@@ -434,5 +435,31 @@ describe('Riot core api', () => {
 
     component.unmount()
     riot.unregister('spread-attribute')
+  })
+
+  it('is directives can be evaluated in runtime', () => {
+    riot.register('runtime-is-directive', RuntimeIsDirective)
+    const element = document.createElement('runtime-is-directive')
+
+    const [component] = riot.mount(element)
+    const child = component.$('.child')
+
+    expect(normalizeInnerHTML(child.textContent)).to.be.equal('I am a child')
+
+    component.update({
+      message: 'I am a message',
+      child: 'simple'
+    })
+
+    expect(normalizeInnerHTML(child.textContent)).to.be.equal('I am a message')
+
+    component.update({
+      child: 'child'
+    })
+
+    expect(normalizeInnerHTML(child.textContent)).to.be.equal('I am a child')
+
+    component.unmount()
+    riot.unregister('runtime-is-directive')
   })
 })

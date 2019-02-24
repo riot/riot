@@ -1,0 +1,19 @@
+<runtime-is-directive>
+  <div class="child" is={state.child} message={state.message}></div>
+
+  <script>
+    import Child from './child.riot'
+    import Simple from './simple.riot'
+
+    export default {
+      components: {
+        Child,
+        Simple
+      },
+
+      state: {
+        child: 'child'
+      }
+    }
+  </script>
+</runtime-is-directive>

@@ -74,8 +74,8 @@ export function createComponent({css, template, tag, name}) {
       update(parentScope, state) {
         return component.update(state, parentScope)
       },
-      unmount() {
-        return component.unmount()
+      unmount(preserveRoot) {
+        return component.unmount(preserveRoot)
       }
     }
   }
