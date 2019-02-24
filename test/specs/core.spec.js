@@ -5,7 +5,6 @@ import NamedSlotsParent from '../tags/named-slots-parent.riot'
 import NestedAliasedImportsComponent from '../tags/nested-aliased-imports.riot'
 import NestedImportsComponent from '../tags/nested-imports.riot'
 import ParentWithSlotsComponent from '../tags/parent-with-slots.riot'
-import Simple from '../tags/simple.riot'
 import SimpleComponent from '../tags/simple.riot'
 import SimpleSlot from '../tags/simple-slot.riot'
 import SpreadAttribute from '../tags/spread-attribute.riot'
@@ -48,7 +47,7 @@ describe('Riot core api', () => {
   })
 
   it('riot.component will mount properly components with css', () => {
-    const component = riot.component(Simple)
+    const component = riot.component(SimpleComponent)
     const element = document.createElement('div')
     document.body.appendChild(element)
 
