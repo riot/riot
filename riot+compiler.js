@@ -1,4 +1,4 @@
-/* Riot v4.0.0-alpha.8, @license MIT */
+/* Riot v4.0.0-alpha.10, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -196,6 +196,15 @@
     return isFunction(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
   }
   /**
+   * Convert a string from camel case to dash-case
+   * @param   {string} string - probably a component tag name
+   * @returns {string} component name normalized
+   */
+
+  function camelToDashCase(string) {
+    return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+  }
+  /**
    * Define default properties if they don't exist on the source object
    * @param   {Object} source - object that will receive the default properties
    * @param   {Object} defaults - object containing additional optional keys
@@ -300,50 +309,7 @@
     SIMPLE,
     TAG
   };
-
-  /*! (c) Andrea Giammarchi - ISC */
-  var self$1 = null ||
-  /* istanbul ignore next */
-  {};
-
-  try {
-    self$1.Map = Map;
-  } catch (Map) {
-    self$1.Map = function Map() {
-      var i = 0;
-      var k = [];
-      var v = [];
-      return {
-        delete: function _delete(key) {
-          var had = contains(key);
-
-          if (had) {
-            k.splice(i, 1);
-            v.splice(i, 1);
-          }
-
-          return had;
-        },
-        get: function get(key) {
-          return contains(key) ? v[i] : void 0;
-        },
-        has: function has(key) {
-          return contains(key);
-        },
-        set: function set(key, value) {
-          v[contains(key) ? i : k.push(key) - 1] = value;
-          return this;
-        }
-      };
-
-      function contains(v) {
-        i = k.indexOf(v);
-        return -1 < i;
-      }
-    };
-  }
-
-  var Map$1 = self$1.Map;
+  var Map$1 = {};
 
   const append = (get, parent, children, start, end, before) => {
     if (end - start < 2) parent.insertBefore(get(children[start], 1), before);else {
@@ -354,8 +320,11 @@
       parent.insertBefore(fragment, before);
     }
   };
+
   const eqeq = (a, b) => a == b;
+
   const identity = O => O;
+
   const indexOf = (moreNodes, moreStart, moreEnd, lessNodes, lessStart, lessEnd, compare) => {
     const length = lessEnd - lessStart;
     /* istanbul ignore if */
@@ -377,14 +346,18 @@
 
     return -1;
   };
+
   const isReversed = (futureNodes, futureEnd, currentNodes, currentStart, currentEnd, compare) => {
     while (currentStart < currentEnd && compare(currentNodes[currentStart], futureNodes[futureEnd - 1])) {
       currentStart++;
       futureEnd--;
     }
+
     return futureEnd === 0;
   };
+
   const next = (get, list, i, length, before) => i < length ? get(list[i], 0) : 0 < i ? get(list[i - 1], -0).nextSibling : before;
+
   const remove$1 = (get, parent, children, start, end) => {
     if (end - start < 2) parent.removeChild(get(children[start], -1));else {
       const range = parent.ownerDocument.createRange();
@@ -395,6 +368,7 @@
   }; // - - - - - - - - - - - - - - - - - - -
   // diff related constants and utilities
   // - - - - - - - - - - - - - - - - - - -
+
 
   const DELETION = -1;
   const INSERTION = 1;
@@ -604,8 +578,8 @@
   const smartDiff = (get, parentNode, futureNodes, futureStart, futureEnd, futureChanges, currentNodes, currentStart, currentEnd, currentChanges, currentLength, compare, before) => {
     applyDiff(OND(futureNodes, futureStart, futureChanges, currentNodes, currentStart, currentChanges, compare) || HS(futureNodes, futureStart, futureEnd, futureChanges, currentNodes, currentStart, currentEnd, currentChanges), get, parentNode, futureNodes, futureStart, currentNodes, currentStart, currentLength, before);
   };
-
   /*! (c) 2018 Andrea Giammarchi (ISC) */
+
 
   const domdiff = (parentNode, // where changes happen
   currentNodes, // Array of current items/nodes
@@ -894,10 +868,11 @@
       placeholder
     });
   }
-
   /**
    * Binding responsible for the `if` directive
    */
+
+
   const IfBinding = Object.seal({
     // dynamic binding properties
     node: null,
@@ -958,9 +933,9 @@
     parent.removeChild(outNode);
   }
 
-  function create$1(node, _ref) {
-    let evaluate = _ref.evaluate,
-        template = _ref.template;
+  function create$1(node, _ref4) {
+    let evaluate = _ref4.evaluate,
+        template = _ref4.template;
     return Object.assign({}, IfBinding, {
       node,
       evaluate,
@@ -979,7 +954,6 @@
     TEXT,
     VALUE
   };
-
   const REMOVE_ATTRIBUTE = 'removeAttribute';
   const SET_ATTIBUTE = 'setAttribute';
   /**
@@ -990,9 +964,9 @@
    */
 
   function setAllAttributes(node, attributes) {
-    Object.entries(attributes).forEach((_ref) => {
-      let name = _ref[0],
-          value = _ref[1];
+    Object.entries(attributes).forEach((_ref5) => {
+      let name = _ref5[0],
+          value = _ref5[1];
       return attributeExpression(node, {
         name
       }, value);
@@ -1020,8 +994,8 @@
    */
 
 
-  function attributeExpression(node, _ref2, value, oldValue) {
-    let name = _ref2.name;
+  function attributeExpression(node, _ref6, value, oldValue) {
+    let name = _ref6.name;
 
     // is it a spread operator? {...attributes}
     if (!name) {
@@ -1049,6 +1023,7 @@
    * @returns {string} the node attribute modifier method name
    */
 
+
   function getMethod(value) {
     return value && typeof value !== 'object' ? SET_ATTIBUTE : REMOVE_ATTRIBUTE;
   }
@@ -1065,7 +1040,6 @@
     if (value === true) return name;
     return value;
   }
-
   /**
    * Set a new event listener
    * @param   {HTMLElement} node - target node
@@ -1074,11 +1048,12 @@
    * @param   {*} value - new expression value
    * @returns {undefined}
    */
-  function eventExpression(node, _ref, value) {
-    let name = _ref.name;
+
+
+  function eventExpression(node, _ref7, value) {
+    let name = _ref7.name;
     node[name] = value;
   }
-
   /**
    * This methods handles a simple text expression update
    * @param   {HTMLElement} node - target node
@@ -1087,8 +1062,10 @@
    * @param   {*} value - new expression value
    * @returns {undefined}
    */
-  function textExpression(node, _ref, value) {
-    let childNodeIndex = _ref.childNodeIndex;
+
+
+  function textExpression(node, _ref8, value) {
+    let childNodeIndex = _ref8.childNodeIndex;
     const target = node.childNodes[childNodeIndex];
     const val = normalizeValue$1(value); // replace the target if it's a placeholder comment
 
@@ -1105,10 +1082,10 @@
    * @returns {string} hopefully a string
    */
 
+
   function normalizeValue$1(value) {
     return value != null ? value : '';
   }
-
   /**
    * This methods handles the input fileds value updates
    * @param   {HTMLElement} node - target node
@@ -1116,6 +1093,8 @@
    * @param   {*} value - new expression value
    * @returns {undefined}
    */
+
+
   function valueExpression(node, expression, value) {
     node.value = value;
   }
@@ -1126,7 +1105,6 @@
     [TEXT]: textExpression,
     [VALUE]: valueExpression
   };
-
   const Expression = Object.seal({
     // Static props
     node: null,
@@ -1190,7 +1168,6 @@
       node
     });
   }
-
   /**
    * Create a flat object having as keys a list of methods that if dispatched will propagate
    * on the whole collection
@@ -1199,6 +1176,8 @@
    * @param   {*} context - context returned by the new methods created
    * @returns {Object} a new object to simplify the the nested methods dispatching
    */
+
+
   function flattenCollectionMethods(collection, methods, context) {
     return methods.reduce((acc, method) => {
       return Object.assign({}, acc, {
@@ -1209,11 +1188,10 @@
     }, {});
   }
 
-  function create$3(node, _ref) {
-    let expressions = _ref.expressions;
+  function create$3(node, _ref9) {
+    let expressions = _ref9.expressions;
     return Object.assign({}, flattenCollectionMethods(expressions.map(expression => create$2(node, expression)), ['mount', 'update', 'unmount']));
   }
-
   /**
    * Create a new tag object if it was registered before, otherwise fallback to the simple
    * template chunk
@@ -1222,6 +1200,7 @@
    * @param   {Array} attributes - dynamic attributes that will be received by the tag element
    * @returns {TagImplementation|TemplateChunk} a tag implementation or a template chunk as fallback
    */
+
 
   function getTag(component, slots, attributes) {
     if (slots === void 0) {
@@ -1259,8 +1238,8 @@
 
 
   function slotBindings(slots) {
-    return slots.reduce((acc, _ref) => {
-      let bindings = _ref.bindings;
+    return slots.reduce((acc, _ref10) => {
+      let bindings = _ref10.bindings;
       return acc.concat(bindings);
     }, []);
   }
@@ -1320,11 +1299,12 @@
     }
 
   });
-  function create$4(node, _ref2) {
-    let evaluate = _ref2.evaluate,
-        getComponent = _ref2.getComponent,
-        slots = _ref2.slots,
-        attributes = _ref2.attributes;
+
+  function create$4(node, _ref11) {
+    let evaluate = _ref11.evaluate,
+        getComponent = _ref11.getComponent,
+        slots = _ref11.slots,
+        attributes = _ref11.attributes;
     return Object.assign({}, TagBinding, {
       node,
       evaluate,
@@ -1340,7 +1320,6 @@
     [EACH]: create,
     [TAG]: create$4
   };
-
   /**
    * Bind a new expression object to a DOM node
    * @param   {HTMLElement} root - DOM node where to bind the expression
@@ -1362,16 +1341,18 @@
       expressions: expressions || []
     }));
   }
-
   /**
    * Check if an element is part of an svg
    * @param   {HTMLElement}  el - element to check
    * @returns {boolean} true if we are in an svg context
    */
+
+
   function isSvg(el) {
     const owner = el.ownerSVGElement;
     return !!owner || owner === null;
-  }
+  } // in this case a simple innerHTML is enough
+
 
   function createHTMLTree(html) {
     const template = document.createElement('template');
@@ -1397,7 +1378,6 @@
     if (isSvg(root)) return creteSVGTree(html, root);
     return createHTMLTree(html);
   }
-
   /**
    * Move all the child nodes from a source tag to another
    * @param   {HTMLElement} source - source node
@@ -1407,6 +1387,8 @@
   // Ignore this helper because it's needed only for svg tags
 
   /* istanbul ignore next */
+
+
   function moveChildren(source, target) {
     if (source.firstChild) {
       target.appendChild(source.firstChild);
@@ -1429,13 +1411,13 @@
       el.appendChild(dom);
     }
   }
-
   /**
    * Create the Template DOM skeleton
    * @param   {HTMLElement} el - root node where the DOM will be injected
    * @param   {string} html - markup that will be injected into the root node
    * @returns {HTMLFragment} fragment that will be injected into the root node
    */
+
 
   function createTemplateDOM(el, html) {
     return html && (typeof html === 'string' ? createDOMTree(el, html) : html);
@@ -1507,7 +1489,7 @@
         this.bindings.forEach(b => b.unmount(scope));
         cleanNode(this.el);
 
-        if (mustRemoveRoot) {
+        if (mustRemoveRoot && this.el.parentNode) {
           this.el.parentNode.removeChild(this.el);
         }
 
@@ -1545,64 +1527,6 @@
       bindingsData: bindings
     });
   }
-
-  /**
-   * Method used to bind expressions to a DOM node
-   * @param   {string|HTMLElement} html - your static template html structure
-   * @param   {Array} bindings - list of the expressions to bind to update the markup
-   * @returns {TemplateChunk} a new TemplateChunk object having the `update`,`mount`, `unmount` and `clone` methods
-   *
-   * @example
-   *
-   * riotDOMBindings
-   *  .template(
-   *   `<div expr0><!----></div><div><p expr1><!----><section expr2></section></p>`,
-   *   [
-   *     {
-   *       selector: '[expr0]',
-   *       redundantAttribute: 'expr0',
-   *       expressions: [
-   *         {
-   *           type: expressionTypes.TEXT,
-   *           childNodeIndex: 0,
-   *           evaluate(scope) {
-   *             return scope.time;
-   *           },
-   *         },
-   *       ],
-   *     },
-   *     {
-   *       selector: '[expr1]',
-   *       redundantAttribute: 'expr1',
-   *       expressions: [
-   *         {
-   *           type: expressionTypes.TEXT,
-   *           childNodeIndex: 0,
-   *           evaluate(scope) {
-   *             return scope.name;
-   *           },
-   *         },
-   *         {
-   *           type: 'attribute',
-   *           name: 'style',
-   *           evaluate(scope) {
-   *             return scope.style;
-   *           },
-   *         },
-   *       ],
-   *     },
-   *     {
-   *       selector: '[expr2]',
-   *       redundantAttribute: 'expr2',
-   *       type: bindingTypes.IF,
-   *       evaluate(scope) {
-   *         return scope.isVisible;
-   *       },
-   *       template: riotDOMBindings.template('hello there'),
-   *     },
-   *   ]
-   * )
-   */
 
   /**
    * Simple helper to find DOM nodes returning them as array like loopable object
@@ -1825,10 +1749,6 @@
 
     $$(selector) {
       return $(selector, this.root);
-    },
-
-    ref(selector) {
-      return $(selector, this.root).map(el => el[DOM_COMPONENT_INSTANCE_PROPERTY] || el);
     }
 
   });
@@ -1916,6 +1836,7 @@
       slots: null,
       root: null
     }, COMPONENT_CORE_HELPERS, {
+      name,
       css,
       template: template$$1 ? template$$1(create$6, expressionTypes, bindingTypes, name => {
         return components[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name);
@@ -1977,9 +1898,7 @@
     return Object.entries(callOrAssign(components)).reduce((acc, _ref4) => {
       let key = _ref4[0],
           value = _ref4[1];
-      acc[key] = createComponent(Object.assign({
-        name: key
-      }, value));
+      acc[camelToDashCase(key)] = createComponent(value);
       return acc;
     }, {});
   }
@@ -1993,9 +1912,29 @@
   function runPlugins(component) {
     return [...PLUGINS_SET].reduce((c, fn) => fn(c) || c, component);
   }
+  /**
+   * Compute the component current state merging it with its previous state
+   * @param   {Object} oldState - previous state object
+   * @param   {Object} newState - new state givent to the `update` call
+   * @returns {Object} new object state
+   */
+
 
   function computeState(oldState, newState) {
     return Object.assign({}, oldState, callOrAssign(newState));
+  }
+  /**
+   * Add eventually the "is" attribute to link this DOM node to its css
+   * @param {HTMLElement} element - target root node
+   * @param {string} name - name of the component mounted
+   * @returns {undefined} it's a void function
+   */
+
+
+  function addCssHook(element, name) {
+    if (getName(element) !== name) {
+      set(element, 'is', name);
+    }
   }
   /**
    * Component creation factory function that will enhance the user provided API
@@ -2022,7 +1961,9 @@
         this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone();
         this[ATTRIBUTES_KEY_SYMBOL] = attributeBindings.createDOM(element).clone(); // link this object to the DOM node
 
-        element[DOM_COMPONENT_INSTANCE_PROPERTY] = this; // define the root element
+        element[DOM_COMPONENT_INSTANCE_PROPERTY] = this; // add eventually the 'is' attribute
+
+        component.name && addCssHook(element, component.name); // define the root element
 
         defineProperty(this, 'root', element); // before mount lifecycle event
 
@@ -2057,11 +1998,11 @@
         return this;
       },
 
-      unmount(removeRoot) {
+      unmount(preserveRoot) {
         this.onBeforeUnmount(this.state, this.props);
         this[ATTRIBUTES_KEY_SYMBOL].unmount();
         this[SLOTS_KEY_SYMBOL].unmount();
-        this[TEMPLATE_KEY_SYMBOL].unmount(this, removeRoot === true);
+        this[TEMPLATE_KEY_SYMBOL].unmount(this, !preserveRoot);
         this.onUnmounted(this.state, this.props);
         return this;
       }
@@ -2192,7 +2133,7 @@
   const component = compose(c => c({}), createComponent);
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-alpha.8'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-alpha.10'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2234,7 +2175,7 @@
 
   var require$$1 = getCjsExportFromNamespace(_empty_module$1);
 
-  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.0.0-alpha.8, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path=path&&path.hasOwnProperty('default')?path['default']:path;const TAG_LOGIC_PROPERTY='tag';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';function unwrapExports$$1(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x.default:x;}function createCommonjsModule$$1(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace$$1(n){return n&&n.default||n;}var types=createCommonjsModule$$1(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
+  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.0.0-alpha.10, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path=path&&path.hasOwnProperty('default')?path['default']:path;const TAG_LOGIC_PROPERTY='tag';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports$$1(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x.default:x;}function createCommonjsModule$$1(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace$$1(n){return n&&n.default||n;}var types=createCommonjsModule$$1(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
   this.allSupertypes=Object.create(null);// Linear inheritance hierarchy. Populated during finalization.
   this.supertypeList=[];// Includes inherited fields.
   this.allFields=Object.create(null);// Non-hidden keys of allFields.
@@ -5400,7 +5341,7 @@
   	 * Find the slots in the current component and group them under the same id
   	 * @param   {RiotParser.Node.Tag} sourceNode - the custom tag
   	 * @returns {Object} object containing all the slots grouped by name
-  	 */function groupSlots(sourceNode){return sourceNode.nodes.reduce((acc,node)=>{const slotAttribute=findSlotAttribute(node);if(slotAttribute){acc[slotAttribute.value]=node;}else{acc.default=createRootNode({nodes:[...getChildrenNodes(acc.default),node]});}return acc;},{default:null});}/**
+  	 */function groupSlots(sourceNode){return getChildrenNodes(sourceNode).reduce((acc,node)=>{const slotAttribute=findSlotAttribute(node);if(slotAttribute){acc[slotAttribute.value]=node;}else{acc.default=createRootNode({nodes:[...getChildrenNodes(acc.default),node]});}return acc;},{default:null});}/**
   	 * Create the slot entity to pass to the riot-dom bindings
   	 * @param   {string} id - slot id
   	 * @param   {RiotParser.Node.Tag} sourceNode - slot root node
@@ -5546,18 +5487,19 @@
   	 * @returns { AST } the AST generated
   	 */function template(sourceNode,source,meta,ast){const options=meta.options;return extendTemplateProperty(ast,options.file,source,sourceNode);}const DEFAULT_OPTIONS={template:'default',file:'[unknown-source-file]',scopedCss:true};/**
   	 * Create the initial AST
+  	 * @param {string} tagName - the name of the component we have compiled
   	 * @returns { AST } the initial AST
   	 *
   	 * @example
   	 * // the output represents the following string in AST
-  	 */function createInitialInput(){/*
+  	 */function createInitialInput(_ref6){let tagName=_ref6.tagName;/*
   	  generates
   	  export default {
   	     ${TAG_CSS_PROPERTY}: null,
   	     ${TAG_LOGIC_PROPERTY}: null,
   	     ${TAG_TEMPLATE_PROPERTY}: null
   	  }
-  	  */return builders.program([builders.exportDefaultDeclaration(builders.objectExpression([simplePropertyNode(TAG_CSS_PROPERTY,nullNode()),simplePropertyNode(TAG_LOGIC_PROPERTY,nullNode()),simplePropertyNode(TAG_TEMPLATE_PROPERTY,nullNode())]))]);}/**
+  	  */return builders.program([builders.exportDefaultDeclaration(builders.objectExpression([simplePropertyNode(TAG_CSS_PROPERTY,nullNode()),simplePropertyNode(TAG_LOGIC_PROPERTY,nullNode()),simplePropertyNode(TAG_TEMPLATE_PROPERTY,nullNode()),simplePropertyNode(TAG_NAME_PROPERTY,builders.literal(tagName))]))]);}/**
   	 * Make sure the input sourcemap is valid otherwise we ignore it
   	 * @param   {SourceMapGenerator} map - preprocessor source map
   	 * @returns {Object} sourcemap as json or nothing
@@ -5577,7 +5519,7 @@
   	 * @param { string } opts - compiling options
   	 * @returns { Output } object containing output code and source map
   	 */function compile(source,opts){if(opts===void 0){opts={};}const meta=createMeta(source,opts);const options=meta.options;const _execute$=execute$1('template',options.template,meta,source),code=_execute$.code,map=_execute$.map;const _parser$2$parse$outpu=parser$2(options).parse(code).output,template$$1=_parser$2$parse$outpu.template,css$$1=_parser$2$parse$outpu.css,javascript$$1=_parser$2$parse$outpu.javascript;// extend the meta object with the result of the parsing
-  Object.assign(meta,{tagName:template$$1.name,fragments:{template:template$$1,css:css$$1,javascript:javascript$$1}});return compose(result=>Object.assign({},result,{meta}),result=>execute(result,meta),result=>Object.assign({},result,{map:overrideSourcemapContent(result.map,source)}),ast=>meta.ast=ast&&generateJavascript(ast,{sourceMapName:`${options.file}.map`,inputSourceMap:normaliseInputSourceMap(map)}),hookGenerator(template,template$$1,code,meta),hookGenerator(javascript,javascript$$1,code,meta),hookGenerator(css,css$$1,code,meta))(createInitialInput());}/**
+  Object.assign(meta,{tagName:template$$1.name,fragments:{template:template$$1,css:css$$1,javascript:javascript$$1}});return compose(result=>Object.assign({},result,{meta}),result=>execute(result,meta),result=>Object.assign({},result,{map:overrideSourcemapContent(result.map,source)}),ast=>meta.ast=ast&&generateJavascript(ast,{sourceMapName:`${options.file}.map`,inputSourceMap:normaliseInputSourceMap(map)}),hookGenerator(template,template$$1,code,meta),hookGenerator(javascript,javascript$$1,code,meta),hookGenerator(css,css$$1,code,meta))(createInitialInput(meta));}/**
   	 * Prepare the riot parser node transformers
   	 * @param   { Function } transformer - transformer function
   	 * @param   { Object } sourceNode - riot parser node
