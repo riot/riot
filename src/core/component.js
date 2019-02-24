@@ -262,11 +262,11 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
 
           return this
         },
-        unmount(removeRoot) {
+        unmount(preserveRoot) {
           this.onBeforeUnmount(this.state, this.props)
           this[ATTRIBUTES_KEY_SYMBOL].unmount()
           this[SLOTS_KEY_SYMBOL].unmount()
-          this[TEMPLATE_KEY_SYMBOL].unmount(this, removeRoot === true)
+          this[TEMPLATE_KEY_SYMBOL].unmount(this, !preserveRoot)
           this.onUnmounted(this.state, this.props)
 
           return this

@@ -46,6 +46,32 @@ describe('Riot core api', () => {
     tag.unmount()
   })
 
+  it('unmounting components should not preserve the root tag', () => {
+    const component = riot.component(SimpleComponent)
+    const element = document.createElement('div')
+    document.body.appendChild(element)
+
+    const tag = component.mount(element, {})
+
+    expect(element.parentNode).to.be.ok
+    tag.unmount()
+    expect(element.parentNode).to.be.not.ok
+  })
+
+  it('unmounting components can preserve the root tag', () => {
+    const component = riot.component(SimpleComponent)
+    const element = document.createElement('div')
+    document.body.appendChild(element)
+
+    const tag = component.mount(element, {})
+
+    expect(element.parentNode).to.be.ok
+    tag.unmount(true)
+    expect(element.parentNode).to.be.ok
+
+    document.body.removeChild(element)
+  })
+
   it('riot.component will mount properly components with css', () => {
     const component = riot.component(SimpleComponent)
     const element = document.createElement('div')
