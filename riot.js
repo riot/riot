@@ -1,4 +1,4 @@
-/* Riot v4.0.0-alpha.10, @license MIT */
+/* Riot v4.0.0-alpha.12, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1277,10 +1277,7 @@
         this.tag.update(scope);
       } else {
         // unmount the old tag if it exists
-        if (this.tag) {
-          this.tag.unmount(scope);
-        } // mount the new tag
-
+        this.unmount(); // mount the new tag
 
         this.name = name;
         this.tag = getTag(this.getComponent(name), this.slots, this.attributes);
@@ -1290,9 +1287,10 @@
       return this;
     },
 
-    unmount(scope) {
+    unmount() {
       if (this.tag) {
-        this.tag.unmount(scope);
+        // keep the root tag
+        this.tag.unmount(true);
       }
 
       return this;
@@ -2127,13 +2125,21 @@
     return PLUGINS_SET$1;
   }
   /**
-   * Helpter method to create an anonymous component without the need to register it
+   * Helpter method to create component without relying on the registered ones
+   * @param   {Object} implementation - component implementation
+   * @returns {Riot.Component} riot component object
    */
 
-  const component = compose(c => c({}), createComponent);
+  function component(implementation) {
+    return {
+      mount: (el, props) => compose(c => c.mount(el), c => c({
+        props
+      }), createComponent)(implementation)
+    };
+  }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-alpha.10'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-alpha.12'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
