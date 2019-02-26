@@ -51,7 +51,7 @@ const MOCKED_TEMPLATE_INTERFACE = {
 }
 
 /**
- * Create the component interface needed for the compiled components
+ * Create the component interface needed for the @riotjs/dom-bindings tag bindings
  * @param   {string} options.css - component css
  * @param   {Function} options.template - functon that will return the dom-bindings template function
  * @param   {Object} options.tag - component interface
@@ -67,6 +67,10 @@ export function createComponent({css, template, tag, name}) {
       name
     })({slots, attributes, props})
 
+    // notice that for the components create via tag binding
+    // we need to invert the mount (state/parentScope) arguments
+    // the template bindings will only forward the parentScope updates
+    // and never deal with the component state
     return {
       mount(element, parentScope, state) {
         return component.mount(element, state, parentScope)
