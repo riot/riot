@@ -13,11 +13,11 @@ export const Slot = Object.seal({
 
   // API methods
   mount(scope) {
-    if (!this.template) {
-      this.node.parentNode.removeChild(this.node)
-    } else {
+    if (this.template) {
       this.template.mount(this.node, scope)
       moveSlotInnerContent(this.node)
+    } else {
+      this.node.parentNode.removeChild(this.node)
     }
 
     return this

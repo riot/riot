@@ -1,9 +1,18 @@
 <simple>
-  <p>{state.message || props.message}</p>
+  <p onclick={onClick}>{state.message || props.message}</p>
 
   <style>
     :host {
       color: rgb(255, 0, 0);
     }
   </style>
+  <script>
+    export default {
+      onClick() {
+        this.update({
+          message: 'clicked'
+        })
+      }
+    }
+  </script>
 </simple>
