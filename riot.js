@@ -1,4 +1,4 @@
-/* Riot v4.0.0-alpha.13, @license MIT */
+/* Riot v4.0.0-alpha.14, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1549,11 +1549,11 @@
 
     // API methods
     mount(scope) {
-      if (!this.template) {
-        this.node.parentNode.removeChild(this.node);
-      } else {
+      if (this.template) {
         this.template.mount(this.node, scope);
         moveSlotInnerContent(this.node);
+      } else {
+        this.node.parentNode.removeChild(this.node);
       }
 
       return this;
@@ -1766,7 +1766,7 @@
     clone: noop,
     createDOM: noop
     /**
-     * Create the component interface needed for the compiled components
+     * Create the component interface needed for the @riotjs/dom-bindings tag bindings
      * @param   {string} options.css - component css
      * @param   {Function} options.template - functon that will return the dom-bindings template function
      * @param   {Object} options.tag - component interface
@@ -1793,7 +1793,11 @@
         slots,
         attributes,
         props
-      });
+      }); // notice that for the components create via tag binding
+      // we need to invert the mount (state/parentScope) arguments
+      // the template bindings will only forward the parentScope updates
+      // and never deal with the component state
+
       return {
         mount(element, parentScope, state) {
           return component.mount(element, state, parentScope);
@@ -2127,19 +2131,17 @@
   /**
    * Helpter method to create component without relying on the registered ones
    * @param   {Object} implementation - component implementation
-   * @returns {Riot.Component} riot component object
+   * @returns {Function} function that will allow you to mount a riot component on a DOM node
    */
 
   function component(implementation) {
-    return {
-      mount: (el, props) => compose(c => c.mount(el), c => c({
-        props
-      }), createComponent)(implementation)
-    };
+    return (el, props) => compose(c => c.mount(el), c => c({
+      props
+    }), createComponent)(implementation);
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-alpha.13'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-alpha.14'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,

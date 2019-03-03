@@ -1,4 +1,4 @@
-/* Riot v4.0.0-alpha.13, @license MIT */
+/* Riot v4.0.0-alpha.14, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1549,11 +1549,11 @@
 
     // API methods
     mount(scope) {
-      if (!this.template) {
-        this.node.parentNode.removeChild(this.node);
-      } else {
+      if (this.template) {
         this.template.mount(this.node, scope);
         moveSlotInnerContent(this.node);
+      } else {
+        this.node.parentNode.removeChild(this.node);
       }
 
       return this;
@@ -1766,7 +1766,7 @@
     clone: noop,
     createDOM: noop
     /**
-     * Create the component interface needed for the compiled components
+     * Create the component interface needed for the @riotjs/dom-bindings tag bindings
      * @param   {string} options.css - component css
      * @param   {Function} options.template - functon that will return the dom-bindings template function
      * @param   {Object} options.tag - component interface
@@ -1793,7 +1793,11 @@
         slots,
         attributes,
         props
-      });
+      }); // notice that for the components create via tag binding
+      // we need to invert the mount (state/parentScope) arguments
+      // the template bindings will only forward the parentScope updates
+      // and never deal with the component state
+
       return {
         mount(element, parentScope, state) {
           return component.mount(element, state, parentScope);
@@ -2127,19 +2131,17 @@
   /**
    * Helpter method to create component without relying on the registered ones
    * @param   {Object} implementation - component implementation
-   * @returns {Riot.Component} riot component object
+   * @returns {Function} function that will allow you to mount a riot component on a DOM node
    */
 
   function component(implementation) {
-    return {
-      mount: (el, props) => compose(c => c.mount(el), c => c({
-        props
-      }), createComponent)(implementation)
-    };
+    return (el, props) => compose(c => c.mount(el), c => c({
+      props
+    }), createComponent)(implementation);
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-alpha.13'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-alpha.14'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2181,7 +2183,7 @@
 
   var require$$1 = getCjsExportFromNamespace(_empty_module$1);
 
-  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.0.0-alpha.13, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path=path&&path.hasOwnProperty('default')?path['default']:path;const TAG_LOGIC_PROPERTY='tag';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports$$1(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x.default:x;}function createCommonjsModule$$1(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace$$1(n){return n&&n.default||n;}var types=createCommonjsModule$$1(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
+  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.0.0-alpha.14, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path=path&&path.hasOwnProperty('default')?path['default']:path;const TAG_LOGIC_PROPERTY='tag';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports$$1(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x.default:x;}function createCommonjsModule$$1(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace$$1(n){return n&&n.default||n;}var types=createCommonjsModule$$1(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
   this.allSupertypes=Object.create(null);// Linear inheritance hierarchy. Populated during finalization.
   this.supertypeList=[];// Includes inherited fields.
   this.allFields=Object.create(null);// Non-hidden keys of allFields.
