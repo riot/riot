@@ -95,16 +95,14 @@ export function uninstall(plugin) {
 /**
  * Helpter method to create component without relying on the registered ones
  * @param   {Object} implementation - component implementation
- * @returns {Riot.Component} riot component object
+ * @returns {Function} function that will allow you to mount a riot component on a DOM node
  */
 export function component(implementation) {
-  return {
-    mount: (el, props) => compose(
-      c => c.mount(el),
-      c => c({props}),
-      createComponent
-    )(implementation)
-  }
+  return (el, props) => compose(
+    c => c.mount(el),
+    c => c({props}),
+    createComponent
+  )(implementation)
 }
 
 /** @type {string} current riot version */

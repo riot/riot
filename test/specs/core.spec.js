@@ -46,7 +46,7 @@ describe('Riot core api', () => {
       })
 
       const element = document.createElement('div')
-      const tag = component.mount(element, { isActive: true })
+      const tag = component(element, { isActive: true })
       expect(tag.root).to.be.equal(element)
       expect(tag.props.isActive).to.be.ok
       expect(mountedSpy).to.have.been.calledOnce
@@ -58,7 +58,7 @@ describe('Riot core api', () => {
       const element = document.createElement('div')
       document.body.appendChild(element)
 
-      const tag = component.mount(element)
+      const tag = component(element)
 
       expect(element.parentNode).to.be.ok
 
@@ -71,7 +71,7 @@ describe('Riot core api', () => {
       const element = document.createElement('div')
       document.body.appendChild(element)
 
-      const tag = component.mount(element, {})
+      const tag = component(element, {})
 
       expect(element.parentNode).to.be.ok
       tag.unmount(true)
@@ -113,7 +113,7 @@ describe('Riot core api', () => {
       const element = document.createElement('div')
       document.body.appendChild(element)
 
-      const tag = component.mount(element, {})
+      const tag = component(element, {})
 
       expect(tag.root.getAttribute('is')).to.be.equal('simple')
       expect(window.getComputedStyle(tag.root).color).to.be.equal('rgb(255, 0, 0)')
