@@ -54,16 +54,16 @@ const MOCKED_TEMPLATE_INTERFACE = {
  * Create the component interface needed for the @riotjs/dom-bindings tag bindings
  * @param   {string} options.css - component css
  * @param   {Function} options.template - functon that will return the dom-bindings template function
- * @param   {Object} options.tag - component interface
+ * @param   {Object} options.exports - component interface
  * @param   {string} options.name - component name
  * @returns {Object} component like interface
  */
-export function createComponent({css, template, tag, name}) {
+export function createComponent({css, template, exports, name}) {
   return ({slots, attributes, props}) => {
     const component = defineComponent({
       css,
       template,
-      tag,
+      exports,
       name
     })({slots, attributes, props})
 
@@ -91,8 +91,8 @@ export function createComponent({css, template, tag, name}) {
  * @param   {Object} component - the component initial properties
  * @returns {Object} a new component implementation object
  */
-export function defineComponent({css, template, tag, name}) {
-  const componentAPI = callOrAssign(tag) || {}
+export function defineComponent({css, template, exports, name}) {
+  const componentAPI = callOrAssign(exports) || {}
   const components = createSubcomponents(componentAPI.components)
 
   // add the component css into the DOM

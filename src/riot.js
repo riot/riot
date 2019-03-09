@@ -18,10 +18,10 @@ const { DOM_COMPONENT_INSTANCE_PROPERTY, COMPONENTS_IMPLEMENTATION_MAP, PLUGINS_
  * @param   {Object} implementation - tag implementation
  * @returns {Map} map containing all the components implementations
  */
-export function register(name, {css, template, tag}) {
+export function register(name, {css, template, exports}) {
   if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component "${name}" was already registered`)
 
-  COMPONENTS_IMPLEMENTATION_MAP.set(name, createComponent({name, css, template, tag}))
+  COMPONENTS_IMPLEMENTATION_MAP.set(name, createComponent({name, css, template, exports}))
 
   return COMPONENTS_IMPLEMENTATION_MAP
 }

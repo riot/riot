@@ -38,7 +38,7 @@ describe('Riot core api', () => {
     it('riot.component can mount anonymous components', () => {
       const mountedSpy = spy()
       const component = riot.component({
-        tag:  {
+        exports:  {
           onMounted() {
             mountedSpy()
           }
@@ -83,7 +83,7 @@ describe('Riot core api', () => {
     it('the shouldUpdate method can block all the components updates', () => {
       const updatedSpy = spy()
       riot.register('my-component', {
-        tag: {
+        exports: {
           onUpdated() {
             updatedSpy()
           },
@@ -125,7 +125,7 @@ describe('Riot core api', () => {
       const mountedSpy = spy()
       riot.register('my-component', {
         css: 'my-component { color: red; }',
-        tag: {
+        exports: {
           onMounted() {
             mountedSpy()
           }
@@ -139,7 +139,7 @@ describe('Riot core api', () => {
     it('custom components have core helpers and the root property', () => {
       riot.register('my-component', {
         css: 'my-component { color: red; }',
-        tag: {
+        exports: {
           onMounted() {
             expect(this.root).to.be.ok
             expect(this.$('div')).to.be.ok
@@ -158,7 +158,7 @@ describe('Riot core api', () => {
       const destroyedSpy = spy()
       riot.register('my-component', {
         css: 'my-component { color: red; }',
-        tag: {
+        exports: {
           onUnmounted() {
             destroyedSpy()
           }
@@ -178,7 +178,7 @@ describe('Riot core api', () => {
 
       riot.register('my-component', {
         css: 'my-component { color: red; }',
-        tag: {
+        exports: {
           onUnmounted() {
             destroyedSpy()
           }
@@ -199,7 +199,7 @@ describe('Riot core api', () => {
       const destroyedSpy = spy()
       riot.register('my-component', {
         css: 'my-component { color: red; }',
-        tag: {
+        exports: {
           onUnmounted() {
             destroyedSpy()
           }
@@ -218,7 +218,7 @@ describe('Riot core api', () => {
       const mountedSpy = spy()
       riot.register('my-component', {
         css: 'my-component { color: red; }',
-        tag() {
+        exports() {
           return {
             onMounted() {
               mountedSpy()
@@ -239,7 +239,7 @@ describe('Riot core api', () => {
       const mountedSpy = spy()
       riot.register('my-component', {
         css: 'my-component { color: red; }',
-        tag: class MyComponent {
+        exports: class MyComponent {
           onMounted() {
             mountedSpy()
           }
@@ -349,7 +349,7 @@ describe('Riot core api', () => {
 
       riot.register('my-component', {
         css: 'my-component { color: red; }',
-        tag: {
+        exports: {
           onBeforeMount() {
             expect(this.hello).to.be.ok
           }
@@ -438,7 +438,7 @@ describe('Riot core api', () => {
       const mountedSpy = spy()
       riot.register('my-component', {
         css: 'my-component { color: red; }',
-        tag: {
+        exports: {
           onMounted() {
             expect(this.props.name).to.be.equal('foo')
             mountedSpy()
