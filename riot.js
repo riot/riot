@@ -1,4 +1,4 @@
-/* Riot v4.0.0-alpha.14, @license MIT */
+/* Riot v4.0.0-beta.1, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -358,7 +358,7 @@
 
   const next = (get, list, i, length, before) => i < length ? get(list[i], 0) : 0 < i ? get(list[i - 1], -0).nextSibling : before;
 
-  const remove$1 = (get, parent, children, start, end) => {
+  const remove = (get, parent, children, start, end) => {
     if (end - start < 2) parent.removeChild(get(children[start], -1));else {
       const range = parent.ownerDocument.createRange();
       range.setStartBefore(get(children[start], -1));
@@ -557,7 +557,7 @@
 
         case DELETION:
           // TODO: bulk removes for sequential nodes
-          if (live.has(currentNodes[currentStart])) currentStart++;else remove$1(get, parentNode, currentNodes, currentStart++, currentStart);
+          if (live.has(currentNodes[currentStart])) currentStart++;else remove(get, parentNode, currentNodes, currentStart++, currentStart);
           break;
       }
     }
@@ -622,7 +622,7 @@
 
 
     if (futureSame && currentStart < currentEnd) {
-      remove$1(get, parentNode, currentNodes, currentStart, currentEnd);
+      remove(get, parentNode, currentNodes, currentStart, currentEnd);
       return futureNodes;
     }
 
@@ -644,8 +644,8 @@
         i = indexOf(currentNodes, currentStart, currentEnd, futureNodes, futureStart, futureEnd, compare); // outer diff
 
         if (-1 < i) {
-          remove$1(get, parentNode, currentNodes, currentStart, i);
-          remove$1(get, parentNode, currentNodes, i + futureChanges, currentEnd);
+          remove(get, parentNode, currentNodes, currentStart, i);
+          remove(get, parentNode, currentNodes, i + futureChanges, currentEnd);
           return futureNodes;
         }
       } // common case with one replacement for many nodes
@@ -656,7 +656,7 @@
 
     if (currentChanges < 2 || futureChanges < 2) {
       append(get, parentNode, futureNodes, futureStart, futureEnd, get(currentNodes[currentStart], 0));
-      remove$1(get, parentNode, currentNodes, currentStart, currentEnd);
+      remove(get, parentNode, currentNodes, currentStart, currentEnd);
       return futureNodes;
     } // the half match diff part has been skipped in petit-dom
     // https://github.com/yelouafi/petit-dom/blob/bd6f5c919b5ae5297be01612c524c40be45f14a7/src/vdom.js#L391-L397
@@ -1769,7 +1769,7 @@
      * Create the component interface needed for the @riotjs/dom-bindings tag bindings
      * @param   {string} options.css - component css
      * @param   {Function} options.template - functon that will return the dom-bindings template function
-     * @param   {Object} options.tag - component interface
+     * @param   {Object} options.exports - component interface
      * @param   {string} options.name - component name
      * @returns {Object} component like interface
      */
@@ -1777,8 +1777,8 @@
   };
   function createComponent(_ref) {
     let css = _ref.css,
-        template$$1 = _ref.template,
-        tag = _ref.tag,
+        template = _ref.template,
+        exports = _ref.exports,
         name = _ref.name;
     return (_ref2) => {
       let slots = _ref2.slots,
@@ -1786,8 +1786,8 @@
           props = _ref2.props;
       const component = defineComponent({
         css,
-        template: template$$1,
-        tag,
+        template,
+        exports,
         name
       })({
         slots,
@@ -1823,10 +1823,10 @@
 
   function defineComponent(_ref3) {
     let css = _ref3.css,
-        template$$1 = _ref3.template,
-        tag = _ref3.tag,
+        template = _ref3.template,
+        exports = _ref3.exports,
         name = _ref3.name;
-    const componentAPI = callOrAssign(tag) || {};
+    const componentAPI = callOrAssign(exports) || {};
     const components = createSubcomponents(componentAPI.components); // add the component css into the DOM
 
     if (css && name) cssManager.add(name, css);
@@ -1840,7 +1840,7 @@
     }, COMPONENT_CORE_HELPERS, {
       name,
       css,
-      template: template$$1 ? template$$1(create$6, expressionTypes, bindingTypes, name => {
+      template: template ? template(create$6, expressionTypes, bindingTypes, name => {
         return components[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name);
       }) : MOCKED_TEMPLATE_INTERFACE
     })));
@@ -2057,13 +2057,13 @@
   function register(name, _ref) {
     let css = _ref.css,
         template = _ref.template,
-        tag = _ref.tag;
+        exports = _ref.exports;
     if (COMPONENTS_IMPLEMENTATION_MAP$1.has(name)) panic(`The component "${name}" was already registered`);
     COMPONENTS_IMPLEMENTATION_MAP$1.set(name, createComponent({
       name,
       css,
       template,
-      tag
+      exports
     }));
     return COMPONENTS_IMPLEMENTATION_MAP$1;
   }
@@ -2141,7 +2141,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-alpha.14'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-beta.1'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
