@@ -9,6 +9,7 @@ import RuntimeIsDirective from '../tags/runtime-is-directive.riot'
 import SimpleComponent from '../tags/simple.riot'
 import SimpleSlot from '../tags/simple-slot.riot'
 import SpreadAttribute from '../tags/spread-attribute.riot'
+import TitleProps from '../tags/title-prop.riot'
 
 import {expect} from 'chai'
 import {spy} from 'sinon'
@@ -399,6 +400,21 @@ describe('Riot core api', () => {
       expect(p.innerHTML).to.be.equal('goodbye')
 
       riot.unregister('simple-component')
+    })
+
+    it('Initial props should not be lost on the consequent updates', () => {
+      const mountComponent = riot.component(TitleProps)
+
+      const element = document.createElement('title-prop')
+      const component = mountComponent(element, { title: 'hello' })
+
+      expect(component.props.title).to.be.equal('hello')
+
+      component.update()
+
+      expect(component.props.title).to.be.equal('hello')
+
+      component.unmount()
     })
 
     it('nested components can be loaded in runtime via imports statements', () => {
