@@ -1,4 +1,4 @@
-/* Riot v4.0.0-beta.1, @license MIT */
+/* Riot v4.0.0-beta.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1958,7 +1958,7 @@
           state = {};
         }
 
-        this.props = Object.assign({}, props, evaluateProps(element, attributes, parentScope));
+        this.props = Object.freeze(Object.assign({}, props, evaluateProps(element, attributes, parentScope)));
         this.state = computeState(this.state, state);
         this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone();
         this[ATTRIBUTES_KEY_SYMBOL] = attributeBindings.createDOM(element).clone(); // link this object to the DOM node
@@ -1969,13 +1969,13 @@
 
         defineProperty(this, 'root', element); // before mount lifecycle event
 
-        this.onBeforeMount(this.state, this.props); // handlte the template and its attributes
+        this.onBeforeMount(this.props, this.state); // handlte the template and its attributes
 
         this[ATTRIBUTES_KEY_SYMBOL].mount(element, parentScope);
         this[TEMPLATE_KEY_SYMBOL].mount(element, this); // create the slots and mount them
 
         this[SLOTS_KEY_SYMBOL] = createSlots(element, slots || []).mount(parentScope);
-        this.onMounted(this.state, this.props);
+        this.onMounted(this.props, this.state);
         return this;
       },
 
@@ -1986,9 +1986,9 @@
 
         const newProps = evaluateProps(this.root, attributes, parentScope, this.props);
         if (this.shouldUpdate(newProps, this.props) === false) return;
-        this.props = newProps;
+        this.props = Object.freeze(Object.assign({}, props, newProps));
         this.state = computeState(this.state, state);
-        this.onBeforeUpdate(this.state, this.props);
+        this.onBeforeUpdate(this.props, this.state);
 
         if (parentScope) {
           this[ATTRIBUTES_KEY_SYMBOL].update(parentScope);
@@ -1996,16 +1996,16 @@
         }
 
         this[TEMPLATE_KEY_SYMBOL].update(this);
-        this.onUpdated(this.state, this.props);
+        this.onUpdated(this.props, this.state);
         return this;
       },
 
       unmount(preserveRoot) {
-        this.onBeforeUnmount(this.state, this.props);
+        this.onBeforeUnmount(this.props, this.state);
         this[ATTRIBUTES_KEY_SYMBOL].unmount();
         this[SLOTS_KEY_SYMBOL].unmount();
         this[TEMPLATE_KEY_SYMBOL].unmount(this, !preserveRoot);
-        this.onUnmounted(this.state, this.props);
+        this.onUnmounted(this.props, this.state);
         return this;
       }
 
@@ -2141,7 +2141,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-beta.1'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-beta.2'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
