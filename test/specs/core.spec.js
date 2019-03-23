@@ -1,5 +1,6 @@
 import * as riot from '../../src/riot'
 
+import DashedAttributeParent from '../tags/dashed-attribute-parent.riot'
 import GlobalComponents from '../tags/global-components.riot'
 import NamedSlotsParent from '../tags/named-slots-parent.riot'
 import NestedAliasedImportsComponent from '../tags/nested-aliased-imports.riot'
@@ -483,6 +484,18 @@ describe('Riot core api', () => {
 
       component.unmount()
       riot.unregister('spread-attribute')
+    })
+
+    it('dashed attributes will be camelized', () => {
+      riot.register('dashed-attribute-parent', DashedAttributeParent)
+      const element = document.createElement('dashed-attribute-parent')
+
+      const [component] = riot.mount(element)
+
+      expect(component.$('dashed-attribute-child p').innerHTML).to.be.equal('hello')
+
+      component.unmount()
+      riot.unregister('dashed-attribute-parent')
     })
   })
 

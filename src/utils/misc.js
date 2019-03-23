@@ -30,6 +30,15 @@ export function camelToDashCase(string) {
 }
 
 /**
+ * Convert a string containing dashes to camel case
+ * @param   {string} string - input string
+ * @returns {string} my-string -> myString
+ */
+export function dashToCamelCase(string) {
+  return string.replace(/-(\w)/g, (_, c) => c.toUpperCase())
+}
+
+/**
  * Define default properties if they don't exist on the source object
  * @param   {Object} source - object that will receive the default properties
  * @param   {Object} defaults - object containing additional optional keys
@@ -83,6 +92,19 @@ export function defineProperty(source, key, value, options = {}) {
 }
 
 /**
+ * Normalize a DOM attribute that will be passed to a child component
+ * @param   {string} attribute.name - attribute names might be dash case
+ * @param   {*} attribute.value - sky is the limit
+ * @returns {attribute} attribute object normalized
+ */
+export function normalizeAttribute({name, value}) {
+  return {
+    name: dashToCamelCase(name),
+    value: value
+  }
+}
+
+/**
  * Define multiple properties on a target object
  * @param   {Object} source - object where the new properties will be set
  * @param   {Object} properties - object containing as key pair the key + value properties
@@ -105,9 +127,9 @@ export function defineProperties(source, properties, options) {
  */
 export function evaluateAttributeExpressions(attributes, scope) {
   return attributes.reduce((acc, attribute) => {
-    const value = attribute.evaluate(scope)
+    const attr = normalizeAttribute({ value: attribute.evaluate(scope), name: attribute.name })
 
-    acc[attribute.name] = value
+    acc[dashToCamelCase(attr.name)] = attr.value
 
     return acc
   }, {})

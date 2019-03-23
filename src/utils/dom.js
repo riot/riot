@@ -1,5 +1,6 @@
 import {IS_DIRECTIVE} from '../globals'
 import {get as getAttr} from 'bianco.attr'
+import {normalizeAttribute} from './misc'
 
 /**
  * Get the document window
@@ -17,7 +18,8 @@ export function getWindow() {
  */
 export function DOMattributesToObject(element) {
   return Array.from(element.attributes).reduce((acc, attribute) => {
-    acc[attribute.name] = attribute.value
+    const attr = normalizeAttribute(attribute)
+    acc[attr.name] = attr.value
     return acc
   }, {})
 }
