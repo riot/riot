@@ -1,4 +1,4 @@
-/* Riot v4.0.0-beta.3, @license MIT */
+/* Riot v4.0.0-beta.4, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -337,7 +337,7 @@
     SIMPLE,
     TAG
   };
-  var Map$1 = {};
+  /* get rid of the @ungap/essential-map polyfill */
 
   const append = (get, parent, children, start, end, before) => {
     if (end - start < 2) parent.insertBefore(get(children[start], 1), before);else {
@@ -414,7 +414,7 @@
 
     for (let i = 1; i < minLen; i++) tresh[i] = currentEnd;
 
-    const keymap = new Map$1();
+    const keymap = new Map();
 
     for (let i = currentStart; i < currentEnd; i++) keymap.set(currentNodes[i], i);
 
@@ -551,7 +551,7 @@
   };
 
   const applyDiff = (diff, get, parentNode, futureNodes, futureStart, currentNodes, currentStart, currentLength, before) => {
-    const live = new Map$1();
+    const live = new Map();
     const length = diff.length;
     let currentIndex = currentStart;
     let i = 0;
@@ -2169,7 +2169,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-beta.3'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-beta.4'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
