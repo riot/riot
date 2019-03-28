@@ -132,12 +132,6 @@ $ make riot
 
 # To build without testing
 $ make raw
-
-# To build anytime you change a src file
-$ make watch
-
-# To bench riot
-$ make perf
 ```
 
 #### 5) Pull request only against the `dev` branch making sure you have read [our pull request template](.github/PULL_REQUEST_TEMPLATE.md)
