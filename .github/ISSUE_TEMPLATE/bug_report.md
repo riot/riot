@@ -30,13 +30,3 @@ Help us to manage our issues by answering the following:
 3. On which browser/OS does the issue appear?
 
 4. Which version of Riot does it affect?
-
-5. How would you tag this issue?
-
-  - [ ] Question
-  - [ ] Bug
-  - [ ] Discussion
-  - [ ] Feature request
-  - [ ] Tip
-  - [ ] Enhancement
-  - [ ] Performance

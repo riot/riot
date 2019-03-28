@@ -1,9 +1,9 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
-title: ''
+about: Suggest an idea for Riot.js
+title: "[FEATURE REQUEST] Feature title"
 labels: ''
-assignees: ''
+assignees: GianlucaGuarini
 
 ---
 
