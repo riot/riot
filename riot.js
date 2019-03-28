@@ -1,4 +1,4 @@
-/* Riot v4.0.0-beta.2, @license MIT */
+/* Riot v4.0.0-beta.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -126,38 +126,6 @@
   }
 
   /**
-   * Get the document window
-   * @returns {Object} window object
-   */
-
-  function getWindow() {
-    return typeof window === 'undefined' ?
-    /* istanbul ignore next */
-    undefined : window;
-  }
-  /**
-   * Get all the element attributes as object
-   * @param   {HTMLElement} element - DOM node we want to parse
-   * @returns {Object} all the attributes found as a key value pairs
-   */
-
-  function DOMattributesToObject(element) {
-    return Array.from(element.attributes).reduce((acc, attribute) => {
-      acc[attribute.name] = attribute.value;
-      return acc;
-    }, {});
-  }
-  /**
-   * Get the tag name of any DOM node
-   * @param   {HTMLElement} element - DOM node we want to inspect
-   * @returns {string} name to identify this dom node in riot
-   */
-
-  function getName(element) {
-    return get(element, IS_DIRECTIVE) || element.tagName.toLowerCase();
-  }
-
-  /**
    * Quick type checking
    * @param   {*} element - anything
    * @param   {string} type - type definition
@@ -203,6 +171,15 @@
 
   function camelToDashCase(string) {
     return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+  }
+  /**
+   * Convert a string containing dashes to camel case
+   * @param   {string} string - input string
+   * @returns {string} my-string -> myString
+   */
+
+  function dashToCamelCase(string) {
+    return string.replace(/-(\w)/g, (_, c) => c.toUpperCase());
   }
   /**
    * Define default properties if they don't exist on the source object
@@ -259,6 +236,21 @@
     return source;
   }
   /**
+   * Normalize a DOM attribute that will be passed to a child component
+   * @param   {string} attribute.name - attribute names might be dash case
+   * @param   {*} attribute.value - sky is the limit
+   * @returns {attribute} attribute object normalized
+   */
+
+  function normalizeAttribute(_ref2) {
+    let name = _ref2.name,
+        value = _ref2.value;
+    return {
+      name: dashToCamelCase(name),
+      value: value
+    };
+  }
+  /**
    * Define multiple properties on a target object
    * @param   {Object} source - object where the new properties will be set
    * @param   {Object} properties - object containing as key pair the key + value properties
@@ -267,9 +259,9 @@
    */
 
   function defineProperties(source, properties, options) {
-    Object.entries(properties).forEach((_ref2) => {
-      let key = _ref2[0],
-          value = _ref2[1];
+    Object.entries(properties).forEach((_ref3) => {
+      let key = _ref3[0],
+          value = _ref3[1];
       defineProperty(source, key, value, options);
     });
     return source;
@@ -283,10 +275,46 @@
 
   function evaluateAttributeExpressions(attributes, scope) {
     return attributes.reduce((acc, attribute) => {
-      const value = attribute.evaluate(scope);
-      acc[attribute.name] = value;
+      const attr = normalizeAttribute({
+        value: attribute.evaluate(scope),
+        name: attribute.name
+      });
+      acc[dashToCamelCase(attr.name)] = attr.value;
       return acc;
     }, {});
+  }
+
+  /**
+   * Get the document window
+   * @returns {Object} window object
+   */
+
+  function getWindow() {
+    return typeof window === 'undefined' ?
+    /* istanbul ignore next */
+    undefined : window;
+  }
+  /**
+   * Get all the element attributes as object
+   * @param   {HTMLElement} element - DOM node we want to parse
+   * @returns {Object} all the attributes found as a key value pairs
+   */
+
+  function DOMattributesToObject(element) {
+    return Array.from(element.attributes).reduce((acc, attribute) => {
+      const attr = normalizeAttribute(attribute);
+      acc[attr.name] = attr.value;
+      return acc;
+    }, {});
+  }
+  /**
+   * Get the tag name of any DOM node
+   * @param   {HTMLElement} element - DOM node we want to inspect
+   * @returns {string} name to identify this dom node in riot
+   */
+
+  function getName(element) {
+    return get(element, IS_DIRECTIVE) || element.tagName.toLowerCase();
   }
 
   /**
@@ -2141,7 +2169,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-beta.2'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-beta.3'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2149,15 +2177,15 @@
     globals
   };
 
-  exports.register = register;
-  exports.unregister = unregister;
-  exports.mount = mount;
-  exports.unmount = unmount;
-  exports.install = install;
-  exports.uninstall = uninstall;
-  exports.component = component;
-  exports.version = version;
   exports.__ = __;
+  exports.component = component;
+  exports.install = install;
+  exports.mount = mount;
+  exports.register = register;
+  exports.uninstall = uninstall;
+  exports.unmount = unmount;
+  exports.unregister = unregister;
+  exports.version = version;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

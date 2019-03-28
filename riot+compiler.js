@@ -1,4 +1,4 @@
-/* Riot v4.0.0-beta.2, @license MIT */
+/* Riot v4.0.0-beta.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -126,38 +126,6 @@
   }
 
   /**
-   * Get the document window
-   * @returns {Object} window object
-   */
-
-  function getWindow() {
-    return typeof window === 'undefined' ?
-    /* istanbul ignore next */
-    undefined : window;
-  }
-  /**
-   * Get all the element attributes as object
-   * @param   {HTMLElement} element - DOM node we want to parse
-   * @returns {Object} all the attributes found as a key value pairs
-   */
-
-  function DOMattributesToObject(element) {
-    return Array.from(element.attributes).reduce((acc, attribute) => {
-      acc[attribute.name] = attribute.value;
-      return acc;
-    }, {});
-  }
-  /**
-   * Get the tag name of any DOM node
-   * @param   {HTMLElement} element - DOM node we want to inspect
-   * @returns {string} name to identify this dom node in riot
-   */
-
-  function getName(element) {
-    return get(element, IS_DIRECTIVE) || element.tagName.toLowerCase();
-  }
-
-  /**
    * Quick type checking
    * @param   {*} element - anything
    * @param   {string} type - type definition
@@ -203,6 +171,15 @@
 
   function camelToDashCase(string) {
     return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+  }
+  /**
+   * Convert a string containing dashes to camel case
+   * @param   {string} string - input string
+   * @returns {string} my-string -> myString
+   */
+
+  function dashToCamelCase(string) {
+    return string.replace(/-(\w)/g, (_, c) => c.toUpperCase());
   }
   /**
    * Define default properties if they don't exist on the source object
@@ -259,6 +236,21 @@
     return source;
   }
   /**
+   * Normalize a DOM attribute that will be passed to a child component
+   * @param   {string} attribute.name - attribute names might be dash case
+   * @param   {*} attribute.value - sky is the limit
+   * @returns {attribute} attribute object normalized
+   */
+
+  function normalizeAttribute(_ref2) {
+    let name = _ref2.name,
+        value = _ref2.value;
+    return {
+      name: dashToCamelCase(name),
+      value: value
+    };
+  }
+  /**
    * Define multiple properties on a target object
    * @param   {Object} source - object where the new properties will be set
    * @param   {Object} properties - object containing as key pair the key + value properties
@@ -267,9 +259,9 @@
    */
 
   function defineProperties(source, properties, options) {
-    Object.entries(properties).forEach((_ref2) => {
-      let key = _ref2[0],
-          value = _ref2[1];
+    Object.entries(properties).forEach((_ref3) => {
+      let key = _ref3[0],
+          value = _ref3[1];
       defineProperty(source, key, value, options);
     });
     return source;
@@ -283,10 +275,46 @@
 
   function evaluateAttributeExpressions(attributes, scope) {
     return attributes.reduce((acc, attribute) => {
-      const value = attribute.evaluate(scope);
-      acc[attribute.name] = value;
+      const attr = normalizeAttribute({
+        value: attribute.evaluate(scope),
+        name: attribute.name
+      });
+      acc[dashToCamelCase(attr.name)] = attr.value;
       return acc;
     }, {});
+  }
+
+  /**
+   * Get the document window
+   * @returns {Object} window object
+   */
+
+  function getWindow() {
+    return typeof window === 'undefined' ?
+    /* istanbul ignore next */
+    undefined : window;
+  }
+  /**
+   * Get all the element attributes as object
+   * @param   {HTMLElement} element - DOM node we want to parse
+   * @returns {Object} all the attributes found as a key value pairs
+   */
+
+  function DOMattributesToObject(element) {
+    return Array.from(element.attributes).reduce((acc, attribute) => {
+      const attr = normalizeAttribute(attribute);
+      acc[attr.name] = attr.value;
+      return acc;
+    }, {});
+  }
+  /**
+   * Get the tag name of any DOM node
+   * @param   {HTMLElement} element - DOM node we want to inspect
+   * @returns {string} name to identify this dom node in riot
+   */
+
+  function getName(element) {
+    return get(element, IS_DIRECTIVE) || element.tagName.toLowerCase();
   }
 
   /**
@@ -2141,7 +2169,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-beta.2'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-beta.3'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2183,7 +2211,7 @@
 
   var require$$1 = getCjsExportFromNamespace(_empty_module$1);
 
-  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.0.0-beta.2, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x.default:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n.default||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
+  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.0.0-beta.3, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x.default:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n.default||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
   this.allSupertypes=Object.create(null);// Linear inheritance hierarchy. Populated during finalization.
   this.supertypeList=[];// Includes inherited fields.
   this.allFields=Object.create(null);// Non-hidden keys of allFields.
@@ -5340,6 +5368,10 @@
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {boolean} true only for the IF EACH and TAG bindings
   	 */function hasItsOwnTemplate(node){return [findEachAttribute,findIfAttribute,isCustomNode].some(test=>test(node));}/**
+  	 * Create a strings array with the `join` call to transform it into a string
+  	 * @param   {Array} stringsArray - array containing all the strings to concatenate
+  	 * @returns {AST.CallExpression} array with a `join` call
+  	 */function createArrayString(stringsArray){return builders.callExpression(builders.memberExpression(builders.arrayExpression(stringsArray),builders.identifier('join'),false),[builders.literal('')]);}/**
   	 * Create a selector that will be used to find the node via dom-bindings
   	 * @param   {number} id - temporary variable that will be increased anytime this function will be called
   	 * @returns {string} selector attribute needed to bind a riot expression
@@ -5348,13 +5380,20 @@
   	 * @param   {*} source - possibily an object to clone
   	 * @returns {*} the object we wanted to clone
   	 */function cloneDeep(source){return JSON.parse(JSON.stringify(source));}/**
+  	 * Simple expression bindings might contain multiple expressions like for example: "class="{foo} red {bar}""
+  	 * This helper aims to merge them in a template literal if it's necessary
+  	 * @param   {RiotParser.Attr} node - riot parser node
+  	 * @param   {string} sourceFile - original tag file
+  	 * @param   {string} sourceCode - original tag source code
+  	 * @returns { Object } a template literal expression object
+  	 */function mergeAttributeExpressions(node,sourceFile,sourceCode){if(!node.parts||node.parts.length===1)return transformExpression(node.expressions[0],sourceFile,sourceCode);const stringsArray=node.parts.reduce((acc,str)=>{const expression=node.expressions.find(e=>e.text===str);return [...acc,expression?transformExpression(expression,sourceFile,sourceCode):builders.literal(str)];},[]);return createArrayString(stringsArray);}/**
   	 * Create a simple attribute expression
   	 * @param   {RiotParser.Node.Attr} sourceNode - the custom tag
   	 * @param   {stiring} sourceFile - source file path
   	 * @param   {string} sourceCode - original source
   	 * @returns {AST.Node} object containing the expression binding keys
   	 */function createAttributeExpression(sourceNode,sourceFile,sourceCode){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(ATTRIBUTE_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_NAME_KEY,isSpreadAttribute(sourceNode)?nullNode():builders.literal(sourceNode.name)),simplePropertyNode(BINDING_EVALUATE_KEY,hasExpressions(sourceNode)?// dynamic attribute
-  toScopedFunction(sourceNode.expressions[0],sourceFile,sourceCode):// static attribute
+  wrapASTInFunctionWithScope(mergeAttributeExpressions(sourceNode,sourceFile,sourceCode)):// static attribute
   builders.functionExpression(null,[],builders.blockStatement([builders.returnStatement(builders.literal(sourceNode.value||true))])))]);}/**
   	 * Find the slots in the current component and group them under the same id
   	 * @param   {RiotParser.Node.Tag} sourceNode - the custom tag
@@ -5418,8 +5457,7 @@
   	 * @param   {string} sourceCode - original tag source code
   	 * @returns { Object } a template literal expression object
   	 */function mergeNodeExpressions(node,sourceFile,sourceCode){if(node.parts.length===1)return transformExpression(node.expressions[0],sourceFile,sourceCode);const pureStringChunks=generateLiteralStringChunksFromNode(node,sourceCode);const stringsArray=pureStringChunks.reduce((acc,str,index)=>{const expr=node.expressions[index];return [...acc,builders.literal(str),expr?transformExpression(expr,sourceFile,sourceCode):nullNode()];},[])// filter the empty literal expressions
-  .filter(expr=>!isLiteral(expr)||expr.value);// eslint-disable-line
-  return builders.callExpression(builders.memberExpression(builders.arrayExpression(stringsArray),builders.identifier('join'),false),[builders.literal('')]);}/**
+  .filter(expr=>!isLiteral(expr)||expr.value);return createArrayString(stringsArray);}/**
   	 * Create a text expression
   	 * @param   {RiotParser.Node.Text} sourceNode - text node to parse
   	 * @param   {stiring} sourceFile - source file path
