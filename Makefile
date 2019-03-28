@@ -74,7 +74,7 @@ bump:
 	# grab all latest changes to master
 	# (if there's any uncommited changes, it will stop here)
 	# bump version in *.json files
-	@ sed -i '' 's/\("version": "\)[^"]*/\1'$(VERSION)'/' *.json
+	@ sed -i '' 's/\("version": "\)[^"]*/\1'$(VERSION)'/' package.json
 	@ make build
 	@ git status --short
 

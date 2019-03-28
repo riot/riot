@@ -41,6 +41,7 @@
     "curri": "^1.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.4.0",
     "@babel/preset-env": "^7.4.2",
     "babel-minify": "^0.5.0",
     "babel-plugin-istanbul": "^5.1.1",
@@ -58,7 +59,7 @@
     "karma-rollup-preprocessor": "^7.0.0",
     "karma-sauce-launcher": "^2.0.2",
     "mocha": "^6.0.2",
-    "rollup": "^1.7.3",
+    "rollup": "^1.7.4",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-commonjs": "^9.2.2",
     "rollup-plugin-ignore": "^1.0.5",
