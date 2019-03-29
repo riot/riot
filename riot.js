@@ -1,4 +1,4 @@
-/* Riot v4.0.0-beta.4, @license MIT */
+/* Riot v4.0.0-beta.5, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1980,13 +1980,14 @@
         attributes = _ref5.attributes,
         props = _ref5.props;
     const attributeBindings = createAttributeBindings(attributes);
+    const initialProps = callOrAssign(props);
     return autobindMethods(runPlugins(defineProperties(Object.create(component), {
       mount(element, state, parentScope) {
         if (state === void 0) {
           state = {};
         }
 
-        this.props = Object.freeze(Object.assign({}, props, evaluateProps(element, attributes, parentScope)));
+        this.props = Object.freeze(Object.assign({}, initialProps, evaluateProps(element, attributes, parentScope)));
         this.state = computeState(this.state, state);
         this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone();
         this[ATTRIBUTES_KEY_SYMBOL] = attributeBindings.createDOM(element).clone(); // link this object to the DOM node
@@ -2014,7 +2015,7 @@
 
         const newProps = evaluateProps(this.root, attributes, parentScope, this.props);
         if (this.shouldUpdate(newProps, this.props) === false) return;
-        this.props = Object.freeze(Object.assign({}, props, newProps));
+        this.props = Object.freeze(Object.assign({}, initialProps, newProps));
         this.state = computeState(this.state, state);
         this.onBeforeUpdate(this.props, this.state);
 
@@ -2042,7 +2043,7 @@
   /**
    * Component initialization function starting from a DOM node
    * @param   {HTMLElement} element - element to upgrade
-   * @param   {Object} initialProps - initial component state
+   * @param   {Object} initialProps - initial component properties
    * @param   {string} componentName - component id
    * @returns {Object} a new component instance bound to a DOM node
    */
@@ -2110,13 +2111,13 @@
   /**
    * Mounting function that will work only for the components that were globally registered
    * @param   {string|HTMLElement} selector - query for the selection or a DOM element
-   * @param   {Object} initialState - the initial component state
+   * @param   {Object} initialProps - the initial component properties
    * @param   {string} name - optional component name
    * @returns {Array} list of nodes upgraded
    */
 
-  function mount(selector, initialState, name) {
-    return $(selector).map(element => mountComponent(element, initialState, name));
+  function mount(selector, initialProps, name) {
+    return $(selector).map(element => mountComponent(element, initialProps, name));
   }
   /**
    * Sweet unmounting helper function for the DOM node mounted manually by the user
@@ -2169,7 +2170,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-beta.4'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-beta.5'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
