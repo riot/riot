@@ -43,12 +43,12 @@ export function unregister(name) {
 /**
  * Mounting function that will work only for the components that were globally registered
  * @param   {string|HTMLElement} selector - query for the selection or a DOM element
- * @param   {Object} initialState - the initial component state
+ * @param   {Object} initialProps - the initial component properties
  * @param   {string} name - optional component name
  * @returns {Array} list of nodes upgraded
  */
-export function mount(selector, initialState, name) {
-  return $(selector).map(element => mountComponent(element, initialState, name))
+export function mount(selector, initialProps, name) {
+  return $(selector).map(element => mountComponent(element, initialProps, name))
 }
 
 /**

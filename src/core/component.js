@@ -284,7 +284,7 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
 /**
  * Component initialization function starting from a DOM node
  * @param   {HTMLElement} element - element to upgrade
- * @param   {Object} initialProps - initial component state
+ * @param   {Object} initialProps - initial component properties
  * @param   {string} componentName - component id
  * @returns {Object} a new component instance bound to a DOM node
  */
