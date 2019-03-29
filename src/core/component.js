@@ -211,13 +211,14 @@ function addCssHook(element, name) {
  */
 export function enhanceComponentAPI(component, {slots, attributes, props}) {
   const attributeBindings = createAttributeBindings(attributes)
+  const initialProps = callOrAssign(props)
 
   return autobindMethods(
     runPlugins(
       defineProperties(Object.create(component), {
         mount(element, state = {}, parentScope) {
           this.props = Object.freeze({
-            ...props,
+            ...initialProps,
             ...evaluateProps(element, attributes, parentScope)
           })
 
@@ -251,7 +252,7 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
 
           if (this.shouldUpdate(newProps, this.props) === false) return
 
-          this.props = Object.freeze({...props, ...newProps})
+          this.props = Object.freeze({...initialProps, ...newProps})
           this.state = computeState(this.state, state)
 
           this.onBeforeUpdate(this.props, this.state)

@@ -418,6 +418,21 @@ describe('Riot core api', () => {
       component.unmount()
     })
 
+    it('Initial props can be also a function', () => {
+      const mountComponent = riot.component(TitleProps)
+
+      const element = document.createElement('title-prop')
+      const component = mountComponent(element, () => ({ title: 'hello' }))
+
+      expect(component.props.title).to.be.equal('hello')
+
+      component.update()
+
+      expect(component.props.title).to.be.equal('hello')
+
+      component.unmount()
+    })
+
     it('nested components can be loaded in runtime via imports statements', () => {
       riot.register('nested-imports', NestedImportsComponent)
 
