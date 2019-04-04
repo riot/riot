@@ -300,11 +300,10 @@ describe('Riot core api', () => {
     })
 
     it('nested global components can be loaded and mounted', () => {
-      riot.register('global-components', GlobalComponents)
-
+      riot.register('simple', SimpleComponent)
       const element = document.createElement('global-components')
 
-      const component = riot.component(SimpleComponent)(element, {message: 'hello'})
+      const component = riot.component(GlobalComponents)(element, {message: 'hello'})
       expect(component.$('p').innerHTML).to.be.equal('hello')
 
       component.update({message: 'goodbye'})
@@ -312,7 +311,7 @@ describe('Riot core api', () => {
       expect(component.$('p').innerHTML).to.be.equal('goodbye')
 
       component.unmount()
-      riot.unregister('global-components')
+      riot.unregister('simple')
     })
 
 
