@@ -1,4 +1,4 @@
-/* Riot v4.0.0-beta.5, @license MIT */
+/* Riot v4.0.0-beta.6, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2057,17 +2057,30 @@
     return component.mount(element);
   }
 
-  /* eslint-disable */
-  // source: https://30secondsofcode.org/function#compose
-  var compose = (function () {
-    for (var _len = arguments.length, fns = new Array(_len), _key = 0; _key < _len; _key++) {
-      fns[_key] = arguments[_key];
+  /**
+   * Similar to compose but performs from left-to-right function composition.<br/>
+   * {@link https://30secondsofcode.org/function#composeright see also}
+   * @param   {...[function]} fns) - list of unary function
+   * @returns {*} result of the computation
+   */
+  /**
+   * Performs right-to-left function composition.<br/>
+   * Use Array.prototype.reduce() to perform right-to-left function composition.<br/>
+   * The last (rightmost) function can accept one or more arguments; the remaining functions must be unary.<br/>
+   * {@link https://30secondsofcode.org/function#compose original source code}
+   * @param   {...[function]} fns) - list of unary function
+   * @returns {*} result of the computation
+   */
+
+  function compose() {
+    for (var _len2 = arguments.length, fns = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      fns[_key2] = arguments[_key2];
     }
 
     return fns.reduce((f, g) => function () {
       return f(g(...arguments));
     });
-  });
+  }
 
   const DOM_COMPONENT_INSTANCE_PROPERTY$1 = DOM_COMPONENT_INSTANCE_PROPERTY,
         COMPONENTS_IMPLEMENTATION_MAP$1 = COMPONENTS_IMPLEMENTATION_MAP,
@@ -2170,7 +2183,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-beta.5'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-beta.6'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
