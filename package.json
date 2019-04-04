@@ -34,10 +34,11 @@
     "riot.js"
   ],
   "dependencies": {
-    "@riotjs/compiler": "^4.0.0-beta.3",
+    "@riotjs/compiler": "^4.0.0-beta.5",
     "@riotjs/dom-bindings": "^0.11.3",
     "bianco.attr": "^1.0.0",
     "bianco.query": "^1.0.0",
+    "cumpa": "^1.0.1",
     "curri": "^1.0.1"
   },
   "devDependencies": {

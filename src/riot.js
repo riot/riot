@@ -1,7 +1,7 @@
 import * as globals from './globals'
 import {createComponent, defineComponent, mountComponent} from './core/component'
 import $ from 'bianco.query'
-import compose from '@riotjs/compiler/src/utils/compose'
+import compose from 'cumpa'
 import cssManager from './core/css-manager'
 import {isFunction} from './utils/checks'
 import {panic} from './utils/misc'

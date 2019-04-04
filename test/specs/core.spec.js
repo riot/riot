@@ -538,11 +538,11 @@ describe('Riot core api', () => {
     it('multiple expression on the same attribute will be merged', () => {
       const element = document.createElement('merge-attributes')
       const component = riot.component(MergeAttributes)(element, {
-        name: 'jack',
-        surname: 'black'
+        name: 'Jack',
+        surname: 'Black'
       })
 
-      expect(component.root.getAttribute('name')).to.be.equal('jack-black')
+      expect(component.root.getAttribute('name')).to.be.equal('Jack-Black')
 
       component.unmount()
     })
