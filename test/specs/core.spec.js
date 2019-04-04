@@ -535,14 +535,12 @@ describe('Riot core api', () => {
   })
 
   describe('components rendering', () => {
-    it.skip('multiple expression on the same attribute will be merged', () => {
+    it('multiple expression on the same attribute will be merged', () => {
       const element = document.createElement('merge-attributes')
       const component = riot.component(MergeAttributes)(element, {
         name: 'jack',
         surname: 'black'
       })
-
-      console.log(component.root, MergeAttributes) // eslint-disable-line
 
       expect(component.root.getAttribute('name')).to.be.equal('jack-black')
 
