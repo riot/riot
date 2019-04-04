@@ -2,6 +2,7 @@ import * as riot from '../../src/riot'
 
 import DashedAttributeParent from '../tags/dashed-attribute-parent.riot'
 import GlobalComponents from '../tags/global-components.riot'
+import MergeAttributes from '../tags/merge-attributes.riot'
 import NamedSlotsParent from '../tags/named-slots-parent.riot'
 import NestedAliasedImportsComponent from '../tags/nested-aliased-imports.riot'
 import NestedImportsComponent from '../tags/nested-imports.riot'
@@ -39,20 +40,20 @@ describe('Riot core api', () => {
   describe('lifecycle events', () => {
     it('riot.component can mount anonymous components', () => {
       const mountedSpy = spy()
-      const component = riot.component({
+      const MyComponent = {
         exports:  {
           onMounted() {
             mountedSpy()
           }
         }
-      })
+      }
 
       const element = document.createElement('div')
-      const tag = component(element, { isActive: true })
-      expect(tag.root).to.be.equal(element)
-      expect(tag.props.isActive).to.be.ok
+      const component = riot.component(MyComponent)(element, { isActive: true })
+      expect(component.root).to.be.equal(element)
+      expect(component.props.isActive).to.be.ok
       expect(mountedSpy).to.have.been.calledOnce
-      tag.unmount()
+      component.unmount()
     })
 
     it('unmounting components should not preserve the root tag', () => {
@@ -84,7 +85,7 @@ describe('Riot core api', () => {
 
     it('the shouldUpdate method can block all the components updates', () => {
       const updatedSpy = spy()
-      riot.register('my-component', {
+      const MyComponent = {
         exports: {
           onUpdated() {
             updatedSpy()
@@ -93,10 +94,10 @@ describe('Riot core api', () => {
             return false
           }
         }
-      })
+      }
 
       const element = document.createElement('my-component')
-      const [component] = riot.mount(element)
+      const component = riot.component(MyComponent)(element)
 
       component.update()
       component.update()
@@ -105,7 +106,6 @@ describe('Riot core api', () => {
       expect(updatedSpy).to.not.have.been.called
 
       component.unmount()
-      riot.unregister('my-component')
     })
   })
 
@@ -133,26 +133,28 @@ describe('Riot core api', () => {
           }
         }
       })
-      riot.mount(document.createElement('my-component'))
+      const [component] = riot.mount(document.createElement('my-component'))
       expect(mountedSpy).to.have.been.calledOnce
       riot.unregister('my-component')
+      component.unmount()
     })
 
-    it('custom components have core helpers and the root property', () => {
-      riot.register('my-component', {
+    it('custom components have core helpers and the root property', done => {
+      const MyComponent = {
         css: 'my-component { color: red; }',
         exports: {
           onMounted() {
             expect(this.root).to.be.ok
             expect(this.$('div')).to.be.ok
             expect(this.$$('div')).to.be.ok
+            done()
           }
         },
         template: () => template('<div>hello</div>')
-      })
-      const [tag] = riot.mount(document.createElement('my-component'))
-      tag.unmount()
-      riot.unregister('my-component')
+      }
+
+      const component = riot.component(MyComponent)(document.createElement('my-component'))
+      component.unmount()
     })
 
 
@@ -218,7 +220,7 @@ describe('Riot core api', () => {
 
     it('custom components be also functions', () => {
       const mountedSpy = spy()
-      riot.register('my-component', {
+      const MyComponent = {
         css: 'my-component { color: red; }',
         exports() {
           return {
@@ -227,33 +229,37 @@ describe('Riot core api', () => {
             }
           }
         }
-      })
+      }
 
-      riot.mount(document.createElement('div'), {}, 'my-component')
-      riot.mount(document.createElement('div'), {}, 'my-component')
+      const components = [
+        riot.component(MyComponent)(document.createElement('div'), {}),
+        riot.component(MyComponent)(document.createElement('div'), {})
+      ]
 
       expect(mountedSpy).to.have.been.calledTwice
 
-      riot.unregister('my-component')
+      components.forEach(c => c.unmount())
     })
 
     it('custom components be also classes', () => {
       const mountedSpy = spy()
-      riot.register('my-component', {
+      const MyComponent = {
         css: 'my-component { color: red; }',
         exports: class MyComponent {
           onMounted() {
             mountedSpy()
           }
         }
-      })
+      }
 
-      riot.mount(document.createElement('div'), {}, 'my-component')
-      riot.mount(document.createElement('div'), {}, 'my-component')
+      const components = [
+        riot.component(MyComponent)(document.createElement('div'), {}),
+        riot.component(MyComponent)(document.createElement('div'), {})
+      ]
 
       expect(mountedSpy).to.have.been.calledTwice
 
-      riot.unregister('my-component')
+      components.forEach(c => c.unmount())
     })
 
     it('unmounting random DOM nodes will not throw', () => {
@@ -276,13 +282,11 @@ describe('Riot core api', () => {
 
 
     it('nested components can be properly styled', () => {
-      riot.register('nested-aliased-imports', NestedAliasedImportsComponent)
-
       const element = document.createElement('nested-aliased-imports')
 
       document.body.appendChild(element)
 
-      const [component] = riot.mount(element, {message: 'hello'})
+      const component = riot.component(NestedAliasedImportsComponent)(element, {message: 'hello'})
       const p = component.$('p')
       expect(p.innerHTML).to.be.equal('hello')
 
@@ -293,16 +297,14 @@ describe('Riot core api', () => {
       expect(window.getComputedStyle(p).color).to.be.equal('rgb(255, 0, 0)')
 
       component.unmount()
-      riot.unregister('nested-aliased-imports')
     })
 
     it('nested global components can be loaded and mounted', () => {
-      riot.register('simple', SimpleComponent)
       riot.register('global-components', GlobalComponents)
 
       const element = document.createElement('global-components')
 
-      const [component] = riot.mount(element, {message: 'hello'})
+      const component = riot.component(SimpleComponent)(element, {message: 'hello'})
       expect(component.$('p').innerHTML).to.be.equal('hello')
 
       component.update({message: 'goodbye'})
@@ -311,15 +313,12 @@ describe('Riot core api', () => {
 
       component.unmount()
       riot.unregister('global-components')
-      riot.unregister('simple')
     })
 
 
     it('is directives can be evaluated in runtime', () => {
-      riot.register('runtime-is-directive', RuntimeIsDirective)
       const element = document.createElement('runtime-is-directive')
-
-      const [component] = riot.mount(element)
+      const component = riot.component(RuntimeIsDirective)(element)
       const child = component.$('.child')
 
       expect(normalizeInnerHTML(child.textContent)).to.be.equal('I am a child')
@@ -338,7 +337,6 @@ describe('Riot core api', () => {
       expect(normalizeInnerHTML(child.textContent)).to.be.equal('I am a child')
 
       component.unmount()
-      riot.unregister('runtime-is-directive')
     })
   })
 
@@ -349,19 +347,20 @@ describe('Riot core api', () => {
         component.hello = 'hello'
       }
 
-      riot.register('my-component', {
+      const MyComponent = {
+        name: 'my-component',
         css: 'my-component { color: red; }',
         exports: {
           onBeforeMount() {
             expect(this.hello).to.be.ok
           }
         }
-      })
+      }
 
       riot.install(hello)
-      riot.mount(document.createElement('my-component'))
+      const component = riot.component(MyComponent)(document.createElement('my-component'))
       riot.uninstall(hello)
-      riot.unregister('my-component')
+      component.unmount()
     })
 
     it('the same plugin can\'t be installed twice', () => {
@@ -388,11 +387,8 @@ describe('Riot core api', () => {
 
   describe('components state and props', () => {
     it('components will receive and update properly their state property', () => {
-      riot.register('simple-component', SimpleComponent)
-
       const element = document.createElement('simple-component')
-
-      const [component] = riot.mount(element, {message: 'hello'})
+      const component = riot.component(SimpleComponent)(element, {message: 'hello'})
       const p = component.$('p')
       expect(p.innerHTML).to.be.equal('hello')
 
@@ -400,14 +396,12 @@ describe('Riot core api', () => {
 
       expect(p.innerHTML).to.be.equal('goodbye')
 
-      riot.unregister('simple-component')
+      component.unmount()
     })
 
     it('Initial props should not be lost on the consequent updates', () => {
-      const mountComponent = riot.component(TitleProps)
-
       const element = document.createElement('title-prop')
-      const component = mountComponent(element, { title: 'hello' })
+      const component = riot.component(TitleProps)(element, { title: 'hello' })
 
       expect(component.props.title).to.be.equal('hello')
 
@@ -419,10 +413,8 @@ describe('Riot core api', () => {
     })
 
     it('Initial props can be also a function', () => {
-      const mountComponent = riot.component(TitleProps)
-
       const element = document.createElement('title-prop')
-      const component = mountComponent(element, () => ({ title: 'hello' }))
+      const component = riot.component(TitleProps)(element, () => ({ title: 'hello' }))
 
       expect(component.props.title).to.be.equal('hello')
 
@@ -434,11 +426,9 @@ describe('Riot core api', () => {
     })
 
     it('nested components can be loaded in runtime via imports statements', () => {
-      riot.register('nested-imports', NestedImportsComponent)
-
       const element = document.createElement('nested-imports')
 
-      const [component] = riot.mount(element, {message: 'hello'})
+      const component = riot.component(NestedImportsComponent)(element, {message: 'hello'})
       const p = component.$('p')
       expect(p.innerHTML).to.be.equal('hello')
 
@@ -447,15 +437,12 @@ describe('Riot core api', () => {
       expect(p.innerHTML).to.be.equal('goodbye')
 
       component.unmount()
-      riot.unregister('nested-imports')
     })
 
     it('nested components can update properly their internal state', () => {
-      riot.register('nested-imports', NestedImportsComponent)
-
       const element = document.createElement('nested-imports')
 
-      const [component] = riot.mount(element, {message: 'hello'})
+      const component = riot.component(NestedImportsComponent)(element, {message: 'hello'})
       const p = component.$('p')
 
       expect(p.innerHTML).to.be.equal('hello')
@@ -463,12 +450,11 @@ describe('Riot core api', () => {
       expect(p.innerHTML).to.be.equal('clicked')
 
       component.unmount()
-      riot.unregister('nested-imports')
     })
 
     it('simple attribute can be properly evaluated', () => {
       const mountedSpy = spy()
-      riot.register('my-component', {
+      const MyComponent = {
         css: 'my-component { color: red; }',
         exports: {
           onMounted() {
@@ -476,62 +462,50 @@ describe('Riot core api', () => {
             mountedSpy()
           }
         }
-      })
+      }
 
       const element = document.createElement('my-component')
 
       element.setAttribute('name', 'foo')
 
-      const [tag] = riot.mount(element)
+      const component = riot.component(MyComponent)(element)
 
       expect(mountedSpy).to.have.been.calledOnce
-      tag.unmount()
-      riot.unregister('my-component')
+      component.unmount()
     })
 
     it('spread attributes can be properly evaluated', () => {
-      riot.register('spread-attribute', SpreadAttribute)
       const element = document.createElement('spread-attribute')
-
-      const [component] = riot.mount(element)
+      const component = riot.component(SpreadAttribute)(element)
 
       expect(component.$('p').getAttribute('hidden')).to.be.ok
 
       component.unmount()
-      riot.unregister('spread-attribute')
     })
 
     it('dashed attributes will be camelized', () => {
-      riot.register('dashed-attribute-parent', DashedAttributeParent)
       const element = document.createElement('dashed-attribute-parent')
-
-      const [component] = riot.mount(element)
+      const component = riot.component(DashedAttributeParent)(element)
 
       expect(component.$('dashed-attribute-child p').innerHTML).to.be.equal('hello')
 
       component.unmount()
-      riot.unregister('dashed-attribute-parent')
     })
   })
 
   describe('slots', () => {
     it('default slots will be properly rendered', () => {
-      riot.register('parent-with-slots', ParentWithSlotsComponent)
       const element = document.createElement('parent-with-slots')
-
-      const [component] = riot.mount(element, { message: 'hello' })
+      const component = riot.component(ParentWithSlotsComponent)(element, { message: 'hello' })
 
       expect(normalizeInnerHTML(component.$('simple-slot').innerHTML)).to.be.equal('hello')
 
       component.unmount()
-      riot.unregister('parent-with-slots')
     })
 
     it('named slots will be properly rendered', () => {
-      riot.register('named-slots-parent', NamedSlotsParent)
       const element = document.createElement('named-slots-parent')
-
-      const [component] = riot.mount(element)
+      const component = riot.component(NamedSlotsParent)(element)
 
       expect(normalizeInnerHTML(component.$('named-slots header span').innerHTML)).to.be.equal(component.state.header)
       expect(normalizeInnerHTML(component.$('named-slots footer span').innerHTML)).to.be.equal(component.state.footer)
@@ -542,14 +516,11 @@ describe('Riot core api', () => {
       expect(normalizeInnerHTML(component.$('named-slots header span').innerHTML)).to.be.equal(component.state.header)
 
       component.unmount()
-      riot.unregister('named-slots-parent')
     })
 
     it('<slot> tags will be removed if there will be no markup to inject', () => {
-      riot.register('simple-slot', SimpleSlot)
       const element = document.createElement('simple-slot')
-
-      const [component] = riot.mount(element)
+      const component = riot.component(SimpleSlot)(element)
 
       expect(component.$('slot')).to.be.not.ok
       expect(component.root.innerHTML).to.be.not.ok
@@ -560,7 +531,22 @@ describe('Riot core api', () => {
       expect(component.root.innerHTML).to.be.not.ok
 
       component.unmount()
-      riot.unregister('simple-slot')
+    })
+  })
+
+  describe('components rendering', () => {
+    it.skip('multiple expression on the same attribute will be merged', () => {
+      const element = document.createElement('merge-attributes')
+      const component = riot.component(MergeAttributes)(element, {
+        name: 'jack',
+        surname: 'black'
+      })
+
+      console.log(component.root, MergeAttributes) // eslint-disable-line
+
+      expect(component.root.getAttribute('name')).to.be.equal('jack-black')
+
+      component.unmount()
     })
   })
 })
