@@ -19,7 +19,7 @@
 
 # Important
 
-This branch hosts the work for riot4 it's not stable and it's not meant to be used only by the riot core contributors
+This branch hosts the work for riot4 it's not stable and it's meant to be used only by the riot core contributors
 
 ### How to contribute
 
