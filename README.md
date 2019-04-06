@@ -2,6 +2,10 @@
 [![Riot logo](https://riot.js.org/img/logo/riot480x.png)](https://riot.js.org)
 
 
+# IMPORTANT NEWS: Riot.js V4
+
+Riot.js@4 will be soon released. Make sure to check the new API and what's changed on https://riot.js.org/next/
+
 ## Simple and elegant component-based UI library
 
 [![Build Status][travis-image]][travis-url]
