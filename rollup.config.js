@@ -18,7 +18,7 @@ module.exports = {
   plugins: [
     ignore(builtinModules),
     resolve({
-      jsnext: true
+      mainFields: ['module', 'main', 'next']
     }),
     commonjs(),
     json(),
