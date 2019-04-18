@@ -1,4 +1,4 @@
-/* Riot v4.0.0-rc.1, @license MIT */
+/* Riot v4.0.0-rc.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -324,7 +324,7 @@
    */
   function cleanNode(node) {
     const children = node.childNodes;
-    children.forEach(n => node.removeChild(n));
+    Array.from(children).forEach(n => node.removeChild(n));
   }
 
   const EACH = 0;
@@ -931,8 +931,8 @@
           break;
 
         case mustUnmount:
-          swap(this.placeholder, this.node);
           this.unmount(scope);
+          swap(this.placeholder, this.node);
           break;
 
         default:
@@ -2183,7 +2183,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-rc.1'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-rc.2'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,

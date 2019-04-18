@@ -6,11 +6,10 @@ const resolve = require('rollup-plugin-node-resolve')
 const babel = require('rollup-plugin-babel')
 
 module.exports = {
-  output: {
+  output: [{
     banner: '/* Riot WIP, @license MIT */',
-    format: 'umd',
     name: 'riot'
-  },
+  }],
   onwarn: function(error) {
     if (/external dependency|Circular dependency/.test(error.message)) return
     console.error(error.message) // eslint-disable-line
