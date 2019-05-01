@@ -3,15 +3,6 @@ import {get as getAttr} from 'bianco.attr'
 import {normalizeAttribute} from './misc'
 
 /**
- * Get the document window
- * @returns {Object} window object
- */
-export function getWindow() {
-  return typeof window === 'undefined' ? /* istanbul ignore next */ undefined : window
-}
-
-
-/**
  * Get all the element attributes as object
  * @param   {HTMLElement} element - DOM node we want to parse
  * @returns {Object} all the attributes found as a key value pairs

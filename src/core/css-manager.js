@@ -1,21 +1,28 @@
 import $ from 'bianco.query'
-import {getWindow} from '../utils/dom'
 import {set as setAttr} from 'bianco.attr'
 
-export const WIN = getWindow()
 export const CSS_BY_NAME = new Map()
 export const STYLE_NODE_SELECTOR = 'style[riot]'
 
-// skip the following code on the server
-const styleNode = WIN && ((() => {
-  // create a new style element or use an existing one
-  const style = $(STYLE_NODE_SELECTOR)[0] || document.createElement('style')
-  setAttr(style, 'type', 'text/css')
+// memoized curried function
+const getStyleNode = (style => {
+  return () => {
+    // lazy evaluation:
+    // if this function was already called before
+    // we return its cached result
+    if (style) return style
 
-  if (!style.parentNode) document.head.appendChild(style)
+    // create a new style element or use an existing one
+    // and cache it internally
+    style = $(STYLE_NODE_SELECTOR)[0] || document.createElement('style')
+    setAttr(style, 'type', 'text/css')
 
-  return style
-}))()
+    /* istanbul ignore next */
+    if (!style.parentNode) document.head.appendChild(style)
+
+    return style
+  }
+})()
 
 /**
  * Object that will be used to inject and manage the css of every tag instance
@@ -41,10 +48,7 @@ export default {
    * @returns {Object} self
    */
   inject() {
-    // a node environment can't rely on css
-    /* istanbul ignore next */
-    if (!styleNode) return this
-    styleNode.innerHTML = [...CSS_BY_NAME.values()].join('\n')
+    getStyleNode().innerHTML = [...CSS_BY_NAME.values()].join('\n')
     return this
   },
 
@@ -54,9 +58,6 @@ export default {
    * @returns {Object} self
    */
   remove(name) {
-    // a node environment can't rely on css
-    /* istanbul ignore next */
-    if (!styleNode) return this
     if (CSS_BY_NAME.has(name)) {
       CSS_BY_NAME.delete(name)
       this.inject()

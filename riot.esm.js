@@ -1,4 +1,4 @@
-/* Riot v4.0.0-rc.3, @license MIT */
+/* Riot v4.0.0-rc.4, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -278,16 +278,6 @@ function evaluateAttributeExpressions(attributes, scope) {
   }, {});
 }
 
-/**
- * Get the document window
- * @returns {Object} window object
- */
-
-function getWindow() {
-  return typeof window === 'undefined' ?
-  /* istanbul ignore next */
-  undefined : window;
-}
 /**
  * Get all the element attributes as object
  * @param   {HTMLElement} element - DOM node we want to parse
@@ -1673,16 +1663,24 @@ function createSlots(root, slots) {
   };
 }
 
-const WIN = getWindow();
 const CSS_BY_NAME = new Map();
-const STYLE_NODE_SELECTOR = 'style[riot]'; // skip the following code on the server
+const STYLE_NODE_SELECTOR = 'style[riot]'; // memoized curried function
 
-const styleNode = WIN && (() => {
-  // create a new style element or use an existing one
-  const style = $(STYLE_NODE_SELECTOR)[0] || document.createElement('style');
-  set(style, 'type', 'text/css');
-  if (!style.parentNode) document.head.appendChild(style);
-  return style;
+const getStyleNode = (style => {
+  return () => {
+    // lazy evaluation:
+    // if this function was already called before
+    // we return its cached result
+    if (style) return style; // create a new style element or use an existing one
+    // and cache it internally
+
+    style = $(STYLE_NODE_SELECTOR)[0] || document.createElement('style');
+    set(style, 'type', 'text/css');
+    /* istanbul ignore next */
+
+    if (!style.parentNode) document.head.appendChild(style);
+    return style;
+  };
 })();
 /**
  * Object that will be used to inject and manage the css of every tag instance
@@ -1711,11 +1709,7 @@ var cssManager = {
    * @returns {Object} self
    */
   inject() {
-    // a node environment can't rely on css
-
-    /* istanbul ignore next */
-    if (!styleNode) return this;
-    styleNode.innerHTML = [...CSS_BY_NAME.values()].join('\n');
+    getStyleNode().innerHTML = [...CSS_BY_NAME.values()].join('\n');
     return this;
   },
 
@@ -1725,11 +1719,6 @@ var cssManager = {
    * @returns {Object} self
    */
   remove(name) {
-    // a node environment can't rely on css
-
-    /* istanbul ignore next */
-    if (!styleNode) return this;
-
     if (CSS_BY_NAME.has(name)) {
       CSS_BY_NAME.delete(name);
       this.inject();
@@ -2178,7 +2167,7 @@ function component(implementation) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.0.0-rc.3'; // expose some internal stuff that might be used from external tools
+const version = 'v4.0.0-rc.4'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
