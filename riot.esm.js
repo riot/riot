@@ -1,4 +1,4 @@
-/* Riot v4.0.0-rc.4, @license MIT */
+/* Riot v4.0.0-rc.5, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -1688,6 +1688,8 @@ const getStyleNode = (style => {
 
 
 var cssManager = {
+  CSS_BY_NAME,
+
   /**
    * Save a tag style to be later injected into DOM
    * @param { string } name - if it's passed we will map the css to a tagname
@@ -2167,7 +2169,7 @@ function component(implementation) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.0.0-rc.4'; // expose some internal stuff that might be used from external tools
+const version = 'v4.0.0-rc.5'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
