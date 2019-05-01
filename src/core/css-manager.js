@@ -1,17 +1,20 @@
+import $ from 'bianco.query'
 import {getWindow} from '../utils/dom'
 import {set as setAttr} from 'bianco.attr'
 
-const WIN = getWindow()
-const CSS_BY_NAME = new Map()
+export const WIN = getWindow()
+export const CSS_BY_NAME = new Map()
+export const STYLE_NODE_SELECTOR = 'style[riot]'
 
 // skip the following code on the server
 const styleNode = WIN && ((() => {
-  // create a new style element with the correct type
-  const newNode = document.createElement('style')
-  setAttr(newNode, 'type', 'text/css')
-  document.head.appendChild(newNode)
+  // create a new style element or use an existing one
+  const style = $(STYLE_NODE_SELECTOR)[0] || document.createElement('style')
+  setAttr(style, 'type', 'text/css')
 
-  return newNode
+  if (!style.parentNode) document.head.appendChild(style)
+
+  return style
 }))()
 
 /**

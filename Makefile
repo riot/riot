@@ -117,4 +117,4 @@ publish:
 	@ git push origin master
 	@ git push origin master --tags
 
-.PHONY: test min eslint test-coveralls test-sauce compare raw riot perf watch tags perf-leaks build bump bump-undo version version-undo release-undo publish
+.PHONY: test min eslint test-coveralls test-sauce raw riot build bump bump-undo version version-undo release-undo publish
