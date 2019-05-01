@@ -1,4 +1,4 @@
-/* Riot v4.0.0-rc.2, @license MIT */
+/* Riot v4.0.0-rc.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1680,14 +1680,15 @@
   }
 
   const WIN = getWindow();
-  const CSS_BY_NAME = new Map(); // skip the following code on the server
+  const CSS_BY_NAME = new Map();
+  const STYLE_NODE_SELECTOR = 'style[riot]'; // skip the following code on the server
 
   const styleNode = WIN && (() => {
-    // create a new style element with the correct type
-    const newNode = document.createElement('style');
-    set(newNode, 'type', 'text/css');
-    document.head.appendChild(newNode);
-    return newNode;
+    // create a new style element or use an existing one
+    const style = $(STYLE_NODE_SELECTOR)[0] || document.createElement('style');
+    set(style, 'type', 'text/css');
+    if (!style.parentNode) document.head.appendChild(style);
+    return style;
   })();
   /**
    * Object that will be used to inject and manage the css of every tag instance
@@ -2183,7 +2184,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-rc.2'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-rc.3'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
