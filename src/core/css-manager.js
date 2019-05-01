@@ -28,6 +28,7 @@ const getStyleNode = (style => {
  * Object that will be used to inject and manage the css of every tag instance
  */
 export default {
+  CSS_BY_NAME,
   /**
    * Save a tag style to be later injected into DOM
    * @param { string } name - if it's passed we will map the css to a tagname
