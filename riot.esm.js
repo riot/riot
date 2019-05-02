@@ -1,4 +1,4 @@
-/* Riot v4.0.0-rc.5, @license MIT */
+/* Riot v4.0.0-rc.6, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -269,11 +269,17 @@ function defineProperties(source, properties, options) {
 
 function evaluateAttributeExpressions(attributes, scope) {
   return attributes.reduce((acc, attribute) => {
+    const value = attribute.evaluate(scope); // spread attributes should be handled differently
+
+    if (!attribute.name) {
+      return Object.assign({}, acc, value);
+    }
+
     const attr = normalizeAttribute({
-      value: attribute.evaluate(scope),
+      value,
       name: attribute.name
     });
-    acc[dashToCamelCase(attr.name)] = attr.value;
+    acc[attr.name] = attr.value;
     return acc;
   }, {});
 }
@@ -2169,7 +2175,7 @@ function component(implementation) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.0.0-rc.5'; // expose some internal stuff that might be used from external tools
+const version = 'v4.0.0-rc.6'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
