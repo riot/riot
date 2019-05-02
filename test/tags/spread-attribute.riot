@@ -1,8 +1,14 @@
 <spread-attribute>
   <p {...state.attributes}>I am a tag</p>
+  <child {...state.attributes}></child>
 
   <script>
+    import Child from './child.riot'
+
     export default {
+      components: {
+        Child,
+      },
       state: {
         attributes: {
           hidden: true

@@ -478,6 +478,7 @@ describe('Riot core api', () => {
       const component = riot.component(SpreadAttribute)(element)
 
       expect(component.$('p').getAttribute('hidden')).to.be.ok
+      expect(component.$('child').getAttribute('hidden')).to.be.ok
 
       component.unmount()
     })

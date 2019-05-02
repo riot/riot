@@ -127,9 +127,19 @@ export function defineProperties(source, properties, options) {
  */
 export function evaluateAttributeExpressions(attributes, scope) {
   return attributes.reduce((acc, attribute) => {
-    const attr = normalizeAttribute({ value: attribute.evaluate(scope), name: attribute.name })
+    const value = attribute.evaluate(scope)
 
-    acc[dashToCamelCase(attr.name)] = attr.value
+    // spread attributes should be handled differently
+    if (!attribute.name) {
+      return {
+        ...acc,
+        ...value
+      }
+    }
+
+    const attr = normalizeAttribute({ value, name: attribute.name })
+
+    acc[attr.name] = attr.value
 
     return acc
   }, {})
