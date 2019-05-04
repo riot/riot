@@ -1,4 +1,4 @@
-/* Riot v4.0.0-rc.6, @license MIT */
+/* Riot v4.0.0-rc.7, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1711,9 +1711,9 @@
     add(name, css) {
       if (!CSS_BY_NAME.has(name)) {
         CSS_BY_NAME.set(name, css);
+        this.inject();
       }
 
-      this.inject();
       return this;
     },
 
@@ -2181,7 +2181,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-rc.6'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-rc.7'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
