@@ -36,9 +36,7 @@ export default {
    * @returns {Object} self
    */
   add(name, css) {
-    if (!CSS_BY_NAME.has(name)) {
-      CSS_BY_NAME.set(name, css)
-    }
+    CSS_BY_NAME.set(name, css)
 
     this.inject()
     return this
