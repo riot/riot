@@ -38,9 +38,9 @@ export default {
   add(name, css) {
     if (!CSS_BY_NAME.has(name)) {
       CSS_BY_NAME.set(name, css)
+      this.inject()
     }
 
-    this.inject()
     return this
   },
   /**
