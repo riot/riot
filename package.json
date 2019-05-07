@@ -34,7 +34,7 @@
     "riot.js"
   ],
   "dependencies": {
-    "@riotjs/compiler": "^4.0.0",
+    "@riotjs/compiler": "^4.0.2",
     "@riotjs/dom-bindings": "^1.0.0",
     "bianco.attr": "^1.0.0",
     "bianco.query": "^1.0.0",
@@ -60,7 +60,7 @@
     "karma-rollup-preprocessor": "^7.0.0",
     "karma-sauce-launcher": "^2.0.2",
     "mocha": "^6.1.4",
-    "rollup": "^1.11.2",
+    "rollup": "^1.11.3",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-commonjs": "^9.3.4",
     "rollup-plugin-ignore": "^1.0.5",

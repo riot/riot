@@ -22,7 +22,7 @@ describe('Riot compiler api', () => {
   })
 
   it('compiler can load asynchronously tags via url', async function() {
-    const {code} = await riot.compileFromUrl('/tags/simple.riot')
+    const {code} = await riot.compileFromUrl('/components/simple.riot')
 
     expect(code).to.match(/scope\.props\.message/)
   })
@@ -30,7 +30,7 @@ describe('Riot compiler api', () => {
   it('compiler can load asynchronously script tags', async function() {
     const script = document.createElement('script')
     script.setAttribute('type', 'riot')
-    script.setAttribute('data-src', 'tags/simple.riot')
+    script.setAttribute('data-src', 'components/simple.riot')
     document.body.appendChild(script)
     await riot.compile()
 

@@ -15,14 +15,14 @@ module.exports = function(conf) {
     autoWatch: true,
     frameworks: ['mocha'],
     proxies: {
-      '/tags/': '/base/tags/'
+      '/components/': '/base/components/'
     },
     files: [
       '../node_modules/chai/chai.js',
       '../node_modules/sinon/pkg/sinon.js',
       '../node_modules/sinon-chai/lib/sinon-chai.js',
       {
-        pattern: 'tags/*.riot',
+        pattern: 'components/*.riot',
         served: true,
         included: false
       },

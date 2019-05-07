@@ -1,0 +1,19 @@
+<each-and-spread-attribute>
+  <p {...state.attributes}>I am a tag</p>
+  <child each={item in items} {...item}></child>
+
+  <script>
+    import Child from './child.riot'
+
+    export default {
+      components: {
+        Child,
+      },
+      items: [{
+        name: 'hello'
+      }, {
+        name: 'there'
+      }]
+    }
+  </script>
+</each-and-spread-attribute>

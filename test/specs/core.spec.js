@@ -1,17 +1,18 @@
 import * as riot from '../../src/riot'
 
-import DashedAttributeParent from '../tags/dashed-attribute-parent.riot'
-import GlobalComponents from '../tags/global-components.riot'
-import MergeAttributes from '../tags/merge-attributes.riot'
-import NamedSlotsParent from '../tags/named-slots-parent.riot'
-import NestedAliasedImportsComponent from '../tags/nested-aliased-imports.riot'
-import NestedImportsComponent from '../tags/nested-imports.riot'
-import ParentWithSlotsComponent from '../tags/parent-with-slots.riot'
-import RuntimeIsDirective from '../tags/runtime-is-directive.riot'
-import SimpleComponent from '../tags/simple.riot'
-import SimpleSlot from '../tags/simple-slot.riot'
-import SpreadAttribute from '../tags/spread-attribute.riot'
-import TitleProps from '../tags/title-prop.riot'
+import DashedAttributeParent from '../components/dashed-attribute-parent.riot'
+import GlobalComponents from '../components/global-components.riot'
+import EachAndSpreadAttribute from '../components/each-and-spread-attribute.riot'
+import MergeAttributes from '../components/merge-attributes.riot'
+import NamedSlotsParent from '../components/named-slots-parent.riot'
+import NestedAliasedImportsComponent from '../components/nested-aliased-imports.riot'
+import NestedImportsComponent from '../components/nested-imports.riot'
+import ParentWithSlotsComponent from '../components/parent-with-slots.riot'
+import RuntimeIsDirective from '../components/runtime-is-directive.riot'
+import SimpleComponent from '../components/simple.riot'
+import SimpleSlot from '../components/simple-slot.riot'
+import SpreadAttribute from '../components/spread-attribute.riot'
+import TitleProps from '../components/title-prop.riot'
 
 import {expect} from 'chai'
 import {spy} from 'sinon'
@@ -479,6 +480,16 @@ describe('Riot core api', () => {
 
       expect(component.$('p').getAttribute('hidden')).to.be.ok
       expect(component.$('child').getAttribute('hidden')).to.be.ok
+
+      component.unmount()
+    })
+
+    it('spread attributes works also together with each directives', () => {
+      const element = document.createElement('each-and-spread-attribute')
+      const component = riot.component(EachAndSpreadAttribute)(element)
+
+      expect(component.$$('child')[0].getAttribute('name')).to.be.ok
+      expect(component.$$('child')[1].getAttribute('name')).to.be.ok
 
       component.unmount()
     })
