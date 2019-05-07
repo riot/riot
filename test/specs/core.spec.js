@@ -1,8 +1,8 @@
 import * as riot from '../../src/riot'
 
 import DashedAttributeParent from '../components/dashed-attribute-parent.riot'
-import GlobalComponents from '../components/global-components.riot'
 import EachAndSpreadAttribute from '../components/each-and-spread-attribute.riot'
+import GlobalComponents from '../components/global-components.riot'
 import MergeAttributes from '../components/merge-attributes.riot'
 import NamedSlotsParent from '../components/named-slots-parent.riot'
 import NestedAliasedImportsComponent from '../components/nested-aliased-imports.riot'
