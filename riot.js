@@ -1,4 +1,4 @@
-/* Riot v4.0.0-rc.9, @license MIT */
+/* Riot v4.0.0-rc.10, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -10,8 +10,7 @@
         PLUGINS_SET = new Set(),
         IS_DIRECTIVE = 'is',
         ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
-        TEMPLATE_KEY_SYMBOL = Symbol('template'),
-        SLOTS_KEY_SYMBOL = Symbol('slots');
+        TEMPLATE_KEY_SYMBOL = Symbol('template');
 
   var globals = /*#__PURE__*/Object.freeze({
     COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
@@ -19,8 +18,7 @@
     PLUGINS_SET: PLUGINS_SET,
     IS_DIRECTIVE: IS_DIRECTIVE,
     ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
-    TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL,
-    SLOTS_KEY_SYMBOL: SLOTS_KEY_SYMBOL
+    TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL
   });
 
   /**
@@ -327,11 +325,13 @@
   const IF = 1;
   const SIMPLE = 2;
   const TAG = 3;
+  const SLOT = 4;
   var bindingTypes = {
     EACH,
     IF,
     SIMPLE,
-    TAG
+    TAG,
+    SLOT
   };
   /* get rid of the @ungap/essential-map polyfill */
 
@@ -1216,6 +1216,75 @@
     let expressions = _ref9.expressions;
     return Object.assign({}, flattenCollectionMethods(expressions.map(expression => create$2(node, expression)), ['mount', 'update', 'unmount']));
   }
+
+  const SlotBinding = Object.seal({
+    // dynamic binding properties
+    node: null,
+    name: null,
+    template: null,
+
+    // API methods
+    mount(scope, parentScope) {
+      const templateData = scope.slots ? scope.slots.find((_ref10) => {
+        let id = _ref10.id;
+        return id === this.name;
+      }) : false;
+      const parentNode = this.node.parentNode;
+      this.template = templateData && create$6(templateData.html, templateData.bindings).createDOM(parentNode);
+
+      if (this.template) {
+        this.template.mount(this.node, parentScope);
+        moveSlotInnerContent(this.node);
+      }
+
+      parentNode.removeChild(this.node);
+      return this;
+    },
+
+    update(scope, parentScope) {
+      if (this.template) {
+        this.template.update(parentScope);
+      }
+
+      return this;
+    },
+
+    unmount(scope, parentScope) {
+      if (this.template) {
+        this.template.unmount(parentScope);
+      }
+
+      return this;
+    }
+
+  });
+  /**
+   * Move the inner content of the slots outside of them
+   * @param   {HTMLNode} slot - slot node
+   * @returns {undefined} it's a void function
+   */
+
+  function moveSlotInnerContent(slot) {
+    if (slot.firstChild) {
+      slot.parentNode.insertBefore(slot.firstChild, slot);
+      moveSlotInnerContent(slot);
+    }
+  }
+  /**
+   * Create a single slot binding
+   * @param   {HTMLElement} node - slot node
+   * @param   {string} options.name - slot id
+   * @returns {Object} Slot binding object
+   */
+
+
+  function createSlot(node, _ref11) {
+    let name = _ref11.name;
+    return Object.assign({}, SlotBinding, {
+      node,
+      name
+    });
+  }
   /**
    * Create a new tag object if it was registered before, otherwise fallback to the simple
    * template chunk
@@ -1262,8 +1331,8 @@
 
 
   function slotBindings(slots) {
-    return slots.reduce((acc, _ref10) => {
-      let bindings = _ref10.bindings;
+    return slots.reduce((acc, _ref12) => {
+      let bindings = _ref12.bindings;
       return acc.concat(bindings);
     }, []);
   }
@@ -1322,11 +1391,11 @@
 
   });
 
-  function create$4(node, _ref11) {
-    let evaluate = _ref11.evaluate,
-        getComponent = _ref11.getComponent,
-        slots = _ref11.slots,
-        attributes = _ref11.attributes;
+  function create$4(node, _ref13) {
+    let evaluate = _ref13.evaluate,
+        getComponent = _ref13.getComponent,
+        slots = _ref13.slots,
+        attributes = _ref13.attributes;
     return Object.assign({}, TagBinding, {
       node,
       evaluate,
@@ -1340,7 +1409,8 @@
     [IF]: create$1,
     [SIMPLE]: create$3,
     [EACH]: create,
-    [TAG]: create$4
+    [TAG]: create$4,
+    [SLOT]: createSlot
   };
   /**
    * Bind a new expression object to a DOM node
@@ -1475,9 +1545,10 @@
      * Attach the template to a DOM node
      * @param   {HTMLElement} el - target DOM node
      * @param   {*} scope - template data
+     * @param   {*} parentScope - scope of the parent template tag
      * @returns {TemplateChunk} self
      */
-    mount(el, scope) {
+    mount(el, scope, parentScope) {
       if (!el) throw new Error('Please provide DOM node to mount properly your template');
       if (this.el) this.unmount(scope);
       this.el = el; // create the DOM if it wasn't created before
@@ -1486,29 +1557,31 @@
       if (this.dom) injectDOM(el, this.dom.cloneNode(true)); // create the bindings
 
       this.bindings = this.bindingsData.map(binding => create$5(this.el, binding));
-      this.bindings.forEach(b => b.mount(scope));
+      this.bindings.forEach(b => b.mount(scope, parentScope));
       return this;
     },
 
     /**
      * Update the template with fresh data
      * @param   {*} scope - template data
+     * @param   {*} parentScope - scope of the parent template tag
      * @returns {TemplateChunk} self
      */
-    update(scope) {
-      this.bindings.forEach(b => b.update(scope));
+    update(scope, parentScope) {
+      this.bindings.forEach(b => b.update(scope, parentScope));
       return this;
     },
 
     /**
      * Remove the template from the node where it was initially mounted
      * @param   {*} scope - template data
+     * @param   {*} parentScope - scope of the parent template tag
      * @param   {boolean} mustRemoveRoot - if true remove the root element
      * @returns {TemplateChunk} self
      */
-    unmount(scope, mustRemoveRoot) {
+    unmount(scope, parentScope, mustRemoveRoot) {
       if (this.el) {
-        this.bindings.forEach(b => b.unmount(scope));
+        this.bindings.forEach(b => b.unmount(scope, parentScope));
         cleanNode(this.el);
 
         if (mustRemoveRoot && this.el.parentNode) {
@@ -1559,120 +1632,6 @@
 
   function $(selector, ctx) {
     return domToArray(typeof selector === 'string' ? (ctx || document).querySelectorAll(selector) : selector);
-  }
-
-  /**
-   * Binding responsible for the slots
-   */
-
-  const Slot = Object.seal({
-    // dynamic binding properties
-    node: null,
-    name: null,
-    template: null,
-
-    // API methods
-    mount(scope) {
-      if (this.template) {
-        this.template.mount(this.node, scope);
-        moveSlotInnerContent(this.node);
-      } else {
-        this.node.parentNode.removeChild(this.node);
-      }
-
-      return this;
-    },
-
-    update(scope) {
-      if (this.template) {
-        this.template.update(scope);
-      }
-
-      return this;
-    },
-
-    unmount(scope) {
-      if (this.template) {
-        this.template.unmount(scope);
-      }
-
-      return this;
-    }
-
-  });
-  /**
-   * Move the inner content of the slots outside of them
-   * @param   {HTMLNode} slot - slot node
-   * @returns {undefined} it's a void function
-   */
-
-  function moveSlotInnerContent(slot) {
-    if (slot.firstChild) {
-      slot.parentNode.insertBefore(slot.firstChild, slot);
-      moveSlotInnerContent(slot);
-    }
-
-    if (slot.parentNode) {
-      slot.parentNode.removeChild(slot);
-    }
-  }
-  /**
-   * Create a single slot binding
-   * @param   {HTMLElement} root - component root
-   * @param   {HTMLElement} node - slot node
-   * @param   {string} options.name - slot id
-   * @param   {Array} options.slots - component slots
-   * @returns {Object} Slot binding object
-   */
-
-
-  function createSlot(root, node, _ref) {
-    let name = _ref.name,
-        slots = _ref.slots;
-    const templateData = slots.find((_ref2) => {
-      let id = _ref2.id;
-      return id === name;
-    });
-    return Object.assign({}, Slot, {
-      node,
-      name,
-      template: templateData && create$6(templateData.html, templateData.bindings).createDOM(root)
-    });
-  }
-  /**
-   * Create the object that will manage the slots
-   * @param   {HTMLElement} root - component root element
-   * @param   {Array} slots - slots objects containing html and bindings
-   * @return  {Object} tag like interface that will manage all the slots
-   */
-
-
-  function createSlots(root, slots) {
-    const slotNodes = $('slot', root);
-    const slotsBindings = slotNodes.map(node => {
-      const name = get(node, 'name') || 'default';
-      return createSlot(root, node, {
-        name,
-        slots
-      });
-    });
-    return {
-      mount(scope) {
-        slotsBindings.forEach(s => s.mount(scope));
-        return this;
-      },
-
-      update(scope) {
-        slotsBindings.forEach(s => s.update(scope));
-        return this;
-      },
-
-      unmount(scope) {
-        slotsBindings.forEach(s => s.unmount(scope));
-        return this;
-      }
-
-    };
   }
 
   const CSS_BY_NAME = new Map();
@@ -1994,14 +1953,14 @@
 
         component.name && addCssHook(element, component.name); // define the root element
 
-        defineProperty(this, 'root', element); // before mount lifecycle event
+        defineProperty(this, 'root', element); // define the slots array
+
+        defineProperty(this, 'slots', slots); // before mount lifecycle event
 
         this.onBeforeMount(this.props, this.state); // handlte the template and its attributes
 
         this[ATTRIBUTES_KEY_SYMBOL].mount(element, parentScope);
-        this[TEMPLATE_KEY_SYMBOL].mount(element, this); // create the slots and mount them
-
-        this[SLOTS_KEY_SYMBOL] = createSlots(element, slots || []).mount(parentScope);
+        this[TEMPLATE_KEY_SYMBOL].mount(element, this, parentScope);
         this.onMounted(this.props, this.state);
         return this;
       },
@@ -2019,10 +1978,9 @@
 
         if (parentScope) {
           this[ATTRIBUTES_KEY_SYMBOL].update(parentScope);
-          this[SLOTS_KEY_SYMBOL].update(parentScope);
         }
 
-        this[TEMPLATE_KEY_SYMBOL].update(this);
+        this[TEMPLATE_KEY_SYMBOL].update(this, parentScope);
         this.onUpdated(this.props, this.state);
         return this;
       },
@@ -2030,8 +1988,7 @@
       unmount(preserveRoot) {
         this.onBeforeUnmount(this.props, this.state);
         this[ATTRIBUTES_KEY_SYMBOL].unmount();
-        this[SLOTS_KEY_SYMBOL].unmount();
-        this[TEMPLATE_KEY_SYMBOL].unmount(this, !preserveRoot);
+        this[TEMPLATE_KEY_SYMBOL].unmount(this, {}, !preserveRoot);
         this.onUnmounted(this.props, this.state);
         return this;
       }
@@ -2181,7 +2138,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-rc.9'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-rc.10'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,

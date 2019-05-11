@@ -1,4 +1,4 @@
-/* Riot v4.0.0-rc.9, @license MIT */
+/* Riot v4.0.0-rc.10, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -10,8 +10,7 @@
         PLUGINS_SET = new Set(),
         IS_DIRECTIVE = 'is',
         ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
-        TEMPLATE_KEY_SYMBOL = Symbol('template'),
-        SLOTS_KEY_SYMBOL = Symbol('slots');
+        TEMPLATE_KEY_SYMBOL = Symbol('template');
 
   var globals = /*#__PURE__*/Object.freeze({
     COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
@@ -19,8 +18,7 @@
     PLUGINS_SET: PLUGINS_SET,
     IS_DIRECTIVE: IS_DIRECTIVE,
     ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
-    TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL,
-    SLOTS_KEY_SYMBOL: SLOTS_KEY_SYMBOL
+    TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL
   });
 
   /**
@@ -327,11 +325,13 @@
   const IF = 1;
   const SIMPLE = 2;
   const TAG = 3;
+  const SLOT = 4;
   var bindingTypes = {
     EACH,
     IF,
     SIMPLE,
-    TAG
+    TAG,
+    SLOT
   };
   /* get rid of the @ungap/essential-map polyfill */
 
@@ -1216,6 +1216,75 @@
     let expressions = _ref9.expressions;
     return Object.assign({}, flattenCollectionMethods(expressions.map(expression => create$2(node, expression)), ['mount', 'update', 'unmount']));
   }
+
+  const SlotBinding = Object.seal({
+    // dynamic binding properties
+    node: null,
+    name: null,
+    template: null,
+
+    // API methods
+    mount(scope, parentScope) {
+      const templateData = scope.slots ? scope.slots.find((_ref10) => {
+        let id = _ref10.id;
+        return id === this.name;
+      }) : false;
+      const parentNode = this.node.parentNode;
+      this.template = templateData && create$6(templateData.html, templateData.bindings).createDOM(parentNode);
+
+      if (this.template) {
+        this.template.mount(this.node, parentScope);
+        moveSlotInnerContent(this.node);
+      }
+
+      parentNode.removeChild(this.node);
+      return this;
+    },
+
+    update(scope, parentScope) {
+      if (this.template) {
+        this.template.update(parentScope);
+      }
+
+      return this;
+    },
+
+    unmount(scope, parentScope) {
+      if (this.template) {
+        this.template.unmount(parentScope);
+      }
+
+      return this;
+    }
+
+  });
+  /**
+   * Move the inner content of the slots outside of them
+   * @param   {HTMLNode} slot - slot node
+   * @returns {undefined} it's a void function
+   */
+
+  function moveSlotInnerContent(slot) {
+    if (slot.firstChild) {
+      slot.parentNode.insertBefore(slot.firstChild, slot);
+      moveSlotInnerContent(slot);
+    }
+  }
+  /**
+   * Create a single slot binding
+   * @param   {HTMLElement} node - slot node
+   * @param   {string} options.name - slot id
+   * @returns {Object} Slot binding object
+   */
+
+
+  function createSlot(node, _ref11) {
+    let name = _ref11.name;
+    return Object.assign({}, SlotBinding, {
+      node,
+      name
+    });
+  }
   /**
    * Create a new tag object if it was registered before, otherwise fallback to the simple
    * template chunk
@@ -1262,8 +1331,8 @@
 
 
   function slotBindings(slots) {
-    return slots.reduce((acc, _ref10) => {
-      let bindings = _ref10.bindings;
+    return slots.reduce((acc, _ref12) => {
+      let bindings = _ref12.bindings;
       return acc.concat(bindings);
     }, []);
   }
@@ -1322,11 +1391,11 @@
 
   });
 
-  function create$4(node, _ref11) {
-    let evaluate = _ref11.evaluate,
-        getComponent = _ref11.getComponent,
-        slots = _ref11.slots,
-        attributes = _ref11.attributes;
+  function create$4(node, _ref13) {
+    let evaluate = _ref13.evaluate,
+        getComponent = _ref13.getComponent,
+        slots = _ref13.slots,
+        attributes = _ref13.attributes;
     return Object.assign({}, TagBinding, {
       node,
       evaluate,
@@ -1340,7 +1409,8 @@
     [IF]: create$1,
     [SIMPLE]: create$3,
     [EACH]: create,
-    [TAG]: create$4
+    [TAG]: create$4,
+    [SLOT]: createSlot
   };
   /**
    * Bind a new expression object to a DOM node
@@ -1475,9 +1545,10 @@
      * Attach the template to a DOM node
      * @param   {HTMLElement} el - target DOM node
      * @param   {*} scope - template data
+     * @param   {*} parentScope - scope of the parent template tag
      * @returns {TemplateChunk} self
      */
-    mount(el, scope) {
+    mount(el, scope, parentScope) {
       if (!el) throw new Error('Please provide DOM node to mount properly your template');
       if (this.el) this.unmount(scope);
       this.el = el; // create the DOM if it wasn't created before
@@ -1486,29 +1557,31 @@
       if (this.dom) injectDOM(el, this.dom.cloneNode(true)); // create the bindings
 
       this.bindings = this.bindingsData.map(binding => create$5(this.el, binding));
-      this.bindings.forEach(b => b.mount(scope));
+      this.bindings.forEach(b => b.mount(scope, parentScope));
       return this;
     },
 
     /**
      * Update the template with fresh data
      * @param   {*} scope - template data
+     * @param   {*} parentScope - scope of the parent template tag
      * @returns {TemplateChunk} self
      */
-    update(scope) {
-      this.bindings.forEach(b => b.update(scope));
+    update(scope, parentScope) {
+      this.bindings.forEach(b => b.update(scope, parentScope));
       return this;
     },
 
     /**
      * Remove the template from the node where it was initially mounted
      * @param   {*} scope - template data
+     * @param   {*} parentScope - scope of the parent template tag
      * @param   {boolean} mustRemoveRoot - if true remove the root element
      * @returns {TemplateChunk} self
      */
-    unmount(scope, mustRemoveRoot) {
+    unmount(scope, parentScope, mustRemoveRoot) {
       if (this.el) {
-        this.bindings.forEach(b => b.unmount(scope));
+        this.bindings.forEach(b => b.unmount(scope, parentScope));
         cleanNode(this.el);
 
         if (mustRemoveRoot && this.el.parentNode) {
@@ -1559,120 +1632,6 @@
 
   function $(selector, ctx) {
     return domToArray(typeof selector === 'string' ? (ctx || document).querySelectorAll(selector) : selector);
-  }
-
-  /**
-   * Binding responsible for the slots
-   */
-
-  const Slot = Object.seal({
-    // dynamic binding properties
-    node: null,
-    name: null,
-    template: null,
-
-    // API methods
-    mount(scope) {
-      if (this.template) {
-        this.template.mount(this.node, scope);
-        moveSlotInnerContent(this.node);
-      } else {
-        this.node.parentNode.removeChild(this.node);
-      }
-
-      return this;
-    },
-
-    update(scope) {
-      if (this.template) {
-        this.template.update(scope);
-      }
-
-      return this;
-    },
-
-    unmount(scope) {
-      if (this.template) {
-        this.template.unmount(scope);
-      }
-
-      return this;
-    }
-
-  });
-  /**
-   * Move the inner content of the slots outside of them
-   * @param   {HTMLNode} slot - slot node
-   * @returns {undefined} it's a void function
-   */
-
-  function moveSlotInnerContent(slot) {
-    if (slot.firstChild) {
-      slot.parentNode.insertBefore(slot.firstChild, slot);
-      moveSlotInnerContent(slot);
-    }
-
-    if (slot.parentNode) {
-      slot.parentNode.removeChild(slot);
-    }
-  }
-  /**
-   * Create a single slot binding
-   * @param   {HTMLElement} root - component root
-   * @param   {HTMLElement} node - slot node
-   * @param   {string} options.name - slot id
-   * @param   {Array} options.slots - component slots
-   * @returns {Object} Slot binding object
-   */
-
-
-  function createSlot(root, node, _ref) {
-    let name = _ref.name,
-        slots = _ref.slots;
-    const templateData = slots.find((_ref2) => {
-      let id = _ref2.id;
-      return id === name;
-    });
-    return Object.assign({}, Slot, {
-      node,
-      name,
-      template: templateData && create$6(templateData.html, templateData.bindings).createDOM(root)
-    });
-  }
-  /**
-   * Create the object that will manage the slots
-   * @param   {HTMLElement} root - component root element
-   * @param   {Array} slots - slots objects containing html and bindings
-   * @return  {Object} tag like interface that will manage all the slots
-   */
-
-
-  function createSlots(root, slots) {
-    const slotNodes = $('slot', root);
-    const slotsBindings = slotNodes.map(node => {
-      const name = get(node, 'name') || 'default';
-      return createSlot(root, node, {
-        name,
-        slots
-      });
-    });
-    return {
-      mount(scope) {
-        slotsBindings.forEach(s => s.mount(scope));
-        return this;
-      },
-
-      update(scope) {
-        slotsBindings.forEach(s => s.update(scope));
-        return this;
-      },
-
-      unmount(scope) {
-        slotsBindings.forEach(s => s.unmount(scope));
-        return this;
-      }
-
-    };
   }
 
   const CSS_BY_NAME = new Map();
@@ -1994,14 +1953,14 @@
 
         component.name && addCssHook(element, component.name); // define the root element
 
-        defineProperty(this, 'root', element); // before mount lifecycle event
+        defineProperty(this, 'root', element); // define the slots array
+
+        defineProperty(this, 'slots', slots); // before mount lifecycle event
 
         this.onBeforeMount(this.props, this.state); // handlte the template and its attributes
 
         this[ATTRIBUTES_KEY_SYMBOL].mount(element, parentScope);
-        this[TEMPLATE_KEY_SYMBOL].mount(element, this); // create the slots and mount them
-
-        this[SLOTS_KEY_SYMBOL] = createSlots(element, slots || []).mount(parentScope);
+        this[TEMPLATE_KEY_SYMBOL].mount(element, this, parentScope);
         this.onMounted(this.props, this.state);
         return this;
       },
@@ -2019,10 +1978,9 @@
 
         if (parentScope) {
           this[ATTRIBUTES_KEY_SYMBOL].update(parentScope);
-          this[SLOTS_KEY_SYMBOL].update(parentScope);
         }
 
-        this[TEMPLATE_KEY_SYMBOL].update(this);
+        this[TEMPLATE_KEY_SYMBOL].update(this, parentScope);
         this.onUpdated(this.props, this.state);
         return this;
       },
@@ -2030,8 +1988,7 @@
       unmount(preserveRoot) {
         this.onBeforeUnmount(this.props, this.state);
         this[ATTRIBUTES_KEY_SYMBOL].unmount();
-        this[SLOTS_KEY_SYMBOL].unmount();
-        this[TEMPLATE_KEY_SYMBOL].unmount(this, !preserveRoot);
+        this[TEMPLATE_KEY_SYMBOL].unmount(this, {}, !preserveRoot);
         this.onUnmounted(this.props, this.state);
         return this;
       }
@@ -2181,7 +2138,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-rc.9'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-rc.10'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2223,7 +2180,7 @@
 
   var require$$1 = getCjsExportFromNamespace(_empty_module$1);
 
-  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.0.0-rc.9, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
+  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.0.0-rc.10, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
   this.allSupertypes=Object.create(null);// Linear inheritance hierarchy. Populated during finalization.
   this.supertypeList=[];// Includes inherited fields.
   this.allFields=Object.create(null);// Non-hidden keys of allFields.
@@ -3790,7 +3747,7 @@
   var dollarCurlyPos=lines.skipSpaces(expr.loc.start,true,false);if(lines.prevPos(dollarCurlyPos)&&lines.charAt(dollarCurlyPos)==="{"&&lines.prevPos(dollarCurlyPos)&&lines.charAt(dollarCurlyPos)==="$"){var quasiBefore=node.quasis[i];if(comparePos(dollarCurlyPos,quasiBefore.loc.end)<0){quasiBefore.loc.end=dollarCurlyPos;}}// Likewise, some parsers accidentally include the } that follows
   // the expression in the .loc of the following quasi element.
   var rightCurlyPos=lines.skipSpaces(expr.loc.end,false,false);if(lines.charAt(rightCurlyPos)==="}"){assert_1.default.ok(lines.nextPos(rightCurlyPos));// Now rightCurlyPos is technically the position just after the }.
-  var quasiAfter=node.quasis[i+1];if(comparePos(quasiAfter.loc.start,rightCurlyPos)<0){quasiAfter.loc.start=rightCurlyPos;}}});}function isExportDeclaration(node){if(node)switch(node.type){case"ExportDeclaration":case"ExportDefaultDeclaration":case"ExportDefaultSpecifier":case"DeclareExportDeclaration":case"ExportNamedDeclaration":case"ExportAllDeclaration":return true;}return false;}exports.isExportDeclaration=isExportDeclaration;function getParentExportDeclaration(path){var parentNode=path.getParentNode();if(path.getName()==="declaration"&&isExportDeclaration(parentNode)){return parentNode;}return null;}exports.getParentExportDeclaration=getParentExportDeclaration;function isTrailingCommaEnabled(options,context){var trailingComma=options.trailingComma;if(typeof trailingComma==="object"){return !!trailingComma[context];}return !!trailingComma;}exports.isTrailingCommaEnabled=isTrailingCommaEnabled;});var recastUtil=unwrapExports(util);var util_1=util.getOption;var util_2=util.getUnionOfKeys;var util_3=util.comparePos;var util_4=util.copyPos;var util_5=util.composeSourceMaps;var util_6=util.getTrueLoc;var util_7=util.fixFaultyLocations;var util_8=util.isExportDeclaration;var util_9=util.getParentExportDeclaration;var util_10=util.isTrailingCommaEnabled;var esprima$1=createCommonjsModule(function(module,exports){(function webpackUniversalModuleDefinition(root,factory){/* istanbul ignore next */module.exports=factory();})(this,function(){return(/******/function(modules){// webpackBootstrap
+  var quasiAfter=node.quasis[i+1];if(comparePos(quasiAfter.loc.start,rightCurlyPos)<0){quasiAfter.loc.start=rightCurlyPos;}}});}function isExportDeclaration(node){if(node)switch(node.type){case"ExportDeclaration":case"ExportDefaultDeclaration":case"ExportDefaultSpecifier":case"DeclareExportDeclaration":case"ExportNamedDeclaration":case"ExportAllDeclaration":return true;}return false;}exports.isExportDeclaration=isExportDeclaration;function getParentExportDeclaration(path){var parentNode=path.getParentNode();if(path.getName()==="declaration"&&isExportDeclaration(parentNode)){return parentNode;}return null;}exports.getParentExportDeclaration=getParentExportDeclaration;function isTrailingCommaEnabled(options,context){var trailingComma=options.trailingComma;if(typeof trailingComma==="object"){return !!trailingComma[context];}return !!trailingComma;}exports.isTrailingCommaEnabled=isTrailingCommaEnabled;});unwrapExports(util);var util_1=util.getOption;var util_2=util.getUnionOfKeys;var util_3=util.comparePos;var util_4=util.copyPos;var util_5=util.composeSourceMaps;var util_6=util.getTrueLoc;var util_7=util.fixFaultyLocations;var util_8=util.isExportDeclaration;var util_9=util.getParentExportDeclaration;var util_10=util.isTrailingCommaEnabled;var esprima$1=createCommonjsModule(function(module,exports){(function webpackUniversalModuleDefinition(root,factory){/* istanbul ignore next */module.exports=factory();})(this,function(){return(/******/function(modules){// webpackBootstrap
   /******/ // The module cache
   /******/var installedModules={};/******/ // The require function
   /******/function __webpack_require__(moduleId){/******/ // Check if module is in cache
@@ -4557,7 +4514,7 @@
   	 * @param   { SourceMapGenerator } formerMap - original sourcemap
   	 * @param   { SourceMapGenerator } latterMap - target sourcemap
   	 * @returns { Object } sourcemap json
-  	 */function composeSourcemaps(formerMap,latterMap){if(isNode()&&formerMap&&latterMap&&latterMap.mappings){return recastUtil.composeSourceMaps(sourcemapAsJSON(formerMap),sourcemapAsJSON(latterMap));}else if(isNode()&&formerMap){return sourcemapAsJSON(formerMap);}return {};}/**
+  	 */function composeSourcemaps(formerMap,latterMap){if(isNode()&&formerMap&&latterMap&&latterMap.mappings){return util_5(sourcemapAsJSON(formerMap),sourcemapAsJSON(latterMap));}else if(isNode()&&formerMap){return sourcemapAsJSON(formerMap);}return {};}/**
   	 * Create a new sourcemap generator
   	 * @param   { Object } options - sourcemap options
   	 * @returns { SourceMapGenerator } SourceMapGenerator instance
@@ -4631,10 +4588,9 @@
   	 * @param   { string } preprocessorType - either css, js
   	 * @param   { string } preprocessorName - preprocessor id
   	 * @param   { Object } meta - compilation meta information
-  	 * @param   { string } source - tag source code
   	 * @param   { RiotParser.nodeTypes } node - css node detected by the parser
   	 * @returns { Output } code and sourcemap generated by the preprocessor
-  	 */function preprocess(preprocessorType,preprocessorName,meta,source,node){const code=node.text;return preprocessorName?execute$1(preprocessorType,preprocessorName,meta,code):{code};}/**
+  	 */function preprocess(preprocessorType,preprocessorName,meta,node){const code=node.text;return preprocessorName?execute$1(preprocessorType,preprocessorName,meta,code):{code};}/**
   	 * Source for creating regexes matching valid quoted, single-line JavaScript strings.
   	 * It recognizes escape characters, including nested quotes and line continuation.
   	 * @const {string}
@@ -4663,7 +4619,7 @@
   	 * @param   { Object } meta - compilation meta information
   	 * @param   { AST } ast - current AST output
   	 * @returns { AST } the AST generated
-  	 */function css(sourceNode,source,meta,ast){const preprocessorName=getPreprocessorTypeByAttribute(sourceNode);const options=meta.options;const cssNode=sourceNode.text;const preprocessorOutput=preprocess('css',preprocessorName,meta,source,cssNode);const cssCode=(options.scopedCss?scopedCSS(meta.tagName,preprocessorOutput.code):preprocessorOutput.code).trim();types$2.visit(ast,{visitProperty(path){if(path.value.key.value===TAG_CSS_PROPERTY){path.value.value=builders.templateLiteral([builders.templateElement({raw:cssCode,cooked:''},false)],[]);return false;}this.traverse(path);}});return ast;}/**
+  	 */function css(sourceNode,source,meta,ast){const preprocessorName=getPreprocessorTypeByAttribute(sourceNode);const options=meta.options;const cssNode=sourceNode.text;const preprocessorOutput=preprocess('css',preprocessorName,meta,cssNode);const cssCode=(options.scopedCss?scopedCSS(meta.tagName,preprocessorOutput.code):preprocessorOutput.code).trim();types$2.visit(ast,{visitProperty(path){if(path.value.key.value===TAG_CSS_PROPERTY){path.value.value=builders.templateLiteral([builders.templateElement({raw:cssCode,cooked:''},false)],[]);return false;}this.traverse(path);}});return ast;}/**
   	 * Function to curry any javascript method
   	 * @param   {Function}  fn - the target function we want to curry
   	 * @param   {...[args]} acc - initial arguments
@@ -4722,7 +4678,7 @@
   	 * @param   { Object } meta - compilation meta information
   	 * @param   { AST } ast - current AST output
   	 * @returns { AST } the AST generated
-  	 */function javascript(sourceNode,source,meta,ast){const preprocessorName=getPreprocessorTypeByAttribute(sourceNode);const javascriptNode=addLineOffset(sourceNode.text.text,source,sourceNode);const options=meta.options;const preprocessorOutput=preprocess('javascript',preprocessorName,meta,source,Object.assign({},sourceNode,{text:javascriptNode}));const inputSourceMap=sourcemapAsJSON(preprocessorOutput.map);const generatedAst=generateAST(preprocessorOutput.code,{sourceFileName:options.file,inputSourceMap:isEmptySourcemap(inputSourceMap)?null:inputSourceMap});const generatedAstBody=getProgramBody(generatedAst);const bodyWithoutExportDefault=filterNonExportDefaultStatements(generatedAstBody);const exportDefaultNode=findExportDefaultStatement(generatedAstBody);const outputBody=getProgramBody(ast);// add to the ast the "private" javascript content of our tag script node
+  	 */function javascript(sourceNode,source,meta,ast){const preprocessorName=getPreprocessorTypeByAttribute(sourceNode);const javascriptNode=addLineOffset(sourceNode.text.text,source,sourceNode);const options=meta.options;const preprocessorOutput=preprocess('javascript',preprocessorName,meta,Object.assign({},sourceNode,{text:javascriptNode}));const inputSourceMap=sourcemapAsJSON(preprocessorOutput.map);const generatedAst=generateAST(preprocessorOutput.code,{sourceFileName:options.file,inputSourceMap:isEmptySourcemap(inputSourceMap)?null:inputSourceMap});const generatedAstBody=getProgramBody(generatedAst);const bodyWithoutExportDefault=filterNonExportDefaultStatements(generatedAstBody);const exportDefaultNode=findExportDefaultStatement(generatedAstBody);const outputBody=getProgramBody(ast);// add to the ast the "private" javascript content of our tag script node
   outputBody.unshift(...bodyWithoutExportDefault);// convert the export default adding its content to the "tag" property exported
   if(exportDefaultNode)extendTagProperty(ast,exportDefaultNode);return ast;}/**
   	 * Not all the types are handled in this module.
@@ -5199,10 +5155,11 @@
   	 */function eat(state,type){switch(type){case TAG:return tag(state);case ATTR:return attr(state);default:return text(state);}}/**
   	 * The nodeTypes definition
   	 */const nodeTypes=types$3;// import {IS_BOOLEAN,IS_CUSTOM,IS_RAW,IS_SPREAD,IS_VOID} from '@riotjs/parser/src/constants'
-  const BINDING_TYPES='bindingTypes';const EACH_BINDING_TYPE='EACH';const IF_BINDING_TYPE='IF';const TAG_BINDING_TYPE='TAG';const EXPRESSION_TYPES='expressionTypes';const ATTRIBUTE_EXPRESSION_TYPE='ATTRIBUTE';const VALUE_EXPRESSION_TYPE='VALUE';const TEXT_EXPRESSION_TYPE='TEXT';const EVENT_EXPRESSION_TYPE='EVENT';const TEMPLATE_FN='template';const SCOPE='scope';const GET_COMPONENT_FN='getComponent';// keys needed to create the DOM bindings
+  const BINDING_TYPES='bindingTypes';const EACH_BINDING_TYPE='EACH';const IF_BINDING_TYPE='IF';const TAG_BINDING_TYPE='TAG';const SLOT_BINDING_TYPE='SLOT';const EXPRESSION_TYPES='expressionTypes';const ATTRIBUTE_EXPRESSION_TYPE='ATTRIBUTE';const VALUE_EXPRESSION_TYPE='VALUE';const TEXT_EXPRESSION_TYPE='TEXT';const EVENT_EXPRESSION_TYPE='EVENT';const TEMPLATE_FN='template';const SCOPE='scope';const GET_COMPONENT_FN='getComponent';// keys needed to create the DOM bindings
   const BINDING_SELECTOR_KEY='selector';const BINDING_GET_COMPONENT_KEY='getComponent';const BINDING_TEMPLATE_KEY='template';const BINDING_TYPE_KEY='type';const BINDING_REDUNDANT_ATTRIBUTE_KEY='redundantAttribute';const BINDING_CONDITION_KEY='condition';const BINDING_ITEM_NAME_KEY='itemName';const BINDING_GET_KEY_KEY='getKey';const BINDING_INDEX_NAME_KEY='indexName';const BINDING_EVALUATE_KEY='evaluate';const BINDING_NAME_KEY='name';const BINDING_SLOTS_KEY='slots';const BINDING_EXPRESSIONS_KEY='expressions';const BINDING_CHILD_NODE_INDEX_KEY='childNodeIndex';// slots keys
   const BINDING_BINDINGS_KEY='bindings';const BINDING_ID_KEY='id';const BINDING_HTML_KEY='html';const BINDING_ATTRIBUTES_KEY='attributes';// DOM directives
-  const IF_DIRECTIVE='if';const EACH_DIRECTIVE='each';const KEY_ATTRIBUTE='key';const SLOT_ATTRIBUTE='slot';const IS_DIRECTIVE='is';const TEXT_NODE_EXPRESSION_PLACEHOLDER='<!---->';const BINDING_SELECTOR_PREFIX='expr';const IS_VOID_NODE='isVoid';const IS_CUSTOM_NODE='isCustom';const IS_BOOLEAN_ATTRIBUTE='isBoolean';const IS_SPREAD_ATTRIBUTE='isSpread';/**
+  const IF_DIRECTIVE='if';const EACH_DIRECTIVE='each';const KEY_ATTRIBUTE='key';const SLOT_ATTRIBUTE='slot';const NAME_ATTRIBUTE='name';const IS_DIRECTIVE='is';// Misc
+  const DEFAULT_SLOT_NAME='default';const TEXT_NODE_EXPRESSION_PLACEHOLDER='<!---->';const BINDING_SELECTOR_PREFIX='expr';const SLOT_TAG_NODE_NAME='slot';const IS_VOID_NODE='isVoid';const IS_CUSTOM_NODE='isCustom';const IS_BOOLEAN_ATTRIBUTE='isBoolean';const IS_SPREAD_ATTRIBUTE='isSpread';/**
   	 * Unescape the user escaped chars
   	 * @param   {string} string - input string
   	 * @param   {string} char - probably a '{' or anything the user want's to escape
@@ -5339,6 +5296,10 @@
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {boolean} true if either it's a riot component or a custom element
   	 */function isCustomNode(node){return !!(node[IS_CUSTOM_NODE]||hasIsAttribute(node));}/**
+  	 * True the node is <slot>
+  	 * @param   {RiotParser.Node} node - riot parser node
+  	 * @returns {boolean} true if it's a slot node
+  	 */function isSlotNode(node){return node.name===SLOT_TAG_NODE_NAME;}/**
   	 * True if the node has the isVoid attribute set
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {boolean} true if the node is self closing
@@ -5393,7 +5354,7 @@
   	 * True if the node has not expression set nor bindings directives
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {boolean} true only if it's a static node that doesn't need bindings or expressions
-  	 */function isStaticNode(node){return [hasExpressions,findEachAttribute,findIfAttribute,isCustomNode].every(test=>!test(node));}/**
+  	 */function isStaticNode(node){return [hasExpressions,findEachAttribute,findIfAttribute,isCustomNode,isSlotNode].every(test=>!test(node));}/**
   	 * True if the node is a directive having its own template
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {boolean} true only for the IF EACH and TAG bindings
@@ -5409,46 +5370,7 @@
   	 * Simple clone deep function, do not use it for classes or recursive objects!
   	 * @param   {*} source - possibily an object to clone
   	 * @returns {*} the object we wanted to clone
-  	 */function cloneDeep(source){return JSON.parse(JSON.stringify(source));}/**
-  	 * Simple expression bindings might contain multiple expressions like for example: "class="{foo} red {bar}""
-  	 * This helper aims to merge them in a template literal if it's necessary
-  	 * @param   {RiotParser.Attr} node - riot parser node
-  	 * @param   {string} sourceFile - original tag file
-  	 * @param   {string} sourceCode - original tag source code
-  	 * @returns { Object } a template literal expression object
-  	 */function mergeAttributeExpressions(node,sourceFile,sourceCode){if(!node.parts||node.parts.length===1)return transformExpression(node.expressions[0],sourceFile,sourceCode);const lastExpression=node.expressions[node.expressions.length-1];const tail=sourceCode.substring(lastExpression.end,node.end).replace(/"|'/,'');const stringsArray=[...node.parts.reduce((acc,str)=>{const expression=node.expressions.find(e=>e.text.trim()===str);return [...acc,expression?transformExpression(expression,sourceFile,sourceCode):builders.literal(str)];},[]),builders.literal(tail)].filter(expr=>!isLiteral(expr)||expr.value);return createArrayString(stringsArray);}/**
-  	 * Create a simple attribute expression
-  	 * @param   {RiotParser.Node.Attr} sourceNode - the custom tag
-  	 * @param   {stiring} sourceFile - source file path
-  	 * @param   {string} sourceCode - original source
-  	 * @returns {AST.Node} object containing the expression binding keys
-  	 */function createAttributeExpression(sourceNode,sourceFile,sourceCode){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(ATTRIBUTE_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_NAME_KEY,isSpreadAttribute(sourceNode)?nullNode():builders.literal(sourceNode.name)),simplePropertyNode(BINDING_EVALUATE_KEY,hasExpressions(sourceNode)?// dynamic attribute
-  wrapASTInFunctionWithScope(mergeAttributeExpressions(sourceNode,sourceFile,sourceCode)):// static attribute
-  builders.functionExpression(null,[],builders.blockStatement([builders.returnStatement(builders.literal(sourceNode.value||true))])))]);}/**
-  	 * Find the slots in the current component and group them under the same id
-  	 * @param   {RiotParser.Node.Tag} sourceNode - the custom tag
-  	 * @returns {Object} object containing all the slots grouped by name
-  	 */function groupSlots(sourceNode){return getChildrenNodes(sourceNode).reduce((acc,node)=>{const slotAttribute=findSlotAttribute(node);if(slotAttribute){acc[slotAttribute.value]=node;}else{acc.default=createRootNode({nodes:[...getChildrenNodes(acc.default),node]});}return acc;},{default:null});}/**
-  	 * Create the slot entity to pass to the riot-dom bindings
-  	 * @param   {string} id - slot id
-  	 * @param   {RiotParser.Node.Tag} sourceNode - slot root node
-  	 * @param   {stiring} sourceFile - source file path
-  	 * @param   {string} sourceCode - original source
-  	 * @returns {AST.Node} ast node containing the slot object properties
-  	 */function buildSlot(id,sourceNode,sourceFile,sourceCode){const cloneNode=Object.assign({},sourceNode,{// avoid to render the slot attribute
-  attributes:getNodeAttributes(sourceNode).filter(attribute=>attribute.name!==SLOT_ATTRIBUTE)});const _build=build(cloneNode,sourceFile,sourceCode),html=_build[0],bindings=_build[1];return builders.objectExpression([simplePropertyNode(BINDING_ID_KEY,builders.literal(id)),simplePropertyNode(BINDING_HTML_KEY,builders.literal(html)),simplePropertyNode(BINDING_BINDINGS_KEY,builders.arrayExpression(bindings))]);}/**
-  	 * Find the slot attribute if it exists
-  	 * @param   {RiotParser.Node.Tag} sourceNode - the custom tag
-  	 * @returns {RiotParser.Node.Attr|undefined} the slot attribute found
-  	 */function findSlotAttribute(sourceNode){return getNodeAttributes(sourceNode).find(attribute=>attribute.name===SLOT_ATTRIBUTE);}/**
-  	 * Transform a RiotParser.Node.Tag into a tag binding
-  	 * @param   { RiotParser.Node.Tag } sourceNode - the custom tag
-  	 * @param   { string } selectorAttribute - attribute needed to select the target node
-  	 * @param   { stiring } sourceFile - source file path
-  	 * @param   { string } sourceCode - original source
-  	 * @returns { AST.Node } tag binding node
-  	 */function createTagBinding(sourceNode,selectorAttribute,sourceFile,sourceCode){const createAttributeExpression$1=attribute=>createAttributeExpression(attribute,sourceFile,sourceCode);return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(BINDING_TYPES),builders.identifier(TAG_BINDING_TYPE),false)),simplePropertyNode(BINDING_GET_COMPONENT_KEY,builders.identifier(GET_COMPONENT_FN)),simplePropertyNode(BINDING_EVALUATE_KEY,toScopedFunction(getCustomNodeNameAsExpression(sourceNode),sourceFile,sourceCode)),simplePropertyNode(BINDING_SLOTS_KEY,builders.arrayExpression([...compose(slots=>slots.map((_ref4)=>{let key=_ref4[0],value=_ref4[1];return buildSlot(key,value,sourceFile,sourceCode);}),slots=>slots.filter((_ref5)=>{let value=_ref5[1];return value;}),Object.entries,groupSlots)(sourceNode)])),simplePropertyNode(BINDING_ATTRIBUTES_KEY,builders.arrayExpression([...compose(attributes=>attributes.map(createAttributeExpression$1),attributes=>getAttributesWithoutSelector(attributes,selectorAttribute),// eslint-disable-line
-  cleanAttributes)(sourceNode)])),...createSelectorProperties(selectorAttribute)]);}const getEachItemName=expression=>isSequenceExpression(expression.left)?expression.left.expressions[0]:expression.left;const getEachIndexName=expression=>isSequenceExpression(expression.left)?expression.left.expressions[1]:null;const getEachValue=expression=>expression.right;const nameToliteral=compose(builders.literal,getName$1);const generateEachItemNameKey=expression=>simplePropertyNode(BINDING_ITEM_NAME_KEY,compose(nameToliteral,getEachItemName)(expression));const generateEachIndexNameKey=expression=>simplePropertyNode(BINDING_INDEX_NAME_KEY,compose(nameToliteral,getEachIndexName)(expression));const generateEachEvaluateKey=(expression,eachExpression,sourceFile,sourceCode)=>simplePropertyNode(BINDING_EVALUATE_KEY,compose(e=>toScopedFunction(e,sourceFile,sourceCode),e=>Object.assign({},eachExpression,{text:generateJavascript(e).code}),getEachValue)(expression));/**
+  	 */function cloneDeep(source){return JSON.parse(JSON.stringify(source));}const getEachItemName=expression=>isSequenceExpression(expression.left)?expression.left.expressions[0]:expression.left;const getEachIndexName=expression=>isSequenceExpression(expression.left)?expression.left.expressions[1]:null;const getEachValue=expression=>expression.right;const nameToliteral=compose(builders.literal,getName$1);const generateEachItemNameKey=expression=>simplePropertyNode(BINDING_ITEM_NAME_KEY,compose(nameToliteral,getEachItemName)(expression));const generateEachIndexNameKey=expression=>simplePropertyNode(BINDING_INDEX_NAME_KEY,compose(nameToliteral,getEachIndexName)(expression));const generateEachEvaluateKey=(expression,eachExpression,sourceFile,sourceCode)=>simplePropertyNode(BINDING_EVALUATE_KEY,compose(e=>toScopedFunction(e,sourceFile,sourceCode),e=>Object.assign({},eachExpression,{text:generateJavascript(e).code}),getEachValue)(expression));/**
   	 * Get the each expression properties to create properly the template binding
   	 * @param   { DomBinding.Expression } eachExpression - original each expression data
   	 * @param   { string } sourceFile - original tag file
@@ -5458,20 +5380,35 @@
   	 * Transform a RiotParser.Node.Tag into an each binding
   	 * @param   { RiotParser.Node.Tag } sourceNode - tag containing the each attribute
   	 * @param   { string } selectorAttribute - attribute needed to select the target node
-  	 * @param   { stiring } sourceFile - source file path
+  	 * @param   { string } sourceFile - source file path
   	 * @param   { string } sourceCode - original source
   	 * @returns { AST.Node } an each binding node
-  	 */function createEachBinding(sourceNode,selectorAttribute,sourceFile,sourceCode){const _map=[findIfAttribute,findEachAttribute,findKeyAttribute].map(f=>f(sourceNode)),ifAttribute=_map[0],eachAttribute=_map[1],keyAttribute=_map[2];const mightBeARiotComponent=isCustomNode(sourceNode);const attributeOrNull=attribute=>attribute?toScopedFunction(getAttributeExpression(attribute),sourceFile,sourceCode):nullNode();return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(BINDING_TYPES),builders.identifier(EACH_BINDING_TYPE),false)),simplePropertyNode(BINDING_GET_KEY_KEY,attributeOrNull(keyAttribute)),simplePropertyNode(BINDING_CONDITION_KEY,attributeOrNull(ifAttribute)),createTemplateProperty(mightBeARiotComponent?[null,[createTagBinding(cloneNodeWithoutSelectorAttribute(sourceNode),null,sourceFile,sourceCode)]]:build(createRootNode(sourceNode),sourceFile,sourceCode)),...createSelectorProperties(selectorAttribute),...compose(generateEachExpressionProperties,getAttributeExpression)(eachAttribute)]);}/**
+  	 */function createEachBinding(sourceNode,selectorAttribute,sourceFile,sourceCode){const _map=[findIfAttribute,findEachAttribute,findKeyAttribute].map(f=>f(sourceNode)),ifAttribute=_map[0],eachAttribute=_map[1],keyAttribute=_map[2];const attributeOrNull=attribute=>attribute?toScopedFunction(getAttributeExpression(attribute),sourceFile,sourceCode):nullNode();return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(BINDING_TYPES),builders.identifier(EACH_BINDING_TYPE),false)),simplePropertyNode(BINDING_GET_KEY_KEY,attributeOrNull(keyAttribute)),simplePropertyNode(BINDING_CONDITION_KEY,attributeOrNull(ifAttribute)),createTemplateProperty(createNestedBindings(sourceNode,sourceFile,sourceCode)),...createSelectorProperties(selectorAttribute),...compose(generateEachExpressionProperties,getAttributeExpression)(eachAttribute)]);}/**
   	 * Transform a RiotParser.Node.Tag into an if binding
   	 * @param   { RiotParser.Node.Tag } sourceNode - tag containing the if attribute
   	 * @param   { string } selectorAttribute - attribute needed to select the target node
   	 * @param   { stiring } sourceFile - source file path
   	 * @param   { string } sourceCode - original source
-  	 * @returns { AST.Node } an each binding node
-  	 */function createIfBinding(sourceNode,selectorAttribute,sourceFile,sourceCode){const ifAttribute=findIfAttribute(sourceNode);const mightBeARiotComponent=isCustomNode(sourceNode);return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(BINDING_TYPES),builders.identifier(IF_BINDING_TYPE),false)),simplePropertyNode(BINDING_EVALUATE_KEY,toScopedFunction(ifAttribute.expressions[0],sourceFile,sourceCode)),...createSelectorProperties(selectorAttribute),createTemplateProperty(mightBeARiotComponent?[null,[createTagBinding(cloneNodeWithoutSelectorAttribute(sourceNode),null,sourceFile,sourceCode)]]:build(createRootNode(sourceNode),sourceFile,sourceCode))]);}/**
+  	 * @returns { AST.Node } an if binding node
+  	 */function createIfBinding(sourceNode,selectorAttribute,sourceFile,sourceCode){const ifAttribute=findIfAttribute(sourceNode);return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(BINDING_TYPES),builders.identifier(IF_BINDING_TYPE),false)),simplePropertyNode(BINDING_EVALUATE_KEY,toScopedFunction(ifAttribute.expressions[0],sourceFile,sourceCode)),...createSelectorProperties(selectorAttribute),createTemplateProperty(createNestedBindings(sourceNode,sourceFile,sourceCode))]);}/**
+  	 * Simple expression bindings might contain multiple expressions like for example: "class="{foo} red {bar}""
+  	 * This helper aims to merge them in a template literal if it's necessary
+  	 * @param   {RiotParser.Attr} node - riot parser node
+  	 * @param   {string} sourceFile - original tag file
+  	 * @param   {string} sourceCode - original tag source code
+  	 * @returns { Object } a template literal expression object
+  	 */function mergeAttributeExpressions(node,sourceFile,sourceCode){if(!node.parts||node.parts.length===1)return transformExpression(node.expressions[0],sourceFile,sourceCode);const lastExpression=node.expressions[node.expressions.length-1];const tail=sourceCode.substring(lastExpression.end,node.end).replace(/"|'/,'');const stringsArray=[...node.parts.reduce((acc,str)=>{const expression=node.expressions.find(e=>e.text.trim()===str);return [...acc,expression?transformExpression(expression,sourceFile,sourceCode):builders.literal(str)];},[]),builders.literal(tail)].filter(expr=>!isLiteral(expr)||expr.value);return createArrayString(stringsArray);}/**
+  	 * Create a simple attribute expression
+  	 * @param   {RiotParser.Node.Attr} sourceNode - the custom tag
+  	 * @param   {string} sourceFile - source file path
+  	 * @param   {string} sourceCode - original source
+  	 * @returns {AST.Node} object containing the expression binding keys
+  	 */function createAttributeExpression(sourceNode,sourceFile,sourceCode){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(ATTRIBUTE_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_NAME_KEY,isSpreadAttribute(sourceNode)?nullNode():builders.literal(sourceNode.name)),simplePropertyNode(BINDING_EVALUATE_KEY,hasExpressions(sourceNode)?// dynamic attribute
+  wrapASTInFunctionWithScope(mergeAttributeExpressions(sourceNode,sourceFile,sourceCode)):// static attribute
+  builders.functionExpression(null,[],builders.blockStatement([builders.returnStatement(builders.literal(sourceNode.value||true))])))]);}/**
   	 * Create a simple event expression
   	 * @param   {RiotParser.Node.Attr} sourceNode - attribute containing the event handlers
-  	 * @param   {stiring} sourceFile - source file path
+  	 * @param   {string} sourceFile - source file path
   	 * @param   {string} sourceCode - original source
   	 * @returns {AST.Node} object containing the expression binding keys
   	 */function createEventExpression(sourceNode,sourceFile,sourceCode){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(EVENT_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_NAME_KEY,builders.literal(sourceNode.name)),simplePropertyNode(BINDING_EVALUATE_KEY,toScopedFunction(sourceNode.expressions[0],sourceFile,sourceCode))]);}/**
@@ -5491,30 +5428,72 @@
   .filter(expr=>!isLiteral(expr)||expr.value);return createArrayString(stringsArray);}/**
   	 * Create a text expression
   	 * @param   {RiotParser.Node.Text} sourceNode - text node to parse
-  	 * @param   {stiring} sourceFile - source file path
+  	 * @param   {string} sourceFile - source file path
   	 * @param   {string} sourceCode - original source
   	 * @param   {number} childNodeIndex - position of the child text node in its parent children nodes
   	 * @returns {AST.Node} object containing the expression binding keys
   	 */function createTextExpression(sourceNode,sourceFile,sourceCode,childNodeIndex){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(TEXT_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_CHILD_NODE_INDEX_KEY,builders.literal(childNodeIndex)),simplePropertyNode(BINDING_EVALUATE_KEY,wrapASTInFunctionWithScope(mergeNodeExpressions(sourceNode,sourceFile,sourceCode)))]);}function createValueExpression(sourceNode,sourceFile,sourceCode){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(VALUE_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_EVALUATE_KEY,toScopedFunction(sourceNode.expressions[0],sourceFile,sourceCode))]);}function createExpression(sourceNode,sourceFile,sourceCode,childNodeIndex){switch(true){case isTextNode(sourceNode):return createTextExpression(sourceNode,sourceFile,sourceCode,childNodeIndex);case isValueAttribute(sourceNode):return createValueExpression(sourceNode,sourceFile,sourceCode);case isEventAttribute(sourceNode):return createEventExpression(sourceNode,sourceFile,sourceCode);default:return createAttributeExpression(sourceNode,sourceFile,sourceCode);}}/**
   	 * Create the attribute expressions
   	 * @param   {RiotParser.Node} sourceNode - any kind of node parsed via riot parser
-  	 * @param   {stiring} sourceFile - source file path
+  	 * @param   {string} sourceFile - source file path
   	 * @param   {string} sourceCode - original source
   	 * @returns {Array} array containing all the attribute expressions
   	 */function createAttributeExpressions(sourceNode,sourceFile,sourceCode){return findDynamicAttributes(sourceNode).map(attribute=>createExpression(attribute,sourceFile,sourceCode));}/**
   	 * Create the text node expressions
   	 * @param   {RiotParser.Node} sourceNode - any kind of node parsed via riot parser
-  	 * @param   {stiring} sourceFile - source file path
+  	 * @param   {string} sourceFile - source file path
   	 * @param   {string} sourceCode - original source
   	 * @returns {Array} array containing all the text node expressions
   	 */function createTextNodeExpressions(sourceNode,sourceFile,sourceCode){const childrenNodes=getChildrenNodes(sourceNode);return childrenNodes.filter(isTextNode).filter(hasExpressions).map(node=>createExpression(node,sourceFile,sourceCode,childrenNodes.indexOf(node)));}/**
   	 * Add a simple binding to a riot parser node
   	 * @param   { RiotParser.Node.Tag } sourceNode - tag containing the if attribute
   	 * @param   { string } selectorAttribute - attribute needed to select the target node
-  	 * @param   { stiring } sourceFile - source file path
+  	 * @param   { string } sourceFile - source file path
   	 * @param   { string } sourceCode - original source
   	 * @returns { AST.Node } an each binding node
-  	 */function createSimpleBinding(sourceNode,selectorAttribute,sourceFile,sourceCode){return builders.objectExpression([...createSelectorProperties(selectorAttribute),simplePropertyNode(BINDING_EXPRESSIONS_KEY,builders.arrayExpression([...createTextNodeExpressions(sourceNode,sourceFile,sourceCode),...createAttributeExpressions(sourceNode,sourceFile,sourceCode)]))]);}const BuildingState=Object.freeze({html:[],bindings:[],parent:null});/**
+  	 */function createSimpleBinding(sourceNode,selectorAttribute,sourceFile,sourceCode){return builders.objectExpression([...createSelectorProperties(selectorAttribute),simplePropertyNode(BINDING_EXPRESSIONS_KEY,builders.arrayExpression([...createTextNodeExpressions(sourceNode,sourceFile,sourceCode),...createAttributeExpressions(sourceNode,sourceFile,sourceCode)]))]);}/**
+  	 * Transform a RiotParser.Node.Tag of type slot into a slot binding
+  	 * @param   { RiotParser.Node.Tag } sourceNode - slot node
+  	 * @param   { string } selectorAttribute - attribute needed to select the target node
+  	 * @returns { AST.Node } a slot binding node
+  	 */function createSlotBinding(sourceNode,selectorAttribute){const slotNameAttribute=findAttribute(NAME_ATTRIBUTE,sourceNode);const slotName=slotNameAttribute?slotNameAttribute.value:DEFAULT_SLOT_NAME;return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(BINDING_TYPES),builders.identifier(SLOT_BINDING_TYPE),false)),simplePropertyNode(BINDING_NAME_KEY,builders.literal(slotName)),...createSelectorProperties(selectorAttribute)]);}/**
+  	 * Find the slots in the current component and group them under the same id
+  	 * @param   {RiotParser.Node.Tag} sourceNode - the custom tag
+  	 * @returns {Object} object containing all the slots grouped by name
+  	 */function groupSlots(sourceNode){return getChildrenNodes(sourceNode).reduce((acc,node)=>{const slotAttribute=findSlotAttribute(node);if(slotAttribute){acc[slotAttribute.value]=node;}else{acc.default=createRootNode({nodes:[...getChildrenNodes(acc.default),node]});}return acc;},{default:null});}/**
+  	 * Create the slot entity to pass to the riot-dom bindings
+  	 * @param   {string} id - slot id
+  	 * @param   {RiotParser.Node.Tag} sourceNode - slot root node
+  	 * @param   {string} sourceFile - source file path
+  	 * @param   {string} sourceCode - original source
+  	 * @returns {AST.Node} ast node containing the slot object properties
+  	 */function buildSlot(id,sourceNode,sourceFile,sourceCode){const cloneNode=Object.assign({},sourceNode,{// avoid to render the slot attribute
+  attributes:getNodeAttributes(sourceNode).filter(attribute=>attribute.name!==SLOT_ATTRIBUTE)});const _build=build(cloneNode,sourceFile,sourceCode),html=_build[0],bindings=_build[1];return builders.objectExpression([simplePropertyNode(BINDING_ID_KEY,builders.literal(id)),simplePropertyNode(BINDING_HTML_KEY,builders.literal(html)),simplePropertyNode(BINDING_BINDINGS_KEY,builders.arrayExpression(bindings))]);}/**
+  	 * Create the AST array containing the slots
+  	 * @param   { RiotParser.Node.Tag } sourceNode - the custom tag
+  	 * @param   { string } sourceFile - source file path
+  	 * @param   { string } sourceCode - original source
+  	 * @returns {AST.ArrayExpression} array containing the attributes to bind
+  	 */function createSlotsArray(sourceNode,sourceFile,sourceCode){return builders.arrayExpression([...compose(slots=>slots.map((_ref4)=>{let key=_ref4[0],value=_ref4[1];return buildSlot(key,value,sourceFile,sourceCode);}),slots=>slots.filter((_ref5)=>{let value=_ref5[1];return value;}),Object.entries,groupSlots)(sourceNode)]);}/**
+  	 * Create the AST array containing the attributes to bind to this node
+  	 * @param   { RiotParser.Node.Tag } sourceNode - the custom tag
+  	 * @param   { string } selectorAttribute - attribute needed to select the target node
+  	 * @param   { string } sourceFile - source file path
+  	 * @param   { string } sourceCode - original source
+  	 * @returns {AST.ArrayExpression} array containing the slot objects
+  	 */function createBindingAttributes(sourceNode,selectorAttribute,sourceFile,sourceCode){const createAttributeExpression$1=attribute=>createAttributeExpression(attribute,sourceFile,sourceCode);return builders.arrayExpression([...compose(attributes=>attributes.map(createAttributeExpression$1),attributes=>getAttributesWithoutSelector(attributes,selectorAttribute),// eslint-disable-line
+  cleanAttributes)(sourceNode)]);}/**
+  	 * Find the slot attribute if it exists
+  	 * @param   {RiotParser.Node.Tag} sourceNode - the custom tag
+  	 * @returns {RiotParser.Node.Attr|undefined} the slot attribute found
+  	 */function findSlotAttribute(sourceNode){return getNodeAttributes(sourceNode).find(attribute=>attribute.name===SLOT_ATTRIBUTE);}/**
+  	 * Transform a RiotParser.Node.Tag into a tag binding
+  	 * @param   { RiotParser.Node.Tag } sourceNode - the custom tag
+  	 * @param   { string } selectorAttribute - attribute needed to select the target node
+  	 * @param   { string } sourceFile - source file path
+  	 * @param   { string } sourceCode - original source
+  	 * @returns { AST.Node } tag binding node
+  	 */function createTagBinding(sourceNode,selectorAttribute,sourceFile,sourceCode){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(BINDING_TYPES),builders.identifier(TAG_BINDING_TYPE),false)),simplePropertyNode(BINDING_GET_COMPONENT_KEY,builders.identifier(GET_COMPONENT_FN)),simplePropertyNode(BINDING_EVALUATE_KEY,toScopedFunction(getCustomNodeNameAsExpression(sourceNode),sourceFile,sourceCode)),simplePropertyNode(BINDING_SLOTS_KEY,createSlotsArray(sourceNode,sourceFile,sourceCode)),simplePropertyNode(BINDING_ATTRIBUTES_KEY,createBindingAttributes(sourceNode,selectorAttribute,sourceFile,sourceCode)),...createSelectorProperties(selectorAttribute)]);}const BuildingState=Object.freeze({html:[],bindings:[],parent:null});/**
   	 * Nodes having bindings should be cloned and new selector properties should be added to them
   	 * @param   {RiotParser.Node} sourceNode - any kind of node parsed via riot parser
   	 * @param   {string} bindingsSelector - temporary string to identify the current node
@@ -5523,7 +5502,7 @@
   attributes:[{name:bindingsSelector},...getNodeAttributes(sourceNode)]});}/**
   	 * Create a generic dynamic node (text or tag) and generate its bindings
   	 * @param   {RiotParser.Node} sourceNode - any kind of node parsed via riot parser
-  	 * @param   {stiring} sourceFile - source file path
+  	 * @param   {string} sourceFile - source file path
   	 * @param   {string} sourceCode - original source
   	 * @param   {BuildingState} state - state representing the current building tree state during the recursion
   	 * @returns {Array} array containing the html output and bindings for the current node
@@ -5531,26 +5510,33 @@
   return [nodeToString(sourceNode),[]];default:return createTagWithBindings(sourceNode,sourceFile,sourceCode,state);}}/**
   	 * Create only a dynamic tag node with generating a custom selector and its bindings
   	 * @param   {RiotParser.Node} sourceNode - any kind of node parsed via riot parser
-  	 * @param   {stiring} sourceFile - source file path
+  	 * @param   {string} sourceFile - source file path
   	 * @param   {string} sourceCode - original source
   	 * @param   {BuildingState} state - state representing the current building tree state during the recursion
   	 * @returns {Array} array containing the html output and bindings for the current node
   	 */function createTagWithBindings(sourceNode,sourceFile,sourceCode){const bindingsSelector=isRootNode(sourceNode)?null:createBindingSelector();const cloneNode=createBindingsTag(sourceNode,bindingsSelector);const tagOpeningHTML=nodeToString(cloneNode);switch(true){// EACH bindings have prio 1
   case hasEachAttribute(cloneNode):return [tagOpeningHTML,[createEachBinding(cloneNode,bindingsSelector,sourceFile,sourceCode)]];// IF bindings have prio 2
   case hasIfAttribute(cloneNode):return [tagOpeningHTML,[createIfBinding(cloneNode,bindingsSelector,sourceFile,sourceCode)]];// TAG bindings have prio 3
-  case isCustomNode(cloneNode):return [tagOpeningHTML,[createTagBinding(cloneNode,bindingsSelector,sourceFile,sourceCode)]];// this node has expressions bound to it
+  case isCustomNode(cloneNode):return [tagOpeningHTML,[createTagBinding(cloneNode,bindingsSelector,sourceFile,sourceCode)]];// slot tag
+  case isSlotNode(cloneNode):return [tagOpeningHTML,[createSlotBinding(cloneNode,bindingsSelector)]];// this node has expressions bound to it
   default:return [tagOpeningHTML,[createSimpleBinding(cloneNode,bindingsSelector,sourceFile,sourceCode)]];}}/**
   	 * Parse a node trying to extract its template and bindings
   	 * @param   {RiotParser.Node} sourceNode - any kind of node parsed via riot parser
-  	 * @param   {stiring} sourceFile - source file path
+  	 * @param   {string} sourceFile - source file path
   	 * @param   {string} sourceCode - original source
   	 * @param   {BuildingState} state - state representing the current building tree state during the recursion
   	 * @returns {Array} array containing the html output and bindings for the current node
   	 */function parseNode(sourceNode,sourceFile,sourceCode,state){// static nodes have no bindings
   if(isStaticNode(sourceNode))return [nodeToString(sourceNode),[]];return createDynamicNode(sourceNode,sourceFile,sourceCode,state);}/**
+  	 * Create the tag binding
+  	 * @param   { RiotParser.Node.Tag } sourceNode - tag containing the each attribute
+  	 * @param   { string } sourceFile - source file path
+  	 * @param   { string } sourceCode - original source
+  	 * @returns { Array } array with only the tag binding AST
+  	 */function createNestedBindings(sourceNode,sourceFile,sourceCode){const mightBeARiotComponent=isCustomNode(sourceNode);return mightBeARiotComponent?[null,[createTagBinding(cloneNodeWithoutSelectorAttribute(sourceNode),null,sourceFile,sourceCode)]]:build(createRootNode(sourceNode),sourceFile,sourceCode);}/**
   	 * Build the template and the bindings
   	 * @param   {RiotParser.Node} sourceNode - any kind of node parsed via riot parser
-  	 * @param   {stiring} sourceFile - source file path
+  	 * @param   {string} sourceFile - source file path
   	 * @param   {string} sourceCode - original source
   	 * @param   {BuildingState} state - state representing the current building tree state during the recursion
   	 * @returns {Array} array containing the html output and the dom bindings
@@ -5558,16 +5544,22 @@
   currentState.html.push(...nodeHTML);currentState.bindings.push(...nodeBindings);// do recursion if
   // this tag has children and it has no special directives bound to it
   if(childrenNodes.length&&!hasItsOwnTemplate(sourceNode)){childrenNodes.forEach(node=>build(node,sourceFile,sourceCode,Object.assign({parent:sourceNode},currentState)));}// close the tag if it's not a void one
-  if(isTagNode(sourceNode)&&!isVoidNode(sourceNode)){currentState.html.push(closeTag(sourceNode));}return [currentState.html.join(''),currentState.bindings];}/**
+  if(isTagNode(sourceNode)&&!isVoidNode(sourceNode)){currentState.html.push(closeTag(sourceNode));}return [currentState.html.join(''),currentState.bindings];}const templateFunctionArguments=[TEMPLATE_FN,EXPRESSION_TYPES,BINDING_TYPES,GET_COMPONENT_FN].map(builders.identifier);/**
+  	 * Create the content of the template function
+  	 * @param   { RiotParser.Node } sourceNode - node generated by the riot compiler
+  	 * @param   { string } sourceFile - source file path
+  	 * @param   { string } sourceCode - original source
+  	 * @returns {AST.BlockStatement} the content of the template function
+  	 */function createTemplateFunctionContent(sourceNode,sourceFile,sourceCode){return builders.blockStatement([builders.returnStatement(callTemplateFunction(...build(createRootNode(sourceNode),sourceFile,sourceCode)))]);}/**
   	 * Extend the AST adding the new template property containing our template call to render the component
   	 * @param   { Object } ast - current output ast
-  	* @param   { stiring } sourceFile - source file path
+  	 * @param   { string } sourceFile - source file path
   	 * @param   { string } sourceCode - original source
-  	 * @param   { Object } sourceNode - node generated by the riot compiler
+  	 * @param   { RiotParser.Node } sourceNode - node generated by the riot compiler
   	 * @returns { Object } the output ast having the "template" key
-  	 */function extendTemplateProperty(ast,sourceFile,sourceCode,sourceNode){types$2.visit(ast,{visitProperty(path){if(path.value.key.value===TAG_TEMPLATE_PROPERTY){path.value.value=builders.functionExpression(null,[TEMPLATE_FN,EXPRESSION_TYPES,BINDING_TYPES,GET_COMPONENT_FN].map(builders.identifier),builders.blockStatement([builders.returnStatement(callTemplateFunction(...build(createRootNode(sourceNode),sourceFile,sourceCode)))]));return false;}this.traverse(path);}});return ast;}/**
+  	 */function extendTemplateProperty(ast,sourceFile,sourceCode,sourceNode){types$2.visit(ast,{visitProperty(path){if(path.value.key.value===TAG_TEMPLATE_PROPERTY){path.value.value=builders.functionExpression(null,templateFunctionArguments,createTemplateFunctionContent(sourceNode,sourceFile,sourceCode));return false;}this.traverse(path);}});return ast;}/**
   	 * Generate the component template logic
-  	 * @param   { Object } sourceNode - node generated by the riot compiler
+  	 * @param   { RiotParser.Node } sourceNode - node generated by the riot compiler
   	 * @param   { string } source - original component source code
   	 * @param   { Object } meta - compilation meta information
   	 * @param   { AST } ast - current AST output
