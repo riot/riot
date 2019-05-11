@@ -3,7 +3,6 @@ import {
   COMPONENTS_IMPLEMENTATION_MAP,
   DOM_COMPONENT_INSTANCE_PROPERTY,
   PLUGINS_SET,
-  SLOTS_KEY_SYMBOL,
   TEMPLATE_KEY_SYMBOL
 } from '../globals'
 import {DOMattributesToObject, getName} from '../utils/dom'
@@ -20,7 +19,6 @@ import {
 } from '../utils/misc'
 import {bindingTypes, template as createTemplate, expressionTypes} from '@riotjs/dom-bindings'
 import $ from 'bianco.query'
-import createSlots from './slots'
 import cssManager from './css-manager'
 import curry from 'curri'
 import {isFunction} from '../utils/checks'
@@ -231,17 +229,18 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
           element[DOM_COMPONENT_INSTANCE_PROPERTY] = this
           // add eventually the 'is' attribute
           component.name && addCssHook(element, component.name)
+
           // define the root element
           defineProperty(this, 'root', element)
+          // define the slots array
+          defineProperty(this, 'slots', slots)
 
           // before mount lifecycle event
           this.onBeforeMount(this.props, this.state)
 
           // handlte the template and its attributes
           this[ATTRIBUTES_KEY_SYMBOL].mount(element, parentScope)
-          this[TEMPLATE_KEY_SYMBOL].mount(element, this)
-          // create the slots and mount them
-          this[SLOTS_KEY_SYMBOL] = createSlots(element, slots || []).mount(parentScope)
+          this[TEMPLATE_KEY_SYMBOL].mount(element, this, parentScope)
 
           this.onMounted(this.props, this.state)
 
@@ -259,10 +258,9 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
 
           if (parentScope) {
             this[ATTRIBUTES_KEY_SYMBOL].update(parentScope)
-            this[SLOTS_KEY_SYMBOL].update(parentScope)
           }
 
-          this[TEMPLATE_KEY_SYMBOL].update(this)
+          this[TEMPLATE_KEY_SYMBOL].update(this, parentScope)
           this.onUpdated(this.props, this.state)
 
           return this
@@ -270,8 +268,7 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
         unmount(preserveRoot) {
           this.onBeforeUnmount(this.props, this.state)
           this[ATTRIBUTES_KEY_SYMBOL].unmount()
-          this[SLOTS_KEY_SYMBOL].unmount()
-          this[TEMPLATE_KEY_SYMBOL].unmount(this, !preserveRoot)
+          this[TEMPLATE_KEY_SYMBOL].unmount(this, {}, !preserveRoot)
           this.onUnmounted(this.props, this.state)
 
           return this

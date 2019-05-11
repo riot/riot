@@ -34,8 +34,7 @@
     "riot.js"
   ],
   "dependencies": {
-    "@riotjs/compiler": "^4.0.4",
-    "@riotjs/dom-bindings": "^1.0.0",
+    "@riotjs/compiler": "^4.1.1",
     "bianco.attr": "^1.0.0",
     "bianco.query": "^1.0.0",
     "cumpa": "^1.0.1",
@@ -44,6 +43,7 @@
   "devDependencies": {
     "@babel/core": "^7.4.4",
     "@babel/preset-env": "^7.4.4",
+    "@riotjs/dom-bindings": "^4.0.0-rc.2",
     "babel-minify": "^0.5.0",
     "babel-plugin-istanbul": "^5.1.4",
     "chai": "^4.2.0",

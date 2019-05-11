@@ -1,5 +1,6 @@
 import * as riot from '../../src/riot'
 
+import ConditionalSlotParent from '../components/conditional-slot-parent.riot'
 import DashedAttributeParent from '../components/dashed-attribute-parent.riot'
 import EachAndSpreadAttribute from '../components/each-and-spread-attribute.riot'
 import GlobalComponents from '../components/global-components.riot'
@@ -540,6 +541,21 @@ describe('Riot core api', () => {
 
       expect(component.$('slot')).to.be.not.ok
       expect(component.root.innerHTML).to.be.not.ok
+
+      component.unmount()
+    })
+
+    it('<slot> tags in if directives will be properly mounted', () => {
+      const element = document.createElement('conditional-slot-parent')
+      const component = riot.component(ConditionalSlotParent)(element)
+
+      expect(component.$('slot')).to.be.not.ok
+      expect(component.$('p')).to.be.not.ok
+
+      component.update({ mustShowSlot: true })
+
+      expect(component.$('slot')).to.be.not.ok
+      expect(component.$('p')).to.be.ok
 
       component.unmount()
     })

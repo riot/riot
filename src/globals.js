@@ -4,5 +4,4 @@ export const
   PLUGINS_SET = new Set(),
   IS_DIRECTIVE = 'is',
   ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
-  TEMPLATE_KEY_SYMBOL = Symbol('template'),
-  SLOTS_KEY_SYMBOL = Symbol('slots')
+  TEMPLATE_KEY_SYMBOL = Symbol('template')
