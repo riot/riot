@@ -3,6 +3,7 @@ import * as riot from '../../src/riot'
 import ConditionalSlotParent from '../components/conditional-slot-parent.riot'
 import DashedAttributeParent from '../components/dashed-attribute-parent.riot'
 import EachAndSpreadAttribute from '../components/each-and-spread-attribute.riot'
+import EachRootAttributes from '../components/each-root-attributes.riot'
 import GlobalComponents from '../components/global-components.riot'
 import MergeAttributes from '../components/merge-attributes.riot'
 import NamedSlotsParent from '../components/named-slots-parent.riot'
@@ -500,6 +501,15 @@ describe('Riot core api', () => {
       const component = riot.component(DashedAttributeParent)(element)
 
       expect(component.$('dashed-attribute-child p').innerHTML).to.be.equal('hello')
+
+      component.unmount()
+    })
+
+    it('root attributes in an each loop will be properly rendered', () => {
+      const element = document.createElement('each-root-attributes')
+      const component = riot.component(EachRootAttributes)(element)
+
+      expect(component.$('p').classList.contains('something')).to.be.ok
 
       component.unmount()
     })
