@@ -1,4 +1,4 @@
-/* Riot v4.0.0-rc.10, @license MIT */
+/* Riot v4.0.0-rc.11, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -771,33 +771,24 @@
     return condition ? Boolean(condition(context)) === false : false;
   }
   /**
-   * Get the context of the looped tag
+   * Extend the scope of the looped tag
+   * @param   {Object} scope - current template scope
    * @param   {string} options.itemName - key to identify the looped item in the new context
    * @param   {string} options.indexName - key to identify the index of the looped item
    * @param   {number} options.index - current index
    * @param   {*} options.item - collection item looped
-   * @param   {*} options.scope - current parent scope
    * @returns {Object} enhanced scope object
    */
 
 
-  function getContext(_ref2) {
+  function extendScope(scope, _ref2) {
     let itemName = _ref2.itemName,
         indexName = _ref2.indexName,
         index = _ref2.index,
-        item = _ref2.item,
-        scope = _ref2.scope;
-    const context = Object.assign({
-      [itemName]: item
-    }, scope);
-
-    if (indexName) {
-      return Object.assign({
-        [indexName]: index
-      }, context);
-    }
-
-    return context;
+        item = _ref2.item;
+    scope[itemName] = item;
+    if (indexName) scope[indexName] = index;
+    return scope;
   }
   /**
    * Loop the current tag items
@@ -826,12 +817,11 @@
     items.forEach((item, i) => {
       // the real item index should be subtracted to the items that were filtered
       const index = i - filteredItems.size;
-      const context = getContext({
+      const context = extendScope(Object.create(scope), {
         itemName,
         indexName,
         index,
-        item,
-        scope
+        item
       });
       const key = getKey ? getKey(context) : index;
       const oldItem = childrenMap.get(key);
@@ -2138,7 +2128,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-rc.10'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-rc.11'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
