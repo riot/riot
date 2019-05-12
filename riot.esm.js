@@ -1,4 +1,4 @@
-/* Riot v4.0.0-rc.11, @license MIT */
+/* Riot v4.0.0-rc.12, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -711,17 +711,17 @@ const EachBinding = Object.seal({
   placeholder: null,
 
   // API methods
-  mount(scope) {
-    return this.update(scope);
+  mount(scope, parentScope) {
+    return this.update(scope, parentScope);
   },
 
-  update(scope) {
+  update(scope, parentScope) {
     const placeholder = this.placeholder;
     const collection = this.evaluate(scope);
     const items = collection ? Array.from(collection) : [];
     const parent = placeholder.parentNode; // prepare the diffing
 
-    const _loopItems = loopItems(items, scope, this),
+    const _loopItems = loopItems(items, scope, parentScope, this),
           newChildrenMap = _loopItems.newChildrenMap,
           batches = _loopItems.batches,
           futureNodes = _loopItems.futureNodes;
@@ -788,6 +788,7 @@ function extendScope(scope, _ref2) {
  * Loop the current tag items
  * @param   { Array } items - tag collection
  * @param   { * } scope - tag scope
+ * @param   { * } parentScope - scope of the parent tag
  * @param   { EeachBinding } binding - each binding object instance
  * @returns { Object } data
  * @returns { Map } data.newChildrenMap - a Map containing the new children tags structure
@@ -796,7 +797,7 @@ function extendScope(scope, _ref2) {
  */
 
 
-function loopItems(items, scope, binding) {
+function loopItems(items, scope, parentScope, binding) {
   const condition = binding.condition,
         template = binding.template,
         childrenMap = binding.childrenMap,
@@ -829,9 +830,9 @@ function loopItems(items, scope, binding) {
     const el = oldItem ? tag.el : root.cloneNode();
 
     if (!oldItem) {
-      batches.push(() => tag.mount(el, context));
+      batches.push(() => tag.mount(el, context, parentScope));
     } else {
-      batches.push(() => tag.update(context));
+      batches.push(() => tag.update(context, parentScope));
     }
 
     futureNodes.push(el); // update the children map
@@ -889,12 +890,12 @@ const IfBinding = Object.seal({
   template: '',
 
   // API methods
-  mount(scope) {
+  mount(scope, parentScope) {
     swap(this.placeholder, this.node);
-    return this.update(scope);
+    return this.update(scope, parentScope);
   },
 
-  update(scope) {
+  update(scope, parentScope) {
     const value = !!this.evaluate(scope);
     const mustMount = !this.value && value;
     const mustUnmount = this.value && !value;
@@ -905,7 +906,7 @@ const IfBinding = Object.seal({
 
         if (this.template) {
           this.template = this.template.clone();
-          this.template.mount(this.node, scope);
+          this.template.mount(this.node, scope, parentScope);
         }
 
         break;
@@ -916,18 +917,18 @@ const IfBinding = Object.seal({
         break;
 
       default:
-        if (value) this.template.update(scope);
+        if (value) this.template.update(scope, parentScope);
     }
 
     this.value = value;
     return this;
   },
 
-  unmount(scope) {
+  unmount(scope, parentScope) {
     const template = this.template;
 
     if (template) {
-      template.unmount(scope);
+      template.unmount(scope, parentScope);
     }
 
     return this;
@@ -1226,7 +1227,7 @@ const SlotBinding = Object.seal({
   },
 
   update(scope, parentScope) {
-    if (this.template) {
+    if (this.template && parentScope) {
       this.template.update(parentScope);
     }
 
@@ -1769,6 +1770,8 @@ function createComponent(_ref) {
 
     return {
       mount(element, parentScope, state) {
+        debugger; // eslint-disable-line
+
         return component.mount(element, state, parentScope);
       },
 
@@ -2122,7 +2125,7 @@ function component(implementation) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.0.0-rc.11'; // expose some internal stuff that might be used from external tools
+const version = 'v4.0.0-rc.12'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
