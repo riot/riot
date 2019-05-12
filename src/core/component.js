@@ -71,6 +71,7 @@ export function createComponent({css, template, exports, name}) {
     // and never deal with the component state
     return {
       mount(element, parentScope, state) {
+        debugger // eslint-disable-line
         return component.mount(element, state, parentScope)
       },
       update(parentScope, state) {

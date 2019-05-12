@@ -1,6 +1,7 @@
 <conditional-slot-parent>
   <conditional-slot is-visible={state.mustShowSlot}>
     <p>Hello there</p>
+    <b if={state.mustShowSlot}>I am visible</b>
   </conditional-slot>
 
   <script>

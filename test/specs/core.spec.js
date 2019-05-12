@@ -555,6 +555,21 @@ describe('Riot core api', () => {
       component.unmount()
     })
 
+    it('<slot>s shouldn\'t throw if the parent scope is not defined', () => {
+      const element = document.createElement('conditional-slot-parent')
+      const component = riot.component(ConditionalSlotParent)(element)
+
+      expect(component.$('slot')).to.be.not.ok
+      expect(component.$('p')).to.be.not.ok
+
+      expect(() => component.update({ mustShowSlot: true })).to.not.throw()
+
+      expect(component.$('slot')).to.be.not.ok
+      expect(component.$('p')).to.be.ok
+
+      component.unmount()
+    })
+
     it('<slot> tags in if directives will be properly mounted', () => {
       const element = document.createElement('conditional-slot-parent')
       const component = riot.component(ConditionalSlotParent)(element)
