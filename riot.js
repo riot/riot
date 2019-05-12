@@ -1,4 +1,4 @@
-/* Riot v4.0.0-rc.12, @license MIT */
+/* Riot v4.0.0-rc.13, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1776,8 +1776,6 @@
 
       return {
         mount(element, parentScope, state) {
-          debugger; // eslint-disable-line
-
           return component.mount(element, state, parentScope);
         },
 
@@ -2131,7 +2129,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-rc.12'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-rc.13'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
