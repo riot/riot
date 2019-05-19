@@ -1,4 +1,4 @@
-/* Riot v4.0.0-rc.13, @license MIT */
+/* Riot v4.0.0-rc.14, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -2129,7 +2129,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-rc.13'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-rc.14'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2171,7 +2171,7 @@
 
   var require$$1 = getCjsExportFromNamespace(_empty_module$1);
 
-  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.0.0-rc.13, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
+  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.0.0-rc.14, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
   this.allSupertypes=Object.create(null);// Linear inheritance hierarchy. Populated during finalization.
   this.supertypeList=[];// Includes inherited fields.
   this.allFields=Object.create(null);// Non-hidden keys of allFields.
@@ -4958,6 +4958,10 @@
   	 * isBoolAttribute('selected') // true
   	 * isBoolAttribute('class') // false
   	 */function isBoolAttribute(attribute){return BOOLEAN_ATTRIBUTES_RE.test(attribute);}/**
+  	 * Memoization function
+  	 * @param   {Function} fn - function to memoize
+  	 * @returns {*} return of the function to memoize
+  	 */function memoize(fn){const cache=new WeakMap();return function(){if(cache.has(arguments.length<=0?undefined:arguments[0]))return cache.get(arguments.length<=0?undefined:arguments[0]);const ret=fn(...arguments);cache.set(arguments.length<=0?undefined:arguments[0],ret);return ret;};}const expressionsContentRe=memoize(brackets=>RegExp(`(${brackets[0]}[^${brackets[1]}]*?${brackets[1]})`,'g'));const isSpreadAttribute=name=>SPREAD_OPERATOR.test(name);const isAttributeExpression=(name,brackets)=>name[0]===brackets[0];const getAttributeEnd=(state,attr)=>expr(state,attr,'[>/\\s]',attr.start);/**
   	 * The more complex parsing is for attributes as it can contain quoted or
   	 * unquoted values or expressions.
   	 *
@@ -4983,9 +4987,9 @@
   	 * @param   {Object} tag    - Current parent tag
   	 * @returns {undefined} void function
   	 * @private
-  	 */function setAttribute(state,pos,tag){const data=state.data;const re=ATTR_START;// (\S[^>/=\s]*)(?:\s*=\s*([^>/])?)? g
-  const start=re.lastIndex=pos;// first non-whitespace
-  const match=re.exec(data);if(match){const end=re.lastIndex;const attr=parseAttribute(state,match,start,end);//assert(q && q.type === Mode.TAG, 'no previous tag for the attr!')
+  	 */function setAttribute(state,pos,tag){const data=state.data;const expressionContent=expressionsContentRe(state.options.brackets);const re=ATTR_START;// (\S[^>/=\s]*)(?:\s*=\s*([^>/])?)? g
+  const start=re.lastIndex=expressionContent.lastIndex=pos;// first non-whitespace
+  const attrMatches=re.exec(data);const isExpressionName=isAttributeExpression(attrMatches[1],state.options.brackets);const match=isExpressionName?[null,expressionContent.exec(data)[1],null]:attrMatches;if(match){const end=re.lastIndex;const attr=parseAttribute(state,match,start,end,isExpressionName);//assert(q && q.type === Mode.TAG, 'no previous tag for the attr!')
   // Pushes the attribute and shifts the `end` position of the tag (`last`).
   state.pos=tag.end=attr.end;tag.attributes=addToCollection(tag.attributes,attr);}}function parseNomalAttribute(state,attr,quote){const data=state.data;let end=attr.end;if(isBoolAttribute(attr.name)){attr[IS_BOOLEAN]=true;}// parse the whole value (if any) and get any expressions on it
   if(quote){// Usually, the value's first char (`quote`) is a quote and the lastIndex
@@ -4994,15 +4998,26 @@
   if(quote!=='"'&&quote!=='\''){quote='';// first char of value is not a quote
   valueStart--;// adjust the starting position
   }end=expr(state,attr,quote||'[>/\\s]',valueStart);// adjust the bounds of the value and save its content
-  return Object.assign(attr,{value:getChunk(data,valueStart,end),valueStart,end:quote?++end:end});}return attr;}function parseSpreadAttribute(state,attr,quote){let end=expr(state,attr,quote||'[>/\\s]',attr.start);return {[IS_SPREAD]:true,start:attr.start,expressions:attr.expressions.map(expr=>Object.assign(expr,{text:expr.text.replace(SPREAD_OPERATOR,'')})),end:quote?++end:end};}/**
+  return Object.assign(attr,{value:getChunk(data,valueStart,end),valueStart,end:quote?++end:end});}return attr;}/**
+  	 * Parse expression names <a {href}>
+  	 * @param   {ParserStore}  state  - Parser state
+  	 * @param   {Object} attr - attribute object parsed
+  	 * @returns {Object} normalized attribute object
+  	 */function parseSpreadAttribute(state,attr){const end=getAttributeEnd(state,attr);return {[IS_SPREAD]:true,start:attr.start,expressions:attr.expressions.map(expr=>Object.assign(expr,{text:expr.text.replace(SPREAD_OPERATOR,'').trim()})),end:end};}/**
+  	 * Parse expression names <a {href}>
+  	 * @param   {ParserStore}  state  - Parser state
+  	 * @param   {Object} attr - attribute object parsed
+  	 * @returns {Object} normalized attribute object
+  	 */function parseExpressionNameAttribute(state,attr){const end=getAttributeEnd(state,attr);return {start:attr.start,name:attr.expressions[0].text.trim(),expressions:attr.expressions,end:end};}/**
   	 * Parse the attribute values normalising the quotes
   	 * @param   {ParserStore}  state  - Parser state
   	 * @param   {Array} match - results of the attributes regex
   	 * @param   {number} start - attribute start position
   	 * @param   {number} end - attribute end position
+  	 * @param   {boolean} isExpressionName - true if the attribute name is an expression
   	 * @returns {Object} attribute object
-  	 */function parseAttribute(state,match,start,end){const attr={name:match[1],value:'',start,end};const quote=match[2];// first letter of value or nothing
-  if(SPREAD_OPERATOR.test(attr.name)){return parseSpreadAttribute(state,attr,quote);}return parseNomalAttribute(state,attr,quote);}/**
+  	 */function parseAttribute(state,match,start,end,isExpressionName){const attr={name:match[1],value:'',start,end};const quote=match[2];// first letter of value or nothing
+  switch(true){case isSpreadAttribute(attr.name):return parseSpreadAttribute(state,attr);case isExpressionName===true:return parseExpressionNameAttribute(state,attr);default:return parseNomalAttribute(state,attr,quote);}}/**
   	 * Parses comments in long or short form
   	 * (any DOCTYPE & CDATA blocks are parsed as comments).
   	 *
@@ -5310,7 +5325,7 @@
   	 * True if the attribute parsed is of type spread one
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {boolean} true if the attribute node is of type spread
-  	 */function isSpreadAttribute(node){return node[IS_SPREAD_ATTRIBUTE];}/**
+  	 */function isSpreadAttribute$1(node){return node[IS_SPREAD_ATTRIBUTE];}/**
   	 * True if the node is an attribute and its name is "value"
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {boolean} true only for value attribute nodes
@@ -5394,7 +5409,7 @@
   	 * @param   {string} sourceFile - source file path
   	 * @param   {string} sourceCode - original source
   	 * @returns {AST.Node} object containing the expression binding keys
-  	 */function createAttributeExpression(sourceNode,sourceFile,sourceCode){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(ATTRIBUTE_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_NAME_KEY,isSpreadAttribute(sourceNode)?nullNode():builders.literal(sourceNode.name)),simplePropertyNode(BINDING_EVALUATE_KEY,hasExpressions(sourceNode)?// dynamic attribute
+  	 */function createAttributeExpression(sourceNode,sourceFile,sourceCode){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(ATTRIBUTE_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_NAME_KEY,isSpreadAttribute$1(sourceNode)?nullNode():builders.literal(sourceNode.name)),simplePropertyNode(BINDING_EVALUATE_KEY,hasExpressions(sourceNode)?// dynamic attribute
   wrapASTInFunctionWithScope(mergeAttributeExpressions(sourceNode,sourceFile,sourceCode)):// static attribute
   builders.functionExpression(null,[],builders.blockStatement([builders.returnStatement(builders.literal(sourceNode.value||true))])))]);}/**
   	 * Create a simple event expression
