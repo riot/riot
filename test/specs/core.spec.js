@@ -13,6 +13,7 @@ import ParentWithSlotsComponent from '../components/parent-with-slots.riot'
 import RuntimeIsDirective from '../components/runtime-is-directive.riot'
 import SimpleComponent from '../components/simple.riot'
 import SimpleSlot from '../components/simple-slot.riot'
+import ShorthandAttribute from '../components/shorthand-attribute.riot'
 import SpreadAttribute from '../components/spread-attribute.riot'
 import TitleProps from '../components/title-prop.riot'
 
@@ -473,6 +474,17 @@ describe('Riot core api', () => {
       const component = riot.component(MyComponent)(element)
 
       expect(mountedSpy).to.have.been.calledOnce
+      component.unmount()
+    })
+
+    it('shorthand attributes can be properly rendered', () => {
+      const element = document.createElement('shorthand-attribute')
+
+      const component = riot.component(ShorthandAttribute)(element)
+      const a = component.$('a')
+
+      expect(a.getAttribute('href')).to.be.equal(component.href)
+      expect(a.getAttribute('target')).to.be.equal(component.target)
       component.unmount()
     })
 
