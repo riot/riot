@@ -16,8 +16,9 @@ describe('Riot compiler api', () => {
       '__',
       // compiler API
       'compile',
-      'compileFromString',
-      'compileFromUrl'
+      'evaluate',
+      'compileFromUrl',
+      'compileFromString'
     ])
   })
 

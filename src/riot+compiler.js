@@ -7,7 +7,7 @@ const GLOBAL_REGISTRY = '__riot_registry__'
 window[GLOBAL_REGISTRY] = {}
 
 // evaluates a compiled tag within the global context
-function globalEval(js, url) {
+function injectScript(js, url) {
   const node = document.createElement('script')
   const root = document.documentElement
 
@@ -20,12 +20,14 @@ function globalEval(js, url) {
 }
 
 // cheap module transpilation
-compiler.registerPostprocessor(function(code){
-  return {
-    code: `(function (global){${code}})(this)`.replace('export default', 'return'),
-    map: {}
-  }
-})
+function transpile(code) {
+  return `(function (global){${code}})(this)`.replace('export default', 'return')
+}
+
+function evaluate(tagName, code, url) {
+  injectScript(`window.${GLOBAL_REGISTRY}['${tagName}'] = ${transpile(code)}`, url)
+  riot.register(tagName, window[GLOBAL_REGISTRY][tagName])
+}
 
 function compileFromString(string, options) {
   return compiler.compile(string, options)
@@ -47,15 +49,15 @@ async function compile() {
     const url = urls[i]
     const {tagName} = meta
 
-    globalEval(`window.${GLOBAL_REGISTRY}['${tagName}'] = ${code}`, url)
-    riot.register(tagName, window[GLOBAL_REGISTRY][tagName])
+    evaluate(tagName, code, url)
   })
 }
 
 export default {
   ...riot,
   compile,
-  compileFromString,
-  compileFromUrl
+  evaluate,
+  compileFromUrl,
+  compileFromString
 }
 
