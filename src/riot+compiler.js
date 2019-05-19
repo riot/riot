@@ -7,13 +7,13 @@ const GLOBAL_REGISTRY = '__riot_registry__'
 window[GLOBAL_REGISTRY] = {}
 
 // evaluates a compiled tag within the global context
-function injectScript(js, url) {
+function evaluate(js, url) {
   const node = document.createElement('script')
   const root = document.documentElement
 
   // make the source available in the "(no domain)" tab
   // of Chrome DevTools, with a .js extension
-  node.text =  `${js}\n//# sourceURL=${url}.js`
+  if (url) node.text =  `${js}\n//# sourceURL=${url}.js`
 
   root.appendChild(node)
   root.removeChild(node)
@@ -24,8 +24,8 @@ function transpile(code) {
   return `(function (global){${code}})(this)`.replace('export default', 'return')
 }
 
-function evaluate(tagName, code, url) {
-  injectScript(`window.${GLOBAL_REGISTRY}['${tagName}'] = ${transpile(code)}`, url)
+function inject(code, tagName, url) {
+  evaluate(`window.${GLOBAL_REGISTRY}['${tagName}'] = ${transpile(code)}`, url)
   riot.register(tagName, window[GLOBAL_REGISTRY][tagName])
 }
 
@@ -49,14 +49,14 @@ async function compile() {
     const url = urls[i]
     const {tagName} = meta
 
-    evaluate(tagName, code, url)
+    inject(code, tagName, url)
   })
 }
 
 export default {
   ...riot,
   compile,
-  evaluate,
+  inject,
   compileFromUrl,
   compileFromString
 }
