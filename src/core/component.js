@@ -49,6 +49,23 @@ const MOCKED_TEMPLATE_INTERFACE = {
 }
 
 /**
+ * Factory function to create the component templates only once
+ * @param   {Function} template - component template creation function
+ * @param   {Object} components - object containing the nested components
+ * @returns {TemplateChunk} template chunk object
+ */
+function componentTemplateFactory(template, components) {
+  return template(
+    createTemplate,
+    expressionTypes,
+    bindingTypes,
+    name => {
+      return components[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
+    }
+  )
+}
+
+/**
  * Create the component interface needed for the @riotjs/dom-bindings tag bindings
  * @param   {string} options.css - component css
  * @param   {Function} options.template - functon that will return the dom-bindings template function
@@ -57,11 +74,18 @@ const MOCKED_TEMPLATE_INTERFACE = {
  * @returns {Object} component like interface
  */
 export function createComponent({css, template, exports, name}) {
+  const templateFn = template ? componentTemplateFactory(
+    template,
+    exports ? createSubcomponents(exports.components) : {}
+  ) : MOCKED_TEMPLATE_INTERFACE
+
   return ({slots, attributes, props}) => {
+    const componentAPI = callOrAssign(exports) || {}
+
     const component = defineComponent({
       css,
-      template,
-      exports,
+      template: templateFn,
+      componentAPI,
       name
     })({slots, attributes, props})
 
@@ -89,10 +113,7 @@ export function createComponent({css, template, exports, name}) {
  * @param   {Object} component - the component initial properties
  * @returns {Object} a new component implementation object
  */
-export function defineComponent({css, template, exports, name}) {
-  const componentAPI = callOrAssign(exports) || {}
-  const components = createSubcomponents(componentAPI.components)
-
+export function defineComponent({css, template, componentAPI, name}) {
   // add the component css into the DOM
   if (css && name) cssManager.add(name, css)
 
@@ -109,14 +130,7 @@ export function defineComponent({css, template, exports, name}) {
       ...COMPONENT_CORE_HELPERS,
       name,
       css,
-      template: template ? template(
-        createTemplate,
-        expressionTypes,
-        bindingTypes,
-        name => {
-          return components[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
-        }
-      ) : MOCKED_TEMPLATE_INTERFACE
+      template
     })
   )
 }
@@ -223,7 +237,7 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
           this.state = computeState(this.state, state)
 
           this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone()
-          this[ATTRIBUTES_KEY_SYMBOL] = attributeBindings.createDOM(element).clone()
+          this[ATTRIBUTES_KEY_SYMBOL] = attributeBindings.clone()
 
           // link this object to the DOM node
           element[DOM_COMPONENT_INSTANCE_PROPERTY] = this
