@@ -1,4 +1,4 @@
-/* Riot v4.0.0-rc.17, @license MIT */
+/* Riot v4.0.0-rc.18, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1742,28 +1742,44 @@
     clone: noop,
     createDOM: noop
     /**
-     * Create the component interface needed for the @riotjs/dom-bindings tag bindings
-     * @param   {string} options.css - component css
-     * @param   {Function} options.template - functon that will return the dom-bindings template function
-     * @param   {Object} options.exports - component interface
-     * @param   {string} options.name - component name
-     * @returns {Object} component like interface
+     * Factory function to create the component templates only once
+     * @param   {Function} template - component template creation function
+     * @param   {Object} components - object containing the nested components
+     * @returns {TemplateChunk} template chunk object
      */
 
   };
+
+  function componentTemplateFactory(template, components) {
+    return template(create$6, expressionTypes, bindingTypes, name => {
+      return components[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name);
+    });
+  }
+  /**
+   * Create the component interface needed for the @riotjs/dom-bindings tag bindings
+   * @param   {string} options.css - component css
+   * @param   {Function} options.template - functon that will return the dom-bindings template function
+   * @param   {Object} options.exports - component interface
+   * @param   {string} options.name - component name
+   * @returns {Object} component like interface
+   */
+
+
   function createComponent(_ref) {
     let css = _ref.css,
         template = _ref.template,
         exports = _ref.exports,
         name = _ref.name;
+    const templateFn = template ? componentTemplateFactory(template, exports ? createSubcomponents(exports.components) : {}) : MOCKED_TEMPLATE_INTERFACE;
     return (_ref2) => {
       let slots = _ref2.slots,
           attributes = _ref2.attributes,
           props = _ref2.props;
+      const componentAPI = callOrAssign(exports) || {};
       const component = defineComponent({
         css,
-        template,
-        exports,
+        template: templateFn,
+        componentAPI,
         name
       })({
         slots,
@@ -1800,11 +1816,9 @@
   function defineComponent(_ref3) {
     let css = _ref3.css,
         template = _ref3.template,
-        exports = _ref3.exports,
+        componentAPI = _ref3.componentAPI,
         name = _ref3.name;
-    const componentAPI = callOrAssign(exports) || {};
-    const components = createSubcomponents(componentAPI.components); // add the component css into the DOM
-
+    // add the component css into the DOM
     if (css && name) cssManager.add(name, css);
     return curry(enhanceComponentAPI)(defineProperties( // set the component defaults without overriding the original component API
     defineDefaults(componentAPI, Object.assign({}, COMPONENT_LIFECYCLE_METHODS, {
@@ -1816,9 +1830,7 @@
     }, COMPONENT_CORE_HELPERS, {
       name,
       css,
-      template: template ? template(create$6, expressionTypes, bindingTypes, name => {
-        return components[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name);
-      }) : MOCKED_TEMPLATE_INTERFACE
+      template
     })));
   }
   /**
@@ -1938,7 +1950,7 @@
         this.props = Object.freeze(Object.assign({}, initialProps, evaluateProps(element, attributes, parentScope)));
         this.state = computeState(this.state, state);
         this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone();
-        this[ATTRIBUTES_KEY_SYMBOL] = attributeBindings.createDOM(element).clone(); // link this object to the DOM node
+        this[ATTRIBUTES_KEY_SYMBOL] = attributeBindings.clone(); // link this object to the DOM node
 
         element[DOM_COMPONENT_INSTANCE_PROPERTY] = this; // add eventually the 'is' attribute
 
@@ -2129,7 +2141,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-rc.17'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-rc.18'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
