@@ -1,4 +1,4 @@
-/* Riot v4.0.0-rc.18, @license MIT */
+/* Riot v4.0.0-rc.19, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -727,19 +727,20 @@
       const items = collection ? Array.from(collection) : [];
       const parent = placeholder.parentNode; // prepare the diffing
 
-      const _loopItems = loopItems(items, scope, parentScope, this),
-            newChildrenMap = _loopItems.newChildrenMap,
-            batches = _loopItems.batches,
-            futureNodes = _loopItems.futureNodes;
-      /**
-       * DOM Updates
-       */
+      const _createPatch = createPatch(items, scope, parentScope, this),
+            newChildrenMap = _createPatch.newChildrenMap,
+            batches = _createPatch.batches,
+            futureNodes = _createPatch.futureNodes; // DOM Updates only if it's needed
 
 
-      const before = this.tags[this.tags.length - 1];
-      domdiff(parent, this.tags, futureNodes, {
-        before: before ? before.nextSibling : placeholder.nextSibling
-      }); // trigger the mounts and the updates
+      if (futureNodes.length) {
+        domdiff(parent, this.tags, futureNodes, {
+          before: placeholder
+        });
+      } // remove redundant instances
+
+
+      unmountRedundant(this.childrenMap); // trigger the mounts and the updates
 
       batches.forEach(fn => fn()); // update the children map
 
@@ -748,12 +749,8 @@
       return this;
     },
 
-    unmount() {
-      Array.from(this.childrenMap.values()).forEach((_ref) => {
-        let tag = _ref.tag,
-            context = _ref.context;
-        tag.unmount(context, true);
-      });
+    unmount(scope, parentScope) {
+      unmountRedundant(this.childrenMap, parentScope);
       this.childrenMap = new Map();
       this.tags = [];
       return this;
@@ -761,11 +758,26 @@
 
   });
   /**
+   * Unmount the remaining template instances
+   * @param   {Map} childrenMap - map containing the children template to unmount
+   * @param  {*} parentScope - scope of the parent tag
+   * @returns {TemplateChunk[]} collection containing the template chunks unmounted
+   */
+
+  function unmountRedundant(childrenMap, parentScope) {
+    return Array.from(childrenMap.values()).map((_ref) => {
+      let tag = _ref.tag,
+          context = _ref.context;
+      return tag.unmount(context, parentScope, true);
+    });
+  }
+  /**
    * Check whether a tag must be filtered from a loop
    * @param   {Function} condition - filter function
    * @param   {Object} context - argument passed to the filter function
    * @returns {boolean} true if this item should be skipped
    */
+
 
   function mustFilterItem(condition, context) {
     return condition ? Boolean(condition(context)) === false : false;
@@ -792,18 +804,18 @@
   }
   /**
    * Loop the current tag items
-   * @param   { Array } items - tag collection
-   * @param   { * } scope - tag scope
-   * @param   { * } parentScope - scope of the parent tag
-   * @param   { EeachBinding } binding - each binding object instance
-   * @returns { Object } data
-   * @returns { Map } data.newChildrenMap - a Map containing the new children tags structure
-   * @returns { Array } data.batches - array containing functions the tags lifecycle functions to trigger
-   * @returns { Array } data.futureNodes - array containing the nodes we need to diff
+   * @param   {Array} items - tag collection
+   * @param   {*} scope - tag scope
+   * @param   {*} parentScope - scope of the parent tag
+   * @param   {EeachBinding} binding - each binding object instance
+   * @returns {Object} data
+   * @returns {Map} data.newChildrenMap - a Map containing the new children tags structure
+   * @returns {Array} data.batches - array containing functions the tags lifecycle functions to trigger
+   * @returns {Array} data.futureNodes - array containing the nodes we need to diff
    */
 
 
-  function loopItems(items, scope, parentScope, binding) {
+  function createPatch(items, scope, parentScope, binding) {
     const condition = binding.condition,
           template = binding.template,
           childrenMap = binding.childrenMap,
@@ -811,13 +823,17 @@
           getKey = binding.getKey,
           indexName = binding.indexName,
           root = binding.root;
-    const filteredItems = new Set();
     const newChildrenMap = new Map();
     const batches = [];
     const futureNodes = [];
+    /* eslint-disable fp/no-let */
+
+    let filteredItems = 0;
+    /* eslint-enable fp/no-let */
+
     items.forEach((item, i) => {
       // the real item index should be subtracted to the items that were filtered
-      const index = i - filteredItems.size;
+      const index = i - filteredItems;
       const context = extendScope(Object.create(scope), {
         itemName,
         indexName,
@@ -828,7 +844,7 @@
       const oldItem = childrenMap.get(key);
 
       if (mustFilterItem(condition, context)) {
-        filteredItems.add(oldItem);
+        filteredItems++;
         return;
       }
 
@@ -839,9 +855,12 @@
         batches.push(() => tag.mount(el, context, parentScope));
       } else {
         batches.push(() => tag.update(context, parentScope));
-      }
+      } // create the collection of nodes to update or to add
 
-      futureNodes.push(el); // update the children map
+
+      futureNodes.push(el); // delete the old item from the children map
+
+      childrenMap.delete(key); // update the children map
 
       newChildrenMap.set(key, {
         tag,
@@ -2141,7 +2160,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.0-rc.18'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.0-rc.19'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2183,7 +2202,7 @@
 
   var require$$1 = getCjsExportFromNamespace(_empty_module$1);
 
-  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.0.0-rc.18, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
+  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.0.0-rc.19, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
   this.allSupertypes=Object.create(null);// Linear inheritance hierarchy. Populated during finalization.
   this.supertypeList=[];// Includes inherited fields.
   this.allFields=Object.create(null);// Non-hidden keys of allFields.

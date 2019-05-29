@@ -1,4 +1,4 @@
-/* Riot v4.0.0-rc.18, @license MIT */
+/* Riot v4.0.0-rc.19, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -721,19 +721,20 @@ const EachBinding = Object.seal({
     const items = collection ? Array.from(collection) : [];
     const parent = placeholder.parentNode; // prepare the diffing
 
-    const _loopItems = loopItems(items, scope, parentScope, this),
-          newChildrenMap = _loopItems.newChildrenMap,
-          batches = _loopItems.batches,
-          futureNodes = _loopItems.futureNodes;
-    /**
-     * DOM Updates
-     */
+    const _createPatch = createPatch(items, scope, parentScope, this),
+          newChildrenMap = _createPatch.newChildrenMap,
+          batches = _createPatch.batches,
+          futureNodes = _createPatch.futureNodes; // DOM Updates only if it's needed
 
 
-    const before = this.tags[this.tags.length - 1];
-    domdiff(parent, this.tags, futureNodes, {
-      before: before ? before.nextSibling : placeholder.nextSibling
-    }); // trigger the mounts and the updates
+    if (futureNodes.length) {
+      domdiff(parent, this.tags, futureNodes, {
+        before: placeholder
+      });
+    } // remove redundant instances
+
+
+    unmountRedundant(this.childrenMap); // trigger the mounts and the updates
 
     batches.forEach(fn => fn()); // update the children map
 
@@ -742,12 +743,8 @@ const EachBinding = Object.seal({
     return this;
   },
 
-  unmount() {
-    Array.from(this.childrenMap.values()).forEach((_ref) => {
-      let tag = _ref.tag,
-          context = _ref.context;
-      tag.unmount(context, true);
-    });
+  unmount(scope, parentScope) {
+    unmountRedundant(this.childrenMap, parentScope);
     this.childrenMap = new Map();
     this.tags = [];
     return this;
@@ -755,11 +752,26 @@ const EachBinding = Object.seal({
 
 });
 /**
+ * Unmount the remaining template instances
+ * @param   {Map} childrenMap - map containing the children template to unmount
+ * @param  {*} parentScope - scope of the parent tag
+ * @returns {TemplateChunk[]} collection containing the template chunks unmounted
+ */
+
+function unmountRedundant(childrenMap, parentScope) {
+  return Array.from(childrenMap.values()).map((_ref) => {
+    let tag = _ref.tag,
+        context = _ref.context;
+    return tag.unmount(context, parentScope, true);
+  });
+}
+/**
  * Check whether a tag must be filtered from a loop
  * @param   {Function} condition - filter function
  * @param   {Object} context - argument passed to the filter function
  * @returns {boolean} true if this item should be skipped
  */
+
 
 function mustFilterItem(condition, context) {
   return condition ? Boolean(condition(context)) === false : false;
@@ -786,18 +798,18 @@ function extendScope(scope, _ref2) {
 }
 /**
  * Loop the current tag items
- * @param   { Array } items - tag collection
- * @param   { * } scope - tag scope
- * @param   { * } parentScope - scope of the parent tag
- * @param   { EeachBinding } binding - each binding object instance
- * @returns { Object } data
- * @returns { Map } data.newChildrenMap - a Map containing the new children tags structure
- * @returns { Array } data.batches - array containing functions the tags lifecycle functions to trigger
- * @returns { Array } data.futureNodes - array containing the nodes we need to diff
+ * @param   {Array} items - tag collection
+ * @param   {*} scope - tag scope
+ * @param   {*} parentScope - scope of the parent tag
+ * @param   {EeachBinding} binding - each binding object instance
+ * @returns {Object} data
+ * @returns {Map} data.newChildrenMap - a Map containing the new children tags structure
+ * @returns {Array} data.batches - array containing functions the tags lifecycle functions to trigger
+ * @returns {Array} data.futureNodes - array containing the nodes we need to diff
  */
 
 
-function loopItems(items, scope, parentScope, binding) {
+function createPatch(items, scope, parentScope, binding) {
   const condition = binding.condition,
         template = binding.template,
         childrenMap = binding.childrenMap,
@@ -805,13 +817,17 @@ function loopItems(items, scope, parentScope, binding) {
         getKey = binding.getKey,
         indexName = binding.indexName,
         root = binding.root;
-  const filteredItems = new Set();
   const newChildrenMap = new Map();
   const batches = [];
   const futureNodes = [];
+  /* eslint-disable fp/no-let */
+
+  let filteredItems = 0;
+  /* eslint-enable fp/no-let */
+
   items.forEach((item, i) => {
     // the real item index should be subtracted to the items that were filtered
-    const index = i - filteredItems.size;
+    const index = i - filteredItems;
     const context = extendScope(Object.create(scope), {
       itemName,
       indexName,
@@ -822,7 +838,7 @@ function loopItems(items, scope, parentScope, binding) {
     const oldItem = childrenMap.get(key);
 
     if (mustFilterItem(condition, context)) {
-      filteredItems.add(oldItem);
+      filteredItems++;
       return;
     }
 
@@ -833,9 +849,12 @@ function loopItems(items, scope, parentScope, binding) {
       batches.push(() => tag.mount(el, context, parentScope));
     } else {
       batches.push(() => tag.update(context, parentScope));
-    }
+    } // create the collection of nodes to update or to add
 
-    futureNodes.push(el); // update the children map
+
+    futureNodes.push(el); // delete the old item from the children map
+
+    childrenMap.delete(key); // update the children map
 
     newChildrenMap.set(key, {
       tag,
@@ -2135,7 +2154,7 @@ function component(implementation) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.0.0-rc.18'; // expose some internal stuff that might be used from external tools
+const version = 'v4.0.0-rc.19'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
