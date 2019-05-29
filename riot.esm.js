@@ -1,4 +1,4 @@
-/* Riot v4.0.0-rc.19, @license MIT */
+/* Riot v4.0.0-rc.20, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -724,17 +724,19 @@ const EachBinding = Object.seal({
     const _createPatch = createPatch(items, scope, parentScope, this),
           newChildrenMap = _createPatch.newChildrenMap,
           batches = _createPatch.batches,
-          futureNodes = _createPatch.futureNodes; // DOM Updates only if it's needed
+          futureNodes = _createPatch.futureNodes; // patch the DOM only if there are new nodes
 
 
     if (futureNodes.length) {
       domdiff(parent, this.tags, futureNodes, {
-        before: placeholder
+        before: placeholder,
+        node: patch(Array.from(this.childrenMap.values()), parentScope)
       });
-    } // remove redundant instances
+    } else {
+      // remove all redundant templates
+      unmountRedundant(this.childrenMap);
+    } // trigger the mounts and the updates
 
-
-    unmountRedundant(this.childrenMap); // trigger the mounts and the updates
 
     batches.forEach(fn => fn()); // update the children map
 
@@ -752,11 +754,32 @@ const EachBinding = Object.seal({
 
 });
 /**
+ * Patch the DOM while diffing
+ * @param   {TemplateChunk[]} redundant - redundant tepmplate chunks
+ * @param   {*} parentScope - scope of the parent tag
+ * @returns {Function} patch function used by domdiff
+ */
+
+function patch(redundant, parentScope) {
+  return (item, info) => {
+    if (info < 0) {
+      const _redundant$pop = redundant.pop(),
+            tag = _redundant$pop.tag,
+            context = _redundant$pop.context;
+
+      tag.unmount(context, parentScope, false);
+    }
+
+    return item;
+  };
+}
+/**
  * Unmount the remaining template instances
  * @param   {Map} childrenMap - map containing the children template to unmount
- * @param  {*} parentScope - scope of the parent tag
+ * @param   {*} parentScope - scope of the parent tag
  * @returns {TemplateChunk[]} collection containing the template chunks unmounted
  */
+
 
 function unmountRedundant(childrenMap, parentScope) {
   return Array.from(childrenMap.values()).map((_ref) => {
@@ -2154,7 +2177,7 @@ function component(implementation) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.0.0-rc.19'; // expose some internal stuff that might be used from external tools
+const version = 'v4.0.0-rc.20'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
