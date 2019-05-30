@@ -1,5 +1,5 @@
 
-[![Riot logo](https://riot.js.org/img/logo/riot480x.png)](https://riot.js.org)
+[![Riot logo](https://riot.js.org/img/logo/riot-logo.svg)](https://riot.js.org)
 
 ## Simple and elegant component-based UI library
 
