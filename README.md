@@ -22,7 +22,7 @@
 
 ### Custom components • Concise syntax • Simple API • Tiny Size
 
-Riot brings custom components to all modern browsers. It is designed to offer you everything you wished native web components API looked like.
+Riot brings custom components to all modern browsers. It is designed to offer you everything you wished native the web components API looked like.
 
 #### Tag definition
 
@@ -36,7 +36,11 @@ Riot brings custom components to all modern browsers. It is designed to offer yo
         this.update({ time: ++this.state.time })
       },
       onBeforeMount(props) {
-        this.state.time = props.start
+        // create the component initial state
+        this.state = {
+          time: props.start
+        }
+
         this.timer = setInterval(this.tick, 1000)
       },
       onUnmounted() {
@@ -52,7 +56,7 @@ Riot brings custom components to all modern browsers. It is designed to offer yo
 #### Mounting
 
 ```javascript
-// mount the timer with an initial state
+// mount the timer with its initial props
 riot.mount('timer', { start: 0 })
 ```
 
