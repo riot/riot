@@ -20,9 +20,9 @@
 [![Sauce Test Status][saucelabs-image]][saucelabs-url]
 
 
-### Custom tags • Concise syntax • Simple API • Tiny Size
+### Custom components • Concise syntax • Simple API • Tiny Size
 
-Riot brings custom tags to all modern browsers. Think React + Polymer but with enjoyable syntax and a small learning curve.
+Riot brings custom components to all modern browsers. It is designed to offer you everything you wished native web components API looked like.
 
 #### Tag definition
 
@@ -58,7 +58,7 @@ riot.mount('timer', { start: 0 })
 
 #### Nesting
 
-Custom tags lets you build complex views with HTML.
+Custom components let you build complex views with HTML.
 
 ```html
 <timetable>
@@ -71,37 +71,54 @@ Custom tags lets you build complex views with HTML.
 HTML syntax is the de facto language on the web and it's designed for building user interfaces. The syntax is explicit, nesting is inherent to the language and attributes offer a clean way to provide options for custom tags.
 
 
-### Expressions Bindings
+### Performant and predictable
 - Absolutely the smallest possible amount of DOM updates and reflows.
+- Fast expressions bindings instead of virtual DOM memory performance issues and drawbacks.
 - One way data flow: updates and unmounts are propagated downwards from parent to children.
+- No "magic" or "smart" reactive properties or hooks
 - Expressions are pre-compiled and cached for high performance.
 - Lifecycle methods for more control.
 
 
 ### Close to standards
 - No proprietary event system.
+- Future proof thanks to the javascript module syntax.
 - The rendered DOM can be freely manipulated with other tools.
-- No extra HTML root elements or `data-` attributes.
+- No extra HTML root elements, `data-` attributes or fancy custom attributes.
+- No new syntax to learn.
 - Plays well with any frontend framework.
 
 
 ### Use your dearest language and tools
-- Create tags with CoffeeScript, Jade, LiveScript, Typescript, ES6 or [any pre-processor](http://riot.js.org/guide/compiler/#pre-processors) you want.
-- Integrate with NPM, CommonJS, AMD, Bower or Component
-- Develop with [Gulp](https://github.com/e-jigsaw/gulp-riot), [Grunt](https://github.com/ariesjia/grunt-riot), [Wintersmith](https://github.com/collingreen/wintersmith-riot), [webpack*](https://github.com/riot/tag-loader), [Rollup*](https://github.com/riot/rollup-plugin-riot), [Browserify*](https://github.com/riot/riotify), [Babel*](https://github.com/riot/babel-preset-es2015-riot) or Bublé
-- Test with [Karma*](https://github.com/riot/karma-riot), Mocha or whatever you like
+- Create components with CoffeeScript, Jade, LiveScript, Typescript, ES6 or [any pre-processor](https://riot.js.org/next/#pre-processors) you want.
+- Build with [@riotjs/cli](https://github.com/riot/cli), [webpack](https://github.com/riot/webpack-loader), [Rollup](https://github.com/riot/rollup-plugin-riot), [parcel](https://github.com/riot/parcel-plugin-riot), [Browserify](https://github.com/riot/riotify).
+- Test with however you like, you can [load your riot tags directly in node](https://github.com/riot/ssr#render---to-render-only-markup)
 
-*Note*: `*` officially maintained
+
+### Powerful and modular ecosystem
+
+The Riot.js ecosystem is completely modular, it's designed to let you pick only the stuff you really need:
+
+  - [@riotjs/cli](https://github.com/riot/cli) - CLI to compile locally your tags to javascript
+  - [@riotjs/ssr](https://github.com/riot/ssr) - Super simple server side rendering
+  - [@riotjs/hydrate](https://github.com/riot/hydrate) - Hydration strategy for your SPA
+  - [@riotjs/hot-reload](https://github.com/riot/hot-reload) - Live reload plugin
+  - [@riotjs/compiler](https://github.com/riot/compiler) - Advanced tags compiler
+  - [@riotjs/parser](https://github.com/riot/parser) - HTML parser
+  - [@riotjs/dom-bindings](https://github.com/riot/dom-bindings) - Expressions based template engine
+  - [@riotjs/now](https://github.com/riot/now) - https://zeit.co/ now integration
+  - [@riotjs/custom-elements](https://github.com/riot/custom-elements) - native custom elements implementation
 
 ### CDN hosting
+- [unpkg](unpkg.com/riot/riot.js)
 - [jsDelivr](http://www.jsdelivr.com/projects/riot)
 - [cdnjs](https://cdnjs.com/libraries/riot)
 
 ### How to contribute
 
-If you are reading this it's already a good sign and we are thankful for it! We try our best working as much as we could on riot but your help is always appreciated.
+If you are reading this it's already a good sign and I am thankful for it! I try my best working as much as I can on riot but your help is always appreciated.
 
-If you want to contribute to riot helping us maintaining the project please check first the list of [our open issues](https://github.com/riot/riot/issues) to understand whether there is a task where you could help.
+If you want to contribute to riot helping the project maintenance please check first the list of [open issues](https://github.com/riot/riot/issues) to understand whether there is a task where you could help.
 
 Riot is mainly developed on UNIX systems so you will be able to run all the commands necessary to build and test the library using our [Makefile](Makefile). If you are on a Microsoft machine it could be harder to set up you development environment properly.
 
@@ -141,8 +158,8 @@ $ make raw
 
 ### Credits
 
-Riot is made with :heart: by many smart people from all over the world. Thanks to all the contributors<br>
-It's actively maintained by:
+Riot is actively maintained with :heart: by:
+
 <table>
   <tbody>
     <tr>
@@ -154,6 +171,8 @@ It's actively maintained by:
      </tr>
   </tbody>
 </table>
+
+Many thanks to all smart people from all over the world who helped improving it.
 
 ## Official Website
 
