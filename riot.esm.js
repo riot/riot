@@ -1,4 +1,4 @@
-/* Riot v4.0.1, @license MIT */
+/* Riot v4.0.2, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -182,8 +182,7 @@ function dashToCamelCase(string) {
 
 function defineDefaults(source, defaults) {
   Object.entries(defaults).forEach((_ref) => {
-    let key = _ref[0],
-        value = _ref[1];
+    let [key, value] = _ref;
     if (!source[key]) source[key] = value;
   });
   return source;
@@ -235,8 +234,10 @@ function defineProperty(source, key, value, options) {
  */
 
 function normalizeAttribute(_ref2) {
-  let name = _ref2.name,
-      value = _ref2.value;
+  let {
+    name,
+    value
+  } = _ref2;
   return {
     name: dashToCamelCase(name),
     value: value
@@ -252,8 +253,7 @@ function normalizeAttribute(_ref2) {
 
 function defineProperties(source, properties, options) {
   Object.entries(properties).forEach((_ref3) => {
-    let key = _ref3[0],
-        value = _ref3[1];
+    let [key, value] = _ref3;
     defineProperty(source, key, value, options);
   });
   return source;
@@ -437,9 +437,10 @@ const HS = (futureNodes, futureStart, futureEnd, futureChanges, currentNodes, cu
   --futureEnd;
 
   while (ptr) {
-    const _ptr = ptr,
-          newi = _ptr.newi,
-          oldi = _ptr.oldi;
+    const {
+      newi,
+      oldi
+    } = ptr;
 
     while (futureEnd > newi) {
       diff[--minLen] = INSERTION;
@@ -716,16 +717,18 @@ const EachBinding = Object.seal({
   },
 
   update(scope, parentScope) {
-    const placeholder = this.placeholder;
+    const {
+      placeholder
+    } = this;
     const collection = this.evaluate(scope);
     const items = collection ? Array.from(collection) : [];
     const parent = placeholder.parentNode; // prepare the diffing
 
-    const _createPatch = createPatch(items, scope, parentScope, this),
-          newChildrenMap = _createPatch.newChildrenMap,
-          batches = _createPatch.batches,
-          futureNodes = _createPatch.futureNodes; // patch the DOM only if there are new nodes
-
+    const {
+      newChildrenMap,
+      batches,
+      futureNodes
+    } = createPatch(items, scope, parentScope, this); // patch the DOM only if there are new nodes
 
     if (futureNodes.length) {
       domdiff(parent, this.nodes, futureNodes, {
@@ -763,10 +766,10 @@ const EachBinding = Object.seal({
 function patch(redundant, parentScope) {
   return (item, info) => {
     if (info < 0) {
-      const _redundant$pop = redundant.pop(),
-            template = _redundant$pop.template,
-            context = _redundant$pop.context;
-
+      const {
+        template,
+        context
+      } = redundant.pop();
       template.unmount(context, parentScope, false);
     }
 
@@ -783,8 +786,10 @@ function patch(redundant, parentScope) {
 
 function unmountRedundant(childrenMap, parentScope) {
   return Array.from(childrenMap.values()).map((_ref) => {
-    let template = _ref.template,
-        context = _ref.context;
+    let {
+      template,
+      context
+    } = _ref;
     return template.unmount(context, parentScope, true);
   });
 }
@@ -811,10 +816,12 @@ function mustFilterItem(condition, context) {
 
 
 function extendScope(scope, _ref2) {
-  let itemName = _ref2.itemName,
-      indexName = _ref2.indexName,
-      index = _ref2.index,
-      item = _ref2.item;
+  let {
+    itemName,
+    indexName,
+    index,
+    item
+  } = _ref2;
   scope[itemName] = item;
   if (indexName) scope[indexName] = index;
   return scope;
@@ -833,13 +840,15 @@ function extendScope(scope, _ref2) {
 
 
 function createPatch(items, scope, parentScope, binding) {
-  const condition = binding.condition,
-        template = binding.template,
-        childrenMap = binding.childrenMap,
-        itemName = binding.itemName,
-        getKey = binding.getKey,
-        indexName = binding.indexName,
-        root = binding.root;
+  const {
+    condition,
+    template,
+    childrenMap,
+    itemName,
+    getKey,
+    indexName,
+    root
+  } = binding;
   const newChildrenMap = new Map();
   const batches = [];
   const futureNodes = [];
@@ -885,12 +894,14 @@ function createPatch(items, scope, parentScope, binding) {
 }
 
 function create(node, _ref3) {
-  let evaluate = _ref3.evaluate,
-      condition = _ref3.condition,
-      itemName = _ref3.itemName,
-      indexName = _ref3.indexName,
-      getKey = _ref3.getKey,
-      template = _ref3.template;
+  let {
+    evaluate,
+    condition,
+    itemName,
+    indexName,
+    getKey,
+    template
+  } = _ref3;
   const placeholder = document.createTextNode('');
   const parent = node.parentNode;
   const root = node.cloneNode();
@@ -959,7 +970,9 @@ const IfBinding = Object.seal({
   },
 
   unmount(scope, parentScope) {
-    const template = this.template;
+    const {
+      template
+    } = this;
 
     if (template) {
       template.unmount(scope, parentScope);
@@ -977,8 +990,10 @@ function swap(inNode, outNode) {
 }
 
 function create$1(node, _ref4) {
-  let evaluate = _ref4.evaluate,
-      template = _ref4.template;
+  let {
+    evaluate,
+    template
+  } = _ref4;
   return Object.assign({}, IfBinding, {
     node,
     evaluate,
@@ -1008,8 +1023,7 @@ const SET_ATTIBUTE = 'setAttribute';
 
 function setAllAttributes(node, attributes) {
   Object.entries(attributes).forEach((_ref5) => {
-    let name = _ref5[0],
-        value = _ref5[1];
+    let [name, value] = _ref5;
     return attributeExpression(node, {
       name
     }, value);
@@ -1038,7 +1052,9 @@ function removeAllAttributes(node, attributes) {
 
 
 function attributeExpression(node, _ref6, value, oldValue) {
-  let name = _ref6.name;
+  let {
+    name
+  } = _ref6;
 
   // is it a spread operator? {...attributes}
   if (!name) {
@@ -1094,7 +1110,9 @@ function normalizeValue(name, value) {
 
 
 function eventExpression(node, _ref7, value) {
-  let name = _ref7.name;
+  let {
+    name
+  } = _ref7;
   node[name] = value;
 }
 /**
@@ -1108,7 +1126,9 @@ function eventExpression(node, _ref7, value) {
 
 
 function textExpression(node, _ref8, value) {
-  let childNodeIndex = _ref8.childNodeIndex;
+  let {
+    childNodeIndex
+  } = _ref8;
   const target = node.childNodes[childNodeIndex];
   const val = normalizeValue$1(value); // replace the target if it's a placeholder comment
 
@@ -1232,7 +1252,9 @@ function flattenCollectionMethods(collection, methods, context) {
 }
 
 function create$3(node, _ref9) {
-  let expressions = _ref9.expressions;
+  let {
+    expressions
+  } = _ref9;
   return Object.assign({}, flattenCollectionMethods(expressions.map(expression => create$2(node, expression)), ['mount', 'update', 'unmount']));
 }
 
@@ -1245,10 +1267,14 @@ const SlotBinding = Object.seal({
   // API methods
   mount(scope, parentScope) {
     const templateData = scope.slots ? scope.slots.find((_ref10) => {
-      let id = _ref10.id;
+      let {
+        id
+      } = _ref10;
       return id === this.name;
     }) : false;
-    const parentNode = this.node.parentNode;
+    const {
+      parentNode
+    } = this.node;
     this.template = templateData && create$6(templateData.html, templateData.bindings).createDOM(parentNode);
 
     if (this.template) {
@@ -1298,7 +1324,9 @@ function moveSlotInnerContent(slot) {
 
 
 function createSlot(node, _ref11) {
-  let name = _ref11.name;
+  let {
+    name
+  } = _ref11;
   return Object.assign({}, SlotBinding, {
     node,
     name
@@ -1351,7 +1379,9 @@ function getTag(component, slots, attributes) {
 
 function slotBindings(slots) {
   return slots.reduce((acc, _ref12) => {
-    let bindings = _ref12.bindings;
+    let {
+      bindings
+    } = _ref12;
     return acc.concat(bindings);
   }, []);
 }
@@ -1411,10 +1441,12 @@ const TagBinding = Object.seal({
 });
 
 function create$4(node, _ref13) {
-  let evaluate = _ref13.evaluate,
-      getComponent = _ref13.getComponent,
-      slots = _ref13.slots,
-      attributes = _ref13.attributes;
+  let {
+    evaluate,
+    getComponent,
+    slots,
+    attributes
+  } = _ref13;
   return Object.assign({}, TagBinding, {
     node,
     evaluate,
@@ -1439,10 +1471,12 @@ var bindings = {
  */
 
 function create$5(root, binding) {
-  const selector = binding.selector,
-        type = binding.type,
-        redundantAttribute = binding.redundantAttribute,
-        expressions = binding.expressions; // find the node to apply the bindings
+  const {
+    selector,
+    type,
+    redundantAttribute,
+    expressions
+  } = binding; // find the node to apply the bindings
 
   const node = selector ? root.querySelector(selector) : root; // remove eventually additional attributes created only to select this node
 
@@ -1794,15 +1828,19 @@ function componentTemplateFactory(template, components) {
 
 
 function createComponent(_ref) {
-  let css = _ref.css,
-      template = _ref.template,
-      exports = _ref.exports,
-      name = _ref.name;
+  let {
+    css,
+    template,
+    exports,
+    name
+  } = _ref;
   const templateFn = template ? componentTemplateFactory(template, exports ? createSubcomponents(exports.components) : {}) : MOCKED_TEMPLATE_INTERFACE;
   return (_ref2) => {
-    let slots = _ref2.slots,
-        attributes = _ref2.attributes,
-        props = _ref2.props;
+    let {
+      slots,
+      attributes,
+      props
+    } = _ref2;
     const componentAPI = callOrAssign(exports) || {};
     const component = defineComponent({
       css,
@@ -1842,10 +1880,12 @@ function createComponent(_ref) {
  */
 
 function defineComponent(_ref3) {
-  let css = _ref3.css,
-      template = _ref3.template,
-      componentAPI = _ref3.componentAPI,
-      name = _ref3.name;
+  let {
+    css,
+    template,
+    componentAPI,
+    name
+  } = _ref3;
   // add the component css into the DOM
   if (css && name) cssManager.add(name, css);
   return curry(enhanceComponentAPI)(defineProperties( // set the component defaults without overriding the original component API
@@ -1914,8 +1954,7 @@ function createSubcomponents(components) {
   }
 
   return Object.entries(callOrAssign(components)).reduce((acc, _ref4) => {
-    let key = _ref4[0],
-        value = _ref4[1];
+    let [key, value] = _ref4;
     acc[camelToDashCase(key)] = createComponent(value);
     return acc;
   }, {});
@@ -1964,9 +2003,11 @@ function addCssHook(element, name) {
 
 
 function enhanceComponentAPI(component, _ref5) {
-  let slots = _ref5.slots,
-      attributes = _ref5.attributes,
-      props = _ref5.props;
+  let {
+    slots,
+    attributes,
+    props
+  } = _ref5;
   const attributeBindings = createAttributeBindings(attributes);
   const initialProps = callOrAssign(props);
   return autobindMethods(runPlugins(defineProperties(Object.create(component), {
@@ -2068,9 +2109,11 @@ function compose() {
   });
 }
 
-const DOM_COMPONENT_INSTANCE_PROPERTY$1 = DOM_COMPONENT_INSTANCE_PROPERTY,
-      COMPONENTS_IMPLEMENTATION_MAP$1 = COMPONENTS_IMPLEMENTATION_MAP,
-      PLUGINS_SET$1 = PLUGINS_SET;
+const {
+  DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY$1,
+  COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP$1,
+  PLUGINS_SET: PLUGINS_SET$1
+} = globals;
 /**
  * Riot public api
  */
@@ -2083,9 +2126,11 @@ const DOM_COMPONENT_INSTANCE_PROPERTY$1 = DOM_COMPONENT_INSTANCE_PROPERTY,
  */
 
 function register(name, _ref) {
-  let css = _ref.css,
-      template = _ref.template,
-      exports = _ref.exports;
+  let {
+    css,
+    template,
+    exports
+  } = _ref;
   if (COMPONENTS_IMPLEMENTATION_MAP$1.has(name)) panic(`The component "${name}" was already registered`);
   COMPONENTS_IMPLEMENTATION_MAP$1.set(name, createComponent({
     name,
@@ -2169,7 +2214,7 @@ function component(implementation) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.0.1'; // expose some internal stuff that might be used from external tools
+const version = 'v4.0.2'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,

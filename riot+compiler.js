@@ -1,4 +1,4 @@
-/* Riot v4.0.1, @license MIT */
+/* Riot v4.0.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -188,8 +188,7 @@
 
   function defineDefaults(source, defaults) {
     Object.entries(defaults).forEach((_ref) => {
-      let key = _ref[0],
-          value = _ref[1];
+      let [key, value] = _ref;
       if (!source[key]) source[key] = value;
     });
     return source;
@@ -241,8 +240,10 @@
    */
 
   function normalizeAttribute(_ref2) {
-    let name = _ref2.name,
-        value = _ref2.value;
+    let {
+      name,
+      value
+    } = _ref2;
     return {
       name: dashToCamelCase(name),
       value: value
@@ -258,8 +259,7 @@
 
   function defineProperties(source, properties, options) {
     Object.entries(properties).forEach((_ref3) => {
-      let key = _ref3[0],
-          value = _ref3[1];
+      let [key, value] = _ref3;
       defineProperty(source, key, value, options);
     });
     return source;
@@ -443,9 +443,10 @@
     --futureEnd;
 
     while (ptr) {
-      const _ptr = ptr,
-            newi = _ptr.newi,
-            oldi = _ptr.oldi;
+      const {
+        newi,
+        oldi
+      } = ptr;
 
       while (futureEnd > newi) {
         diff[--minLen] = INSERTION;
@@ -722,16 +723,18 @@
     },
 
     update(scope, parentScope) {
-      const placeholder = this.placeholder;
+      const {
+        placeholder
+      } = this;
       const collection = this.evaluate(scope);
       const items = collection ? Array.from(collection) : [];
       const parent = placeholder.parentNode; // prepare the diffing
 
-      const _createPatch = createPatch(items, scope, parentScope, this),
-            newChildrenMap = _createPatch.newChildrenMap,
-            batches = _createPatch.batches,
-            futureNodes = _createPatch.futureNodes; // patch the DOM only if there are new nodes
-
+      const {
+        newChildrenMap,
+        batches,
+        futureNodes
+      } = createPatch(items, scope, parentScope, this); // patch the DOM only if there are new nodes
 
       if (futureNodes.length) {
         domdiff(parent, this.nodes, futureNodes, {
@@ -769,10 +772,10 @@
   function patch(redundant, parentScope) {
     return (item, info) => {
       if (info < 0) {
-        const _redundant$pop = redundant.pop(),
-              template = _redundant$pop.template,
-              context = _redundant$pop.context;
-
+        const {
+          template,
+          context
+        } = redundant.pop();
         template.unmount(context, parentScope, false);
       }
 
@@ -789,8 +792,10 @@
 
   function unmountRedundant(childrenMap, parentScope) {
     return Array.from(childrenMap.values()).map((_ref) => {
-      let template = _ref.template,
-          context = _ref.context;
+      let {
+        template,
+        context
+      } = _ref;
       return template.unmount(context, parentScope, true);
     });
   }
@@ -817,10 +822,12 @@
 
 
   function extendScope(scope, _ref2) {
-    let itemName = _ref2.itemName,
-        indexName = _ref2.indexName,
-        index = _ref2.index,
-        item = _ref2.item;
+    let {
+      itemName,
+      indexName,
+      index,
+      item
+    } = _ref2;
     scope[itemName] = item;
     if (indexName) scope[indexName] = index;
     return scope;
@@ -839,13 +846,15 @@
 
 
   function createPatch(items, scope, parentScope, binding) {
-    const condition = binding.condition,
-          template = binding.template,
-          childrenMap = binding.childrenMap,
-          itemName = binding.itemName,
-          getKey = binding.getKey,
-          indexName = binding.indexName,
-          root = binding.root;
+    const {
+      condition,
+      template,
+      childrenMap,
+      itemName,
+      getKey,
+      indexName,
+      root
+    } = binding;
     const newChildrenMap = new Map();
     const batches = [];
     const futureNodes = [];
@@ -891,12 +900,14 @@
   }
 
   function create(node, _ref3) {
-    let evaluate = _ref3.evaluate,
-        condition = _ref3.condition,
-        itemName = _ref3.itemName,
-        indexName = _ref3.indexName,
-        getKey = _ref3.getKey,
-        template = _ref3.template;
+    let {
+      evaluate,
+      condition,
+      itemName,
+      indexName,
+      getKey,
+      template
+    } = _ref3;
     const placeholder = document.createTextNode('');
     const parent = node.parentNode;
     const root = node.cloneNode();
@@ -965,7 +976,9 @@
     },
 
     unmount(scope, parentScope) {
-      const template = this.template;
+      const {
+        template
+      } = this;
 
       if (template) {
         template.unmount(scope, parentScope);
@@ -983,8 +996,10 @@
   }
 
   function create$1(node, _ref4) {
-    let evaluate = _ref4.evaluate,
-        template = _ref4.template;
+    let {
+      evaluate,
+      template
+    } = _ref4;
     return Object.assign({}, IfBinding, {
       node,
       evaluate,
@@ -1014,8 +1029,7 @@
 
   function setAllAttributes(node, attributes) {
     Object.entries(attributes).forEach((_ref5) => {
-      let name = _ref5[0],
-          value = _ref5[1];
+      let [name, value] = _ref5;
       return attributeExpression(node, {
         name
       }, value);
@@ -1044,7 +1058,9 @@
 
 
   function attributeExpression(node, _ref6, value, oldValue) {
-    let name = _ref6.name;
+    let {
+      name
+    } = _ref6;
 
     // is it a spread operator? {...attributes}
     if (!name) {
@@ -1100,7 +1116,9 @@
 
 
   function eventExpression(node, _ref7, value) {
-    let name = _ref7.name;
+    let {
+      name
+    } = _ref7;
     node[name] = value;
   }
   /**
@@ -1114,7 +1132,9 @@
 
 
   function textExpression(node, _ref8, value) {
-    let childNodeIndex = _ref8.childNodeIndex;
+    let {
+      childNodeIndex
+    } = _ref8;
     const target = node.childNodes[childNodeIndex];
     const val = normalizeValue$1(value); // replace the target if it's a placeholder comment
 
@@ -1238,7 +1258,9 @@
   }
 
   function create$3(node, _ref9) {
-    let expressions = _ref9.expressions;
+    let {
+      expressions
+    } = _ref9;
     return Object.assign({}, flattenCollectionMethods(expressions.map(expression => create$2(node, expression)), ['mount', 'update', 'unmount']));
   }
 
@@ -1251,10 +1273,14 @@
     // API methods
     mount(scope, parentScope) {
       const templateData = scope.slots ? scope.slots.find((_ref10) => {
-        let id = _ref10.id;
+        let {
+          id
+        } = _ref10;
         return id === this.name;
       }) : false;
-      const parentNode = this.node.parentNode;
+      const {
+        parentNode
+      } = this.node;
       this.template = templateData && create$6(templateData.html, templateData.bindings).createDOM(parentNode);
 
       if (this.template) {
@@ -1304,7 +1330,9 @@
 
 
   function createSlot(node, _ref11) {
-    let name = _ref11.name;
+    let {
+      name
+    } = _ref11;
     return Object.assign({}, SlotBinding, {
       node,
       name
@@ -1357,7 +1385,9 @@
 
   function slotBindings(slots) {
     return slots.reduce((acc, _ref12) => {
-      let bindings = _ref12.bindings;
+      let {
+        bindings
+      } = _ref12;
       return acc.concat(bindings);
     }, []);
   }
@@ -1417,10 +1447,12 @@
   });
 
   function create$4(node, _ref13) {
-    let evaluate = _ref13.evaluate,
-        getComponent = _ref13.getComponent,
-        slots = _ref13.slots,
-        attributes = _ref13.attributes;
+    let {
+      evaluate,
+      getComponent,
+      slots,
+      attributes
+    } = _ref13;
     return Object.assign({}, TagBinding, {
       node,
       evaluate,
@@ -1445,10 +1477,12 @@
    */
 
   function create$5(root, binding) {
-    const selector = binding.selector,
-          type = binding.type,
-          redundantAttribute = binding.redundantAttribute,
-          expressions = binding.expressions; // find the node to apply the bindings
+    const {
+      selector,
+      type,
+      redundantAttribute,
+      expressions
+    } = binding; // find the node to apply the bindings
 
     const node = selector ? root.querySelector(selector) : root; // remove eventually additional attributes created only to select this node
 
@@ -1800,15 +1834,19 @@
 
 
   function createComponent(_ref) {
-    let css = _ref.css,
-        template = _ref.template,
-        exports = _ref.exports,
-        name = _ref.name;
+    let {
+      css,
+      template,
+      exports,
+      name
+    } = _ref;
     const templateFn = template ? componentTemplateFactory(template, exports ? createSubcomponents(exports.components) : {}) : MOCKED_TEMPLATE_INTERFACE;
     return (_ref2) => {
-      let slots = _ref2.slots,
-          attributes = _ref2.attributes,
-          props = _ref2.props;
+      let {
+        slots,
+        attributes,
+        props
+      } = _ref2;
       const componentAPI = callOrAssign(exports) || {};
       const component = defineComponent({
         css,
@@ -1848,10 +1886,12 @@
    */
 
   function defineComponent(_ref3) {
-    let css = _ref3.css,
-        template = _ref3.template,
-        componentAPI = _ref3.componentAPI,
-        name = _ref3.name;
+    let {
+      css,
+      template,
+      componentAPI,
+      name
+    } = _ref3;
     // add the component css into the DOM
     if (css && name) cssManager.add(name, css);
     return curry(enhanceComponentAPI)(defineProperties( // set the component defaults without overriding the original component API
@@ -1920,8 +1960,7 @@
     }
 
     return Object.entries(callOrAssign(components)).reduce((acc, _ref4) => {
-      let key = _ref4[0],
-          value = _ref4[1];
+      let [key, value] = _ref4;
       acc[camelToDashCase(key)] = createComponent(value);
       return acc;
     }, {});
@@ -1970,9 +2009,11 @@
 
 
   function enhanceComponentAPI(component, _ref5) {
-    let slots = _ref5.slots,
-        attributes = _ref5.attributes,
-        props = _ref5.props;
+    let {
+      slots,
+      attributes,
+      props
+    } = _ref5;
     const attributeBindings = createAttributeBindings(attributes);
     const initialProps = callOrAssign(props);
     return autobindMethods(runPlugins(defineProperties(Object.create(component), {
@@ -2074,9 +2115,11 @@
     });
   }
 
-  const DOM_COMPONENT_INSTANCE_PROPERTY$1 = DOM_COMPONENT_INSTANCE_PROPERTY,
-        COMPONENTS_IMPLEMENTATION_MAP$1 = COMPONENTS_IMPLEMENTATION_MAP,
-        PLUGINS_SET$1 = PLUGINS_SET;
+  const {
+    DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY$1,
+    COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP$1,
+    PLUGINS_SET: PLUGINS_SET$1
+  } = globals;
   /**
    * Riot public api
    */
@@ -2089,9 +2132,11 @@
    */
 
   function register(name, _ref) {
-    let css = _ref.css,
-        template = _ref.template,
-        exports = _ref.exports;
+    let {
+      css,
+      template,
+      exports
+    } = _ref;
     if (COMPONENTS_IMPLEMENTATION_MAP$1.has(name)) panic(`The component "${name}" was already registered`);
     COMPONENTS_IMPLEMENTATION_MAP$1.set(name, createComponent({
       name,
@@ -2175,7 +2220,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.1'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.2'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2217,7 +2262,7 @@
 
   var require$$1 = getCjsExportFromNamespace(_empty_module$1);
 
-  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.0.1, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
+  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.0.2, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
   this.allSupertypes=Object.create(null);// Linear inheritance hierarchy. Populated during finalization.
   this.supertypeList=[];// Includes inherited fields.
   this.allFields=Object.create(null);// Non-hidden keys of allFields.
@@ -4573,7 +4618,7 @@
   	 * @param   { Output } compilerOutput - output generated by the compiler
   	 * @param   { Object } meta - compiling meta information
   	 * @returns { Output } object containing output code and source map
-  	 */function execute(compilerOutput,meta){return Array.from(postprocessors).reduce(function(acc,postprocessor){const code=acc.code,map=acc.map;const output=postprocessor(code,meta);return {code:output.code,map:composeSourcemaps(map,output.map)};},createOutput(compilerOutput,meta));}/**
+  	 */function execute(compilerOutput,meta){return Array.from(postprocessors).reduce(function(acc,postprocessor){const{code,map}=acc;const output=postprocessor(code,meta);return {code:output.code,map:composeSourcemaps(map,output.map)};},createOutput(compilerOutput,meta));}/**
   	 * Parsers that can be registered by users to preparse components fragments
   	 * @type { Object }
   	 */const preprocessors=Object.freeze({javascript:new Map(),css:new Map(),template:new Map().set('default',code=>({code}))});// throw a processor type error
@@ -4655,7 +4700,7 @@
   	 * @param   { Object } meta - compilation meta information
   	 * @param   { AST } ast - current AST output
   	 * @returns { AST } the AST generated
-  	 */function css(sourceNode,source,meta,ast){const preprocessorName=getPreprocessorTypeByAttribute(sourceNode);const options=meta.options;const cssNode=compactCss(sourceNode.text);const preprocessorOutput=preprocess('css',preprocessorName,meta,cssNode);const cssCode=(options.scopedCss?scopedCSS(meta.tagName,preprocessorOutput.code):preprocessorOutput.code).trim();types$1.visit(ast,{visitProperty(path){if(path.value.key.value===TAG_CSS_PROPERTY){path.value.value=builders.templateLiteral([builders.templateElement({raw:cssCode,cooked:''},false)],[]);return false;}this.traverse(path);}});return ast;}/**
+  	 */function css(sourceNode,source,meta,ast){const preprocessorName=getPreprocessorTypeByAttribute(sourceNode);const{options}=meta;const cssNode=compactCss(sourceNode.text);const preprocessorOutput=preprocess('css',preprocessorName,meta,cssNode);const cssCode=(options.scopedCss?scopedCSS(meta.tagName,preprocessorOutput.code):preprocessorOutput.code).trim();types$1.visit(ast,{visitProperty(path){if(path.value.key.value===TAG_CSS_PROPERTY){path.value.value=builders.templateLiteral([builders.templateElement({raw:cssCode,cooked:''},false)],[]);return false;}this.traverse(path);}});return ast;}/**
   	 * Function to curry any javascript method
   	 * @param   {Function}  fn - the target function we want to curry
   	 * @param   {...[args]} acc - initial arguments
@@ -4685,12 +4730,12 @@
   	 * @param {string} source - original source code
   	 * @param {RiotParser.Node} node - node that we are going to transform
   	 * @return {string} the input string with the offset properly set
-  	 */function addLineOffset(input,source,node){const _getLineAndColumnByPo=getLineAndColumnByPosition(source,node.start),column=_getLineAndColumnByPo.column,line=_getLineAndColumnByPo.line;return `${'\n'.repeat(line-1)}${' '.repeat(column+1)}${input}`;}/**
+  	 */function addLineOffset(input,source,node){const{column,line}=getLineAndColumnByPosition(source,node.start);return `${'\n'.repeat(line-1)}${' '.repeat(column+1)}${input}`;}/**
   	 * Parse a js source to generate the AST
   	 * @param   {string} source - javascript source
   	 * @param   {Object} options - parser options
   	 * @returns {AST} AST tree
-  	 */function generateAST(source,options){return main_2$1(source,Object.assign({},options));}var builtin={"Array":false,"ArrayBuffer":false,Atomics:false,BigInt:false,BigInt64Array:false,BigUint64Array:false,"Boolean":false,constructor:false,"DataView":false,"Date":false,"decodeURI":false,"decodeURIComponent":false,"encodeURI":false,"encodeURIComponent":false,"Error":false,"escape":false,"eval":false,"EvalError":false,"Float32Array":false,"Float64Array":false,"Function":false,globalThis:false,hasOwnProperty:false,"Infinity":false,"Int16Array":false,"Int32Array":false,"Int8Array":false,"isFinite":false,"isNaN":false,isPrototypeOf:false,"JSON":false,"Map":false,"Math":false,"NaN":false,"Number":false,"Object":false,"parseFloat":false,"parseInt":false,"Promise":false,propertyIsEnumerable:false,"Proxy":false,"RangeError":false,"ReferenceError":false,"Reflect":false,"RegExp":false,"Set":false,SharedArrayBuffer:false,"String":false,"Symbol":false,"SyntaxError":false,toLocaleString:false,toString:false,"TypeError":false,"Uint16Array":false,"Uint32Array":false,"Uint8Array":false,"Uint8ClampedArray":false,"undefined":false,"unescape":false,"URIError":false,valueOf:false,"WeakMap":false,"WeakSet":false};var es5={"Array":false,"Boolean":false,constructor:false,"Date":false,"decodeURI":false,"decodeURIComponent":false,"encodeURI":false,"encodeURIComponent":false,"Error":false,"escape":false,"eval":false,"EvalError":false,"Function":false,hasOwnProperty:false,"Infinity":false,"isFinite":false,"isNaN":false,isPrototypeOf:false,"JSON":false,"Math":false,"NaN":false,"Number":false,"Object":false,"parseFloat":false,"parseInt":false,propertyIsEnumerable:false,"RangeError":false,"ReferenceError":false,"RegExp":false,"String":false,"SyntaxError":false,toLocaleString:false,toString:false,"TypeError":false,"undefined":false,"unescape":false,"URIError":false,valueOf:false};var es2015={"Array":false,"ArrayBuffer":false,"Boolean":false,constructor:false,"DataView":false,"Date":false,"decodeURI":false,"decodeURIComponent":false,"encodeURI":false,"encodeURIComponent":false,"Error":false,"escape":false,"eval":false,"EvalError":false,"Float32Array":false,"Float64Array":false,"Function":false,hasOwnProperty:false,"Infinity":false,"Int16Array":false,"Int32Array":false,"Int8Array":false,"isFinite":false,"isNaN":false,isPrototypeOf:false,"JSON":false,"Map":false,"Math":false,"NaN":false,"Number":false,"Object":false,"parseFloat":false,"parseInt":false,"Promise":false,propertyIsEnumerable:false,"Proxy":false,"RangeError":false,"ReferenceError":false,"Reflect":false,"RegExp":false,"Set":false,"String":false,"Symbol":false,"SyntaxError":false,toLocaleString:false,toString:false,"TypeError":false,"Uint16Array":false,"Uint32Array":false,"Uint8Array":false,"Uint8ClampedArray":false,"undefined":false,"unescape":false,"URIError":false,valueOf:false,"WeakMap":false,"WeakSet":false};var es2017={"Array":false,"ArrayBuffer":false,Atomics:false,"Boolean":false,constructor:false,"DataView":false,"Date":false,"decodeURI":false,"decodeURIComponent":false,"encodeURI":false,"encodeURIComponent":false,"Error":false,"escape":false,"eval":false,"EvalError":false,"Float32Array":false,"Float64Array":false,"Function":false,hasOwnProperty:false,"Infinity":false,"Int16Array":false,"Int32Array":false,"Int8Array":false,"isFinite":false,"isNaN":false,isPrototypeOf:false,"JSON":false,"Map":false,"Math":false,"NaN":false,"Number":false,"Object":false,"parseFloat":false,"parseInt":false,"Promise":false,propertyIsEnumerable:false,"Proxy":false,"RangeError":false,"ReferenceError":false,"Reflect":false,"RegExp":false,"Set":false,SharedArrayBuffer:false,"String":false,"Symbol":false,"SyntaxError":false,toLocaleString:false,toString:false,"TypeError":false,"Uint16Array":false,"Uint32Array":false,"Uint8Array":false,"Uint8ClampedArray":false,"undefined":false,"unescape":false,"URIError":false,valueOf:false,"WeakMap":false,"WeakSet":false};var browser={AbortController:false,AbortSignal:false,addEventListener:false,alert:false,AnalyserNode:false,Animation:false,AnimationEffectReadOnly:false,AnimationEffectTiming:false,AnimationEffectTimingReadOnly:false,AnimationEvent:false,AnimationPlaybackEvent:false,AnimationTimeline:false,applicationCache:false,ApplicationCache:false,ApplicationCacheErrorEvent:false,atob:false,Attr:false,Audio:false,AudioBuffer:false,AudioBufferSourceNode:false,AudioContext:false,AudioDestinationNode:false,AudioListener:false,AudioNode:false,AudioParam:false,AudioProcessingEvent:false,AudioScheduledSourceNode:false,"AudioWorkletGlobalScope ":false,AudioWorkletNode:false,AudioWorkletProcessor:false,BarProp:false,BaseAudioContext:false,BatteryManager:false,BeforeUnloadEvent:false,BiquadFilterNode:false,Blob:false,BlobEvent:false,blur:false,BroadcastChannel:false,btoa:false,BudgetService:false,ByteLengthQueuingStrategy:false,Cache:false,caches:false,CacheStorage:false,cancelAnimationFrame:false,cancelIdleCallback:false,CanvasCaptureMediaStreamTrack:false,CanvasGradient:false,CanvasPattern:false,CanvasRenderingContext2D:false,ChannelMergerNode:false,ChannelSplitterNode:false,CharacterData:false,clearInterval:false,clearTimeout:false,clientInformation:false,ClipboardEvent:false,close:false,closed:false,CloseEvent:false,Comment:false,CompositionEvent:false,confirm:false,console:false,ConstantSourceNode:false,ConvolverNode:false,CountQueuingStrategy:false,createImageBitmap:false,Credential:false,CredentialsContainer:false,crypto:false,Crypto:false,CryptoKey:false,CSS:false,CSSConditionRule:false,CSSFontFaceRule:false,CSSGroupingRule:false,CSSImportRule:false,CSSKeyframeRule:false,CSSKeyframesRule:false,CSSMediaRule:false,CSSNamespaceRule:false,CSSPageRule:false,CSSRule:false,CSSRuleList:false,CSSStyleDeclaration:false,CSSStyleRule:false,CSSStyleSheet:false,CSSSupportsRule:false,CustomElementRegistry:false,customElements:false,CustomEvent:false,DataTransfer:false,DataTransferItem:false,DataTransferItemList:false,defaultstatus:false,defaultStatus:false,DelayNode:false,DeviceMotionEvent:false,DeviceOrientationEvent:false,devicePixelRatio:false,dispatchEvent:false,document:false,Document:false,DocumentFragment:false,DocumentType:false,DOMError:false,DOMException:false,DOMImplementation:false,DOMMatrix:false,DOMMatrixReadOnly:false,DOMParser:false,DOMPoint:false,DOMPointReadOnly:false,DOMQuad:false,DOMRect:false,DOMRectReadOnly:false,DOMStringList:false,DOMStringMap:false,DOMTokenList:false,DragEvent:false,DynamicsCompressorNode:false,Element:false,ErrorEvent:false,event:false,Event:false,EventSource:false,EventTarget:false,external:false,fetch:false,File:false,FileList:false,FileReader:false,find:false,focus:false,FocusEvent:false,FontFace:false,FontFaceSetLoadEvent:false,FormData:false,frameElement:false,frames:false,GainNode:false,Gamepad:false,GamepadButton:false,GamepadEvent:false,getComputedStyle:false,getSelection:false,HashChangeEvent:false,Headers:false,history:false,History:false,HTMLAllCollection:false,HTMLAnchorElement:false,HTMLAreaElement:false,HTMLAudioElement:false,HTMLBaseElement:false,HTMLBodyElement:false,HTMLBRElement:false,HTMLButtonElement:false,HTMLCanvasElement:false,HTMLCollection:false,HTMLContentElement:false,HTMLDataElement:false,HTMLDataListElement:false,HTMLDetailsElement:false,HTMLDialogElement:false,HTMLDirectoryElement:false,HTMLDivElement:false,HTMLDListElement:false,HTMLDocument:false,HTMLElement:false,HTMLEmbedElement:false,HTMLFieldSetElement:false,HTMLFontElement:false,HTMLFormControlsCollection:false,HTMLFormElement:false,HTMLFrameElement:false,HTMLFrameSetElement:false,HTMLHeadElement:false,HTMLHeadingElement:false,HTMLHRElement:false,HTMLHtmlElement:false,HTMLIFrameElement:false,HTMLImageElement:false,HTMLInputElement:false,HTMLLabelElement:false,HTMLLegendElement:false,HTMLLIElement:false,HTMLLinkElement:false,HTMLMapElement:false,HTMLMarqueeElement:false,HTMLMediaElement:false,HTMLMenuElement:false,HTMLMetaElement:false,HTMLMeterElement:false,HTMLModElement:false,HTMLObjectElement:false,HTMLOListElement:false,HTMLOptGroupElement:false,HTMLOptionElement:false,HTMLOptionsCollection:false,HTMLOutputElement:false,HTMLParagraphElement:false,HTMLParamElement:false,HTMLPictureElement:false,HTMLPreElement:false,HTMLProgressElement:false,HTMLQuoteElement:false,HTMLScriptElement:false,HTMLSelectElement:false,HTMLShadowElement:false,HTMLSlotElement:false,HTMLSourceElement:false,HTMLSpanElement:false,HTMLStyleElement:false,HTMLTableCaptionElement:false,HTMLTableCellElement:false,HTMLTableColElement:false,HTMLTableElement:false,HTMLTableRowElement:false,HTMLTableSectionElement:false,HTMLTemplateElement:false,HTMLTextAreaElement:false,HTMLTimeElement:false,HTMLTitleElement:false,HTMLTrackElement:false,HTMLUListElement:false,HTMLUnknownElement:false,HTMLVideoElement:false,IDBCursor:false,IDBCursorWithValue:false,IDBDatabase:false,IDBFactory:false,IDBIndex:false,IDBKeyRange:false,IDBObjectStore:false,IDBOpenDBRequest:false,IDBRequest:false,IDBTransaction:false,IDBVersionChangeEvent:false,IdleDeadline:false,IIRFilterNode:false,Image:false,ImageBitmap:false,ImageBitmapRenderingContext:false,ImageCapture:false,ImageData:false,indexedDB:false,innerHeight:false,innerWidth:false,InputEvent:false,IntersectionObserver:false,IntersectionObserverEntry:false,"Intl":false,isSecureContext:false,KeyboardEvent:false,KeyframeEffect:false,KeyframeEffectReadOnly:false,length:false,localStorage:false,location:true,Location:false,locationbar:false,matchMedia:false,MediaDeviceInfo:false,MediaDevices:false,MediaElementAudioSourceNode:false,MediaEncryptedEvent:false,MediaError:false,MediaKeyMessageEvent:false,MediaKeySession:false,MediaKeyStatusMap:false,MediaKeySystemAccess:false,MediaList:false,MediaQueryList:false,MediaQueryListEvent:false,MediaRecorder:false,MediaSettingsRange:false,MediaSource:false,MediaStream:false,MediaStreamAudioDestinationNode:false,MediaStreamAudioSourceNode:false,MediaStreamEvent:false,MediaStreamTrack:false,MediaStreamTrackEvent:false,menubar:false,MessageChannel:false,MessageEvent:false,MessagePort:false,MIDIAccess:false,MIDIConnectionEvent:false,MIDIInput:false,MIDIInputMap:false,MIDIMessageEvent:false,MIDIOutput:false,MIDIOutputMap:false,MIDIPort:false,MimeType:false,MimeTypeArray:false,MouseEvent:false,moveBy:false,moveTo:false,MutationEvent:false,MutationObserver:false,MutationRecord:false,name:false,NamedNodeMap:false,NavigationPreloadManager:false,navigator:false,Navigator:false,NetworkInformation:false,Node:false,NodeFilter:false,NodeIterator:false,NodeList:false,Notification:false,OfflineAudioCompletionEvent:false,OfflineAudioContext:false,offscreenBuffering:false,OffscreenCanvas:true,onabort:true,onafterprint:true,onanimationend:true,onanimationiteration:true,onanimationstart:true,onappinstalled:true,onauxclick:true,onbeforeinstallprompt:true,onbeforeprint:true,onbeforeunload:true,onblur:true,oncancel:true,oncanplay:true,oncanplaythrough:true,onchange:true,onclick:true,onclose:true,oncontextmenu:true,oncuechange:true,ondblclick:true,ondevicemotion:true,ondeviceorientation:true,ondeviceorientationabsolute:true,ondrag:true,ondragend:true,ondragenter:true,ondragleave:true,ondragover:true,ondragstart:true,ondrop:true,ondurationchange:true,onemptied:true,onended:true,onerror:true,onfocus:true,ongotpointercapture:true,onhashchange:true,oninput:true,oninvalid:true,onkeydown:true,onkeypress:true,onkeyup:true,onlanguagechange:true,onload:true,onloadeddata:true,onloadedmetadata:true,onloadstart:true,onlostpointercapture:true,onmessage:true,onmessageerror:true,onmousedown:true,onmouseenter:true,onmouseleave:true,onmousemove:true,onmouseout:true,onmouseover:true,onmouseup:true,onmousewheel:true,onoffline:true,ononline:true,onpagehide:true,onpageshow:true,onpause:true,onplay:true,onplaying:true,onpointercancel:true,onpointerdown:true,onpointerenter:true,onpointerleave:true,onpointermove:true,onpointerout:true,onpointerover:true,onpointerup:true,onpopstate:true,onprogress:true,onratechange:true,onrejectionhandled:true,onreset:true,onresize:true,onscroll:true,onsearch:true,onseeked:true,onseeking:true,onselect:true,onstalled:true,onstorage:true,onsubmit:true,onsuspend:true,ontimeupdate:true,ontoggle:true,ontransitionend:true,onunhandledrejection:true,onunload:true,onvolumechange:true,onwaiting:true,onwheel:true,open:false,openDatabase:false,opener:false,Option:false,origin:false,OscillatorNode:false,outerHeight:false,outerWidth:false,PageTransitionEvent:false,pageXOffset:false,pageYOffset:false,PannerNode:false,parent:false,Path2D:false,PaymentAddress:false,PaymentRequest:false,PaymentRequestUpdateEvent:false,PaymentResponse:false,performance:false,Performance:false,PerformanceEntry:false,PerformanceLongTaskTiming:false,PerformanceMark:false,PerformanceMeasure:false,PerformanceNavigation:false,PerformanceNavigationTiming:false,PerformanceObserver:false,PerformanceObserverEntryList:false,PerformancePaintTiming:false,PerformanceResourceTiming:false,PerformanceTiming:false,PeriodicWave:false,Permissions:false,PermissionStatus:false,personalbar:false,PhotoCapabilities:false,Plugin:false,PluginArray:false,PointerEvent:false,PopStateEvent:false,postMessage:false,Presentation:false,PresentationAvailability:false,PresentationConnection:false,PresentationConnectionAvailableEvent:false,PresentationConnectionCloseEvent:false,PresentationConnectionList:false,PresentationReceiver:false,PresentationRequest:false,print:false,ProcessingInstruction:false,ProgressEvent:false,PromiseRejectionEvent:false,prompt:false,PushManager:false,PushSubscription:false,PushSubscriptionOptions:false,queueMicrotask:false,RadioNodeList:false,Range:false,ReadableStream:false,registerProcessor:false,RemotePlayback:false,removeEventListener:false,Request:false,requestAnimationFrame:false,requestIdleCallback:false,resizeBy:false,ResizeObserver:false,ResizeObserverEntry:false,resizeTo:false,Response:false,RTCCertificate:false,RTCDataChannel:false,RTCDataChannelEvent:false,RTCDtlsTransport:false,RTCIceCandidate:false,RTCIceGatherer:false,RTCIceTransport:false,RTCPeerConnection:false,RTCPeerConnectionIceEvent:false,RTCRtpContributingSource:false,RTCRtpReceiver:false,RTCRtpSender:false,RTCSctpTransport:false,RTCSessionDescription:false,RTCStatsReport:false,RTCTrackEvent:false,screen:false,Screen:false,screenLeft:false,ScreenOrientation:false,screenTop:false,screenX:false,screenY:false,ScriptProcessorNode:false,scroll:false,scrollbars:false,scrollBy:false,scrollTo:false,scrollX:false,scrollY:false,SecurityPolicyViolationEvent:false,Selection:false,self:false,ServiceWorker:false,ServiceWorkerContainer:false,ServiceWorkerRegistration:false,sessionStorage:false,setInterval:false,setTimeout:false,ShadowRoot:false,SharedWorker:false,SourceBuffer:false,SourceBufferList:false,speechSynthesis:false,SpeechSynthesisEvent:false,SpeechSynthesisUtterance:false,StaticRange:false,status:false,statusbar:false,StereoPannerNode:false,stop:false,Storage:false,StorageEvent:false,StorageManager:false,styleMedia:false,StyleSheet:false,StyleSheetList:false,SubtleCrypto:false,SVGAElement:false,SVGAngle:false,SVGAnimatedAngle:false,SVGAnimatedBoolean:false,SVGAnimatedEnumeration:false,SVGAnimatedInteger:false,SVGAnimatedLength:false,SVGAnimatedLengthList:false,SVGAnimatedNumber:false,SVGAnimatedNumberList:false,SVGAnimatedPreserveAspectRatio:false,SVGAnimatedRect:false,SVGAnimatedString:false,SVGAnimatedTransformList:false,SVGAnimateElement:false,SVGAnimateMotionElement:false,SVGAnimateTransformElement:false,SVGAnimationElement:false,SVGCircleElement:false,SVGClipPathElement:false,SVGComponentTransferFunctionElement:false,SVGDefsElement:false,SVGDescElement:false,SVGDiscardElement:false,SVGElement:false,SVGEllipseElement:false,SVGFEBlendElement:false,SVGFEColorMatrixElement:false,SVGFEComponentTransferElement:false,SVGFECompositeElement:false,SVGFEConvolveMatrixElement:false,SVGFEDiffuseLightingElement:false,SVGFEDisplacementMapElement:false,SVGFEDistantLightElement:false,SVGFEDropShadowElement:false,SVGFEFloodElement:false,SVGFEFuncAElement:false,SVGFEFuncBElement:false,SVGFEFuncGElement:false,SVGFEFuncRElement:false,SVGFEGaussianBlurElement:false,SVGFEImageElement:false,SVGFEMergeElement:false,SVGFEMergeNodeElement:false,SVGFEMorphologyElement:false,SVGFEOffsetElement:false,SVGFEPointLightElement:false,SVGFESpecularLightingElement:false,SVGFESpotLightElement:false,SVGFETileElement:false,SVGFETurbulenceElement:false,SVGFilterElement:false,SVGForeignObjectElement:false,SVGGElement:false,SVGGeometryElement:false,SVGGradientElement:false,SVGGraphicsElement:false,SVGImageElement:false,SVGLength:false,SVGLengthList:false,SVGLinearGradientElement:false,SVGLineElement:false,SVGMarkerElement:false,SVGMaskElement:false,SVGMatrix:false,SVGMetadataElement:false,SVGMPathElement:false,SVGNumber:false,SVGNumberList:false,SVGPathElement:false,SVGPatternElement:false,SVGPoint:false,SVGPointList:false,SVGPolygonElement:false,SVGPolylineElement:false,SVGPreserveAspectRatio:false,SVGRadialGradientElement:false,SVGRect:false,SVGRectElement:false,SVGScriptElement:false,SVGSetElement:false,SVGStopElement:false,SVGStringList:false,SVGStyleElement:false,SVGSVGElement:false,SVGSwitchElement:false,SVGSymbolElement:false,SVGTextContentElement:false,SVGTextElement:false,SVGTextPathElement:false,SVGTextPositioningElement:false,SVGTitleElement:false,SVGTransform:false,SVGTransformList:false,SVGTSpanElement:false,SVGUnitTypes:false,SVGUseElement:false,SVGViewElement:false,TaskAttributionTiming:false,Text:false,TextDecoder:false,TextEncoder:false,TextEvent:false,TextMetrics:false,TextTrack:false,TextTrackCue:false,TextTrackCueList:false,TextTrackList:false,TimeRanges:false,toolbar:false,top:false,Touch:false,TouchEvent:false,TouchList:false,TrackEvent:false,TransitionEvent:false,TreeWalker:false,UIEvent:false,URL:false,URLSearchParams:false,ValidityState:false,visualViewport:false,VisualViewport:false,VTTCue:false,WaveShaperNode:false,WebAssembly:false,WebGL2RenderingContext:false,WebGLActiveInfo:false,WebGLBuffer:false,WebGLContextEvent:false,WebGLFramebuffer:false,WebGLProgram:false,WebGLQuery:false,WebGLRenderbuffer:false,WebGLRenderingContext:false,WebGLSampler:false,WebGLShader:false,WebGLShaderPrecisionFormat:false,WebGLSync:false,WebGLTexture:false,WebGLTransformFeedback:false,WebGLUniformLocation:false,WebGLVertexArrayObject:false,WebSocket:false,WheelEvent:false,window:false,Window:false,Worker:false,WritableStream:false,XMLDocument:false,XMLHttpRequest:false,XMLHttpRequestEventTarget:false,XMLHttpRequestUpload:false,XMLSerializer:false,XPathEvaluator:false,XPathExpression:false,XPathResult:false,XSLTProcessor:false};var worker={addEventListener:false,applicationCache:false,atob:false,Blob:false,BroadcastChannel:false,btoa:false,Cache:false,caches:false,clearInterval:false,clearTimeout:false,close:true,console:false,fetch:false,FileReaderSync:false,FormData:false,Headers:false,IDBCursor:false,IDBCursorWithValue:false,IDBDatabase:false,IDBFactory:false,IDBIndex:false,IDBKeyRange:false,IDBObjectStore:false,IDBOpenDBRequest:false,IDBRequest:false,IDBTransaction:false,IDBVersionChangeEvent:false,ImageData:false,importScripts:true,indexedDB:false,location:false,MessageChannel:false,MessagePort:false,name:false,navigator:false,Notification:false,onclose:true,onconnect:true,onerror:true,onlanguagechange:true,onmessage:true,onoffline:true,ononline:true,onrejectionhandled:true,onunhandledrejection:true,performance:false,Performance:false,PerformanceEntry:false,PerformanceMark:false,PerformanceMeasure:false,PerformanceNavigation:false,PerformanceResourceTiming:false,PerformanceTiming:false,postMessage:true,"Promise":false,queueMicrotask:false,removeEventListener:false,Request:false,Response:false,self:true,ServiceWorkerRegistration:false,setInterval:false,setTimeout:false,TextDecoder:false,TextEncoder:false,URL:false,URLSearchParams:false,WebSocket:false,Worker:false,WorkerGlobalScope:false,XMLHttpRequest:false};var node={__dirname:false,__filename:false,Buffer:false,clearImmediate:false,clearInterval:false,clearTimeout:false,console:false,exports:true,global:false,"Intl":false,module:false,process:false,queueMicrotask:false,require:false,setImmediate:false,setInterval:false,setTimeout:false,TextDecoder:false,TextEncoder:false,URL:false,URLSearchParams:false};var commonjs={exports:true,global:false,module:false,require:false};var amd={define:false,require:false};var mocha={after:false,afterEach:false,before:false,beforeEach:false,context:false,describe:false,it:false,mocha:false,run:false,setup:false,specify:false,suite:false,suiteSetup:false,suiteTeardown:false,teardown:false,test:false,xcontext:false,xdescribe:false,xit:false,xspecify:false};var jasmine={afterAll:false,afterEach:false,beforeAll:false,beforeEach:false,describe:false,expect:false,fail:false,fdescribe:false,fit:false,it:false,jasmine:false,pending:false,runs:false,spyOn:false,spyOnProperty:false,waits:false,waitsFor:false,xdescribe:false,xit:false};var jest={afterAll:false,afterEach:false,beforeAll:false,beforeEach:false,describe:false,expect:false,fdescribe:false,fit:false,it:false,jest:false,pit:false,require:false,test:false,xdescribe:false,xit:false,xtest:false};var qunit={asyncTest:false,deepEqual:false,equal:false,expect:false,module:false,notDeepEqual:false,notEqual:false,notOk:false,notPropEqual:false,notStrictEqual:false,ok:false,propEqual:false,QUnit:false,raises:false,start:false,stop:false,strictEqual:false,test:false,throws:false};var phantomjs={console:true,exports:true,phantom:true,require:true,WebPage:true};var couch={emit:false,exports:false,getRow:false,log:false,module:false,provides:false,require:false,respond:false,send:false,start:false,sum:false};var rhino={defineClass:false,deserialize:false,gc:false,help:false,importClass:false,importPackage:false,java:false,load:false,loadClass:false,Packages:false,print:false,quit:false,readFile:false,readUrl:false,runCommand:false,seal:false,serialize:false,spawn:false,sync:false,toint32:false,version:false};var nashorn={__DIR__:false,__FILE__:false,__LINE__:false,com:false,edu:false,exit:false,java:false,Java:false,javafx:false,JavaImporter:false,javax:false,JSAdapter:false,load:false,loadWithNewGlobal:false,org:false,Packages:false,print:false,quit:false};var wsh={ActiveXObject:true,Enumerator:true,GetObject:true,ScriptEngine:true,ScriptEngineBuildVersion:true,ScriptEngineMajorVersion:true,ScriptEngineMinorVersion:true,VBArray:true,WScript:true,WSH:true,XDomainRequest:true};var jquery={$:false,jQuery:false};var yui={YAHOO:false,YAHOO_config:false,YUI:false,YUI_config:false};var shelljs={cat:false,cd:false,chmod:false,config:false,cp:false,dirs:false,echo:false,env:false,error:false,exec:false,exit:false,find:false,grep:false,ln:false,ls:false,mkdir:false,mv:false,popd:false,pushd:false,pwd:false,rm:false,sed:false,set:false,target:false,tempdir:false,test:false,touch:false,which:false};var prototypejs={$:false,$$:false,$A:false,$break:false,$continue:false,$F:false,$H:false,$R:false,$w:false,Abstract:false,Ajax:false,Autocompleter:false,Builder:false,Class:false,Control:false,Draggable:false,Draggables:false,Droppables:false,Effect:false,Element:false,Enumerable:false,Event:false,Field:false,Form:false,Hash:false,Insertion:false,ObjectRange:false,PeriodicalExecuter:false,Position:false,Prototype:false,Scriptaculous:false,Selector:false,Sortable:false,SortableObserver:false,Sound:false,Template:false,Toggle:false,Try:false};var meteor={_:false,$:false,Accounts:false,AccountsClient:false,AccountsCommon:false,AccountsServer:false,App:false,Assets:false,Blaze:false,check:false,Cordova:false,DDP:false,DDPRateLimiter:false,DDPServer:false,Deps:false,EJSON:false,Email:false,HTTP:false,Log:false,Match:false,Meteor:false,Mongo:false,MongoInternals:false,Npm:false,Package:false,Plugin:false,process:false,Random:false,ReactiveDict:false,ReactiveVar:false,Router:false,ServiceConfiguration:false,Session:false,share:false,Spacebars:false,Template:false,Tinytest:false,Tracker:false,UI:false,Utils:false,WebApp:false,WebAppInternals:false};var mongo={_isWindows:false,_rand:false,BulkWriteResult:false,cat:false,cd:false,connect:false,db:false,getHostName:false,getMemInfo:false,hostname:false,ISODate:false,listFiles:false,load:false,ls:false,md5sumFile:false,mkdir:false,Mongo:false,NumberInt:false,NumberLong:false,ObjectId:false,PlanCache:false,print:false,printjson:false,pwd:false,quit:false,removeFile:false,rs:false,sh:false,UUID:false,version:false,WriteResult:false};var applescript={$:false,Application:false,Automation:false,console:false,delay:false,Library:false,ObjC:false,ObjectSpecifier:false,Path:false,Progress:false,Ref:false};var serviceworker={addEventListener:false,applicationCache:false,atob:false,Blob:false,BroadcastChannel:false,btoa:false,Cache:false,caches:false,CacheStorage:false,clearInterval:false,clearTimeout:false,Client:false,clients:false,Clients:false,close:true,console:false,ExtendableEvent:false,ExtendableMessageEvent:false,fetch:false,FetchEvent:false,FileReaderSync:false,FormData:false,Headers:false,IDBCursor:false,IDBCursorWithValue:false,IDBDatabase:false,IDBFactory:false,IDBIndex:false,IDBKeyRange:false,IDBObjectStore:false,IDBOpenDBRequest:false,IDBRequest:false,IDBTransaction:false,IDBVersionChangeEvent:false,ImageData:false,importScripts:false,indexedDB:false,location:false,MessageChannel:false,MessagePort:false,name:false,navigator:false,Notification:false,onclose:true,onconnect:true,onerror:true,onfetch:true,oninstall:true,onlanguagechange:true,onmessage:true,onmessageerror:true,onnotificationclick:true,onnotificationclose:true,onoffline:true,ononline:true,onpush:true,onpushsubscriptionchange:true,onrejectionhandled:true,onsync:true,onunhandledrejection:true,performance:false,Performance:false,PerformanceEntry:false,PerformanceMark:false,PerformanceMeasure:false,PerformanceNavigation:false,PerformanceResourceTiming:false,PerformanceTiming:false,postMessage:true,"Promise":false,queueMicrotask:false,registration:false,removeEventListener:false,Request:false,Response:false,self:false,ServiceWorker:false,ServiceWorkerContainer:false,ServiceWorkerGlobalScope:false,ServiceWorkerMessageEvent:false,ServiceWorkerRegistration:false,setInterval:false,setTimeout:false,skipWaiting:false,TextDecoder:false,TextEncoder:false,URL:false,URLSearchParams:false,WebSocket:false,WindowClient:false,Worker:false,WorkerGlobalScope:false,XMLHttpRequest:false};var atomtest={advanceClock:false,fakeClearInterval:false,fakeClearTimeout:false,fakeSetInterval:false,fakeSetTimeout:false,resetTimeouts:false,waitsForPromise:false};var embertest={andThen:false,click:false,currentPath:false,currentRouteName:false,currentURL:false,fillIn:false,find:false,findAll:false,findWithAssert:false,keyEvent:false,pauseTest:false,resumeTest:false,triggerEvent:false,visit:false,wait:false};var protractor={$:false,$$:false,browser:false,by:false,By:false,DartObject:false,element:false,protractor:false};var webextensions={browser:false,chrome:false,opr:false};var greasemonkey={cloneInto:false,createObjectIn:false,exportFunction:false,GM:false,GM_addStyle:false,GM_deleteValue:false,GM_getResourceText:false,GM_getResourceURL:false,GM_getValue:false,GM_info:false,GM_listValues:false,GM_log:false,GM_openInTab:false,GM_registerMenuCommand:false,GM_setClipboard:false,GM_setValue:false,GM_xmlhttpRequest:false,unsafeWindow:false};var devtools={$:false,$_:false,$$:false,$0:false,$1:false,$2:false,$3:false,$4:false,$x:false,chrome:false,clear:false,copy:false,debug:false,dir:false,dirxml:false,getEventListeners:false,inspect:false,keys:false,monitor:false,monitorEvents:false,profile:false,profileEnd:false,queryObjects:false,table:false,undebug:false,unmonitor:false,unmonitorEvents:false,values:false};var globals={builtin:builtin,es5:es5,es2015:es2015,es2017:es2017,browser:browser,worker:worker,node:node,commonjs:commonjs,amd:amd,mocha:mocha,jasmine:jasmine,jest:jest,qunit:qunit,phantomjs:phantomjs,couch:couch,rhino:rhino,nashorn:nashorn,wsh:wsh,jquery:jquery,yui:yui,shelljs:shelljs,prototypejs:prototypejs,meteor:meteor,mongo:mongo,applescript:applescript,serviceworker:serviceworker,atomtest:atomtest,embertest:embertest,protractor:protractor,"shared-node-browser":{clearInterval:false,clearTimeout:false,console:false,setInterval:false,setTimeout:false,URL:false,URLSearchParams:false},webextensions:webextensions,greasemonkey:greasemonkey,devtools:devtools};var globals$1=/*#__PURE__*/Object.freeze({builtin:builtin,es5:es5,es2015:es2015,es2017:es2017,browser:browser,worker:worker,node:node,commonjs:commonjs,amd:amd,mocha:mocha,jasmine:jasmine,jest:jest,qunit:qunit,phantomjs:phantomjs,couch:couch,rhino:rhino,nashorn:nashorn,wsh:wsh,jquery:jquery,yui:yui,shelljs:shelljs,prototypejs:prototypejs,meteor:meteor,mongo:mongo,applescript:applescript,serviceworker:serviceworker,atomtest:atomtest,embertest:embertest,protractor:protractor,webextensions:webextensions,greasemonkey:greasemonkey,devtools:devtools,'default':globals});var require$$0=getCjsExportFromNamespace(globals$1);var globals$2=require$$0;const browserAPIs=Object.keys(globals$2.browser);const builtinAPIs=Object.keys(globals$2.builtin);const isIdentifier=namedTypes.Identifier.check.bind(namedTypes.Identifier);const isLiteral=namedTypes.Literal.check.bind(namedTypes.Literal);const isExpressionStatement=namedTypes.ExpressionStatement.check.bind(namedTypes.ExpressionStatement);const isObjectExpression=namedTypes.ObjectExpression.check.bind(namedTypes.ObjectExpression);const isThisExpression=namedTypes.ThisExpression.check.bind(namedTypes.ThisExpression);const isSequenceExpression=namedTypes.SequenceExpression.check.bind(namedTypes.SequenceExpression);const isBinaryExpression=namedTypes.BinaryExpression.check.bind(namedTypes.BinaryExpression);const isExportDefaultStatement=namedTypes.ExportDefaultDeclaration.check.bind(namedTypes.ExportDefaultDeclaration);const isBrowserAPI=(_ref)=>{let name=_ref.name;return browserAPIs.includes(name);};const isBuiltinAPI=(_ref2)=>{let name=_ref2.name;return builtinAPIs.includes(name);};const isRaw=node=>node&&node.raw;/**
+  	 */function generateAST(source,options){return main_2$1(source,Object.assign({},options));}var builtin={"Array":false,"ArrayBuffer":false,Atomics:false,BigInt:false,BigInt64Array:false,BigUint64Array:false,"Boolean":false,constructor:false,"DataView":false,"Date":false,"decodeURI":false,"decodeURIComponent":false,"encodeURI":false,"encodeURIComponent":false,"Error":false,"escape":false,"eval":false,"EvalError":false,"Float32Array":false,"Float64Array":false,"Function":false,globalThis:false,hasOwnProperty:false,"Infinity":false,"Int16Array":false,"Int32Array":false,"Int8Array":false,"isFinite":false,"isNaN":false,isPrototypeOf:false,"JSON":false,"Map":false,"Math":false,"NaN":false,"Number":false,"Object":false,"parseFloat":false,"parseInt":false,"Promise":false,propertyIsEnumerable:false,"Proxy":false,"RangeError":false,"ReferenceError":false,"Reflect":false,"RegExp":false,"Set":false,SharedArrayBuffer:false,"String":false,"Symbol":false,"SyntaxError":false,toLocaleString:false,toString:false,"TypeError":false,"Uint16Array":false,"Uint32Array":false,"Uint8Array":false,"Uint8ClampedArray":false,"undefined":false,"unescape":false,"URIError":false,valueOf:false,"WeakMap":false,"WeakSet":false};var es5={"Array":false,"Boolean":false,constructor:false,"Date":false,"decodeURI":false,"decodeURIComponent":false,"encodeURI":false,"encodeURIComponent":false,"Error":false,"escape":false,"eval":false,"EvalError":false,"Function":false,hasOwnProperty:false,"Infinity":false,"isFinite":false,"isNaN":false,isPrototypeOf:false,"JSON":false,"Math":false,"NaN":false,"Number":false,"Object":false,"parseFloat":false,"parseInt":false,propertyIsEnumerable:false,"RangeError":false,"ReferenceError":false,"RegExp":false,"String":false,"SyntaxError":false,toLocaleString:false,toString:false,"TypeError":false,"undefined":false,"unescape":false,"URIError":false,valueOf:false};var es2015={"Array":false,"ArrayBuffer":false,"Boolean":false,constructor:false,"DataView":false,"Date":false,"decodeURI":false,"decodeURIComponent":false,"encodeURI":false,"encodeURIComponent":false,"Error":false,"escape":false,"eval":false,"EvalError":false,"Float32Array":false,"Float64Array":false,"Function":false,hasOwnProperty:false,"Infinity":false,"Int16Array":false,"Int32Array":false,"Int8Array":false,"isFinite":false,"isNaN":false,isPrototypeOf:false,"JSON":false,"Map":false,"Math":false,"NaN":false,"Number":false,"Object":false,"parseFloat":false,"parseInt":false,"Promise":false,propertyIsEnumerable:false,"Proxy":false,"RangeError":false,"ReferenceError":false,"Reflect":false,"RegExp":false,"Set":false,"String":false,"Symbol":false,"SyntaxError":false,toLocaleString:false,toString:false,"TypeError":false,"Uint16Array":false,"Uint32Array":false,"Uint8Array":false,"Uint8ClampedArray":false,"undefined":false,"unescape":false,"URIError":false,valueOf:false,"WeakMap":false,"WeakSet":false};var es2017={"Array":false,"ArrayBuffer":false,Atomics:false,"Boolean":false,constructor:false,"DataView":false,"Date":false,"decodeURI":false,"decodeURIComponent":false,"encodeURI":false,"encodeURIComponent":false,"Error":false,"escape":false,"eval":false,"EvalError":false,"Float32Array":false,"Float64Array":false,"Function":false,hasOwnProperty:false,"Infinity":false,"Int16Array":false,"Int32Array":false,"Int8Array":false,"isFinite":false,"isNaN":false,isPrototypeOf:false,"JSON":false,"Map":false,"Math":false,"NaN":false,"Number":false,"Object":false,"parseFloat":false,"parseInt":false,"Promise":false,propertyIsEnumerable:false,"Proxy":false,"RangeError":false,"ReferenceError":false,"Reflect":false,"RegExp":false,"Set":false,SharedArrayBuffer:false,"String":false,"Symbol":false,"SyntaxError":false,toLocaleString:false,toString:false,"TypeError":false,"Uint16Array":false,"Uint32Array":false,"Uint8Array":false,"Uint8ClampedArray":false,"undefined":false,"unescape":false,"URIError":false,valueOf:false,"WeakMap":false,"WeakSet":false};var browser={AbortController:false,AbortSignal:false,addEventListener:false,alert:false,AnalyserNode:false,Animation:false,AnimationEffectReadOnly:false,AnimationEffectTiming:false,AnimationEffectTimingReadOnly:false,AnimationEvent:false,AnimationPlaybackEvent:false,AnimationTimeline:false,applicationCache:false,ApplicationCache:false,ApplicationCacheErrorEvent:false,atob:false,Attr:false,Audio:false,AudioBuffer:false,AudioBufferSourceNode:false,AudioContext:false,AudioDestinationNode:false,AudioListener:false,AudioNode:false,AudioParam:false,AudioProcessingEvent:false,AudioScheduledSourceNode:false,"AudioWorkletGlobalScope ":false,AudioWorkletNode:false,AudioWorkletProcessor:false,BarProp:false,BaseAudioContext:false,BatteryManager:false,BeforeUnloadEvent:false,BiquadFilterNode:false,Blob:false,BlobEvent:false,blur:false,BroadcastChannel:false,btoa:false,BudgetService:false,ByteLengthQueuingStrategy:false,Cache:false,caches:false,CacheStorage:false,cancelAnimationFrame:false,cancelIdleCallback:false,CanvasCaptureMediaStreamTrack:false,CanvasGradient:false,CanvasPattern:false,CanvasRenderingContext2D:false,ChannelMergerNode:false,ChannelSplitterNode:false,CharacterData:false,clearInterval:false,clearTimeout:false,clientInformation:false,ClipboardEvent:false,close:false,closed:false,CloseEvent:false,Comment:false,CompositionEvent:false,confirm:false,console:false,ConstantSourceNode:false,ConvolverNode:false,CountQueuingStrategy:false,createImageBitmap:false,Credential:false,CredentialsContainer:false,crypto:false,Crypto:false,CryptoKey:false,CSS:false,CSSConditionRule:false,CSSFontFaceRule:false,CSSGroupingRule:false,CSSImportRule:false,CSSKeyframeRule:false,CSSKeyframesRule:false,CSSMediaRule:false,CSSNamespaceRule:false,CSSPageRule:false,CSSRule:false,CSSRuleList:false,CSSStyleDeclaration:false,CSSStyleRule:false,CSSStyleSheet:false,CSSSupportsRule:false,CustomElementRegistry:false,customElements:false,CustomEvent:false,DataTransfer:false,DataTransferItem:false,DataTransferItemList:false,defaultstatus:false,defaultStatus:false,DelayNode:false,DeviceMotionEvent:false,DeviceOrientationEvent:false,devicePixelRatio:false,dispatchEvent:false,document:false,Document:false,DocumentFragment:false,DocumentType:false,DOMError:false,DOMException:false,DOMImplementation:false,DOMMatrix:false,DOMMatrixReadOnly:false,DOMParser:false,DOMPoint:false,DOMPointReadOnly:false,DOMQuad:false,DOMRect:false,DOMRectReadOnly:false,DOMStringList:false,DOMStringMap:false,DOMTokenList:false,DragEvent:false,DynamicsCompressorNode:false,Element:false,ErrorEvent:false,event:false,Event:false,EventSource:false,EventTarget:false,external:false,fetch:false,File:false,FileList:false,FileReader:false,find:false,focus:false,FocusEvent:false,FontFace:false,FontFaceSetLoadEvent:false,FormData:false,frameElement:false,frames:false,GainNode:false,Gamepad:false,GamepadButton:false,GamepadEvent:false,getComputedStyle:false,getSelection:false,HashChangeEvent:false,Headers:false,history:false,History:false,HTMLAllCollection:false,HTMLAnchorElement:false,HTMLAreaElement:false,HTMLAudioElement:false,HTMLBaseElement:false,HTMLBodyElement:false,HTMLBRElement:false,HTMLButtonElement:false,HTMLCanvasElement:false,HTMLCollection:false,HTMLContentElement:false,HTMLDataElement:false,HTMLDataListElement:false,HTMLDetailsElement:false,HTMLDialogElement:false,HTMLDirectoryElement:false,HTMLDivElement:false,HTMLDListElement:false,HTMLDocument:false,HTMLElement:false,HTMLEmbedElement:false,HTMLFieldSetElement:false,HTMLFontElement:false,HTMLFormControlsCollection:false,HTMLFormElement:false,HTMLFrameElement:false,HTMLFrameSetElement:false,HTMLHeadElement:false,HTMLHeadingElement:false,HTMLHRElement:false,HTMLHtmlElement:false,HTMLIFrameElement:false,HTMLImageElement:false,HTMLInputElement:false,HTMLLabelElement:false,HTMLLegendElement:false,HTMLLIElement:false,HTMLLinkElement:false,HTMLMapElement:false,HTMLMarqueeElement:false,HTMLMediaElement:false,HTMLMenuElement:false,HTMLMetaElement:false,HTMLMeterElement:false,HTMLModElement:false,HTMLObjectElement:false,HTMLOListElement:false,HTMLOptGroupElement:false,HTMLOptionElement:false,HTMLOptionsCollection:false,HTMLOutputElement:false,HTMLParagraphElement:false,HTMLParamElement:false,HTMLPictureElement:false,HTMLPreElement:false,HTMLProgressElement:false,HTMLQuoteElement:false,HTMLScriptElement:false,HTMLSelectElement:false,HTMLShadowElement:false,HTMLSlotElement:false,HTMLSourceElement:false,HTMLSpanElement:false,HTMLStyleElement:false,HTMLTableCaptionElement:false,HTMLTableCellElement:false,HTMLTableColElement:false,HTMLTableElement:false,HTMLTableRowElement:false,HTMLTableSectionElement:false,HTMLTemplateElement:false,HTMLTextAreaElement:false,HTMLTimeElement:false,HTMLTitleElement:false,HTMLTrackElement:false,HTMLUListElement:false,HTMLUnknownElement:false,HTMLVideoElement:false,IDBCursor:false,IDBCursorWithValue:false,IDBDatabase:false,IDBFactory:false,IDBIndex:false,IDBKeyRange:false,IDBObjectStore:false,IDBOpenDBRequest:false,IDBRequest:false,IDBTransaction:false,IDBVersionChangeEvent:false,IdleDeadline:false,IIRFilterNode:false,Image:false,ImageBitmap:false,ImageBitmapRenderingContext:false,ImageCapture:false,ImageData:false,indexedDB:false,innerHeight:false,innerWidth:false,InputEvent:false,IntersectionObserver:false,IntersectionObserverEntry:false,"Intl":false,isSecureContext:false,KeyboardEvent:false,KeyframeEffect:false,KeyframeEffectReadOnly:false,length:false,localStorage:false,location:true,Location:false,locationbar:false,matchMedia:false,MediaDeviceInfo:false,MediaDevices:false,MediaElementAudioSourceNode:false,MediaEncryptedEvent:false,MediaError:false,MediaKeyMessageEvent:false,MediaKeySession:false,MediaKeyStatusMap:false,MediaKeySystemAccess:false,MediaList:false,MediaQueryList:false,MediaQueryListEvent:false,MediaRecorder:false,MediaSettingsRange:false,MediaSource:false,MediaStream:false,MediaStreamAudioDestinationNode:false,MediaStreamAudioSourceNode:false,MediaStreamEvent:false,MediaStreamTrack:false,MediaStreamTrackEvent:false,menubar:false,MessageChannel:false,MessageEvent:false,MessagePort:false,MIDIAccess:false,MIDIConnectionEvent:false,MIDIInput:false,MIDIInputMap:false,MIDIMessageEvent:false,MIDIOutput:false,MIDIOutputMap:false,MIDIPort:false,MimeType:false,MimeTypeArray:false,MouseEvent:false,moveBy:false,moveTo:false,MutationEvent:false,MutationObserver:false,MutationRecord:false,name:false,NamedNodeMap:false,NavigationPreloadManager:false,navigator:false,Navigator:false,NetworkInformation:false,Node:false,NodeFilter:false,NodeIterator:false,NodeList:false,Notification:false,OfflineAudioCompletionEvent:false,OfflineAudioContext:false,offscreenBuffering:false,OffscreenCanvas:true,onabort:true,onafterprint:true,onanimationend:true,onanimationiteration:true,onanimationstart:true,onappinstalled:true,onauxclick:true,onbeforeinstallprompt:true,onbeforeprint:true,onbeforeunload:true,onblur:true,oncancel:true,oncanplay:true,oncanplaythrough:true,onchange:true,onclick:true,onclose:true,oncontextmenu:true,oncuechange:true,ondblclick:true,ondevicemotion:true,ondeviceorientation:true,ondeviceorientationabsolute:true,ondrag:true,ondragend:true,ondragenter:true,ondragleave:true,ondragover:true,ondragstart:true,ondrop:true,ondurationchange:true,onemptied:true,onended:true,onerror:true,onfocus:true,ongotpointercapture:true,onhashchange:true,oninput:true,oninvalid:true,onkeydown:true,onkeypress:true,onkeyup:true,onlanguagechange:true,onload:true,onloadeddata:true,onloadedmetadata:true,onloadstart:true,onlostpointercapture:true,onmessage:true,onmessageerror:true,onmousedown:true,onmouseenter:true,onmouseleave:true,onmousemove:true,onmouseout:true,onmouseover:true,onmouseup:true,onmousewheel:true,onoffline:true,ononline:true,onpagehide:true,onpageshow:true,onpause:true,onplay:true,onplaying:true,onpointercancel:true,onpointerdown:true,onpointerenter:true,onpointerleave:true,onpointermove:true,onpointerout:true,onpointerover:true,onpointerup:true,onpopstate:true,onprogress:true,onratechange:true,onrejectionhandled:true,onreset:true,onresize:true,onscroll:true,onsearch:true,onseeked:true,onseeking:true,onselect:true,onstalled:true,onstorage:true,onsubmit:true,onsuspend:true,ontimeupdate:true,ontoggle:true,ontransitionend:true,onunhandledrejection:true,onunload:true,onvolumechange:true,onwaiting:true,onwheel:true,open:false,openDatabase:false,opener:false,Option:false,origin:false,OscillatorNode:false,outerHeight:false,outerWidth:false,PageTransitionEvent:false,pageXOffset:false,pageYOffset:false,PannerNode:false,parent:false,Path2D:false,PaymentAddress:false,PaymentRequest:false,PaymentRequestUpdateEvent:false,PaymentResponse:false,performance:false,Performance:false,PerformanceEntry:false,PerformanceLongTaskTiming:false,PerformanceMark:false,PerformanceMeasure:false,PerformanceNavigation:false,PerformanceNavigationTiming:false,PerformanceObserver:false,PerformanceObserverEntryList:false,PerformancePaintTiming:false,PerformanceResourceTiming:false,PerformanceTiming:false,PeriodicWave:false,Permissions:false,PermissionStatus:false,personalbar:false,PhotoCapabilities:false,Plugin:false,PluginArray:false,PointerEvent:false,PopStateEvent:false,postMessage:false,Presentation:false,PresentationAvailability:false,PresentationConnection:false,PresentationConnectionAvailableEvent:false,PresentationConnectionCloseEvent:false,PresentationConnectionList:false,PresentationReceiver:false,PresentationRequest:false,print:false,ProcessingInstruction:false,ProgressEvent:false,PromiseRejectionEvent:false,prompt:false,PushManager:false,PushSubscription:false,PushSubscriptionOptions:false,queueMicrotask:false,RadioNodeList:false,Range:false,ReadableStream:false,registerProcessor:false,RemotePlayback:false,removeEventListener:false,Request:false,requestAnimationFrame:false,requestIdleCallback:false,resizeBy:false,ResizeObserver:false,ResizeObserverEntry:false,resizeTo:false,Response:false,RTCCertificate:false,RTCDataChannel:false,RTCDataChannelEvent:false,RTCDtlsTransport:false,RTCIceCandidate:false,RTCIceGatherer:false,RTCIceTransport:false,RTCPeerConnection:false,RTCPeerConnectionIceEvent:false,RTCRtpContributingSource:false,RTCRtpReceiver:false,RTCRtpSender:false,RTCSctpTransport:false,RTCSessionDescription:false,RTCStatsReport:false,RTCTrackEvent:false,screen:false,Screen:false,screenLeft:false,ScreenOrientation:false,screenTop:false,screenX:false,screenY:false,ScriptProcessorNode:false,scroll:false,scrollbars:false,scrollBy:false,scrollTo:false,scrollX:false,scrollY:false,SecurityPolicyViolationEvent:false,Selection:false,self:false,ServiceWorker:false,ServiceWorkerContainer:false,ServiceWorkerRegistration:false,sessionStorage:false,setInterval:false,setTimeout:false,ShadowRoot:false,SharedWorker:false,SourceBuffer:false,SourceBufferList:false,speechSynthesis:false,SpeechSynthesisEvent:false,SpeechSynthesisUtterance:false,StaticRange:false,status:false,statusbar:false,StereoPannerNode:false,stop:false,Storage:false,StorageEvent:false,StorageManager:false,styleMedia:false,StyleSheet:false,StyleSheetList:false,SubtleCrypto:false,SVGAElement:false,SVGAngle:false,SVGAnimatedAngle:false,SVGAnimatedBoolean:false,SVGAnimatedEnumeration:false,SVGAnimatedInteger:false,SVGAnimatedLength:false,SVGAnimatedLengthList:false,SVGAnimatedNumber:false,SVGAnimatedNumberList:false,SVGAnimatedPreserveAspectRatio:false,SVGAnimatedRect:false,SVGAnimatedString:false,SVGAnimatedTransformList:false,SVGAnimateElement:false,SVGAnimateMotionElement:false,SVGAnimateTransformElement:false,SVGAnimationElement:false,SVGCircleElement:false,SVGClipPathElement:false,SVGComponentTransferFunctionElement:false,SVGDefsElement:false,SVGDescElement:false,SVGDiscardElement:false,SVGElement:false,SVGEllipseElement:false,SVGFEBlendElement:false,SVGFEColorMatrixElement:false,SVGFEComponentTransferElement:false,SVGFECompositeElement:false,SVGFEConvolveMatrixElement:false,SVGFEDiffuseLightingElement:false,SVGFEDisplacementMapElement:false,SVGFEDistantLightElement:false,SVGFEDropShadowElement:false,SVGFEFloodElement:false,SVGFEFuncAElement:false,SVGFEFuncBElement:false,SVGFEFuncGElement:false,SVGFEFuncRElement:false,SVGFEGaussianBlurElement:false,SVGFEImageElement:false,SVGFEMergeElement:false,SVGFEMergeNodeElement:false,SVGFEMorphologyElement:false,SVGFEOffsetElement:false,SVGFEPointLightElement:false,SVGFESpecularLightingElement:false,SVGFESpotLightElement:false,SVGFETileElement:false,SVGFETurbulenceElement:false,SVGFilterElement:false,SVGForeignObjectElement:false,SVGGElement:false,SVGGeometryElement:false,SVGGradientElement:false,SVGGraphicsElement:false,SVGImageElement:false,SVGLength:false,SVGLengthList:false,SVGLinearGradientElement:false,SVGLineElement:false,SVGMarkerElement:false,SVGMaskElement:false,SVGMatrix:false,SVGMetadataElement:false,SVGMPathElement:false,SVGNumber:false,SVGNumberList:false,SVGPathElement:false,SVGPatternElement:false,SVGPoint:false,SVGPointList:false,SVGPolygonElement:false,SVGPolylineElement:false,SVGPreserveAspectRatio:false,SVGRadialGradientElement:false,SVGRect:false,SVGRectElement:false,SVGScriptElement:false,SVGSetElement:false,SVGStopElement:false,SVGStringList:false,SVGStyleElement:false,SVGSVGElement:false,SVGSwitchElement:false,SVGSymbolElement:false,SVGTextContentElement:false,SVGTextElement:false,SVGTextPathElement:false,SVGTextPositioningElement:false,SVGTitleElement:false,SVGTransform:false,SVGTransformList:false,SVGTSpanElement:false,SVGUnitTypes:false,SVGUseElement:false,SVGViewElement:false,TaskAttributionTiming:false,Text:false,TextDecoder:false,TextEncoder:false,TextEvent:false,TextMetrics:false,TextTrack:false,TextTrackCue:false,TextTrackCueList:false,TextTrackList:false,TimeRanges:false,toolbar:false,top:false,Touch:false,TouchEvent:false,TouchList:false,TrackEvent:false,TransitionEvent:false,TreeWalker:false,UIEvent:false,URL:false,URLSearchParams:false,ValidityState:false,visualViewport:false,VisualViewport:false,VTTCue:false,WaveShaperNode:false,WebAssembly:false,WebGL2RenderingContext:false,WebGLActiveInfo:false,WebGLBuffer:false,WebGLContextEvent:false,WebGLFramebuffer:false,WebGLProgram:false,WebGLQuery:false,WebGLRenderbuffer:false,WebGLRenderingContext:false,WebGLSampler:false,WebGLShader:false,WebGLShaderPrecisionFormat:false,WebGLSync:false,WebGLTexture:false,WebGLTransformFeedback:false,WebGLUniformLocation:false,WebGLVertexArrayObject:false,WebSocket:false,WheelEvent:false,window:false,Window:false,Worker:false,WritableStream:false,XMLDocument:false,XMLHttpRequest:false,XMLHttpRequestEventTarget:false,XMLHttpRequestUpload:false,XMLSerializer:false,XPathEvaluator:false,XPathExpression:false,XPathResult:false,XSLTProcessor:false};var worker={addEventListener:false,applicationCache:false,atob:false,Blob:false,BroadcastChannel:false,btoa:false,Cache:false,caches:false,clearInterval:false,clearTimeout:false,close:true,console:false,fetch:false,FileReaderSync:false,FormData:false,Headers:false,IDBCursor:false,IDBCursorWithValue:false,IDBDatabase:false,IDBFactory:false,IDBIndex:false,IDBKeyRange:false,IDBObjectStore:false,IDBOpenDBRequest:false,IDBRequest:false,IDBTransaction:false,IDBVersionChangeEvent:false,ImageData:false,importScripts:true,indexedDB:false,location:false,MessageChannel:false,MessagePort:false,name:false,navigator:false,Notification:false,onclose:true,onconnect:true,onerror:true,onlanguagechange:true,onmessage:true,onoffline:true,ononline:true,onrejectionhandled:true,onunhandledrejection:true,performance:false,Performance:false,PerformanceEntry:false,PerformanceMark:false,PerformanceMeasure:false,PerformanceNavigation:false,PerformanceResourceTiming:false,PerformanceTiming:false,postMessage:true,"Promise":false,queueMicrotask:false,removeEventListener:false,Request:false,Response:false,self:true,ServiceWorkerRegistration:false,setInterval:false,setTimeout:false,TextDecoder:false,TextEncoder:false,URL:false,URLSearchParams:false,WebSocket:false,Worker:false,WorkerGlobalScope:false,XMLHttpRequest:false};var node={__dirname:false,__filename:false,Buffer:false,clearImmediate:false,clearInterval:false,clearTimeout:false,console:false,exports:true,global:false,"Intl":false,module:false,process:false,queueMicrotask:false,require:false,setImmediate:false,setInterval:false,setTimeout:false,TextDecoder:false,TextEncoder:false,URL:false,URLSearchParams:false};var commonjs={exports:true,global:false,module:false,require:false};var amd={define:false,require:false};var mocha={after:false,afterEach:false,before:false,beforeEach:false,context:false,describe:false,it:false,mocha:false,run:false,setup:false,specify:false,suite:false,suiteSetup:false,suiteTeardown:false,teardown:false,test:false,xcontext:false,xdescribe:false,xit:false,xspecify:false};var jasmine={afterAll:false,afterEach:false,beforeAll:false,beforeEach:false,describe:false,expect:false,fail:false,fdescribe:false,fit:false,it:false,jasmine:false,pending:false,runs:false,spyOn:false,spyOnProperty:false,waits:false,waitsFor:false,xdescribe:false,xit:false};var jest={afterAll:false,afterEach:false,beforeAll:false,beforeEach:false,describe:false,expect:false,fdescribe:false,fit:false,it:false,jest:false,pit:false,require:false,test:false,xdescribe:false,xit:false,xtest:false};var qunit={asyncTest:false,deepEqual:false,equal:false,expect:false,module:false,notDeepEqual:false,notEqual:false,notOk:false,notPropEqual:false,notStrictEqual:false,ok:false,propEqual:false,QUnit:false,raises:false,start:false,stop:false,strictEqual:false,test:false,throws:false};var phantomjs={console:true,exports:true,phantom:true,require:true,WebPage:true};var couch={emit:false,exports:false,getRow:false,log:false,module:false,provides:false,require:false,respond:false,send:false,start:false,sum:false};var rhino={defineClass:false,deserialize:false,gc:false,help:false,importClass:false,importPackage:false,java:false,load:false,loadClass:false,Packages:false,print:false,quit:false,readFile:false,readUrl:false,runCommand:false,seal:false,serialize:false,spawn:false,sync:false,toint32:false,version:false};var nashorn={__DIR__:false,__FILE__:false,__LINE__:false,com:false,edu:false,exit:false,java:false,Java:false,javafx:false,JavaImporter:false,javax:false,JSAdapter:false,load:false,loadWithNewGlobal:false,org:false,Packages:false,print:false,quit:false};var wsh={ActiveXObject:true,Enumerator:true,GetObject:true,ScriptEngine:true,ScriptEngineBuildVersion:true,ScriptEngineMajorVersion:true,ScriptEngineMinorVersion:true,VBArray:true,WScript:true,WSH:true,XDomainRequest:true};var jquery={$:false,jQuery:false};var yui={YAHOO:false,YAHOO_config:false,YUI:false,YUI_config:false};var shelljs={cat:false,cd:false,chmod:false,config:false,cp:false,dirs:false,echo:false,env:false,error:false,exec:false,exit:false,find:false,grep:false,ln:false,ls:false,mkdir:false,mv:false,popd:false,pushd:false,pwd:false,rm:false,sed:false,set:false,target:false,tempdir:false,test:false,touch:false,which:false};var prototypejs={$:false,$$:false,$A:false,$break:false,$continue:false,$F:false,$H:false,$R:false,$w:false,Abstract:false,Ajax:false,Autocompleter:false,Builder:false,Class:false,Control:false,Draggable:false,Draggables:false,Droppables:false,Effect:false,Element:false,Enumerable:false,Event:false,Field:false,Form:false,Hash:false,Insertion:false,ObjectRange:false,PeriodicalExecuter:false,Position:false,Prototype:false,Scriptaculous:false,Selector:false,Sortable:false,SortableObserver:false,Sound:false,Template:false,Toggle:false,Try:false};var meteor={_:false,$:false,Accounts:false,AccountsClient:false,AccountsCommon:false,AccountsServer:false,App:false,Assets:false,Blaze:false,check:false,Cordova:false,DDP:false,DDPRateLimiter:false,DDPServer:false,Deps:false,EJSON:false,Email:false,HTTP:false,Log:false,Match:false,Meteor:false,Mongo:false,MongoInternals:false,Npm:false,Package:false,Plugin:false,process:false,Random:false,ReactiveDict:false,ReactiveVar:false,Router:false,ServiceConfiguration:false,Session:false,share:false,Spacebars:false,Template:false,Tinytest:false,Tracker:false,UI:false,Utils:false,WebApp:false,WebAppInternals:false};var mongo={_isWindows:false,_rand:false,BulkWriteResult:false,cat:false,cd:false,connect:false,db:false,getHostName:false,getMemInfo:false,hostname:false,ISODate:false,listFiles:false,load:false,ls:false,md5sumFile:false,mkdir:false,Mongo:false,NumberInt:false,NumberLong:false,ObjectId:false,PlanCache:false,print:false,printjson:false,pwd:false,quit:false,removeFile:false,rs:false,sh:false,UUID:false,version:false,WriteResult:false};var applescript={$:false,Application:false,Automation:false,console:false,delay:false,Library:false,ObjC:false,ObjectSpecifier:false,Path:false,Progress:false,Ref:false};var serviceworker={addEventListener:false,applicationCache:false,atob:false,Blob:false,BroadcastChannel:false,btoa:false,Cache:false,caches:false,CacheStorage:false,clearInterval:false,clearTimeout:false,Client:false,clients:false,Clients:false,close:true,console:false,ExtendableEvent:false,ExtendableMessageEvent:false,fetch:false,FetchEvent:false,FileReaderSync:false,FormData:false,Headers:false,IDBCursor:false,IDBCursorWithValue:false,IDBDatabase:false,IDBFactory:false,IDBIndex:false,IDBKeyRange:false,IDBObjectStore:false,IDBOpenDBRequest:false,IDBRequest:false,IDBTransaction:false,IDBVersionChangeEvent:false,ImageData:false,importScripts:false,indexedDB:false,location:false,MessageChannel:false,MessagePort:false,name:false,navigator:false,Notification:false,onclose:true,onconnect:true,onerror:true,onfetch:true,oninstall:true,onlanguagechange:true,onmessage:true,onmessageerror:true,onnotificationclick:true,onnotificationclose:true,onoffline:true,ononline:true,onpush:true,onpushsubscriptionchange:true,onrejectionhandled:true,onsync:true,onunhandledrejection:true,performance:false,Performance:false,PerformanceEntry:false,PerformanceMark:false,PerformanceMeasure:false,PerformanceNavigation:false,PerformanceResourceTiming:false,PerformanceTiming:false,postMessage:true,"Promise":false,queueMicrotask:false,registration:false,removeEventListener:false,Request:false,Response:false,self:false,ServiceWorker:false,ServiceWorkerContainer:false,ServiceWorkerGlobalScope:false,ServiceWorkerMessageEvent:false,ServiceWorkerRegistration:false,setInterval:false,setTimeout:false,skipWaiting:false,TextDecoder:false,TextEncoder:false,URL:false,URLSearchParams:false,WebSocket:false,WindowClient:false,Worker:false,WorkerGlobalScope:false,XMLHttpRequest:false};var atomtest={advanceClock:false,fakeClearInterval:false,fakeClearTimeout:false,fakeSetInterval:false,fakeSetTimeout:false,resetTimeouts:false,waitsForPromise:false};var embertest={andThen:false,click:false,currentPath:false,currentRouteName:false,currentURL:false,fillIn:false,find:false,findAll:false,findWithAssert:false,keyEvent:false,pauseTest:false,resumeTest:false,triggerEvent:false,visit:false,wait:false};var protractor={$:false,$$:false,browser:false,by:false,By:false,DartObject:false,element:false,protractor:false};var webextensions={browser:false,chrome:false,opr:false};var greasemonkey={cloneInto:false,createObjectIn:false,exportFunction:false,GM:false,GM_addStyle:false,GM_deleteValue:false,GM_getResourceText:false,GM_getResourceURL:false,GM_getValue:false,GM_info:false,GM_listValues:false,GM_log:false,GM_openInTab:false,GM_registerMenuCommand:false,GM_setClipboard:false,GM_setValue:false,GM_xmlhttpRequest:false,unsafeWindow:false};var devtools={$:false,$_:false,$$:false,$0:false,$1:false,$2:false,$3:false,$4:false,$x:false,chrome:false,clear:false,copy:false,debug:false,dir:false,dirxml:false,getEventListeners:false,inspect:false,keys:false,monitor:false,monitorEvents:false,profile:false,profileEnd:false,queryObjects:false,table:false,undebug:false,unmonitor:false,unmonitorEvents:false,values:false};var globals={builtin:builtin,es5:es5,es2015:es2015,es2017:es2017,browser:browser,worker:worker,node:node,commonjs:commonjs,amd:amd,mocha:mocha,jasmine:jasmine,jest:jest,qunit:qunit,phantomjs:phantomjs,couch:couch,rhino:rhino,nashorn:nashorn,wsh:wsh,jquery:jquery,yui:yui,shelljs:shelljs,prototypejs:prototypejs,meteor:meteor,mongo:mongo,applescript:applescript,serviceworker:serviceworker,atomtest:atomtest,embertest:embertest,protractor:protractor,"shared-node-browser":{clearInterval:false,clearTimeout:false,console:false,setInterval:false,setTimeout:false,URL:false,URLSearchParams:false},webextensions:webextensions,greasemonkey:greasemonkey,devtools:devtools};var globals$1=/*#__PURE__*/Object.freeze({builtin:builtin,es5:es5,es2015:es2015,es2017:es2017,browser:browser,worker:worker,node:node,commonjs:commonjs,amd:amd,mocha:mocha,jasmine:jasmine,jest:jest,qunit:qunit,phantomjs:phantomjs,couch:couch,rhino:rhino,nashorn:nashorn,wsh:wsh,jquery:jquery,yui:yui,shelljs:shelljs,prototypejs:prototypejs,meteor:meteor,mongo:mongo,applescript:applescript,serviceworker:serviceworker,atomtest:atomtest,embertest:embertest,protractor:protractor,webextensions:webextensions,greasemonkey:greasemonkey,devtools:devtools,'default':globals});var require$$0=getCjsExportFromNamespace(globals$1);var globals$2=require$$0;const browserAPIs=Object.keys(globals$2.browser);const builtinAPIs=Object.keys(globals$2.builtin);const isIdentifier=namedTypes.Identifier.check.bind(namedTypes.Identifier);const isLiteral=namedTypes.Literal.check.bind(namedTypes.Literal);const isExpressionStatement=namedTypes.ExpressionStatement.check.bind(namedTypes.ExpressionStatement);const isObjectExpression=namedTypes.ObjectExpression.check.bind(namedTypes.ObjectExpression);const isThisExpression=namedTypes.ThisExpression.check.bind(namedTypes.ThisExpression);const isSequenceExpression=namedTypes.SequenceExpression.check.bind(namedTypes.SequenceExpression);const isBinaryExpression=namedTypes.BinaryExpression.check.bind(namedTypes.BinaryExpression);const isExportDefaultStatement=namedTypes.ExportDefaultDeclaration.check.bind(namedTypes.ExportDefaultDeclaration);const isBrowserAPI=(_ref)=>{let{name}=_ref;return browserAPIs.includes(name);};const isBuiltinAPI=(_ref2)=>{let{name}=_ref2;return builtinAPIs.includes(name);};const isRaw=node=>node&&node.raw;/**
   	 * Find the export default statement
   	 * @param   { Array } body - tree structure containing the program code
   	 * @returns { Object } node containing only the code of the export default statement
@@ -4714,7 +4759,7 @@
   	 * @param   { Object } meta - compilation meta information
   	 * @param   { AST } ast - current AST output
   	 * @returns { AST } the AST generated
-  	 */function javascript(sourceNode,source,meta,ast){const preprocessorName=getPreprocessorTypeByAttribute(sourceNode);const javascriptNode=addLineOffset(sourceNode.text.text,source,sourceNode);const options=meta.options;const preprocessorOutput=preprocess('javascript',preprocessorName,meta,Object.assign({},sourceNode,{text:javascriptNode}));const inputSourceMap=sourcemapAsJSON(preprocessorOutput.map);const generatedAst=generateAST(preprocessorOutput.code,{sourceFileName:options.file,inputSourceMap:isEmptySourcemap(inputSourceMap)?null:inputSourceMap});const generatedAstBody=getProgramBody(generatedAst);const bodyWithoutExportDefault=filterNonExportDefaultStatements(generatedAstBody);const exportDefaultNode=findExportDefaultStatement(generatedAstBody);const outputBody=getProgramBody(ast);// add to the ast the "private" javascript content of our tag script node
+  	 */function javascript(sourceNode,source,meta,ast){const preprocessorName=getPreprocessorTypeByAttribute(sourceNode);const javascriptNode=addLineOffset(sourceNode.text.text,source,sourceNode);const{options}=meta;const preprocessorOutput=preprocess('javascript',preprocessorName,meta,Object.assign({},sourceNode,{text:javascriptNode}));const inputSourceMap=sourcemapAsJSON(preprocessorOutput.map);const generatedAst=generateAST(preprocessorOutput.code,{sourceFileName:options.file,inputSourceMap:isEmptySourcemap(inputSourceMap)?null:inputSourceMap});const generatedAstBody=getProgramBody(generatedAst);const bodyWithoutExportDefault=filterNonExportDefaultStatements(generatedAstBody);const exportDefaultNode=findExportDefaultStatement(generatedAstBody);const outputBody=getProgramBody(ast);// add to the ast the "private" javascript content of our tag script node
   outputBody.unshift(...bodyWithoutExportDefault);// convert the export default adding its content to the "tag" property exported
   if(exportDefaultNode)extendTagProperty(ast,exportDefaultNode);return ast;}/**
   	 * Not all the types are handled in this module.
@@ -4871,12 +4916,12 @@
   	   * @param   {[string,string]} bp - Brackets pair
   	   * @returns {Object} Expression's end (after the closing brace) or -1
   	   *                            if it is not an expr.
-  	   */function exprExtr(code,start,bp){const openingBraces=bp[0],closingBraces=bp[1];const offset=start+openingBraces.length;// skips the opening brace
+  	   */function exprExtr(code,start,bp){const[openingBraces,closingBraces]=bp;const offset=start+openingBraces.length;// skips the opening brace
   const stack=[];// expected closing braces ('`' for ES6 TL)
   const re=_regex(closingBraces);re.lastIndex=offset;// begining of the expression
   let end;let match;while(match=re.exec(code)){// eslint-disable-line
   const idx=match.index;const str=match[0];end=re.lastIndex;// end the iteration
-  if(str===closingBraces&&!stack.length){return {text:code.slice(offset,idx),start,end};}const _updateStack=updateStack(stack,str[0],idx,code),char=_updateStack.char,index=_updateStack.index;// update the end value depending on the new index received
+  if(str===closingBraces&&!stack.length){return {text:code.slice(offset,idx),start,end};}const{char,index}=updateStack(stack,str[0],idx,code);// update the end value depending on the new index received
   end=index||end;// update the regex last index
   re.lastIndex=char===$_ES6_BQ?skipES6TL(code,end,stack):end;}if(stack.length){panic$1(code,unclosedExpression,end);}}/**
   	 * Outputs the last parsed node. Can be used with a builder too.
@@ -4914,12 +4959,12 @@
   	 * @returns {number} Ending position
   	 * @private
   	 */function expr(state,node,endingChars,start){const re=b0re(state,endingChars);re.lastIndex=start;// reset re position
-  const _parseExpressions=parseExpressions(state,re),unescape=_parseExpressions.unescape,expressions=_parseExpressions.expressions,end=_parseExpressions.end;if(node){if(unescape){node.unescape=unescape;}if(expressions.length){node.expressions=expressions;}}else{pushText(state,start,end,{expressions,unescape});}return end;}/**
+  const{unescape,expressions,end}=parseExpressions(state,re);if(node){if(unescape){node.unescape=unescape;}if(expressions.length){node.expressions=expressions;}}else{pushText(state,start,end,{expressions,unescape});}return end;}/**
   	 * Parse a text chunk finding all the expressions in it
   	 * @param   {ParserState} state  - Parser state
   	 * @param   {RegExp} re - regex to match the expressions contents
   	 * @returns {Object} result containing the expression found, the string to unescape and the end position
-  	 */function parseExpressions(state,re){const data=state.data,options=state.options;const brackets=options.brackets;const expressions=[];let unescape,pos,match;// Anything captured in $1 (closing quote or character) ends the loop...
+  	 */function parseExpressions(state,re){const{data,options}=state;const{brackets}=options;const expressions=[];let unescape,pos,match;// Anything captured in $1 (closing quote or character) ends the loop...
   while((match=re.exec(data))&&!match[1]){// ...else, we have an opening bracket and maybe an expression.
   pos=match.index;if(data[pos-1]==='\\'){unescape=match[0];// it is an escaped opening brace
   }else{const tmpExpr=exprExtr(data,pos,brackets);if(tmpExpr){expressions.push(tmpExpr);re.lastIndex=tmpExpr.end;}}}// Even for text, the parser needs match a closing char
@@ -4931,7 +4976,7 @@
   	 * @param   {string} str - String to search
   	 * @returns {RegExp} Resulting regex.
   	 * @private
-  	 */function b0re(state,str){const brackets=state.options.brackets;const re=state.regexCache[str];if(re)return re;const b0=escapeStr(brackets[0]);// cache the regex extending the regexCache object
+  	 */function b0re(state,str){const{brackets}=state.options;const re=state.regexCache[str];if(re)return re;const b0=escapeStr(brackets[0]);// cache the regex extending the regexCache object
   Object.assign(state.regexCache,{[str]:new RegExp(`(${str})|${b0}`,'g')});return state.regexCache[str];}/**
   	 * SVG void elements that cannot be auto-closed and shouldn't contain child nodes.
   	 * @const {Array}
@@ -5013,7 +5058,7 @@
   	 * @param   {ParserStore} state  - Parser state
   	 * @returns {number} New parser mode.
   	 * @private
-  	 */function attr(state){const data=state.data,last=state.last,pos=state.pos,root=state.root;const tag=last;// the last (current) tag in the output
+  	 */function attr(state){const{data,last,pos,root}=state;const tag=last;// the last (current) tag in the output
   const _CH=/\S/g;// matches the first non-space char
   const ch=execFromPos(_CH,pos,data);switch(true){case!ch:state.pos=data.length;// reaching the end of the buffer with
   // NodeTypes.ATTR will generate error
@@ -5032,11 +5077,11 @@
   	 * @param   {Object} tag    - Current parent tag
   	 * @returns {undefined} void function
   	 * @private
-  	 */function setAttribute(state,pos,tag){const data=state.data;const expressionContent=expressionsContentRe(state.options.brackets);const re=ATTR_START;// (\S[^>/=\s]*)(?:\s*=\s*([^>/])?)? g
+  	 */function setAttribute(state,pos,tag){const{data}=state;const expressionContent=expressionsContentRe(state.options.brackets);const re=ATTR_START;// (\S[^>/=\s]*)(?:\s*=\s*([^>/])?)? g
   const start=re.lastIndex=expressionContent.lastIndex=pos;// first non-whitespace
   const attrMatches=re.exec(data);const isExpressionName=isAttributeExpression(attrMatches[1],state.options.brackets);const match=isExpressionName?[null,expressionContent.exec(data)[1],null]:attrMatches;if(match){const end=re.lastIndex;const attr=parseAttribute(state,match,start,end,isExpressionName);//assert(q && q.type === Mode.TAG, 'no previous tag for the attr!')
   // Pushes the attribute and shifts the `end` position of the tag (`last`).
-  state.pos=tag.end=attr.end;tag.attributes=addToCollection(tag.attributes,attr);}}function parseNomalAttribute(state,attr,quote){const data=state.data;let end=attr.end;if(isBoolAttribute(attr.name)){attr[IS_BOOLEAN]=true;}// parse the whole value (if any) and get any expressions on it
+  state.pos=tag.end=attr.end;tag.attributes=addToCollection(tag.attributes,attr);}}function parseNomalAttribute(state,attr,quote){const{data}=state;let{end}=attr;if(isBoolAttribute(attr.name)){attr[IS_BOOLEAN]=true;}// parse the whole value (if any) and get any expressions on it
   if(quote){// Usually, the value's first char (`quote`) is a quote and the lastIndex
   // (`end`) is the start of the value.
   let valueStart=end;// If it not, this is an unquoted value and we need adjust the start.
@@ -5098,11 +5143,11 @@
   	 * @param   {ParserState} state  - Parser state
   	 * @returns {number} New parser mode
   	 * @private
-  	 */function tag(state){const pos=state.pos,data=state.data;// pos of the char following '<'
+  	 */function tag(state){const{pos,data}=state;// pos of the char following '<'
   const start=pos-1;// pos of '<'
   const str=data.substr(pos,2);// first two chars following '<'
   switch(true){case str[0]==='!':return comment(state,data,start);case TAG_2C.test(str):return parseTag(state,start);default:return pushText(state,start,pos);// pushes the '<' as text
-  }}function parseTag(state,start){const data=state.data,pos=state.pos;const re=TAG_NAME;// (\/?[^\s>/]+)\s*(>)? g
+  }}function parseTag(state,start){const{data,pos}=state;const re=TAG_NAME;// (\/?[^\s>/]+)\s*(>)? g
   const match=execFromPos(re,pos,data);const end=re.lastIndex;const name=match[1].toLowerCase();// $1: tag name including any '/'
   // script/style block is parsed as another tag to extract attributes
   if(name in RE_SCRYLE){state.scryle=name;// used by parseText
@@ -5114,7 +5159,7 @@
   	 * @param   {ParserState} state - Parser state
   	 * @returns {number} New parser mode.
   	 * @private
-  	 */function text(state){const pos=state.pos,data=state.data,scryle=state.scryle;switch(true){case typeof scryle==='string':{const name=scryle;const re=RE_SCRYLE[name];const match=execFromPos(re,pos,data);if(!match){panic$1(data,unclosedNamedBlock.replace('%1',name),pos-1);}const start=match.index;const end=re.lastIndex;state.scryle=null;// reset the script/style flag now
+  	 */function text(state){const{pos,data,scryle}=state;switch(true){case typeof scryle==='string':{const name=scryle;const re=RE_SCRYLE[name];const match=execFromPos(re,pos,data);if(!match){panic$1(data,unclosedNamedBlock.replace('%1',name),pos-1);}const start=match.index;const end=re.lastIndex;state.scryle=null;// reset the script/style flag now
   // write the tag content, if any
   if(start>pos){parseSpecialTagsContent(state,name,match);}// now the closing tag, either </script> or </style>
   pushTag(state,`/${name}`,start,end);break;}case data[pos]==='<':state.pos++;return TAG;default:expr(state,null,'<',pos);}return TEXT;}/**
@@ -5123,7 +5168,7 @@
   	 * @param   {string} name  - one of the tags matched by the RE_SCRYLE regex
   	 * @param   {Array}  match - result of the regex matching the content of the parsed tag
   	 * @returns {undefined} void function
-  	 */function parseSpecialTagsContent(state,name,match){const pos=state.pos;const start=match.index;if(name===TEXTAREA_TAG){expr(state,null,match[0],pos);}else{pushText(state,pos,start);}}/*---------------------------------------------------------------------
+  	 */function parseSpecialTagsContent(state,name,match){const{pos}=state;const start=match.index;if(name===TEXTAREA_TAG){expr(state,null,match[0],pos);}else{pushText(state,pos,start);}}/*---------------------------------------------------------------------
   	 * Tree builder for the riot tag parser.
   	 *
   	 * The output has a root property and separate arrays for `html`, `css`,
@@ -5189,12 +5234,12 @@
   	 *
   	 * @param   {ParserState}  state - Current parser state
   	 * @returns {ParserResult} Result, contains data and output properties.
-  	 */function _parse(state){const data=state.data;walk(state);flush(state);if(state.count){panic$1(data,state.count>0?unexpectedEndOfFile:rootTagNotFound,state.pos);}return {data,output:state.builder.get()};}/**
+  	 */function _parse(state){const{data}=state;walk(state);flush(state);if(state.count){panic$1(data,state.count>0?unexpectedEndOfFile:rootTagNotFound,state.pos);}return {data,output:state.builder.get()};}/**
   	 * Parser walking recursive function
   	 * @param {ParserState}  state - Current parser state
   	 * @param {string} type - current parsing context
   	 * @returns {undefined} void function
-  	 */function walk(state,type){const data=state.data;// extend the state adding the tree builder instance and the initial data
+  	 */function walk(state,type){const{data}=state;// extend the state adding the tree builder instance and the initial data
   const length=data.length;// The "count" property is set to 1 when the first tag is found.
   // This becomes the root and precedent text or comments are discarded.
   // So, at the end of the parsing count must be zero.
@@ -5224,7 +5269,7 @@
   	 * Check if a node name is part of the browser or builtin javascript api or it belongs to the current scope
   	 * @param   { types.NodePath } path - containing the current node visited
   	 * @returns {boolean} true if it's a global api variable
-  	 */function isGlobal(_ref3){let scope=_ref3.scope,node=_ref3.node;return Boolean(isRaw(node)||isBuiltinAPI(node)||isBrowserAPI(node)||scope.lookup(getName$1(node)));}/**
+  	 */function isGlobal(_ref3){let{scope,node}=_ref3;return Boolean(isRaw(node)||isBuiltinAPI(node)||isBrowserAPI(node)||scope.lookup(getName$1(node)));}/**
   	 * Replace the path scope with a member Expression
   	 * @param   { types.NodePath } path - containing the current node visited
   	 * @param   { types.Node } property - node we want to prefix with the scope identifier
@@ -5427,21 +5472,21 @@
   	 * @param   { string } sourceFile - original tag file
   	 * @param   { string } sourceCode - original tag source code
   	 * @returns { Array } AST nodes that are needed to build an each binding
-  	 */function generateEachExpressionProperties(eachExpression,sourceFile,sourceCode){const ast=createASTFromExpression(eachExpression,sourceFile,sourceCode);const body=ast.program.body;const firstNode=body[0];if(!isExpressionStatement(firstNode)){panic(`The each directives supported should be of type "ExpressionStatement",you have provided a "${firstNode.type}"`);}const expression=firstNode.expression;return [generateEachItemNameKey(expression),generateEachIndexNameKey(expression),generateEachEvaluateKey(expression,eachExpression,sourceFile,sourceCode)];}/**
+  	 */function generateEachExpressionProperties(eachExpression,sourceFile,sourceCode){const ast=createASTFromExpression(eachExpression,sourceFile,sourceCode);const body=ast.program.body;const firstNode=body[0];if(!isExpressionStatement(firstNode)){panic(`The each directives supported should be of type "ExpressionStatement",you have provided a "${firstNode.type}"`);}const{expression}=firstNode;return [generateEachItemNameKey(expression),generateEachIndexNameKey(expression),generateEachEvaluateKey(expression,eachExpression,sourceFile,sourceCode)];}/**
   	 * Transform a RiotParser.Node.Tag into an each binding
   	 * @param   { RiotParser.Node.Tag } sourceNode - tag containing the each attribute
   	 * @param   { string } selectorAttribute - attribute needed to select the target node
   	 * @param   { string } sourceFile - source file path
   	 * @param   { string } sourceCode - original source
   	 * @returns { AST.Node } an each binding node
-  	 */function createEachBinding(sourceNode,selectorAttribute,sourceFile,sourceCode){const _map=[findIfAttribute,findEachAttribute,findKeyAttribute].map(f=>f(sourceNode)),ifAttribute=_map[0],eachAttribute=_map[1],keyAttribute=_map[2];const attributeOrNull=attribute=>attribute?toScopedFunction(getAttributeExpression(attribute),sourceFile,sourceCode):nullNode();return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(BINDING_TYPES),builders.identifier(EACH_BINDING_TYPE),false)),simplePropertyNode(BINDING_GET_KEY_KEY,attributeOrNull(keyAttribute)),simplePropertyNode(BINDING_CONDITION_KEY,attributeOrNull(ifAttribute)),createTemplateProperty(createNestedBindings(sourceNode,sourceFile,sourceCode)),...createSelectorProperties(selectorAttribute),...compose(generateEachExpressionProperties,getAttributeExpression)(eachAttribute)]);}/**
+  	 */function createEachBinding(sourceNode,selectorAttribute,sourceFile,sourceCode){const[ifAttribute,eachAttribute,keyAttribute]=[findIfAttribute,findEachAttribute,findKeyAttribute].map(f=>f(sourceNode));const attributeOrNull=attribute=>attribute?toScopedFunction(getAttributeExpression(attribute),sourceFile,sourceCode):nullNode();return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(BINDING_TYPES),builders.identifier(EACH_BINDING_TYPE),false)),simplePropertyNode(BINDING_GET_KEY_KEY,attributeOrNull(keyAttribute)),simplePropertyNode(BINDING_CONDITION_KEY,attributeOrNull(ifAttribute)),createTemplateProperty(createNestedBindings(sourceNode,sourceFile,sourceCode,selectorAttribute)),...createSelectorProperties(selectorAttribute),...compose(generateEachExpressionProperties,getAttributeExpression)(eachAttribute)]);}/**
   	 * Transform a RiotParser.Node.Tag into an if binding
   	 * @param   { RiotParser.Node.Tag } sourceNode - tag containing the if attribute
   	 * @param   { string } selectorAttribute - attribute needed to select the target node
   	 * @param   { stiring } sourceFile - source file path
   	 * @param   { string } sourceCode - original source
   	 * @returns { AST.Node } an if binding node
-  	 */function createIfBinding(sourceNode,selectorAttribute,sourceFile,sourceCode){const ifAttribute=findIfAttribute(sourceNode);return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(BINDING_TYPES),builders.identifier(IF_BINDING_TYPE),false)),simplePropertyNode(BINDING_EVALUATE_KEY,toScopedFunction(ifAttribute.expressions[0],sourceFile,sourceCode)),...createSelectorProperties(selectorAttribute),createTemplateProperty(createNestedBindings(sourceNode,sourceFile,sourceCode))]);}/**
+  	 */function createIfBinding(sourceNode,selectorAttribute,sourceFile,sourceCode){const ifAttribute=findIfAttribute(sourceNode);return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(BINDING_TYPES),builders.identifier(IF_BINDING_TYPE),false)),simplePropertyNode(BINDING_EVALUATE_KEY,toScopedFunction(ifAttribute.expressions[0],sourceFile,sourceCode)),...createSelectorProperties(selectorAttribute),createTemplateProperty(createNestedBindings(sourceNode,sourceFile,sourceCode,selectorAttribute))]);}/**
   	 * Simple expression bindings might contain multiple expressions like for example: "class="{foo} red {bar}""
   	 * This helper aims to merge them in a template literal if it's necessary
   	 * @param   {RiotParser.Attr} node - riot parser node
@@ -5519,20 +5564,20 @@
   	 * @param   {string} sourceCode - original source
   	 * @returns {AST.Node} ast node containing the slot object properties
   	 */function buildSlot(id,sourceNode,sourceFile,sourceCode){const cloneNode=Object.assign({},sourceNode,{// avoid to render the slot attribute
-  attributes:getNodeAttributes(sourceNode).filter(attribute=>attribute.name!==SLOT_ATTRIBUTE)});const _build=build(cloneNode,sourceFile,sourceCode),html=_build[0],bindings=_build[1];return builders.objectExpression([simplePropertyNode(BINDING_ID_KEY,builders.literal(id)),simplePropertyNode(BINDING_HTML_KEY,builders.literal(html)),simplePropertyNode(BINDING_BINDINGS_KEY,builders.arrayExpression(bindings))]);}/**
+  attributes:getNodeAttributes(sourceNode).filter(attribute=>attribute.name!==SLOT_ATTRIBUTE)});const[html,bindings]=build(cloneNode,sourceFile,sourceCode);return builders.objectExpression([simplePropertyNode(BINDING_ID_KEY,builders.literal(id)),simplePropertyNode(BINDING_HTML_KEY,builders.literal(html)),simplePropertyNode(BINDING_BINDINGS_KEY,builders.arrayExpression(bindings))]);}/**
   	 * Create the AST array containing the slots
   	 * @param   { RiotParser.Node.Tag } sourceNode - the custom tag
   	 * @param   { string } sourceFile - source file path
   	 * @param   { string } sourceCode - original source
   	 * @returns {AST.ArrayExpression} array containing the attributes to bind
-  	 */function createSlotsArray(sourceNode,sourceFile,sourceCode){return builders.arrayExpression([...compose(slots=>slots.map((_ref4)=>{let key=_ref4[0],value=_ref4[1];return buildSlot(key,value,sourceFile,sourceCode);}),slots=>slots.filter((_ref5)=>{let value=_ref5[1];return value;}),Object.entries,groupSlots)(sourceNode)]);}/**
+  	 */function createSlotsArray(sourceNode,sourceFile,sourceCode){return builders.arrayExpression([...compose(slots=>slots.map((_ref4)=>{let[key,value]=_ref4;return buildSlot(key,value,sourceFile,sourceCode);}),slots=>slots.filter((_ref5)=>{let[,value]=_ref5;return value;}),Object.entries,groupSlots)(sourceNode)]);}/**
   	 * Create the AST array containing the attributes to bind to this node
   	 * @param   { RiotParser.Node.Tag } sourceNode - the custom tag
   	 * @param   { string } selectorAttribute - attribute needed to select the target node
   	 * @param   { string } sourceFile - source file path
   	 * @param   { string } sourceCode - original source
   	 * @returns {AST.ArrayExpression} array containing the slot objects
-  	 */function createBindingAttributes(sourceNode,selectorAttribute,sourceFile,sourceCode){const createAttributeExpression$1=attribute=>createAttributeExpression(attribute,sourceFile,sourceCode);return builders.arrayExpression([...compose(attributes=>attributes.map(createAttributeExpression$1),attributes=>getAttributesWithoutSelector(attributes,selectorAttribute),// eslint-disable-line
+  	 */function createBindingAttributes(sourceNode,selectorAttribute,sourceFile,sourceCode){return builders.arrayExpression([...compose(attributes=>attributes.map(attribute=>createExpression(attribute,sourceFile,sourceCode)),attributes=>getAttributesWithoutSelector(attributes,selectorAttribute),// eslint-disable-line
   cleanAttributes)(sourceNode)]);}/**
   	 * Find the slot attribute if it exists
   	 * @param   {RiotParser.Node.Tag} sourceNode - the custom tag
@@ -5583,15 +5628,16 @@
   	 * @param   { RiotParser.Node.Tag } sourceNode - tag containing the each attribute
   	 * @param   { string } sourceFile - source file path
   	 * @param   { string } sourceCode - original source
+  	 * @param   { string } selector - binding selector
   	 * @returns { Array } array with only the tag binding AST
-  	 */function createNestedBindings(sourceNode,sourceFile,sourceCode){const mightBeARiotComponent=isCustomNode(sourceNode);return mightBeARiotComponent?[null,[createTagBinding(cloneNodeWithoutSelectorAttribute(sourceNode),null,sourceFile,sourceCode)]]:build(createRootNode(sourceNode),sourceFile,sourceCode);}/**
+  	 */function createNestedBindings(sourceNode,sourceFile,sourceCode,selector){const mightBeARiotComponent=isCustomNode(sourceNode);return mightBeARiotComponent?[null,[createTagBinding(cloneNodeWithoutSelectorAttribute(sourceNode,selector),null,sourceFile,sourceCode)]]:build(createRootNode(sourceNode),sourceFile,sourceCode);}/**
   	 * Build the template and the bindings
   	 * @param   {RiotParser.Node} sourceNode - any kind of node parsed via riot parser
   	 * @param   {string} sourceFile - source file path
   	 * @param   {string} sourceCode - original source
   	 * @param   {BuildingState} state - state representing the current building tree state during the recursion
   	 * @returns {Array} array containing the html output and the dom bindings
-  	 */function build(sourceNode,sourceFile,sourceCode,state){if(!sourceNode)panic('Something went wrong with your tag DOM parsing, your tag template can\'t be created');const _parseNode=parseNode(sourceNode,sourceFile,sourceCode,state),nodeHTML=_parseNode[0],nodeBindings=_parseNode[1];const childrenNodes=getChildrenNodes(sourceNode);const currentState=Object.assign({},cloneDeep(BuildingState),state);// mutate the original arrays
+  	 */function build(sourceNode,sourceFile,sourceCode,state){if(!sourceNode)panic('Something went wrong with your tag DOM parsing, your tag template can\'t be created');const[nodeHTML,nodeBindings]=parseNode(sourceNode,sourceFile,sourceCode,state);const childrenNodes=getChildrenNodes(sourceNode);const currentState=Object.assign({},cloneDeep(BuildingState),state);// mutate the original arrays
   currentState.html.push(...nodeHTML);currentState.bindings.push(...nodeBindings);// do recursion if
   // this tag has children and it has no special directives bound to it
   if(childrenNodes.length&&!hasItsOwnTemplate(sourceNode)){childrenNodes.forEach(node=>build(node,sourceFile,sourceCode,Object.assign({parent:sourceNode},currentState)));}// close the tag if it's not a void one
@@ -5615,14 +5661,14 @@
   	 * @param   { Object } meta - compilation meta information
   	 * @param   { AST } ast - current AST output
   	 * @returns { AST } the AST generated
-  	 */function template(sourceNode,source,meta,ast){const options=meta.options;return extendTemplateProperty(ast,options.file,source,sourceNode);}const DEFAULT_OPTIONS={template:'default',file:'[unknown-source-file]',scopedCss:true};/**
+  	 */function template(sourceNode,source,meta,ast){const{options}=meta;return extendTemplateProperty(ast,options.file,source,sourceNode);}const DEFAULT_OPTIONS={template:'default',file:'[unknown-source-file]',scopedCss:true};/**
   	 * Create the initial AST
   	 * @param {string} tagName - the name of the component we have compiled
   	 * @returns { AST } the initial AST
   	 *
   	 * @example
   	 * // the output represents the following string in AST
-  	 */function createInitialInput(_ref6){let tagName=_ref6.tagName;/*
+  	 */function createInitialInput(_ref6){let{tagName}=_ref6;/*
   	  generates
   	  export default {
   	     ${TAG_CSS_PROPERTY}: null,
@@ -5648,7 +5694,7 @@
   	 * @param { string } source - source code of the tag we will need to compile
   	 * @param { string } opts - compiling options
   	 * @returns { Output } object containing output code and source map
-  	 */function compile(source,opts){if(opts===void 0){opts={};}const meta=createMeta(source,opts);const options=meta.options;const _execute$=execute$1('template',options.template,meta,source),code=_execute$.code,map=_execute$.map;const _parser$1$parse$outpu=parser$1(options).parse(code).output,template$1=_parser$1$parse$outpu.template,css$1=_parser$1$parse$outpu.css,javascript$1=_parser$1$parse$outpu.javascript;// extend the meta object with the result of the parsing
+  	 */function compile(source,opts){if(opts===void 0){opts={};}const meta=createMeta(source,opts);const{options}=meta;const{code,map}=execute$1('template',options.template,meta,source);const{template:template$1,css:css$1,javascript:javascript$1}=parser$1(options).parse(code).output;// extend the meta object with the result of the parsing
   Object.assign(meta,{tagName:template$1.name,fragments:{template:template$1,css:css$1,javascript:javascript$1}});return compose(result=>Object.assign({},result,{meta}),result=>execute(result,meta),result=>Object.assign({},result,{map:overrideSourcemapContent(result.map,source)}),ast=>meta.ast=ast&&generateJavascript(ast,{sourceMapName:`${options.file}.map`,inputSourceMap:normaliseInputSourceMap(map)}),hookGenerator(template,template$1,code,meta),hookGenerator(javascript,javascript$1,code,meta),hookGenerator(css,css$1,code,meta))(createInitialInput(meta));}/**
   	 * Prepare the riot parser node transformers
   	 * @param   { Function } transformer - transformer function
@@ -5706,10 +5752,14 @@
     const urls = scripts.map(s => get(s, 'src') || get(s, 'data-src'));
     const tags = await Promise.all(urls.map(compileFromUrl));
     tags.forEach((_ref, i) => {
-      let code = _ref.code,
-          meta = _ref.meta;
+      let {
+        code,
+        meta
+      } = _ref;
       const url = urls[i];
-      const tagName = meta.tagName;
+      const {
+        tagName
+      } = meta;
       inject(code, tagName, url);
     });
   }
