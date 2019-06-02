@@ -3,6 +3,7 @@ import * as riot from '../../src/riot'
 import ConditionalSlotParent from '../components/conditional-slot-parent.riot'
 import DashedAttributeParent from '../components/dashed-attribute-parent.riot'
 import EachAndSpreadAttribute from '../components/each-and-spread-attribute.riot'
+import EachChildrenComponentsEvents from '../components/each-children-components-events.riot'
 import EachRootAttributes from '../components/each-root-attributes.riot'
 import GlobalComponents from '../components/global-components.riot'
 import MergeAttributes from '../components/merge-attributes.riot'
@@ -109,6 +110,17 @@ describe('Riot core api', () => {
 
       expect(updatedSpy).to.not.have.been.called
 
+      component.unmount()
+    })
+
+    it('expressions will be evaluated only once', () => {
+      const handler = spy()
+      const element = document.createElement('each-children-components-events')
+      const component = riot.component(EachChildrenComponentsEvents)(element, {
+        onClick: handler
+      })
+
+      expect(handler).to.be.callCount(component.items.length)
       component.unmount()
     })
   })
@@ -494,6 +506,7 @@ describe('Riot core api', () => {
 
       expect(component.$('p').getAttribute('hidden')).to.be.ok
       expect(component.$('child').getAttribute('hidden')).to.be.ok
+      expect(component.$('child p')).to.be.ok
 
       component.unmount()
     })
