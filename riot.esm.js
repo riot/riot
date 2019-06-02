@@ -1,4 +1,4 @@
-/* Riot v4.0.3, @license MIT */
+/* Riot v4.0.4, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -770,8 +770,10 @@ function patch(redundant, parentScope) {
       const {
         template,
         context
-      } = redundant.pop();
-      template.unmount(context, parentScope, false);
+      } = redundant.pop(); // notice that we pass null as last argument because
+      // the root node and its children will be removed by domdiff
+
+      template.unmount(context, parentScope, null);
     }
 
     return item;
@@ -1639,7 +1641,7 @@ const TemplateChunk = Object.freeze({
 
       if (mustRemoveRoot && this.el.parentNode) {
         this.el.parentNode.removeChild(this.el);
-      } else {
+      } else if (mustRemoveRoot !== null) {
         cleanNode(this.el);
       }
 
@@ -2215,7 +2217,7 @@ function component(implementation) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.0.3'; // expose some internal stuff that might be used from external tools
+const version = 'v4.0.4'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
