@@ -13,7 +13,7 @@ KARMA = ./node_modules/karma/bin/karma
 ESLINT = ./node_modules/eslint/bin/eslint.js
 MOCHA = ./node_modules/mocha/bin/_mocha
 ROLLUP = ./node_modules/rollup/bin/rollup
-MINIFY = ./node_modules/.bin/minify
+MINIFY = ./node_modules/.bin/terser
 COVERALLS = ./node_modules/coveralls/bin/coveralls.js
 RIOT_CLI = ./node_modules/.bin/riot
 
@@ -60,7 +60,12 @@ riot: clean raw test
 min:
 	# minify riot
 	@ for f in $(GENERATED_FILES); do \
-		$(MINIFY) $(DIST)$$f -o $(DIST)$${f%.*}.min.js; \
+		$(MINIFY) $(DIST)$$f \
+			--comments \
+			--toplevel \
+			--mangle \
+			--compress  \
+			-o $(DIST)$${f%.*}.min.js; \
 		done
 
 build:
