@@ -1,5 +1,8 @@
 /* eslint-disable fp/no-mutating-methods */
+import {VALUE_ATTRIBUTE} from '../globals'
+import {expressionTypes} from '@riotjs/dom-bindings'
 import {isFunction} from './checks'
+
 /**
  * Throw an error
  * @param {string} error - error message
@@ -92,19 +95,6 @@ export function defineProperty(source, key, value, options = {}) {
 }
 
 /**
- * Normalize a DOM attribute that will be passed to a child component
- * @param   {string} attribute.name - attribute names might be dash case
- * @param   {*} attribute.value - sky is the limit
- * @returns {attribute} attribute object normalized
- */
-export function normalizeAttribute({name, value}) {
-  return {
-    name: dashToCamelCase(name),
-    value: value
-  }
-}
-
-/**
  * Define multiple properties on a target object
  * @param   {Object} source - object where the new properties will be set
  * @param   {Object} properties - object containing as key pair the key + value properties
@@ -126,19 +116,23 @@ export function defineProperties(source, properties, options) {
  */
 export function evaluateAttributeExpressions(attributes) {
   return attributes.reduce((acc, attribute) => {
-    const {value} = attribute
+    const {value, type} = attribute
 
-    // spread attributes should be handled differently
-    if (!attribute.name) {
+    switch (true) {
+    // spread attribute
+    case !attribute.name && type === expressionTypes.ATTRIBUTE:
       return {
         ...acc,
         ...value
       }
+    // value attribute
+    case type === expressionTypes.VALUE:
+      acc[VALUE_ATTRIBUTE] = attribute.value
+      break
+    // normal attributes
+    default:
+      acc[dashToCamelCase(attribute.name)] = attribute.value
     }
-
-    const attr = normalizeAttribute({ value, name: attribute.name })
-
-    acc[attr.name] = attr.value
 
     return acc
   }, {})

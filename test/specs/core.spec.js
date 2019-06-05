@@ -10,6 +10,7 @@ import MergeAttributes from '../components/merge-attributes.riot'
 import NamedSlotsParent from '../components/named-slots-parent.riot'
 import NestedAliasedImportsComponent from '../components/nested-aliased-imports.riot'
 import NestedImportsComponent from '../components/nested-imports.riot'
+import ParentValueProp from '../components/parent-value-prop.riot'
 import ParentWithSlotsComponent from '../components/parent-with-slots.riot'
 import RuntimeIsDirective from '../components/runtime-is-directive.riot'
 import ShorthandAttribute from '../components/shorthand-attribute.riot'
@@ -121,6 +122,17 @@ describe('Riot core api', () => {
       })
 
       expect(handler).to.be.callCount(component.items.length)
+      component.unmount()
+    })
+
+    it('the value attribute will be passed as prop to children tags', () => {
+      const element = document.createElement('parent-value-prop')
+      const component = riot.component(ParentValueProp)(element, {
+        onClick() {},
+        value: 'hello'
+      })
+
+      expect(component.$('input').value).to.be.equal('hello')
       component.unmount()
     })
   })

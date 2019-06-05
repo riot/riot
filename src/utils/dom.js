@@ -1,6 +1,6 @@
 import {IS_DIRECTIVE} from '../globals'
+import {dashToCamelCase} from './misc'
 import {get as getAttr} from 'bianco.attr'
-import {normalizeAttribute} from './misc'
 
 /**
  * Get all the element attributes as object
@@ -9,8 +9,7 @@ import {normalizeAttribute} from './misc'
  */
 export function DOMattributesToObject(element) {
   return Array.from(element.attributes).reduce((acc, attribute) => {
-    const attr = normalizeAttribute(attribute)
-    acc[attr.name] = attr.value
+    acc[dashToCamelCase(attribute.name)] = attribute.value
     return acc
   }, {})
 }
