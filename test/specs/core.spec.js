@@ -5,6 +5,7 @@ import DashedAttributeParent from '../components/dashed-attribute-parent.riot'
 import EachAndSpreadAttribute from '../components/each-and-spread-attribute.riot'
 import EachChildrenComponentsEvents from '../components/each-children-components-events.riot'
 import EachRootAttributes from '../components/each-root-attributes.riot'
+import ExpressionParts from '../components/expression-parts.riot'
 import GlobalComponents from '../components/global-components.riot'
 import MergeAttributes from '../components/merge-attributes.riot'
 import NamedSlotsParent from '../components/named-slots-parent.riot'
@@ -122,6 +123,17 @@ describe('Riot core api', () => {
       })
 
       expect(handler).to.be.callCount(component.items.length)
+      component.unmount()
+    })
+
+    it('expression mixed with static text will be properly evaluated', () => {
+      const element = document.createElement('expression-parts')
+      const component = riot.component(ExpressionParts)(element, {
+        val: 'hello'
+      })
+
+      expect(component.$('p').innerHTML).to.be.equal('hellothere')
+      expect(component.$('p').getAttribute('attr')).to.be.equal('hellothere')
       component.unmount()
     })
 
