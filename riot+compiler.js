@@ -1,4 +1,4 @@
-/* Riot v4.0.5, @license MIT */
+/* Riot v4.0.8, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -9,6 +9,7 @@
         DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
         PLUGINS_SET = new Set(),
         IS_DIRECTIVE = 'is',
+        VALUE_ATTRIBUTE = 'value',
         ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
         TEMPLATE_KEY_SYMBOL = Symbol('template');
 
@@ -17,300 +18,10 @@
     DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY,
     PLUGINS_SET: PLUGINS_SET,
     IS_DIRECTIVE: IS_DIRECTIVE,
+    VALUE_ATTRIBUTE: VALUE_ATTRIBUTE,
     ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
     TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL
   });
-
-  /**
-   * Converts any DOM node/s to a loopable array
-   * @param   { HTMLElement|NodeList } els - single html element or a node list
-   * @returns { Array } always a loopable object
-   */
-  function domToArray(els) {
-    // can this object be already looped?
-    if (!Array.isArray(els)) {
-      // is it a node list?
-      if (/^\[object (HTMLCollection|NodeList|Object)\]$/.test(Object.prototype.toString.call(els)) && typeof els.length === 'number') return Array.from(els);else // if it's a single node
-        // it will be returned as "array" with one single entry
-        return [els];
-    } // this object could be looped out of the box
-
-
-    return els;
-  }
-
-  /**
-   * Normalize the return values, in case of a single value we avoid to return an array
-   * @param   { Array } values - list of values we want to return
-   * @returns { Array|string|boolean } either the whole list of values or the single one found
-   * @private
-   */
-
-  const normalize = values => values.length === 1 ? values[0] : values;
-  /**
-   * Parse all the nodes received to get/remove/check their attributes
-   * @param   { HTMLElement|NodeList|Array } els    - DOM node/s to parse
-   * @param   { string|Array }               name   - name or list of attributes
-   * @param   { string }                     method - method that will be used to parse the attributes
-   * @returns { Array|string } result of the parsing in a list or a single value
-   * @private
-   */
-
-
-  function parseNodes(els, name, method) {
-    const names = typeof name === 'string' ? [name] : name;
-    return normalize(domToArray(els).map(el => {
-      return normalize(names.map(n => el[method](n)));
-    }));
-  }
-  /**
-   * Set any attribute on a single or a list of DOM nodes
-   * @param   { HTMLElement|NodeList|Array } els   - DOM node/s to parse
-   * @param   { string|Object }              name  - either the name of the attribute to set
-   *                                                 or a list of properties as object key - value
-   * @param   { string }                     value - the new value of the attribute (optional)
-   * @returns { HTMLElement|NodeList|Array } the original array of elements passed to this function
-   *
-   * @example
-   *
-   * import { set } from 'bianco.attr'
-   *
-   * const img = document.createElement('img')
-   *
-   * set(img, 'width', 100)
-   *
-   * // or also
-   * set(img, {
-   *   width: 300,
-   *   height: 300
-   * })
-   *
-   */
-
-
-  function set(els, name, value) {
-    const attrs = typeof name === 'object' ? name : {
-      [name]: value
-    };
-    const props = Object.keys(attrs);
-    domToArray(els).forEach(el => {
-      props.forEach(prop => el.setAttribute(prop, attrs[prop]));
-    });
-    return els;
-  }
-  /**
-   * Get any attribute from a single or a list of DOM nodes
-   * @param   { HTMLElement|NodeList|Array } els   - DOM node/s to parse
-   * @param   { string|Array }               name  - name or list of attributes to get
-   * @returns { Array|string } list of the attributes found
-   *
-   * @example
-   *
-   * import { get } from 'bianco.attr'
-   *
-   * const img = document.createElement('img')
-   *
-   * get(img, 'width') // => '200'
-   *
-   * // or also
-   * get(img, ['width', 'height']) // => ['200', '300']
-   *
-   * // or also
-   * get([img1, img2], ['width', 'height']) // => [['200', '300'], ['500', '200']]
-   */
-
-  function get(els, name) {
-    return parseNodes(els, name, 'getAttribute');
-  }
-
-  /**
-   * Quick type checking
-   * @param   {*} element - anything
-   * @param   {string} type - type definition
-   * @returns {boolean} true if the type corresponds
-   */
-  function checkType(element, type) {
-    return typeof element === type;
-  }
-  /**
-   * Check that will be passed if its argument is a function
-   * @param   {*} value - value to check
-   * @returns {boolean} - true if the value is a function
-   */
-
-  function isFunction(value) {
-    return checkType(value, 'function');
-  }
-
-  /* eslint-disable fp/no-mutating-methods */
-  /**
-   * Throw an error
-   * @param {string} error - error message
-   * @returns {undefined} it's a IO void function
-   */
-
-  function panic(error) {
-    throw new Error(error);
-  }
-  /**
-   * Call the first argument received only if it's a function otherwise return it as it is
-   * @param   {*} source - anything
-   * @returns {*} anything
-   */
-
-  function callOrAssign(source) {
-    return isFunction(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
-  }
-  /**
-   * Convert a string from camel case to dash-case
-   * @param   {string} string - probably a component tag name
-   * @returns {string} component name normalized
-   */
-
-  function camelToDashCase(string) {
-    return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-  }
-  /**
-   * Convert a string containing dashes to camel case
-   * @param   {string} string - input string
-   * @returns {string} my-string -> myString
-   */
-
-  function dashToCamelCase(string) {
-    return string.replace(/-(\w)/g, (_, c) => c.toUpperCase());
-  }
-  /**
-   * Define default properties if they don't exist on the source object
-   * @param   {Object} source - object that will receive the default properties
-   * @param   {Object} defaults - object containing additional optional keys
-   * @returns {Object} the original object received enhanced
-   */
-
-  function defineDefaults(source, defaults) {
-    Object.entries(defaults).forEach((_ref) => {
-      let [key, value] = _ref;
-      if (!source[key]) source[key] = value;
-    });
-    return source;
-  } // doese simply nothing
-
-  function noop() {
-    return this;
-  }
-  /**
-   * Autobind the methods of a source object to itself
-   * @param   {Object} source - probably a riot tag instance
-   * @param   {Array<string>} methods - list of the methods to autobind
-   * @returns {Object} the original object received
-   */
-
-  function autobindMethods(source, methods) {
-    methods.forEach(method => {
-      source[method] = source[method].bind(source);
-    });
-    return source;
-  }
-  /**
-   * Helper function to set an immutable property
-   * @param   {Object} source - object where the new property will be set
-   * @param   {string} key - object key where the new property will be stored
-   * @param   {*} value - value of the new property
-   * @param   {Object} options - set the propery overriding the default options
-   * @returns {Object} - the original object modified
-   */
-
-  function defineProperty(source, key, value, options) {
-    if (options === void 0) {
-      options = {};
-    }
-
-    Object.defineProperty(source, key, Object.assign({
-      value,
-      enumerable: false,
-      writable: false,
-      configurable: true
-    }, options));
-    return source;
-  }
-  /**
-   * Normalize a DOM attribute that will be passed to a child component
-   * @param   {string} attribute.name - attribute names might be dash case
-   * @param   {*} attribute.value - sky is the limit
-   * @returns {attribute} attribute object normalized
-   */
-
-  function normalizeAttribute(_ref2) {
-    let {
-      name,
-      value
-    } = _ref2;
-    return {
-      name: dashToCamelCase(name),
-      value: value
-    };
-  }
-  /**
-   * Define multiple properties on a target object
-   * @param   {Object} source - object where the new properties will be set
-   * @param   {Object} properties - object containing as key pair the key + value properties
-   * @param   {Object} options - set the propery overriding the default options
-   * @returns {Object} the original object modified
-   */
-
-  function defineProperties(source, properties, options) {
-    Object.entries(properties).forEach((_ref3) => {
-      let [key, value] = _ref3;
-      defineProperty(source, key, value, options);
-    });
-    return source;
-  }
-  /**
-   * Evaluate a list of attribute expressions
-   * @param   {Array} attributes - attribute expressions generated by the riot compiler
-   * @returns {Object} key value pairs with the result of the computation
-   */
-
-  function evaluateAttributeExpressions(attributes) {
-    return attributes.reduce((acc, attribute) => {
-      const {
-        value
-      } = attribute; // spread attributes should be handled differently
-
-      if (!attribute.name) {
-        return Object.assign({}, acc, value);
-      }
-
-      const attr = normalizeAttribute({
-        value,
-        name: attribute.name
-      });
-      acc[attr.name] = attr.value;
-      return acc;
-    }, {});
-  }
-
-  /**
-   * Get all the element attributes as object
-   * @param   {HTMLElement} element - DOM node we want to parse
-   * @returns {Object} all the attributes found as a key value pairs
-   */
-
-  function DOMattributesToObject(element) {
-    return Array.from(element.attributes).reduce((acc, attribute) => {
-      const attr = normalizeAttribute(attribute);
-      acc[attr.name] = attr.value;
-      return acc;
-    }, {});
-  }
-  /**
-   * Get the tag name of any DOM node
-   * @param   {HTMLElement} element - DOM node we want to inspect
-   * @returns {string} name to identify this dom node in riot
-   */
-
-  function getName(element) {
-    return get(element, IS_DIRECTIVE) || element.tagName.toLowerCase();
-  }
 
   /**
    * Remove the child nodes from any DOM node
@@ -1687,6 +1398,286 @@
   }
 
   /**
+   * Quick type checking
+   * @param   {*} element - anything
+   * @param   {string} type - type definition
+   * @returns {boolean} true if the type corresponds
+   */
+  function checkType(element, type) {
+    return typeof element === type;
+  }
+  /**
+   * Check that will be passed if its argument is a function
+   * @param   {*} value - value to check
+   * @returns {boolean} - true if the value is a function
+   */
+
+  function isFunction(value) {
+    return checkType(value, 'function');
+  }
+
+  /* eslint-disable fp/no-mutating-methods */
+  /**
+   * Throw an error
+   * @param {string} error - error message
+   * @returns {undefined} it's a IO void function
+   */
+
+  function panic(error) {
+    throw new Error(error);
+  }
+  /**
+   * Call the first argument received only if it's a function otherwise return it as it is
+   * @param   {*} source - anything
+   * @returns {*} anything
+   */
+
+  function callOrAssign(source) {
+    return isFunction(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
+  }
+  /**
+   * Convert a string from camel case to dash-case
+   * @param   {string} string - probably a component tag name
+   * @returns {string} component name normalized
+   */
+
+  function camelToDashCase(string) {
+    return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+  }
+  /**
+   * Convert a string containing dashes to camel case
+   * @param   {string} string - input string
+   * @returns {string} my-string -> myString
+   */
+
+  function dashToCamelCase(string) {
+    return string.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+  }
+  /**
+   * Define default properties if they don't exist on the source object
+   * @param   {Object} source - object that will receive the default properties
+   * @param   {Object} defaults - object containing additional optional keys
+   * @returns {Object} the original object received enhanced
+   */
+
+  function defineDefaults(source, defaults) {
+    Object.entries(defaults).forEach((_ref) => {
+      let [key, value] = _ref;
+      if (!source[key]) source[key] = value;
+    });
+    return source;
+  } // doese simply nothing
+
+  function noop() {
+    return this;
+  }
+  /**
+   * Autobind the methods of a source object to itself
+   * @param   {Object} source - probably a riot tag instance
+   * @param   {Array<string>} methods - list of the methods to autobind
+   * @returns {Object} the original object received
+   */
+
+  function autobindMethods(source, methods) {
+    methods.forEach(method => {
+      source[method] = source[method].bind(source);
+    });
+    return source;
+  }
+  /**
+   * Helper function to set an immutable property
+   * @param   {Object} source - object where the new property will be set
+   * @param   {string} key - object key where the new property will be stored
+   * @param   {*} value - value of the new property
+   * @param   {Object} options - set the propery overriding the default options
+   * @returns {Object} - the original object modified
+   */
+
+  function defineProperty(source, key, value, options) {
+    if (options === void 0) {
+      options = {};
+    }
+
+    Object.defineProperty(source, key, Object.assign({
+      value,
+      enumerable: false,
+      writable: false,
+      configurable: true
+    }, options));
+    return source;
+  }
+  /**
+   * Define multiple properties on a target object
+   * @param   {Object} source - object where the new properties will be set
+   * @param   {Object} properties - object containing as key pair the key + value properties
+   * @param   {Object} options - set the propery overriding the default options
+   * @returns {Object} the original object modified
+   */
+
+  function defineProperties(source, properties, options) {
+    Object.entries(properties).forEach((_ref2) => {
+      let [key, value] = _ref2;
+      defineProperty(source, key, value, options);
+    });
+    return source;
+  }
+  /**
+   * Evaluate a list of attribute expressions
+   * @param   {Array} attributes - attribute expressions generated by the riot compiler
+   * @returns {Object} key value pairs with the result of the computation
+   */
+
+  function evaluateAttributeExpressions(attributes) {
+    return attributes.reduce((acc, attribute) => {
+      const {
+        value,
+        type
+      } = attribute;
+
+      switch (true) {
+        // spread attribute
+        case !attribute.name && type === expressionTypes.ATTRIBUTE:
+          return Object.assign({}, acc, value);
+        // value attribute
+
+        case type === expressionTypes.VALUE:
+          acc[VALUE_ATTRIBUTE] = attribute.value;
+          break;
+        // normal attributes
+
+        default:
+          acc[dashToCamelCase(attribute.name)] = attribute.value;
+      }
+
+      return acc;
+    }, {});
+  }
+
+  /**
+   * Converts any DOM node/s to a loopable array
+   * @param   { HTMLElement|NodeList } els - single html element or a node list
+   * @returns { Array } always a loopable object
+   */
+  function domToArray(els) {
+    // can this object be already looped?
+    if (!Array.isArray(els)) {
+      // is it a node list?
+      if (/^\[object (HTMLCollection|NodeList|Object)\]$/.test(Object.prototype.toString.call(els)) && typeof els.length === 'number') return Array.from(els);else // if it's a single node
+        // it will be returned as "array" with one single entry
+        return [els];
+    } // this object could be looped out of the box
+
+
+    return els;
+  }
+
+  /**
+   * Normalize the return values, in case of a single value we avoid to return an array
+   * @param   { Array } values - list of values we want to return
+   * @returns { Array|string|boolean } either the whole list of values or the single one found
+   * @private
+   */
+
+  const normalize = values => values.length === 1 ? values[0] : values;
+  /**
+   * Parse all the nodes received to get/remove/check their attributes
+   * @param   { HTMLElement|NodeList|Array } els    - DOM node/s to parse
+   * @param   { string|Array }               name   - name or list of attributes
+   * @param   { string }                     method - method that will be used to parse the attributes
+   * @returns { Array|string } result of the parsing in a list or a single value
+   * @private
+   */
+
+
+  function parseNodes(els, name, method) {
+    const names = typeof name === 'string' ? [name] : name;
+    return normalize(domToArray(els).map(el => {
+      return normalize(names.map(n => el[method](n)));
+    }));
+  }
+  /**
+   * Set any attribute on a single or a list of DOM nodes
+   * @param   { HTMLElement|NodeList|Array } els   - DOM node/s to parse
+   * @param   { string|Object }              name  - either the name of the attribute to set
+   *                                                 or a list of properties as object key - value
+   * @param   { string }                     value - the new value of the attribute (optional)
+   * @returns { HTMLElement|NodeList|Array } the original array of elements passed to this function
+   *
+   * @example
+   *
+   * import { set } from 'bianco.attr'
+   *
+   * const img = document.createElement('img')
+   *
+   * set(img, 'width', 100)
+   *
+   * // or also
+   * set(img, {
+   *   width: 300,
+   *   height: 300
+   * })
+   *
+   */
+
+
+  function set(els, name, value) {
+    const attrs = typeof name === 'object' ? name : {
+      [name]: value
+    };
+    const props = Object.keys(attrs);
+    domToArray(els).forEach(el => {
+      props.forEach(prop => el.setAttribute(prop, attrs[prop]));
+    });
+    return els;
+  }
+  /**
+   * Get any attribute from a single or a list of DOM nodes
+   * @param   { HTMLElement|NodeList|Array } els   - DOM node/s to parse
+   * @param   { string|Array }               name  - name or list of attributes to get
+   * @returns { Array|string } list of the attributes found
+   *
+   * @example
+   *
+   * import { get } from 'bianco.attr'
+   *
+   * const img = document.createElement('img')
+   *
+   * get(img, 'width') // => '200'
+   *
+   * // or also
+   * get(img, ['width', 'height']) // => ['200', '300']
+   *
+   * // or also
+   * get([img1, img2], ['width', 'height']) // => [['200', '300'], ['500', '200']]
+   */
+
+  function get(els, name) {
+    return parseNodes(els, name, 'getAttribute');
+  }
+
+  /**
+   * Get all the element attributes as object
+   * @param   {HTMLElement} element - DOM node we want to parse
+   * @returns {Object} all the attributes found as a key value pairs
+   */
+
+  function DOMattributesToObject(element) {
+    return Array.from(element.attributes).reduce((acc, attribute) => {
+      acc[dashToCamelCase(attribute.name)] = attribute.value;
+      return acc;
+    }, {});
+  }
+  /**
+   * Get the tag name of any DOM node
+   * @param   {HTMLElement} element - DOM node we want to inspect
+   * @returns {string} name to identify this dom node in riot
+   */
+
+  function getName(element) {
+    return get(element, IS_DIRECTIVE) || element.tagName.toLowerCase();
+  }
+
+  /**
    * Simple helper to find DOM nodes returning them as array like loopable object
    * @param   { string|DOMNodeList } selector - either the query or the DOM nodes to arraify
    * @param   { HTMLElement }        ctx      - context defining where the query will search for the DOM nodes
@@ -2223,7 +2214,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.0.5'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.0.8'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2265,7 +2256,7 @@
 
   var require$$1 = getCjsExportFromNamespace(_empty_module$1);
 
-  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.0.5, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
+  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.0.8, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
   this.allSupertypes=Object.create(null);// Linear inheritance hierarchy. Populated during finalization.
   this.supertypeList=[];// Includes inherited fields.
   this.allFields=Object.create(null);// Non-hidden keys of allFields.
@@ -5841,7 +5832,7 @@
   // non-void, non-empty tags, so we are sure the `lastTag` here
   // have a `nodes` property.
   const lastTag=store.last;const newNode=node;lastTag.nodes.push(newNode);if(lastTag[IS_RAW]||RAW_TAGS.test(name)){node[IS_RAW]=true;}if(!node[IS_SELF_CLOSING]&&!node[IS_VOID]){store.stack.push(lastTag);newNode.nodes=[];store.last=newNode;}}if(attrs){this.attrs(attrs);}},attrs(attributes){attributes.forEach(attr=>{if(attr.value){this.split(attr,attr.value,attr.valueStart,true);}});},pushText(store,node){const text=node.text;const empty=!/\S/.test(text);const scryle=store.scryle;if(!scryle){// store.last always have a nodes property
-  const parent=store.last;const pack=this.compact&&!parent[IS_RAW];if(pack&&empty){return;}this.split(node,text,node.start,pack);parent.nodes.push(node);}else if(!empty){scryle.text=node;}},split(node,source,start,pack){const expressions=node.expressions;const parts=[];if(expressions){let pos=0;expressions.forEach(expr=>{const text=source.slice(pos,expr.start-start);const code=expr.text;parts.push(this.sanitise(node,text,pack),escapeReturn(escapeSlashes(code).trim()));pos=expr.end-start;});if((pos+=start)<node.end){parts.push(this.sanitise(node,source.slice(pos),pack));}}else{parts[0]=this.sanitise(node,source,pack);}node.parts=parts.filter(p=>p);// remove the empty strings
+  const parent=store.last;const pack=this.compact&&!parent[IS_RAW];if(pack&&empty){return;}this.split(node,text,node.start,pack);parent.nodes.push(node);}else if(!empty){scryle.text=node;}},split(node,source,start,pack){const expressions=node.expressions;const parts=[];if(expressions){let pos=0;expressions.forEach(expr=>{const text=source.slice(pos,expr.start-start);const code=expr.text;parts.push(this.sanitise(node,text,pack),escapeReturn(escapeSlashes(code).trim()));pos=expr.end-start;});if(pos<node.end){parts.push(this.sanitise(node,source.slice(pos),pack));}}else{parts[0]=this.sanitise(node,source,pack);}node.parts=parts.filter(p=>p);// remove the empty strings
   },// unescape escaped brackets and split prefixes of expressions
   sanitise(node,text,pack){let rep=node.unescape;if(rep){let idx=0;rep=`\\${rep}`;while((idx=text.indexOf(rep,idx))!==-1){text=text.substr(0,idx)+text.substr(idx+1);idx++;}}text=escapeSlashes(text);return pack?cleanSpaces(text):escapeReturn(text);}});function createTreeBuilder(data,options){const root={type:TAG,name:'',start:0,end:0,nodes:[]};return Object.assign(Object.create(TREE_BUILDER_STRUCT),{compact:options.compact!==false,store:{last:root,stack:[],scryle:null,root,style:null,script:null,data}});}/**
   	 * Factory for the Parser class, exposing only the `parse` method.
@@ -6125,7 +6116,7 @@
   	 * @param   {string} sourceFile - original tag file
   	 * @param   {string} sourceCode - original tag source code
   	 * @returns { Object } a template literal expression object
-  	 */function mergeAttributeExpressions(node,sourceFile,sourceCode){if(!node.parts||node.parts.length===1)return transformExpression(node.expressions[0],sourceFile,sourceCode);const lastExpression=node.expressions[node.expressions.length-1];const tail=sourceCode.substring(lastExpression.end,node.end).replace(/"|'/,'');const stringsArray=[...node.parts.reduce((acc,str)=>{const expression=node.expressions.find(e=>e.text.trim()===str);return [...acc,expression?transformExpression(expression,sourceFile,sourceCode):builders.literal(str)];},[]),builders.literal(tail)].filter(expr=>!isLiteral(expr)||expr.value);return createArrayString(stringsArray);}/**
+  	 */function mergeAttributeExpressions(node,sourceFile,sourceCode){if(!node.parts||node.parts.length===1)return transformExpression(node.expressions[0],sourceFile,sourceCode);const stringsArray=[...node.parts.reduce((acc,str)=>{const expression=node.expressions.find(e=>e.text.trim()===str);return [...acc,expression?transformExpression(expression,sourceFile,sourceCode):builders.literal(str)];},[])].filter(expr=>!isLiteral(expr)||expr.value);return createArrayString(stringsArray);}/**
   	 * Create a simple attribute expression
   	 * @param   {RiotParser.Node.Attr} sourceNode - the custom tag
   	 * @param   {string} sourceFile - source file path
