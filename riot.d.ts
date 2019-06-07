@@ -4,6 +4,7 @@ export interface RiotCoreComponent {
   props: object
   root: HTMLElement
   name?: string
+  // TODO: add the @riotjs/dom-bindings types
   slots: any[]
   mount(
     element: HTMLElement,
@@ -23,7 +24,7 @@ export interface RiotCoreComponent {
 
 export interface RiotComponentShell {
   css?: string
-  exports?: any
+  exports?: () => RiotComponent|object
   name?: string
   // TODO: add the @riotjs/dom-bindings types
   template(): any
@@ -62,6 +63,6 @@ declare module 'riot' {
   export function unmount(selector: string):HTMLElement[]
   export function install(plugin: ComponentEnhancer):InstalledPluginsSet
   export function uninstall(plugin: ComponentEnhancer):InstalledPluginsSet
-  export function version: string
   export function component(shell: RiotComponentShell):(el: HTMLElement, initialProps?: object) => RiotComponent
+  export const version: string
 }
