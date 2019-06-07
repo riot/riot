@@ -73,6 +73,7 @@
   "files": [
     "src",
     "riot.js",
+    "riot.d.ts",
     "riot.esm.js",
     "riot.min.js",
     "riot+compiler.js",
@@ -80,5 +81,6 @@
   ],
   "main": "riot.js",
   "module": "riot.esm.js",
-  "jsnext:main": "riot.esm.js"
+  "jsnext:main": "riot.esm.js",
+  "types": "./riot.d.ts",
 }
