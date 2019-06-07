@@ -56,13 +56,16 @@ export type RegisteredComponentsMap = Map<string, () => RiotComponent>
 export type ComponentEnhancer = (component: RiotComponent) => RiotComponent
 export type InstalledPluginsSet = Set<ComponentEnhancer>
 
-declare module 'riot' {
-  export function register(componentName: string, shell: RiotComponentShell): RegisteredComponentsMap
-  export function unregister(componentName: string): RegisteredComponentsMap
-  export function mount(selector: string, componentName: string, initialProps?: object): RiotComponent[]
-  export function unmount(selector: string):HTMLElement[]
-  export function install(plugin: ComponentEnhancer):InstalledPluginsSet
-  export function uninstall(plugin: ComponentEnhancer):InstalledPluginsSet
-  export function component(shell: RiotComponentShell):(el: HTMLElement, initialProps?: object) => RiotComponent
-  export const version: string
+export function register(componentName: string, shell: RiotComponentShell): RegisteredComponentsMap
+export function unregister(componentName: string): RegisteredComponentsMap
+export function mount(selector: string, componentName: string, initialProps?: object): RiotComponent[]
+export function unmount(selector: string):HTMLElement[]
+export function install(plugin: ComponentEnhancer):InstalledPluginsSet
+export function uninstall(plugin: ComponentEnhancer):InstalledPluginsSet
+export function component(shell: RiotComponentShell):(el: HTMLElement, initialProps?: object) => RiotComponent
+export const version: string
+
+// Riot files export
+declare module '*.riot' {
+  export default RiotComponentShell;
 }
