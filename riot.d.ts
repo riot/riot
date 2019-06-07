@@ -58,7 +58,7 @@ export type InstalledPluginsSet = Set<ComponentEnhancer>
 declare module 'riot' {
   export function register(componentName: string, shell: RiotComponentShell): RegisteredComponentsMap
   export function unregister(componentName: string): RegisteredComponentsMap
-  export function mount(selector: string, componentName: string, initialProps: object): RiotComponent[]
+  export function mount(selector: string, componentName: string, initialProps?: object): RiotComponent[]
   export function unmount(selector: string):HTMLElement[]
   export function install(plugin: ComponentEnhancer):InstalledPluginsSet
   export function uninstall(plugin: ComponentEnhancer):InstalledPluginsSet
