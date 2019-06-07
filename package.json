@@ -82,5 +82,5 @@
   "main": "riot.js",
   "module": "riot.esm.js",
   "jsnext:main": "riot.esm.js",
-  "types": "./riot.d.ts",
+  "types": "./riot.d.ts"
 }
