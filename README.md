@@ -5,7 +5,6 @@
 
 [![Build Status][travis-image]][travis-url]
 [![MIT License][license-image]][license-url]
-[![Riot Forum][riot-forum-image]][riot-forum-url]
 [![Join the chat at https://gitter.im/riot/riot][gitter-image]][gitter-url]
 [![Join the chat (ja) at https://riot-jp-slackin.herokuapp.com/][slack-ja-image]][slack-ja-url]
 [![OpenCollective Backers][backer-badge]][backer-url] [![OpenCollective Sponsors][sponsor-badge]][sponsor-url]
@@ -211,9 +210,6 @@ Special thanks to Browserstack for their support
 [npm-version-image]:http://img.shields.io/npm/v/riot.svg?style=flat-square
 [npm-downloads-image]:http://img.shields.io/npm/dm/riot.svg?style=flat-square
 [npm-url]:https://npmjs.org/package/riot
-
-[riot-forum-image]:https://img.shields.io/badge/muut-JOIN_FORUM%E2%86%92-ff0044.svg?style=flat-square
-[riot-forum-url]:http://riot.js.org/forum/
 
 [coverage-image]:https://img.shields.io/coveralls/riot/riot/dev.svg?style=flat-square
 [coverage-url]:https://coveralls.io/r/riot/riot?branch=dev
