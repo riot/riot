@@ -1,11 +1,11 @@
 // This interface is only exposed and any Riot component will receive the following properties
 export interface RiotCoreComponent {
   // automatically generated on any component instance
-  props: object
-  root: HTMLElement
-  name?: string
+  readonly props: object
+  readonly root: HTMLElement
+  readonly name?: string
   // TODO: add the @riotjs/dom-bindings types
-  slots: any[]
+  readonly slots: any[]
   mount(
     element: HTMLElement,
     initialState?: object,
@@ -23,9 +23,9 @@ export interface RiotCoreComponent {
 }
 
 export interface RiotComponentShell {
-  css?: string
-  exports?: () => RiotComponent|object
-  name?: string
+  readonly css?: string
+  readonly exports?: () => RiotComponent|object
+  readonly name?: string
   // TODO: add the @riotjs/dom-bindings types
   template(): any
 }
@@ -64,8 +64,3 @@ export function install(plugin: ComponentEnhancer):InstalledPluginsSet
 export function uninstall(plugin: ComponentEnhancer):InstalledPluginsSet
 export function component(shell: RiotComponentShell):(el: HTMLElement, initialProps?: object) => RiotComponent
 export const version: string
-
-// Riot files export
-declare module '*.riot' {
-  export default RiotComponentShell;
-}
