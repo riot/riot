@@ -22,6 +22,7 @@ export interface RiotCoreComponent {
   $$(selector: string): [HTMLElement]
 }
 
+// This object interface is created anytime a riot file will be compiled into javascript
 export interface RiotComponentShell {
   readonly css?: string
   readonly exports?: () => RiotComponent|object
