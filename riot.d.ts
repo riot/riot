@@ -31,7 +31,7 @@ export interface RiotComponentShell {
   template(): any
 }
 
-
+// Interface that can be used when creating the components export
 export interface RiotComponentExport {
   // optional on the component object
   state?: object
