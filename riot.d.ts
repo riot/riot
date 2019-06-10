@@ -1,21 +1,21 @@
 // This interface is only exposed and any Riot component will receive the following properties
-export interface RiotCoreComponent {
+export interface RiotCoreComponent<P = object, S = object> {
   // automatically generated on any component instance
-  readonly props: object
+  readonly props: P
   readonly root: HTMLElement
   readonly name?: string
   // TODO: add the @riotjs/dom-bindings types
   readonly slots: any[]
   mount(
     element: HTMLElement,
-    initialState?: object,
+    initialState?: S,
     parentScope?: object
-  ): RiotComponent
+  ): RiotComponent<P, S>
   update(
-    newState?: object,
+    newState?: Partial<S>,
     parentScope?: object
-  ): RiotComponent
-  unmount(keepRootElement: boolean): RiotComponent
+  ): RiotComponent<P, S>
+  unmount(keepRootElement: boolean): RiotComponent<P, S>
 
   // Helpers
   $(selector: string): HTMLElement
@@ -23,49 +23,49 @@ export interface RiotCoreComponent {
 }
 
 // This object interface is created anytime a riot file will be compiled into javascript
-export interface RiotComponentShell {
+export interface RiotComponentShell<P = object, S = object> {
   readonly css?: string
-  readonly exports?: () => RiotComponent|object
+  readonly exports?: () => RiotComponent<P, S>|object
   readonly name?: string
   // TODO: add the @riotjs/dom-bindings types
   template(): any
 }
 
 // Interface that can be used when creating the components export
-export interface RiotComponentExport {
+export interface RiotComponentExport<P = object, S = object> {
   // optional on the component object
-  state?: object
+  state?: S
 
   // optional alias to map the children component names
   components?: {
-    [key: string]: RiotComponentShell
+    [key: string]: RiotComponentShell<P, S>
   }
 
   // state handling methods
-  shouldUpdate?(newProps: object, currentProps: object): boolean
+  shouldUpdate?(newProps: Partial<P>, currentProps: P): boolean
 
   // lifecycle methods
-  onBeforeMount?(currentProps: object, currentState: object): void
-  onMounted?(currentProps: object, currentState: object): void
-  onBeforeUpdate?(currentProps: object, currentState: object): void
-  onUpdated?(currentProps: object, currentState: object): void
-  onBeforeUnmount?(currentProps: object, currentState: object): void
-  onUnmounted?(currentProps: object, currentState: object): void
+  onBeforeMount?(currentProps: P, currentState: S): void
+  onMounted?(currentProps: P, currentState: S): void
+  onBeforeUpdate?(currentProps: P, currentState: S): void
+  onUpdated?(currentProps: P, currentState: S): void
+  onBeforeUnmount?(currentProps: P, currentState: S): void
+  onUnmounted?(currentProps: P, currentState: S): void
   [key: string]: any
 }
 
 // All the RiotComponent Public interface properties are optional
-export interface RiotComponent extends RiotCoreComponent, RiotComponentExport {}
+export interface RiotComponent<P = object, S = object> extends RiotCoreComponent<P, S>, RiotComponentExport<P, S> {}
 
 export type RegisteredComponentsMap = Map<string, () => RiotComponent>
-export type ComponentEnhancer = (component: RiotComponent) => RiotComponent
+export type ComponentEnhancer = <P, S>(component: RiotComponent<P, S>) => RiotComponent<P, S>
 export type InstalledPluginsSet = Set<ComponentEnhancer>
 
-export function register(componentName: string, shell: RiotComponentShell): RegisteredComponentsMap
+export function register<P, S>(componentName: string, shell: RiotComponentShell<P, S>): RegisteredComponentsMap
 export function unregister(componentName: string): RegisteredComponentsMap
-export function mount(selector: string, componentName: string, initialProps?: object): RiotComponent[]
+export function mount<P = object, S = object>(selector: string, componentName: string, initialProps?: P): RiotComponent<P, S>[]
 export function unmount(selector: string):HTMLElement[]
 export function install(plugin: ComponentEnhancer):InstalledPluginsSet
 export function uninstall(plugin: ComponentEnhancer):InstalledPluginsSet
-export function component(shell: RiotComponentShell):(el: HTMLElement, initialProps?: object) => RiotComponent
+export function component<P , S>(shell: RiotComponentShell<P, S>):(el: HTMLElement, initialProps?: P) => RiotComponent<P, S>
 export const version: string
