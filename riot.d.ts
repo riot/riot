@@ -25,7 +25,7 @@ export interface RiotCoreComponent<P = object, S = object> {
 // This object interface is created anytime a riot file will be compiled into javascript
 export interface RiotComponentShell<P = object, S = object> {
   readonly css?: string
-  readonly exports?: () => RiotComponent<P, S>|object
+  readonly exports?: () => RiotComponentExport<P, S>|object
   readonly name?: string
   // TODO: add the @riotjs/dom-bindings types
   template(): any
