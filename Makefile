@@ -43,6 +43,10 @@ test-sauce:
 	# run the riot tests on saucelabs
 	@ SAUCELABS=1 make test-karma
 
+test-typing:
+	# silent compile typescript
+	tsc -p ./test
+
 raw:
 	# build riot
 	@ mkdir -p $(DIST)
