@@ -42,7 +42,7 @@ export interface RiotComponentExport<P = object, S = object> {
   }
 
   // state handling methods
-  shouldUpdate?(newProps: Partial<P>, currentProps: P): boolean
+  shouldUpdate?(newProps: P, currentProps: P): boolean
 
   // lifecycle methods
   onBeforeMount?(currentProps: P, currentState: S): void
