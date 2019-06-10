@@ -31,8 +31,8 @@ export interface RiotComponentShell {
   template(): any
 }
 
-// All the RiotComponent Public interface properties are optional
-export interface RiotComponent extends RiotCoreComponent {
+
+export interface RiotComponentExport {
   // optional on the component object
   state?: object
 
@@ -51,7 +51,11 @@ export interface RiotComponent extends RiotCoreComponent {
   onUpdated?(currentProps: object, currentState: object): void
   onBeforeUnmount?(currentProps: object, currentState: object): void
   onUnmounted?(currentProps: object, currentState: object): void
+  [key: string]: any
 }
+
+// All the RiotComponent Public interface properties are optional
+export interface RiotComponent extends RiotCoreComponent, RiotComponentExport {}
 
 export type RegisteredComponentsMap = Map<string, () => RiotComponent>
 export type ComponentEnhancer = (component: RiotComponent) => RiotComponent
