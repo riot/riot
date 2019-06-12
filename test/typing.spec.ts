@@ -5,11 +5,11 @@ import {
   unmount,
   register,
   unregister,
-} from "../riot";
+} from '../riot'
 
 interface TodoItem {
-  summary: string;
-  done: boolean;
+  summary: string
+  done: boolean
 }
 
 interface TodoProps {
@@ -18,7 +18,7 @@ interface TodoProps {
 
 interface TodoState {
   items: [TodoItem]
-  doShowDoneItems: boolean;
+  doShowDoneItems: boolean
 }
 
 interface TodoComponentShell extends RiotComponentShell<TodoProps, TodoState> {
@@ -28,11 +28,13 @@ interface TodoComponent extends RiotComponent<TodoProps, TodoState> {
 }
 
 //  equivalent to `import todo from "todo"`
-let todo: TodoComponentShell
+const todo: TodoComponentShell = {
+  template() {}
+}
 
-let component: TodoComponent = mount<TodoProps, TodoState>("todo", "todo", {
+const component: TodoComponent = mount<TodoProps, TodoState>('todo', 'todo', {
   initialItems: [
-    { summary: "buy eggs", done: false}
+    { summary: 'buy eggs', done: false }
   ]
 })[0]
 
