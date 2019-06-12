@@ -68,7 +68,8 @@
     "rollup-plugin-riot": "^4.0.0",
     "sinon": "^7.3.2",
     "sinon-chai": "^3.3.0",
-    "terser": "^4.0.0"
+    "terser": "^4.0.0",
+    "typescript": "^3.5.1"
   },
   "files": [
     "src",

@@ -16,6 +16,7 @@ ROLLUP = ./node_modules/rollup/bin/rollup
 MINIFY = ./node_modules/.bin/terser
 COVERALLS = ./node_modules/coveralls/bin/coveralls.js
 RIOT_CLI = ./node_modules/.bin/riot
+TSC = ./node_modules/.bin/tsc
 
 # folders
 DIST = dist/riot/
@@ -24,7 +25,7 @@ CONFIG = config/
 
 GENERATED_FILES = riot.js riot+compiler.js
 
-test: eslint test-karma
+test: eslint test-karma test-typing
 
 test-karma:
 	@ $(KARMA) start test/karma.conf.js
@@ -45,7 +46,7 @@ test-sauce:
 
 test-typing:
 	# silent compile typescript
-	tsc -p ./test
+	@ $(TSC) -p ./test
 
 raw:
 	# build riot
