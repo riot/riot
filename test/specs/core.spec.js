@@ -19,6 +19,7 @@ import SimpleComponent from '../components/simple.riot'
 import SimpleSlot from '../components/simple-slot.riot'
 import SpreadAttribute from '../components/spread-attribute.riot'
 import TitleProps from '../components/title-prop.riot'
+import VirtualEach from '../components/virtual-each.riot'
 
 import {expect} from 'chai'
 import {spy} from 'sinon'
@@ -644,6 +645,22 @@ describe('Riot core api', () => {
       })
 
       expect(component.root.getAttribute('name')).to.be.equal('Jack-Black')
+
+      component.unmount()
+    })
+
+    it('nested template tags will be properly rendered', () => {
+      const element = document.createElement('virtual-each')
+      const component = riot.component(VirtualEach)(element, {
+        items: [
+          { title: 'hello', description: 'world' },
+          { title: 'hello', description: 'world' },
+          { title: 'hello', description: 'world' }
+        ]
+      })
+
+      expect(component.$$('dd')).to.have.length(3)
+      expect(component.$('template')).to.be.not.ok
 
       component.unmount()
     })
