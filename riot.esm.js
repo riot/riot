@@ -1,4 +1,4 @@
-/* Riot v4.1.1, @license MIT */
+/* Riot v4.2.0, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -23,8 +23,18 @@ var globals = /*#__PURE__*/Object.freeze({
  * @returns {undefined}
  */
 function cleanNode(node) {
-  const children = node.childNodes;
-  Array.from(children).forEach(n => node.removeChild(n));
+  clearChildren(node, node.childNodes);
+}
+/**
+ * Clear multiple children in a node
+ * @param   {HTMLElement} parent - parent node where the children will be removed
+ * @param   {HTMLElement[]} children - direct children nodes
+ * @returns {undefined}
+ */
+
+
+function clearChildren(parent, children) {
+  Array.from(children).forEach(n => parent.removeChild(n));
 }
 
 const EACH = 0;
@@ -39,7 +49,22 @@ var bindingTypes = {
   TAG,
   SLOT
 };
+/**
+ * Create the template meta object in case of <template> fragments
+ * @param   {TemplateChunk} componentTemplate - template chunk object
+ * @returns {Object} the meta property that will be passed to the mount function of the TemplateChunk
+ */
+
+function createTemplateMeta(componentTemplate) {
+  const fragment = componentTemplate.dom.cloneNode(true);
+  return {
+    avoidDOMInjection: true,
+    fragment,
+    children: Array.from(fragment.childNodes)
+  };
+}
 /* get rid of the @ungap/essential-map polyfill */
+
 
 const append = (get, parent, children, start, end, before) => {
   if (end - start < 2) parent.insertBefore(get(children[start], 1), before);else {
@@ -407,6 +432,26 @@ options // optional object with one of the following properties
   smartDiff(get, parentNode, futureNodes, futureStart, futureEnd, futureChanges, currentNodes, currentStart, currentEnd, currentChanges, currentLength, compare, before);
   return futureNodes;
 };
+/**
+ * Check if a value is null or undefined
+ * @param   {*}  value - anything
+ * @returns {boolean} true only for the 'undefined' and 'null' types
+ */
+
+
+function isNil(value) {
+  return value == null;
+}
+/**
+ * Check if an element is a template tag
+ * @param   {HTMLElement}  el - element to check
+ * @returns {boolean} true if it's a <template>
+ */
+
+
+function isTemplate(el) {
+  return !isNil(el.content);
+}
 
 const EachBinding = Object.seal({
   // dynamic binding properties
@@ -416,6 +461,7 @@ const EachBinding = Object.seal({
   condition: null,
   evaluate: null,
   template: null,
+  isTemplateTag: false,
   nodes: [],
   getKey: null,
   indexName: null,
@@ -561,7 +607,8 @@ function createPatch(items, scope, parentScope, binding) {
     itemName,
     getKey,
     indexName,
-    root
+    root,
+    isTemplateTag
   } = binding;
   const newChildrenMap = new Map();
   const batches = [];
@@ -582,15 +629,23 @@ function createPatch(items, scope, parentScope, binding) {
 
     const componentTemplate = oldItem ? oldItem.template : template.clone();
     const el = oldItem ? componentTemplate.el : root.cloneNode();
+    const mustMount = !oldItem;
+    const meta = isTemplateTag && mustMount ? createTemplateMeta(componentTemplate) : {};
 
-    if (!oldItem) {
-      batches.push(() => componentTemplate.mount(el, context, parentScope));
+    if (mustMount) {
+      batches.push(() => componentTemplate.mount(el, context, parentScope, meta));
     } else {
       batches.push(() => componentTemplate.update(context, parentScope));
     } // create the collection of nodes to update or to add
+    // in case of template tags we need to add all its children nodes
 
 
-    futureNodes.push(el); // delete the old item from the children map
+    if (isTemplateTag) {
+      futureNodes.push(...(meta.children || componentTemplate.children));
+    } else {
+      futureNodes.push(el);
+    } // delete the old item from the children map
+
 
     childrenMap.delete(key); // update the children map
 
@@ -619,16 +674,15 @@ function create(node, _ref3) {
   const placeholder = document.createTextNode('');
   const parent = node.parentNode;
   const root = node.cloneNode();
-  const offset = Array.from(parent.childNodes).indexOf(node);
   parent.insertBefore(placeholder, node);
   parent.removeChild(node);
   return Object.assign({}, EachBinding, {
     childrenMap: new Map(),
     node,
     root,
-    offset,
     condition,
     evaluate,
+    isTemplateTag: isTemplate(root),
     template: template.createDOM(node),
     getKey,
     indexName,
@@ -645,12 +699,15 @@ const IfBinding = Object.seal({
   // dynamic binding properties
   node: null,
   evaluate: null,
+  parent: null,
+  isTemplateTag: false,
   placeholder: null,
-  template: '',
+  template: null,
 
   // API methods
   mount(scope, parentScope) {
-    swap(this.placeholder, this.node);
+    this.parent.insertBefore(this.placeholder, this.node);
+    this.parent.removeChild(this.node);
     return this.update(scope, parentScope);
   },
 
@@ -661,18 +718,13 @@ const IfBinding = Object.seal({
 
     switch (true) {
       case mustMount:
-        swap(this.node, this.placeholder);
-
-        if (this.template) {
-          this.template = this.template.clone();
-          this.template.mount(this.node, scope, parentScope);
-        }
-
+        this.parent.insertBefore(this.node, this.placeholder);
+        this.template = this.template.clone();
+        this.template.mount(this.node, scope, parentScope);
         break;
 
       case mustUnmount:
         this.unmount(scope);
-        swap(this.placeholder, this.node);
         break;
 
       default:
@@ -684,24 +736,11 @@ const IfBinding = Object.seal({
   },
 
   unmount(scope, parentScope) {
-    const {
-      template
-    } = this;
-
-    if (template) {
-      template.unmount(scope, parentScope);
-    }
-
+    this.template.unmount(scope, parentScope);
     return this;
   }
 
 });
-
-function swap(inNode, outNode) {
-  const parent = outNode.parentNode;
-  parent.insertBefore(inNode, outNode);
-  parent.removeChild(outNode);
-}
 
 function create$1(node, _ref4) {
   let {
@@ -711,6 +750,7 @@ function create$1(node, _ref4) {
   return Object.assign({}, IfBinding, {
     node,
     evaluate,
+    parent: node.parentNode,
     placeholder: document.createTextNode(''),
     template: template.createDOM(node)
   });
@@ -798,7 +838,7 @@ function attributeExpression(node, _ref6, value, oldValue) {
 
 
 function getMethod(value) {
-  return value && typeof value !== 'object' ? SET_ATTIBUTE : REMOVE_ATTRIBUTE;
+  return isNil(value) || value === false || value === '' || typeof value === 'object' ? REMOVE_ATTRIBUTE : SET_ATTIBUTE;
 }
 /**
  * Get the value as string
@@ -1126,14 +1166,14 @@ const TagBinding = Object.seal({
     return this.update(scope);
   },
 
-  update(scope) {
+  update(scope, parentScope) {
     const name = this.evaluate(scope); // simple update
 
     if (name === this.name) {
       this.tag.update(scope);
     } else {
       // unmount the old tag if it exists
-      this.unmount(); // mount the new tag
+      this.unmount(scope, parentScope, true); // mount the new tag
 
       this.name = name;
       this.tag = getTag(this.getComponent(name), this.slots, this.attributes);
@@ -1143,10 +1183,10 @@ const TagBinding = Object.seal({
     return this;
   },
 
-  unmount() {
+  unmount(scope, parentScope, keepRootTag) {
     if (this.tag) {
       // keep the root tag
-      this.tag.unmount(true);
+      this.tag.unmount(keepRootTag);
     }
 
     return this;
@@ -1213,8 +1253,8 @@ function isSvg(el) {
 } // in this case a simple innerHTML is enough
 
 
-function createHTMLTree(html) {
-  const template = document.createElement('template');
+function createHTMLTree(html, root) {
+  const template = isTemplate(root) ? root : document.createElement('template');
   template.innerHTML = html;
   return template.content;
 } // for svg nodes we need a bit more work
@@ -1235,7 +1275,7 @@ function creteSVGTree(html, container) {
 
 function createDOMTree(root, html) {
   if (isSvg(root)) return creteSVGTree(html, root);
-  return createHTMLTree(html);
+  return createHTMLTree(html, root);
 }
 /**
  * Move all the child nodes from a source tag to another
@@ -1254,8 +1294,6 @@ function moveChildren(source, target) {
     moveChildren(source, target);
   }
 }
-
-const SVG_RE = /svg/i;
 /**
  * Inject the DOM tree into a target node
  * @param   {HTMLElement} el - target element
@@ -1263,11 +1301,19 @@ const SVG_RE = /svg/i;
  * @returns {undefined}
  */
 
+
 function injectDOM(el, dom) {
-  if (SVG_RE.test(el.tagName)) {
-    moveChildren(dom, el);
-  } else {
-    el.appendChild(dom);
+  switch (true) {
+    case isSvg(el):
+      moveChildren(dom, el);
+      break;
+
+    case isTemplate(el):
+      el.parentNode.replaceChild(dom, el);
+      break;
+
+    default:
+      el.appendChild(dom);
   }
 }
 /**
@@ -1292,6 +1338,9 @@ const TemplateChunk = Object.freeze({
   bindings: null,
   bindingsData: null,
   html: null,
+  isTemplateTag: false,
+  fragment: null,
+  children: null,
   dom: null,
   el: null,
 
@@ -1313,15 +1362,44 @@ const TemplateChunk = Object.freeze({
    * @param   {HTMLElement} el - target DOM node
    * @param   {*} scope - template data
    * @param   {*} parentScope - scope of the parent template tag
+   * @param   {Object} meta - meta properties needed to handle the <template> tags in loops
    * @returns {TemplateChunk} self
    */
-  mount(el, scope, parentScope) {
+  mount(el, scope, parentScope, meta) {
+    if (meta === void 0) {
+      meta = {};
+    }
+
     if (!el) throw new Error('Please provide DOM node to mount properly your template');
-    if (this.el) this.unmount(scope);
-    this.el = el; // create the DOM if it wasn't created before
+    if (this.el) this.unmount(scope); // <template> tags require a bit more work
+    // the template fragment might be already created via meta outside of this call
+
+    const {
+      fragment,
+      children,
+      avoidDOMInjection
+    } = meta; // <template> bindings of course can not have a root element
+    // so we check the parent node to set the query selector bindings
+
+    const {
+      parentNode
+    } = children ? children[0] : el;
+    this.isTemplateTag = isTemplate(el); // create the DOM if it wasn't created before
 
     this.createDOM(el);
-    if (this.dom) injectDOM(el, this.dom.cloneNode(true)); // create the bindings
+
+    if (this.dom) {
+      // create the new template dom fragment if it want already passed in via meta
+      this.fragment = fragment || this.dom.cloneNode(true);
+    } // store root node
+    // notice that for template tags the root note will be the parent tag
+
+
+    this.el = this.isTemplateTag ? parentNode : el; // create the children array only for the <template> fragments
+
+    this.children = this.isTemplateTag ? children || Array.from(this.fragment.childNodes) : null; // inject the DOM into the el only if a fragment is available
+
+    if (!avoidDOMInjection && this.fragment) injectDOM(el, this.fragment); // create the bindings
 
     this.bindings = this.bindingsData.map(binding => create$5(this.el, binding));
     this.bindings.forEach(b => b.mount(scope, parentScope));
@@ -1343,7 +1421,8 @@ const TemplateChunk = Object.freeze({
    * Remove the template from the node where it was initially mounted
    * @param   {*} scope - template data
    * @param   {*} parentScope - scope of the parent template tag
-   * @param   {boolean} mustRemoveRoot - if true remove the root element
+   * @param   {boolean|null} mustRemoveRoot - if true remove the root element,
+   * if false or undefined clean the root tag content, if null don't touch the DOM
    * @returns {TemplateChunk} self
    */
   unmount(scope, parentScope, mustRemoveRoot) {
@@ -1353,7 +1432,11 @@ const TemplateChunk = Object.freeze({
       if (mustRemoveRoot && this.el.parentNode) {
         this.el.parentNode.removeChild(this.el);
       } else if (mustRemoveRoot !== null) {
-        cleanNode(this.el);
+        if (this.children) {
+          clearChildren(this.children[0].parentNode, this.children);
+        } else {
+          cleanNode(this.el);
+        }
       }
 
       this.el = null;
@@ -2053,8 +2136,10 @@ function enhanceComponentAPI(component, _ref5) {
 
     unmount(preserveRoot) {
       this.onBeforeUnmount(this.props, this.state);
-      this[ATTRIBUTES_KEY_SYMBOL].unmount();
-      this[TEMPLATE_KEY_SYMBOL].unmount(this, {}, !preserveRoot);
+      this[ATTRIBUTES_KEY_SYMBOL].unmount(); // if the preserveRoot is null the template html will be left untouched
+      // in that case the DOM cleanup will happen differently from a parent node
+
+      this[TEMPLATE_KEY_SYMBOL].unmount(this, {}, preserveRoot === null ? null : !preserveRoot);
       this.onUnmounted(this.props, this.state);
       return this;
     }
@@ -2208,7 +2293,7 @@ function component(implementation) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.1.1'; // expose some internal stuff that might be used from external tools
+const version = 'v4.2.0'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
