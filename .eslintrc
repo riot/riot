@@ -9,5 +9,5 @@ globals:
   chai: true
 
 rules:
-  fp/no-rest-parameters: false
-  fp/no-proxy: false
+  fp/no-rest-parameters: 0
+  fp/no-proxy: 0

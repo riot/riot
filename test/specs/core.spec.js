@@ -662,6 +662,13 @@ describe('Riot core api', () => {
       expect(component.$$('dd')).to.have.length(3)
       expect(component.$('template')).to.be.not.ok
 
+      component.update({
+        items: null
+      })
+
+      expect(component.$$('dd')).to.have.length(0)
+      expect(component.$('template')).to.be.not.ok
+
       component.unmount()
     })
   })
