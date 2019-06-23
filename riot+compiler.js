@@ -1,4 +1,4 @@
-/* Riot v4.1.0, @license MIT */
+/* Riot v4.2.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -29,8 +29,18 @@
    * @returns {undefined}
    */
   function cleanNode(node) {
-    const children = node.childNodes;
-    Array.from(children).forEach(n => node.removeChild(n));
+    clearChildren(node, node.childNodes);
+  }
+  /**
+   * Clear multiple children in a node
+   * @param   {HTMLElement} parent - parent node where the children will be removed
+   * @param   {HTMLElement[]} children - direct children nodes
+   * @returns {undefined}
+   */
+
+
+  function clearChildren(parent, children) {
+    Array.from(children).forEach(n => parent.removeChild(n));
   }
 
   const EACH = 0;
@@ -45,7 +55,22 @@
     TAG,
     SLOT
   };
+  /**
+   * Create the template meta object in case of <template> fragments
+   * @param   {TemplateChunk} componentTemplate - template chunk object
+   * @returns {Object} the meta property that will be passed to the mount function of the TemplateChunk
+   */
+
+  function createTemplateMeta(componentTemplate) {
+    const fragment = componentTemplate.dom.cloneNode(true);
+    return {
+      avoidDOMInjection: true,
+      fragment,
+      children: Array.from(fragment.childNodes)
+    };
+  }
   /* get rid of the @ungap/essential-map polyfill */
+
 
   const append = (get, parent, children, start, end, before) => {
     if (end - start < 2) parent.insertBefore(get(children[start], 1), before);else {
@@ -413,6 +438,26 @@
     smartDiff(get, parentNode, futureNodes, futureStart, futureEnd, futureChanges, currentNodes, currentStart, currentEnd, currentChanges, currentLength, compare, before);
     return futureNodes;
   };
+  /**
+   * Check if a value is null or undefined
+   * @param   {*}  value - anything
+   * @returns {boolean} true only for the 'undefined' and 'null' types
+   */
+
+
+  function isNil(value) {
+    return value == null;
+  }
+  /**
+   * Check if an element is a template tag
+   * @param   {HTMLElement}  el - element to check
+   * @returns {boolean} true if it's a <template>
+   */
+
+
+  function isTemplate(el) {
+    return !isNil(el.content);
+  }
 
   const EachBinding = Object.seal({
     // dynamic binding properties
@@ -422,6 +467,7 @@
     condition: null,
     evaluate: null,
     template: null,
+    isTemplateTag: false,
     nodes: [],
     getKey: null,
     indexName: null,
@@ -567,7 +613,8 @@
       itemName,
       getKey,
       indexName,
-      root
+      root,
+      isTemplateTag
     } = binding;
     const newChildrenMap = new Map();
     const batches = [];
@@ -588,15 +635,23 @@
 
       const componentTemplate = oldItem ? oldItem.template : template.clone();
       const el = oldItem ? componentTemplate.el : root.cloneNode();
+      const mustMount = !oldItem;
+      const meta = isTemplateTag && mustMount ? createTemplateMeta(componentTemplate) : {};
 
-      if (!oldItem) {
-        batches.push(() => componentTemplate.mount(el, context, parentScope));
+      if (mustMount) {
+        batches.push(() => componentTemplate.mount(el, context, parentScope, meta));
       } else {
         batches.push(() => componentTemplate.update(context, parentScope));
       } // create the collection of nodes to update or to add
+      // in case of template tags we need to add all its children nodes
 
 
-      futureNodes.push(el); // delete the old item from the children map
+      if (isTemplateTag) {
+        futureNodes.push(...(meta.children || componentTemplate.children));
+      } else {
+        futureNodes.push(el);
+      } // delete the old item from the children map
+
 
       childrenMap.delete(key); // update the children map
 
@@ -625,16 +680,15 @@
     const placeholder = document.createTextNode('');
     const parent = node.parentNode;
     const root = node.cloneNode();
-    const offset = Array.from(parent.childNodes).indexOf(node);
     parent.insertBefore(placeholder, node);
     parent.removeChild(node);
     return Object.assign({}, EachBinding, {
       childrenMap: new Map(),
       node,
       root,
-      offset,
       condition,
       evaluate,
+      isTemplateTag: isTemplate(root),
       template: template.createDOM(node),
       getKey,
       indexName,
@@ -651,12 +705,15 @@
     // dynamic binding properties
     node: null,
     evaluate: null,
+    parent: null,
+    isTemplateTag: false,
     placeholder: null,
-    template: '',
+    template: null,
 
     // API methods
     mount(scope, parentScope) {
-      swap(this.placeholder, this.node);
+      this.parent.insertBefore(this.placeholder, this.node);
+      this.parent.removeChild(this.node);
       return this.update(scope, parentScope);
     },
 
@@ -667,18 +724,13 @@
 
       switch (true) {
         case mustMount:
-          swap(this.node, this.placeholder);
-
-          if (this.template) {
-            this.template = this.template.clone();
-            this.template.mount(this.node, scope, parentScope);
-          }
-
+          this.parent.insertBefore(this.node, this.placeholder);
+          this.template = this.template.clone();
+          this.template.mount(this.node, scope, parentScope);
           break;
 
         case mustUnmount:
           this.unmount(scope);
-          swap(this.placeholder, this.node);
           break;
 
         default:
@@ -690,24 +742,11 @@
     },
 
     unmount(scope, parentScope) {
-      const {
-        template
-      } = this;
-
-      if (template) {
-        template.unmount(scope, parentScope);
-      }
-
+      this.template.unmount(scope, parentScope);
       return this;
     }
 
   });
-
-  function swap(inNode, outNode) {
-    const parent = outNode.parentNode;
-    parent.insertBefore(inNode, outNode);
-    parent.removeChild(outNode);
-  }
 
   function create$1(node, _ref4) {
     let {
@@ -717,6 +756,7 @@
     return Object.assign({}, IfBinding, {
       node,
       evaluate,
+      parent: node.parentNode,
       placeholder: document.createTextNode(''),
       template: template.createDOM(node)
     });
@@ -804,7 +844,7 @@
 
 
   function getMethod(value) {
-    return value && typeof value !== 'object' ? SET_ATTIBUTE : REMOVE_ATTRIBUTE;
+    return isNil(value) || value === false || value === '' || typeof value === 'object' ? REMOVE_ATTRIBUTE : SET_ATTIBUTE;
   }
   /**
    * Get the value as string
@@ -1132,14 +1172,14 @@
       return this.update(scope);
     },
 
-    update(scope) {
+    update(scope, parentScope) {
       const name = this.evaluate(scope); // simple update
 
       if (name === this.name) {
         this.tag.update(scope);
       } else {
         // unmount the old tag if it exists
-        this.unmount(); // mount the new tag
+        this.unmount(scope, parentScope, true); // mount the new tag
 
         this.name = name;
         this.tag = getTag(this.getComponent(name), this.slots, this.attributes);
@@ -1149,10 +1189,10 @@
       return this;
     },
 
-    unmount() {
+    unmount(scope, parentScope, keepRootTag) {
       if (this.tag) {
         // keep the root tag
-        this.tag.unmount(true);
+        this.tag.unmount(keepRootTag);
       }
 
       return this;
@@ -1219,8 +1259,8 @@
   } // in this case a simple innerHTML is enough
 
 
-  function createHTMLTree(html) {
-    const template = document.createElement('template');
+  function createHTMLTree(html, root) {
+    const template = isTemplate(root) ? root : document.createElement('template');
     template.innerHTML = html;
     return template.content;
   } // for svg nodes we need a bit more work
@@ -1241,7 +1281,7 @@
 
   function createDOMTree(root, html) {
     if (isSvg(root)) return creteSVGTree(html, root);
-    return createHTMLTree(html);
+    return createHTMLTree(html, root);
   }
   /**
    * Move all the child nodes from a source tag to another
@@ -1260,8 +1300,6 @@
       moveChildren(source, target);
     }
   }
-
-  const SVG_RE = /svg/i;
   /**
    * Inject the DOM tree into a target node
    * @param   {HTMLElement} el - target element
@@ -1269,11 +1307,19 @@
    * @returns {undefined}
    */
 
+
   function injectDOM(el, dom) {
-    if (SVG_RE.test(el.tagName)) {
-      moveChildren(dom, el);
-    } else {
-      el.appendChild(dom);
+    switch (true) {
+      case isSvg(el):
+        moveChildren(dom, el);
+        break;
+
+      case isTemplate(el):
+        el.parentNode.replaceChild(dom, el);
+        break;
+
+      default:
+        el.appendChild(dom);
     }
   }
   /**
@@ -1298,6 +1344,9 @@
     bindings: null,
     bindingsData: null,
     html: null,
+    isTemplateTag: false,
+    fragment: null,
+    children: null,
     dom: null,
     el: null,
 
@@ -1319,15 +1368,44 @@
      * @param   {HTMLElement} el - target DOM node
      * @param   {*} scope - template data
      * @param   {*} parentScope - scope of the parent template tag
+     * @param   {Object} meta - meta properties needed to handle the <template> tags in loops
      * @returns {TemplateChunk} self
      */
-    mount(el, scope, parentScope) {
+    mount(el, scope, parentScope, meta) {
+      if (meta === void 0) {
+        meta = {};
+      }
+
       if (!el) throw new Error('Please provide DOM node to mount properly your template');
-      if (this.el) this.unmount(scope);
-      this.el = el; // create the DOM if it wasn't created before
+      if (this.el) this.unmount(scope); // <template> tags require a bit more work
+      // the template fragment might be already created via meta outside of this call
+
+      const {
+        fragment,
+        children,
+        avoidDOMInjection
+      } = meta; // <template> bindings of course can not have a root element
+      // so we check the parent node to set the query selector bindings
+
+      const {
+        parentNode
+      } = children ? children[0] : el;
+      this.isTemplateTag = isTemplate(el); // create the DOM if it wasn't created before
 
       this.createDOM(el);
-      if (this.dom) injectDOM(el, this.dom.cloneNode(true)); // create the bindings
+
+      if (this.dom) {
+        // create the new template dom fragment if it want already passed in via meta
+        this.fragment = fragment || this.dom.cloneNode(true);
+      } // store root node
+      // notice that for template tags the root note will be the parent tag
+
+
+      this.el = this.isTemplateTag ? parentNode : el; // create the children array only for the <template> fragments
+
+      this.children = this.isTemplateTag ? children || Array.from(this.fragment.childNodes) : null; // inject the DOM into the el only if a fragment is available
+
+      if (!avoidDOMInjection && this.fragment) injectDOM(el, this.fragment); // create the bindings
 
       this.bindings = this.bindingsData.map(binding => create$5(this.el, binding));
       this.bindings.forEach(b => b.mount(scope, parentScope));
@@ -1349,7 +1427,8 @@
      * Remove the template from the node where it was initially mounted
      * @param   {*} scope - template data
      * @param   {*} parentScope - scope of the parent template tag
-     * @param   {boolean} mustRemoveRoot - if true remove the root element
+     * @param   {boolean|null} mustRemoveRoot - if true remove the root element,
+     * if false or undefined clean the root tag content, if null don't touch the DOM
      * @returns {TemplateChunk} self
      */
     unmount(scope, parentScope, mustRemoveRoot) {
@@ -1359,7 +1438,11 @@
         if (mustRemoveRoot && this.el.parentNode) {
           this.el.parentNode.removeChild(this.el);
         } else if (mustRemoveRoot !== null) {
-          cleanNode(this.el);
+          if (this.children) {
+            clearChildren(this.children[0].parentNode, this.children);
+          } else {
+            cleanNode(this.el);
+          }
         }
 
         this.el = null;
@@ -2059,8 +2142,10 @@
 
       unmount(preserveRoot) {
         this.onBeforeUnmount(this.props, this.state);
-        this[ATTRIBUTES_KEY_SYMBOL].unmount();
-        this[TEMPLATE_KEY_SYMBOL].unmount(this, {}, !preserveRoot);
+        this[ATTRIBUTES_KEY_SYMBOL].unmount(); // if the preserveRoot is null the template html will be left untouched
+        // in that case the DOM cleanup will happen differently from a parent node
+
+        this[TEMPLATE_KEY_SYMBOL].unmount(this, {}, preserveRoot === null ? null : !preserveRoot);
         this.onUnmounted(this.props, this.state);
         return this;
       }
@@ -2214,7 +2299,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.1.0'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.2.0'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2256,7 +2341,7 @@
 
   var require$$1 = getCjsExportFromNamespace(_empty_module$1);
 
-  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.1.0, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
+  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.2.0, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
   this.allSupertypes=Object.create(null);// Linear inheritance hierarchy. Populated during finalization.
   this.supertypeList=[];// Includes inherited fields.
   this.allFields=Object.create(null);// Non-hidden keys of allFields.
@@ -2753,7 +2838,7 @@
   }// Decode in chunks to avoid "call stack size exceeded".
   var res='';var i=0;while(i<len){res+=String.fromCharCode.apply(String,codePoints.slice(i,i+=MAX_ARGUMENTS_LENGTH));}return res;}function asciiSlice(buf,start,end){var ret='';end=Math.min(buf.length,end);for(var i=start;i<end;++i){ret+=String.fromCharCode(buf[i]&0x7F);}return ret;}function latin1Slice(buf,start,end){var ret='';end=Math.min(buf.length,end);for(var i=start;i<end;++i){ret+=String.fromCharCode(buf[i]);}return ret;}function hexSlice(buf,start,end){var len=buf.length;if(!start||start<0)start=0;if(!end||end<0||end>len)end=len;var out='';for(var i=start;i<end;++i){out+=toHex(buf[i]);}return out;}function utf16leSlice(buf,start,end){var bytes=buf.slice(start,end);var res='';for(var i=0;i<bytes.length;i+=2){res+=String.fromCharCode(bytes[i]+bytes[i+1]*256);}return res;}Buffer.prototype.slice=function slice(start,end){var len=this.length;start=~~start;end=end===undefined?len:~~end;if(start<0){start+=len;if(start<0)start=0;}else if(start>len){start=len;}if(end<0){end+=len;if(end<0)end=0;}else if(end>len){end=len;}if(end<start)end=start;var newBuf;if(Buffer.TYPED_ARRAY_SUPPORT){newBuf=this.subarray(start,end);newBuf.__proto__=Buffer.prototype;}else{var sliceLen=end-start;newBuf=new Buffer(sliceLen,undefined);for(var i=0;i<sliceLen;++i){newBuf[i]=this[i+start];}}return newBuf;};/*
   	 * Need to make sure that buffer isn't trying to write out of bounds.
-  	 */function checkOffset(offset,ext,length){if(offset%1!==0||offset<0)throw new RangeError('offset is not uint');if(offset+ext>length)throw new RangeError('Trying to access beyond buffer length');}Buffer.prototype.readUIntLE=function readUIntLE(offset,byteLength,noAssert){offset=offset|0;byteLength=byteLength|0;if(!noAssert)checkOffset(offset,byteLength,this.length);var val=this[offset];var mul=1;var i=0;while(++i<byteLength&&(mul*=0x100)){val+=this[offset+i]*mul;}return val;};Buffer.prototype.readUIntBE=function readUIntBE(offset,byteLength,noAssert){offset=offset|0;byteLength=byteLength|0;if(!noAssert){checkOffset(offset,byteLength,this.length);}var val=this[offset+--byteLength];var mul=1;while(byteLength>0&&(mul*=0x100)){val+=this[offset+--byteLength]*mul;}return val;};Buffer.prototype.readUInt8=function readUInt8(offset,noAssert){if(!noAssert)checkOffset(offset,1,this.length);return this[offset];};Buffer.prototype.readUInt16LE=function readUInt16LE(offset,noAssert){if(!noAssert)checkOffset(offset,2,this.length);return this[offset]|this[offset+1]<<8;};Buffer.prototype.readUInt16BE=function readUInt16BE(offset,noAssert){if(!noAssert)checkOffset(offset,2,this.length);return this[offset]<<8|this[offset+1];};Buffer.prototype.readUInt32LE=function readUInt32LE(offset,noAssert){if(!noAssert)checkOffset(offset,4,this.length);return (this[offset]|this[offset+1]<<8|this[offset+2]<<16)+this[offset+3]*0x1000000;};Buffer.prototype.readUInt32BE=function readUInt32BE(offset,noAssert){if(!noAssert)checkOffset(offset,4,this.length);return this[offset]*0x1000000+(this[offset+1]<<16|this[offset+2]<<8|this[offset+3]);};Buffer.prototype.readIntLE=function readIntLE(offset,byteLength,noAssert){offset=offset|0;byteLength=byteLength|0;if(!noAssert)checkOffset(offset,byteLength,this.length);var val=this[offset];var mul=1;var i=0;while(++i<byteLength&&(mul*=0x100)){val+=this[offset+i]*mul;}mul*=0x80;if(val>=mul)val-=Math.pow(2,8*byteLength);return val;};Buffer.prototype.readIntBE=function readIntBE(offset,byteLength,noAssert){offset=offset|0;byteLength=byteLength|0;if(!noAssert)checkOffset(offset,byteLength,this.length);var i=byteLength;var mul=1;var val=this[offset+--i];while(i>0&&(mul*=0x100)){val+=this[offset+--i]*mul;}mul*=0x80;if(val>=mul)val-=Math.pow(2,8*byteLength);return val;};Buffer.prototype.readInt8=function readInt8(offset,noAssert){if(!noAssert)checkOffset(offset,1,this.length);if(!(this[offset]&0x80))return this[offset];return (0xff-this[offset]+1)*-1;};Buffer.prototype.readInt16LE=function readInt16LE(offset,noAssert){if(!noAssert)checkOffset(offset,2,this.length);var val=this[offset]|this[offset+1]<<8;return val&0x8000?val|0xFFFF0000:val;};Buffer.prototype.readInt16BE=function readInt16BE(offset,noAssert){if(!noAssert)checkOffset(offset,2,this.length);var val=this[offset+1]|this[offset]<<8;return val&0x8000?val|0xFFFF0000:val;};Buffer.prototype.readInt32LE=function readInt32LE(offset,noAssert){if(!noAssert)checkOffset(offset,4,this.length);return this[offset]|this[offset+1]<<8|this[offset+2]<<16|this[offset+3]<<24;};Buffer.prototype.readInt32BE=function readInt32BE(offset,noAssert){if(!noAssert)checkOffset(offset,4,this.length);return this[offset]<<24|this[offset+1]<<16|this[offset+2]<<8|this[offset+3];};Buffer.prototype.readFloatLE=function readFloatLE(offset,noAssert){if(!noAssert)checkOffset(offset,4,this.length);return read(this,offset,true,23,4);};Buffer.prototype.readFloatBE=function readFloatBE(offset,noAssert){if(!noAssert)checkOffset(offset,4,this.length);return read(this,offset,false,23,4);};Buffer.prototype.readDoubleLE=function readDoubleLE(offset,noAssert){if(!noAssert)checkOffset(offset,8,this.length);return read(this,offset,true,52,8);};Buffer.prototype.readDoubleBE=function readDoubleBE(offset,noAssert){if(!noAssert)checkOffset(offset,8,this.length);return read(this,offset,false,52,8);};function checkInt(buf,value,offset,ext,max,min){if(!internalIsBuffer(buf))throw new TypeError('"buffer" argument must be a Buffer instance');if(value>max||value<min)throw new RangeError('"value" argument is out of bounds');if(offset+ext>buf.length)throw new RangeError('Index out of range');}Buffer.prototype.writeUIntLE=function writeUIntLE(value,offset,byteLength,noAssert){value=+value;offset=offset|0;byteLength=byteLength|0;if(!noAssert){var maxBytes=Math.pow(2,8*byteLength)-1;checkInt(this,value,offset,byteLength,maxBytes,0);}var mul=1;var i=0;this[offset]=value&0xFF;while(++i<byteLength&&(mul*=0x100)){this[offset+i]=value/mul&0xFF;}return offset+byteLength;};Buffer.prototype.writeUIntBE=function writeUIntBE(value,offset,byteLength,noAssert){value=+value;offset=offset|0;byteLength=byteLength|0;if(!noAssert){var maxBytes=Math.pow(2,8*byteLength)-1;checkInt(this,value,offset,byteLength,maxBytes,0);}var i=byteLength-1;var mul=1;this[offset+i]=value&0xFF;while(--i>=0&&(mul*=0x100)){this[offset+i]=value/mul&0xFF;}return offset+byteLength;};Buffer.prototype.writeUInt8=function writeUInt8(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,1,0xff,0);if(!Buffer.TYPED_ARRAY_SUPPORT)value=Math.floor(value);this[offset]=value&0xff;return offset+1;};function objectWriteUInt16(buf,value,offset,littleEndian){if(value<0)value=0xffff+value+1;for(var i=0,j=Math.min(buf.length-offset,2);i<j;++i){buf[offset+i]=(value&0xff<<8*(littleEndian?i:1-i))>>>(littleEndian?i:1-i)*8;}}Buffer.prototype.writeUInt16LE=function writeUInt16LE(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,2,0xffff,0);if(Buffer.TYPED_ARRAY_SUPPORT){this[offset]=value&0xff;this[offset+1]=value>>>8;}else{objectWriteUInt16(this,value,offset,true);}return offset+2;};Buffer.prototype.writeUInt16BE=function writeUInt16BE(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,2,0xffff,0);if(Buffer.TYPED_ARRAY_SUPPORT){this[offset]=value>>>8;this[offset+1]=value&0xff;}else{objectWriteUInt16(this,value,offset,false);}return offset+2;};function objectWriteUInt32(buf,value,offset,littleEndian){if(value<0)value=0xffffffff+value+1;for(var i=0,j=Math.min(buf.length-offset,4);i<j;++i){buf[offset+i]=value>>>(littleEndian?i:3-i)*8&0xff;}}Buffer.prototype.writeUInt32LE=function writeUInt32LE(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,4,0xffffffff,0);if(Buffer.TYPED_ARRAY_SUPPORT){this[offset+3]=value>>>24;this[offset+2]=value>>>16;this[offset+1]=value>>>8;this[offset]=value&0xff;}else{objectWriteUInt32(this,value,offset,true);}return offset+4;};Buffer.prototype.writeUInt32BE=function writeUInt32BE(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,4,0xffffffff,0);if(Buffer.TYPED_ARRAY_SUPPORT){this[offset]=value>>>24;this[offset+1]=value>>>16;this[offset+2]=value>>>8;this[offset+3]=value&0xff;}else{objectWriteUInt32(this,value,offset,false);}return offset+4;};Buffer.prototype.writeIntLE=function writeIntLE(value,offset,byteLength,noAssert){value=+value;offset=offset|0;if(!noAssert){var limit=Math.pow(2,8*byteLength-1);checkInt(this,value,offset,byteLength,limit-1,-limit);}var i=0;var mul=1;var sub=0;this[offset]=value&0xFF;while(++i<byteLength&&(mul*=0x100)){if(value<0&&sub===0&&this[offset+i-1]!==0){sub=1;}this[offset+i]=(value/mul>>0)-sub&0xFF;}return offset+byteLength;};Buffer.prototype.writeIntBE=function writeIntBE(value,offset,byteLength,noAssert){value=+value;offset=offset|0;if(!noAssert){var limit=Math.pow(2,8*byteLength-1);checkInt(this,value,offset,byteLength,limit-1,-limit);}var i=byteLength-1;var mul=1;var sub=0;this[offset+i]=value&0xFF;while(--i>=0&&(mul*=0x100)){if(value<0&&sub===0&&this[offset+i+1]!==0){sub=1;}this[offset+i]=(value/mul>>0)-sub&0xFF;}return offset+byteLength;};Buffer.prototype.writeInt8=function writeInt8(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,1,0x7f,-0x80);if(!Buffer.TYPED_ARRAY_SUPPORT)value=Math.floor(value);if(value<0)value=0xff+value+1;this[offset]=value&0xff;return offset+1;};Buffer.prototype.writeInt16LE=function writeInt16LE(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,2,0x7fff,-0x8000);if(Buffer.TYPED_ARRAY_SUPPORT){this[offset]=value&0xff;this[offset+1]=value>>>8;}else{objectWriteUInt16(this,value,offset,true);}return offset+2;};Buffer.prototype.writeInt16BE=function writeInt16BE(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,2,0x7fff,-0x8000);if(Buffer.TYPED_ARRAY_SUPPORT){this[offset]=value>>>8;this[offset+1]=value&0xff;}else{objectWriteUInt16(this,value,offset,false);}return offset+2;};Buffer.prototype.writeInt32LE=function writeInt32LE(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,4,0x7fffffff,-0x80000000);if(Buffer.TYPED_ARRAY_SUPPORT){this[offset]=value&0xff;this[offset+1]=value>>>8;this[offset+2]=value>>>16;this[offset+3]=value>>>24;}else{objectWriteUInt32(this,value,offset,true);}return offset+4;};Buffer.prototype.writeInt32BE=function writeInt32BE(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,4,0x7fffffff,-0x80000000);if(value<0)value=0xffffffff+value+1;if(Buffer.TYPED_ARRAY_SUPPORT){this[offset]=value>>>24;this[offset+1]=value>>>16;this[offset+2]=value>>>8;this[offset+3]=value&0xff;}else{objectWriteUInt32(this,value,offset,false);}return offset+4;};function checkIEEE754(buf,value,offset,ext,max,min){if(offset+ext>buf.length)throw new RangeError('Index out of range');if(offset<0)throw new RangeError('Index out of range');}function writeFloat(buf,value,offset,littleEndian,noAssert){if(!noAssert){checkIEEE754(buf,value,offset,4,3.4028234663852886e+38,-3.4028234663852886e+38);}write(buf,value,offset,littleEndian,23,4);return offset+4;}Buffer.prototype.writeFloatLE=function writeFloatLE(value,offset,noAssert){return writeFloat(this,value,offset,true,noAssert);};Buffer.prototype.writeFloatBE=function writeFloatBE(value,offset,noAssert){return writeFloat(this,value,offset,false,noAssert);};function writeDouble(buf,value,offset,littleEndian,noAssert){if(!noAssert){checkIEEE754(buf,value,offset,8,1.7976931348623157E+308,-1.7976931348623157E+308);}write(buf,value,offset,littleEndian,52,8);return offset+8;}Buffer.prototype.writeDoubleLE=function writeDoubleLE(value,offset,noAssert){return writeDouble(this,value,offset,true,noAssert);};Buffer.prototype.writeDoubleBE=function writeDoubleBE(value,offset,noAssert){return writeDouble(this,value,offset,false,noAssert);};// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
+  	 */function checkOffset(offset,ext,length){if(offset%1!==0||offset<0)throw new RangeError('offset is not uint');if(offset+ext>length)throw new RangeError('Trying to access beyond buffer length');}Buffer.prototype.readUIntLE=function readUIntLE(offset,byteLength,noAssert){offset=offset|0;byteLength=byteLength|0;if(!noAssert)checkOffset(offset,byteLength,this.length);var val=this[offset];var mul=1;var i=0;while(++i<byteLength&&(mul*=0x100)){val+=this[offset+i]*mul;}return val;};Buffer.prototype.readUIntBE=function readUIntBE(offset,byteLength,noAssert){offset=offset|0;byteLength=byteLength|0;if(!noAssert){checkOffset(offset,byteLength,this.length);}var val=this[offset+--byteLength];var mul=1;while(byteLength>0&&(mul*=0x100)){val+=this[offset+--byteLength]*mul;}return val;};Buffer.prototype.readUInt8=function readUInt8(offset,noAssert){if(!noAssert)checkOffset(offset,1,this.length);return this[offset];};Buffer.prototype.readUInt16LE=function readUInt16LE(offset,noAssert){if(!noAssert)checkOffset(offset,2,this.length);return this[offset]|this[offset+1]<<8;};Buffer.prototype.readUInt16BE=function readUInt16BE(offset,noAssert){if(!noAssert)checkOffset(offset,2,this.length);return this[offset]<<8|this[offset+1];};Buffer.prototype.readUInt32LE=function readUInt32LE(offset,noAssert){if(!noAssert)checkOffset(offset,4,this.length);return (this[offset]|this[offset+1]<<8|this[offset+2]<<16)+this[offset+3]*0x1000000;};Buffer.prototype.readUInt32BE=function readUInt32BE(offset,noAssert){if(!noAssert)checkOffset(offset,4,this.length);return this[offset]*0x1000000+(this[offset+1]<<16|this[offset+2]<<8|this[offset+3]);};Buffer.prototype.readIntLE=function readIntLE(offset,byteLength,noAssert){offset=offset|0;byteLength=byteLength|0;if(!noAssert)checkOffset(offset,byteLength,this.length);var val=this[offset];var mul=1;var i=0;while(++i<byteLength&&(mul*=0x100)){val+=this[offset+i]*mul;}mul*=0x80;if(val>=mul)val-=Math.pow(2,8*byteLength);return val;};Buffer.prototype.readIntBE=function readIntBE(offset,byteLength,noAssert){offset=offset|0;byteLength=byteLength|0;if(!noAssert)checkOffset(offset,byteLength,this.length);var i=byteLength;var mul=1;var val=this[offset+--i];while(i>0&&(mul*=0x100)){val+=this[offset+--i]*mul;}mul*=0x80;if(val>=mul)val-=Math.pow(2,8*byteLength);return val;};Buffer.prototype.readInt8=function readInt8(offset,noAssert){if(!noAssert)checkOffset(offset,1,this.length);if(!(this[offset]&0x80))return this[offset];return (0xff-this[offset]+1)*-1;};Buffer.prototype.readInt16LE=function readInt16LE(offset,noAssert){if(!noAssert)checkOffset(offset,2,this.length);var val=this[offset]|this[offset+1]<<8;return val&0x8000?val|0xFFFF0000:val;};Buffer.prototype.readInt16BE=function readInt16BE(offset,noAssert){if(!noAssert)checkOffset(offset,2,this.length);var val=this[offset+1]|this[offset]<<8;return val&0x8000?val|0xFFFF0000:val;};Buffer.prototype.readInt32LE=function readInt32LE(offset,noAssert){if(!noAssert)checkOffset(offset,4,this.length);return this[offset]|this[offset+1]<<8|this[offset+2]<<16|this[offset+3]<<24;};Buffer.prototype.readInt32BE=function readInt32BE(offset,noAssert){if(!noAssert)checkOffset(offset,4,this.length);return this[offset]<<24|this[offset+1]<<16|this[offset+2]<<8|this[offset+3];};Buffer.prototype.readFloatLE=function readFloatLE(offset,noAssert){if(!noAssert)checkOffset(offset,4,this.length);return read(this,offset,true,23,4);};Buffer.prototype.readFloatBE=function readFloatBE(offset,noAssert){if(!noAssert)checkOffset(offset,4,this.length);return read(this,offset,false,23,4);};Buffer.prototype.readDoubleLE=function readDoubleLE(offset,noAssert){if(!noAssert)checkOffset(offset,8,this.length);return read(this,offset,true,52,8);};Buffer.prototype.readDoubleBE=function readDoubleBE(offset,noAssert){if(!noAssert)checkOffset(offset,8,this.length);return read(this,offset,false,52,8);};function checkInt(buf,value,offset,ext,max,min){if(!internalIsBuffer(buf))throw new TypeError('"buffer" argument must be a Buffer instance');if(value>max||value<min)throw new RangeError('"value" argument is out of bounds');if(offset+ext>buf.length)throw new RangeError('Index out of range');}Buffer.prototype.writeUIntLE=function writeUIntLE(value,offset,byteLength,noAssert){value=+value;offset=offset|0;byteLength=byteLength|0;if(!noAssert){var maxBytes=Math.pow(2,8*byteLength)-1;checkInt(this,value,offset,byteLength,maxBytes,0);}var mul=1;var i=0;this[offset]=value&0xFF;while(++i<byteLength&&(mul*=0x100)){this[offset+i]=value/mul&0xFF;}return offset+byteLength;};Buffer.prototype.writeUIntBE=function writeUIntBE(value,offset,byteLength,noAssert){value=+value;offset=offset|0;byteLength=byteLength|0;if(!noAssert){var maxBytes=Math.pow(2,8*byteLength)-1;checkInt(this,value,offset,byteLength,maxBytes,0);}var i=byteLength-1;var mul=1;this[offset+i]=value&0xFF;while(--i>=0&&(mul*=0x100)){this[offset+i]=value/mul&0xFF;}return offset+byteLength;};Buffer.prototype.writeUInt8=function writeUInt8(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,1,0xff,0);if(!Buffer.TYPED_ARRAY_SUPPORT)value=Math.floor(value);this[offset]=value&0xff;return offset+1;};function objectWriteUInt16(buf,value,offset,littleEndian){if(value<0)value=0xffff+value+1;for(var i=0,j=Math.min(buf.length-offset,2);i<j;++i){buf[offset+i]=(value&0xff<<8*(littleEndian?i:1-i))>>>(littleEndian?i:1-i)*8;}}Buffer.prototype.writeUInt16LE=function writeUInt16LE(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,2,0xffff,0);if(Buffer.TYPED_ARRAY_SUPPORT){this[offset]=value&0xff;this[offset+1]=value>>>8;}else{objectWriteUInt16(this,value,offset,true);}return offset+2;};Buffer.prototype.writeUInt16BE=function writeUInt16BE(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,2,0xffff,0);if(Buffer.TYPED_ARRAY_SUPPORT){this[offset]=value>>>8;this[offset+1]=value&0xff;}else{objectWriteUInt16(this,value,offset,false);}return offset+2;};function objectWriteUInt32(buf,value,offset,littleEndian){if(value<0)value=0xffffffff+value+1;for(var i=0,j=Math.min(buf.length-offset,4);i<j;++i){buf[offset+i]=value>>>(littleEndian?i:3-i)*8&0xff;}}Buffer.prototype.writeUInt32LE=function writeUInt32LE(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,4,0xffffffff,0);if(Buffer.TYPED_ARRAY_SUPPORT){this[offset+3]=value>>>24;this[offset+2]=value>>>16;this[offset+1]=value>>>8;this[offset]=value&0xff;}else{objectWriteUInt32(this,value,offset,true);}return offset+4;};Buffer.prototype.writeUInt32BE=function writeUInt32BE(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,4,0xffffffff,0);if(Buffer.TYPED_ARRAY_SUPPORT){this[offset]=value>>>24;this[offset+1]=value>>>16;this[offset+2]=value>>>8;this[offset+3]=value&0xff;}else{objectWriteUInt32(this,value,offset,false);}return offset+4;};Buffer.prototype.writeIntLE=function writeIntLE(value,offset,byteLength,noAssert){value=+value;offset=offset|0;if(!noAssert){var limit=Math.pow(2,8*byteLength-1);checkInt(this,value,offset,byteLength,limit-1,-limit);}var i=0;var mul=1;var sub=0;this[offset]=value&0xFF;while(++i<byteLength&&(mul*=0x100)){if(value<0&&sub===0&&this[offset+i-1]!==0){sub=1;}this[offset+i]=(value/mul>>0)-sub&0xFF;}return offset+byteLength;};Buffer.prototype.writeIntBE=function writeIntBE(value,offset,byteLength,noAssert){value=+value;offset=offset|0;if(!noAssert){var limit=Math.pow(2,8*byteLength-1);checkInt(this,value,offset,byteLength,limit-1,-limit);}var i=byteLength-1;var mul=1;var sub=0;this[offset+i]=value&0xFF;while(--i>=0&&(mul*=0x100)){if(value<0&&sub===0&&this[offset+i+1]!==0){sub=1;}this[offset+i]=(value/mul>>0)-sub&0xFF;}return offset+byteLength;};Buffer.prototype.writeInt8=function writeInt8(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,1,0x7f,-0x80);if(!Buffer.TYPED_ARRAY_SUPPORT)value=Math.floor(value);if(value<0)value=0xff+value+1;this[offset]=value&0xff;return offset+1;};Buffer.prototype.writeInt16LE=function writeInt16LE(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,2,0x7fff,-0x8000);if(Buffer.TYPED_ARRAY_SUPPORT){this[offset]=value&0xff;this[offset+1]=value>>>8;}else{objectWriteUInt16(this,value,offset,true);}return offset+2;};Buffer.prototype.writeInt16BE=function writeInt16BE(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,2,0x7fff,-0x8000);if(Buffer.TYPED_ARRAY_SUPPORT){this[offset]=value>>>8;this[offset+1]=value&0xff;}else{objectWriteUInt16(this,value,offset,false);}return offset+2;};Buffer.prototype.writeInt32LE=function writeInt32LE(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,4,0x7fffffff,-0x80000000);if(Buffer.TYPED_ARRAY_SUPPORT){this[offset]=value&0xff;this[offset+1]=value>>>8;this[offset+2]=value>>>16;this[offset+3]=value>>>24;}else{objectWriteUInt32(this,value,offset,true);}return offset+4;};Buffer.prototype.writeInt32BE=function writeInt32BE(value,offset,noAssert){value=+value;offset=offset|0;if(!noAssert)checkInt(this,value,offset,4,0x7fffffff,-0x80000000);if(value<0)value=0xffffffff+value+1;if(Buffer.TYPED_ARRAY_SUPPORT){this[offset]=value>>>24;this[offset+1]=value>>>16;this[offset+2]=value>>>8;this[offset+3]=value&0xff;}else{objectWriteUInt32(this,value,offset,false);}return offset+4;};function checkIEEE754(buf,value,offset,ext,max,min){if(offset+ext>buf.length)throw new RangeError('Index out of range');if(offset<0)throw new RangeError('Index out of range');}function writeFloat(buf,value,offset,littleEndian,noAssert){if(!noAssert){checkIEEE754(buf,value,offset,4);}write(buf,value,offset,littleEndian,23,4);return offset+4;}Buffer.prototype.writeFloatLE=function writeFloatLE(value,offset,noAssert){return writeFloat(this,value,offset,true,noAssert);};Buffer.prototype.writeFloatBE=function writeFloatBE(value,offset,noAssert){return writeFloat(this,value,offset,false,noAssert);};function writeDouble(buf,value,offset,littleEndian,noAssert){if(!noAssert){checkIEEE754(buf,value,offset,8);}write(buf,value,offset,littleEndian,52,8);return offset+8;}Buffer.prototype.writeDoubleLE=function writeDoubleLE(value,offset,noAssert){return writeDouble(this,value,offset,true,noAssert);};Buffer.prototype.writeDoubleBE=function writeDoubleBE(value,offset,noAssert){return writeDouble(this,value,offset,false,noAssert);};// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
   Buffer.prototype.copy=function copy(target,targetStart,start,end){if(!start)start=0;if(!end&&end!==0)end=this.length;if(targetStart>=target.length)targetStart=target.length;if(!targetStart)targetStart=0;if(end>0&&end<start)end=start;// Copy 0 bytes; we're done
   if(end===start)return 0;if(target.length===0||this.length===0)return 0;// Fatal error conditions
   if(targetStart<0){throw new RangeError('targetStart out of bounds');}if(start<0||start>=this.length)throw new RangeError('sourceStart out of bounds');if(end<0)throw new RangeError('sourceEnd out of bounds');// Are we oob?
@@ -6226,7 +6311,7 @@
   	 * @param   {BuildingState} state - state representing the current building tree state during the recursion
   	 * @returns {Array} array containing the html output and bindings for the current node
   	 */function createDynamicNode(sourceNode,sourceFile,sourceCode,state){switch(true){case isTextNode(sourceNode):// text nodes will not have any bindings
-  return [nodeToString(sourceNode),[]];default:return createTagWithBindings(sourceNode,sourceFile,sourceCode,state);}}/**
+  return [nodeToString(sourceNode),[]];default:return createTagWithBindings(sourceNode,sourceFile,sourceCode);}}/**
   	 * Create only a dynamic tag node with generating a custom selector and its bindings
   	 * @param   {RiotParser.Node} sourceNode - any kind of node parsed via riot parser
   	 * @param   {string} sourceFile - source file path
@@ -6246,7 +6331,7 @@
   	 * @param   {BuildingState} state - state representing the current building tree state during the recursion
   	 * @returns {Array} array containing the html output and bindings for the current node
   	 */function parseNode(sourceNode,sourceFile,sourceCode,state){// static nodes have no bindings
-  if(isStaticNode(sourceNode))return [nodeToString(sourceNode),[]];return createDynamicNode(sourceNode,sourceFile,sourceCode,state);}/**
+  if(isStaticNode(sourceNode))return [nodeToString(sourceNode),[]];return createDynamicNode(sourceNode,sourceFile,sourceCode);}/**
   	 * Create the tag binding
   	 * @param   { RiotParser.Node.Tag } sourceNode - tag containing the each attribute
   	 * @param   { string } sourceFile - source file path
@@ -6260,7 +6345,7 @@
   	 * @param   {string} sourceCode - original source
   	 * @param   {BuildingState} state - state representing the current building tree state during the recursion
   	 * @returns {Array} array containing the html output and the dom bindings
-  	 */function build(sourceNode,sourceFile,sourceCode,state){if(!sourceNode)panic('Something went wrong with your tag DOM parsing, your tag template can\'t be created');const[nodeHTML,nodeBindings]=parseNode(sourceNode,sourceFile,sourceCode,state);const childrenNodes=getChildrenNodes(sourceNode);const currentState=Object.assign({},cloneDeep(BuildingState),state);// mutate the original arrays
+  	 */function build(sourceNode,sourceFile,sourceCode,state){if(!sourceNode)panic('Something went wrong with your tag DOM parsing, your tag template can\'t be created');const[nodeHTML,nodeBindings]=parseNode(sourceNode,sourceFile,sourceCode);const childrenNodes=getChildrenNodes(sourceNode);const currentState=Object.assign({},cloneDeep(BuildingState),state);// mutate the original arrays
   currentState.html.push(...nodeHTML);currentState.bindings.push(...nodeBindings);// do recursion if
   // this tag has children and it has no special directives bound to it
   if(childrenNodes.length&&!hasItsOwnTemplate(sourceNode)){childrenNodes.forEach(node=>build(node,sourceFile,sourceCode,Object.assign({parent:sourceNode},currentState)));}// close the tag if it's not a void one
