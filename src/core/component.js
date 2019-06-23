@@ -284,7 +284,9 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
         unmount(preserveRoot) {
           this.onBeforeUnmount(this.props, this.state)
           this[ATTRIBUTES_KEY_SYMBOL].unmount()
-          this[TEMPLATE_KEY_SYMBOL].unmount(this, {}, !preserveRoot)
+          // if the preserveRoot is null the template html will be left untouched
+          // in that case the DOM cleanup will happen differently from a parent node
+          this[TEMPLATE_KEY_SYMBOL].unmount(this, {}, preserveRoot === null ? null : !preserveRoot)
           this.onUnmounted(this.props, this.state)
 
           return this
