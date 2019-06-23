@@ -113,8 +113,8 @@ The Riot.js ecosystem is completely modular, it's designed to let you pick only 
   - [@riotjs/custom-elements](https://github.com/riot/custom-elements) - native custom elements implementation
 
 ### CDN hosting
-- [unpkg](unpkg.com/riot/riot.js)
-- [jsDelivr](http://www.jsdelivr.com/projects/riot)
+- [unpkg](https://unpkg.com/riot/riot.js)
+- [jsDelivr](https://www.jsdelivr.com/projects/riot)
 - [cdnjs](https://cdnjs.com/libraries/riot)
 
 ### How to contribute
