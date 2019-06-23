@@ -50,7 +50,7 @@ Riot brings custom components to all modern browsers. It is designed to offer yo
 </timer>
 ```
 
-[Open this example on Plunker](http://riot.js.org/examples/plunker/?app=timer)
+[Open this example on Plunker](https://riot.js.org/examples/plunker/?app=timer)
 
 #### Mounting
 
@@ -179,7 +179,7 @@ Many thanks to all smart people from all over the world who helped improving it.
 
 ## Official Website
 
-http://riot.js.org
+https://riot.js.org
 
 ## Backers
 
@@ -204,11 +204,11 @@ Special thanks to Browserstack for their support
 [travis-image]:https://img.shields.io/travis/riot/riot.svg?style=flat-square
 [travis-url]:https://travis-ci.org/riot/riot
 
-[license-image]:http://img.shields.io/badge/license-MIT-000000.svg?style=flat-square
+[license-image]:https://img.shields.io/badge/license-MIT-000000.svg?style=flat-square
 [license-url]:LICENSE.txt
 
-[npm-version-image]:http://img.shields.io/npm/v/riot.svg?style=flat-square
-[npm-downloads-image]:http://img.shields.io/npm/dm/riot.svg?style=flat-square
+[npm-version-image]:https://img.shields.io/npm/v/riot.svg?style=flat-square
+[npm-downloads-image]:https://img.shields.io/npm/dm/riot.svg?style=flat-square
 [npm-url]:https://npmjs.org/package/riot
 
 [coverage-image]:https://img.shields.io/coveralls/riot/riot/dev.svg?style=flat-square
@@ -240,7 +240,7 @@ Special thanks to Browserstack for their support
 
 [support-url]: https://opencollective.com/riot#support
 
-[lib-size]: http://img.badgesize.io/https://unpkg.com/riot/riot.min.js?compression=gzip
+[lib-size]: https://img.badgesize.io/https://unpkg.com/riot/riot.min.js?compression=gzip
 
 [backers-image]: https://opencollective.com/riot/backers.svg
 [sponsors-image]: https://opencollective.com/riot/sponsors.svg
