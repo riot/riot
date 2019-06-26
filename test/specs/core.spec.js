@@ -260,31 +260,28 @@ describe('Riot core api', () => {
     })
 
     it('custom components can be unmounted by tag keeping the root element', () => {
-      const destroyedSpy = spy()
+      const element1 = document.createElement('div')
+      const element2 = document.createElement('div')
+
+      document.body.appendChild(element1)
+      document.body.appendChild(element2)
+
       riot.register('my-component-red', {
-        css: 'my-component-red { color: red; }',
-        exports: {
-          onUnmounted() {
-            destroyedSpy()
-          }
-        }
+        css: 'my-component-red { color: red; }'
       })
       riot.register('my-component-green', {
-        css: 'my-component-green { color: green; }',
-        exports: {
-          onUnmounted() {
-            destroyedSpy()
-          }
-        }
+        css: 'my-component-green { color: green; }'
       })
-      const element = document.createElement('div')
 
-      riot.mount(element, {}, 'my-component-red')
-      riot.unmount(element, true)
-      riot.mount(element, {}, 'my-component-green')
-      riot.unmount(element, true)
+      riot.mount(element1, {}, 'my-component-red')
+      riot.mount(element2, {}, 'my-component-green')
+      riot.unmount(element1, true)
+      riot.unmount(element2)
 
-      expect(destroyedSpy).to.have.been.calledTwice
+      expect(document.body.contains(element1)).to.be.ok
+      expect(document.body.contains(element2)).to.be.not.ok
+
+      element2.parentNode.removeChild(element2)
       riot.unregister('my-component-red')
       riot.unregister('my-component-green')
     })
