@@ -266,24 +266,20 @@ describe('Riot core api', () => {
       document.body.appendChild(element1)
       document.body.appendChild(element2)
 
-      riot.register('my-component-red', {
-        css: 'my-component-red { color: red; }'
-      })
-      riot.register('my-component-green', {
-        css: 'my-component-green { color: green; }'
-      })
+      riot.register('my-component-1', SimpleComponent)
+      riot.register('my-component-2', SimpleComponent)
 
-      riot.mount(element1, {}, 'my-component-red')
-      riot.mount(element2, {}, 'my-component-green')
+      riot.mount(element1, {}, 'my-component-1')
+      riot.mount(element2, {}, 'my-component-2')
       riot.unmount(element1, true)
       riot.unmount(element2)
 
       expect(document.body.contains(element1)).to.be.ok
       expect(document.body.contains(element2)).to.be.not.ok
 
-      element2.parentNode.removeChild(element2)
-      riot.unregister('my-component-red')
-      riot.unregister('my-component-green')
+      element1.parentNode.removeChild(element1)
+      riot.unregister('my-component-1')
+      riot.unregister('my-component-2')
     })
 
     it('custom components be also functions', () => {
