@@ -93,7 +93,7 @@ HTML syntax is the de facto language on the web and it's designed for building u
 
 
 ### Use your dearest language and tools
-- Create components with CoffeeScript, Jade, LiveScript, Typescript, ES6 or [any pre-processor](https://riot.js.org/next/#pre-processors) you want.
+- Create components with CoffeeScript, Jade, LiveScript, Typescript, ES6 or [any pre-processor](https://riot.js.org/compiler/#pre-processors) you want.
 - Build with [@riotjs/cli](https://github.com/riot/cli), [webpack](https://github.com/riot/webpack-loader), [Rollup](https://github.com/riot/rollup-plugin-riot), [parcel](https://github.com/riot/parcel-plugin-riot), [Browserify](https://github.com/riot/riotify).
 - Test with however you like, you can [load your riot tags directly in node](https://github.com/riot/ssr#render---to-render-only-markup)
 
