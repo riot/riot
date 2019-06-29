@@ -1,4 +1,4 @@
-/* Riot v4.2.0, @license MIT */
+/* Riot v4.3.0, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -2245,13 +2245,14 @@ function mount(selector, initialProps, name) {
 /**
  * Sweet unmounting helper function for the DOM node mounted manually by the user
  * @param   {string|HTMLElement} selector - query for the selection or a DOM element
+ * @param   {boolean|null} keepRootElement - if true keep the root element
  * @returns {Array} list of nodes unmounted
  */
 
-function unmount(selector) {
+function unmount(selector, keepRootElement) {
   return $(selector).map(element => {
     if (element[DOM_COMPONENT_INSTANCE_PROPERTY$1]) {
-      element[DOM_COMPONENT_INSTANCE_PROPERTY$1].unmount();
+      element[DOM_COMPONENT_INSTANCE_PROPERTY$1].unmount(keepRootElement);
     }
 
     return element;
@@ -2293,7 +2294,7 @@ function component(implementation) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.2.0'; // expose some internal stuff that might be used from external tools
+const version = 'v4.3.0'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
