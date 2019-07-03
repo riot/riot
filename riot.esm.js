@@ -1,4 +1,4 @@
-/* Riot v4.3.1, @license MIT */
+/* Riot v4.3.2, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -1048,9 +1048,9 @@ const SlotBinding = Object.seal({
     return this;
   },
 
-  unmount(scope, parentScope) {
+  unmount(scope, parentScope, mustRemoveRoot) {
     if (this.template) {
-      this.template.unmount(parentScope);
+      this.template.unmount(parentScope, null, mustRemoveRoot);
     }
 
     return this;
@@ -1427,7 +1427,7 @@ const TemplateChunk = Object.freeze({
    */
   unmount(scope, parentScope, mustRemoveRoot) {
     if (this.el) {
-      this.bindings.forEach(b => b.unmount(scope, parentScope));
+      this.bindings.forEach(b => b.unmount(scope, parentScope, mustRemoveRoot));
 
       if (mustRemoveRoot && this.el.parentNode) {
         this.el.parentNode.removeChild(this.el);
@@ -2294,7 +2294,7 @@ function component(implementation) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.3.1'; // expose some internal stuff that might be used from external tools
+const version = 'v4.3.2'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
