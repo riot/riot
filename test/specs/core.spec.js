@@ -3,7 +3,7 @@ import * as riot from '../../src/riot'
 import ConditionalSlotParent from '../components/conditional-slot-parent.riot'
 import DashedAttributeParent from '../components/dashed-attribute-parent.riot'
 import EachAndSpreadAttribute from '../components/each-and-spread-attribute.riot'
-import EachChildrenComponentsEvents from '../components/each-children-components-events.riot'
+import EachCustomChildrenComponents from '../components/each-custom-children-components.riot'
 import EachRootAttributes from '../components/each-root-attributes.riot'
 import ExpressionParts from '../components/expression-parts.riot'
 import GlobalComponents from '../components/global-components.riot'
@@ -118,12 +118,30 @@ describe('Riot core api', () => {
 
     it('expressions will be evaluated only once', () => {
       const handler = spy()
-      const element = document.createElement('each-children-components-events')
-      const component = riot.component(EachChildrenComponentsEvents)(element, {
-        onClick: handler
+      const element = document.createElement('each-custom-children-components')
+      const component = riot.component(EachCustomChildrenComponents)(element, {
+        onClick: handler,
+        items: [{ value: 'hello'}, { value: 'there'}]
       })
 
-      expect(handler).to.be.callCount(component.items.length)
+      expect(handler).to.be.callCount(component.state.items.length)
+      component.unmount()
+    })
+
+    it('children components can be updated without throwing (see bug #2728)', () => {
+      const handler = spy()
+      const element = document.createElement('each-custom-children-components')
+      const component = riot.component(EachCustomChildrenComponents)(element, {
+        onClick: handler,
+        items: [{ value: 'hello'}, { value: 'there'}]
+      })
+
+      expect(() => {
+        component.update({
+          items: [{ value: 'goodbye'} ]
+        })
+      }).to.not.throw()
+
       component.unmount()
     })
 
