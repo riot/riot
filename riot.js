@@ -1,4 +1,4 @@
-/* Riot v4.3.1, @license MIT */
+/* Riot v4.3.4, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -641,7 +641,7 @@
       if (mustMount) {
         batches.push(() => componentTemplate.mount(el, context, parentScope, meta));
       } else {
-        batches.push(() => componentTemplate.update(context, parentScope));
+        componentTemplate.update(context, parentScope);
       } // create the collection of nodes to update or to add
       // in case of template tags we need to add all its children nodes
 
@@ -987,7 +987,7 @@
   }
 
   function create$2(node, data) {
-    return Object.assign({}, Expression, data, {
+    return Object.assign({}, Expression, {}, data, {
       node
     });
   }
@@ -1054,9 +1054,9 @@
       return this;
     },
 
-    unmount(scope, parentScope) {
+    unmount(scope, parentScope, mustRemoveRoot) {
       if (this.template) {
-        this.template.unmount(parentScope);
+        this.template.unmount(parentScope, null, mustRemoveRoot);
       }
 
       return this;
@@ -1433,7 +1433,7 @@
      */
     unmount(scope, parentScope, mustRemoveRoot) {
       if (this.el) {
-        this.bindings.forEach(b => b.unmount(scope, parentScope));
+        this.bindings.forEach(b => b.unmount(scope, parentScope, mustRemoveRoot));
 
         if (mustRemoveRoot && this.el.parentNode) {
           this.el.parentNode.removeChild(this.el);
@@ -1620,7 +1620,7 @@
       switch (true) {
         // spread attribute
         case !attribute.name && type === expressionTypes.ATTRIBUTE:
-          return Object.assign({}, acc, value);
+          return Object.assign({}, acc, {}, value);
         // value attribute
 
         case type === expressionTypes.VALUE:
@@ -1997,7 +1997,7 @@
       attributeExpressions = [];
     }
 
-    return Object.assign({}, DOMattributesToObject(element), evaluateAttributeExpressions(attributeExpressions));
+    return Object.assign({}, DOMattributesToObject(element), {}, evaluateAttributeExpressions(attributeExpressions));
   }
   /**
    * Create the bindings to update the component attributes
@@ -2064,7 +2064,7 @@
 
 
   function computeState(oldState, newState) {
-    return Object.assign({}, oldState, callOrAssign(newState));
+    return Object.assign({}, oldState, {}, callOrAssign(newState));
   }
   /**
    * Add eventually the "is" attribute to link this DOM node to its css
@@ -2102,7 +2102,7 @@
         }
 
         this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(element, attributes).mount(parentScope);
-        this.props = Object.freeze(Object.assign({}, initialProps, evaluateProps(element, this[ATTRIBUTES_KEY_SYMBOL].expressions)));
+        this.props = Object.freeze(Object.assign({}, initialProps, {}, evaluateProps(element, this[ATTRIBUTES_KEY_SYMBOL].expressions)));
         this.state = computeState(this.state, state);
         this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone(); // link this object to the DOM node
 
@@ -2132,7 +2132,7 @@
 
         const newProps = evaluateProps(this.root, this[ATTRIBUTES_KEY_SYMBOL].expressions);
         if (this.shouldUpdate(newProps, this.props) === false) return;
-        this.props = Object.freeze(Object.assign({}, initialProps, newProps));
+        this.props = Object.freeze(Object.assign({}, initialProps, {}, newProps));
         this.state = computeState(this.state, state);
         this.onBeforeUpdate(this.props, this.state);
         this[TEMPLATE_KEY_SYMBOL].update(this, parentScope);
@@ -2300,7 +2300,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.3.1'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.3.4'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
