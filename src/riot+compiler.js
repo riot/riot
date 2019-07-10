@@ -13,7 +13,7 @@ function evaluate(js, url) {
 
   // make the source available in the "(no domain)" tab
   // of Chrome DevTools, with a .js extension
-  if (url) node.text =  `${js}\n//# sourceURL=${url}.js`
+  if (url) node.text = `${js}\n//# sourceURL=${url}.js`
 
   root.appendChild(node)
   root.removeChild(node)
