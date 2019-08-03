@@ -1,4 +1,4 @@
-/* Riot v4.3.6, @license MIT */
+/* Riot v4.3.7, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -2300,7 +2300,7 @@ function component(implementation) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.3.6'; // expose some internal stuff that might be used from external tools
+const version = 'v4.3.7'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
