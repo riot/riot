@@ -63,7 +63,7 @@ export type InstalledPluginsSet = Set<ComponentEnhancer>
 
 export function register<P, S>(componentName: string, shell: RiotComponentShell<P, S>): RegisteredComponentsMap
 export function unregister(componentName: string): RegisteredComponentsMap
-export function mount<P = object, S = object>(selector: string, componentName: string, initialProps?: P): RiotComponent<P, S>[]
+export function mount<P = object, S = object>(selector: string, initialProps?: P, componentName: string): RiotComponent<P, S>[]
 export function unmount(selector: string, keepRootElement: boolean):HTMLElement[]
 export function install(plugin: ComponentEnhancer):InstalledPluginsSet
 export function uninstall(plugin: ComponentEnhancer):InstalledPluginsSet
