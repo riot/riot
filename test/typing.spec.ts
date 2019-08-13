@@ -32,11 +32,11 @@ const todo: TodoComponentShell = {
   template() {}
 }
 
-const component: TodoComponent = mount<TodoProps, TodoState>('todo', 'todo', {
+const component: TodoComponent = mount<TodoProps, TodoState>('todo', {
   initialItems: [
     { summary: 'buy eggs', done: false }
   ]
-})[0]
+}, 'todo')[0]
 
 component.update({ doShowDoneItems: false }, { })
 component.unmount(true)
