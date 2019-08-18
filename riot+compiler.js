@@ -6490,18 +6490,18 @@
     return compiler$1.compile(string, options);
   }
 
-  async function compileFromUrl(url) {
+  async function compileFromUrl(url, options) {
     const response = await fetch(url);
     const code = await response.text();
-    return compiler$1.compile(code, {
+    return compiler$1.compile(code, Object.assign({
       file: url
-    });
+    }, options));
   }
 
-  async function compile() {
+  async function compile(options) {
     const scripts = $('script[type="riot"]');
     const urls = scripts.map(s => get(s, 'src') || get(s, 'data-src'));
-    const tags = await Promise.all(urls.map(compileFromUrl));
+    const tags = await Promise.all(urls.map(url => compileFromUrl(url, options)));
     tags.forEach((_ref, i) => {
       let {
         code,
