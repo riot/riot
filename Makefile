@@ -64,14 +64,18 @@ riot: clean raw test
 
 min:
 	# minify riot
-	@ for f in $(GENERATED_FILES); do \
-		$(MINIFY) $(DIST)$$f \
+	@ $(MINIFY) $(DIST)riot.js \
 			--comments \
 			--toplevel \
 			--mangle \
 			--compress  \
-			-o $(DIST)$${f%.*}.min.js; \
-		done
+			-o $(DIST)riot.min.js;
+	# minify the riot+compiler
+	@ $(MINIFY) $(DIST)riot+compiler.js \
+			--comments \
+			--toplevel \
+			--mangle \
+			-o $(DIST)riot+compiler.min.js;
 
 build:
 	# generate riot.js & riot.min.js
