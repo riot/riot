@@ -1,4 +1,4 @@
-/* Riot v4.5.0, @license MIT */
+/* Riot v4.5.1, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1948,14 +1948,13 @@
     unmount: noop,
     clone: noop,
     createDOM: noop
-    /**
-     * Factory function to create the component templates only once
-     * @param   {Function} template - component template creation function
-     * @param   {Object} components - object containing the nested components
-     * @returns {TemplateChunk} template chunk object
-     */
-
   };
+  /**
+   * Factory function to create the component templates only once
+   * @param   {Function} template - component template creation function
+   * @param   {Object} components - object containing the nested components
+   * @returns {TemplateChunk} template chunk object
+   */
 
   function componentTemplateFactory(template, components) {
     return template(create$6, expressionTypes, bindingTypes, name => {
@@ -2361,7 +2360,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.5.0'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.5.1'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
