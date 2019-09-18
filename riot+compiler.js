@@ -1,4 +1,4 @@
-/* Riot v4.4.1, @license MIT */
+/* Riot v4.5.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -29,18 +29,17 @@
    * @returns {undefined}
    */
   function cleanNode(node) {
-    clearChildren(node, node.childNodes);
+    clearChildren(node.childNodes);
   }
   /**
    * Clear multiple children in a node
-   * @param   {HTMLElement} parent - parent node where the children will be removed
    * @param   {HTMLElement[]} children - direct children nodes
    * @returns {undefined}
    */
 
 
-  function clearChildren(parent, children) {
-    Array.from(children).forEach(n => parent.removeChild(n));
+  function clearChildren(children) {
+    Array.from(children).forEach(n => n.parentNode && n.parentNode.removeChild(n));
   }
 
   const EACH = 0;
@@ -72,18 +71,28 @@
   /* get rid of the @ungap/essential-map polyfill */
 
 
+  const {
+    indexOf: iOF
+  } = [];
+
   const append = (get, parent, children, start, end, before) => {
     const isSelect = 'selectedIndex' in parent;
-    let selectedIndex = -1;
+    let noSelection = isSelect;
 
     while (start < end) {
       const child = get(children[start], 1);
-      if (isSelect && selectedIndex < 0 && child.selected) selectedIndex = start;
       parent.insertBefore(child, before);
+
+      if (isSelect && noSelection && child.selected) {
+        noSelection = !noSelection;
+        let {
+          selectedIndex
+        } = parent;
+        parent.selectedIndex = selectedIndex < 0 ? start : iOF.call(parent.querySelectorAll('option'), child);
+      }
+
       start++;
     }
-
-    if (isSelect && -1 < selectedIndex) parent.selectedIndex = selectedIndex;
   };
 
   const eqeq = (a, b) => a == b;
@@ -450,7 +459,7 @@
 
 
   function isNil(value) {
-    return value == null;
+    return value === null || value === undefined;
   }
   /**
    * Check if an element is a template tag
@@ -726,11 +735,16 @@
       const mustMount = !this.value && value;
       const mustUnmount = this.value && !value;
 
+      const mount = () => {
+        const pristine = this.node.cloneNode();
+        this.parent.insertBefore(pristine, this.placeholder);
+        this.template = this.template.clone();
+        this.template.mount(pristine, scope, parentScope);
+      };
+
       switch (true) {
         case mustMount:
-          this.parent.insertBefore(this.node, this.placeholder);
-          this.template = this.template.clone();
-          this.template.mount(this.node, scope, parentScope);
+          mount();
           break;
 
         case mustUnmount:
@@ -776,6 +790,26 @@
     TEXT,
     VALUE
   };
+  /**
+   * Check if a value is a Boolean
+   * @param   {*}  value - anything
+   * @returns {boolean} true only for the value is a boolean
+   */
+
+  function isBoolean(value) {
+    return typeof value === 'boolean';
+  }
+  /**
+   * Check if a value is an Object
+   * @param   {*}  value - anything
+   * @returns {boolean} true only for the value is an object
+   */
+
+
+  function isObject(value) {
+    return typeof value === 'object';
+  }
+
   const REMOVE_ATTRIBUTE = 'removeAttribute';
   const SET_ATTIBUTE = 'setAttribute';
   /**
@@ -834,7 +868,7 @@
     } // handle boolean attributes
 
 
-    if (typeof value === 'boolean') {
+    if (isBoolean(value) || isObject(value)) {
       node[name] = value;
     }
 
@@ -848,7 +882,7 @@
 
 
   function getMethod(value) {
-    return isNil(value) || value === false || value === '' || typeof value === 'object' ? REMOVE_ATTRIBUTE : SET_ATTIBUTE;
+    return isNil(value) || value === false || value === '' || isObject(value) ? REMOVE_ATTRIBUTE : SET_ATTIBUTE;
   }
   /**
    * Get the value as string
@@ -863,21 +897,33 @@
     if (value === true) return name;
     return value;
   }
+
+  const RE_EVENTS_PREFIX = /^on/;
   /**
    * Set a new event listener
    * @param   {HTMLElement} node - target node
    * @param   {Object} expression - expression object
    * @param   {string} expression.name - event name
    * @param   {*} value - new expression value
-   * @returns {undefined}
+   * @param   {*} oldValue - old expression value
+   * @returns {value} the callback just received
    */
 
-
-  function eventExpression(node, _ref7, value) {
+  function eventExpression(node, _ref7, value, oldValue) {
     let {
       name
     } = _ref7;
-    node[name] = value;
+    const normalizedEventName = name.replace(RE_EVENTS_PREFIX, '');
+
+    if (oldValue) {
+      node.removeEventListener(normalizedEventName, oldValue);
+    }
+
+    if (value) {
+      node.addEventListener(normalizedEventName, value, false);
+    }
+
+    return value;
   }
   /**
    * This methods handles a simple text expression update
@@ -911,7 +957,7 @@
 
 
   function normalizeValue$1(value) {
-    return value != null ? value : '';
+    return isNil(value) ? '' : value;
   }
   /**
    * This methods handles the input fileds value updates
@@ -975,6 +1021,8 @@
      * @returns {Expression} self
      */
     unmount() {
+      // unmount only the event handling expressions
+      if (this.type === EVENT) apply(this, null);
       return this;
     }
 
@@ -1270,7 +1318,7 @@
   } // for svg nodes we need a bit more work
 
 
-  function creteSVGTree(html, container) {
+  function createSVGTree(html, container) {
     // create the SVGNode
     const svgNode = container.ownerDocument.importNode(new window.DOMParser().parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${html}</svg>`, 'application/xml').documentElement, true);
     return svgNode;
@@ -1284,7 +1332,7 @@
 
 
   function createDOMTree(root, html) {
-    if (isSvg(root)) return creteSVGTree(html, root);
+    if (isSvg(root)) return createSVGTree(html, root);
     return createHTMLTree(html, root);
   }
   /**
@@ -1439,16 +1487,23 @@
       if (this.el) {
         this.bindings.forEach(b => b.unmount(scope, parentScope, mustRemoveRoot));
 
-        if (mustRemoveRoot && this.el.parentNode) {
-          this.el.parentNode.removeChild(this.el);
-        }
+        switch (true) {
+          // <template> tags should be treated a bit differently
+          // we need to clear their children only if it's explicitly required by the caller
+          // via mustRemoveRoot !== null
+          case this.isTemplateTag === true && mustRemoveRoot !== null:
+            clearChildren(this.children);
+            break;
+          // remove the root node only if the mustRemoveRoot === true
 
-        if (mustRemoveRoot !== null) {
-          if (this.children) {
-            clearChildren(this.children[0].parentNode, this.children);
-          } else {
+          case mustRemoveRoot === true && this.el.parentNode !== null:
+            this.el.parentNode.removeChild(this.el);
+            break;
+          // otherwise we clean the node children
+
+          case mustRemoveRoot !== null:
             cleanNode(this.el);
-          }
+            break;
         }
 
         this.el = null;
@@ -2306,7 +2361,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.4.1'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.5.0'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2348,7 +2403,7 @@
 
   var require$$1 = getCjsExportFromNamespace(_empty_module$1);
 
-  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.4.1, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
+  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.5.0, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
   this.allSupertypes=Object.create(null);// Linear inheritance hierarchy. Populated during finalization.
   this.supertypeList=[];// Includes inherited fields.
   this.allFields=Object.create(null);// Non-hidden keys of allFields.
