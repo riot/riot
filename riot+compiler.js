@@ -1,4 +1,4 @@
-/* Riot v4.5.1, @license MIT */
+/* Riot v4.6.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -24,10 +24,86 @@
   });
 
   /**
+   * Quick type checking
+   * @param   {*} element - anything
+   * @param   {string} type - type definition
+   * @returns {boolean} true if the type corresponds
+   */
+  function checkType(element, type) {
+    return typeof element === type;
+  }
+  /**
+   * Check that will be passed if its argument is a function
+   * @param   {*} value - value to check
+   * @returns {boolean} - true if the value is a function
+   */
+
+  function isFunction(value) {
+    return checkType(value, 'function');
+  }
+
+  function noop() {
+    return this;
+  }
+  /**
+   * Autobind the methods of a source object to itself
+   * @param   {Object} source - probably a riot tag instance
+   * @param   {Array<string>} methods - list of the methods to autobind
+   * @returns {Object} the original object received
+   */
+
+  function autobindMethods(source, methods) {
+    methods.forEach(method => {
+      source[method] = source[method].bind(source);
+    });
+    return source;
+  }
+  /**
+   * Call the first argument received only if it's a function otherwise return it as it is
+   * @param   {*} source - anything
+   * @returns {*} anything
+   */
+
+  function callOrAssign(source) {
+    return isFunction(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
+  }
+
+  /**
+   * Convert a string from camel case to dash-case
+   * @param   {string} string - probably a component tag name
+   * @returns {string} component name normalized
+   */
+
+  /**
+   * Convert a string containing dashes to camel case
+   * @param   {string} string - input string
+   * @returns {string} my-string -> myString
+   */
+  function dashToCamelCase(string) {
+    return string.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+  }
+  /**
+   * Move all the child nodes from a source tag to another
+   * @param   {HTMLElement} source - source node
+   * @param   {HTMLElement} target - target node
+   * @returns {undefined} it's a void method ¯\_(ツ)_/¯
+   */
+  // Ignore this helper because it's needed only for svg tags
+
+
+  function moveChildren(source, target) {
+    if (source.firstChild) {
+      target.appendChild(source.firstChild);
+      moveChildren(source, target);
+    }
+  }
+  /**
    * Remove the child nodes from any DOM node
    * @param   {HTMLElement} node - target node
    * @returns {undefined}
    */
+
+
   function cleanNode(node) {
     clearChildren(node.childNodes);
   }
@@ -53,6 +129,16 @@
     SIMPLE,
     TAG,
     SLOT
+  };
+  const ATTRIBUTE = 0;
+  const EVENT = 1;
+  const TEXT = 2;
+  const VALUE = 3;
+  var expressionTypes = {
+    ATTRIBUTE,
+    EVENT,
+    TEXT,
+    VALUE
   };
   /**
    * Create the template meta object in case of <template> fragments
@@ -133,12 +219,7 @@
   const next = (get, list, i, length, before) => i < length ? get(list[i], 0) : 0 < i ? get(list[i - 1], -0).nextSibling : before;
 
   const remove = (get, parent, children, start, end) => {
-    if (end - start < 2) parent.removeChild(get(children[start], -1));else {
-      const range = parent.ownerDocument.createRange();
-      range.setStartBefore(get(children[start], -1));
-      range.setEndAfter(get(children[end - 1], -1));
-      range.deleteContents();
-    }
+    while (start < end) removeChild(get(children[start++], -1), parent);
   }; // - - - - - - - - - - - - - - - - - - -
   // diff related constants and utilities
   // - - - - - - - - - - - - - - - - - - -
@@ -353,6 +434,22 @@
   const smartDiff = (get, parentNode, futureNodes, futureStart, futureEnd, futureChanges, currentNodes, currentStart, currentEnd, currentChanges, currentLength, compare, before) => {
     applyDiff(OND(futureNodes, futureStart, futureChanges, currentNodes, currentStart, currentChanges, compare) || HS(futureNodes, futureStart, futureEnd, futureChanges, currentNodes, currentStart, currentEnd, currentChanges), get, parentNode, futureNodes, futureStart, currentNodes, currentStart, currentLength, before);
   };
+
+  let removeChild = (child, parentNode) => {
+    /* istanbul ignore if */
+    if ('remove' in child) {
+      removeChild = child => {
+        child.remove();
+      };
+    } else {
+      removeChild = (child, parentNode) => {
+        /* istanbul ignore else */
+        if (child.parentNode === parentNode) parentNode.removeChild(child);
+      };
+    }
+
+    removeChild(child, parentNode);
+  };
   /*! (c) 2018 Andrea Giammarchi (ISC) */
 
 
@@ -452,14 +549,26 @@
     return futureNodes;
   };
   /**
-   * Check if a value is null or undefined
-   * @param   {*}  value - anything
-   * @returns {boolean} true only for the 'undefined' and 'null' types
+   * Quick type checking
+   * @param   {*} element - anything
+   * @param   {string} type - type definition
+   * @returns {boolean} true if the type corresponds
    */
 
 
-  function isNil(value) {
-    return value === null || value === undefined;
+  function checkType$1(element, type) {
+    return typeof element === type;
+  }
+  /**
+   * Check if an element is part of an svg
+   * @param   {HTMLElement}  el - element to check
+   * @returns {boolean} true if we are in an svg context
+   */
+
+
+  function isSvg(el) {
+    const owner = el.ownerSVGElement;
+    return !!owner || owner === null;
   }
   /**
    * Check if an element is a template tag
@@ -470,6 +579,36 @@
 
   function isTemplate(el) {
     return !isNil(el.content);
+  }
+  /**
+   * Check if a value is a Boolean
+   * @param   {*}  value - anything
+   * @returns {boolean} true only for the value is a boolean
+   */
+
+
+  function isBoolean(value) {
+    return checkType$1(value, 'boolean');
+  }
+  /**
+   * Check if a value is an Object
+   * @param   {*}  value - anything
+   * @returns {boolean} true only for the value is an object
+   */
+
+
+  function isObject(value) {
+    return !isNil(value) && checkType$1(value, 'object');
+  }
+  /**
+   * Check if a value is null or undefined
+   * @param   {*}  value - anything
+   * @returns {boolean} true only for the 'undefined' and 'null' types
+   */
+
+
+  function isNil(value) {
+    return value === null || value === undefined;
   }
 
   const EachBinding = Object.seal({
@@ -780,36 +919,6 @@
     });
   }
 
-  const ATTRIBUTE = 0;
-  const EVENT = 1;
-  const TEXT = 2;
-  const VALUE = 3;
-  var expressionTypes = {
-    ATTRIBUTE,
-    EVENT,
-    TEXT,
-    VALUE
-  };
-  /**
-   * Check if a value is a Boolean
-   * @param   {*}  value - anything
-   * @returns {boolean} true only for the value is a boolean
-   */
-
-  function isBoolean(value) {
-    return typeof value === 'boolean';
-  }
-  /**
-   * Check if a value is an Object
-   * @param   {*}  value - anything
-   * @returns {boolean} true only for the value is an object
-   */
-
-
-  function isObject(value) {
-    return typeof value === 'object';
-  }
-
   const REMOVE_ATTRIBUTE = 'removeAttribute';
   const SET_ATTIBUTE = 'setAttribute';
   /**
@@ -1069,12 +1178,57 @@
     } = _ref9;
     return Object.assign({}, flattenCollectionMethods(expressions.map(expression => create$2(node, expression)), ['mount', 'update', 'unmount']));
   }
+  /**
+   * Evaluate a list of attribute expressions
+   * @param   {Array} attributes - attribute expressions generated by the riot compiler
+   * @returns {Object} key value pairs with the result of the computation
+   */
+
+
+  function evaluateAttributeExpressions(attributes) {
+    return attributes.reduce((acc, attribute) => {
+      const {
+        value,
+        type
+      } = attribute;
+
+      switch (true) {
+        // spread attribute
+        case !attribute.name && type === ATTRIBUTE:
+          return Object.assign({}, acc, {}, value);
+        // value attribute
+
+        case type === VALUE:
+          acc.value = attribute.value;
+          break;
+        // normal attributes
+
+        default:
+          acc[dashToCamelCase(attribute.name)] = attribute.value;
+      }
+
+      return acc;
+    }, {});
+  }
+
+  function extendParentScope(attributes, scope, parentScope) {
+    if (!attributes || !attributes.length) return parentScope;
+    const expressions = attributes.map(attr => Object.assign({}, attr, {
+      value: attr.evaluate(scope)
+    }));
+    return Object.assign(Object.create(parentScope || null), evaluateAttributeExpressions(expressions));
+  }
 
   const SlotBinding = Object.seal({
     // dynamic binding properties
     node: null,
     name: null,
+    attributes: [],
     template: null,
+
+    getTemplateScope(scope, parentScope) {
+      return extendParentScope(this.attributes, scope, parentScope);
+    },
 
     // API methods
     mount(scope, parentScope) {
@@ -1090,7 +1244,7 @@
       this.template = templateData && create$6(templateData.html, templateData.bindings).createDOM(parentNode);
 
       if (this.template) {
-        this.template.mount(this.node, parentScope);
+        this.template.mount(this.node, this.getTemplateScope(scope, parentScope));
         moveSlotInnerContent(this.node);
       }
 
@@ -1099,8 +1253,8 @@
     },
 
     update(scope, parentScope) {
-      if (this.template && parentScope) {
-        this.template.update(parentScope);
+      if (this.template) {
+        this.template.update(this.getTemplateScope(scope, parentScope));
       }
 
       return this;
@@ -1108,7 +1262,7 @@
 
     unmount(scope, parentScope, mustRemoveRoot) {
       if (this.template) {
-        this.template.unmount(parentScope, null, mustRemoveRoot);
+        this.template.unmount(this.getTemplateScope(scope, parentScope), null, mustRemoveRoot);
       }
 
       return this;
@@ -1137,9 +1291,11 @@
 
   function createSlot(node, _ref11) {
     let {
-      name
+      name,
+      attributes
     } = _ref11;
     return Object.assign({}, SlotBinding, {
+      attributes,
       node,
       name
     });
@@ -1276,13 +1432,28 @@
     [SLOT]: createSlot
   };
   /**
+   * Text expressions in a template tag will get childNodeIndex value normalized
+   * depending on the position of the <template> tag offset
+   * @param   {Expression[]} expressions - riot expressions array
+   * @param   {number} textExpressionsOffset - offset of the <template> tag
+   * @returns {Expression[]} expressions containing the text expressions normalized
+   */
+
+  function fixTextExpressionsOffset(expressions, textExpressionsOffset) {
+    return expressions.map(e => e.type === TEXT ? Object.assign({}, e, {
+      childNodeIndex: e.childNodeIndex + textExpressionsOffset
+    }) : e);
+  }
+  /**
    * Bind a new expression object to a DOM node
    * @param   {HTMLElement} root - DOM node where to bind the expression
    * @param   {Object} binding - binding data
+   * @param   {number|null} templateTagOffset - if it's defined we need to fix the text expressions childNodeIndex offset
    * @returns {Expression} Expression object
    */
 
-  function create$5(root, binding) {
+
+  function create$5(root, binding, templateTagOffset) {
     const {
       selector,
       type,
@@ -1292,22 +1463,12 @@
 
     const node = selector ? root.querySelector(selector) : root; // remove eventually additional attributes created only to select this node
 
-    if (redundantAttribute) node.removeAttribute(redundantAttribute); // init the binding
+    if (redundantAttribute) node.removeAttribute(redundantAttribute);
+    const bindingExpressions = expressions || []; // init the binding
 
     return (bindings[type] || bindings[SIMPLE])(node, Object.assign({}, binding, {
-      expressions: expressions || []
+      expressions: templateTagOffset && !selector ? fixTextExpressionsOffset(bindingExpressions, templateTagOffset) : bindingExpressions
     }));
-  }
-  /**
-   * Check if an element is part of an svg
-   * @param   {HTMLElement}  el - element to check
-   * @returns {boolean} true if we are in an svg context
-   */
-
-
-  function isSvg(el) {
-    const owner = el.ownerSVGElement;
-    return !!owner || owner === null;
   } // in this case a simple innerHTML is enough
 
 
@@ -1334,23 +1495,6 @@
   function createDOMTree(root, html) {
     if (isSvg(root)) return createSVGTree(html, root);
     return createHTMLTree(html, root);
-  }
-  /**
-   * Move all the child nodes from a source tag to another
-   * @param   {HTMLElement} source - source node
-   * @param   {HTMLElement} target - target node
-   * @returns {undefined} it's a void method ¯\_(ツ)_/¯
-   */
-  // Ignore this helper because it's needed only for svg tags
-
-  /* istanbul ignore next */
-
-
-  function moveChildren(source, target) {
-    if (source.firstChild) {
-      target.appendChild(source.firstChild);
-      moveChildren(source, target);
-    }
   }
   /**
    * Inject the DOM tree into a target node
@@ -1442,7 +1586,9 @@
       const {
         parentNode
       } = children ? children[0] : el;
-      this.isTemplateTag = isTemplate(el); // create the DOM if it wasn't created before
+      const isTemplateTag = isTemplate(el);
+      const templateTagOffset = isTemplateTag ? Math.max(Array.from(parentNode.children).indexOf(el), 0) : null;
+      this.isTemplateTag = isTemplateTag; // create the DOM if it wasn't created before
 
       this.createDOM(el);
 
@@ -1459,7 +1605,7 @@
 
       if (!avoidDOMInjection && this.fragment) injectDOM(el, this.fragment); // create the bindings
 
-      this.bindings = this.bindingsData.map(binding => create$5(this.el, binding));
+      this.bindings = this.bindingsData.map(binding => create$5(this.el, binding, templateTagOffset));
       this.bindings.forEach(b => b.mount(scope, parentScope));
       return this;
     },
@@ -1542,93 +1688,6 @@
   }
 
   /**
-   * Quick type checking
-   * @param   {*} element - anything
-   * @param   {string} type - type definition
-   * @returns {boolean} true if the type corresponds
-   */
-  function checkType(element, type) {
-    return typeof element === type;
-  }
-  /**
-   * Check that will be passed if its argument is a function
-   * @param   {*} value - value to check
-   * @returns {boolean} - true if the value is a function
-   */
-
-  function isFunction(value) {
-    return checkType(value, 'function');
-  }
-
-  /* eslint-disable fp/no-mutating-methods */
-  /**
-   * Throw an error
-   * @param {string} error - error message
-   * @returns {undefined} it's a IO void function
-   */
-
-  function panic(error) {
-    throw new Error(error);
-  }
-  /**
-   * Call the first argument received only if it's a function otherwise return it as it is
-   * @param   {*} source - anything
-   * @returns {*} anything
-   */
-
-  function callOrAssign(source) {
-    return isFunction(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
-  }
-  /**
-   * Convert a string from camel case to dash-case
-   * @param   {string} string - probably a component tag name
-   * @returns {string} component name normalized
-   */
-
-  function camelToDashCase(string) {
-    return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-  }
-  /**
-   * Convert a string containing dashes to camel case
-   * @param   {string} string - input string
-   * @returns {string} my-string -> myString
-   */
-
-  function dashToCamelCase(string) {
-    return string.replace(/-(\w)/g, (_, c) => c.toUpperCase());
-  }
-  /**
-   * Define default properties if they don't exist on the source object
-   * @param   {Object} source - object that will receive the default properties
-   * @param   {Object} defaults - object containing additional optional keys
-   * @returns {Object} the original object received enhanced
-   */
-
-  function defineDefaults(source, defaults) {
-    Object.entries(defaults).forEach((_ref) => {
-      let [key, value] = _ref;
-      if (!source[key]) source[key] = value;
-    });
-    return source;
-  } // doese simply nothing
-
-  function noop() {
-    return this;
-  }
-  /**
-   * Autobind the methods of a source object to itself
-   * @param   {Object} source - probably a riot tag instance
-   * @param   {Array<string>} methods - list of the methods to autobind
-   * @returns {Object} the original object received
-   */
-
-  function autobindMethods(source, methods) {
-    methods.forEach(method => {
-      source[method] = source[method].bind(source);
-    });
-    return source;
-  }
-  /**
    * Helper function to set an immutable property
    * @param   {Object} source - object where the new property will be set
    * @param   {string} key - object key where the new property will be stored
@@ -1636,18 +1695,20 @@
    * @param   {Object} options - set the propery overriding the default options
    * @returns {Object} - the original object modified
    */
-
   function defineProperty(source, key, value, options) {
     if (options === void 0) {
       options = {};
     }
 
+    /* eslint-disable fp/no-mutating-methods */
     Object.defineProperty(source, key, Object.assign({
       value,
       enumerable: false,
       writable: false,
       configurable: true
     }, options));
+    /* eslint-enable fp/no-mutating-methods */
+
     return source;
   }
   /**
@@ -1659,11 +1720,56 @@
    */
 
   function defineProperties(source, properties, options) {
-    Object.entries(properties).forEach((_ref2) => {
-      let [key, value] = _ref2;
+    Object.entries(properties).forEach((_ref) => {
+      let [key, value] = _ref;
       defineProperty(source, key, value, options);
     });
     return source;
+  }
+  /**
+   * Define default properties if they don't exist on the source object
+   * @param   {Object} source - object that will receive the default properties
+   * @param   {Object} defaults - object containing additional optional keys
+   * @returns {Object} the original object received enhanced
+   */
+
+  function defineDefaults(source, defaults) {
+    Object.entries(defaults).forEach((_ref2) => {
+      let [key, value] = _ref2;
+      if (!source[key]) source[key] = value;
+    });
+    return source;
+  }
+
+  const ATTRIBUTE$1 = 0;
+  const VALUE$1 = 3;
+
+  /**
+   * Convert a string from camel case to dash-case
+   * @param   {string} string - probably a component tag name
+   * @returns {string} component name normalized
+   */
+  function camelToDashCase(string) {
+    return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+  }
+  /**
+   * Convert a string containing dashes to camel case
+   * @param   {string} string - input string
+   * @returns {string} my-string -> myString
+   */
+
+  function dashToCamelCase$1(string) {
+    return string.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+  }
+
+  /**
+   * Throw an error with a descriptive message
+   * @param   { string } message - error message
+   * @returns { undefined } hoppla.. at this point the program should stop working
+   */
+
+  function panic(message) {
+    throw new Error(message);
   }
   /**
    * Evaluate a list of attribute expressions
@@ -1671,7 +1777,7 @@
    * @returns {Object} key value pairs with the result of the computation
    */
 
-  function evaluateAttributeExpressions(attributes) {
+  function evaluateAttributeExpressions$1(attributes) {
     return attributes.reduce((acc, attribute) => {
       const {
         value,
@@ -1680,17 +1786,17 @@
 
       switch (true) {
         // spread attribute
-        case !attribute.name && type === expressionTypes.ATTRIBUTE:
+        case !attribute.name && type === ATTRIBUTE$1:
           return Object.assign({}, acc, {}, value);
         // value attribute
 
-        case type === expressionTypes.VALUE:
-          acc[VALUE_ATTRIBUTE] = attribute.value;
+        case type === VALUE$1:
+          acc.value = attribute.value;
           break;
         // normal attributes
 
         default:
-          acc[dashToCamelCase(attribute.name)] = attribute.value;
+          acc[dashToCamelCase$1(attribute.name)] = attribute.value;
       }
 
       return acc;
@@ -1713,6 +1819,30 @@
 
 
     return els;
+  }
+
+  /**
+   * Simple helper to find DOM nodes returning them as array like loopable object
+   * @param   { string|DOMNodeList } selector - either the query or the DOM nodes to arraify
+   * @param   { HTMLElement }        ctx      - context defining where the query will search for the DOM nodes
+   * @returns { Array } DOM nodes found as array
+   */
+
+  function $(selector, ctx) {
+    return domToArray(typeof selector === 'string' ? (ctx || document).querySelectorAll(selector) : selector);
+  }
+
+  /**
+   * Get all the element attributes as object
+   * @param   {HTMLElement} element - DOM node we want to parse
+   * @returns {Object} all the attributes found as a key value pairs
+   */
+
+  function DOMattributesToObject(element) {
+    return Array.from(element.attributes).reduce((acc, attribute) => {
+      acc[dashToCamelCase$1(attribute.name)] = attribute.value;
+      return acc;
+    }, {});
   }
 
   /**
@@ -1797,39 +1927,6 @@
 
   function get(els, name) {
     return parseNodes(els, name, 'getAttribute');
-  }
-
-  /**
-   * Get all the element attributes as object
-   * @param   {HTMLElement} element - DOM node we want to parse
-   * @returns {Object} all the attributes found as a key value pairs
-   */
-
-  function DOMattributesToObject(element) {
-    return Array.from(element.attributes).reduce((acc, attribute) => {
-      acc[dashToCamelCase(attribute.name)] = attribute.value;
-      return acc;
-    }, {});
-  }
-  /**
-   * Get the tag name of any DOM node
-   * @param   {HTMLElement} element - DOM node we want to inspect
-   * @returns {string} name to identify this dom node in riot
-   */
-
-  function getName(element) {
-    return get(element, IS_DIRECTIVE) || element.tagName.toLowerCase();
-  }
-
-  /**
-   * Simple helper to find DOM nodes returning them as array like loopable object
-   * @param   { string|DOMNodeList } selector - either the query or the DOM nodes to arraify
-   * @param   { HTMLElement }        ctx      - context defining where the query will search for the DOM nodes
-   * @returns { Array } DOM nodes found as array
-   */
-
-  function $(selector, ctx) {
-    return domToArray(typeof selector === 'string' ? (ctx || document).querySelectorAll(selector) : selector);
   }
 
   const CSS_BY_NAME = new Map();
@@ -1920,6 +2017,16 @@
       args = [...acc, ...args];
       return args.length < fn.length ? curry(fn, ...args) : fn(...args);
     };
+  }
+
+  /**
+   * Get the tag name of any DOM node
+   * @param   {HTMLElement} element - DOM node we want to inspect
+   * @returns {string} name to identify this dom node in riot
+   */
+
+  function getName(element) {
+    return get(element, IS_DIRECTIVE) || element.tagName.toLowerCase();
   }
 
   const COMPONENT_CORE_HELPERS = Object.freeze({
@@ -2057,7 +2164,7 @@
       attributeExpressions = [];
     }
 
-    return Object.assign({}, DOMattributesToObject(element), {}, evaluateAttributeExpressions(attributeExpressions));
+    return Object.assign({}, DOMattributesToObject(element), {}, evaluateAttributeExpressions$1(attributeExpressions));
   }
   /**
    * Create the bindings to update the component attributes
@@ -2360,7 +2467,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.5.1'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.6.0'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2402,7 +2509,7 @@
 
   var require$$1 = getCjsExportFromNamespace(_empty_module$1);
 
-  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.5.1, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
+  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.6.0, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
   this.allSupertypes=Object.create(null);// Linear inheritance hierarchy. Populated during finalization.
   this.supertypeList=[];// Includes inherited fields.
   this.allFields=Object.create(null);// Non-hidden keys of allFields.
@@ -4617,8 +4724,13 @@
   	 * @param   { SourceMapGenerator|Object } map - a sourcemap generator or simply an json object
   	 * @returns { Object } the source map as JSON
   	 */function sourcemapAsJSON(map){if(map&&map.toJSON)return map.toJSON();return map;}/**
+  	 * Quick type checking
+  	 * @param   {*} element - anything
+  	 * @param   {string} type - type definition
+  	 * @returns {boolean} true if the type corresponds
+  	 */ /**
   	 * Detect node js environements
-  	 * @returns { boolean } true if the runtime is node
+  	 * @returns {boolean} true if the runtime is node
   	 */function isNode(){return typeof process!=='undefined';}/**
   	 * Compose two sourcemaps
   	 * @param   { SourceMapGenerator } formerMap - original sourcemap
@@ -6196,7 +6308,9 @@
   	 * @returns { AST } the AST generated
   	 */function javascript(sourceNode,source,meta,ast){const preprocessorName=getPreprocessorTypeByAttribute(sourceNode);const javascriptNode=addLineOffset(sourceNode.text.text,source,sourceNode);const{options}=meta;const preprocessorOutput=preprocess('javascript',preprocessorName,meta,Object.assign({},sourceNode,{text:javascriptNode}));const inputSourceMap=sourcemapAsJSON(preprocessorOutput.map);const generatedAst=generateAST(preprocessorOutput.code,{sourceFileName:options.file,inputSourceMap:isEmptySourcemap(inputSourceMap)?null:inputSourceMap});const generatedAstBody=getProgramBody(generatedAst);const bodyWithoutExportDefault=filterNonExportDefaultStatements(generatedAstBody);const exportDefaultNode=findExportDefaultStatement(generatedAstBody);const outputBody=getProgramBody(ast);// add to the ast the "private" javascript content of our tag script node
   outputBody.unshift(...bodyWithoutExportDefault);// convert the export default adding its content to the "tag" property exported
-  if(exportDefaultNode)extendTagProperty(ast,exportDefaultNode);return ast;}/**
+  if(exportDefaultNode)extendTagProperty(ast,exportDefaultNode);return ast;}const JAVASCRIPT_OUTPUT_NAME='javascript';const CSS_OUTPUT_NAME='css';const TEMPLATE_OUTPUT_NAME='template';// Tag names
+  const JAVASCRIPT_TAG='script';const STYLE_TAG='style';const TEXTAREA_TAG='textarea';// Boolean attributes
+  const IS_RAW='isRaw';const IS_SELF_CLOSING='isSelfClosing';const IS_VOID='isVoid';const IS_BOOLEAN='isBoolean';const IS_CUSTOM='isCustom';const IS_SPREAD='isSpread';var c=/*#__PURE__*/Object.freeze({JAVASCRIPT_OUTPUT_NAME:JAVASCRIPT_OUTPUT_NAME,CSS_OUTPUT_NAME:CSS_OUTPUT_NAME,TEMPLATE_OUTPUT_NAME:TEMPLATE_OUTPUT_NAME,JAVASCRIPT_TAG:JAVASCRIPT_TAG,STYLE_TAG:STYLE_TAG,TEXTAREA_TAG:TEXTAREA_TAG,IS_RAW:IS_RAW,IS_SELF_CLOSING:IS_SELF_CLOSING,IS_VOID:IS_VOID,IS_BOOLEAN:IS_BOOLEAN,IS_CUSTOM:IS_CUSTOM,IS_SPREAD:IS_SPREAD});/**
   	 * Not all the types are handled in this module.
   	 *
   	 * @enum {number}
@@ -6225,9 +6339,7 @@
   	 * @const
   	 * @private
   	 */const RE_SCRYLE={script:/<\/script\s*>/gi,style:/<\/style\s*>/gi,textarea:/<\/textarea\s*>/gi};// Do not touch text content inside this tags
-  const RAW_TAGS=/^\/?(?:pre|textarea)$/;const JAVASCRIPT_OUTPUT_NAME='javascript';const CSS_OUTPUT_NAME='css';const TEMPLATE_OUTPUT_NAME='template';// Tag names
-  const JAVASCRIPT_TAG='script';const STYLE_TAG='style';const TEXTAREA_TAG='textarea';// Boolean attributes
-  const IS_RAW='isRaw';const IS_SELF_CLOSING='isSelfClosing';const IS_VOID='isVoid';const IS_BOOLEAN='isBoolean';const IS_CUSTOM='isCustom';const IS_SPREAD='isSpread';/**
+  const RAW_TAGS=/^\/?(?:pre|textarea)$/;/**
   	 * Add an item into a collection, if the collection is not an array
   	 * we create one and add the item to it
   	 * @param   {Array} collection - target collection
@@ -6697,13 +6809,15 @@
   	 * @param   {string} type - current parsing context
   	 * @returns {string} parsing context
   	 */function eat(state,type){switch(type){case TAG:return tag(state);case ATTR:return attr(state);default:return text(state);}}/**
+  	 * Expose the internal constants
+  	 */const constants=c;/**
   	 * The nodeTypes definition
-  	 */const nodeTypes=types$3;// import {IS_BOOLEAN,IS_CUSTOM,IS_RAW,IS_SPREAD,IS_VOID} from '@riotjs/parser/src/constants'
-  const BINDING_TYPES='bindingTypes';const EACH_BINDING_TYPE='EACH';const IF_BINDING_TYPE='IF';const TAG_BINDING_TYPE='TAG';const SLOT_BINDING_TYPE='SLOT';const EXPRESSION_TYPES='expressionTypes';const ATTRIBUTE_EXPRESSION_TYPE='ATTRIBUTE';const VALUE_EXPRESSION_TYPE='VALUE';const TEXT_EXPRESSION_TYPE='TEXT';const EVENT_EXPRESSION_TYPE='EVENT';const TEMPLATE_FN='template';const SCOPE='scope';const GET_COMPONENT_FN='getComponent';// keys needed to create the DOM bindings
+  	 */const nodeTypes=types$3;const BINDING_TYPES='bindingTypes';const EACH_BINDING_TYPE='EACH';const IF_BINDING_TYPE='IF';const TAG_BINDING_TYPE='TAG';const SLOT_BINDING_TYPE='SLOT';const EXPRESSION_TYPES='expressionTypes';const ATTRIBUTE_EXPRESSION_TYPE='ATTRIBUTE';const VALUE_EXPRESSION_TYPE='VALUE';const TEXT_EXPRESSION_TYPE='TEXT';const EVENT_EXPRESSION_TYPE='EVENT';const TEMPLATE_FN='template';const SCOPE='scope';const GET_COMPONENT_FN='getComponent';// keys needed to create the DOM bindings
   const BINDING_SELECTOR_KEY='selector';const BINDING_GET_COMPONENT_KEY='getComponent';const BINDING_TEMPLATE_KEY='template';const BINDING_TYPE_KEY='type';const BINDING_REDUNDANT_ATTRIBUTE_KEY='redundantAttribute';const BINDING_CONDITION_KEY='condition';const BINDING_ITEM_NAME_KEY='itemName';const BINDING_GET_KEY_KEY='getKey';const BINDING_INDEX_NAME_KEY='indexName';const BINDING_EVALUATE_KEY='evaluate';const BINDING_NAME_KEY='name';const BINDING_SLOTS_KEY='slots';const BINDING_EXPRESSIONS_KEY='expressions';const BINDING_CHILD_NODE_INDEX_KEY='childNodeIndex';// slots keys
   const BINDING_BINDINGS_KEY='bindings';const BINDING_ID_KEY='id';const BINDING_HTML_KEY='html';const BINDING_ATTRIBUTES_KEY='attributes';// DOM directives
   const IF_DIRECTIVE='if';const EACH_DIRECTIVE='each';const KEY_ATTRIBUTE='key';const SLOT_ATTRIBUTE='slot';const NAME_ATTRIBUTE='name';const IS_DIRECTIVE='is';// Misc
-  const DEFAULT_SLOT_NAME='default';const TEXT_NODE_EXPRESSION_PLACEHOLDER='<!---->';const BINDING_SELECTOR_PREFIX='expr';const SLOT_TAG_NODE_NAME='slot';const PROGRESS_TAG_NODE_NAME='progress';const IS_VOID_NODE='isVoid';const IS_CUSTOM_NODE='isCustom';const IS_BOOLEAN_ATTRIBUTE='isBoolean';const IS_SPREAD_ATTRIBUTE='isSpread';/**
+  const DEFAULT_SLOT_NAME='default';const TEXT_NODE_EXPRESSION_PLACEHOLDER=' ';const BINDING_SELECTOR_PREFIX='expr';const SLOT_TAG_NODE_NAME='slot';const PROGRESS_TAG_NODE_NAME='progress';// Riot Parser constants
+  const IS_RAW_NODE=constants.IS_RAW;const IS_VOID_NODE=constants.IS_VOID;const IS_CUSTOM_NODE=constants.IS_CUSTOM;const IS_BOOLEAN_ATTRIBUTE=constants.IS_BOOLEAN;const IS_SPREAD_ATTRIBUTE=constants.IS_SPREAD;/**
   	 * True if the node has not expression set nor bindings directives
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {boolean} true only if it's a static node that doesn't need bindings or expressions
@@ -6781,11 +6895,52 @@
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {Array} list of all the dynamic attributes
   	 */function findDynamicAttributes(node){return getNodeAttributes(node).filter(hasExpressions);}/**
+  	 * Create a simple attribute expression
+  	 * @param   {RiotParser.Node.Attr} sourceNode - the custom tag
+  	 * @param   {string} sourceFile - source file path
+  	 * @param   {string} sourceCode - original source
+  	 * @returns {AST.Node} object containing the expression binding keys
+  	 */function createAttributeExpression(sourceNode,sourceFile,sourceCode){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(ATTRIBUTE_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_NAME_KEY,isSpreadAttribute$1(sourceNode)?nullNode():builders.literal(sourceNode.name)),simplePropertyNode(BINDING_EVALUATE_KEY,createAttributeEvaluationFunction(sourceNode,sourceFile,sourceCode))]);}/**
+  	 * Create a simple event expression
+  	 * @param   {RiotParser.Node.Attr} sourceNode - attribute containing the event handlers
+  	 * @param   {string} sourceFile - source file path
+  	 * @param   {string} sourceCode - original source
+  	 * @returns {AST.Node} object containing the expression binding keys
+  	 */function createEventExpression(sourceNode,sourceFile,sourceCode){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(EVENT_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_NAME_KEY,builders.literal(sourceNode.name)),simplePropertyNode(BINDING_EVALUATE_KEY,createAttributeEvaluationFunction(sourceNode,sourceFile,sourceCode))]);}/**
   	 * Unescape the user escaped chars
   	 * @param   {string} string - input string
   	 * @param   {string} char - probably a '{' or anything the user want's to escape
   	 * @returns {string} cleaned up string
-  	 */function unescapeChar(string,char){return string.replace(RegExp(`\\\\${char}`,'gm'),char);}const scope$1=builders.identifier(SCOPE);const getName$1=node=>node&&node.name?node.name:node;/**
+  	 */function unescapeChar(string,char){return string.replace(RegExp(`\\\\${char}`,'gm'),char);}/**
+  	 * Generate the pure immutable string chunks from a RiotParser.Node.Text
+  	 * @param   {RiotParser.Node.Text} node - riot parser text node
+  	 * @param   {string} sourceCode sourceCode - source code
+  	 * @returns {Array} array containing the immutable string chunks
+  	 */function generateLiteralStringChunksFromNode(node,sourceCode){return node.expressions.reduce((chunks,expression,index)=>{const start=index?node.expressions[index-1].end:node.start;chunks.push(sourceCode.substring(start,expression.start));// add the tail to the string
+  if(index===node.expressions.length-1)chunks.push(sourceCode.substring(expression.end,node.end));return chunks;},[]).map(str=>node.unescape?unescapeChar(str,node.unescape):str);}/**
+  	 * Simple bindings might contain multiple expressions like for example: "{foo} and {bar}"
+  	 * This helper aims to merge them in a template literal if it's necessary
+  	 * @param   {RiotParser.Node} node - riot parser node
+  	 * @param   {string} sourceFile - original tag file
+  	 * @param   {string} sourceCode - original tag source code
+  	 * @returns { Object } a template literal expression object
+  	 */function mergeNodeExpressions(node,sourceFile,sourceCode){if(node.parts.length===1)return transformExpression(node.expressions[0],sourceFile,sourceCode);const pureStringChunks=generateLiteralStringChunksFromNode(node,sourceCode);const stringsArray=pureStringChunks.reduce((acc,str,index)=>{const expr=node.expressions[index];return [...acc,builders.literal(str),expr?transformExpression(expr,sourceFile,sourceCode):nullNode()];},[])// filter the empty literal expressions
+  .filter(expr=>!isLiteral(expr)||expr.value);return createArrayString(stringsArray);}/**
+  	 * Create a text expression
+  	 * @param   {RiotParser.Node.Text} sourceNode - text node to parse
+  	 * @param   {string} sourceFile - source file path
+  	 * @param   {string} sourceCode - original source
+  	 * @param   {number} childNodeIndex - position of the child text node in its parent children nodes
+  	 * @returns {AST.Node} object containing the expression binding keys
+  	 */function createTextExpression(sourceNode,sourceFile,sourceCode,childNodeIndex){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(TEXT_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_CHILD_NODE_INDEX_KEY,builders.literal(childNodeIndex)),simplePropertyNode(BINDING_EVALUATE_KEY,wrapASTInFunctionWithScope(mergeNodeExpressions(sourceNode,sourceFile,sourceCode)))]);}function createValueExpression(sourceNode,sourceFile,sourceCode){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(VALUE_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_EVALUATE_KEY,createAttributeEvaluationFunction(sourceNode,sourceFile,sourceCode))]);}function createExpression(sourceNode,sourceFile,sourceCode,childNodeIndex,parentNode){switch(true){case isTextNode(sourceNode):return createTextExpression(sourceNode,sourceFile,sourceCode,childNodeIndex);// progress nodes value attributes will be rendered as attributes
+  // see https://github.com/riot/compiler/issues/122
+  case isValueAttribute(sourceNode)&&hasValueAttribute(parentNode.name)&&!isProgressNode(parentNode):return createValueExpression(sourceNode,sourceFile,sourceCode);case isEventAttribute(sourceNode):return createEventExpression(sourceNode,sourceFile,sourceCode);default:return createAttributeExpression(sourceNode,sourceFile,sourceCode);}}/**
+  	 * Create the attribute expressions
+  	 * @param   {RiotParser.Node} sourceNode - any kind of node parsed via riot parser
+  	 * @param   {string} sourceFile - source file path
+  	 * @param   {string} sourceCode - original source
+  	 * @returns {Array} array containing all the attribute expressions
+  	 */function createAttributeExpressions(sourceNode,sourceFile,sourceCode){return findDynamicAttributes(sourceNode).map(attribute=>createExpression(attribute,sourceFile,sourceCode,0,sourceNode));}const scope$1=builders.identifier(SCOPE);const getName$1=node=>node&&node.name?node.name:node;/**
   	 * Replace the path scope with a member Expression
   	 * @param   { types.NodePath } path - containing the current node visited
   	 * @param   { types.Node } property - node we want to prefix with the scope identifier
@@ -6928,6 +7083,13 @@
   	 * @param   {number} id - temporary variable that will be increased anytime this function will be called
   	 * @returns {string} selector attribute needed to bind a riot expression
   	 */const createBindingSelector=function createSelector(id){if(id===void 0){id=0;}return ()=>`${BINDING_SELECTOR_PREFIX}${id++}`;}();/**
+  	 * Create the AST array containing the attributes to bind to this node
+  	 * @param   { RiotParser.Node.Tag } sourceNode - the custom tag
+  	 * @param   { string } selectorAttribute - attribute needed to select the target node
+  	 * @param   { string } sourceFile - source file path
+  	 * @param   { string } sourceCode - original source
+  	 * @returns {AST.ArrayExpression} array containing the slot objects
+  	 */function createBindingAttributes(sourceNode,selectorAttribute,sourceFile,sourceCode){return builders.arrayExpression([...compose(attributes=>attributes.map(attribute=>createExpression(attribute,sourceFile,sourceCode,0,sourceNode)),attributes=>getAttributesWithoutSelector(attributes,selectorAttribute),cleanAttributes)(sourceNode)]);}/**
   	 * Create an attribute evaluation function
   	 * @param   {RiotParser.Attr} sourceNode - riot parser node
   	 * @param   {string} sourceFile - original tag file
@@ -6960,47 +7122,6 @@
   	 * @param   { string } sourceCode - original source
   	 * @returns { AST.Node } an if binding node
   	 */function createIfBinding(sourceNode,selectorAttribute,sourceFile,sourceCode){const ifAttribute=findIfAttribute(sourceNode);return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(BINDING_TYPES),builders.identifier(IF_BINDING_TYPE),false)),simplePropertyNode(BINDING_EVALUATE_KEY,toScopedFunction(ifAttribute.expressions[0],sourceFile,sourceCode)),...createSelectorProperties(selectorAttribute),createTemplateProperty(createNestedBindings(sourceNode,sourceFile,sourceCode,selectorAttribute))]);}/**
-  	 * Create a simple attribute expression
-  	 * @param   {RiotParser.Node.Attr} sourceNode - the custom tag
-  	 * @param   {string} sourceFile - source file path
-  	 * @param   {string} sourceCode - original source
-  	 * @returns {AST.Node} object containing the expression binding keys
-  	 */function createAttributeExpression(sourceNode,sourceFile,sourceCode){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(ATTRIBUTE_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_NAME_KEY,isSpreadAttribute$1(sourceNode)?nullNode():builders.literal(sourceNode.name)),simplePropertyNode(BINDING_EVALUATE_KEY,createAttributeEvaluationFunction(sourceNode,sourceFile,sourceCode))]);}/**
-  	 * Create a simple event expression
-  	 * @param   {RiotParser.Node.Attr} sourceNode - attribute containing the event handlers
-  	 * @param   {string} sourceFile - source file path
-  	 * @param   {string} sourceCode - original source
-  	 * @returns {AST.Node} object containing the expression binding keys
-  	 */function createEventExpression(sourceNode,sourceFile,sourceCode){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(EVENT_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_NAME_KEY,builders.literal(sourceNode.name)),simplePropertyNode(BINDING_EVALUATE_KEY,createAttributeEvaluationFunction(sourceNode,sourceFile,sourceCode))]);}/**
-  	 * Generate the pure immutable string chunks from a RiotParser.Node.Text
-  	 * @param   {RiotParser.Node.Text} node - riot parser text node
-  	 * @param   {string} sourceCode sourceCode - source code
-  	 * @returns {Array} array containing the immutable string chunks
-  	 */function generateLiteralStringChunksFromNode(node,sourceCode){return node.expressions.reduce((chunks,expression,index)=>{const start=index?node.expressions[index-1].end:node.start;chunks.push(sourceCode.substring(start,expression.start));// add the tail to the string
-  if(index===node.expressions.length-1)chunks.push(sourceCode.substring(expression.end,node.end));return chunks;},[]).map(str=>node.unescape?unescapeChar(str,node.unescape):str);}/**
-  	 * Simple bindings might contain multiple expressions like for example: "{foo} and {bar}"
-  	 * This helper aims to merge them in a template literal if it's necessary
-  	 * @param   {RiotParser.Node} node - riot parser node
-  	 * @param   {string} sourceFile - original tag file
-  	 * @param   {string} sourceCode - original tag source code
-  	 * @returns { Object } a template literal expression object
-  	 */function mergeNodeExpressions(node,sourceFile,sourceCode){if(node.parts.length===1)return transformExpression(node.expressions[0],sourceFile,sourceCode);const pureStringChunks=generateLiteralStringChunksFromNode(node,sourceCode);const stringsArray=pureStringChunks.reduce((acc,str,index)=>{const expr=node.expressions[index];return [...acc,builders.literal(str),expr?transformExpression(expr,sourceFile,sourceCode):nullNode()];},[])// filter the empty literal expressions
-  .filter(expr=>!isLiteral(expr)||expr.value);return createArrayString(stringsArray);}/**
-  	 * Create a text expression
-  	 * @param   {RiotParser.Node.Text} sourceNode - text node to parse
-  	 * @param   {string} sourceFile - source file path
-  	 * @param   {string} sourceCode - original source
-  	 * @param   {number} childNodeIndex - position of the child text node in its parent children nodes
-  	 * @returns {AST.Node} object containing the expression binding keys
-  	 */function createTextExpression(sourceNode,sourceFile,sourceCode,childNodeIndex){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(TEXT_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_CHILD_NODE_INDEX_KEY,builders.literal(childNodeIndex)),simplePropertyNode(BINDING_EVALUATE_KEY,wrapASTInFunctionWithScope(mergeNodeExpressions(sourceNode,sourceFile,sourceCode)))]);}function createValueExpression(sourceNode,sourceFile,sourceCode){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(VALUE_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_EVALUATE_KEY,createAttributeEvaluationFunction(sourceNode,sourceFile,sourceCode))]);}function createExpression(sourceNode,sourceFile,sourceCode,childNodeIndex,parentNode){switch(true){case isTextNode(sourceNode):return createTextExpression(sourceNode,sourceFile,sourceCode,childNodeIndex);// progress nodes value attributes will be rendered as attributes
-  // see https://github.com/riot/compiler/issues/122
-  case isValueAttribute(sourceNode)&&hasValueAttribute(parentNode.name)&&!isProgressNode(parentNode):return createValueExpression(sourceNode,sourceFile,sourceCode);case isEventAttribute(sourceNode):return createEventExpression(sourceNode,sourceFile,sourceCode);default:return createAttributeExpression(sourceNode,sourceFile,sourceCode);}}/**
-  	 * Create the attribute expressions
-  	 * @param   {RiotParser.Node} sourceNode - any kind of node parsed via riot parser
-  	 * @param   {string} sourceFile - source file path
-  	 * @param   {string} sourceCode - original source
-  	 * @returns {Array} array containing all the attribute expressions
-  	 */function createAttributeExpressions(sourceNode,sourceFile,sourceCode){return findDynamicAttributes(sourceNode).map(attribute=>createExpression(attribute,sourceFile,sourceCode,0,sourceNode));}/**
   	 * Create the text node expressions
   	 * @param   {RiotParser.Node} sourceNode - any kind of node parsed via riot parser
   	 * @param   {string} sourceFile - source file path
@@ -7017,8 +7138,11 @@
   	 * Transform a RiotParser.Node.Tag of type slot into a slot binding
   	 * @param   { RiotParser.Node.Tag } sourceNode - slot node
   	 * @param   { string } selectorAttribute - attribute needed to select the target node
+  	 * @param   { string } sourceFile - source file path
+  	 * @param   { string } sourceCode - original source
   	 * @returns { AST.Node } a slot binding node
-  	 */function createSlotBinding(sourceNode,selectorAttribute){const slotNameAttribute=findAttribute(NAME_ATTRIBUTE,sourceNode);const slotName=slotNameAttribute?slotNameAttribute.value:DEFAULT_SLOT_NAME;return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(BINDING_TYPES),builders.identifier(SLOT_BINDING_TYPE),false)),simplePropertyNode(BINDING_NAME_KEY,builders.literal(slotName)),...createSelectorProperties(selectorAttribute)]);}/**
+  	 */function createSlotBinding(sourceNode,selectorAttribute,sourceFile,sourceCode){const slotNameAttribute=findAttribute(NAME_ATTRIBUTE,sourceNode);const slotName=slotNameAttribute?slotNameAttribute.value:DEFAULT_SLOT_NAME;return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(BINDING_TYPES),builders.identifier(SLOT_BINDING_TYPE),false)),simplePropertyNode(BINDING_ATTRIBUTES_KEY,createBindingAttributes(Object.assign({},sourceNode,{// filter the name attribute
+  attributes:getNodeAttributes(sourceNode).filter(attribute=>getName$1(attribute)!==NAME_ATTRIBUTE)}),selectorAttribute,sourceFile,sourceCode)),simplePropertyNode(BINDING_NAME_KEY,builders.literal(slotName)),...createSelectorProperties(selectorAttribute)]);}/**
   	 * Find the slots in the current component and group them under the same id
   	 * @param   {RiotParser.Node.Tag} sourceNode - the custom tag
   	 * @returns {Object} object containing all the slots grouped by name
@@ -7037,13 +7161,6 @@
   	 * @param   { string } sourceCode - original source
   	 * @returns {AST.ArrayExpression} array containing the attributes to bind
   	 */function createSlotsArray(sourceNode,sourceFile,sourceCode){return builders.arrayExpression([...compose(slots=>slots.map((_ref4)=>{let[key,value]=_ref4;return buildSlot(key,value,sourceFile,sourceCode);}),slots=>slots.filter((_ref5)=>{let[,value]=_ref5;return value;}),Object.entries,groupSlots)(sourceNode)]);}/**
-  	 * Create the AST array containing the attributes to bind to this node
-  	 * @param   { RiotParser.Node.Tag } sourceNode - the custom tag
-  	 * @param   { string } selectorAttribute - attribute needed to select the target node
-  	 * @param   { string } sourceFile - source file path
-  	 * @param   { string } sourceCode - original source
-  	 * @returns {AST.ArrayExpression} array containing the slot objects
-  	 */function createBindingAttributes(sourceNode,selectorAttribute,sourceFile,sourceCode){return builders.arrayExpression([...compose(attributes=>attributes.map(attribute=>createExpression(attribute,sourceFile,sourceCode,0,sourceNode)),attributes=>getAttributesWithoutSelector(attributes,selectorAttribute),cleanAttributes)(sourceNode)]);}/**
   	 * Find the slot attribute if it exists
   	 * @param   {RiotParser.Node.Tag} sourceNode - the custom tag
   	 * @returns {RiotParser.Node.Attr|undefined} the slot attribute found

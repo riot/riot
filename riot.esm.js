@@ -1,4 +1,4 @@
-/* Riot v4.5.1, @license MIT */
+/* Riot v4.6.0, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -18,10 +18,86 @@ var globals = /*#__PURE__*/Object.freeze({
 });
 
 /**
+ * Quick type checking
+ * @param   {*} element - anything
+ * @param   {string} type - type definition
+ * @returns {boolean} true if the type corresponds
+ */
+function checkType(element, type) {
+  return typeof element === type;
+}
+/**
+ * Check that will be passed if its argument is a function
+ * @param   {*} value - value to check
+ * @returns {boolean} - true if the value is a function
+ */
+
+function isFunction(value) {
+  return checkType(value, 'function');
+}
+
+function noop() {
+  return this;
+}
+/**
+ * Autobind the methods of a source object to itself
+ * @param   {Object} source - probably a riot tag instance
+ * @param   {Array<string>} methods - list of the methods to autobind
+ * @returns {Object} the original object received
+ */
+
+function autobindMethods(source, methods) {
+  methods.forEach(method => {
+    source[method] = source[method].bind(source);
+  });
+  return source;
+}
+/**
+ * Call the first argument received only if it's a function otherwise return it as it is
+ * @param   {*} source - anything
+ * @returns {*} anything
+ */
+
+function callOrAssign(source) {
+  return isFunction(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
+}
+
+/**
+ * Convert a string from camel case to dash-case
+ * @param   {string} string - probably a component tag name
+ * @returns {string} component name normalized
+ */
+
+/**
+ * Convert a string containing dashes to camel case
+ * @param   {string} string - input string
+ * @returns {string} my-string -> myString
+ */
+function dashToCamelCase(string) {
+  return string.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+}
+/**
+ * Move all the child nodes from a source tag to another
+ * @param   {HTMLElement} source - source node
+ * @param   {HTMLElement} target - target node
+ * @returns {undefined} it's a void method ¯\_(ツ)_/¯
+ */
+// Ignore this helper because it's needed only for svg tags
+
+
+function moveChildren(source, target) {
+  if (source.firstChild) {
+    target.appendChild(source.firstChild);
+    moveChildren(source, target);
+  }
+}
+/**
  * Remove the child nodes from any DOM node
  * @param   {HTMLElement} node - target node
  * @returns {undefined}
  */
+
+
 function cleanNode(node) {
   clearChildren(node.childNodes);
 }
@@ -47,6 +123,16 @@ var bindingTypes = {
   SIMPLE,
   TAG,
   SLOT
+};
+const ATTRIBUTE = 0;
+const EVENT = 1;
+const TEXT = 2;
+const VALUE = 3;
+var expressionTypes = {
+  ATTRIBUTE,
+  EVENT,
+  TEXT,
+  VALUE
 };
 /**
  * Create the template meta object in case of <template> fragments
@@ -127,12 +213,7 @@ const isReversed = (futureNodes, futureEnd, currentNodes, currentStart, currentE
 const next = (get, list, i, length, before) => i < length ? get(list[i], 0) : 0 < i ? get(list[i - 1], -0).nextSibling : before;
 
 const remove = (get, parent, children, start, end) => {
-  if (end - start < 2) parent.removeChild(get(children[start], -1));else {
-    const range = parent.ownerDocument.createRange();
-    range.setStartBefore(get(children[start], -1));
-    range.setEndAfter(get(children[end - 1], -1));
-    range.deleteContents();
-  }
+  while (start < end) removeChild(get(children[start++], -1), parent);
 }; // - - - - - - - - - - - - - - - - - - -
 // diff related constants and utilities
 // - - - - - - - - - - - - - - - - - - -
@@ -347,6 +428,22 @@ const findK = (ktr, length, j) => {
 const smartDiff = (get, parentNode, futureNodes, futureStart, futureEnd, futureChanges, currentNodes, currentStart, currentEnd, currentChanges, currentLength, compare, before) => {
   applyDiff(OND(futureNodes, futureStart, futureChanges, currentNodes, currentStart, currentChanges, compare) || HS(futureNodes, futureStart, futureEnd, futureChanges, currentNodes, currentStart, currentEnd, currentChanges), get, parentNode, futureNodes, futureStart, currentNodes, currentStart, currentLength, before);
 };
+
+let removeChild = (child, parentNode) => {
+  /* istanbul ignore if */
+  if ('remove' in child) {
+    removeChild = child => {
+      child.remove();
+    };
+  } else {
+    removeChild = (child, parentNode) => {
+      /* istanbul ignore else */
+      if (child.parentNode === parentNode) parentNode.removeChild(child);
+    };
+  }
+
+  removeChild(child, parentNode);
+};
 /*! (c) 2018 Andrea Giammarchi (ISC) */
 
 
@@ -446,14 +543,26 @@ options // optional object with one of the following properties
   return futureNodes;
 };
 /**
- * Check if a value is null or undefined
- * @param   {*}  value - anything
- * @returns {boolean} true only for the 'undefined' and 'null' types
+ * Quick type checking
+ * @param   {*} element - anything
+ * @param   {string} type - type definition
+ * @returns {boolean} true if the type corresponds
  */
 
 
-function isNil(value) {
-  return value === null || value === undefined;
+function checkType$1(element, type) {
+  return typeof element === type;
+}
+/**
+ * Check if an element is part of an svg
+ * @param   {HTMLElement}  el - element to check
+ * @returns {boolean} true if we are in an svg context
+ */
+
+
+function isSvg(el) {
+  const owner = el.ownerSVGElement;
+  return !!owner || owner === null;
 }
 /**
  * Check if an element is a template tag
@@ -464,6 +573,36 @@ function isNil(value) {
 
 function isTemplate(el) {
   return !isNil(el.content);
+}
+/**
+ * Check if a value is a Boolean
+ * @param   {*}  value - anything
+ * @returns {boolean} true only for the value is a boolean
+ */
+
+
+function isBoolean(value) {
+  return checkType$1(value, 'boolean');
+}
+/**
+ * Check if a value is an Object
+ * @param   {*}  value - anything
+ * @returns {boolean} true only for the value is an object
+ */
+
+
+function isObject(value) {
+  return !isNil(value) && checkType$1(value, 'object');
+}
+/**
+ * Check if a value is null or undefined
+ * @param   {*}  value - anything
+ * @returns {boolean} true only for the 'undefined' and 'null' types
+ */
+
+
+function isNil(value) {
+  return value === null || value === undefined;
 }
 
 const EachBinding = Object.seal({
@@ -774,36 +913,6 @@ function create$1(node, _ref4) {
   });
 }
 
-const ATTRIBUTE = 0;
-const EVENT = 1;
-const TEXT = 2;
-const VALUE = 3;
-var expressionTypes = {
-  ATTRIBUTE,
-  EVENT,
-  TEXT,
-  VALUE
-};
-/**
- * Check if a value is a Boolean
- * @param   {*}  value - anything
- * @returns {boolean} true only for the value is a boolean
- */
-
-function isBoolean(value) {
-  return typeof value === 'boolean';
-}
-/**
- * Check if a value is an Object
- * @param   {*}  value - anything
- * @returns {boolean} true only for the value is an object
- */
-
-
-function isObject(value) {
-  return typeof value === 'object';
-}
-
 const REMOVE_ATTRIBUTE = 'removeAttribute';
 const SET_ATTIBUTE = 'setAttribute';
 /**
@@ -1063,12 +1172,57 @@ function create$3(node, _ref9) {
   } = _ref9;
   return Object.assign({}, flattenCollectionMethods(expressions.map(expression => create$2(node, expression)), ['mount', 'update', 'unmount']));
 }
+/**
+ * Evaluate a list of attribute expressions
+ * @param   {Array} attributes - attribute expressions generated by the riot compiler
+ * @returns {Object} key value pairs with the result of the computation
+ */
+
+
+function evaluateAttributeExpressions(attributes) {
+  return attributes.reduce((acc, attribute) => {
+    const {
+      value,
+      type
+    } = attribute;
+
+    switch (true) {
+      // spread attribute
+      case !attribute.name && type === ATTRIBUTE:
+        return Object.assign({}, acc, {}, value);
+      // value attribute
+
+      case type === VALUE:
+        acc.value = attribute.value;
+        break;
+      // normal attributes
+
+      default:
+        acc[dashToCamelCase(attribute.name)] = attribute.value;
+    }
+
+    return acc;
+  }, {});
+}
+
+function extendParentScope(attributes, scope, parentScope) {
+  if (!attributes || !attributes.length) return parentScope;
+  const expressions = attributes.map(attr => Object.assign({}, attr, {
+    value: attr.evaluate(scope)
+  }));
+  return Object.assign(Object.create(parentScope || null), evaluateAttributeExpressions(expressions));
+}
 
 const SlotBinding = Object.seal({
   // dynamic binding properties
   node: null,
   name: null,
+  attributes: [],
   template: null,
+
+  getTemplateScope(scope, parentScope) {
+    return extendParentScope(this.attributes, scope, parentScope);
+  },
 
   // API methods
   mount(scope, parentScope) {
@@ -1084,7 +1238,7 @@ const SlotBinding = Object.seal({
     this.template = templateData && create$6(templateData.html, templateData.bindings).createDOM(parentNode);
 
     if (this.template) {
-      this.template.mount(this.node, parentScope);
+      this.template.mount(this.node, this.getTemplateScope(scope, parentScope));
       moveSlotInnerContent(this.node);
     }
 
@@ -1093,8 +1247,8 @@ const SlotBinding = Object.seal({
   },
 
   update(scope, parentScope) {
-    if (this.template && parentScope) {
-      this.template.update(parentScope);
+    if (this.template) {
+      this.template.update(this.getTemplateScope(scope, parentScope));
     }
 
     return this;
@@ -1102,7 +1256,7 @@ const SlotBinding = Object.seal({
 
   unmount(scope, parentScope, mustRemoveRoot) {
     if (this.template) {
-      this.template.unmount(parentScope, null, mustRemoveRoot);
+      this.template.unmount(this.getTemplateScope(scope, parentScope), null, mustRemoveRoot);
     }
 
     return this;
@@ -1131,9 +1285,11 @@ function moveSlotInnerContent(slot) {
 
 function createSlot(node, _ref11) {
   let {
-    name
+    name,
+    attributes
   } = _ref11;
   return Object.assign({}, SlotBinding, {
+    attributes,
     node,
     name
   });
@@ -1270,13 +1426,28 @@ var bindings = {
   [SLOT]: createSlot
 };
 /**
+ * Text expressions in a template tag will get childNodeIndex value normalized
+ * depending on the position of the <template> tag offset
+ * @param   {Expression[]} expressions - riot expressions array
+ * @param   {number} textExpressionsOffset - offset of the <template> tag
+ * @returns {Expression[]} expressions containing the text expressions normalized
+ */
+
+function fixTextExpressionsOffset(expressions, textExpressionsOffset) {
+  return expressions.map(e => e.type === TEXT ? Object.assign({}, e, {
+    childNodeIndex: e.childNodeIndex + textExpressionsOffset
+  }) : e);
+}
+/**
  * Bind a new expression object to a DOM node
  * @param   {HTMLElement} root - DOM node where to bind the expression
  * @param   {Object} binding - binding data
+ * @param   {number|null} templateTagOffset - if it's defined we need to fix the text expressions childNodeIndex offset
  * @returns {Expression} Expression object
  */
 
-function create$5(root, binding) {
+
+function create$5(root, binding, templateTagOffset) {
   const {
     selector,
     type,
@@ -1286,22 +1457,12 @@ function create$5(root, binding) {
 
   const node = selector ? root.querySelector(selector) : root; // remove eventually additional attributes created only to select this node
 
-  if (redundantAttribute) node.removeAttribute(redundantAttribute); // init the binding
+  if (redundantAttribute) node.removeAttribute(redundantAttribute);
+  const bindingExpressions = expressions || []; // init the binding
 
   return (bindings[type] || bindings[SIMPLE])(node, Object.assign({}, binding, {
-    expressions: expressions || []
+    expressions: templateTagOffset && !selector ? fixTextExpressionsOffset(bindingExpressions, templateTagOffset) : bindingExpressions
   }));
-}
-/**
- * Check if an element is part of an svg
- * @param   {HTMLElement}  el - element to check
- * @returns {boolean} true if we are in an svg context
- */
-
-
-function isSvg(el) {
-  const owner = el.ownerSVGElement;
-  return !!owner || owner === null;
 } // in this case a simple innerHTML is enough
 
 
@@ -1328,23 +1489,6 @@ function createSVGTree(html, container) {
 function createDOMTree(root, html) {
   if (isSvg(root)) return createSVGTree(html, root);
   return createHTMLTree(html, root);
-}
-/**
- * Move all the child nodes from a source tag to another
- * @param   {HTMLElement} source - source node
- * @param   {HTMLElement} target - target node
- * @returns {undefined} it's a void method ¯\_(ツ)_/¯
- */
-// Ignore this helper because it's needed only for svg tags
-
-/* istanbul ignore next */
-
-
-function moveChildren(source, target) {
-  if (source.firstChild) {
-    target.appendChild(source.firstChild);
-    moveChildren(source, target);
-  }
 }
 /**
  * Inject the DOM tree into a target node
@@ -1436,7 +1580,9 @@ const TemplateChunk = Object.freeze({
     const {
       parentNode
     } = children ? children[0] : el;
-    this.isTemplateTag = isTemplate(el); // create the DOM if it wasn't created before
+    const isTemplateTag = isTemplate(el);
+    const templateTagOffset = isTemplateTag ? Math.max(Array.from(parentNode.children).indexOf(el), 0) : null;
+    this.isTemplateTag = isTemplateTag; // create the DOM if it wasn't created before
 
     this.createDOM(el);
 
@@ -1453,7 +1599,7 @@ const TemplateChunk = Object.freeze({
 
     if (!avoidDOMInjection && this.fragment) injectDOM(el, this.fragment); // create the bindings
 
-    this.bindings = this.bindingsData.map(binding => create$5(this.el, binding));
+    this.bindings = this.bindingsData.map(binding => create$5(this.el, binding, templateTagOffset));
     this.bindings.forEach(b => b.mount(scope, parentScope));
     return this;
   },
@@ -1536,93 +1682,6 @@ function create$6(html, bindings) {
 }
 
 /**
- * Quick type checking
- * @param   {*} element - anything
- * @param   {string} type - type definition
- * @returns {boolean} true if the type corresponds
- */
-function checkType(element, type) {
-  return typeof element === type;
-}
-/**
- * Check that will be passed if its argument is a function
- * @param   {*} value - value to check
- * @returns {boolean} - true if the value is a function
- */
-
-function isFunction(value) {
-  return checkType(value, 'function');
-}
-
-/* eslint-disable fp/no-mutating-methods */
-/**
- * Throw an error
- * @param {string} error - error message
- * @returns {undefined} it's a IO void function
- */
-
-function panic(error) {
-  throw new Error(error);
-}
-/**
- * Call the first argument received only if it's a function otherwise return it as it is
- * @param   {*} source - anything
- * @returns {*} anything
- */
-
-function callOrAssign(source) {
-  return isFunction(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
-}
-/**
- * Convert a string from camel case to dash-case
- * @param   {string} string - probably a component tag name
- * @returns {string} component name normalized
- */
-
-function camelToDashCase(string) {
-  return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-}
-/**
- * Convert a string containing dashes to camel case
- * @param   {string} string - input string
- * @returns {string} my-string -> myString
- */
-
-function dashToCamelCase(string) {
-  return string.replace(/-(\w)/g, (_, c) => c.toUpperCase());
-}
-/**
- * Define default properties if they don't exist on the source object
- * @param   {Object} source - object that will receive the default properties
- * @param   {Object} defaults - object containing additional optional keys
- * @returns {Object} the original object received enhanced
- */
-
-function defineDefaults(source, defaults) {
-  Object.entries(defaults).forEach((_ref) => {
-    let [key, value] = _ref;
-    if (!source[key]) source[key] = value;
-  });
-  return source;
-} // doese simply nothing
-
-function noop() {
-  return this;
-}
-/**
- * Autobind the methods of a source object to itself
- * @param   {Object} source - probably a riot tag instance
- * @param   {Array<string>} methods - list of the methods to autobind
- * @returns {Object} the original object received
- */
-
-function autobindMethods(source, methods) {
-  methods.forEach(method => {
-    source[method] = source[method].bind(source);
-  });
-  return source;
-}
-/**
  * Helper function to set an immutable property
  * @param   {Object} source - object where the new property will be set
  * @param   {string} key - object key where the new property will be stored
@@ -1630,18 +1689,20 @@ function autobindMethods(source, methods) {
  * @param   {Object} options - set the propery overriding the default options
  * @returns {Object} - the original object modified
  */
-
 function defineProperty(source, key, value, options) {
   if (options === void 0) {
     options = {};
   }
 
+  /* eslint-disable fp/no-mutating-methods */
   Object.defineProperty(source, key, Object.assign({
     value,
     enumerable: false,
     writable: false,
     configurable: true
   }, options));
+  /* eslint-enable fp/no-mutating-methods */
+
   return source;
 }
 /**
@@ -1653,11 +1714,56 @@ function defineProperty(source, key, value, options) {
  */
 
 function defineProperties(source, properties, options) {
-  Object.entries(properties).forEach((_ref2) => {
-    let [key, value] = _ref2;
+  Object.entries(properties).forEach((_ref) => {
+    let [key, value] = _ref;
     defineProperty(source, key, value, options);
   });
   return source;
+}
+/**
+ * Define default properties if they don't exist on the source object
+ * @param   {Object} source - object that will receive the default properties
+ * @param   {Object} defaults - object containing additional optional keys
+ * @returns {Object} the original object received enhanced
+ */
+
+function defineDefaults(source, defaults) {
+  Object.entries(defaults).forEach((_ref2) => {
+    let [key, value] = _ref2;
+    if (!source[key]) source[key] = value;
+  });
+  return source;
+}
+
+const ATTRIBUTE$1 = 0;
+const VALUE$1 = 3;
+
+/**
+ * Convert a string from camel case to dash-case
+ * @param   {string} string - probably a component tag name
+ * @returns {string} component name normalized
+ */
+function camelToDashCase(string) {
+  return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+}
+/**
+ * Convert a string containing dashes to camel case
+ * @param   {string} string - input string
+ * @returns {string} my-string -> myString
+ */
+
+function dashToCamelCase$1(string) {
+  return string.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+}
+
+/**
+ * Throw an error with a descriptive message
+ * @param   { string } message - error message
+ * @returns { undefined } hoppla.. at this point the program should stop working
+ */
+
+function panic(message) {
+  throw new Error(message);
 }
 /**
  * Evaluate a list of attribute expressions
@@ -1665,7 +1771,7 @@ function defineProperties(source, properties, options) {
  * @returns {Object} key value pairs with the result of the computation
  */
 
-function evaluateAttributeExpressions(attributes) {
+function evaluateAttributeExpressions$1(attributes) {
   return attributes.reduce((acc, attribute) => {
     const {
       value,
@@ -1674,17 +1780,17 @@ function evaluateAttributeExpressions(attributes) {
 
     switch (true) {
       // spread attribute
-      case !attribute.name && type === expressionTypes.ATTRIBUTE:
+      case !attribute.name && type === ATTRIBUTE$1:
         return Object.assign({}, acc, {}, value);
       // value attribute
 
-      case type === expressionTypes.VALUE:
-        acc[VALUE_ATTRIBUTE] = attribute.value;
+      case type === VALUE$1:
+        acc.value = attribute.value;
         break;
       // normal attributes
 
       default:
-        acc[dashToCamelCase(attribute.name)] = attribute.value;
+        acc[dashToCamelCase$1(attribute.name)] = attribute.value;
     }
 
     return acc;
@@ -1707,6 +1813,30 @@ function domToArray(els) {
 
 
   return els;
+}
+
+/**
+ * Simple helper to find DOM nodes returning them as array like loopable object
+ * @param   { string|DOMNodeList } selector - either the query or the DOM nodes to arraify
+ * @param   { HTMLElement }        ctx      - context defining where the query will search for the DOM nodes
+ * @returns { Array } DOM nodes found as array
+ */
+
+function $(selector, ctx) {
+  return domToArray(typeof selector === 'string' ? (ctx || document).querySelectorAll(selector) : selector);
+}
+
+/**
+ * Get all the element attributes as object
+ * @param   {HTMLElement} element - DOM node we want to parse
+ * @returns {Object} all the attributes found as a key value pairs
+ */
+
+function DOMattributesToObject(element) {
+  return Array.from(element.attributes).reduce((acc, attribute) => {
+    acc[dashToCamelCase$1(attribute.name)] = attribute.value;
+    return acc;
+  }, {});
 }
 
 /**
@@ -1791,39 +1921,6 @@ function set(els, name, value) {
 
 function get(els, name) {
   return parseNodes(els, name, 'getAttribute');
-}
-
-/**
- * Get all the element attributes as object
- * @param   {HTMLElement} element - DOM node we want to parse
- * @returns {Object} all the attributes found as a key value pairs
- */
-
-function DOMattributesToObject(element) {
-  return Array.from(element.attributes).reduce((acc, attribute) => {
-    acc[dashToCamelCase(attribute.name)] = attribute.value;
-    return acc;
-  }, {});
-}
-/**
- * Get the tag name of any DOM node
- * @param   {HTMLElement} element - DOM node we want to inspect
- * @returns {string} name to identify this dom node in riot
- */
-
-function getName(element) {
-  return get(element, IS_DIRECTIVE) || element.tagName.toLowerCase();
-}
-
-/**
- * Simple helper to find DOM nodes returning them as array like loopable object
- * @param   { string|DOMNodeList } selector - either the query or the DOM nodes to arraify
- * @param   { HTMLElement }        ctx      - context defining where the query will search for the DOM nodes
- * @returns { Array } DOM nodes found as array
- */
-
-function $(selector, ctx) {
-  return domToArray(typeof selector === 'string' ? (ctx || document).querySelectorAll(selector) : selector);
 }
 
 const CSS_BY_NAME = new Map();
@@ -1914,6 +2011,16 @@ function curry(fn) {
     args = [...acc, ...args];
     return args.length < fn.length ? curry(fn, ...args) : fn(...args);
   };
+}
+
+/**
+ * Get the tag name of any DOM node
+ * @param   {HTMLElement} element - DOM node we want to inspect
+ * @returns {string} name to identify this dom node in riot
+ */
+
+function getName(element) {
+  return get(element, IS_DIRECTIVE) || element.tagName.toLowerCase();
 }
 
 const COMPONENT_CORE_HELPERS = Object.freeze({
@@ -2051,7 +2158,7 @@ function evaluateProps(element, attributeExpressions) {
     attributeExpressions = [];
   }
 
-  return Object.assign({}, DOMattributesToObject(element), {}, evaluateAttributeExpressions(attributeExpressions));
+  return Object.assign({}, DOMattributesToObject(element), {}, evaluateAttributeExpressions$1(attributeExpressions));
 }
 /**
  * Create the bindings to update the component attributes
@@ -2354,7 +2461,7 @@ function component(implementation) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.5.1'; // expose some internal stuff that might be used from external tools
+const version = 'v4.6.0'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
