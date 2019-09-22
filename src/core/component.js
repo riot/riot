@@ -5,23 +5,31 @@ import {
   PLUGINS_SET,
   TEMPLATE_KEY_SYMBOL
 } from '../globals'
-import {DOMattributesToObject, getName} from '../utils/dom'
 import {
   autobindMethods,
   callOrAssign,
-  camelToDashCase,
+  noop
+} from '@riotjs/util/functions'
+import {
+  bindingTypes,
+  createExpression,
+  template as createTemplate,
+  expressionTypes
+} from '@riotjs/dom-bindings'
+import {
   defineDefaults,
   defineProperties,
-  defineProperty,
-  evaluateAttributeExpressions,
-  noop,
-  panic
-} from '../utils/misc'
-import {bindingTypes, createExpression, template as createTemplate, expressionTypes} from '@riotjs/dom-bindings'
+  defineProperty
+} from '@riotjs/util/objects'
+
+import {evaluateAttributeExpressions, panic} from '@riotjs/util/misc'
 import $ from 'bianco.query'
+import {DOMattributesToObject} from '@riotjs/util/dom'
+import {camelToDashCase} from '@riotjs/util/strings'
 import cssManager from './css-manager'
 import curry from 'curri'
-import {isFunction} from '../utils/checks'
+import {getName} from '../utils/dom'
+import {isFunction} from '@riotjs/util/checks'
 import {set as setAttr} from 'bianco.attr'
 
 const COMPONENT_CORE_HELPERS = Object.freeze({

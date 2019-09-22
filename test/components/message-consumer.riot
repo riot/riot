@@ -1,0 +1,15 @@
+<message-consumer>
+  <message-provider-hoc>
+    <p>{message} {state.message}</p>
+  </message-provider-hoc>
+  <script>
+    import MessageProviderHoc from './message-provider-hoc.riot'
+
+    export default {
+      components: {MessageProviderHoc},
+      state: {
+        message: 'world'
+      }
+    }
+  </script>
+</message-consumer>

@@ -8,6 +8,7 @@ import EachRootAttributes from '../components/each-root-attributes.riot'
 import ExpressionParts from '../components/expression-parts.riot'
 import GlobalComponents from '../components/global-components.riot'
 import MergeAttributes from '../components/merge-attributes.riot'
+import MessageConsumer from '../components/message-consumer.riot'
 import NamedSlotsParent from '../components/named-slots-parent.riot'
 import NestedAliasedImportsComponent from '../components/nested-aliased-imports.riot'
 import NestedImportsComponent from '../components/nested-imports.riot'
@@ -672,6 +673,15 @@ describe('Riot core api', () => {
 
       expect(component.$('slot')).to.be.not.ok
       expect(component.$('p')).to.be.ok
+
+      component.unmount()
+    })
+
+    it('<slot>s can be used as data providers', () => {
+      const element = document.createElement('message-consumer')
+      const component = riot.component(MessageConsumer)(element)
+
+      expect(component.$('p').innerHTML).to.be.equal('hello world')
 
       component.unmount()
     })

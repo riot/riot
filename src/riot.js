@@ -3,8 +3,8 @@ import {createComponent, defineComponent, mountComponent} from './core/component
 import $ from 'bianco.query'
 import compose from 'cumpa'
 import cssManager from './core/css-manager'
-import {isFunction} from './utils/checks'
-import {panic} from './utils/misc'
+import {isFunction} from '@riotjs/util/checks'
+import {panic} from '@riotjs/util/misc'
 
 const { DOM_COMPONENT_INSTANCE_PROPERTY, COMPONENTS_IMPLEMENTATION_MAP, PLUGINS_SET } = globals
 
