@@ -1,4 +1,4 @@
-/* Riot v4.6.0, @license MIT */
+/* Riot v4.6.1, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1245,7 +1245,7 @@
 
       if (this.template) {
         this.template.mount(this.node, this.getTemplateScope(scope, parentScope));
-        moveSlotInnerContent(this.node);
+        this.template.children = moveSlotInnerContent(this.node);
       }
 
       parentNode.removeChild(this.node);
@@ -1272,14 +1272,23 @@
   /**
    * Move the inner content of the slots outside of them
    * @param   {HTMLNode} slot - slot node
-   * @returns {undefined} it's a void function
+   * @param   {HTMLElement} children - array to fill with the child nodes detected
+   * @returns {HTMLElement[]} list of the node moved
    */
 
-  function moveSlotInnerContent(slot) {
-    if (slot.firstChild) {
-      slot.parentNode.insertBefore(slot.firstChild, slot);
-      moveSlotInnerContent(slot);
+  function moveSlotInnerContent(slot, children) {
+    if (children === void 0) {
+      children = [];
     }
+
+    const child = slot.firstChild;
+
+    if (child) {
+      slot.parentNode.insertBefore(child, slot);
+      return [child, ...moveSlotInnerContent(slot)];
+    }
+
+    return children;
   }
   /**
    * Create a single slot binding
@@ -1637,7 +1646,7 @@
           // <template> tags should be treated a bit differently
           // we need to clear their children only if it's explicitly required by the caller
           // via mustRemoveRoot !== null
-          case this.isTemplateTag === true && mustRemoveRoot !== null:
+          case this.children && mustRemoveRoot !== null:
             clearChildren(this.children);
             break;
           // remove the root node only if the mustRemoveRoot === true
@@ -2467,7 +2476,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.6.0'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.6.1'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
