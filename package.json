@@ -34,8 +34,8 @@
     "riot.js"
   ],
   "dependencies": {
-    "@riotjs/compiler": "^4.4.2",
-    "@riotjs/dom-bindings": "^4.4.1",
+    "@riotjs/compiler": "^4.4.3",
+    "@riotjs/dom-bindings": "^4.4.2",
     "@riotjs/util": "^1.1.0",
     "bianco.attr": "^1.0.0",
     "bianco.query": "^1.0.0",
@@ -43,8 +43,8 @@
     "curri": "^1.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.6.0",
-    "@babel/preset-env": "^7.6.0",
+    "@babel/core": "^7.6.2",
+    "@babel/preset-env": "^7.6.2",
     "babel-plugin-istanbul": "^5.2.0",
     "chai": "^4.2.0",
     "core-js": "^3.2.1",
@@ -69,7 +69,7 @@
     "rollup-plugin-riot": "^4.0.0",
     "sinon": "^7.5.0",
     "sinon-chai": "^3.3.0",
-    "terser": "^4.3.1",
+    "terser": "^4.3.3",
     "typescript": "^3.6.3"
   },
   "files": [
