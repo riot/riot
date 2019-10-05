@@ -1,0 +1,21 @@
+<nested-hoc>
+  <conditional-slot is-visible={true}>
+    <message-provider-hoc>
+      <p>{message} {state.subject}</p>
+    </message-provider-hoc>
+  </conditional-slot>
+
+  <script>
+    import ConditionalSlot from './conditional-slot.riot'
+    import MessageProviderHoc from './message-provider-hoc.riot'
+    export default {
+      components: {
+        ConditionalSlot,
+        MessageProviderHoc
+      },
+      state: {
+        subject: 'world'
+      }
+    }
+  </script>
+</nested-hoc>

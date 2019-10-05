@@ -1,5 +1,4 @@
 import * as riot from '../../src/riot'
-
 import ConditionalSlotParent from '../components/conditional-slot-parent.riot'
 import DashedAttributeParent from '../components/dashed-attribute-parent.riot'
 import EachAndSpreadAttribute from '../components/each-and-spread-attribute.riot'
@@ -11,6 +10,7 @@ import MergeAttributes from '../components/merge-attributes.riot'
 import MessageConsumer from '../components/message-consumer.riot'
 import NamedSlotsParent from '../components/named-slots-parent.riot'
 import NestedAliasedImportsComponent from '../components/nested-aliased-imports.riot'
+import NestedHoc from '../components/nested-hoc.riot'
 import NestedImportsComponent from '../components/nested-imports.riot'
 import ParentValueProp from '../components/parent-value-prop.riot'
 import ParentWithSlotsComponent from '../components/parent-with-slots.riot'
@@ -23,6 +23,7 @@ import TitleProps from '../components/title-prop.riot'
 import VirtualEach from '../components/virtual-each.riot'
 
 import {expect} from 'chai'
+import {fireEvent} from '../utils'
 import {spy} from 'sinon'
 import {template} from '@riotjs/dom-bindings'
 
@@ -682,6 +683,27 @@ describe('Riot core api', () => {
       const component = riot.component(MessageConsumer)(element)
 
       expect(component.$('p').innerHTML).to.be.equal('hello world')
+
+      fireEvent(component.$('article'), 'click')
+
+      expect(component.$('p').innerHTML).to.be.equal('goodbye world')
+
+      component.unmount()
+    })
+
+    it('Nested HOC <slot>s scope gets preserved', () => {
+      const element = document.createElement('nested-hoc')
+      const component = riot.component(NestedHoc)(element)
+
+      expect(component.$('p').innerHTML).to.be.equal('hello world')
+
+      component.update({ subject: 'developer'})
+
+      expect(component.$('p').innerHTML).to.be.equal('hello developer')
+
+      fireEvent(component.$('article'), 'click')
+
+      expect(component.$('p').innerHTML).to.be.equal('goodbye developer')
 
       component.unmount()
     })

@@ -1,10 +1,17 @@
 <message-provider-hoc>
-  <slot message={state.message}/>
+  <article onclick={ onClick }>
+    <slot message={state.message}/>
+  </article>
 
   <script>
     export default {
       state: {
         message: 'hello'
+      },
+      onClick() {
+        this.update({
+          message: 'goodbye'
+        })
       }
     }
   </script>
