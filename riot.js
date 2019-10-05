@@ -1,4 +1,4 @@
-/* Riot v4.6.2, @license MIT */
+/* Riot v4.6.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -14,6 +14,7 @@
         TEMPLATE_KEY_SYMBOL = Symbol('template');
 
   var globals = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
     DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY,
     PLUGINS_SET: PLUGINS_SET,
@@ -2479,7 +2480,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.6.2'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.6.3'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
