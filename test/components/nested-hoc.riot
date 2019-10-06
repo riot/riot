@@ -1,5 +1,5 @@
 <nested-hoc>
-  <conditional-slot is-visible={true}>
+  <conditional-slot is-visible={state.isVisible}>
     <message-provider-hoc>
       <p>{message} {state.subject}</p>
     </message-provider-hoc>
@@ -13,8 +13,11 @@
         ConditionalSlot,
         MessageProviderHoc
       },
-      state: {
-        subject: 'world'
+      onBeforeMount(props) {
+        this.state = {
+          isVisible: props.isVisible,
+          subject: 'world'
+        }
       }
     }
   </script>

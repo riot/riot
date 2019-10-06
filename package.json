@@ -35,7 +35,7 @@
   ],
   "dependencies": {
     "@riotjs/compiler": "^4.5.1",
-    "@riotjs/dom-bindings": "^4.4.4",
+    "@riotjs/dom-bindings": "^4.4.5",
     "@riotjs/util": "^1.1.0",
     "bianco.attr": "^1.0.0",
     "bianco.query": "^1.0.0",
@@ -69,7 +69,7 @@
     "rollup-plugin-riot": "^4.0.0",
     "sinon": "^7.5.0",
     "sinon-chai": "^3.3.0",
-    "terser": "^4.3.7",
+    "terser": "^4.3.8",
     "typescript": "^3.6.3"
   },
   "files": [

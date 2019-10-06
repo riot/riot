@@ -693,7 +693,10 @@ describe('Riot core api', () => {
 
     it('Nested HOC <slot>s scope gets preserved', () => {
       const element = document.createElement('nested-hoc')
-      const component = riot.component(NestedHoc)(element)
+
+      const component = riot.component(NestedHoc)(element, {
+        isVisible: true
+      })
 
       expect(component.$('p').innerHTML).to.be.equal('hello world')
 
@@ -704,6 +707,12 @@ describe('Riot core api', () => {
       fireEvent(component.$('article'), 'click')
 
       expect(component.$('p').innerHTML).to.be.equal('goodbye developer')
+
+      component.update({
+        isVisible: false
+      })
+
+      expect(component.$('p')).to.be.not.ok
 
       component.unmount()
     })

@@ -2,6 +2,7 @@ import {
   ATTRIBUTES_KEY_SYMBOL,
   COMPONENTS_IMPLEMENTATION_MAP,
   DOM_COMPONENT_INSTANCE_PROPERTY,
+  PARENT_KEY_SYMBOL,
   PLUGINS_SET,
   TEMPLATE_KEY_SYMBOL
 } from '../globals'
@@ -265,6 +266,7 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
           this.onBeforeMount(this.props, this.state)
           // mount the template
           this[TEMPLATE_KEY_SYMBOL].mount(element, this, parentScope)
+          this[PARENT_KEY_SYMBOL] = parentScope
 
           this.onMounted(this.props, this.state)
 
@@ -284,7 +286,7 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
 
           this.onBeforeUpdate(this.props, this.state)
 
-          this[TEMPLATE_KEY_SYMBOL].update(this, parentScope)
+          this[TEMPLATE_KEY_SYMBOL].update(this, this[PARENT_KEY_SYMBOL])
           this.onUpdated(this.props, this.state)
 
           return this
@@ -294,7 +296,7 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
           this[ATTRIBUTES_KEY_SYMBOL].unmount()
           // if the preserveRoot is null the template html will be left untouched
           // in that case the DOM cleanup will happen differently from a parent node
-          this[TEMPLATE_KEY_SYMBOL].unmount(this, {}, preserveRoot === null ? null : !preserveRoot)
+          this[TEMPLATE_KEY_SYMBOL].unmount(this, this[PARENT_KEY_SYMBOL], preserveRoot === null ? null : !preserveRoot)
           this.onUnmounted(this.props, this.state)
 
           return this

@@ -4,5 +4,6 @@ export const
   PLUGINS_SET = new Set(),
   IS_DIRECTIVE = 'is',
   VALUE_ATTRIBUTE = 'value',
+  PARENT_KEY_SYMBOL = Symbol('parent'),
   ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
   TEMPLATE_KEY_SYMBOL = Symbol('template')
