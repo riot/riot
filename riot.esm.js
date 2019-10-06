@@ -1,9 +1,10 @@
-/* Riot v4.6.3, @license MIT */
+/* Riot v4.6.4, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
       IS_DIRECTIVE = 'is',
       VALUE_ATTRIBUTE = 'value',
+      PARENT_KEY_SYMBOL = Symbol('parent'),
       ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
       TEMPLATE_KEY_SYMBOL = Symbol('template');
 
@@ -14,6 +15,7 @@ var globals = /*#__PURE__*/Object.freeze({
   PLUGINS_SET: PLUGINS_SET,
   IS_DIRECTIVE: IS_DIRECTIVE,
   VALUE_ATTRIBUTE: VALUE_ATTRIBUTE,
+  PARENT_KEY_SYMBOL: PARENT_KEY_SYMBOL,
   ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
   TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL
 });
@@ -608,20 +610,20 @@ function isNil(value) {
 
 const EachBinding = Object.seal({
   // dynamic binding properties
-  childrenMap: null,
-  node: null,
-  root: null,
-  condition: null,
-  evaluate: null,
-  template: null,
-  isTemplateTag: false,
+  // childrenMap: null,
+  // node: null,
+  // root: null,
+  // condition: null,
+  // evaluate: null,
+  // template: null,
+  // isTemplateTag: false,
   nodes: [],
-  getKey: null,
-  indexName: null,
-  itemName: null,
-  afterPlaceholder: null,
-  placeholder: null,
 
+  // getKey: null,
+  // indexName: null,
+  // itemName: null,
+  // afterPlaceholder: null,
+  // placeholder: null,
   // API methods
   mount(scope, parentScope) {
     return this.update(scope, parentScope);
@@ -850,13 +852,12 @@ function create(node, _ref3) {
 
 const IfBinding = Object.seal({
   // dynamic binding properties
-  node: null,
-  evaluate: null,
-  parent: null,
-  isTemplateTag: false,
-  placeholder: null,
-  template: null,
-
+  // node: null,
+  // evaluate: null,
+  // parent: null,
+  // isTemplateTag: false,
+  // placeholder: null,
+  // template: null,
   // API methods
   mount(scope, parentScope) {
     this.parent.insertBefore(this.placeholder, this.node);
@@ -1084,9 +1085,8 @@ var expressions = {
 };
 const Expression = Object.seal({
   // Static props
-  node: null,
-  value: null,
-
+  // node: null,
+  // value: null,
   // API methods
 
   /**
@@ -1216,16 +1216,13 @@ function extendParentScope(attributes, scope, parentScope) {
 
 const SlotBinding = Object.seal({
   // dynamic binding properties
-  node: null,
-  name: null,
+  // node: null,
+  // name: null,
   attributes: [],
-  template: null,
-  cachedParentScope: null,
 
+  // template: null,
   getTemplateScope(scope, parentScope) {
-    // cache the parent scope to avoid this issue https://github.com/riot/riot/issues/2762
-    this.cachedParentScope = parentScope || this.cachedParentScope;
-    return extendParentScope(this.attributes, scope, this.cachedParentScope);
+    return extendParentScope(this.attributes, scope, parentScope);
   },
 
   // API methods
@@ -1375,14 +1372,13 @@ function slotsToMarkup(slots) {
 
 const TagBinding = Object.seal({
   // dynamic binding properties
-  node: null,
-  evaluate: null,
-  name: null,
-  slots: null,
-  tag: null,
-  attributes: null,
-  getComponent: null,
-
+  // node: null,
+  // evaluate: null,
+  // name: null,
+  // slots: null,
+  // tag: null,
+  // attributes: null,
+  // getComponent: null,
   mount(scope) {
     return this.update(scope);
   },
@@ -1544,14 +1540,14 @@ function createTemplateDOM(el, html) {
 
 const TemplateChunk = Object.freeze({
   // Static props
-  bindings: null,
-  bindingsData: null,
-  html: null,
-  isTemplateTag: false,
-  fragment: null,
-  children: null,
-  dom: null,
-  el: null,
+  // bindings: null,
+  // bindingsData: null,
+  // html: null,
+  // isTemplateTag: false,
+  // fragment: null,
+  // children: null,
+  // dom: null,
+  // el: null,
 
   /**
    * Create the template DOM structure that will be cloned on each mount
@@ -2291,6 +2287,7 @@ function enhanceComponentAPI(component, _ref5) {
       this.onBeforeMount(this.props, this.state); // mount the template
 
       this[TEMPLATE_KEY_SYMBOL].mount(element, this, parentScope);
+      this[PARENT_KEY_SYMBOL] = parentScope;
       this.onMounted(this.props, this.state);
       return this;
     },
@@ -2309,7 +2306,7 @@ function enhanceComponentAPI(component, _ref5) {
       this.props = Object.freeze(Object.assign({}, initialProps, {}, newProps));
       this.state = computeState(this.state, state);
       this.onBeforeUpdate(this.props, this.state);
-      this[TEMPLATE_KEY_SYMBOL].update(this, parentScope);
+      this[TEMPLATE_KEY_SYMBOL].update(this, this[PARENT_KEY_SYMBOL]);
       this.onUpdated(this.props, this.state);
       return this;
     },
@@ -2319,7 +2316,7 @@ function enhanceComponentAPI(component, _ref5) {
       this[ATTRIBUTES_KEY_SYMBOL].unmount(); // if the preserveRoot is null the template html will be left untouched
       // in that case the DOM cleanup will happen differently from a parent node
 
-      this[TEMPLATE_KEY_SYMBOL].unmount(this, {}, preserveRoot === null ? null : !preserveRoot);
+      this[TEMPLATE_KEY_SYMBOL].unmount(this, this[PARENT_KEY_SYMBOL], preserveRoot === null ? null : !preserveRoot);
       this.onUnmounted(this.props, this.state);
       return this;
     }
@@ -2474,7 +2471,7 @@ function component(implementation) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.6.3'; // expose some internal stuff that might be used from external tools
+const version = 'v4.6.4'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,

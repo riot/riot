@@ -1,4 +1,4 @@
-/* Riot v4.6.3, @license MIT */
+/* Riot v4.6.4, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -10,6 +10,7 @@
         PLUGINS_SET = new Set(),
         IS_DIRECTIVE = 'is',
         VALUE_ATTRIBUTE = 'value',
+        PARENT_KEY_SYMBOL = Symbol('parent'),
         ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
         TEMPLATE_KEY_SYMBOL = Symbol('template');
 
@@ -20,6 +21,7 @@
     PLUGINS_SET: PLUGINS_SET,
     IS_DIRECTIVE: IS_DIRECTIVE,
     VALUE_ATTRIBUTE: VALUE_ATTRIBUTE,
+    PARENT_KEY_SYMBOL: PARENT_KEY_SYMBOL,
     ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
     TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL
   });
@@ -614,20 +616,20 @@
 
   const EachBinding = Object.seal({
     // dynamic binding properties
-    childrenMap: null,
-    node: null,
-    root: null,
-    condition: null,
-    evaluate: null,
-    template: null,
-    isTemplateTag: false,
+    // childrenMap: null,
+    // node: null,
+    // root: null,
+    // condition: null,
+    // evaluate: null,
+    // template: null,
+    // isTemplateTag: false,
     nodes: [],
-    getKey: null,
-    indexName: null,
-    itemName: null,
-    afterPlaceholder: null,
-    placeholder: null,
 
+    // getKey: null,
+    // indexName: null,
+    // itemName: null,
+    // afterPlaceholder: null,
+    // placeholder: null,
     // API methods
     mount(scope, parentScope) {
       return this.update(scope, parentScope);
@@ -856,13 +858,12 @@
 
   const IfBinding = Object.seal({
     // dynamic binding properties
-    node: null,
-    evaluate: null,
-    parent: null,
-    isTemplateTag: false,
-    placeholder: null,
-    template: null,
-
+    // node: null,
+    // evaluate: null,
+    // parent: null,
+    // isTemplateTag: false,
+    // placeholder: null,
+    // template: null,
     // API methods
     mount(scope, parentScope) {
       this.parent.insertBefore(this.placeholder, this.node);
@@ -1090,9 +1091,8 @@
   };
   const Expression = Object.seal({
     // Static props
-    node: null,
-    value: null,
-
+    // node: null,
+    // value: null,
     // API methods
 
     /**
@@ -1222,16 +1222,13 @@
 
   const SlotBinding = Object.seal({
     // dynamic binding properties
-    node: null,
-    name: null,
+    // node: null,
+    // name: null,
     attributes: [],
-    template: null,
-    cachedParentScope: null,
 
+    // template: null,
     getTemplateScope(scope, parentScope) {
-      // cache the parent scope to avoid this issue https://github.com/riot/riot/issues/2762
-      this.cachedParentScope = parentScope || this.cachedParentScope;
-      return extendParentScope(this.attributes, scope, this.cachedParentScope);
+      return extendParentScope(this.attributes, scope, parentScope);
     },
 
     // API methods
@@ -1381,14 +1378,13 @@
 
   const TagBinding = Object.seal({
     // dynamic binding properties
-    node: null,
-    evaluate: null,
-    name: null,
-    slots: null,
-    tag: null,
-    attributes: null,
-    getComponent: null,
-
+    // node: null,
+    // evaluate: null,
+    // name: null,
+    // slots: null,
+    // tag: null,
+    // attributes: null,
+    // getComponent: null,
     mount(scope) {
       return this.update(scope);
     },
@@ -1550,14 +1546,14 @@
 
   const TemplateChunk = Object.freeze({
     // Static props
-    bindings: null,
-    bindingsData: null,
-    html: null,
-    isTemplateTag: false,
-    fragment: null,
-    children: null,
-    dom: null,
-    el: null,
+    // bindings: null,
+    // bindingsData: null,
+    // html: null,
+    // isTemplateTag: false,
+    // fragment: null,
+    // children: null,
+    // dom: null,
+    // el: null,
 
     /**
      * Create the template DOM structure that will be cloned on each mount
@@ -2297,6 +2293,7 @@
         this.onBeforeMount(this.props, this.state); // mount the template
 
         this[TEMPLATE_KEY_SYMBOL].mount(element, this, parentScope);
+        this[PARENT_KEY_SYMBOL] = parentScope;
         this.onMounted(this.props, this.state);
         return this;
       },
@@ -2315,7 +2312,7 @@
         this.props = Object.freeze(Object.assign({}, initialProps, {}, newProps));
         this.state = computeState(this.state, state);
         this.onBeforeUpdate(this.props, this.state);
-        this[TEMPLATE_KEY_SYMBOL].update(this, parentScope);
+        this[TEMPLATE_KEY_SYMBOL].update(this, this[PARENT_KEY_SYMBOL]);
         this.onUpdated(this.props, this.state);
         return this;
       },
@@ -2325,7 +2322,7 @@
         this[ATTRIBUTES_KEY_SYMBOL].unmount(); // if the preserveRoot is null the template html will be left untouched
         // in that case the DOM cleanup will happen differently from a parent node
 
-        this[TEMPLATE_KEY_SYMBOL].unmount(this, {}, preserveRoot === null ? null : !preserveRoot);
+        this[TEMPLATE_KEY_SYMBOL].unmount(this, this[PARENT_KEY_SYMBOL], preserveRoot === null ? null : !preserveRoot);
         this.onUnmounted(this.props, this.state);
         return this;
       }
@@ -2480,7 +2477,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.6.3'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.6.4'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2524,7 +2521,7 @@
 
   var require$$1 = getCjsExportFromNamespace(_empty_module$1);
 
-  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.6.3, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
+  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.6.4, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
   this.allSupertypes=Object.create(null);// Linear inheritance hierarchy. Populated during finalization.
   this.supertypeList=[];// Includes inherited fields.
   this.allFields=Object.create(null);// Non-hidden keys of allFields.
@@ -6922,11 +6919,7 @@
   	 * @param   {string} sourceFile - source file path
   	 * @param   {string} sourceCode - original source
   	 * @returns {AST.Node} object containing the expression binding keys
-  	 */function createEventExpression(sourceNode,sourceFile,sourceCode){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(EVENT_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_NAME_KEY,builders.literal(sourceNode.name)),simplePropertyNode(BINDING_EVALUATE_KEY,createAttributeEvaluationFunction(sourceNode,sourceFile,sourceCode))]);}const BLANK_CHARS_RE=/^[\s\n\r]*$/;/**
-  	 * Check wheter a string is blank
-  	 * @param   {string}  string - test string
-  	 * @returns {boolean} True if the strings has empty or contains only white spaces
-  	 */function isEmptyString(string){return !!(string||string.match(BLANK_CHARS_RE));}/**
+  	 */function createEventExpression(sourceNode,sourceFile,sourceCode){return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(EXPRESSION_TYPES),builders.identifier(EVENT_EXPRESSION_TYPE),false)),simplePropertyNode(BINDING_NAME_KEY,builders.literal(sourceNode.name)),simplePropertyNode(BINDING_EVALUATE_KEY,createAttributeEvaluationFunction(sourceNode,sourceFile,sourceCode))]);}/**
   	 * Unescape the user escaped chars
   	 * @param   {string} string - input string
   	 * @param   {string} char - probably a '{' or anything the user want's to escape
@@ -6938,7 +6931,7 @@
   	 * @returns {Array} array containing the immutable string chunks
   	 */function generateLiteralStringChunksFromNode(node,sourceCode){return node.expressions.reduce((chunks,expression,index)=>{const start=index?node.expressions[index-1].end:node.start;const string=sourceCode.substring(start,expression.start);// trimStart the first string
   chunks.push(index===0?string.trimStart():string);// add the tail to the string
-  if(index===node.expressions.length-1)chunks.push(sourceCode.substring(expression.end,node.end).trimEnd());return chunks;},[]).map(str=>node.unescape?unescapeChar(str,node.unescape):str).filter(isEmptyString);}/**
+  if(index===node.expressions.length-1)chunks.push(sourceCode.substring(expression.end,node.end).trimEnd());return chunks;},[]).map(str=>node.unescape?unescapeChar(str,node.unescape):str);}/**
   	 * Simple bindings might contain multiple expressions like for example: "{foo} and {bar}"
   	 * This helper aims to merge them in a template literal if it's necessary
   	 * @param   {RiotParser.Node} node - riot parser node
