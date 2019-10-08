@@ -1,4 +1,4 @@
-/* Riot v4.6.4, @license MIT */
+/* Riot v4.6.5, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1033,32 +1033,37 @@
     if (value) {
       node.addEventListener(normalizedEventName, value, false);
     }
-
-    return value;
   }
+  /**
+   * Get the the target text node to update or create one from of a comment node
+   * @param   {HTMLElement} node - any html element containing childNodes
+   * @param   {number} childNodeIndex - index of the text node in the childNodes list
+   * @returns {HTMLTextNode} the text node to update
+   */
+
+
+  const getTextNode = (node, childNodeIndex) => {
+    const target = node.childNodes[childNodeIndex];
+
+    if (target.nodeType === Node.COMMENT_NODE) {
+      const textNode = document.createTextNode('');
+      node.replaceChild(textNode, target);
+      return textNode;
+    }
+
+    return target;
+  };
   /**
    * This methods handles a simple text expression update
    * @param   {HTMLElement} node - target node
-   * @param   {Object} expression - expression object
-   * @param   {number} expression.childNodeIndex - index to find the text node to update
+   * @param   {Object} data - expression object
    * @param   {*} value - new expression value
    * @returns {undefined}
    */
 
 
-  function textExpression(node, _ref8, value) {
-    let {
-      childNodeIndex
-    } = _ref8;
-    const target = node.childNodes[childNodeIndex];
-    const val = normalizeValue$1(value); // replace the target if it's a placeholder comment
-
-    if (target.nodeType === Node.COMMENT_NODE) {
-      const textNode = document.createTextNode(val);
-      node.replaceChild(textNode, target);
-    } else {
-      target.data = normalizeValue$1(val);
-    }
+  function textExpression(node, data, value) {
+    node.data = normalizeValue$1(value);
   }
   /**
    * Normalize the user value in order to render a empty string in case of falsy values
@@ -1150,7 +1155,7 @@
 
   function create$2(node, data) {
     return Object.assign({}, Expression, {}, data, {
-      node
+      node: data.type === TEXT ? getTextNode(node, data.childNodeIndex) : node
     });
   }
   /**
@@ -1173,10 +1178,10 @@
     }, {});
   }
 
-  function create$3(node, _ref9) {
+  function create$3(node, _ref8) {
     let {
       expressions
-    } = _ref9;
+    } = _ref8;
     return Object.assign({}, flattenCollectionMethods(expressions.map(expression => create$2(node, expression)), ['mount', 'update', 'unmount']));
   }
   /**
@@ -1233,10 +1238,10 @@
 
     // API methods
     mount(scope, parentScope) {
-      const templateData = scope.slots ? scope.slots.find((_ref10) => {
+      const templateData = scope.slots ? scope.slots.find((_ref9) => {
         let {
           id
-        } = _ref10;
+        } = _ref9;
         return id === this.name;
       }) : false;
       const {
@@ -1299,11 +1304,11 @@
    */
 
 
-  function createSlot(node, _ref11) {
+  function createSlot(node, _ref10) {
     let {
       name,
       attributes
-    } = _ref11;
+    } = _ref10;
     return Object.assign({}, SlotBinding, {
       attributes,
       node,
@@ -1356,10 +1361,10 @@
 
 
   function slotBindings(slots) {
-    return slots.reduce((acc, _ref12) => {
+    return slots.reduce((acc, _ref11) => {
       let {
         bindings
-      } = _ref12;
+      } = _ref11;
       return acc.concat(bindings);
     }, []);
   }
@@ -1417,13 +1422,13 @@
 
   });
 
-  function create$4(node, _ref13) {
+  function create$4(node, _ref12) {
     let {
       evaluate,
       getComponent,
       slots,
       attributes
-    } = _ref13;
+    } = _ref12;
     return Object.assign({}, TagBinding, {
       node,
       evaluate,
@@ -2477,7 +2482,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.6.4'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.6.5'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
