@@ -1,9 +1,9 @@
-/* Riot v4.6.5, @license MIT */
+/* Riot v4.5.6, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
   (global = global || self, factory(global.riot = {}));
-}(this, function (exports) { 'use strict';
+}(this, (function (exports) { 'use strict';
 
   const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
         DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
@@ -1035,6 +1035,16 @@
     }
   }
   /**
+   * Normalize the user value in order to render a empty string in case of falsy values
+   * @param   {*} value - user input value
+   * @returns {string} hopefully a string
+   */
+
+
+  function normalizeStringValue(value) {
+    return isNil(value) ? '' : value;
+  }
+  /**
    * Get the the target text node to update or create one from of a comment node
    * @param   {HTMLElement} node - any html element containing childNodes
    * @param   {number} childNodeIndex - index of the text node in the childNodes list
@@ -1063,17 +1073,7 @@
 
 
   function textExpression(node, data, value) {
-    node.data = normalizeValue$1(value);
-  }
-  /**
-   * Normalize the user value in order to render a empty string in case of falsy values
-   * @param   {*} value - user input value
-   * @returns {string} hopefully a string
-   */
-
-
-  function normalizeValue$1(value) {
-    return isNil(value) ? '' : value;
+    node.data = normalizeStringValue(value);
   }
   /**
    * This methods handles the input fileds value updates
@@ -1085,7 +1085,7 @@
 
 
   function valueExpression(node, expression, value) {
-    node.value = value;
+    node.value = normalizeStringValue(value);
   }
 
   var expressions = {
@@ -2482,7 +2482,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.6.5'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.5.6'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2502,4 +2502,4 @@
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
-}));
+})));
