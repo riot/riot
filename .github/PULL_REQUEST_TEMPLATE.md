@@ -10,8 +10,8 @@
 2. Can you provide an example of your patch in use?
 
   Post the link using one of our bug report templates:
-  - [Bug Report Template](http://riotjs.com/examples/plunker/?app=bug-reporter) on plnkr (preferred)
-  - [Bug Report Template](http://jsfiddle.net/gianlucaguarini/86m9uepL/) on jsFiddle
+  - [Bug Report Template](https://riot.js.org/examples/plunker/?app=bug-reporter) on plnkr (preferred)
+  - [Bug Report Template](https://codesandbox.io/s/riotjs-4-bug-template-4umx9) on jsFiddle
 
 
 3. Is this a breaking change?

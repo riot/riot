@@ -8,7 +8,7 @@
 2. Can you reproduce the issue?
 
   Post the link using one of our bug report templates:
-  - [Bug Report Template](http://riotjs.com/examples/plunker/?app=bug-reporter) on plnkr (preferred)
+  - [Bug Report Template](https://riot.js.org/examples/plunker/?app=bug-reporter) on plnkr (preferred)
   - [Bug Report Template](https://codesandbox.io/s/riotjs-4-bug-template-4umx9) on codesandbox
 
 3. On which browser/OS does the issue appear?
