@@ -106,6 +106,7 @@ The Riot.js ecosystem is completely modular, it's designed to let you pick only 
   - [@riotjs/cli](https://github.com/riot/cli) - CLI to compile locally your tags to javascript
   - [@riotjs/ssr](https://github.com/riot/ssr) - Super simple server side rendering
   - [@riotjs/hydrate](https://github.com/riot/hydrate) - Hydration strategy for your SPA
+  - [@riotjs/route](https://github.com/riot/route) - Isomorphic router
   - [@riotjs/hot-reload](https://github.com/riot/hot-reload) - Live reload plugin
   - [@riotjs/compiler](https://github.com/riot/compiler) - Advanced tags compiler
   - [@riotjs/parser](https://github.com/riot/parser) - HTML parser
