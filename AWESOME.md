@@ -64,6 +64,9 @@
 - [riot-view-router: a simple state based router mixin](https://github.com/neetjn/riot-view-router)
 - [riotx - Centralized State Management for riot.js](https://github.com/cam-inc/riotx)
 - [storybook for riot.js components <sup>alpha</sup>](https://github.com/storybooks/storybook/tree/master/app/riot)
+- [riot-meiosis - State management for Riot 4](https://github.com/damusix/riot-meiosis)
+- [riot-final-form - Final Form wrapper for Riot 4](https://github.com/damusix/riot-final-form)
+
 
 ### Components
 - [Material UI](http://kysonic.github.io/riot-mui/)
@@ -100,6 +103,7 @@
 - [Riot loader plugin for JSPM/SystemJS](https://github.com/amenadiel/systemjs-riot)
 - [RiotJS Style Guide](https://github.com/voorhoede/riotjs-style-guide)
 - [Riot Cheatsheet](http://martinmuzatko.github.io/riot-cheatsheet/)
+- [Riot 4 SPA Boilerplate](https://github.com/damusix/riot-4-boilerplate)
 
 ### Miscellaneous
 - [Q&A with RiotJS author Tero Piirainen](http://www.triplet.fi/blog/q-and-a-with-riotjs-author-tero-piirainen/)
