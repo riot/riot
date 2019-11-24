@@ -1,4 +1,5 @@
 import * as riot from '../../src/riot'
+import {bindingTypes, expressionTypes, template} from '@riotjs/dom-bindings'
 import ConditionalSlotParent from '../components/conditional-slot-parent.riot'
 import DashedAttributeParent from '../components/dashed-attribute-parent.riot'
 import EachAndSpreadAttribute from '../components/each-and-spread-attribute.riot'
@@ -25,7 +26,6 @@ import VirtualEach from '../components/virtual-each.riot'
 import {expect} from 'chai'
 import {fireEvent} from '../utils'
 import {spy} from 'sinon'
-import {template} from '@riotjs/dom-bindings'
 
 function normalizeInnerHTML(string) {
   return string.replace(/\n/g, '').trim()
@@ -166,6 +166,40 @@ describe('Riot core api', () => {
       })
 
       expect(component.$('input').value).to.be.equal('hello')
+      component.unmount()
+    })
+
+    it('riot.component accepts custom slots and attributes', () => {
+      const mountedSpy = spy()
+      const MyComponent = {
+        template: () => template('<slot/>', [{
+          type: bindingTypes.SLOT,
+          selector: 'slot',
+          name: 'default'
+        }]),
+        exports:  {
+          onMounted() {
+            mountedSpy()
+          }
+        }
+      }
+
+      const element = document.createElement('div')
+      const component = riot.component(MyComponent)(element, {}, {
+        slots: [{
+          id: 'default',
+          html: 'hello'
+        }],
+        attributes: [{
+          type: expressionTypes.ATTRIBUTE,
+          name: 'class',
+          evaluate() { return 'hello' }
+        }]
+      })
+      expect(component.root).to.be.equal(element)
+      expect(component.root.getAttribute('class')).to.be.equal('hello')
+      expect(component.root.innerHTML).to.be.equal('hello')
+      expect(mountedSpy).to.have.been.calledOnce
       component.unmount()
     })
   })

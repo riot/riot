@@ -61,6 +61,7 @@ module.exports = function(conf) {
         riotRollup(),
         ...rollupConfig.plugins
       ],
+      onwarn: () => {},
       external: ['chai', 'sinon'],
       output: {
         globals: {'chai': 'chai', 'sinon': 'sinon'},
