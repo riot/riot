@@ -112,6 +112,7 @@ export const version = 'WIP'
 // expose some internal stuff that might be used from external tools
 export const __ = {
   cssManager,
+  createComponent,
   defineComponent,
   globals
 }
