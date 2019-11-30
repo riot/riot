@@ -1,4 +1,4 @@
-/* Riot v4.6.6, @license MIT */
+/* Riot v4.7.0, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -151,8 +151,6 @@ function createTemplateMeta(componentTemplate) {
     children: Array.from(fragment.childNodes)
   };
 }
-/* get rid of the @ungap/essential-map polyfill */
-
 
 const {
   indexOf: iOF
@@ -215,8 +213,8 @@ const isReversed = (futureNodes, futureEnd, currentNodes, currentStart, currentE
 
 const next = (get, list, i, length, before) => i < length ? get(list[i], 0) : 0 < i ? get(list[i - 1], -0).nextSibling : before;
 
-const remove = (get, parent, children, start, end) => {
-  while (start < end) removeChild(get(children[start++], -1), parent);
+const remove = (get, children, start, end) => {
+  while (start < end) drop(get(children[start++], -1));
 }; // - - - - - - - - - - - - - - - - - - -
 // diff related constants and utilities
 // - - - - - - - - - - - - - - - - - - -
@@ -238,14 +236,13 @@ const HS = (futureNodes, futureStart, futureEnd, futureChanges, currentNodes, cu
 
   for (let i = 1; i < minLen; i++) tresh[i] = currentEnd;
 
-  const keymap = new Map();
-
-  for (let i = currentStart; i < currentEnd; i++) keymap.set(currentNodes[i], i);
+  const nodes = currentNodes.slice(currentStart, currentEnd);
 
   for (let i = futureStart; i < futureEnd; i++) {
-    const idxInOld = keymap.get(futureNodes[i]);
+    const index = nodes.indexOf(futureNodes[i]);
 
-    if (idxInOld != null) {
+    if (-1 < index) {
+      const idxInOld = index + currentStart;
       k = findK(tresh, minLen, idxInOld);
       /* istanbul ignore else */
 
@@ -376,7 +373,7 @@ const OND = (futureNodes, futureStart, rows, currentNodes, currentStart, cols, c
 };
 
 const applyDiff = (diff, get, parentNode, futureNodes, futureStart, currentNodes, currentStart, currentLength, before) => {
-  const live = new Map();
+  const live = [];
   const length = diff.length;
   let currentIndex = currentStart;
   let i = 0;
@@ -390,7 +387,7 @@ const applyDiff = (diff, get, parentNode, futureNodes, futureStart, currentNodes
 
       case INSERTION:
         // TODO: bulk appends for sequential nodes
-        live.set(futureNodes[futureStart], 1);
+        live.push(futureNodes[futureStart]);
         append(get, parentNode, futureNodes, futureStart++, futureStart, currentIndex < currentLength ? get(currentNodes[currentIndex], 0) : before);
         break;
 
@@ -410,7 +407,7 @@ const applyDiff = (diff, get, parentNode, futureNodes, futureStart, currentNodes
 
       case DELETION:
         // TODO: bulk removes for sequential nodes
-        if (live.has(currentNodes[currentStart])) currentStart++;else remove(get, parentNode, currentNodes, currentStart++, currentStart);
+        if (-1 < live.indexOf(currentNodes[currentStart])) currentStart++;else remove(get, currentNodes, currentStart++, currentStart);
         break;
     }
   }
@@ -432,21 +429,16 @@ const smartDiff = (get, parentNode, futureNodes, futureStart, futureEnd, futureC
   applyDiff(OND(futureNodes, futureStart, futureChanges, currentNodes, currentStart, currentChanges, compare) || HS(futureNodes, futureStart, futureEnd, futureChanges, currentNodes, currentStart, currentEnd, currentChanges), get, parentNode, futureNodes, futureStart, currentNodes, currentStart, currentLength, before);
 };
 
-let removeChild = (child, parentNode) => {
-  /* istanbul ignore if */
-  if ('remove' in child) {
-    removeChild = child => {
-      child.remove();
-    };
-  } else {
-    removeChild = (child, parentNode) => {
-      /* istanbul ignore else */
-      if (child.parentNode === parentNode) parentNode.removeChild(child);
-    };
-  }
+const drop = node => (node.remove || dropChild).call(node);
 
-  removeChild(child, parentNode);
-};
+function dropChild() {
+  const {
+    parentNode
+  } = this;
+  /* istanbul ignore else */
+
+  if (parentNode) parentNode.removeChild(this);
+}
 /*! (c) 2018 Andrea Giammarchi (ISC) */
 
 
@@ -491,7 +483,7 @@ options // optional object with one of the following properties
 
 
   if (futureSame && currentStart < currentEnd) {
-    remove(get, parentNode, currentNodes, currentStart, currentEnd);
+    remove(get, currentNodes, currentStart, currentEnd);
     return futureNodes;
   }
 
@@ -513,8 +505,8 @@ options // optional object with one of the following properties
       i = indexOf(currentNodes, currentStart, currentEnd, futureNodes, futureStart, futureEnd, compare); // outer diff
 
       if (-1 < i) {
-        remove(get, parentNode, currentNodes, currentStart, i);
-        remove(get, parentNode, currentNodes, i + futureChanges, currentEnd);
+        remove(get, currentNodes, currentStart, i);
+        remove(get, currentNodes, i + futureChanges, currentEnd);
         return futureNodes;
       }
     } // common case with one replacement for many nodes
@@ -525,7 +517,7 @@ options // optional object with one of the following properties
 
   if (currentChanges < 2 || futureChanges < 2) {
     append(get, parentNode, futureNodes, futureStart, futureEnd, get(currentNodes[currentStart], 0));
-    remove(get, parentNode, currentNodes, currentStart, currentEnd);
+    remove(get, currentNodes, currentStart, currentEnd);
     return futureNodes;
   } // the half match diff part has been skipped in petit-dom
   // https://github.com/yelouafi/petit-dom/blob/bd6f5c919b5ae5297be01612c524c40be45f14a7/src/vdom.js#L391-L397
@@ -2470,16 +2462,25 @@ function uninstall(plugin) {
  */
 
 function component(implementation) {
-  return (el, props) => compose(c => c.mount(el), c => c({
-    props
-  }), createComponent)(implementation);
+  return function (el, props, _temp) {
+    let {
+      slots,
+      attributes
+    } = _temp === void 0 ? {} : _temp;
+    return compose(c => c.mount(el), c => c({
+      props,
+      slots,
+      attributes
+    }), createComponent)(implementation);
+  };
 }
 /** @type {string} current riot version */
 
-const version = 'v4.6.6'; // expose some internal stuff that might be used from external tools
+const version = 'v4.7.0'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
+  createComponent,
   defineComponent,
   globals
 };
