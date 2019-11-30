@@ -67,5 +67,9 @@ export function mount<P = object, S = object>(selector: string, initialProps?: P
 export function unmount(selector: string, keepRootElement: boolean):HTMLElement[]
 export function install(plugin: ComponentEnhancer):InstalledPluginsSet
 export function uninstall(plugin: ComponentEnhancer):InstalledPluginsSet
-export function component<P , S>(shell: RiotComponentShell<P, S>):(el: HTMLElement, initialProps?: P) => RiotComponent<P, S>
+export function component<P , S>(shell: RiotComponentShell<P, S>):(
+  el: HTMLElement,
+  initialProps?: P,
+  meta?: { slots: any[]; attributes: any[]; }
+) => RiotComponent<P, S>
 export const version: string
