@@ -42,6 +42,7 @@ describe('Riot core api', () => {
       'install',
       'uninstall',
       'component',
+      'pure',
       'version',
       '__'
     ])
