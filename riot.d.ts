@@ -22,6 +22,18 @@ export interface RiotCoreComponent<P = object, S = object> {
   $$(selector: string): [HTMLElement]
 }
 
+// Riot Pure Component interface that should be used together with riot.pure
+export interface RiotPureComponent<C = object> {
+  mount(
+    element: HTMLElement,
+    context?: C,
+  ): any
+  update(
+    context?: C,
+  ): any
+  unmount(keepRootElement: boolean): any
+}
+
 // This object interface is created anytime a riot file will be compiled into javascript
 export interface RiotComponentShell<P = object, S = object> {
   readonly css?: string
@@ -72,4 +84,7 @@ export function component<P , S>(shell: RiotComponentShell<P, S>):(
   initialProps?: P,
   meta?: { slots: any[]; attributes: any[]; }
 ) => RiotComponent<P, S>
+export function pure<
+  C = object,
+  F = ({ slots?: any[]; attributes?: any[]; props?: C; }) => RiotPureComponent<C>>(func: F): F
 export const version: string

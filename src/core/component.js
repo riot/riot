@@ -2,6 +2,7 @@ import {
   ATTRIBUTES_KEY_SYMBOL,
   COMPONENTS_IMPLEMENTATION_MAP,
   DOM_COMPONENT_INSTANCE_PROPERTY,
+  IS_PURE_SYMBOL,
   PARENT_KEY_SYMBOL,
   PLUGINS_SET,
   TEMPLATE_KEY_SYMBOL
@@ -39,6 +40,12 @@ const COMPONENT_CORE_HELPERS = Object.freeze({
   $$(selector){ return $(selector, this.root) }
 })
 
+const PURE_COMPONENT_API = Object.freeze({
+  update: noop,
+  mount: noop,
+  unmount: noop
+})
+
 const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
   shouldUpdate: noop,
   onBeforeMount: noop,
@@ -50,9 +57,7 @@ const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
 })
 
 const MOCKED_TEMPLATE_INTERFACE = {
-  update: noop,
-  mount: noop,
-  unmount: noop,
+  ...PURE_COMPONENT_API,
   clone: noop,
   createDOM: noop
 }
@@ -89,6 +94,13 @@ export function createComponent({css, template, exports, name}) {
   ) : MOCKED_TEMPLATE_INTERFACE
 
   return ({slots, attributes, props}) => {
+    // pure components rendering will be managed by the end user
+    if (exports && exports[IS_PURE_SYMBOL])
+      return defineDefaults(
+        exports({ slots, attributes, props }),
+        PURE_COMPONENT_API
+      )
+
     const componentAPI = callOrAssign(exports) || {}
 
     const component = defineComponent({
