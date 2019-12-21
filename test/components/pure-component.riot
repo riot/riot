@@ -1,0 +1,17 @@
+<pure-component>
+  <script>
+    import { pure } from '../../src/riot'
+
+    export default pure(({ slots, attributes }) => {
+      return {
+        mount(root, context) {
+          this.root = root
+          this.root.setAttribute('is-pure', 'is-pure')
+        },
+        unmount() {
+          this.root.removeAttribute('is-pure')
+        }
+      }
+    })
+  </script>
+</pure-component>

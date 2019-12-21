@@ -1,0 +1,11 @@
+<pure-object>
+  <script>
+    import { pure } from '../../src/riot'
+
+    export default () => pure({
+      mount() {
+        throw new Error('Objects are not supported')
+      },
+    })
+  </script>
+</pure-object>

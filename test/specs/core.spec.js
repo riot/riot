@@ -15,6 +15,8 @@ import NestedHoc from '../components/nested-hoc.riot'
 import NestedImportsComponent from '../components/nested-imports.riot'
 import ParentValueProp from '../components/parent-value-prop.riot'
 import ParentWithSlotsComponent from '../components/parent-with-slots.riot'
+import PureComponent from '../components/pure-component.riot'
+import PureObject from '../components/pure-object.riot'
 import RuntimeIsDirective from '../components/runtime-is-directive.riot'
 import ShorthandAttribute from '../components/shorthand-attribute.riot'
 import SimpleComponent from '../components/simple.riot'
@@ -202,6 +204,23 @@ describe('Riot core api', () => {
       expect(component.root.innerHTML).to.be.equal('hello')
       expect(mountedSpy).to.have.been.calledOnce
       component.unmount()
+    })
+
+    it('riot.pure doesn\'t accept objects', () => {
+      const element = document.createElement('pure-object')
+      expect(() => {
+        riot.component(PureObject)(element)
+      }).to.throw('riot.pure accepts only arguments of type "function"')
+    })
+
+    it('riot.pure components get properly rendered', () => {
+      const element = document.createElement('pure-component')
+      const component = riot.component(PureComponent)(element)
+
+      expect(element.getAttribute('is-pure')).to.be.equal('is-pure')
+      component.unmount()
+
+      expect(element.getAttribute('is-pure')).to.be.not.ok
     })
   })
 

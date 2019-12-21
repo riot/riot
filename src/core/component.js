@@ -80,6 +80,36 @@ function componentTemplateFactory(template, components) {
 }
 
 /**
+ * Create a pure component
+ * @param   {Function} pureFactoryFunction - pure component factory function
+ * @param   {Array} options.slots - component slots
+ * @param   {Array} options.attributes - component attributes
+ * @param   {any} options.props - initial component properties
+ * @returns {Object} pure component object
+ */
+function createPureComponent(pureFactoryFunction, { slots, attributes, props }) {
+  const component = defineDefaults(
+    pureFactoryFunction({ slots, attributes, props }),
+    PURE_COMPONENT_API
+  )
+
+  return {
+    mount(el, context) {
+      component.mount(el, context)
+      return component
+    },
+    update(context) {
+      component.update(context)
+      return component
+    },
+    unmount(preserveRoot) {
+      component.unmount(preserveRoot)
+      return component
+    }
+  }
+}
+
+/**
  * Create the component interface needed for the @riotjs/dom-bindings tag bindings
  * @param   {string} options.css - component css
  * @param   {Function} options.template - functon that will return the dom-bindings template function
@@ -96,9 +126,9 @@ export function createComponent({css, template, exports, name}) {
   return ({slots, attributes, props}) => {
     // pure components rendering will be managed by the end user
     if (exports && exports[IS_PURE_SYMBOL])
-      return defineDefaults(
-        exports({ slots, attributes, props }),
-        PURE_COMPONENT_API
+      return createPureComponent(
+        exports,
+        { slots, attributes, props }
       )
 
     const componentAPI = callOrAssign(exports) || {}
