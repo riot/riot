@@ -27,11 +27,15 @@ export interface RiotPureComponent<C = object> {
   mount(
     element: HTMLElement,
     context?: C,
-  ): any
+  ): RiotPureComponent<C>
   update(
     context?: C,
-  ): any
-  unmount(keepRootElement: boolean): any
+  ): RiotPureComponent<C>
+  unmount(keepRootElement: boolean): RiotPureComponent<C>
+}
+
+export interface PureComponentFactoryFunction<C = object> {
+  ({slots, attributes, props}:{ slots?: any[], attributes?: any[], props?: C; }): RiotPureComponent<C>
 }
 
 // This object interface is created anytime a riot file will be compiled into javascript
@@ -84,7 +88,6 @@ export function component<P , S>(shell: RiotComponentShell<P, S>):(
   initialProps?: P,
   meta?: { slots: any[]; attributes: any[]; }
 ) => RiotComponent<P, S>
-export function pure<
-  C = object,
-  F = ({ slots?: any[]; attributes?: any[]; props?: C; }) => RiotPureComponent<C>>(func: F): F
+
+export function pure<C = object, F = PureComponentFactoryFunction<C>>(func: F): F
 export const version: string
