@@ -3,9 +3,12 @@ import {
   COMPONENTS_IMPLEMENTATION_MAP,
   DOM_COMPONENT_INSTANCE_PROPERTY,
   IS_PURE_SYMBOL,
+  MOUNT_METHOD_KEY,
   PARENT_KEY_SYMBOL,
   PLUGINS_SET,
-  TEMPLATE_KEY_SYMBOL
+  TEMPLATE_KEY_SYMBOL,
+  UNMOUNT_METHOD_KEY,
+  UPDATE_METHOD_KEY
 } from '../globals'
 import {
   autobindMethods,
@@ -41,9 +44,9 @@ const COMPONENT_CORE_HELPERS = Object.freeze({
 })
 
 const PURE_COMPONENT_API = Object.freeze({
-  update: noop,
-  mount: noop,
-  unmount: noop
+  [MOUNT_METHOD_KEY]: noop,
+  [UPDATE_METHOD_KEY]: noop,
+  [UNMOUNT_METHOD_KEY]: noop
 })
 
 const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
@@ -60,6 +63,23 @@ const MOCKED_TEMPLATE_INTERFACE = {
   ...PURE_COMPONENT_API,
   clone: noop,
   createDOM: noop
+}
+
+/**
+ * Wrap the Riot.js core API methods using a mapping function
+ * @param   {Function} mapFunction - lifting function
+ * @returns {Object} an object having the { mount, update, unmount } functions
+ */
+function createCoreAPIMethods(mapFunction) {
+  return [
+    MOUNT_METHOD_KEY,
+    UPDATE_METHOD_KEY,
+    UNMOUNT_METHOD_KEY
+  ].reduce((acc, method) => {
+    acc[method] = mapFunction(method)
+
+    return acc
+  }, {})
 }
 
 /**
@@ -93,20 +113,10 @@ function createPureComponent(pureFactoryFunction, { slots, attributes, props }) 
     PURE_COMPONENT_API
   )
 
-  return {
-    mount(el, context) {
-      component.mount(el, context)
-      return component
-    },
-    update(context) {
-      component.update(context)
-      return component
-    },
-    unmount(preserveRoot) {
-      component.unmount(preserveRoot)
-      return component
-    }
-  }
+  return createCoreAPIMethods(method => (...args) => {
+    component[method](...args)
+    return component
+  })
 }
 
 /**
@@ -209,17 +219,13 @@ function createAttributeBindings(node, attributes = []) {
   const expressions = attributes.map(a => createExpression(node, a))
   const binding = {}
 
-  const updateValues = method => scope => {
-    expressions.forEach(e => e[method](scope))
-
-    return binding
-  }
-
   return Object.assign(binding, {
     expressions,
-    mount: updateValues('mount'),
-    update: updateValues('update'),
-    unmount: updateValues('unmount')
+    ...createCoreAPIMethods(method => scope => {
+      expressions.forEach(e => e[method](scope))
+
+      return binding
+    })
   })
 }
 
