@@ -1,9 +1,13 @@
-/* Riot v4.7.2, @license MIT */
+/* Riot v4.8.0, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
       IS_DIRECTIVE = 'is',
       VALUE_ATTRIBUTE = 'value',
+      MOUNT_METHOD_KEY = 'mount',
+      UPDATE_METHOD_KEY = 'update',
+      UNMOUNT_METHOD_KEY = 'unmount',
+      IS_PURE_SYMBOL = Symbol.for('pure'),
       PARENT_KEY_SYMBOL = Symbol('parent'),
       ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
       TEMPLATE_KEY_SYMBOL = Symbol('template');
@@ -15,6 +19,10 @@ var globals = /*#__PURE__*/Object.freeze({
   PLUGINS_SET: PLUGINS_SET,
   IS_DIRECTIVE: IS_DIRECTIVE,
   VALUE_ATTRIBUTE: VALUE_ATTRIBUTE,
+  MOUNT_METHOD_KEY: MOUNT_METHOD_KEY,
+  UPDATE_METHOD_KEY: UPDATE_METHOD_KEY,
+  UNMOUNT_METHOD_KEY: UNMOUNT_METHOD_KEY,
+  IS_PURE_SYMBOL: IS_PURE_SYMBOL,
   PARENT_KEY_SYMBOL: PARENT_KEY_SYMBOL,
   ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
   TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL
@@ -600,6 +608,7 @@ function isNil(value) {
   return value === null || value === undefined;
 }
 
+const UNMOUNT_SCOPE = Symbol('unmount');
 const EachBinding = Object.seal({
   // dynamic binding properties
   // childrenMap: null,
@@ -623,9 +632,11 @@ const EachBinding = Object.seal({
 
   update(scope, parentScope) {
     const {
-      placeholder
+      placeholder,
+      nodes,
+      childrenMap
     } = this;
-    const collection = this.evaluate(scope);
+    const collection = scope === UNMOUNT_SCOPE ? null : this.evaluate(scope);
     const items = collection ? Array.from(collection) : [];
     const parent = placeholder.parentNode; // prepare the diffing
 
@@ -635,16 +646,10 @@ const EachBinding = Object.seal({
       futureNodes
     } = createPatch(items, scope, parentScope, this); // patch the DOM only if there are new nodes
 
-    if (futureNodes.length) {
-      domdiff(parent, this.nodes, futureNodes, {
-        before: placeholder,
-        node: patch(Array.from(this.childrenMap.values()), parentScope)
-      });
-    } else {
-      // remove all redundant templates
-      unmountRedundant(this.childrenMap);
-    } // trigger the mounts and the updates
-
+    domdiff(parent, nodes, futureNodes, {
+      before: placeholder,
+      node: patch(Array.from(childrenMap.values()), parentScope)
+    }); // trigger the mounts and the updates
 
     batches.forEach(fn => fn()); // update the children map
 
@@ -654,9 +659,7 @@ const EachBinding = Object.seal({
   },
 
   unmount(scope, parentScope) {
-    unmountRedundant(this.childrenMap, parentScope);
-    this.childrenMap = new Map();
-    this.nodes = [];
+    this.update(UNMOUNT_SCOPE, parentScope);
     return this;
   }
 
@@ -671,34 +674,21 @@ const EachBinding = Object.seal({
 function patch(redundant, parentScope) {
   return (item, info) => {
     if (info < 0) {
-      const {
-        template,
-        context
-      } = redundant.pop(); // notice that we pass null as last argument because
-      // the root node and its children will be removed by domdiff
+      const element = redundant.pop();
 
-      template.unmount(context, parentScope, null);
+      if (element) {
+        const {
+          template,
+          context
+        } = element; // notice that we pass null as last argument because
+        // the root node and its children will be removed by domdiff
+
+        template.unmount(context, parentScope, null);
+      }
     }
 
     return item;
   };
-}
-/**
- * Unmount the remaining template instances
- * @param   {Map} childrenMap - map containing the children template to unmount
- * @param   {*} parentScope - scope of the parent template
- * @returns {TemplateChunk[]} collection containing the template chunks unmounted
- */
-
-
-function unmountRedundant(childrenMap, parentScope) {
-  return Array.from(childrenMap.values()).map((_ref) => {
-    let {
-      template,
-      context
-    } = _ref;
-    return template.unmount(context, parentScope, true);
-  });
 }
 /**
  * Check whether a template must be filtered from a loop
@@ -722,13 +712,13 @@ function mustFilterItem(condition, context) {
  */
 
 
-function extendScope(scope, _ref2) {
+function extendScope(scope, _ref) {
   let {
     itemName,
     indexName,
     index,
     item
-  } = _ref2;
+  } = _ref;
   scope[itemName] = item;
   if (indexName) scope[indexName] = index;
   return scope;
@@ -782,13 +772,17 @@ function createPatch(items, scope, parentScope, binding) {
     if (mustMount) {
       batches.push(() => componentTemplate.mount(el, context, parentScope, meta));
     } else {
-      componentTemplate.update(context, parentScope);
+      batches.push(() => componentTemplate.update(context, parentScope));
     } // create the collection of nodes to update or to add
     // in case of template tags we need to add all its children nodes
 
 
     if (isTemplateTag) {
-      futureNodes.push(...(meta.children || componentTemplate.children));
+      const children = meta.children || componentTemplate.children;
+      futureNodes.push(...children); // add fake children into the childrenMap in order to preserve
+      // the index in case of unmount calls
+
+      children.forEach(child => newChildrenMap.set(child, null));
     } else {
       futureNodes.push(el);
     } // delete the old item from the children map
@@ -809,7 +803,7 @@ function createPatch(items, scope, parentScope, binding) {
   };
 }
 
-function create(node, _ref3) {
+function create(node, _ref2) {
   let {
     evaluate,
     condition,
@@ -817,7 +811,7 @@ function create(node, _ref3) {
     indexName,
     getKey,
     template
-  } = _ref3;
+  } = _ref2;
   const placeholder = document.createTextNode('');
   const parent = node.parentNode;
   const root = node.cloneNode();
@@ -893,11 +887,11 @@ const IfBinding = Object.seal({
 
 });
 
-function create$1(node, _ref4) {
+function create$1(node, _ref3) {
   let {
     evaluate,
     template
-  } = _ref4;
+  } = _ref3;
   return Object.assign({}, IfBinding, {
     node,
     evaluate,
@@ -917,8 +911,8 @@ const SET_ATTIBUTE = 'setAttribute';
  */
 
 function setAllAttributes(node, attributes) {
-  Object.entries(attributes).forEach((_ref5) => {
-    let [name, value] = _ref5;
+  Object.entries(attributes).forEach((_ref4) => {
+    let [name, value] = _ref4;
     return attributeExpression(node, {
       name
     }, value);
@@ -946,10 +940,10 @@ function removeAllAttributes(node, attributes) {
  */
 
 
-function attributeExpression(node, _ref6, value, oldValue) {
+function attributeExpression(node, _ref5, value, oldValue) {
   let {
     name
-  } = _ref6;
+  } = _ref5;
 
   // is it a spread operator? {...attributes}
   if (!name) {
@@ -1006,10 +1000,10 @@ const RE_EVENTS_PREFIX = /^on/;
  * @returns {value} the callback just received
  */
 
-function eventExpression(node, _ref7, value, oldValue) {
+function eventExpression(node, _ref6, value, oldValue) {
   let {
     name
-  } = _ref7;
+  } = _ref6;
   const normalizedEventName = name.replace(RE_EVENTS_PREFIX, '');
 
   if (oldValue) {
@@ -1164,10 +1158,10 @@ function flattenCollectionMethods(collection, methods, context) {
   }, {});
 }
 
-function create$3(node, _ref8) {
+function create$3(node, _ref7) {
   let {
     expressions
-  } = _ref8;
+  } = _ref7;
   return Object.assign({}, flattenCollectionMethods(expressions.map(expression => create$2(node, expression)), ['mount', 'update', 'unmount']));
 }
 /**
@@ -1224,10 +1218,10 @@ const SlotBinding = Object.seal({
 
   // API methods
   mount(scope, parentScope) {
-    const templateData = scope.slots ? scope.slots.find((_ref9) => {
+    const templateData = scope.slots ? scope.slots.find((_ref8) => {
       let {
         id
-      } = _ref9;
+      } = _ref8;
       return id === this.name;
     }) : false;
     const {
@@ -1290,11 +1284,11 @@ function moveSlotInnerContent(slot, children) {
  */
 
 
-function createSlot(node, _ref10) {
+function createSlot(node, _ref9) {
   let {
     name,
     attributes
-  } = _ref10;
+  } = _ref9;
   return Object.assign({}, SlotBinding, {
     attributes,
     node,
@@ -1347,10 +1341,10 @@ function getTag(component, slots, attributes) {
 
 
 function slotBindings(slots) {
-  return slots.reduce((acc, _ref11) => {
+  return slots.reduce((acc, _ref10) => {
     let {
       bindings
-    } = _ref11;
+    } = _ref10;
     return acc.concat(bindings);
   }, []);
 }
@@ -1408,13 +1402,13 @@ const TagBinding = Object.seal({
 
 });
 
-function create$4(node, _ref12) {
+function create$4(node, _ref11) {
   let {
     evaluate,
     getComponent,
     slots,
     attributes
-  } = _ref12;
+  } = _ref11;
   return Object.assign({}, TagBinding, {
     node,
     evaluate,
@@ -1449,7 +1443,7 @@ function fixTextExpressionsOffset(expressions, textExpressionsOffset) {
  * @param   {HTMLElement} root - DOM node where to bind the expression
  * @param   {Object} binding - binding data
  * @param   {number|null} templateTagOffset - if it's defined we need to fix the text expressions childNodeIndex offset
- * @returns {Expression} Expression object
+ * @returns {Binding} Binding object
  */
 
 
@@ -2040,6 +2034,11 @@ const COMPONENT_CORE_HELPERS = Object.freeze({
   }
 
 });
+const PURE_COMPONENT_API = Object.freeze({
+  [MOUNT_METHOD_KEY]: noop,
+  [UPDATE_METHOD_KEY]: noop,
+  [UNMOUNT_METHOD_KEY]: noop
+});
 const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
   shouldUpdate: noop,
   onBeforeMount: noop,
@@ -2049,13 +2048,22 @@ const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
   onBeforeUnmount: noop,
   onUnmounted: noop
 });
-const MOCKED_TEMPLATE_INTERFACE = {
-  update: noop,
-  mount: noop,
-  unmount: noop,
+const MOCKED_TEMPLATE_INTERFACE = Object.assign({}, PURE_COMPONENT_API, {
   clone: noop,
   createDOM: noop
-};
+});
+/**
+ * Wrap the Riot.js core API methods using a mapping function
+ * @param   {Function} mapFunction - lifting function
+ * @returns {Object} an object having the { mount, update, unmount } functions
+ */
+
+function createCoreAPIMethods(mapFunction) {
+  return [MOUNT_METHOD_KEY, UPDATE_METHOD_KEY, UNMOUNT_METHOD_KEY].reduce((acc, method) => {
+    acc[method] = mapFunction(method);
+    return acc;
+  }, {});
+}
 /**
  * Factory function to create the component templates only once
  * @param   {Function} template - component template creation function
@@ -2063,9 +2071,42 @@ const MOCKED_TEMPLATE_INTERFACE = {
  * @returns {TemplateChunk} template chunk object
  */
 
+
 function componentTemplateFactory(template, components) {
   return template(create$6, expressionTypes, bindingTypes, name => {
     return components[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name);
+  });
+}
+/**
+ * Create a pure component
+ * @param   {Function} pureFactoryFunction - pure component factory function
+ * @param   {Array} options.slots - component slots
+ * @param   {Array} options.attributes - component attributes
+ * @param   {Array} options.template - template factory function
+ * @param   {Array} options.template - template factory function
+ * @param   {any} options.props - initial component properties
+ * @returns {Object} pure component object
+ */
+
+
+function createPureComponent(pureFactoryFunction, _ref) {
+  let {
+    slots,
+    attributes,
+    props,
+    css,
+    template
+  } = _ref;
+  if (template) panic('Pure components can not have html');
+  if (css) panic('Pure components do not have css');
+  const component = defineDefaults(pureFactoryFunction({
+    slots,
+    attributes,
+    props
+  }), PURE_COMPONENT_API);
+  return createCoreAPIMethods(method => function () {
+    component[method](...arguments);
+    return component;
   });
 }
 /**
@@ -2078,20 +2119,28 @@ function componentTemplateFactory(template, components) {
  */
 
 
-function createComponent(_ref) {
+function createComponent(_ref2) {
   let {
     css,
     template,
     exports,
     name
-  } = _ref;
+  } = _ref2;
   const templateFn = template ? componentTemplateFactory(template, exports ? createSubcomponents(exports.components) : {}) : MOCKED_TEMPLATE_INTERFACE;
-  return (_ref2) => {
+  return (_ref3) => {
     let {
       slots,
       attributes,
       props
-    } = _ref2;
+    } = _ref3;
+    // pure components rendering will be managed by the end user
+    if (exports && exports[IS_PURE_SYMBOL]) return createPureComponent(exports, {
+      slots,
+      attributes,
+      props,
+      css,
+      template
+    });
     const componentAPI = callOrAssign(exports) || {};
     const component = defineComponent({
       css,
@@ -2130,13 +2179,13 @@ function createComponent(_ref) {
  * @returns {Object} a new component implementation object
  */
 
-function defineComponent(_ref3) {
+function defineComponent(_ref4) {
   let {
     css,
     template,
     componentAPI,
     name
-  } = _ref3;
+  } = _ref4;
   // add the component css into the DOM
   if (css && name) cssManager.add(name, css);
   return curry(enhanceComponentAPI)(defineProperties( // set the component defaults without overriding the original component API
@@ -2181,18 +2230,12 @@ function createAttributeBindings(node, attributes) {
 
   const expressions = attributes.map(a => create$2(node, a));
   const binding = {};
-
-  const updateValues = method => scope => {
+  return Object.assign(binding, Object.assign({
+    expressions
+  }, createCoreAPIMethods(method => scope => {
     expressions.forEach(e => e[method](scope));
     return binding;
-  };
-
-  return Object.assign(binding, {
-    expressions,
-    mount: updateValues('mount'),
-    update: updateValues('update'),
-    unmount: updateValues('unmount')
-  });
+  })));
 }
 /**
  * Create the subcomponents that can be included inside a tag in runtime
@@ -2206,8 +2249,8 @@ function createSubcomponents(components) {
     components = {};
   }
 
-  return Object.entries(callOrAssign(components)).reduce((acc, _ref4) => {
-    let [key, value] = _ref4;
+  return Object.entries(callOrAssign(components)).reduce((acc, _ref5) => {
+    let [key, value] = _ref5;
     acc[camelToDashCase(key)] = createComponent(value);
     return acc;
   }, {});
@@ -2255,12 +2298,12 @@ function addCssHook(element, name) {
  */
 
 
-function enhanceComponentAPI(component, _ref5) {
+function enhanceComponentAPI(component, _ref6) {
   let {
     slots,
     attributes,
     props
-  } = _ref5;
+  } = _ref6;
   const initialProps = callOrAssign(props);
   return autobindMethods(runPlugins(defineProperties(Object.create(component), {
     mount(element, state, parentScope) {
@@ -2474,9 +2517,20 @@ function component(implementation) {
     }), createComponent)(implementation);
   };
 }
+/**
+ * Lift a riot component Interface into a pure riot object
+ * @param   {Function} func - RiotPureComponent factory function
+ * @returns {Function} the lifted original function received as argument
+ */
+
+function pure(func) {
+  if (!isFunction(func)) panic('riot.pure accepts only arguments of type "function"');
+  func[IS_PURE_SYMBOL] = true;
+  return func;
+}
 /** @type {string} current riot version */
 
-const version = 'v4.7.2'; // expose some internal stuff that might be used from external tools
+const version = 'v4.8.0'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
@@ -2485,4 +2539,4 @@ const __ = {
   globals
 };
 
-export { __, component, install, mount, register, uninstall, unmount, unregister, version };
+export { __, component, install, mount, pure, register, uninstall, unmount, unregister, version };
