@@ -104,10 +104,15 @@ function componentTemplateFactory(template, components) {
  * @param   {Function} pureFactoryFunction - pure component factory function
  * @param   {Array} options.slots - component slots
  * @param   {Array} options.attributes - component attributes
+ * @param   {Array} options.template - template factory function
+ * @param   {Array} options.template - template factory function
  * @param   {any} options.props - initial component properties
  * @returns {Object} pure component object
  */
-function createPureComponent(pureFactoryFunction, { slots, attributes, props }) {
+function createPureComponent(pureFactoryFunction, { slots, attributes, props, css, template }) {
+  if (template) panic('Pure components can not have html')
+  if (css) panic('Pure components do not have css')
+
   const component = defineDefaults(
     pureFactoryFunction({ slots, attributes, props }),
     PURE_COMPONENT_API
@@ -138,7 +143,7 @@ export function createComponent({css, template, exports, name}) {
     if (exports && exports[IS_PURE_SYMBOL])
       return createPureComponent(
         exports,
-        { slots, attributes, props }
+        { slots, attributes, props, css, template }
       )
 
     const componentAPI = callOrAssign(exports) || {}

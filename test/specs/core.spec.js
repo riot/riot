@@ -7,6 +7,8 @@ import EachCustomChildrenComponents from '../components/each-custom-children-com
 import EachRootAttributes from '../components/each-root-attributes.riot'
 import ExpressionParts from '../components/expression-parts.riot'
 import GlobalComponents from '../components/global-components.riot'
+import InvalidPureCssComponent from '../components/invalid-pure-css-component.riot'
+import InvalidPureHtmlComponent from '../components/invalid-pure-html-component.riot'
 import MergeAttributes from '../components/merge-attributes.riot'
 import MessageConsumer from '../components/message-consumer.riot'
 import NamedSlotsParent from '../components/named-slots-parent.riot'
@@ -211,6 +213,20 @@ describe('Riot core api', () => {
       expect(() => {
         riot.component(PureObject)(element)
       }).to.throw('riot.pure accepts only arguments of type "function"')
+    })
+
+    it('riot.pure components can not have html', () => {
+      const element = document.createElement('invalid-pure-html-component')
+      expect(() => {
+        riot.component(InvalidPureHtmlComponent)(element)
+      }).to.throw('Pure components can not have html')
+    })
+
+    it('riot.pure components can not have css', () => {
+      const element = document.createElement('invalid-pure-css-component')
+      expect(() => {
+        riot.component(InvalidPureCssComponent)(element)
+      }).to.throw('Pure components do not have css')
     })
 
     it('riot.pure components get properly rendered', () => {
