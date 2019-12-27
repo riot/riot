@@ -1,3 +1,5 @@
+import { SlotBindingData, AttributeExpressionData } from '@riotjs/dom-bindings'
+
 // This interface is only exposed and any Riot component will receive the following properties
 export interface RiotCoreComponent<Props = object, State = object> {
   // automatically generated on any component instance
@@ -5,7 +7,7 @@ export interface RiotCoreComponent<Props = object, State = object> {
   readonly root: HTMLElement
   readonly name?: string
   // TODO: add the @riotjs/dom-bindings types
-  readonly slots: any[]
+  readonly slots: SlotBindingData[]
   mount(
     element: HTMLElement,
     initialState?: State,
@@ -35,7 +37,7 @@ export interface RiotPureComponent<Context = object> {
 }
 
 export interface PureComponentFactoryFunction<InitialProps = any, Context = object> {
-  ({slots, attributes, props}:{ slots?: any[], attributes?: any[], props?: InitialProps; }): RiotPureComponent<Context>
+  ({slots, attributes, props}:{ slots?: SlotBindingData[], attributes?: AttributeExpressionData[], props?: InitialProps; }): RiotPureComponent<Context>
 }
 
 // This object interface is created anytime a riot file will be compiled into javascript
@@ -86,7 +88,7 @@ export function uninstall(plugin: ComponentEnhancer):InstalledPluginsSet
 export function component<Props , State>(shell: RiotComponentShell<Props, State>):(
   el: HTMLElement,
   initialProps?: Props,
-  meta?: { slots: any[]; attributes: any[]; }
+  meta?: { slots: SlotBindingData[]; attributes: AttributeExpressionData[]; }
 ) => RiotComponent<Props, State>
 
 export function pure<InitialProps = object, Context = object, FactoryFunction = PureComponentFactoryFunction<InitialProps, Context>>(func: FactoryFunction): FactoryFunction
