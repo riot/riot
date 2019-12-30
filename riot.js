@@ -1,4 +1,4 @@
-/* Riot v4.8.0, @license MIT */
+/* Riot v4.8.1, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -846,14 +846,11 @@
     // dynamic binding properties
     // node: null,
     // evaluate: null,
-    // parent: null,
     // isTemplateTag: false,
     // placeholder: null,
     // template: null,
     // API methods
     mount(scope, parentScope) {
-      this.parent.insertBefore(this.placeholder, this.node);
-      this.parent.removeChild(this.node);
       return this.update(scope, parentScope);
     },
 
@@ -864,7 +861,7 @@
 
       const mount = () => {
         const pristine = this.node.cloneNode();
-        this.parent.insertBefore(pristine, this.placeholder);
+        this.placeholder.parentNode.insertBefore(pristine, this.placeholder);
         this.template = this.template.clone();
         this.template.mount(pristine, scope, parentScope);
       };
@@ -898,11 +895,14 @@
       evaluate,
       template
     } = _ref3;
+    const parent = node.parentNode;
+    const placeholder = document.createTextNode('');
+    parent.insertBefore(placeholder, node);
+    parent.removeChild(node);
     return Object.assign({}, IfBinding, {
       node,
       evaluate,
-      parent: node.parentNode,
-      placeholder: document.createTextNode(''),
+      placeholder,
       template: template.createDOM(node)
     });
   }
@@ -2536,7 +2536,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.8.0'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.8.1'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,

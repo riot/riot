@@ -1,4 +1,4 @@
-/* Riot v4.8.0, @license MIT */
+/* Riot v4.8.1, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -840,14 +840,11 @@ const IfBinding = Object.seal({
   // dynamic binding properties
   // node: null,
   // evaluate: null,
-  // parent: null,
   // isTemplateTag: false,
   // placeholder: null,
   // template: null,
   // API methods
   mount(scope, parentScope) {
-    this.parent.insertBefore(this.placeholder, this.node);
-    this.parent.removeChild(this.node);
     return this.update(scope, parentScope);
   },
 
@@ -858,7 +855,7 @@ const IfBinding = Object.seal({
 
     const mount = () => {
       const pristine = this.node.cloneNode();
-      this.parent.insertBefore(pristine, this.placeholder);
+      this.placeholder.parentNode.insertBefore(pristine, this.placeholder);
       this.template = this.template.clone();
       this.template.mount(pristine, scope, parentScope);
     };
@@ -892,11 +889,14 @@ function create$1(node, _ref3) {
     evaluate,
     template
   } = _ref3;
+  const parent = node.parentNode;
+  const placeholder = document.createTextNode('');
+  parent.insertBefore(placeholder, node);
+  parent.removeChild(node);
   return Object.assign({}, IfBinding, {
     node,
     evaluate,
-    parent: node.parentNode,
-    placeholder: document.createTextNode(''),
+    placeholder,
     template: template.createDOM(node)
   });
 }
@@ -2530,7 +2530,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.8.0'; // expose some internal stuff that might be used from external tools
+const version = 'v4.8.1'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
