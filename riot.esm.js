@@ -1,4 +1,4 @@
-/* Riot v4.8.1, @license MIT */
+/* Riot v4.8.2, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -578,6 +578,16 @@ function isTemplate(el) {
   return !isNil(el.content);
 }
 /**
+ * Check that will be passed if its argument is a function
+ * @param   {*} value - value to check
+ * @returns {boolean} - true if the value is a function
+ */
+
+
+function isFunction$1(value) {
+  return checkType$1(value, 'function');
+}
+/**
  * Check if a value is a Boolean
  * @param   {*}  value - anything
  * @returns {boolean} true only for the value is a boolean
@@ -959,7 +969,7 @@ function attributeExpression(node, _ref5, value, oldValue) {
   } // handle boolean attributes
 
 
-  if (isBoolean(value) || isObject(value)) {
+  if (isBoolean(value) || isObject(value) || isFunction$1(value)) {
     node[name] = value;
   }
 
@@ -973,7 +983,7 @@ function attributeExpression(node, _ref5, value, oldValue) {
 
 
 function getMethod(value) {
-  return isNil(value) || value === false || value === '' || isObject(value) ? REMOVE_ATTRIBUTE : SET_ATTIBUTE;
+  return isNil(value) || value === false || value === '' || isObject(value) || isFunction$1(value) ? REMOVE_ATTRIBUTE : SET_ATTIBUTE;
 }
 /**
  * Get the value as string
@@ -2530,7 +2540,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.8.1'; // expose some internal stuff that might be used from external tools
+const version = 'v4.8.2'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
