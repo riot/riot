@@ -2,10 +2,22 @@ import {
   ATTRIBUTES_KEY_SYMBOL,
   COMPONENTS_IMPLEMENTATION_MAP,
   DOM_COMPONENT_INSTANCE_PROPERTY,
+  IS_DIRECTIVE,
   IS_PURE_SYMBOL,
   MOUNT_METHOD_KEY,
+  ON_BEFORE_MOUNT_KEY,
+  ON_BEFORE_UNMOUNT_KEY,
+  ON_BEFORE_UPDATE_KEY,
+  ON_MOUNTED_KEY,
+  ON_UNMOUNTED_KEY,
+  ON_UPDATED_KEY,
   PARENT_KEY_SYMBOL,
   PLUGINS_SET,
+  PROPS_KEY,
+  ROOT_KEY,
+  SHOULD_UPDATE_KEY,
+  SLOTS_KEY,
+  STATE_KEY,
   TEMPLATE_KEY_SYMBOL,
   UNMOUNT_METHOD_KEY,
   UPDATE_METHOD_KEY
@@ -29,7 +41,6 @@ import {
 
 import {evaluateAttributeExpressions, panic} from '@riotjs/util/misc'
 import $ from 'bianco.query'
-import {DOMattributesToObject} from '@riotjs/util/dom'
 import {camelToDashCase} from '@riotjs/util/strings'
 import cssManager from './css-manager'
 import curry from 'curri'
@@ -50,13 +61,13 @@ const PURE_COMPONENT_API = Object.freeze({
 })
 
 const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
-  shouldUpdate: noop,
-  onBeforeMount: noop,
-  onMounted: noop,
-  onBeforeUpdate: noop,
-  onUpdated: noop,
-  onBeforeUnmount: noop,
-  onUnmounted: noop
+  [SHOULD_UPDATE_KEY]: noop,
+  [ON_BEFORE_MOUNT_KEY]: noop,
+  [ON_MOUNTED_KEY]: noop,
+  [ON_BEFORE_UPDATE_KEY]: noop,
+  [ON_UPDATED_KEY]: noop,
+  [ON_BEFORE_UNMOUNT_KEY]: noop,
+  [ON_UNMOUNTED_KEY]: noop
 })
 
 const MOCKED_TEMPLATE_INTERFACE = {
@@ -187,11 +198,11 @@ export function defineComponent({css, template, componentAPI, name}) {
     // set the component defaults without overriding the original component API
     defineDefaults(componentAPI, {
       ...COMPONENT_LIFECYCLE_METHODS,
-      state: {}
+      [STATE_KEY]: {}
     }), {
       // defined during the component creation
-      slots: null,
-      root: null,
+      [SLOTS_KEY]: null,
+      [ROOT_KEY]: null,
       // these properties should not be overriden
       ...COMPONENT_CORE_HELPERS,
       name,
@@ -199,19 +210,6 @@ export function defineComponent({css, template, componentAPI, name}) {
       template
     })
   )
-}
-
-/**
- * Evaluate the component properties either from its real attributes or from its attribute expressions
- * @param   {HTMLElement} element - component root
- * @param   {Array}  attributeExpressions - attribute values generated via createAttributeBindings
- * @returns {Object} attributes key value pairs
- */
-function evaluateProps(element, attributeExpressions = []) {
-  return {
-    ...DOMattributesToObject(element),
-    ...evaluateAttributeExpressions(attributeExpressions)
-  }
 }
 
 /**
@@ -277,7 +275,7 @@ function computeState(oldState, newState) {
  */
 function addCssHook(element, name) {
   if (getName(element) !== name) {
-    setAttr(element, 'is', name)
+    setAttr(element, IS_DIRECTIVE, name)
   }
 }
 
@@ -289,20 +287,18 @@ function addCssHook(element, name) {
  * @returns {Riot.Component} a riot component instance
  */
 export function enhanceComponentAPI(component, {slots, attributes, props}) {
-  const initialProps = callOrAssign(props)
-
   return autobindMethods(
     runPlugins(
       defineProperties(Object.create(component), {
         mount(element, state = {}, parentScope) {
           this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(element, attributes).mount(parentScope)
 
-          this.props = Object.freeze({
-            ...initialProps,
-            ...evaluateProps(element, this[ATTRIBUTES_KEY_SYMBOL].expressions)
-          })
+          defineProperty(this, PROPS_KEY, Object.freeze({
+            ...props,
+            ...evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions)
+          }))
 
-          this.state = computeState(this.state, state)
+          this[STATE_KEY] = computeState(this[STATE_KEY], state)
           this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone()
 
           // link this object to the DOM node
@@ -311,17 +307,17 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
           component.name && addCssHook(element, component.name)
 
           // define the root element
-          defineProperty(this, 'root', element)
+          defineProperty(this, ROOT_KEY, element)
           // define the slots array
-          defineProperty(this, 'slots', slots)
+          defineProperty(this, SLOTS_KEY, slots)
 
           // before mount lifecycle event
-          this.onBeforeMount(this.props, this.state)
+          this[ON_BEFORE_MOUNT_KEY](this[PROPS_KEY], this[STATE_KEY])
           // mount the template
           this[TEMPLATE_KEY_SYMBOL].mount(element, this, parentScope)
           this[PARENT_KEY_SYMBOL] = parentScope
 
-          this.onMounted(this.props, this.state)
+          this[ON_MOUNTED_KEY](this[PROPS_KEY], this[STATE_KEY])
 
           return this
         },
@@ -330,27 +326,30 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
             this[ATTRIBUTES_KEY_SYMBOL].update(parentScope)
           }
 
-          const newProps = evaluateProps(this.root, this[ATTRIBUTES_KEY_SYMBOL].expressions)
+          const newProps = evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions)
 
-          if (this.shouldUpdate(newProps, this.props) === false) return
+          if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false) return
 
-          this.props = Object.freeze({...initialProps, ...newProps})
-          this.state = computeState(this.state, state)
+          defineProperty(this, PROPS_KEY, Object.freeze({
+            ...props,
+            ...newProps
+          }))
 
-          this.onBeforeUpdate(this.props, this.state)
+          this[STATE_KEY] = computeState(this[STATE_KEY], state)
 
+          this[ON_BEFORE_UPDATE_KEY](this[PROPS_KEY], this[STATE_KEY])
           this[TEMPLATE_KEY_SYMBOL].update(this, this[PARENT_KEY_SYMBOL])
-          this.onUpdated(this.props, this.state)
+          this[ON_UPDATED_KEY](this[PROPS_KEY], this[STATE_KEY])
 
           return this
         },
         unmount(preserveRoot) {
-          this.onBeforeUnmount(this.props, this.state)
+          this[ON_BEFORE_UNMOUNT_KEY](this[PROPS_KEY], this[STATE_KEY])
           this[ATTRIBUTES_KEY_SYMBOL].unmount()
           // if the preserveRoot is null the template html will be left untouched
           // in that case the DOM cleanup will happen differently from a parent node
           this[TEMPLATE_KEY_SYMBOL].unmount(this, this[PARENT_KEY_SYMBOL], preserveRoot === null ? null : !preserveRoot)
-          this.onUnmounted(this.props, this.state)
+          this[ON_UNMOUNTED_KEY](this[PROPS_KEY], this[STATE_KEY])
 
           return this
         }
