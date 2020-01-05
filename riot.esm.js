@@ -1,4 +1,4 @@
-/* Riot v4.8.4, @license MIT */
+/* Riot v4.8.5, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -1000,8 +1000,8 @@ function evaluateAttributeExpressions(attributes) {
 
 const REMOVE_ATTRIBUTE = 'removeAttribute';
 const SET_ATTIBUTE = 'setAttribute';
-const HTMLProto = HTMLElement.prototype;
-const isNativeHtmlProperty = memoize(name => HTMLProto.hasOwnProperty(name) || HTMLProto[name]); // eslint-disable-line
+const ElementProto = Element.prototype;
+const isNativeHtmlProperty = memoize(name => ElementProto.hasOwnProperty(name)); // eslint-disable-line
 
 /**
  * Add all the attributes provided
@@ -2597,7 +2597,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.8.4'; // expose some internal stuff that might be used from external tools
+const version = 'v4.8.5'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
