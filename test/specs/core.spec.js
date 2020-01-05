@@ -12,6 +12,7 @@ import InvalidPureHtmlComponent from '../components/invalid-pure-html-component.
 import MergeAttributes from '../components/merge-attributes.riot'
 import MessageConsumer from '../components/message-consumer.riot'
 import NamedSlotsParent from '../components/named-slots-parent.riot'
+import NativeAttributes from '../components/native-attributes.riot'
 import NestedAliasedImportsComponent from '../components/nested-aliased-imports.riot'
 import NestedHoc from '../components/nested-hoc.riot'
 import NestedImportsComponent from '../components/nested-imports.riot'
@@ -171,6 +172,19 @@ describe('Riot core api', () => {
       })
 
       expect(component.$('input').value).to.be.equal('hello')
+      component.unmount()
+    })
+
+    it('native Element attributes will be properly rendered', () => {
+      const element = document.createElement('native-attributes')
+      const component = riot.component(NativeAttributes)(element, {
+        isHidden: true,
+        myId: 'hello',
+        remove: 'remove'
+      })
+      const p = component.$('p')
+      expect(p.hidden).to.be.ok
+      expect(p.remove).to.be.a('function')
       component.unmount()
     })
 
