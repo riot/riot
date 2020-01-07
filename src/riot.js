@@ -8,7 +8,7 @@ import cssManager from './core/css-manager'
 import {isFunction} from '@riotjs/util/checks'
 import {panic} from '@riotjs/util/misc'
 
-const { DOM_COMPONENT_INSTANCE_PROPERTY, COMPONENTS_IMPLEMENTATION_MAP, PLUGINS_SET } = globals
+const { DOM_COMPONENT_INSTANCE_PROPERTY, COMPONENTS_IMPLEMENTATION_MAP, PLUGINS_SET, IS_PURE_SYMBOL } = globals
 
 /**
  * Evaluate the component properties either from its real attributes or from its initial user properties
@@ -77,7 +77,7 @@ export function unmount(selector, keepRootElement) {
     if (element[DOM_COMPONENT_INSTANCE_PROPERTY]) {
       element[DOM_COMPONENT_INSTANCE_PROPERTY].unmount(keepRootElement)
     } else if (element[IS_PURE_SYMBOL]) {
-      element[IS_PURE_SYMBOL].unmount(keepRootElement);
+      element[IS_PURE_SYMBOL].unmount(keepRootElement)
     }
     return element
   })
