@@ -131,7 +131,7 @@ function createPureComponent(pureFactoryFunction, { slots, attributes, props, cs
 
   return createCoreAPIMethods(method => (...args) => {
     component[method](...args)
-    args[0][IS_PURE_SYMBOL] = component;
+    args[0][IS_PURE_SYMBOL] = component
     return component
   })
 }
