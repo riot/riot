@@ -76,6 +76,8 @@ export function unmount(selector, keepRootElement) {
   return $(selector).map(element => {
     if (element[DOM_COMPONENT_INSTANCE_PROPERTY]) {
       element[DOM_COMPONENT_INSTANCE_PROPERTY].unmount(keepRootElement)
+    } else if (element[IS_PURE_SYMBOL]) {
+      element[IS_PURE_SYMBOL].unmount(keepRootElement);
     }
     return element
   })
