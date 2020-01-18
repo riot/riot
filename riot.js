@@ -1,4 +1,4 @@
-/* Riot v4.8.4, @license MIT */
+/* Riot v4.8.6, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1006,8 +1006,8 @@
 
   const REMOVE_ATTRIBUTE = 'removeAttribute';
   const SET_ATTIBUTE = 'setAttribute';
-  const HTMLProto = HTMLElement.prototype;
-  const isNativeHtmlProperty = memoize(name => HTMLProto.hasOwnProperty(name) || HTMLProto[name]); // eslint-disable-line
+  const ElementProto = typeof Element === 'undefined' ? {} : Element.prototype;
+  const isNativeHtmlProperty = memoize(name => ElementProto.hasOwnProperty(name)); // eslint-disable-line
 
   /**
    * Add all the attributes provided
@@ -2603,7 +2603,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.8.4'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.8.6'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
