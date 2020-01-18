@@ -1,4 +1,4 @@
-/* Riot v4.8.6, @license MIT */
+/* Riot v4.8.7, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -832,10 +832,7 @@
 
       if (isTemplateTag) {
         const children = meta.children || componentTemplate.children;
-        futureNodes.push(...children); // add fake children into the childrenMap in order to preserve
-        // the index in case of unmount calls
-
-        children.forEach(child => newChildrenMap.set(child, null));
+        futureNodes.push(...children);
       } else {
         futureNodes.push(el);
       } // delete the old item from the children map
@@ -2114,10 +2111,19 @@
     createDOM: noop
   });
   /**
+   * Bind a DOM node to its component object
+   * @param   {HTMLElement} node - html node mounted
+   * @param   {Object} component - Riot.js component object
+   * @returns {Object} the component object received as second argument
+   */
+
+  const bindDOMNodeToComponentObject = (node, component) => node[DOM_COMPONENT_INSTANCE_PROPERTY] = component;
+  /**
    * Wrap the Riot.js core API methods using a mapping function
    * @param   {Function} mapFunction - lifting function
    * @returns {Object} an object having the { mount, update, unmount } functions
    */
+
 
   function createCoreAPIMethods(mapFunction) {
     return [MOUNT_METHOD_KEY, UPDATE_METHOD_KEY, UNMOUNT_METHOD_KEY].reduce((acc, method) => {
@@ -2166,7 +2172,18 @@
       props
     }), PURE_COMPONENT_API);
     return createCoreAPIMethods(method => function () {
-      component[method](...arguments);
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      // intercept the mount calls to bind the DOM node to the pure object created
+      // see also https://github.com/riot/riot/issues/2806
+      if (method === MOUNT_METHOD_KEY) {
+        const [el] = args;
+        bindDOMNodeToComponentObject(el, component);
+      }
+
+      component[method](...args);
       return component;
     });
   }
@@ -2361,7 +2378,7 @@
         this[STATE_KEY] = computeState(this[STATE_KEY], state);
         this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone(); // link this object to the DOM node
 
-        element[DOM_COMPONENT_INSTANCE_PROPERTY] = this; // add eventually the 'is' attribute
+        bindDOMNodeToComponentObject(element, this); // add eventually the 'is' attribute
 
         component.name && addCssHook(element, component.name); // define the root element
 
@@ -2603,7 +2620,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.8.6'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.8.7'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
