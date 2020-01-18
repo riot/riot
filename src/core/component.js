@@ -76,6 +76,8 @@ const MOCKED_TEMPLATE_INTERFACE = {
   createDOM: noop
 }
 
+const bindDOMNodeToInstance = (node, instance) => node[DOM_COMPONENT_INSTANCE_PROPERTY] = instance
+
 /**
  * Wrap the Riot.js core API methods using a mapping function
  * @param   {Function} mapFunction - lifting function
@@ -130,7 +132,15 @@ function createPureComponent(pureFactoryFunction, { slots, attributes, props, cs
   )
 
   return createCoreAPIMethods(method => (...args) => {
+    // intercept the mount calls to bind the DOM node to the pure object created
+    // see also https://github.com/riot/riot/issues/2806
+    if (method === MOUNT_METHOD_KEY) {
+      const [el] = args
+      bindDOMNodeToInstance(el, component)
+    }
+
     component[method](...args)
+
     return component
   })
 }
@@ -302,7 +312,7 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
           this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone()
 
           // link this object to the DOM node
-          element[DOM_COMPONENT_INSTANCE_PROPERTY] = this
+          bindDOMNodeToInstance(element, this)
           // add eventually the 'is' attribute
           component.name && addCssHook(element, component.name)
 

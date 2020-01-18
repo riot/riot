@@ -344,6 +344,18 @@ describe('Riot core api', () => {
       riot.unregister('my-component')
     })
 
+    it('pure components can be unmounted', () => {
+      const element = document.createElement('div')
+
+      riot.component(PureComponent)(element)
+
+      expect(element.hasAttribute('is-pure')).to.be.ok
+
+      riot.unmount(element)
+
+      expect(element.hasAttribute('is-pure')).to.be.not.ok
+    })
+
     it('custom components can be mounted via user parameter', () => {
       const destroyedSpy = spy()
       riot.register('my-component', {
