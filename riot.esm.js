@@ -1,4 +1,4 @@
-/* Riot v4.8.7, @license MIT */
+/* Riot v4.8.8, @license MIT */
 const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
       DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
       PLUGINS_SET = new Set(),
@@ -1018,13 +1018,15 @@ function setAllAttributes(node, attributes) {
 /**
  * Remove all the attributes provided
  * @param   {HTMLElement} node - target node
- * @param   {Object} attributes - object containing all the attribute names
+ * @param   {Object} newAttributes - object containing all the new attribute names
+ * @param   {Object} oldAttributes - object containing all the old attribute names
  * @returns {undefined} sorry it's a void function :(
  */
 
 
-function removeAllAttributes(node, attributes) {
-  Object.keys(attributes).forEach(attribute => node.removeAttribute(attribute));
+function removeAllAttributes(node, newAttributes, oldAttributes) {
+  const newKeys = newAttributes ? Object.keys(newAttributes) : [];
+  Object.keys(oldAttributes).filter(name => !newKeys.includes(name)).forEach(attribute => node.removeAttribute(attribute));
 }
 /**
  * This methods handles the DOM attributes updates
@@ -1044,12 +1046,14 @@ function attributeExpression(node, _ref5, value, oldValue) {
 
   // is it a spread operator? {...attributes}
   if (!name) {
-    // is the value still truthy?
+    if (oldValue) {
+      // remove all the old attributes
+      removeAllAttributes(node, value, oldValue);
+    } // is the value still truthy?
+
+
     if (value) {
       setAllAttributes(node, value);
-    } else if (oldValue) {
-      // otherwise remove all the old attributes
-      removeAllAttributes(node, oldValue);
     }
 
     return;
@@ -2592,9 +2596,10 @@ function component(implementation) {
   return function (el, props, _temp) {
     let {
       slots,
-      attributes
+      attributes,
+      parentScope
     } = _temp === void 0 ? {} : _temp;
-    return compose(c => c.mount(el), c => c({
+    return compose(c => c.mount(el, parentScope), c => c({
       props: evaluateInitialProps(el, props),
       slots,
       attributes
@@ -2614,7 +2619,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.8.7'; // expose some internal stuff that might be used from external tools
+const version = 'v4.8.8'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
