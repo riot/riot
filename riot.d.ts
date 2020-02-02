@@ -88,7 +88,7 @@ export function uninstall(plugin: ComponentEnhancer):InstalledPluginsSet
 export function component<Props , State>(shell: RiotComponentShell<Props, State>):(
   el: HTMLElement,
   initialProps?: Props,
-  meta?: { slots: SlotBindingData[]; attributes: AttributeExpressionData[]; }
+  meta?: { slots: SlotBindingData[]; attributes: AttributeExpressionData[]; parentScope: any; }
 ) => RiotComponent<Props, State>
 
 export function pure<InitialProps = object, Context = object, FactoryFunction = PureComponentFactoryFunction<InitialProps, Context>>(func: FactoryFunction): FactoryFunction
