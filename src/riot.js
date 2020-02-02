@@ -114,8 +114,8 @@ export function uninstall(plugin) {
  * @returns {Function} function that will allow you to mount a riot component on a DOM node
  */
 export function component(implementation) {
-  return (el, props, {slots, attributes} = {}) => compose(
-    c => c.mount(el),
+  return (el, props, {slots, attributes, parentScope} = {}) => compose(
+    c => c.mount(el, parentScope),
     c => c({props: evaluateInitialProps(el, props), slots, attributes}),
     createComponent
   )(implementation)
