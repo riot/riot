@@ -58,6 +58,7 @@ export default {
   compile,
   inject,
   compileFromUrl,
-  compileFromString
+  compileFromString,
+  compiler
 }
 

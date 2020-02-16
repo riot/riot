@@ -19,7 +19,8 @@ describe('Riot compiler api', () => {
       'inject',
       'compile',
       'compileFromUrl',
-      'compileFromString'
+      'compileFromString',
+      'compiler'
     ])
   })
 
