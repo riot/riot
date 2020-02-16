@@ -5,11 +5,6 @@ module.exports = {
       browserName: 'ipad',
       version: '10.3'
     },
-    slAndroid8: {
-      base: 'SauceLabs',
-      browserName: 'android',
-      version: '9.0'
-    },
     slSafari12: {
       base: 'SauceLabs',
       browserName: 'safari',
