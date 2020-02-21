@@ -34,7 +34,7 @@
     "riot.js"
   ],
   "dependencies": {
-    "@riotjs/compiler": "^4.6.0",
+    "@riotjs/compiler": "^4.6.2",
     "@riotjs/dom-bindings": "^4.6.8",
     "@riotjs/util": "^1.2.0",
     "bianco.attr": "^1.0.0",
@@ -51,7 +51,7 @@
     "coveralls": "^3.0.9",
     "eslint": "^6.8.0",
     "eslint-config-riot": "^3.0.0",
-    "jsdom": "16.1.0",
+    "jsdom": "16.2.0",
     "jsdom-global": "3.0.2",
     "karma": "^4.4.1",
     "karma-chrome-launcher": "^3.1.0",
@@ -67,10 +67,10 @@
     "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-riot": "^4.0.0",
-    "sinon": "^8.1.1",
-    "sinon-chai": "^3.4.0",
+    "sinon": "^9.0.0",
+    "sinon-chai": "^3.5.0",
     "terser": "^4.6.3",
-    "typescript": "^3.7.5"
+    "typescript": "^3.8.2"
   },
   "files": [
     "src",
