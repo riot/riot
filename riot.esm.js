@@ -1,100 +1,4 @@
-/* Riot v4.9.1, @license MIT */
-const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
-      DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
-      PLUGINS_SET = new Set(),
-      IS_DIRECTIVE = 'is',
-      VALUE_ATTRIBUTE = 'value',
-      MOUNT_METHOD_KEY = 'mount',
-      UPDATE_METHOD_KEY = 'update',
-      UNMOUNT_METHOD_KEY = 'unmount',
-      SHOULD_UPDATE_KEY = 'shouldUpdate',
-      ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
-      ON_MOUNTED_KEY = 'onMounted',
-      ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
-      ON_UPDATED_KEY = 'onUpdated',
-      ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
-      ON_UNMOUNTED_KEY = 'onUnmounted',
-      PROPS_KEY = 'props',
-      STATE_KEY = 'state',
-      SLOTS_KEY = 'slots',
-      ROOT_KEY = 'root',
-      IS_PURE_SYMBOL = Symbol.for('pure'),
-      PARENT_KEY_SYMBOL = Symbol('parent'),
-      ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
-      TEMPLATE_KEY_SYMBOL = Symbol('template');
-
-var globals = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
-  DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY,
-  PLUGINS_SET: PLUGINS_SET,
-  IS_DIRECTIVE: IS_DIRECTIVE,
-  VALUE_ATTRIBUTE: VALUE_ATTRIBUTE,
-  MOUNT_METHOD_KEY: MOUNT_METHOD_KEY,
-  UPDATE_METHOD_KEY: UPDATE_METHOD_KEY,
-  UNMOUNT_METHOD_KEY: UNMOUNT_METHOD_KEY,
-  SHOULD_UPDATE_KEY: SHOULD_UPDATE_KEY,
-  ON_BEFORE_MOUNT_KEY: ON_BEFORE_MOUNT_KEY,
-  ON_MOUNTED_KEY: ON_MOUNTED_KEY,
-  ON_BEFORE_UPDATE_KEY: ON_BEFORE_UPDATE_KEY,
-  ON_UPDATED_KEY: ON_UPDATED_KEY,
-  ON_BEFORE_UNMOUNT_KEY: ON_BEFORE_UNMOUNT_KEY,
-  ON_UNMOUNTED_KEY: ON_UNMOUNTED_KEY,
-  PROPS_KEY: PROPS_KEY,
-  STATE_KEY: STATE_KEY,
-  SLOTS_KEY: SLOTS_KEY,
-  ROOT_KEY: ROOT_KEY,
-  IS_PURE_SYMBOL: IS_PURE_SYMBOL,
-  PARENT_KEY_SYMBOL: PARENT_KEY_SYMBOL,
-  ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
-  TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL
-});
-
-/**
- * Quick type checking
- * @param   {*} element - anything
- * @param   {string} type - type definition
- * @returns {boolean} true if the type corresponds
- */
-function checkType(element, type) {
-  return typeof element === type;
-}
-/**
- * Check that will be passed if its argument is a function
- * @param   {*} value - value to check
- * @returns {boolean} - true if the value is a function
- */
-
-function isFunction(value) {
-  return checkType(value, 'function');
-}
-
-function noop() {
-  return this;
-}
-/**
- * Autobind the methods of a source object to itself
- * @param   {Object} source - probably a riot tag instance
- * @param   {Array<string>} methods - list of the methods to autobind
- * @returns {Object} the original object received
- */
-
-function autobindMethods(source, methods) {
-  methods.forEach(method => {
-    source[method] = source[method].bind(source);
-  });
-  return source;
-}
-/**
- * Call the first argument received only if it's a function otherwise return it as it is
- * @param   {*} source - anything
- * @returns {*} anything
- */
-
-function callOrAssign(source) {
-  return isFunction(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
-}
-
+/* Riot v4.9.2, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -590,7 +494,7 @@ options // optional object with one of the following properties
  */
 
 
-function checkType$1(element, type) {
+function checkType(element, type) {
   return typeof element === type;
 }
 /**
@@ -621,8 +525,8 @@ function isTemplate(el) {
  */
 
 
-function isFunction$1(value) {
-  return checkType$1(value, 'function');
+function isFunction(value) {
+  return checkType(value, 'function');
 }
 /**
  * Check if a value is a Boolean
@@ -632,7 +536,7 @@ function isFunction$1(value) {
 
 
 function isBoolean(value) {
-  return checkType$1(value, 'boolean');
+  return checkType(value, 'boolean');
 }
 /**
  * Check if a value is an Object
@@ -642,7 +546,7 @@ function isBoolean(value) {
 
 
 function isObject(value) {
-  return !isNil(value) && checkType$1(value, 'object');
+  return !isNil(value) && checkType(value, 'object');
 }
 /**
  * Check if a value is null or undefined
@@ -1060,7 +964,7 @@ function attributeExpression(node, _ref5, value, oldValue) {
   } // handle boolean attributes
 
 
-  if (!isNativeHtmlProperty(name) && (isBoolean(value) || isObject(value) || isFunction$1(value))) {
+  if (!isNativeHtmlProperty(name) && (isBoolean(value) || isObject(value) || isFunction(value))) {
     node[name] = value;
   }
 
@@ -1074,7 +978,7 @@ function attributeExpression(node, _ref5, value, oldValue) {
 
 
 function getMethod(value) {
-  return isNil(value) || value === false || value === '' || isObject(value) || isFunction$1(value) ? REMOVE_ATTRIBUTE : SET_ATTIBUTE;
+  return isNil(value) || value === false || value === '' || isObject(value) || isFunction(value) ? REMOVE_ATTRIBUTE : SET_ATTIBUTE;
 }
 /**
  * Get the value as string
@@ -1750,6 +1654,111 @@ function create$6(html, bindings) {
   });
 }
 
+var domBindgings = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  bindingTypes: bindingTypes,
+  createBinding: create$5,
+  createExpression: create$2,
+  expressionTypes: expressionTypes,
+  template: create$6
+});
+
+const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
+      DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
+      PLUGINS_SET = new Set(),
+      IS_DIRECTIVE = 'is',
+      VALUE_ATTRIBUTE = 'value',
+      MOUNT_METHOD_KEY = 'mount',
+      UPDATE_METHOD_KEY = 'update',
+      UNMOUNT_METHOD_KEY = 'unmount',
+      SHOULD_UPDATE_KEY = 'shouldUpdate',
+      ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
+      ON_MOUNTED_KEY = 'onMounted',
+      ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
+      ON_UPDATED_KEY = 'onUpdated',
+      ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
+      ON_UNMOUNTED_KEY = 'onUnmounted',
+      PROPS_KEY = 'props',
+      STATE_KEY = 'state',
+      SLOTS_KEY = 'slots',
+      ROOT_KEY = 'root',
+      IS_PURE_SYMBOL = Symbol.for('pure'),
+      PARENT_KEY_SYMBOL = Symbol('parent'),
+      ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
+      TEMPLATE_KEY_SYMBOL = Symbol('template');
+
+var globals = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
+  DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY,
+  PLUGINS_SET: PLUGINS_SET,
+  IS_DIRECTIVE: IS_DIRECTIVE,
+  VALUE_ATTRIBUTE: VALUE_ATTRIBUTE,
+  MOUNT_METHOD_KEY: MOUNT_METHOD_KEY,
+  UPDATE_METHOD_KEY: UPDATE_METHOD_KEY,
+  UNMOUNT_METHOD_KEY: UNMOUNT_METHOD_KEY,
+  SHOULD_UPDATE_KEY: SHOULD_UPDATE_KEY,
+  ON_BEFORE_MOUNT_KEY: ON_BEFORE_MOUNT_KEY,
+  ON_MOUNTED_KEY: ON_MOUNTED_KEY,
+  ON_BEFORE_UPDATE_KEY: ON_BEFORE_UPDATE_KEY,
+  ON_UPDATED_KEY: ON_UPDATED_KEY,
+  ON_BEFORE_UNMOUNT_KEY: ON_BEFORE_UNMOUNT_KEY,
+  ON_UNMOUNTED_KEY: ON_UNMOUNTED_KEY,
+  PROPS_KEY: PROPS_KEY,
+  STATE_KEY: STATE_KEY,
+  SLOTS_KEY: SLOTS_KEY,
+  ROOT_KEY: ROOT_KEY,
+  IS_PURE_SYMBOL: IS_PURE_SYMBOL,
+  PARENT_KEY_SYMBOL: PARENT_KEY_SYMBOL,
+  ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
+  TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL
+});
+
+/**
+ * Quick type checking
+ * @param   {*} element - anything
+ * @param   {string} type - type definition
+ * @returns {boolean} true if the type corresponds
+ */
+function checkType$1(element, type) {
+  return typeof element === type;
+}
+/**
+ * Check that will be passed if its argument is a function
+ * @param   {*} value - value to check
+ * @returns {boolean} - true if the value is a function
+ */
+
+function isFunction$1(value) {
+  return checkType$1(value, 'function');
+}
+
+function noop() {
+  return this;
+}
+/**
+ * Autobind the methods of a source object to itself
+ * @param   {Object} source - probably a riot tag instance
+ * @param   {Array<string>} methods - list of the methods to autobind
+ * @returns {Object} the original object received
+ */
+
+function autobindMethods(source, methods) {
+  methods.forEach(method => {
+    source[method] = source[method].bind(source);
+  });
+  return source;
+}
+/**
+ * Call the first argument received only if it's a function otherwise return it as it is
+ * @param   {*} source - anything
+ * @returns {*} anything
+ */
+
+function callOrAssign(source) {
+  return isFunction$1(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
+}
+
 /**
  * Helper function to set an immutable property
  * @param   {Object} source - object where the new property will be set
@@ -2421,7 +2430,7 @@ function enhanceComponentAPI(component, _ref6) {
       return this;
     }
 
-  })), Object.keys(component).filter(prop => isFunction(component[prop])));
+  })), Object.keys(component).filter(prop => isFunction$1(component[prop])));
 }
 /**
  * Component initialization function starting from a DOM node
@@ -2570,7 +2579,7 @@ function unmount(selector, keepRootElement) {
  */
 
 function install(plugin) {
-  if (!isFunction(plugin)) panic('Plugins must be of type function');
+  if (!isFunction$1(plugin)) panic('Plugins must be of type function');
   if (PLUGINS_SET$1.has(plugin)) panic('This plugin was already install');
   PLUGINS_SET$1.add(plugin);
   return PLUGINS_SET$1;
@@ -2613,16 +2622,17 @@ function component(implementation) {
  */
 
 function pure(func) {
-  if (!isFunction(func)) panic('riot.pure accepts only arguments of type "function"');
+  if (!isFunction$1(func)) panic('riot.pure accepts only arguments of type "function"');
   func[IS_PURE_SYMBOL] = true;
   return func;
 }
 /** @type {string} current riot version */
 
-const version = 'v4.9.1'; // expose some internal stuff that might be used from external tools
+const version = 'v4.9.2'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
+  domBindgings,
   createComponent,
   defineComponent,
   globals

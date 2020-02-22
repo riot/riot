@@ -1,105 +1,9 @@
-/* Riot v4.9.1, @license MIT */
+/* Riot v4.9.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
   (global = global || self, global.riot = factory());
 }(this, (function () { 'use strict';
-
-  const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
-        DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
-        PLUGINS_SET = new Set(),
-        IS_DIRECTIVE = 'is',
-        VALUE_ATTRIBUTE = 'value',
-        MOUNT_METHOD_KEY = 'mount',
-        UPDATE_METHOD_KEY = 'update',
-        UNMOUNT_METHOD_KEY = 'unmount',
-        SHOULD_UPDATE_KEY = 'shouldUpdate',
-        ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
-        ON_MOUNTED_KEY = 'onMounted',
-        ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
-        ON_UPDATED_KEY = 'onUpdated',
-        ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
-        ON_UNMOUNTED_KEY = 'onUnmounted',
-        PROPS_KEY = 'props',
-        STATE_KEY = 'state',
-        SLOTS_KEY = 'slots',
-        ROOT_KEY = 'root',
-        IS_PURE_SYMBOL = Symbol.for('pure'),
-        PARENT_KEY_SYMBOL = Symbol('parent'),
-        ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
-        TEMPLATE_KEY_SYMBOL = Symbol('template');
-
-  var globals = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
-    DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY,
-    PLUGINS_SET: PLUGINS_SET,
-    IS_DIRECTIVE: IS_DIRECTIVE,
-    VALUE_ATTRIBUTE: VALUE_ATTRIBUTE,
-    MOUNT_METHOD_KEY: MOUNT_METHOD_KEY,
-    UPDATE_METHOD_KEY: UPDATE_METHOD_KEY,
-    UNMOUNT_METHOD_KEY: UNMOUNT_METHOD_KEY,
-    SHOULD_UPDATE_KEY: SHOULD_UPDATE_KEY,
-    ON_BEFORE_MOUNT_KEY: ON_BEFORE_MOUNT_KEY,
-    ON_MOUNTED_KEY: ON_MOUNTED_KEY,
-    ON_BEFORE_UPDATE_KEY: ON_BEFORE_UPDATE_KEY,
-    ON_UPDATED_KEY: ON_UPDATED_KEY,
-    ON_BEFORE_UNMOUNT_KEY: ON_BEFORE_UNMOUNT_KEY,
-    ON_UNMOUNTED_KEY: ON_UNMOUNTED_KEY,
-    PROPS_KEY: PROPS_KEY,
-    STATE_KEY: STATE_KEY,
-    SLOTS_KEY: SLOTS_KEY,
-    ROOT_KEY: ROOT_KEY,
-    IS_PURE_SYMBOL: IS_PURE_SYMBOL,
-    PARENT_KEY_SYMBOL: PARENT_KEY_SYMBOL,
-    ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
-    TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL
-  });
-
-  /**
-   * Quick type checking
-   * @param   {*} element - anything
-   * @param   {string} type - type definition
-   * @returns {boolean} true if the type corresponds
-   */
-  function checkType(element, type) {
-    return typeof element === type;
-  }
-  /**
-   * Check that will be passed if its argument is a function
-   * @param   {*} value - value to check
-   * @returns {boolean} - true if the value is a function
-   */
-
-  function isFunction(value) {
-    return checkType(value, 'function');
-  }
-
-  function noop() {
-    return this;
-  }
-  /**
-   * Autobind the methods of a source object to itself
-   * @param   {Object} source - probably a riot tag instance
-   * @param   {Array<string>} methods - list of the methods to autobind
-   * @returns {Object} the original object received
-   */
-
-  function autobindMethods(source, methods) {
-    methods.forEach(method => {
-      source[method] = source[method].bind(source);
-    });
-    return source;
-  }
-  /**
-   * Call the first argument received only if it's a function otherwise return it as it is
-   * @param   {*} source - anything
-   * @returns {*} anything
-   */
-
-  function callOrAssign(source) {
-    return isFunction(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
-  }
 
   /**
    * Convert a string from camel case to dash-case
@@ -596,7 +500,7 @@
    */
 
 
-  function checkType$1(element, type) {
+  function checkType(element, type) {
     return typeof element === type;
   }
   /**
@@ -627,8 +531,8 @@
    */
 
 
-  function isFunction$1(value) {
-    return checkType$1(value, 'function');
+  function isFunction(value) {
+    return checkType(value, 'function');
   }
   /**
    * Check if a value is a Boolean
@@ -638,7 +542,7 @@
 
 
   function isBoolean(value) {
-    return checkType$1(value, 'boolean');
+    return checkType(value, 'boolean');
   }
   /**
    * Check if a value is an Object
@@ -648,7 +552,7 @@
 
 
   function isObject(value) {
-    return !isNil(value) && checkType$1(value, 'object');
+    return !isNil(value) && checkType(value, 'object');
   }
   /**
    * Check if a value is null or undefined
@@ -1066,7 +970,7 @@
     } // handle boolean attributes
 
 
-    if (!isNativeHtmlProperty(name) && (isBoolean(value) || isObject(value) || isFunction$1(value))) {
+    if (!isNativeHtmlProperty(name) && (isBoolean(value) || isObject(value) || isFunction(value))) {
       node[name] = value;
     }
 
@@ -1080,7 +984,7 @@
 
 
   function getMethod(value) {
-    return isNil(value) || value === false || value === '' || isObject(value) || isFunction$1(value) ? REMOVE_ATTRIBUTE : SET_ATTIBUTE;
+    return isNil(value) || value === false || value === '' || isObject(value) || isFunction(value) ? REMOVE_ATTRIBUTE : SET_ATTIBUTE;
   }
   /**
    * Get the value as string
@@ -1756,6 +1660,111 @@
     });
   }
 
+  var domBindgings = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    bindingTypes: bindingTypes,
+    createBinding: create$5,
+    createExpression: create$2,
+    expressionTypes: expressionTypes,
+    template: create$6
+  });
+
+  const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
+        DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
+        PLUGINS_SET = new Set(),
+        IS_DIRECTIVE = 'is',
+        VALUE_ATTRIBUTE = 'value',
+        MOUNT_METHOD_KEY = 'mount',
+        UPDATE_METHOD_KEY = 'update',
+        UNMOUNT_METHOD_KEY = 'unmount',
+        SHOULD_UPDATE_KEY = 'shouldUpdate',
+        ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
+        ON_MOUNTED_KEY = 'onMounted',
+        ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
+        ON_UPDATED_KEY = 'onUpdated',
+        ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
+        ON_UNMOUNTED_KEY = 'onUnmounted',
+        PROPS_KEY = 'props',
+        STATE_KEY = 'state',
+        SLOTS_KEY = 'slots',
+        ROOT_KEY = 'root',
+        IS_PURE_SYMBOL = Symbol.for('pure'),
+        PARENT_KEY_SYMBOL = Symbol('parent'),
+        ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
+        TEMPLATE_KEY_SYMBOL = Symbol('template');
+
+  var globals = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
+    DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY,
+    PLUGINS_SET: PLUGINS_SET,
+    IS_DIRECTIVE: IS_DIRECTIVE,
+    VALUE_ATTRIBUTE: VALUE_ATTRIBUTE,
+    MOUNT_METHOD_KEY: MOUNT_METHOD_KEY,
+    UPDATE_METHOD_KEY: UPDATE_METHOD_KEY,
+    UNMOUNT_METHOD_KEY: UNMOUNT_METHOD_KEY,
+    SHOULD_UPDATE_KEY: SHOULD_UPDATE_KEY,
+    ON_BEFORE_MOUNT_KEY: ON_BEFORE_MOUNT_KEY,
+    ON_MOUNTED_KEY: ON_MOUNTED_KEY,
+    ON_BEFORE_UPDATE_KEY: ON_BEFORE_UPDATE_KEY,
+    ON_UPDATED_KEY: ON_UPDATED_KEY,
+    ON_BEFORE_UNMOUNT_KEY: ON_BEFORE_UNMOUNT_KEY,
+    ON_UNMOUNTED_KEY: ON_UNMOUNTED_KEY,
+    PROPS_KEY: PROPS_KEY,
+    STATE_KEY: STATE_KEY,
+    SLOTS_KEY: SLOTS_KEY,
+    ROOT_KEY: ROOT_KEY,
+    IS_PURE_SYMBOL: IS_PURE_SYMBOL,
+    PARENT_KEY_SYMBOL: PARENT_KEY_SYMBOL,
+    ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
+    TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL
+  });
+
+  /**
+   * Quick type checking
+   * @param   {*} element - anything
+   * @param   {string} type - type definition
+   * @returns {boolean} true if the type corresponds
+   */
+  function checkType$1(element, type) {
+    return typeof element === type;
+  }
+  /**
+   * Check that will be passed if its argument is a function
+   * @param   {*} value - value to check
+   * @returns {boolean} - true if the value is a function
+   */
+
+  function isFunction$1(value) {
+    return checkType$1(value, 'function');
+  }
+
+  function noop() {
+    return this;
+  }
+  /**
+   * Autobind the methods of a source object to itself
+   * @param   {Object} source - probably a riot tag instance
+   * @param   {Array<string>} methods - list of the methods to autobind
+   * @returns {Object} the original object received
+   */
+
+  function autobindMethods(source, methods) {
+    methods.forEach(method => {
+      source[method] = source[method].bind(source);
+    });
+    return source;
+  }
+  /**
+   * Call the first argument received only if it's a function otherwise return it as it is
+   * @param   {*} source - anything
+   * @returns {*} anything
+   */
+
+  function callOrAssign(source) {
+    return isFunction$1(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
+  }
+
   /**
    * Helper function to set an immutable property
    * @param   {Object} source - object where the new property will be set
@@ -2427,7 +2436,7 @@
         return this;
       }
 
-    })), Object.keys(component).filter(prop => isFunction(component[prop])));
+    })), Object.keys(component).filter(prop => isFunction$1(component[prop])));
   }
   /**
    * Component initialization function starting from a DOM node
@@ -2576,7 +2585,7 @@
    */
 
   function install(plugin) {
-    if (!isFunction(plugin)) panic('Plugins must be of type function');
+    if (!isFunction$1(plugin)) panic('Plugins must be of type function');
     if (PLUGINS_SET$1.has(plugin)) panic('This plugin was already install');
     PLUGINS_SET$1.add(plugin);
     return PLUGINS_SET$1;
@@ -2619,16 +2628,17 @@
    */
 
   function pure(func) {
-    if (!isFunction(func)) panic('riot.pure accepts only arguments of type "function"');
+    if (!isFunction$1(func)) panic('riot.pure accepts only arguments of type "function"');
     func[IS_PURE_SYMBOL] = true;
     return func;
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.9.1'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.9.2'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
+    domBindgings,
     createComponent,
     defineComponent,
     globals
@@ -2671,7 +2681,7 @@
 
   var require$$1 = getCjsExportFromNamespace(_empty_module$1);
 
-  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.9.1, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
+  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.9.2, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&fs.hasOwnProperty('default')?fs['default']:fs;path$1=path$1&&path$1.hasOwnProperty('default')?path$1['default']:path$1;function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
   this.allSupertypes=Object.create(null);// Linear inheritance hierarchy. Populated during finalization.
   this.supertypeList=[];// Includes inherited fields.
   this.allFields=Object.create(null);// Non-hidden keys of allFields.
