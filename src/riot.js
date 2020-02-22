@@ -1,3 +1,4 @@
+import * as domBindgings from '@riotjs/dom-bindings'
 import * as globals from './globals'
 import {createComponent, defineComponent, mountComponent} from './core/component'
 import $ from 'bianco.query'
@@ -138,6 +139,7 @@ export const version = 'WIP'
 // expose some internal stuff that might be used from external tools
 export const __ = {
   cssManager,
+  domBindgings,
   createComponent,
   defineComponent,
   globals
