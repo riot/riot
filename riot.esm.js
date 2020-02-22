@@ -1,4 +1,4 @@
-/* Riot v4.9.2, @license MIT */
+/* Riot v4.9.3, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -1654,7 +1654,7 @@ function create$6(html, bindings) {
   });
 }
 
-var domBindgings = /*#__PURE__*/Object.freeze({
+var DOMBindings = /*#__PURE__*/Object.freeze({
   __proto__: null,
   bindingTypes: bindingTypes,
   createBinding: create$5,
@@ -2628,11 +2628,11 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.9.2'; // expose some internal stuff that might be used from external tools
+const version = 'v4.9.3'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
-  domBindgings,
+  DOMBindings,
   createComponent,
   defineComponent,
   globals
