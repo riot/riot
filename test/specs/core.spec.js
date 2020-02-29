@@ -1,5 +1,6 @@
 import * as riot from '../../src/riot'
 import {bindingTypes, expressionTypes, template} from '@riotjs/dom-bindings'
+import ConditionalSelectOption from '../components/conditional-select-option.riot'
 import ConditionalSlotParent from '../components/conditional-slot-parent.riot'
 import DashedAttributeParent from '../components/dashed-attribute-parent.riot'
 import EachAndSpreadAttribute from '../components/each-and-spread-attribute.riot'
@@ -186,6 +187,15 @@ describe('Riot core api', () => {
       expect(p.hidden).to.be.ok
       expect(p.remove).to.be.a('function')
       component.unmount()
+    })
+
+    it('static attributes get preserved', () => {
+      const element = document.createElement('conditional-select-option')
+      const component = riot.component(ConditionalSelectOption)(element)
+
+      const select = component.$('select')
+
+      expect(select.value).to.be.equal('Due')
     })
 
     it('riot.component accepts custom slots and attributes', () => {
