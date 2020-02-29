@@ -14,6 +14,7 @@ import MergeAttributes from '../components/merge-attributes.riot'
 import MessageConsumer from '../components/message-consumer.riot'
 import NamedSlotsParent from '../components/named-slots-parent.riot'
 import NativeAttributes from '../components/native-attributes.riot'
+import NativeInlineEvents from '../components/native-inline-events.riot'
 import NestedAliasedImportsComponent from '../components/nested-aliased-imports.riot'
 import NestedHoc from '../components/nested-hoc.riot'
 import NestedImportsComponent from '../components/nested-imports.riot'
@@ -196,6 +197,12 @@ describe('Riot core api', () => {
       const select = component.$('select')
 
       expect(select.value).to.be.equal('Due')
+
+      component.unmount()
+    })
+
+    it('inline native events do not crash compilation', () => {
+      expect(NativeInlineEvents).to.be.ok
     })
 
     it('riot.component accepts custom slots and attributes', () => {
