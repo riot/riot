@@ -90,7 +90,7 @@ const MOCKED_TEMPLATE_INTERFACE = {
  * @param   {Object}  initialProps - initial props
  * @returns {Object} component props key value pairs
  */
-function evaluateInitialProps(element, initialProps = []) {
+function evaluateInitialProps(element, initialProps = {}) {
   return {
     ...DOMattributesToObject(element),
     ...callOrAssign(initialProps)
@@ -368,7 +368,7 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
           if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false) return
 
           defineProperty(this, PROPS_KEY, Object.freeze({
-            ...props,
+            ...this[PROPS_KEY],
             ...newProps
           }))
 
@@ -407,7 +407,9 @@ export function mountComponent(element, initialProps, componentName) {
   const name = componentName || getName(element)
   if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component named "${name}" was never registered`)
 
-  const component = COMPONENTS_IMPLEMENTATION_MAP.get(name)({ props: initialProps })
+  const component = COMPONENTS_IMPLEMENTATION_MAP.get(name)({
+    props: initialProps
+  })
 
   return component.mount(element)
 }

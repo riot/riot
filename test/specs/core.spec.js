@@ -712,7 +712,7 @@ describe('Riot core api', () => {
       component.unmount()
     })
 
-    it.only('static attributes get properly evaluated as props', () => {
+    it('static attributes get properly evaluated as props', () => {
       const element = document.createElement('static-attribute')
       const component = riot.component(StaticAttribute)(element)
 
