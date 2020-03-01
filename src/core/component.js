@@ -22,25 +22,33 @@ import {
   UNMOUNT_METHOD_KEY,
   UPDATE_METHOD_KEY
 } from '../globals'
+
 import {
   autobindMethods,
   callOrAssign,
   noop
 } from '@riotjs/util/functions'
+
 import {
   bindingTypes,
   createExpression,
   template as createTemplate,
   expressionTypes
 } from '@riotjs/dom-bindings'
+
 import {
   defineDefaults,
   defineProperties,
   defineProperty
 } from '@riotjs/util/objects'
 
-import {evaluateAttributeExpressions, panic} from '@riotjs/util/misc'
+import {
+  evaluateAttributeExpressions,
+  panic
+} from '@riotjs/util/misc'
+
 import $ from 'bianco.query'
+import {DOMattributesToObject} from '@riotjs/util/dom'
 import {camelToDashCase} from '@riotjs/util/strings'
 import cssManager from './css-manager'
 import curry from 'curri'
@@ -74,6 +82,19 @@ const MOCKED_TEMPLATE_INTERFACE = {
   ...PURE_COMPONENT_API,
   clone: noop,
   createDOM: noop
+}
+
+/**
+ * Evaluate the component properties either from its real attributes or from its initial user properties
+ * @param   {HTMLElement} element - component root
+ * @param   {Object}  initialProps - initial props
+ * @returns {Object} component props key value pairs
+ */
+function evaluateInitialProps(element, initialProps = []) {
+  return {
+    ...DOMattributesToObject(element),
+    ...callOrAssign(initialProps)
+  }
 }
 
 /**
@@ -310,7 +331,7 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
           this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(element, attributes).mount(parentScope)
 
           defineProperty(this, PROPS_KEY, Object.freeze({
-            ...props,
+            ...evaluateInitialProps(element, props),
             ...evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions)
           }))
 

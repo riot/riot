@@ -27,6 +27,7 @@ import ShorthandAttribute from '../components/shorthand-attribute.riot'
 import SimpleComponent from '../components/simple.riot'
 import SimpleSlot from '../components/simple-slot.riot'
 import SpreadAttribute from '../components/spread-attribute.riot'
+import StaticAttribute from '../components/static-attribute.riot'
 import TitleProps from '../components/title-prop.riot'
 import VirtualEach from '../components/virtual-each.riot'
 
@@ -707,6 +708,15 @@ describe('Riot core api', () => {
       const component = riot.component(DashedAttributeParent)(element)
 
       expect(component.$('dashed-attribute-child p').innerHTML).to.be.equal('hello')
+
+      component.unmount()
+    })
+
+    it.only('static attributes get properly evaluated as props', () => {
+      const element = document.createElement('static-attribute')
+      const component = riot.component(StaticAttribute)(element)
+
+      expect(component.$('h1').innerHTML).to.be.equal('hello')
 
       component.unmount()
     })

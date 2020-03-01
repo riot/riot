@@ -2,27 +2,12 @@ import * as DOMBindings from '@riotjs/dom-bindings'
 import * as globals from './globals'
 import {createComponent, defineComponent, mountComponent} from './core/component'
 import $ from 'bianco.query'
-import {DOMattributesToObject} from '@riotjs/util/dom'
-import {callOrAssign} from '@riotjs/util/functions'
 import compose from 'cumpa'
 import cssManager from './core/css-manager'
 import {isFunction} from '@riotjs/util/checks'
 import {panic} from '@riotjs/util/misc'
 
 const { DOM_COMPONENT_INSTANCE_PROPERTY, COMPONENTS_IMPLEMENTATION_MAP, PLUGINS_SET } = globals
-
-/**
- * Evaluate the component properties either from its real attributes or from its initial user properties
- * @param   {HTMLElement} element - component root
- * @param   {Object}  initialProps - initial props
- * @returns {Object} component props key value pairs
- */
-function evaluateInitialProps(element, initialProps = []) {
-  return {
-    ...DOMattributesToObject(element),
-    ...callOrAssign(initialProps)
-  }
-}
 
 /**
  * Riot public api
@@ -64,7 +49,7 @@ export function unregister(name) {
  * @returns {Array} list of nodes upgraded
  */
 export function mount(selector, initialProps, name) {
-  return $(selector).map(element => mountComponent(element, evaluateInitialProps(element, initialProps), name))
+  return $(selector).map(element => mountComponent(element, initialProps, name))
 }
 
 /**
@@ -117,7 +102,7 @@ export function uninstall(plugin) {
 export function component(implementation) {
   return (el, props, {slots, attributes, parentScope} = {}) => compose(
     c => c.mount(el, parentScope),
-    c => c({props: evaluateInitialProps(el, props), slots, attributes}),
+    c => c({props, slots, attributes}),
     createComponent
   )(implementation)
 }
