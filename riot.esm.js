@@ -1,4 +1,4 @@
-/* Riot v4.10.0, @license MIT */
+/* Riot v4.10.1, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -1905,6 +1905,19 @@ function $(selector, ctx) {
 }
 
 /**
+ * Get all the element attributes as object
+ * @param   {HTMLElement} element - DOM node we want to parse
+ * @returns {Object} all the attributes found as a key value pairs
+ */
+
+function DOMattributesToObject(element) {
+  return Array.from(element.attributes).reduce((acc, attribute) => {
+    acc[dashToCamelCase$1(attribute.name)] = attribute.value;
+    return acc;
+  }, {});
+}
+
+/**
  * Normalize the return values, in case of a single value we avoid to return an array
  * @param   { Array } values - list of values we want to return
  * @returns { Array|string|boolean } either the whole list of values or the single one found
@@ -2118,11 +2131,26 @@ const MOCKED_TEMPLATE_INTERFACE = Object.assign({}, PURE_COMPONENT_API, {
   createDOM: noop
 });
 /**
+ * Evaluate the component properties either from its real attributes or from its initial user properties
+ * @param   {HTMLElement} element - component root
+ * @param   {Object}  initialProps - initial props
+ * @returns {Object} component props key value pairs
+ */
+
+function evaluateInitialProps(element, initialProps) {
+  if (initialProps === void 0) {
+    initialProps = {};
+  }
+
+  return Object.assign({}, DOMattributesToObject(element), {}, callOrAssign(initialProps));
+}
+/**
  * Bind a DOM node to its component object
  * @param   {HTMLElement} node - html node mounted
  * @param   {Object} component - Riot.js component object
  * @returns {Object} the component object received as second argument
  */
+
 
 const bindDOMNodeToComponentObject = (node, component) => node[DOM_COMPONENT_INSTANCE_PROPERTY] = component;
 /**
@@ -2381,7 +2409,7 @@ function enhanceComponentAPI(component, _ref6) {
       }
 
       this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(element, attributes).mount(parentScope);
-      defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, props, {}, evaluateAttributeExpressions$1(this[ATTRIBUTES_KEY_SYMBOL].expressions))));
+      defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, evaluateInitialProps(element, props), {}, evaluateAttributeExpressions$1(this[ATTRIBUTES_KEY_SYMBOL].expressions))));
       this[STATE_KEY] = computeState(this[STATE_KEY], state);
       this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone(); // link this object to the DOM node
 
@@ -2412,7 +2440,7 @@ function enhanceComponentAPI(component, _ref6) {
 
       const newProps = evaluateAttributeExpressions$1(this[ATTRIBUTES_KEY_SYMBOL].expressions);
       if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false) return;
-      defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, props, {}, newProps)));
+      defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, this[PROPS_KEY], {}, newProps)));
       this[STATE_KEY] = computeState(this[STATE_KEY], state);
       this[ON_BEFORE_UPDATE_KEY](this[PROPS_KEY], this[STATE_KEY]);
       this[TEMPLATE_KEY_SYMBOL].update(this, this[PARENT_KEY_SYMBOL]);
@@ -2450,19 +2478,6 @@ function mountComponent(element, initialProps, componentName) {
 }
 
 /**
- * Get all the element attributes as object
- * @param   {HTMLElement} element - DOM node we want to parse
- * @returns {Object} all the attributes found as a key value pairs
- */
-
-function DOMattributesToObject(element) {
-  return Array.from(element.attributes).reduce((acc, attribute) => {
-    acc[dashToCamelCase$1(attribute.name)] = attribute.value;
-    return acc;
-  }, {});
-}
-
-/**
  * Similar to compose but performs from left-to-right function composition.<br/>
  * {@link https://30secondsofcode.org/function#composeright see also}
  * @param   {...[function]} fns) - list of unary function
@@ -2493,20 +2508,6 @@ const {
   PLUGINS_SET: PLUGINS_SET$1
 } = globals;
 /**
- * Evaluate the component properties either from its real attributes or from its initial user properties
- * @param   {HTMLElement} element - component root
- * @param   {Object}  initialProps - initial props
- * @returns {Object} component props key value pairs
- */
-
-function evaluateInitialProps(element, initialProps) {
-  if (initialProps === void 0) {
-    initialProps = [];
-  }
-
-  return Object.assign({}, DOMattributesToObject(element), {}, callOrAssign(initialProps));
-}
-/**
  * Riot public api
  */
 
@@ -2516,7 +2517,6 @@ function evaluateInitialProps(element, initialProps) {
  * @param   {Object} implementation - tag implementation
  * @returns {Map} map containing all the components implementations
  */
-
 
 function register(name, _ref) {
   let {
@@ -2554,7 +2554,7 @@ function unregister(name) {
  */
 
 function mount(selector, initialProps, name) {
-  return $(selector).map(element => mountComponent(element, evaluateInitialProps(element, initialProps), name));
+  return $(selector).map(element => mountComponent(element, initialProps, name));
 }
 /**
  * Sweet unmounting helper function for the DOM node mounted manually by the user
@@ -2609,7 +2609,7 @@ function component(implementation) {
       parentScope
     } = _temp === void 0 ? {} : _temp;
     return compose(c => c.mount(el, parentScope), c => c({
-      props: evaluateInitialProps(el, props),
+      props,
       slots,
       attributes
     }), createComponent)(implementation);
@@ -2628,7 +2628,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.10.0'; // expose some internal stuff that might be used from external tools
+const version = 'v4.10.1'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
