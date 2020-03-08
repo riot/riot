@@ -1,4 +1,4 @@
-/* Riot v4.10.1, @license MIT */
+/* Riot v4.11.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1001,6 +1001,8 @@
   }
 
   const RE_EVENTS_PREFIX = /^on/;
+
+  const getCallbackAndOptions = value => Array.isArray(value) ? value : [value, false];
   /**
    * Set a new event listener
    * @param   {HTMLElement} node - target node
@@ -1011,6 +1013,7 @@
    * @returns {value} the callback just received
    */
 
+
   function eventExpression(node, _ref6, value, oldValue) {
     let {
       name
@@ -1018,11 +1021,11 @@
     const normalizedEventName = name.replace(RE_EVENTS_PREFIX, '');
 
     if (oldValue) {
-      node.removeEventListener(normalizedEventName, oldValue);
+      node.removeEventListener(normalizedEventName, ...getCallbackAndOptions(oldValue));
     }
 
     if (value) {
-      node.addEventListener(normalizedEventName, value, false);
+      node.addEventListener(normalizedEventName, ...getCallbackAndOptions(value));
     }
   }
   /**
@@ -1560,7 +1563,7 @@
         parentNode
       } = children ? children[0] : el;
       const isTemplateTag = isTemplate(el);
-      const templateTagOffset = isTemplateTag ? Math.max(Array.from(parentNode.children).indexOf(el), 0) : null;
+      const templateTagOffset = isTemplateTag ? Math.max(Array.from(parentNode.childNodes).indexOf(el), 0) : null;
       this.isTemplateTag = isTemplateTag; // create the DOM if it wasn't created before
 
       this.createDOM(el);
@@ -2634,7 +2637,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.10.1'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.11.0'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
