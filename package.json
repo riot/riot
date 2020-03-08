@@ -35,7 +35,7 @@
   ],
   "dependencies": {
     "@riotjs/compiler": "^4.7.0",
-    "@riotjs/dom-bindings": "^4.6.8",
+    "@riotjs/dom-bindings": "^4.7.0",
     "@riotjs/util": "^1.2.0",
     "bianco.attr": "^1.0.0",
     "bianco.query": "^1.0.0",
@@ -43,8 +43,8 @@
     "curri": "^1.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.8.6",
-    "@babel/preset-env": "^7.8.6",
+    "@babel/core": "^7.8.7",
+    "@babel/preset-env": "^7.8.7",
     "@riotjs/babel-preset": "1.0.0",
     "babel-plugin-istanbul": "^6.0.0",
     "chai": "^4.2.0",
@@ -61,8 +61,8 @@
     "karma-rollup-preprocessor": "^7.0.3",
     "karma-sauce-launcher": "^2.0.2",
     "mocha": "^7.1.0",
-    "rollup": "^1.32.0",
-    "rollup-plugin-babel": "^4.3.3",
+    "rollup": "^2.0.2",
+    "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-commonjs": "^9.3.4",
     "rollup-plugin-ignore": "^1.0.5",
     "rollup-plugin-json": "^4.0.0",
@@ -70,7 +70,7 @@
     "rollup-plugin-riot": "^4.0.0",
     "sinon": "^9.0.0",
     "sinon-chai": "^3.5.0",
-    "terser": "^4.6.4",
+    "terser": "^4.6.6",
     "typescript": "^3.8.3"
   },
   "files": [
