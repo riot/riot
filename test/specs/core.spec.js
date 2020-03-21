@@ -1,5 +1,6 @@
 import * as riot from '../../src/riot'
 import {bindingTypes, expressionTypes, template} from '@riotjs/dom-bindings'
+import CommentsAndExpressions from '../components/comments-and-expressions.riot'
 import ConditionalSelectOption from '../components/conditional-select-option.riot'
 import ConditionalSlotParent from '../components/conditional-slot-parent.riot'
 import DashedAttributeParent from '../components/dashed-attribute-parent.riot'
@@ -269,6 +270,16 @@ describe('Riot core api', () => {
       component.unmount()
 
       expect(element.getAttribute('is-pure')).to.be.not.ok
+    })
+
+    it('html comments do not break the expressions rendering', () => {
+      const element = document.createElement('comments-and-expressions')
+      const component = riot.component(CommentsAndExpressions)(element)
+      const h1 = component.$('h1')
+
+      expect(h1.innerHTML).to.be.equal('above the commentbelow the comment')
+
+      component.unmount()
     })
   })
 
