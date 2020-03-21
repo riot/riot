@@ -1,4 +1,4 @@
-/* Riot v4.11.0, @license MIT */
+/* Riot v4.11.1, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -106,7 +106,7 @@ const {
 } = [];
 
 const append = (get, parent, children, start, end, before) => {
-  const isSelect = 'selectedIndex' in parent;
+  const isSelect = ('selectedIndex' in parent);
   let noSelection = isSelect;
 
   while (start < end) {
@@ -2631,7 +2631,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.11.0'; // expose some internal stuff that might be used from external tools
+const version = 'v4.11.1'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
