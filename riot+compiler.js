@@ -1773,7 +1773,7 @@
    * @param   {Object} source - object where the new property will be set
    * @param   {string} key - object key where the new property will be stored
    * @param   {*} value - value of the new property
-   * @param   {Object} options - set the propery overriding the default options
+   * @param   {Object} options - set the property overriding the default options
    * @returns {Object} - the original object modified
    */
   function defineProperty(source, key, value, options) {
@@ -1796,7 +1796,7 @@
    * Define multiple properties on a target object
    * @param   {Object} source - object where the new properties will be set
    * @param   {Object} properties - object containing as key pair the key + value properties
-   * @param   {Object} options - set the propery overriding the default options
+   * @param   {Object} options - set the property overriding the default options
    * @returns {Object} the original object modified
    */
 
