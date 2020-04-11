@@ -1,4 +1,4 @@
-/* Riot v4.11.1, @license MIT */
+/* Riot v4.12.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -10,14 +10,30 @@
    * @param   {string} string - probably a component tag name
    * @returns {string} component name normalized
    */
-
+  function camelToDashCase(string) {
+    return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+  }
   /**
    * Convert a string containing dashes to camel case
    * @param   {string} string - input string
    * @returns {string} my-string -> myString
    */
+
   function dashToCamelCase(string) {
     return string.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+  }
+
+  /**
+   * Get all the element attributes as object
+   * @param   {HTMLElement} element - DOM node we want to parse
+   * @returns {Object} all the attributes found as a key value pairs
+   */
+
+  function DOMattributesToObject(element) {
+    return Array.from(element.attributes).reduce((acc, attribute) => {
+      acc[dashToCamelCase(attribute.name)] = attribute.value;
+      return acc;
+    }, {});
   }
   /**
    * Move all the child nodes from a source tag to another
@@ -26,7 +42,6 @@
    * @returns {undefined} it's a void method ¯\_(ツ)_/¯
    */
   // Ignore this helper because it's needed only for svg tags
-
 
   function moveChildren(source, target) {
     if (source.firstChild) {
@@ -40,7 +55,6 @@
    * @returns {undefined}
    */
 
-
   function cleanNode(node) {
     clearChildren(node.childNodes);
   }
@@ -50,7 +64,6 @@
    * @returns {undefined}
    */
 
-
   function clearChildren(children) {
     Array.from(children).forEach(removeNode);
   }
@@ -59,7 +72,6 @@
    * @param   {HTMLElement} node - target node
    * @returns {undefined}
    */
-
 
   function removeNode(node) {
     const {
@@ -82,6 +94,7 @@
     TAG,
     SLOT
   };
+
   const ATTRIBUTE = 0;
   const EVENT = 1;
   const TEXT = 2;
@@ -92,12 +105,12 @@
     TEXT,
     VALUE
   };
+
   /**
    * Create the template meta object in case of <template> fragments
    * @param   {TemplateChunk} componentTemplate - template chunk object
    * @returns {Object} the meta property that will be passed to the mount function of the TemplateChunk
    */
-
   function createTemplateMeta(componentTemplate) {
     const fragment = componentTemplate.dom.cloneNode(true);
     return {
@@ -108,7 +121,8 @@
   }
 
   const {
-    indexOf: iOF
+    indexOf,
+    slice
   } = [];
 
   const append = (get, parent, children, start, end, before) => {
@@ -124,18 +138,15 @@
         let {
           selectedIndex
         } = parent;
-        parent.selectedIndex = selectedIndex < 0 ? start : iOF.call(parent.querySelectorAll('option'), child);
+        parent.selectedIndex = selectedIndex < 0 ? start : indexOf.call(parent.querySelectorAll('option'), child);
       }
 
       start++;
     }
   };
-
   const eqeq = (a, b) => a == b;
-
   const identity = O => O;
-
-  const indexOf = (moreNodes, moreStart, moreEnd, lessNodes, lessStart, lessEnd, compare) => {
+  const indexOf$1 = (moreNodes, moreStart, moreEnd, lessNodes, lessStart, lessEnd, compare) => {
     const length = lessEnd - lessStart;
     /* istanbul ignore if */
 
@@ -156,24 +167,19 @@
 
     return -1;
   };
-
   const isReversed = (futureNodes, futureEnd, currentNodes, currentStart, currentEnd, compare) => {
     while (currentStart < currentEnd && compare(currentNodes[currentStart], futureNodes[futureEnd - 1])) {
       currentStart++;
       futureEnd--;
     }
-
     return futureEnd === 0;
   };
-
   const next = (get, list, i, length, before) => i < length ? get(list[i], 0) : 0 < i ? get(list[i - 1], -0).nextSibling : before;
-
   const remove = (get, children, start, end) => {
     while (start < end) drop(get(children[start++], -1));
   }; // - - - - - - - - - - - - - - - - - - -
   // diff related constants and utilities
   // - - - - - - - - - - - - - - - - - - -
-
 
   const DELETION = -1;
   const INSERTION = 1;
@@ -394,8 +400,8 @@
 
     if (parentNode) parentNode.removeChild(this);
   }
-  /*! (c) 2018 Andrea Giammarchi (ISC) */
 
+  /*! (c) 2018 Andrea Giammarchi (ISC) */
 
   const domdiff = (parentNode, // where changes happen
   currentNodes, // Array of current items/nodes
@@ -447,7 +453,7 @@
     let i = -1; // 2 simple indels: the shortest sequence is a subsequence of the longest
 
     if (currentChanges < futureChanges) {
-      i = indexOf(futureNodes, futureStart, futureEnd, currentNodes, currentStart, currentEnd, compare); // inner diff
+      i = indexOf$1(futureNodes, futureStart, futureEnd, currentNodes, currentStart, currentEnd, compare); // inner diff
 
       if (-1 < i) {
         append(get, parentNode, futureNodes, futureStart, i, get(currentNodes[currentStart], 0));
@@ -457,7 +463,7 @@
     }
     /* istanbul ignore else */
     else if (futureChanges < currentChanges) {
-        i = indexOf(currentNodes, currentStart, currentEnd, futureNodes, futureStart, futureEnd, compare); // outer diff
+        i = indexOf$1(currentNodes, currentStart, currentEnd, futureNodes, futureStart, futureEnd, compare); // outer diff
 
         if (-1 < i) {
           remove(get, currentNodes, currentStart, i);
@@ -492,14 +498,13 @@
     smartDiff(get, parentNode, futureNodes, futureStart, futureEnd, futureChanges, currentNodes, currentStart, currentEnd, currentChanges, currentLength, compare, before);
     return futureNodes;
   };
+
   /**
    * Quick type checking
    * @param   {*} element - anything
    * @param   {string} type - type definition
    * @returns {boolean} true if the type corresponds
    */
-
-
   function checkType(element, type) {
     return typeof element === type;
   }
@@ -508,7 +513,6 @@
    * @param   {HTMLElement}  el - element to check
    * @returns {boolean} true if we are in an svg context
    */
-
 
   function isSvg(el) {
     const owner = el.ownerSVGElement;
@@ -520,7 +524,6 @@
    * @returns {boolean} true if it's a <template>
    */
 
-
   function isTemplate(el) {
     return !isNil(el.content);
   }
@@ -529,7 +532,6 @@
    * @param   {*} value - value to check
    * @returns {boolean} - true if the value is a function
    */
-
 
   function isFunction(value) {
     return checkType(value, 'function');
@@ -540,7 +542,6 @@
    * @returns {boolean} true only for the value is a boolean
    */
 
-
   function isBoolean(value) {
     return checkType(value, 'boolean');
   }
@@ -550,7 +551,6 @@
    * @returns {boolean} true only for the value is an object
    */
 
-
   function isObject(value) {
     return !isNil(value) && checkType(value, 'object');
   }
@@ -559,7 +559,6 @@
    * @param   {*}  value - anything
    * @returns {boolean} true only for the 'undefined' and 'null' types
    */
-
 
   function isNil(value) {
     return value === null || value === undefined;
@@ -785,10 +784,10 @@
       placeholder
     });
   }
+
   /**
    * Binding responsible for the `if` directive
    */
-
 
   const IfBinding = Object.seal({
     // dynamic binding properties
@@ -837,12 +836,11 @@
     }
 
   });
-
-  function create$1(node, _ref3) {
+  function create$1(node, _ref) {
     let {
       evaluate,
       template
-    } = _ref3;
+    } = _ref;
     const parent = node.parentNode;
     const placeholder = document.createTextNode('');
     parent.insertBefore(placeholder, node);
@@ -854,13 +852,22 @@
       template: template.createDOM(node)
     });
   }
+
+  /**
+   * Throw an error with a descriptive message
+   * @param   { string } message - error message
+   * @returns { undefined } hoppla.. at this point the program should stop working
+   */
+
+  function panic(message) {
+    throw new Error(message);
+  }
   /**
    * Returns the memoized (cached) function.
    * // borrowed from https://www.30secondsofcode.org/js/s/memoize
    * @param {Function} fn - function to memoize
    * @returns {Function} memoize function
    */
-
 
   function memoize(fn) {
     const cache = new Map();
@@ -877,7 +884,6 @@
    * @param   {Array} attributes - attribute expressions generated by the riot compiler
    * @returns {Object} key value pairs with the result of the computation
    */
-
 
   function evaluateAttributeExpressions(attributes) {
     return attributes.reduce((acc, attribute) => {
@@ -918,8 +924,8 @@
    */
 
   function setAllAttributes(node, attributes) {
-    Object.entries(attributes).forEach((_ref4) => {
-      let [name, value] = _ref4;
+    Object.entries(attributes).forEach((_ref) => {
+      let [name, value] = _ref;
       return attributeExpression(node, {
         name
       }, value);
@@ -949,10 +955,10 @@
    */
 
 
-  function attributeExpression(node, _ref5, value, oldValue) {
+  function attributeExpression(node, _ref2, value, oldValue) {
     let {
       name
-    } = _ref5;
+    } = _ref2;
 
     // is it a spread operator? {...attributes}
     if (!name) {
@@ -982,7 +988,6 @@
    * @returns {string} the node attribute modifier method name
    */
 
-
   function getMethod(value) {
     return isNil(value) || value === false || value === '' || isObject(value) || isFunction(value) ? REMOVE_ATTRIBUTE : SET_ATTIBUTE;
   }
@@ -1002,49 +1007,70 @@
 
   const RE_EVENTS_PREFIX = /^on/;
 
-  const getCallbackAndOptions = value => Array.isArray(value) ? value : [value, false];
+  const getCallbackAndOptions = value => Array.isArray(value) ? value : [value, false]; // see also https://medium.com/@WebReflection/dom-handleevent-a-cross-platform-standard-since-year-2000-5bf17287fd38
+
+
+  const EventListener = {
+    handleEvent(event) {
+      this[event.type](event);
+    }
+
+  };
+  const ListenersWeakMap = new WeakMap();
+
+  const createListener = node => {
+    const listener = Object.create(EventListener);
+    ListenersWeakMap.set(node, listener);
+    return listener;
+  };
   /**
    * Set a new event listener
    * @param   {HTMLElement} node - target node
    * @param   {Object} expression - expression object
    * @param   {string} expression.name - event name
    * @param   {*} value - new expression value
-   * @param   {*} oldValue - old expression value
    * @returns {value} the callback just received
    */
 
 
-  function eventExpression(node, _ref6, value, oldValue) {
+  function eventExpression(node, _ref, value) {
     let {
       name
-    } = _ref6;
+    } = _ref;
     const normalizedEventName = name.replace(RE_EVENTS_PREFIX, '');
+    const eventListener = ListenersWeakMap.get(node) || createListener(node);
+    const [callback, options] = getCallbackAndOptions(value);
+    const handler = eventListener[normalizedEventName];
+    const mustRemoveEvent = handler && !callback;
+    const mustAddEvent = callback && !handler;
 
-    if (oldValue) {
-      node.removeEventListener(normalizedEventName, ...getCallbackAndOptions(oldValue));
+    if (mustRemoveEvent) {
+      node.removeEventListener(normalizedEventName, eventListener);
     }
 
-    if (value) {
-      node.addEventListener(normalizedEventName, ...getCallbackAndOptions(value));
+    if (mustAddEvent) {
+      node.addEventListener(normalizedEventName, eventListener, options);
     }
+
+    eventListener[normalizedEventName] = callback;
   }
+
   /**
    * Normalize the user value in order to render a empty string in case of falsy values
    * @param   {*} value - user input value
    * @returns {string} hopefully a string
    */
 
-
   function normalizeStringValue(value) {
     return isNil(value) ? '' : value;
   }
+
   /**
    * Get the the target text node to update or create one from of a comment node
    * @param   {HTMLElement} node - any html element containing childNodes
    * @param   {number} childNodeIndex - index of the text node in the childNodes list
    * @returns {HTMLTextNode} the text node to update
    */
-
 
   const getTextNode = (node, childNodeIndex) => {
     const target = node.childNodes[childNodeIndex];
@@ -1065,10 +1091,10 @@
    * @returns {undefined}
    */
 
-
   function textExpression(node, data, value) {
     node.data = normalizeStringValue(value);
   }
+
   /**
    * This methods handles the input fileds value updates
    * @param   {HTMLElement} node - target node
@@ -1076,7 +1102,6 @@
    * @param   {*} value - new expression value
    * @returns {undefined}
    */
-
 
   function valueExpression(node, expression, value) {
     node.value = normalizeStringValue(value);
@@ -1088,6 +1113,7 @@
     [TEXT]: textExpression,
     [VALUE]: valueExpression
   };
+
   const Expression = Object.seal({
     // Static props
     // node: null,
@@ -1152,6 +1178,7 @@
       node: data.type === TEXT ? getTextNode(node, data.childNodeIndex) : node
     });
   }
+
   /**
    * Create a flat object having as keys a list of methods that if dispatched will propagate
    * on the whole collection
@@ -1160,8 +1187,6 @@
    * @param   {*} context - context returned by the new methods created
    * @returns {Object} a new object to simplify the the nested methods dispatching
    */
-
-
   function flattenCollectionMethods(collection, methods, context) {
     return methods.reduce((acc, method) => {
       return Object.assign({}, acc, {
@@ -1172,12 +1197,64 @@
     }, {});
   }
 
-  function create$3(node, _ref7) {
+  function create$3(node, _ref) {
     let {
       expressions
-    } = _ref7;
+    } = _ref;
     return Object.assign({}, flattenCollectionMethods(expressions.map(expression => create$2(node, expression)), ['mount', 'update', 'unmount']));
   }
+
+  // Riot.js constants that can be used accross more modules
+  const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
+        DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
+        PLUGINS_SET = new Set(),
+        IS_DIRECTIVE = 'is',
+        VALUE_ATTRIBUTE = 'value',
+        MOUNT_METHOD_KEY = 'mount',
+        UPDATE_METHOD_KEY = 'update',
+        UNMOUNT_METHOD_KEY = 'unmount',
+        SHOULD_UPDATE_KEY = 'shouldUpdate',
+        ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
+        ON_MOUNTED_KEY = 'onMounted',
+        ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
+        ON_UPDATED_KEY = 'onUpdated',
+        ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
+        ON_UNMOUNTED_KEY = 'onUnmounted',
+        PROPS_KEY = 'props',
+        STATE_KEY = 'state',
+        SLOTS_KEY = 'slots',
+        ROOT_KEY = 'root',
+        IS_PURE_SYMBOL = Symbol.for('pure'),
+        PARENT_KEY_SYMBOL = Symbol('parent'),
+        ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
+        TEMPLATE_KEY_SYMBOL = Symbol('template');
+
+  var globals = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
+    DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY,
+    PLUGINS_SET: PLUGINS_SET,
+    IS_DIRECTIVE: IS_DIRECTIVE,
+    VALUE_ATTRIBUTE: VALUE_ATTRIBUTE,
+    MOUNT_METHOD_KEY: MOUNT_METHOD_KEY,
+    UPDATE_METHOD_KEY: UPDATE_METHOD_KEY,
+    UNMOUNT_METHOD_KEY: UNMOUNT_METHOD_KEY,
+    SHOULD_UPDATE_KEY: SHOULD_UPDATE_KEY,
+    ON_BEFORE_MOUNT_KEY: ON_BEFORE_MOUNT_KEY,
+    ON_MOUNTED_KEY: ON_MOUNTED_KEY,
+    ON_BEFORE_UPDATE_KEY: ON_BEFORE_UPDATE_KEY,
+    ON_UPDATED_KEY: ON_UPDATED_KEY,
+    ON_BEFORE_UNMOUNT_KEY: ON_BEFORE_UNMOUNT_KEY,
+    ON_UNMOUNTED_KEY: ON_UNMOUNTED_KEY,
+    PROPS_KEY: PROPS_KEY,
+    STATE_KEY: STATE_KEY,
+    SLOTS_KEY: SLOTS_KEY,
+    ROOT_KEY: ROOT_KEY,
+    IS_PURE_SYMBOL: IS_PURE_SYMBOL,
+    PARENT_KEY_SYMBOL: PARENT_KEY_SYMBOL,
+    ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
+    TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL
+  });
 
   function extendParentScope(attributes, scope, parentScope) {
     if (!attributes || !attributes.length) return parentScope;
@@ -1185,7 +1262,11 @@
       value: attr.evaluate(scope)
     }));
     return Object.assign(Object.create(parentScope || null), evaluateAttributeExpressions(expressions));
-  }
+  } // this function is only meant to fix an edge case
+  // https://github.com/riot/riot/issues/2842
+
+
+  const getRealParent = (scope, parentScope) => parentScope ? parentScope === scope ? scope[PARENT_KEY_SYMBOL] : parentScope : undefined;
 
   const SlotBinding = Object.seal({
     // dynamic binding properties
@@ -1200,19 +1281,20 @@
 
     // API methods
     mount(scope, parentScope) {
-      const templateData = scope.slots ? scope.slots.find((_ref8) => {
+      const templateData = scope.slots ? scope.slots.find((_ref) => {
         let {
           id
-        } = _ref8;
+        } = _ref;
         return id === this.name;
       }) : false;
       const {
         parentNode
       } = this.node;
+      const realParent = getRealParent(scope, parentScope);
       this.template = templateData && create$6(templateData.html, templateData.bindings).createDOM(parentNode);
 
       if (this.template) {
-        this.template.mount(this.node, this.getTemplateScope(scope, parentScope));
+        this.template.mount(this.node, this.getTemplateScope(scope, realParent), realParent);
         this.template.children = moveSlotInnerContent(this.node);
       }
 
@@ -1222,7 +1304,8 @@
 
     update(scope, parentScope) {
       if (this.template) {
-        this.template.update(this.getTemplateScope(scope, parentScope));
+        const realParent = getRealParent(scope, parentScope);
+        this.template.update(this.getTemplateScope(scope, realParent), realParent);
       }
 
       return this;
@@ -1266,17 +1349,18 @@
    */
 
 
-  function createSlot(node, _ref9) {
+  function createSlot(node, _ref2) {
     let {
       name,
       attributes
-    } = _ref9;
+    } = _ref2;
     return Object.assign({}, SlotBinding, {
       attributes,
       node,
       name
     });
   }
+
   /**
    * Create a new tag object if it was registered before, otherwise fallback to the simple
    * template chunk
@@ -1285,7 +1369,6 @@
    * @param   {Array} attributes - dynamic attributes that will be received by the tag element
    * @returns {TagImplementation|TemplateChunk} a tag implementation or a template chunk as fallback
    */
-
 
   function getTag(component, slots, attributes) {
     if (slots === void 0) {
@@ -1323,10 +1406,10 @@
 
 
   function slotBindings(slots) {
-    return slots.reduce((acc, _ref10) => {
+    return slots.reduce((acc, _ref) => {
       let {
         bindings
-      } = _ref10;
+      } = _ref;
       return acc.concat(bindings);
     }, []);
   }
@@ -1383,14 +1466,13 @@
     }
 
   });
-
-  function create$4(node, _ref11) {
+  function create$4(node, _ref2) {
     let {
       evaluate,
       getComponent,
       slots,
       attributes
-    } = _ref11;
+    } = _ref2;
     return Object.assign({}, TagBinding, {
       node,
       evaluate,
@@ -1407,6 +1489,7 @@
     [TAG]: create$4,
     [SLOT]: createSlot
   };
+
   /**
    * Text expressions in a template tag will get childNodeIndex value normalized
    * depending on the position of the <template> tag offset
@@ -1445,8 +1528,7 @@
     return (bindings[type] || bindings[SIMPLE])(node, Object.assign({}, binding, {
       expressions: templateTagOffset && !selector ? fixTextExpressionsOffset(bindingExpressions, templateTagOffset) : bindingExpressions
     }));
-  } // in this case a simple innerHTML is enough
-
+  }
 
   function createHTMLTree(html, root) {
     const template = isTemplate(root) ? root : document.createElement('template');
@@ -1472,13 +1554,13 @@
     if (isSvg(root)) return createSVGTree(html, root);
     return createHTMLTree(html, root);
   }
+
   /**
    * Inject the DOM tree into a target node
    * @param   {HTMLElement} el - target element
    * @param   {HTMLFragment|SVGElement} dom - dom tree to inject
    * @returns {undefined}
    */
-
 
   function injectDOM(el, dom) {
     switch (true) {
@@ -1494,13 +1576,13 @@
         el.appendChild(dom);
     }
   }
+
   /**
    * Create the Template DOM skeleton
    * @param   {HTMLElement} el - root node where the DOM will be injected
    * @param   {string} html - markup that will be injected into the root node
    * @returns {HTMLFragment} fragment that will be injected into the root node
    */
-
 
   function createTemplateDOM(el, html) {
     return html && (typeof html === 'string' ? createDOMTree(el, html) : html);
@@ -1663,84 +1745,72 @@
     });
   }
 
+  /**
+   * Method used to bind expressions to a DOM node
+   * @param   {string|HTMLElement} html - your static template html structure
+   * @param   {Array} bindings - list of the expressions to bind to update the markup
+   * @returns {TemplateChunk} a new TemplateChunk object having the `update`,`mount`, `unmount` and `clone` methods
+   *
+   * @example
+   *
+   * riotDOMBindings
+   *  .template(
+   *   `<div expr0><!----></div><div><p expr1><!----><section expr2></section></p>`,
+   *   [
+   *     {
+   *       selector: '[expr0]',
+   *       redundantAttribute: 'expr0',
+   *       expressions: [
+   *         {
+   *           type: expressionTypes.TEXT,
+   *           childNodeIndex: 0,
+   *           evaluate(scope) {
+   *             return scope.time;
+   *           },
+   *         },
+   *       ],
+   *     },
+   *     {
+   *       selector: '[expr1]',
+   *       redundantAttribute: 'expr1',
+   *       expressions: [
+   *         {
+   *           type: expressionTypes.TEXT,
+   *           childNodeIndex: 0,
+   *           evaluate(scope) {
+   *             return scope.name;
+   *           },
+   *         },
+   *         {
+   *           type: 'attribute',
+   *           name: 'style',
+   *           evaluate(scope) {
+   *             return scope.style;
+   *           },
+   *         },
+   *       ],
+   *     },
+   *     {
+   *       selector: '[expr2]',
+   *       redundantAttribute: 'expr2',
+   *       type: bindingTypes.IF,
+   *       evaluate(scope) {
+   *         return scope.isVisible;
+   *       },
+   *       template: riotDOMBindings.template('hello there'),
+   *     },
+   *   ]
+   * )
+   */
+
   var DOMBindings = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    bindingTypes: bindingTypes,
+    template: create$6,
     createBinding: create$5,
     createExpression: create$2,
-    expressionTypes: expressionTypes,
-    template: create$6
+    bindingTypes: bindingTypes,
+    expressionTypes: expressionTypes
   });
-
-  const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
-        DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
-        PLUGINS_SET = new Set(),
-        IS_DIRECTIVE = 'is',
-        VALUE_ATTRIBUTE = 'value',
-        MOUNT_METHOD_KEY = 'mount',
-        UPDATE_METHOD_KEY = 'update',
-        UNMOUNT_METHOD_KEY = 'unmount',
-        SHOULD_UPDATE_KEY = 'shouldUpdate',
-        ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
-        ON_MOUNTED_KEY = 'onMounted',
-        ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
-        ON_UPDATED_KEY = 'onUpdated',
-        ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
-        ON_UNMOUNTED_KEY = 'onUnmounted',
-        PROPS_KEY = 'props',
-        STATE_KEY = 'state',
-        SLOTS_KEY = 'slots',
-        ROOT_KEY = 'root',
-        IS_PURE_SYMBOL = Symbol.for('pure'),
-        PARENT_KEY_SYMBOL = Symbol('parent'),
-        ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
-        TEMPLATE_KEY_SYMBOL = Symbol('template');
-
-  var globals = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
-    DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY,
-    PLUGINS_SET: PLUGINS_SET,
-    IS_DIRECTIVE: IS_DIRECTIVE,
-    VALUE_ATTRIBUTE: VALUE_ATTRIBUTE,
-    MOUNT_METHOD_KEY: MOUNT_METHOD_KEY,
-    UPDATE_METHOD_KEY: UPDATE_METHOD_KEY,
-    UNMOUNT_METHOD_KEY: UNMOUNT_METHOD_KEY,
-    SHOULD_UPDATE_KEY: SHOULD_UPDATE_KEY,
-    ON_BEFORE_MOUNT_KEY: ON_BEFORE_MOUNT_KEY,
-    ON_MOUNTED_KEY: ON_MOUNTED_KEY,
-    ON_BEFORE_UPDATE_KEY: ON_BEFORE_UPDATE_KEY,
-    ON_UPDATED_KEY: ON_UPDATED_KEY,
-    ON_BEFORE_UNMOUNT_KEY: ON_BEFORE_UNMOUNT_KEY,
-    ON_UNMOUNTED_KEY: ON_UNMOUNTED_KEY,
-    PROPS_KEY: PROPS_KEY,
-    STATE_KEY: STATE_KEY,
-    SLOTS_KEY: SLOTS_KEY,
-    ROOT_KEY: ROOT_KEY,
-    IS_PURE_SYMBOL: IS_PURE_SYMBOL,
-    PARENT_KEY_SYMBOL: PARENT_KEY_SYMBOL,
-    ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
-    TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL
-  });
-
-  /**
-   * Quick type checking
-   * @param   {*} element - anything
-   * @param   {string} type - type definition
-   * @returns {boolean} true if the type corresponds
-   */
-  function checkType$1(element, type) {
-    return typeof element === type;
-  }
-  /**
-   * Check that will be passed if its argument is a function
-   * @param   {*} value - value to check
-   * @returns {boolean} - true if the value is a function
-   */
-
-  function isFunction$1(value) {
-    return checkType$1(value, 'function');
-  }
 
   function noop() {
     return this;
@@ -1765,7 +1835,7 @@
    */
 
   function callOrAssign(source) {
-    return isFunction$1(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
+    return isFunction(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
   }
 
   /**
@@ -1822,68 +1892,6 @@
     return source;
   }
 
-  const ATTRIBUTE$1 = 0;
-  const VALUE$1 = 3;
-
-  /**
-   * Convert a string from camel case to dash-case
-   * @param   {string} string - probably a component tag name
-   * @returns {string} component name normalized
-   */
-  function camelToDashCase(string) {
-    return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-  }
-  /**
-   * Convert a string containing dashes to camel case
-   * @param   {string} string - input string
-   * @returns {string} my-string -> myString
-   */
-
-  function dashToCamelCase$1(string) {
-    return string.replace(/-(\w)/g, (_, c) => c.toUpperCase());
-  }
-
-  /**
-   * Throw an error with a descriptive message
-   * @param   { string } message - error message
-   * @returns { undefined } hoppla.. at this point the program should stop working
-   */
-
-  function panic(message) {
-    throw new Error(message);
-  }
-  /**
-   * Evaluate a list of attribute expressions
-   * @param   {Array} attributes - attribute expressions generated by the riot compiler
-   * @returns {Object} key value pairs with the result of the computation
-   */
-
-  function evaluateAttributeExpressions$1(attributes) {
-    return attributes.reduce((acc, attribute) => {
-      const {
-        value,
-        type
-      } = attribute;
-
-      switch (true) {
-        // spread attribute
-        case !attribute.name && type === ATTRIBUTE$1:
-          return Object.assign({}, acc, {}, value);
-        // value attribute
-
-        case type === VALUE$1:
-          acc.value = attribute.value;
-          break;
-        // normal attributes
-
-        default:
-          acc[dashToCamelCase$1(attribute.name)] = attribute.value;
-      }
-
-      return acc;
-    }, {});
-  }
-
   /**
    * Converts any DOM node/s to a loopable array
    * @param   { HTMLElement|NodeList } els - single html element or a node list
@@ -1911,19 +1919,6 @@
 
   function $(selector, ctx) {
     return domToArray(typeof selector === 'string' ? (ctx || document).querySelectorAll(selector) : selector);
-  }
-
-  /**
-   * Get all the element attributes as object
-   * @param   {HTMLElement} element - DOM node we want to parse
-   * @returns {Object} all the attributes found as a key value pairs
-   */
-
-  function DOMattributesToObject(element) {
-    return Array.from(element.attributes).reduce((acc, attribute) => {
-      acc[dashToCamelCase$1(attribute.name)] = attribute.value;
-      return acc;
-    }, {});
   }
 
   /**
@@ -2418,7 +2413,7 @@
         }
 
         this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(element, attributes).mount(parentScope);
-        defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, evaluateInitialProps(element, props), {}, evaluateAttributeExpressions$1(this[ATTRIBUTES_KEY_SYMBOL].expressions))));
+        defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, evaluateInitialProps(element, props), {}, evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions))));
         this[STATE_KEY] = computeState(this[STATE_KEY], state);
         this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone(); // link this object to the DOM node
 
@@ -2430,10 +2425,10 @@
 
         defineProperty(this, SLOTS_KEY, slots); // before mount lifecycle event
 
-        this[ON_BEFORE_MOUNT_KEY](this[PROPS_KEY], this[STATE_KEY]); // mount the template
+        this[ON_BEFORE_MOUNT_KEY](this[PROPS_KEY], this[STATE_KEY]);
+        this[PARENT_KEY_SYMBOL] = parentScope; // mount the template
 
         this[TEMPLATE_KEY_SYMBOL].mount(element, this, parentScope);
-        this[PARENT_KEY_SYMBOL] = parentScope;
         this[ON_MOUNTED_KEY](this[PROPS_KEY], this[STATE_KEY]);
         return this;
       },
@@ -2447,7 +2442,7 @@
           this[ATTRIBUTES_KEY_SYMBOL].update(parentScope);
         }
 
-        const newProps = evaluateAttributeExpressions$1(this[ATTRIBUTES_KEY_SYMBOL].expressions);
+        const newProps = evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions);
         if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false) return;
         defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, this[PROPS_KEY], {}, newProps)));
         this[STATE_KEY] = computeState(this[STATE_KEY], state);
@@ -2467,7 +2462,7 @@
         return this;
       }
 
-    })), Object.keys(component).filter(prop => isFunction$1(component[prop])));
+    })), Object.keys(component).filter(prop => isFunction(component[prop])));
   }
   /**
    * Component initialization function starting from a DOM node
@@ -2588,7 +2583,7 @@
    */
 
   function install(plugin) {
-    if (!isFunction$1(plugin)) panic('Plugins must be of type function');
+    if (!isFunction(plugin)) panic('Plugins must be of type function');
     if (PLUGINS_SET$1.has(plugin)) panic('This plugin was already install');
     PLUGINS_SET$1.add(plugin);
     return PLUGINS_SET$1;
@@ -2631,13 +2626,13 @@
    */
 
   function pure(func) {
-    if (!isFunction$1(func)) panic('riot.pure accepts only arguments of type "function"');
+    if (!isFunction(func)) panic('riot.pure accepts only arguments of type "function"');
     func[IS_PURE_SYMBOL] = true;
     return func;
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.11.1'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.12.0'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
