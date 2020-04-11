@@ -1,4 +1,4 @@
-import {IS_DIRECTIVE} from '../globals'
+import {IS_DIRECTIVE} from '@riotjs/util/constants'
 import {get as getAttr} from 'bianco.attr'
 
 /**

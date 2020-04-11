@@ -1,5 +1,5 @@
 import * as DOMBindings from '@riotjs/dom-bindings'
-import * as globals from './globals'
+import * as globals from '@riotjs/util/constants'
 import {createComponent, defineComponent, mountComponent} from './core/component'
 import $ from 'bianco.query'
 import compose from 'cumpa'

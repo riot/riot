@@ -1,0 +1,18 @@
+<nested-slot>
+  <sub-nested-slot>
+    { state.message }
+  </sub-nested-slot>
+
+  <script>
+    import SubNestedSlot from './sub-nested-slot.riot'
+
+    export default {
+      components: {
+        SubNestedSlot,
+      },
+      onBeforeMount({ message }) {
+        this.state.message = message
+      }
+    }
+  </script>
+</nested-slot>

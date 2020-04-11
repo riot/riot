@@ -21,7 +21,7 @@ import {
   TEMPLATE_KEY_SYMBOL,
   UNMOUNT_METHOD_KEY,
   UPDATE_METHOD_KEY
-} from '../globals'
+} from '@riotjs/util/constants'
 
 import {
   autobindMethods,
@@ -350,10 +350,9 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
 
           // before mount lifecycle event
           this[ON_BEFORE_MOUNT_KEY](this[PROPS_KEY], this[STATE_KEY])
+          this[PARENT_KEY_SYMBOL] = parentScope
           // mount the template
           this[TEMPLATE_KEY_SYMBOL].mount(element, this, parentScope)
-          this[PARENT_KEY_SYMBOL] = parentScope
-
           this[ON_MOUNTED_KEY](this[PROPS_KEY], this[STATE_KEY])
 
           return this

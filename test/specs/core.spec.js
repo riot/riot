@@ -19,6 +19,7 @@ import NativeInlineEvents from '../components/native-inline-events.riot'
 import NestedAliasedImportsComponent from '../components/nested-aliased-imports.riot'
 import NestedHoc from '../components/nested-hoc.riot'
 import NestedImportsComponent from '../components/nested-imports.riot'
+import NestedSlot from '../components/nested-slot.riot'
 import ParentValueProp from '../components/parent-value-prop.riot'
 import ParentWithSlotsComponent from '../components/parent-with-slots.riot'
 import PureComponent from '../components/pure-component.riot'
@@ -847,6 +848,22 @@ describe('Riot core api', () => {
       })
 
       expect(component.$('p')).to.be.not.ok
+
+      component.unmount()
+    })
+
+    it('Nested <slot>s scope gets preserved', () => {
+      const element = document.createElement('nested-slot')
+
+      const component = riot.component(NestedSlot)(element, {
+        message: 'hello'
+      })
+
+      expect(component.$('simple-slot').innerHTML).to.be.equal('hello')
+
+      component.update({ message: 'goodbye' })
+
+      expect(component.$('simple-slot').innerHTML).to.be.equal('goodbye')
 
       component.unmount()
     })
