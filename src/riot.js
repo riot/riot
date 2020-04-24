@@ -74,7 +74,7 @@ export function unmount(selector, keepRootElement) {
  */
 export function install(plugin) {
   if (!isFunction(plugin)) panic('Plugins must be of type function')
-  if (PLUGINS_SET.has(plugin)) panic('This plugin was already install')
+  if (PLUGINS_SET.has(plugin)) panic('This plugin was already installed')
 
   PLUGINS_SET.add(plugin)
 
@@ -95,7 +95,7 @@ export function uninstall(plugin) {
 }
 
 /**
- * Helpter method to create component without relying on the registered ones
+ * Helper method to create component without relying on the registered ones
  * @param   {Object} implementation - component implementation
  * @returns {Function} function that will allow you to mount a riot component on a DOM node
  */
