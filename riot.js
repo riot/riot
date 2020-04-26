@@ -1,4 +1,4 @@
-/* Riot v4.12.0, @license MIT */
+/* Riot v4.12.1, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2584,7 +2584,7 @@
 
   function install(plugin) {
     if (!isFunction(plugin)) panic('Plugins must be of type function');
-    if (PLUGINS_SET$1.has(plugin)) panic('This plugin was already install');
+    if (PLUGINS_SET$1.has(plugin)) panic('This plugin was already installed');
     PLUGINS_SET$1.add(plugin);
     return PLUGINS_SET$1;
   }
@@ -2600,7 +2600,7 @@
     return PLUGINS_SET$1;
   }
   /**
-   * Helpter method to create component without relying on the registered ones
+   * Helper method to create component without relying on the registered ones
    * @param   {Object} implementation - component implementation
    * @returns {Function} function that will allow you to mount a riot component on a DOM node
    */
@@ -2632,7 +2632,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.12.0'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.12.1'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
