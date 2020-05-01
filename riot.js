@@ -1,4 +1,4 @@
-/* Riot v4.12.1, @license MIT */
+/* Riot v4.12.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -770,7 +770,7 @@
     const root = node.cloneNode();
     parent.insertBefore(placeholder, node);
     removeNode(node);
-    return Object.assign({}, EachBinding, {
+    return Object.assign(Object.assign({}, EachBinding), {}, {
       childrenMap: new Map(),
       node,
       root,
@@ -845,7 +845,7 @@
     const placeholder = document.createTextNode('');
     parent.insertBefore(placeholder, node);
     removeNode(node);
-    return Object.assign({}, IfBinding, {
+    return Object.assign(Object.assign({}, IfBinding), {}, {
       node,
       evaluate,
       placeholder,
@@ -895,7 +895,7 @@
       switch (true) {
         // spread attribute
         case !attribute.name && type === ATTRIBUTE:
-          return Object.assign({}, acc, {}, value);
+          return Object.assign(Object.assign({}, acc), value);
         // value attribute
 
         case type === VALUE:
@@ -1174,7 +1174,7 @@
   }
 
   function create$2(node, data) {
-    return Object.assign({}, Expression, {}, data, {
+    return Object.assign(Object.assign(Object.assign({}, Expression), data), {}, {
       node: data.type === TEXT ? getTextNode(node, data.childNodeIndex) : node
     });
   }
@@ -1189,7 +1189,7 @@
    */
   function flattenCollectionMethods(collection, methods, context) {
     return methods.reduce((acc, method) => {
-      return Object.assign({}, acc, {
+      return Object.assign(Object.assign({}, acc), {}, {
         [method]: scope => {
           return collection.map(item => item[method](scope)) && context;
         }
@@ -1258,7 +1258,7 @@
 
   function extendParentScope(attributes, scope, parentScope) {
     if (!attributes || !attributes.length) return parentScope;
-    const expressions = attributes.map(attr => Object.assign({}, attr, {
+    const expressions = attributes.map(attr => Object.assign(Object.assign({}, attr), {}, {
       value: attr.evaluate(scope)
     }));
     return Object.assign(Object.create(parentScope || null), evaluateAttributeExpressions(expressions));
@@ -1354,7 +1354,7 @@
       name,
       attributes
     } = _ref2;
-    return Object.assign({}, SlotBinding, {
+    return Object.assign(Object.assign({}, SlotBinding), {}, {
       attributes,
       node,
       name
@@ -1473,7 +1473,7 @@
       slots,
       attributes
     } = _ref2;
-    return Object.assign({}, TagBinding, {
+    return Object.assign(Object.assign({}, TagBinding), {}, {
       node,
       evaluate,
       slots,
@@ -1499,7 +1499,7 @@
    */
 
   function fixTextExpressionsOffset(expressions, textExpressionsOffset) {
-    return expressions.map(e => e.type === TEXT ? Object.assign({}, e, {
+    return expressions.map(e => e.type === TEXT ? Object.assign(Object.assign({}, e), {}, {
       childNodeIndex: e.childNodeIndex + textExpressionsOffset
     }) : e);
   }
@@ -1525,7 +1525,7 @@
     if (redundantAttribute) node.removeAttribute(redundantAttribute);
     const bindingExpressions = expressions || []; // init the binding
 
-    return (bindings[type] || bindings[SIMPLE])(node, Object.assign({}, binding, {
+    return (bindings[type] || bindings[SIMPLE])(node, Object.assign(Object.assign({}, binding), {}, {
       expressions: templateTagOffset && !selector ? fixTextExpressionsOffset(bindingExpressions, templateTagOffset) : bindingExpressions
     }));
   }
@@ -1721,7 +1721,7 @@
      * @returns {TemplateChunk} a clone of this object resetting the this.el property
      */
     clone() {
-      return Object.assign({}, this, {
+      return Object.assign(Object.assign({}, this), {}, {
         el: null
       });
     }
@@ -1739,7 +1739,7 @@
       bindings = [];
     }
 
-    return Object.assign({}, TemplateChunk, {
+    return Object.assign(Object.assign({}, TemplateChunk), {}, {
       html,
       bindingsData: bindings
     });
@@ -2130,7 +2130,7 @@
     [ON_BEFORE_UNMOUNT_KEY]: noop,
     [ON_UNMOUNTED_KEY]: noop
   });
-  const MOCKED_TEMPLATE_INTERFACE = Object.assign({}, PURE_COMPONENT_API, {
+  const MOCKED_TEMPLATE_INTERFACE = Object.assign(Object.assign({}, PURE_COMPONENT_API), {}, {
     clone: noop,
     createDOM: noop
   });
@@ -2146,7 +2146,7 @@
       initialProps = {};
     }
 
-    return Object.assign({}, DOMattributesToObject(element), {}, callOrAssign(initialProps));
+    return Object.assign(Object.assign({}, DOMattributesToObject(element)), callOrAssign(initialProps));
   }
   /**
    * Bind a DOM node to its component object
@@ -2306,13 +2306,13 @@
     // add the component css into the DOM
     if (css && name) cssManager.add(name, css);
     return curry(enhanceComponentAPI)(defineProperties( // set the component defaults without overriding the original component API
-    defineDefaults(componentAPI, Object.assign({}, COMPONENT_LIFECYCLE_METHODS, {
+    defineDefaults(componentAPI, Object.assign(Object.assign({}, COMPONENT_LIFECYCLE_METHODS), {}, {
       [STATE_KEY]: {}
-    })), Object.assign({
+    })), Object.assign(Object.assign({
       // defined during the component creation
       [SLOTS_KEY]: null,
       [ROOT_KEY]: null
-    }, COMPONENT_CORE_HELPERS, {
+    }, COMPONENT_CORE_HELPERS), {}, {
       name,
       css,
       template
@@ -2376,7 +2376,7 @@
 
 
   function computeState(oldState, newState) {
-    return Object.assign({}, oldState, {}, callOrAssign(newState));
+    return Object.assign(Object.assign({}, oldState), callOrAssign(newState));
   }
   /**
    * Add eventually the "is" attribute to link this DOM node to its css
@@ -2413,7 +2413,7 @@
         }
 
         this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(element, attributes).mount(parentScope);
-        defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, evaluateInitialProps(element, props), {}, evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions))));
+        defineProperty(this, PROPS_KEY, Object.freeze(Object.assign(Object.assign({}, evaluateInitialProps(element, props)), evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions))));
         this[STATE_KEY] = computeState(this[STATE_KEY], state);
         this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone(); // link this object to the DOM node
 
@@ -2444,7 +2444,7 @@
 
         const newProps = evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions);
         if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false) return;
-        defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, this[PROPS_KEY], {}, newProps)));
+        defineProperty(this, PROPS_KEY, Object.freeze(Object.assign(Object.assign({}, this[PROPS_KEY]), newProps)));
         this[STATE_KEY] = computeState(this[STATE_KEY], state);
         this[ON_BEFORE_UPDATE_KEY](this[PROPS_KEY], this[STATE_KEY]);
         this[TEMPLATE_KEY_SYMBOL].update(this, this[PARENT_KEY_SYMBOL]);
@@ -2632,7 +2632,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.12.1'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.12.2'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
