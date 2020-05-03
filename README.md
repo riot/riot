@@ -22,7 +22,7 @@
 
 ### Custom components • Concise syntax • Simple API • Tiny Size
 
-Riot brings custom components to all modern browsers. It is designed to offer you everything you wished native the web components API looked like.
+Riot brings custom components to all modern browsers. It is designed to offer you everything you wished the native web components API provided.
 
 #### Tag definition
 
@@ -96,14 +96,14 @@ HTML syntax is the de facto language on the web and it's designed for building u
 ### Use your dearest language and tools
 - Create components with CoffeeScript, Jade, LiveScript, Typescript, ES6 or [any pre-processor](https://riot.js.org/compiler/#pre-processors) you want.
 - Build with [@riotjs/cli](https://github.com/riot/cli), [webpack](https://github.com/riot/webpack-loader), [Rollup](https://github.com/riot/rollup-plugin-riot), [parcel](https://github.com/riot/parcel-plugin-riot), [Browserify](https://github.com/riot/riotify).
-- Test with however you like, you can [load your riot tags directly in node](https://github.com/riot/ssr#render---to-render-only-markup)
+- Test however you like; you can [load your riot tags directly in node](https://github.com/riot/ssr#render---to-render-only-markup)
 
 
 ### Powerful and modular ecosystem
 
 The Riot.js ecosystem is completely modular, it's designed to let you pick only the stuff you really need:
 
-  - [@riotjs/cli](https://github.com/riot/cli) - CLI to compile locally your tags to javascript
+  - [@riotjs/cli](https://github.com/riot/cli) - CLI to locally compile your tags to javascript
   - [@riotjs/ssr](https://github.com/riot/ssr) - Super simple server side rendering
   - [@riotjs/hydrate](https://github.com/riot/hydrate) - Hydration strategy for your SPA
   - [@riotjs/route](https://github.com/riot/route) - Isomorphic router
