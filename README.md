@@ -5,7 +5,6 @@
 
 [![Build Status][travis-image]][travis-url]
 [![MIT License][license-image]][license-url]
-[![Join the chat at https://gitter.im/riot/riot][gitter-image]][gitter-url]
 [![Join the discord community channel][discord-image]][discord-url]
 [![Join the chat (ja) at https://riot-jp-slackin.herokuapp.com/][slack-ja-image]][slack-ja-url]
 [![OpenCollective Backers][backer-badge]][backer-url] [![OpenCollective Sponsors][sponsor-badge]][sponsor-url]
@@ -219,9 +218,6 @@ Special thanks to Browserstack for their support
 
 [saucelabs-image]:https://saucelabs.com/browser-matrix/testsriotjs.svg?1
 [saucelabs-url]:https://saucelabs.com/u/testsriotjs
-
-[gitter-image]:https://img.shields.io/badge/GITTER-JOIN_CHAT_%E2%86%92-1dce73.svg?style=flat-square
-[gitter-url]:https://gitter.im/riot/riot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
 [discord-url]:https://discord.gg/PagXe5Y
 [discord-image]:https://img.shields.io/badge/DISCORD-JOIN_CHANNEL_%E2%86%92-7289da.svg?style=flat-square
