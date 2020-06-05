@@ -1,4 +1,4 @@
-/* Riot v4.12.4, @license MIT */
+/* Riot v4.13.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -770,7 +770,7 @@
     const root = node.cloneNode();
     parent.insertBefore(placeholder, node);
     removeNode(node);
-    return Object.assign(Object.assign({}, EachBinding), {}, {
+    return Object.assign({}, EachBinding, {
       childrenMap: new Map(),
       node,
       root,
@@ -845,7 +845,7 @@
     const placeholder = document.createTextNode('');
     parent.insertBefore(placeholder, node);
     removeNode(node);
-    return Object.assign(Object.assign({}, IfBinding), {}, {
+    return Object.assign({}, IfBinding, {
       node,
       evaluate,
       placeholder,
@@ -895,7 +895,7 @@
       switch (true) {
         // spread attribute
         case !attribute.name && type === ATTRIBUTE:
-          return Object.assign(Object.assign({}, acc), value);
+          return Object.assign({}, acc, value);
         // value attribute
 
         case type === VALUE:
@@ -1174,7 +1174,7 @@
   }
 
   function create$2(node, data) {
-    return Object.assign(Object.assign(Object.assign({}, Expression), data), {}, {
+    return Object.assign({}, Expression, data, {
       node: data.type === TEXT ? getTextNode(node, data.childNodeIndex) : node
     });
   }
@@ -1189,7 +1189,7 @@
    */
   function flattenCollectionMethods(collection, methods, context) {
     return methods.reduce((acc, method) => {
-      return Object.assign(Object.assign({}, acc), {}, {
+      return Object.assign({}, acc, {
         [method]: scope => {
           return collection.map(item => item[method](scope)) && context;
         }
@@ -1258,7 +1258,7 @@
 
   function extendParentScope(attributes, scope, parentScope) {
     if (!attributes || !attributes.length) return parentScope;
-    const expressions = attributes.map(attr => Object.assign(Object.assign({}, attr), {}, {
+    const expressions = attributes.map(attr => Object.assign({}, attr, {
       value: attr.evaluate(scope)
     }));
     return Object.assign(Object.create(parentScope || null), evaluateAttributeExpressions(expressions));
@@ -1354,7 +1354,7 @@
       name,
       attributes
     } = _ref2;
-    return Object.assign(Object.assign({}, SlotBinding), {}, {
+    return Object.assign({}, SlotBinding, {
       attributes,
       node,
       name
@@ -1473,7 +1473,7 @@
       slots,
       attributes
     } = _ref2;
-    return Object.assign(Object.assign({}, TagBinding), {}, {
+    return Object.assign({}, TagBinding, {
       node,
       evaluate,
       slots,
@@ -1499,7 +1499,7 @@
    */
 
   function fixTextExpressionsOffset(expressions, textExpressionsOffset) {
-    return expressions.map(e => e.type === TEXT ? Object.assign(Object.assign({}, e), {}, {
+    return expressions.map(e => e.type === TEXT ? Object.assign({}, e, {
       childNodeIndex: e.childNodeIndex + textExpressionsOffset
     }) : e);
   }
@@ -1525,7 +1525,7 @@
     if (redundantAttribute) node.removeAttribute(redundantAttribute);
     const bindingExpressions = expressions || []; // init the binding
 
-    return (bindings[type] || bindings[SIMPLE])(node, Object.assign(Object.assign({}, binding), {}, {
+    return (bindings[type] || bindings[SIMPLE])(node, Object.assign({}, binding, {
       expressions: templateTagOffset && !selector ? fixTextExpressionsOffset(bindingExpressions, templateTagOffset) : bindingExpressions
     }));
   }
@@ -1721,7 +1721,7 @@
      * @returns {TemplateChunk} a clone of this object resetting the this.el property
      */
     clone() {
-      return Object.assign(Object.assign({}, this), {}, {
+      return Object.assign({}, this, {
         el: null
       });
     }
@@ -1739,7 +1739,7 @@
       bindings = [];
     }
 
-    return Object.assign(Object.assign({}, TemplateChunk), {}, {
+    return Object.assign({}, TemplateChunk, {
       html,
       bindingsData: bindings
     });
@@ -2130,7 +2130,7 @@
     [ON_BEFORE_UNMOUNT_KEY]: noop,
     [ON_UNMOUNTED_KEY]: noop
   });
-  const MOCKED_TEMPLATE_INTERFACE = Object.assign(Object.assign({}, PURE_COMPONENT_API), {}, {
+  const MOCKED_TEMPLATE_INTERFACE = Object.assign({}, PURE_COMPONENT_API, {
     clone: noop,
     createDOM: noop
   });
@@ -2146,7 +2146,7 @@
       initialProps = {};
     }
 
-    return Object.assign(Object.assign({}, DOMattributesToObject(element)), callOrAssign(initialProps));
+    return Object.assign({}, DOMattributesToObject(element), callOrAssign(initialProps));
   }
   /**
    * Bind a DOM node to its component object
@@ -2306,13 +2306,13 @@
     // add the component css into the DOM
     if (css && name) cssManager.add(name, css);
     return curry(enhanceComponentAPI)(defineProperties( // set the component defaults without overriding the original component API
-    defineDefaults(componentAPI, Object.assign(Object.assign({}, COMPONENT_LIFECYCLE_METHODS), {}, {
+    defineDefaults(componentAPI, Object.assign({}, COMPONENT_LIFECYCLE_METHODS, {
       [STATE_KEY]: {}
-    })), Object.assign(Object.assign({
+    })), Object.assign({
       // defined during the component creation
       [SLOTS_KEY]: null,
       [ROOT_KEY]: null
-    }, COMPONENT_CORE_HELPERS), {}, {
+    }, COMPONENT_CORE_HELPERS, {
       name,
       css,
       template
@@ -2376,7 +2376,7 @@
 
 
   function computeState(oldState, newState) {
-    return Object.assign(Object.assign({}, oldState), callOrAssign(newState));
+    return Object.assign({}, oldState, callOrAssign(newState));
   }
   /**
    * Add eventually the "is" attribute to link this DOM node to its css
@@ -2413,7 +2413,7 @@
         }
 
         this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(element, attributes).mount(parentScope);
-        defineProperty(this, PROPS_KEY, Object.freeze(Object.assign(Object.assign({}, evaluateInitialProps(element, props)), evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions))));
+        defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, evaluateInitialProps(element, props), evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions))));
         this[STATE_KEY] = computeState(this[STATE_KEY], state);
         this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone(); // link this object to the DOM node
 
@@ -2444,7 +2444,7 @@
 
         const newProps = evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions);
         if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false) return;
-        defineProperty(this, PROPS_KEY, Object.freeze(Object.assign(Object.assign({}, this[PROPS_KEY]), newProps)));
+        defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, this[PROPS_KEY], newProps)));
         this[STATE_KEY] = computeState(this[STATE_KEY], state);
         this[ON_BEFORE_UPDATE_KEY](this[PROPS_KEY], this[STATE_KEY]);
         this[TEMPLATE_KEY_SYMBOL].update(this, this[PARENT_KEY_SYMBOL]);
@@ -2632,7 +2632,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.12.4'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.13.0'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2670,16 +2670,16 @@
   	return n && n['default'] || n;
   }
 
-  var _empty_module = {};
+  var _rollup_plugin_ignore_empty_module_placeholder = {};
 
-  var _empty_module$1 = /*#__PURE__*/Object.freeze({
+  var _rollup_plugin_ignore_empty_module_placeholder$1 = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': _empty_module
+    'default': _rollup_plugin_ignore_empty_module_placeholder
   });
 
-  var require$$1 = getCjsExportFromNamespace(_empty_module$1);
+  var require$$1 = getCjsExportFromNamespace(_rollup_plugin_ignore_empty_module_placeholder$1);
 
-  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.12.4, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&Object.prototype.hasOwnProperty.call(fs,'default')?fs['default']:fs;path$1=path$1&&Object.prototype.hasOwnProperty.call(path$1,'default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
+  var compiler=createCommonjsModule(function(module,exports){/* Riot Compiler v4.13.0, @license MIT */(function(global,factory){factory(exports,require$$1,require$$1);})(commonjsGlobal,function(exports,fs,path$1){fs=fs&&Object.prototype.hasOwnProperty.call(fs,'default')?fs['default']:fs;path$1=path$1&&Object.prototype.hasOwnProperty.call(path$1,'default')?path$1['default']:path$1;const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function unwrapExports(x){return x&&x.__esModule&&Object.prototype.hasOwnProperty.call(x,'default')?x['default']:x;}function createCommonjsModule(fn,module){return module={exports:{}},fn(module,module.exports),module.exports;}function getCjsExportFromNamespace(n){return n&&n['default']||n;}var types=createCommonjsModule(function(module,exports){var __extends=this&&this.__extends||function(){var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(b.hasOwnProperty(p))d[p]=b[p];};return _extendStatics(d,b);};return function(d,b){_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());};}();Object.defineProperty(exports,"__esModule",{value:true});var Op=Object.prototype;var objToStr=Op.toString;var hasOwn=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
   this.allSupertypes=Object.create(null);// Linear inheritance hierarchy. Populated during finalization.
   this.supertypeList=[];// Includes inherited fields.
   this.allFields=Object.create(null);// Non-hidden keys of allFields.
@@ -5444,387 +5444,7 @@
   // element. Make sure we always return the smallest of these.
   while(index-1>=0){if(aCompare(aHaystack[index],aHaystack[index-1],true)!==0){break;}--index;}return index;};});var binarySearch_1$1=binarySearch$1.GREATEST_LOWER_BOUND;var binarySearch_2$1=binarySearch$1.LEAST_UPPER_BOUND;var binarySearch_3$1=binarySearch$1.search;var readWasm=createCommonjsModule(function(module){if(typeof fetch==="function"){// Web version of reading a wasm file into an array buffer.
   let mappingsWasmUrl=null;module.exports=function readWasm(){if(typeof mappingsWasmUrl!=="string"){throw new Error("You must provide the URL of lib/mappings.wasm by calling "+"SourceMapConsumer.initialize({ 'lib/mappings.wasm': ... }) "+"before using SourceMapConsumer");}return fetch(mappingsWasmUrl).then(response=>response.arrayBuffer());};module.exports.initialize=url=>mappingsWasmUrl=url;}else {// Node version of reading a wasm file into an array buffer.
-  const fs$1=fs;const path=path$1;module.exports=function readWasm(){return new Promise((resolve,reject)=>{const wasmPath=path.join(__dirname,"mappings.wasm");fs$1.readFile(wasmPath,null,(error,data)=>{if(error){reject(error);return;}resolve(data.buffer);});});};module.exports.initialize=_=>{console.debug("SourceMapConsumer.initialize is a no-op when running in node.js");};}});var readWasm_1=readWasm.initialize;/**
-  	 * Provide the JIT with a nice shape / hidden class.
-  	 */function Mapping$1(){this.generatedLine=0;this.generatedColumn=0;this.lastGeneratedColumn=null;this.source=null;this.originalLine=null;this.originalColumn=null;this.name=null;}let cachedWasm=null;var wasm=function wasm(){if(cachedWasm){return cachedWasm;}const callbackStack=[];cachedWasm=readWasm().then(buffer=>{return WebAssembly.instantiate(buffer,{env:{mapping_callback(generatedLine,generatedColumn,hasLastGeneratedColumn,lastGeneratedColumn,hasOriginal,source,originalLine,originalColumn,hasName,name){const mapping=new Mapping$1();// JS uses 1-based line numbers, wasm uses 0-based.
-  mapping.generatedLine=generatedLine+1;mapping.generatedColumn=generatedColumn;if(hasLastGeneratedColumn){// JS uses inclusive last generated column, wasm uses exclusive.
-  mapping.lastGeneratedColumn=lastGeneratedColumn-1;}if(hasOriginal){mapping.source=source;// JS uses 1-based line numbers, wasm uses 0-based.
-  mapping.originalLine=originalLine+1;mapping.originalColumn=originalColumn;if(hasName){mapping.name=name;}}callbackStack[callbackStack.length-1](mapping);},start_all_generated_locations_for(){console.time("all_generated_locations_for");},end_all_generated_locations_for(){console.timeEnd("all_generated_locations_for");},start_compute_column_spans(){console.time("compute_column_spans");},end_compute_column_spans(){console.timeEnd("compute_column_spans");},start_generated_location_for(){console.time("generated_location_for");},end_generated_location_for(){console.timeEnd("generated_location_for");},start_original_location_for(){console.time("original_location_for");},end_original_location_for(){console.timeEnd("original_location_for");},start_parse_mappings(){console.time("parse_mappings");},end_parse_mappings(){console.timeEnd("parse_mappings");},start_sort_by_generated_location(){console.time("sort_by_generated_location");},end_sort_by_generated_location(){console.timeEnd("sort_by_generated_location");},start_sort_by_original_location(){console.time("sort_by_original_location");},end_sort_by_original_location(){console.timeEnd("sort_by_original_location");}}});}).then(Wasm=>{return {exports:Wasm.instance.exports,withMappingCallback:(mappingCallback,f)=>{callbackStack.push(mappingCallback);try{f();}finally{callbackStack.pop();}}};}).then(null,e=>{cachedWasm=null;throw e;});return cachedWasm;};/* -*- Mode: js; js-indent-level: 2; -*- */ /*
-  	 * Copyright 2011 Mozilla Foundation and contributors
-  	 * Licensed under the New BSD license. See LICENSE or:
-  	 * http://opensource.org/licenses/BSD-3-Clause
-  	 */const ArraySet$5=arraySet$1.ArraySet;// eslint-disable-line no-unused-vars
-  const INTERNAL=Symbol("smcInternal");class SourceMapConsumer$2{constructor(aSourceMap,aSourceMapURL){// If the constructor was called by super(), just return Promise<this>.
-  // Yes, this is a hack to retain the pre-existing API of the base-class
-  // constructor also being an async factory function.
-  if(aSourceMap==INTERNAL){return Promise.resolve(this);}return _factory(aSourceMap,aSourceMapURL);}static initialize(opts){readWasm.initialize(opts["lib/mappings.wasm"]);}static fromSourceMap(aSourceMap,aSourceMapURL){return _factoryBSM(aSourceMap,aSourceMapURL);}/**
-  	   * Construct a new `SourceMapConsumer` from `rawSourceMap` and `sourceMapUrl`
-  	   * (see the `SourceMapConsumer` constructor for details. Then, invoke the `async
-  	   * function f(SourceMapConsumer) -> T` with the newly constructed consumer, wait
-  	   * for `f` to complete, call `destroy` on the consumer, and return `f`'s return
-  	   * value.
-  	   *
-  	   * You must not use the consumer after `f` completes!
-  	   *
-  	   * By using `with`, you do not have to remember to manually call `destroy` on
-  	   * the consumer, since it will be called automatically once `f` completes.
-  	   *
-  	   * ```js
-  	   * const xSquared = await SourceMapConsumer.with(
-  	   *   myRawSourceMap,
-  	   *   null,
-  	   *   async function (consumer) {
-  	   *     // Use `consumer` inside here and don't worry about remembering
-  	   *     // to call `destroy`.
-  	   *
-  	   *     const x = await whatever(consumer);
-  	   *     return x * x;
-  	   *   }
-  	   * );
-  	   *
-  	   * // You may not use that `consumer` anymore out here; it has
-  	   * // been destroyed. But you can use `xSquared`.
-  	   * console.log(xSquared);
-  	   * ```
-  	   */static with(rawSourceMap,sourceMapUrl,f){// Note: The `acorn` version that `webpack` currently depends on doesn't
-  // support `async` functions, and the nodes that we support don't all have
-  // `.finally`. Therefore, this is written a bit more convolutedly than it
-  // should really be.
-  let consumer=null;const promise=new SourceMapConsumer$2(rawSourceMap,sourceMapUrl);return promise.then(c=>{consumer=c;return f(c);}).then(x=>{if(consumer){consumer.destroy();}return x;},e=>{if(consumer){consumer.destroy();}throw e;});}/**
-  	   * Parse the mappings in a string in to a data structure which we can easily
-  	   * query (the ordered arrays in the `this.__generatedMappings` and
-  	   * `this.__originalMappings` properties).
-  	   */_parseMappings(aStr,aSourceRoot){throw new Error("Subclasses must implement _parseMappings");}/**
-  	   * Iterate over each mapping between an original source/line/column and a
-  	   * generated line/column in this source map.
-  	   *
-  	   * @param Function aCallback
-  	   *        The function that is called with each mapping.
-  	   * @param Object aContext
-  	   *        Optional. If specified, this object will be the value of `this` every
-  	   *        time that `aCallback` is called.
-  	   * @param aOrder
-  	   *        Either `SourceMapConsumer.GENERATED_ORDER` or
-  	   *        `SourceMapConsumer.ORIGINAL_ORDER`. Specifies whether you want to
-  	   *        iterate over the mappings sorted by the generated file's line/column
-  	   *        order or the original's source/line/column order, respectively. Defaults to
-  	   *        `SourceMapConsumer.GENERATED_ORDER`.
-  	   */eachMapping(aCallback,aContext,aOrder){throw new Error("Subclasses must implement eachMapping");}/**
-  	   * Returns all generated line and column information for the original source,
-  	   * line, and column provided. If no column is provided, returns all mappings
-  	   * corresponding to a either the line we are searching for or the next
-  	   * closest line that has any mappings. Otherwise, returns all mappings
-  	   * corresponding to the given line and either the column we are searching for
-  	   * or the next closest column that has any offsets.
-  	   *
-  	   * The only argument is an object with the following properties:
-  	   *
-  	   *   - source: The filename of the original source.
-  	   *   - line: The line number in the original source.  The line number is 1-based.
-  	   *   - column: Optional. the column number in the original source.
-  	   *    The column number is 0-based.
-  	   *
-  	   * and an array of objects is returned, each with the following properties:
-  	   *
-  	   *   - line: The line number in the generated source, or null.  The
-  	   *    line number is 1-based.
-  	   *   - column: The column number in the generated source, or null.
-  	   *    The column number is 0-based.
-  	   */allGeneratedPositionsFor(aArgs){throw new Error("Subclasses must implement allGeneratedPositionsFor");}destroy(){throw new Error("Subclasses must implement destroy");}}/**
-  	 * The version of the source mapping spec that we are consuming.
-  	 */SourceMapConsumer$2.prototype._version=3;SourceMapConsumer$2.GENERATED_ORDER=1;SourceMapConsumer$2.ORIGINAL_ORDER=2;SourceMapConsumer$2.GREATEST_LOWER_BOUND=1;SourceMapConsumer$2.LEAST_UPPER_BOUND=2;/**
-  	 * A BasicSourceMapConsumer instance represents a parsed source map which we can
-  	 * query for information about the original file positions by giving it a file
-  	 * position in the generated source.
-  	 *
-  	 * The first parameter is the raw source map (either as a JSON string, or
-  	 * already parsed to an object). According to the spec, source maps have the
-  	 * following attributes:
-  	 *
-  	 *   - version: Which version of the source map spec this map is following.
-  	 *   - sources: An array of URLs to the original source files.
-  	 *   - names: An array of identifiers which can be referenced by individual mappings.
-  	 *   - sourceRoot: Optional. The URL root from which all sources are relative.
-  	 *   - sourcesContent: Optional. An array of contents of the original source files.
-  	 *   - mappings: A string of base64 VLQs which contain the actual mappings.
-  	 *   - file: Optional. The generated file this source map is associated with.
-  	 *
-  	 * Here is an example source map, taken from the source map spec[0]:
-  	 *
-  	 *     {
-  	 *       version : 3,
-  	 *       file: "out.js",
-  	 *       sourceRoot : "",
-  	 *       sources: ["foo.js", "bar.js"],
-  	 *       names: ["src", "maps", "are", "fun"],
-  	 *       mappings: "AA,AB;;ABCDE;"
-  	 *     }
-  	 *
-  	 * The second parameter, if given, is a string whose value is the URL
-  	 * at which the source map was found.  This URL is used to compute the
-  	 * sources array.
-  	 *
-  	 * [0]: https://docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k/edit?pli=1#
-  	 */class BasicSourceMapConsumer$1 extends SourceMapConsumer$2{constructor(aSourceMap,aSourceMapURL){return super(INTERNAL).then(that=>{let sourceMap=aSourceMap;if(typeof aSourceMap==="string"){sourceMap=util$2.parseSourceMapInput(aSourceMap);}const version=util$2.getArg(sourceMap,"version");let sources=util$2.getArg(sourceMap,"sources");// Sass 3.3 leaves out the 'names' array, so we deviate from the spec (which
-  // requires the array) to play nice here.
-  const names=util$2.getArg(sourceMap,"names",[]);let sourceRoot=util$2.getArg(sourceMap,"sourceRoot",null);const sourcesContent=util$2.getArg(sourceMap,"sourcesContent",null);const mappings=util$2.getArg(sourceMap,"mappings");const file=util$2.getArg(sourceMap,"file",null);// Once again, Sass deviates from the spec and supplies the version as a
-  // string rather than a number, so we use loose equality checking here.
-  if(version!=that._version){throw new Error("Unsupported version: "+version);}if(sourceRoot){sourceRoot=util$2.normalize(sourceRoot);}sources=sources.map(String)// Some source maps produce relative source paths like "./foo.js" instead of
-  // "foo.js".  Normalize these first so that future comparisons will succeed.
-  // See bugzil.la/1090768.
-  .map(util$2.normalize)// Always ensure that absolute sources are internally stored relative to
-  // the source root, if the source root is absolute. Not doing this would
-  // be particularly problematic when the source root is a prefix of the
-  // source (valid, but why??). See github issue #199 and bugzil.la/1188982.
-  .map(function(source){return sourceRoot&&util$2.isAbsolute(sourceRoot)&&util$2.isAbsolute(source)?util$2.relative(sourceRoot,source):source;});// Pass `true` below to allow duplicate names and sources. While source maps
-  // are intended to be compressed and deduplicated, the TypeScript compiler
-  // sometimes generates source maps with duplicates in them. See Github issue
-  // #72 and bugzil.la/889492.
-  that._names=ArraySet$5.fromArray(names.map(String),true);that._sources=ArraySet$5.fromArray(sources,true);that._absoluteSources=that._sources.toArray().map(function(s){return util$2.computeSourceURL(sourceRoot,s,aSourceMapURL);});that.sourceRoot=sourceRoot;that.sourcesContent=sourcesContent;that._mappings=mappings;that._sourceMapURL=aSourceMapURL;that.file=file;that._computedColumnSpans=false;that._mappingsPtr=0;that._wasm=null;return wasm().then(w=>{that._wasm=w;return that;});});}/**
-  	   * Utility function to find the index of a source.  Returns -1 if not
-  	   * found.
-  	   */_findSourceIndex(aSource){let relativeSource=aSource;if(this.sourceRoot!=null){relativeSource=util$2.relative(this.sourceRoot,relativeSource);}if(this._sources.has(relativeSource)){return this._sources.indexOf(relativeSource);}// Maybe aSource is an absolute URL as returned by |sources|.  In
-  // this case we can't simply undo the transform.
-  for(let i=0;i<this._absoluteSources.length;++i){if(this._absoluteSources[i]==aSource){return i;}}return -1;}/**
-  	   * Create a BasicSourceMapConsumer from a SourceMapGenerator.
-  	   *
-  	   * @param SourceMapGenerator aSourceMap
-  	   *        The source map that will be consumed.
-  	   * @param String aSourceMapURL
-  	   *        The URL at which the source map can be found (optional)
-  	   * @returns BasicSourceMapConsumer
-  	   */static fromSourceMap(aSourceMap,aSourceMapURL){return new BasicSourceMapConsumer$1(aSourceMap.toString());}get sources(){return this._absoluteSources.slice();}_getMappingsPtr(){if(this._mappingsPtr===0){this._parseMappings(this._mappings,this.sourceRoot);}return this._mappingsPtr;}/**
-  	   * Parse the mappings in a string in to a data structure which we can easily
-  	   * query (the ordered arrays in the `this.__generatedMappings` and
-  	   * `this.__originalMappings` properties).
-  	   */_parseMappings(aStr,aSourceRoot){const size=aStr.length;const mappingsBufPtr=this._wasm.exports.allocate_mappings(size);const mappingsBuf=new Uint8Array(this._wasm.exports.memory.buffer,mappingsBufPtr,size);for(let i=0;i<size;i++){mappingsBuf[i]=aStr.charCodeAt(i);}const mappingsPtr=this._wasm.exports.parse_mappings(mappingsBufPtr);if(!mappingsPtr){const error=this._wasm.exports.get_last_error();let msg=`Error parsing mappings (code ${error}): `;// XXX: keep these error codes in sync with `fitzgen/source-map-mappings`.
-  switch(error){case 1:msg+="the mappings contained a negative line, column, source index, or name index";break;case 2:msg+="the mappings contained a number larger than 2**32";break;case 3:msg+="reached EOF while in the middle of parsing a VLQ";break;case 4:msg+="invalid base 64 character while parsing a VLQ";break;default:msg+="unknown error code";break;}throw new Error(msg);}this._mappingsPtr=mappingsPtr;}eachMapping(aCallback,aContext,aOrder){const context=aContext||null;const order=aOrder||SourceMapConsumer$2.GENERATED_ORDER;const sourceRoot=this.sourceRoot;this._wasm.withMappingCallback(mapping=>{if(mapping.source!==null){mapping.source=this._sources.at(mapping.source);mapping.source=util$2.computeSourceURL(sourceRoot,mapping.source,this._sourceMapURL);if(mapping.name!==null){mapping.name=this._names.at(mapping.name);}}aCallback.call(context,mapping);},()=>{switch(order){case SourceMapConsumer$2.GENERATED_ORDER:this._wasm.exports.by_generated_location(this._getMappingsPtr());break;case SourceMapConsumer$2.ORIGINAL_ORDER:this._wasm.exports.by_original_location(this._getMappingsPtr());break;default:throw new Error("Unknown order of iteration.");}});}allGeneratedPositionsFor(aArgs){let source=util$2.getArg(aArgs,"source");const originalLine=util$2.getArg(aArgs,"line");const originalColumn=aArgs.column||0;source=this._findSourceIndex(source);if(source<0){return [];}if(originalLine<1){throw new Error("Line numbers must be >= 1");}if(originalColumn<0){throw new Error("Column numbers must be >= 0");}const mappings=[];this._wasm.withMappingCallback(m=>{let lastColumn=m.lastGeneratedColumn;if(this._computedColumnSpans&&lastColumn===null){lastColumn=Infinity;}mappings.push({line:m.generatedLine,column:m.generatedColumn,lastColumn});},()=>{this._wasm.exports.all_generated_locations_for(this._getMappingsPtr(),source,originalLine-1,"column"in aArgs,originalColumn);});return mappings;}destroy(){if(this._mappingsPtr!==0){this._wasm.exports.free_mappings(this._mappingsPtr);this._mappingsPtr=0;}}/**
-  	   * Compute the last column for each generated mapping. The last column is
-  	   * inclusive.
-  	   */computeColumnSpans(){if(this._computedColumnSpans){return;}this._wasm.exports.compute_column_spans(this._getMappingsPtr());this._computedColumnSpans=true;}/**
-  	   * Returns the original source, line, and column information for the generated
-  	   * source's line and column positions provided. The only argument is an object
-  	   * with the following properties:
-  	   *
-  	   *   - line: The line number in the generated source.  The line number
-  	   *     is 1-based.
-  	   *   - column: The column number in the generated source.  The column
-  	   *     number is 0-based.
-  	   *   - bias: Either 'SourceMapConsumer.GREATEST_LOWER_BOUND' or
-  	   *     'SourceMapConsumer.LEAST_UPPER_BOUND'. Specifies whether to return the
-  	   *     closest element that is smaller than or greater than the one we are
-  	   *     searching for, respectively, if the exact element cannot be found.
-  	   *     Defaults to 'SourceMapConsumer.GREATEST_LOWER_BOUND'.
-  	   *
-  	   * and an object is returned with the following properties:
-  	   *
-  	   *   - source: The original source file, or null.
-  	   *   - line: The line number in the original source, or null.  The
-  	   *     line number is 1-based.
-  	   *   - column: The column number in the original source, or null.  The
-  	   *     column number is 0-based.
-  	   *   - name: The original identifier, or null.
-  	   */originalPositionFor(aArgs){const needle={generatedLine:util$2.getArg(aArgs,"line"),generatedColumn:util$2.getArg(aArgs,"column")};if(needle.generatedLine<1){throw new Error("Line numbers must be >= 1");}if(needle.generatedColumn<0){throw new Error("Column numbers must be >= 0");}let bias=util$2.getArg(aArgs,"bias",SourceMapConsumer$2.GREATEST_LOWER_BOUND);if(bias==null){bias=SourceMapConsumer$2.GREATEST_LOWER_BOUND;}let mapping;this._wasm.withMappingCallback(m=>mapping=m,()=>{this._wasm.exports.original_location_for(this._getMappingsPtr(),needle.generatedLine-1,needle.generatedColumn,bias);});if(mapping){if(mapping.generatedLine===needle.generatedLine){let source=util$2.getArg(mapping,"source",null);if(source!==null){source=this._sources.at(source);source=util$2.computeSourceURL(this.sourceRoot,source,this._sourceMapURL);}let name=util$2.getArg(mapping,"name",null);if(name!==null){name=this._names.at(name);}return {source,line:util$2.getArg(mapping,"originalLine",null),column:util$2.getArg(mapping,"originalColumn",null),name};}}return {source:null,line:null,column:null,name:null};}/**
-  	   * Return true if we have the source content for every source in the source
-  	   * map, false otherwise.
-  	   */hasContentsOfAllSources(){if(!this.sourcesContent){return false;}return this.sourcesContent.length>=this._sources.size()&&!this.sourcesContent.some(function(sc){return sc==null;});}/**
-  	   * Returns the original source content. The only argument is the url of the
-  	   * original source file. Returns null if no original source content is
-  	   * available.
-  	   */sourceContentFor(aSource,nullOnMissing){if(!this.sourcesContent){return null;}const index=this._findSourceIndex(aSource);if(index>=0){return this.sourcesContent[index];}let relativeSource=aSource;if(this.sourceRoot!=null){relativeSource=util$2.relative(this.sourceRoot,relativeSource);}let url;if(this.sourceRoot!=null&&(url=util$2.urlParse(this.sourceRoot))){// XXX: file:// URIs and absolute paths lead to unexpected behavior for
-  // many users. We can help them out when they expect file:// URIs to
-  // behave like it would if they were running a local HTTP server. See
-  // https://bugzilla.mozilla.org/show_bug.cgi?id=885597.
-  const fileUriAbsPath=relativeSource.replace(/^file:\/\//,"");if(url.scheme=="file"&&this._sources.has(fileUriAbsPath)){return this.sourcesContent[this._sources.indexOf(fileUriAbsPath)];}if((!url.path||url.path=="/")&&this._sources.has("/"+relativeSource)){return this.sourcesContent[this._sources.indexOf("/"+relativeSource)];}}// This function is used recursively from
-  // IndexedSourceMapConsumer.prototype.sourceContentFor. In that case, we
-  // don't want to throw if we can't find the source - we just want to
-  // return null, so we provide a flag to exit gracefully.
-  if(nullOnMissing){return null;}throw new Error('"'+relativeSource+'" is not in the SourceMap.');}/**
-  	   * Returns the generated line and column information for the original source,
-  	   * line, and column positions provided. The only argument is an object with
-  	   * the following properties:
-  	   *
-  	   *   - source: The filename of the original source.
-  	   *   - line: The line number in the original source.  The line number
-  	   *     is 1-based.
-  	   *   - column: The column number in the original source.  The column
-  	   *     number is 0-based.
-  	   *   - bias: Either 'SourceMapConsumer.GREATEST_LOWER_BOUND' or
-  	   *     'SourceMapConsumer.LEAST_UPPER_BOUND'. Specifies whether to return the
-  	   *     closest element that is smaller than or greater than the one we are
-  	   *     searching for, respectively, if the exact element cannot be found.
-  	   *     Defaults to 'SourceMapConsumer.GREATEST_LOWER_BOUND'.
-  	   *
-  	   * and an object is returned with the following properties:
-  	   *
-  	   *   - line: The line number in the generated source, or null.  The
-  	   *     line number is 1-based.
-  	   *   - column: The column number in the generated source, or null.
-  	   *     The column number is 0-based.
-  	   */generatedPositionFor(aArgs){let source=util$2.getArg(aArgs,"source");source=this._findSourceIndex(source);if(source<0){return {line:null,column:null,lastColumn:null};}const needle={source,originalLine:util$2.getArg(aArgs,"line"),originalColumn:util$2.getArg(aArgs,"column")};if(needle.originalLine<1){throw new Error("Line numbers must be >= 1");}if(needle.originalColumn<0){throw new Error("Column numbers must be >= 0");}let bias=util$2.getArg(aArgs,"bias",SourceMapConsumer$2.GREATEST_LOWER_BOUND);if(bias==null){bias=SourceMapConsumer$2.GREATEST_LOWER_BOUND;}let mapping;this._wasm.withMappingCallback(m=>mapping=m,()=>{this._wasm.exports.generated_location_for(this._getMappingsPtr(),needle.source,needle.originalLine-1,needle.originalColumn,bias);});if(mapping){if(mapping.source===needle.source){let lastColumn=mapping.lastGeneratedColumn;if(this._computedColumnSpans&&lastColumn===null){lastColumn=Infinity;}return {line:util$2.getArg(mapping,"generatedLine",null),column:util$2.getArg(mapping,"generatedColumn",null),lastColumn};}}return {line:null,column:null,lastColumn:null};}}BasicSourceMapConsumer$1.prototype.consumer=SourceMapConsumer$2;/**
-  	 * An IndexedSourceMapConsumer instance represents a parsed source map which
-  	 * we can query for information. It differs from BasicSourceMapConsumer in
-  	 * that it takes "indexed" source maps (i.e. ones with a "sections" field) as
-  	 * input.
-  	 *
-  	 * The first parameter is a raw source map (either as a JSON string, or already
-  	 * parsed to an object). According to the spec for indexed source maps, they
-  	 * have the following attributes:
-  	 *
-  	 *   - version: Which version of the source map spec this map is following.
-  	 *   - file: Optional. The generated file this source map is associated with.
-  	 *   - sections: A list of section definitions.
-  	 *
-  	 * Each value under the "sections" field has two fields:
-  	 *   - offset: The offset into the original specified at which this section
-  	 *       begins to apply, defined as an object with a "line" and "column"
-  	 *       field.
-  	 *   - map: A source map definition. This source map could also be indexed,
-  	 *       but doesn't have to be.
-  	 *
-  	 * Instead of the "map" field, it's also possible to have a "url" field
-  	 * specifying a URL to retrieve a source map from, but that's currently
-  	 * unsupported.
-  	 *
-  	 * Here's an example source map, taken from the source map spec[0], but
-  	 * modified to omit a section which uses the "url" field.
-  	 *
-  	 *  {
-  	 *    version : 3,
-  	 *    file: "app.js",
-  	 *    sections: [{
-  	 *      offset: {line:100, column:10},
-  	 *      map: {
-  	 *        version : 3,
-  	 *        file: "section.js",
-  	 *        sources: ["foo.js", "bar.js"],
-  	 *        names: ["src", "maps", "are", "fun"],
-  	 *        mappings: "AAAA,E;;ABCDE;"
-  	 *      }
-  	 *    }],
-  	 *  }
-  	 *
-  	 * The second parameter, if given, is a string whose value is the URL
-  	 * at which the source map was found.  This URL is used to compute the
-  	 * sources array.
-  	 *
-  	 * [0]: https://docs.google.com/document/d/1U1RGAehQwRypUTovF1KRlpiOFze0b-_2gc6fAH0KY0k/edit#heading=h.535es3xeprgt
-  	 */class IndexedSourceMapConsumer$1 extends SourceMapConsumer$2{constructor(aSourceMap,aSourceMapURL){return super(INTERNAL).then(that=>{let sourceMap=aSourceMap;if(typeof aSourceMap==="string"){sourceMap=util$2.parseSourceMapInput(aSourceMap);}const version=util$2.getArg(sourceMap,"version");const sections=util$2.getArg(sourceMap,"sections");if(version!=that._version){throw new Error("Unsupported version: "+version);}that._sources=new ArraySet$5();that._names=new ArraySet$5();that.__generatedMappings=null;that.__originalMappings=null;that.__generatedMappingsUnsorted=null;that.__originalMappingsUnsorted=null;let lastOffset={line:-1,column:0};return Promise.all(sections.map(s=>{if(s.url){// The url field will require support for asynchronicity.
-  // See https://github.com/mozilla/source-map/issues/16
-  throw new Error("Support for url field in sections not implemented.");}const offset=util$2.getArg(s,"offset");const offsetLine=util$2.getArg(offset,"line");const offsetColumn=util$2.getArg(offset,"column");if(offsetLine<lastOffset.line||offsetLine===lastOffset.line&&offsetColumn<lastOffset.column){throw new Error("Section offsets must be ordered and non-overlapping.");}lastOffset=offset;const cons=new SourceMapConsumer$2(util$2.getArg(s,"map"),aSourceMapURL);return cons.then(consumer=>{return {generatedOffset:{// The offset fields are 0-based, but we use 1-based indices when
-  // encoding/decoding from VLQ.
-  generatedLine:offsetLine+1,generatedColumn:offsetColumn+1},consumer};});})).then(s=>{that._sections=s;return that;});});}// `__generatedMappings` and `__originalMappings` are arrays that hold the
-  // parsed mapping coordinates from the source map's "mappings" attribute. They
-  // are lazily instantiated, accessed via the `_generatedMappings` and
-  // `_originalMappings` getters respectively, and we only parse the mappings
-  // and create these arrays once queried for a source location. We jump through
-  // these hoops because there can be many thousands of mappings, and parsing
-  // them is expensive, so we only want to do it if we must.
-  //
-  // Each object in the arrays is of the form:
-  //
-  //     {
-  //       generatedLine: The line number in the generated code,
-  //       generatedColumn: The column number in the generated code,
-  //       source: The path to the original source file that generated this
-  //               chunk of code,
-  //       originalLine: The line number in the original source that
-  //                     corresponds to this chunk of generated code,
-  //       originalColumn: The column number in the original source that
-  //                       corresponds to this chunk of generated code,
-  //       name: The name of the original symbol which generated this chunk of
-  //             code.
-  //     }
-  //
-  // All properties except for `generatedLine` and `generatedColumn` can be
-  // `null`.
-  //
-  // `_generatedMappings` is ordered by the generated positions.
-  //
-  // `_originalMappings` is ordered by the original positions.
-  get _generatedMappings(){if(!this.__generatedMappings){this._sortGeneratedMappings();}return this.__generatedMappings;}get _originalMappings(){if(!this.__originalMappings){this._sortOriginalMappings();}return this.__originalMappings;}get _generatedMappingsUnsorted(){if(!this.__generatedMappingsUnsorted){this._parseMappings(this._mappings,this.sourceRoot);}return this.__generatedMappingsUnsorted;}get _originalMappingsUnsorted(){if(!this.__originalMappingsUnsorted){this._parseMappings(this._mappings,this.sourceRoot);}return this.__originalMappingsUnsorted;}_sortGeneratedMappings(){const mappings=this._generatedMappingsUnsorted;mappings.sort(util$2.compareByGeneratedPositionsDeflated);this.__generatedMappings=mappings;}_sortOriginalMappings(){const mappings=this._originalMappingsUnsorted;mappings.sort(util$2.compareByOriginalPositions);this.__originalMappings=mappings;}/**
-  	   * The list of original sources.
-  	   */get sources(){const sources=[];for(let i=0;i<this._sections.length;i++){for(let j=0;j<this._sections[i].consumer.sources.length;j++){sources.push(this._sections[i].consumer.sources[j]);}}return sources;}/**
-  	   * Returns the original source, line, and column information for the generated
-  	   * source's line and column positions provided. The only argument is an object
-  	   * with the following properties:
-  	   *
-  	   *   - line: The line number in the generated source.  The line number
-  	   *     is 1-based.
-  	   *   - column: The column number in the generated source.  The column
-  	   *     number is 0-based.
-  	   *
-  	   * and an object is returned with the following properties:
-  	   *
-  	   *   - source: The original source file, or null.
-  	   *   - line: The line number in the original source, or null.  The
-  	   *     line number is 1-based.
-  	   *   - column: The column number in the original source, or null.  The
-  	   *     column number is 0-based.
-  	   *   - name: The original identifier, or null.
-  	   */originalPositionFor(aArgs){const needle={generatedLine:util$2.getArg(aArgs,"line"),generatedColumn:util$2.getArg(aArgs,"column")};// Find the section containing the generated position we're trying to map
-  // to an original position.
-  const sectionIndex=binarySearch$1.search(needle,this._sections,function(aNeedle,section){const cmp=aNeedle.generatedLine-section.generatedOffset.generatedLine;if(cmp){return cmp;}return aNeedle.generatedColumn-section.generatedOffset.generatedColumn;});const section=this._sections[sectionIndex];if(!section){return {source:null,line:null,column:null,name:null};}return section.consumer.originalPositionFor({line:needle.generatedLine-(section.generatedOffset.generatedLine-1),column:needle.generatedColumn-(section.generatedOffset.generatedLine===needle.generatedLine?section.generatedOffset.generatedColumn-1:0),bias:aArgs.bias});}/**
-  	   * Return true if we have the source content for every source in the source
-  	   * map, false otherwise.
-  	   */hasContentsOfAllSources(){return this._sections.every(function(s){return s.consumer.hasContentsOfAllSources();});}/**
-  	   * Returns the original source content. The only argument is the url of the
-  	   * original source file. Returns null if no original source content is
-  	   * available.
-  	   */sourceContentFor(aSource,nullOnMissing){for(let i=0;i<this._sections.length;i++){const section=this._sections[i];const content=section.consumer.sourceContentFor(aSource,true);if(content){return content;}}if(nullOnMissing){return null;}throw new Error('"'+aSource+'" is not in the SourceMap.');}/**
-  	   * Returns the generated line and column information for the original source,
-  	   * line, and column positions provided. The only argument is an object with
-  	   * the following properties:
-  	   *
-  	   *   - source: The filename of the original source.
-  	   *   - line: The line number in the original source.  The line number
-  	   *     is 1-based.
-  	   *   - column: The column number in the original source.  The column
-  	   *     number is 0-based.
-  	   *
-  	   * and an object is returned with the following properties:
-  	   *
-  	   *   - line: The line number in the generated source, or null.  The
-  	   *     line number is 1-based.
-  	   *   - column: The column number in the generated source, or null.
-  	   *     The column number is 0-based.
-  	   */generatedPositionFor(aArgs){for(let i=0;i<this._sections.length;i++){const section=this._sections[i];// Only consider this section if the requested source is in the list of
-  // sources of the consumer.
-  if(section.consumer._findSourceIndex(util$2.getArg(aArgs,"source"))===-1){continue;}const generatedPosition=section.consumer.generatedPositionFor(aArgs);if(generatedPosition){const ret={line:generatedPosition.line+(section.generatedOffset.generatedLine-1),column:generatedPosition.column+(section.generatedOffset.generatedLine===generatedPosition.line?section.generatedOffset.generatedColumn-1:0)};return ret;}}return {line:null,column:null};}/**
-  	   * Parse the mappings in a string in to a data structure which we can easily
-  	   * query (the ordered arrays in the `this.__generatedMappings` and
-  	   * `this.__originalMappings` properties).
-  	   */_parseMappings(aStr,aSourceRoot){const generatedMappings=this.__generatedMappingsUnsorted=[];const originalMappings=this.__originalMappingsUnsorted=[];for(let i=0;i<this._sections.length;i++){const section=this._sections[i];const sectionMappings=[];section.consumer.eachMapping(m=>sectionMappings.push(m));for(let j=0;j<sectionMappings.length;j++){const mapping=sectionMappings[j];// TODO: test if null is correct here.  The original code used
-  // `source`, which would actually have gotten used as null because
-  // var's get hoisted.
-  // See: https://github.com/mozilla/source-map/issues/333
-  let source=util$2.computeSourceURL(section.consumer.sourceRoot,null,this._sourceMapURL);this._sources.add(source);source=this._sources.indexOf(source);let name=null;if(mapping.name){this._names.add(mapping.name);name=this._names.indexOf(mapping.name);}// The mappings coming from the consumer for the section have
-  // generated positions relative to the start of the section, so we
-  // need to offset them to be relative to the start of the concatenated
-  // generated file.
-  const adjustedMapping={source,generatedLine:mapping.generatedLine+(section.generatedOffset.generatedLine-1),generatedColumn:mapping.generatedColumn+(section.generatedOffset.generatedLine===mapping.generatedLine?section.generatedOffset.generatedColumn-1:0),originalLine:mapping.originalLine,originalColumn:mapping.originalColumn,name};generatedMappings.push(adjustedMapping);if(typeof adjustedMapping.originalLine==="number"){originalMappings.push(adjustedMapping);}}}}eachMapping(aCallback,aContext,aOrder){const context=aContext||null;const order=aOrder||SourceMapConsumer$2.GENERATED_ORDER;let mappings;switch(order){case SourceMapConsumer$2.GENERATED_ORDER:mappings=this._generatedMappings;break;case SourceMapConsumer$2.ORIGINAL_ORDER:mappings=this._originalMappings;break;default:throw new Error("Unknown order of iteration.");}const sourceRoot=this.sourceRoot;mappings.map(function(mapping){let source=null;if(mapping.source!==null){source=this._sources.at(mapping.source);source=util$2.computeSourceURL(sourceRoot,source,this._sourceMapURL);}return {source,generatedLine:mapping.generatedLine,generatedColumn:mapping.generatedColumn,originalLine:mapping.originalLine,originalColumn:mapping.originalColumn,name:mapping.name===null?null:this._names.at(mapping.name)};},this).forEach(aCallback,context);}/**
-  	   * Find the mapping that best matches the hypothetical "needle" mapping that
-  	   * we are searching for in the given "haystack" of mappings.
-  	   */_findMapping(aNeedle,aMappings,aLineName,aColumnName,aComparator,aBias){// To return the position we are searching for, we must first find the
-  // mapping for the given position and then return the opposite position it
-  // points to. Because the mappings are sorted, we can use binary search to
-  // find the best mapping.
-  if(aNeedle[aLineName]<=0){throw new TypeError("Line must be greater than or equal to 1, got "+aNeedle[aLineName]);}if(aNeedle[aColumnName]<0){throw new TypeError("Column must be greater than or equal to 0, got "+aNeedle[aColumnName]);}return binarySearch$1.search(aNeedle,aMappings,aComparator,aBias);}allGeneratedPositionsFor(aArgs){const line=util$2.getArg(aArgs,"line");// When there is no exact match, BasicSourceMapConsumer.prototype._findMapping
-  // returns the index of the closest mapping less than the needle. By
-  // setting needle.originalColumn to 0, we thus find the last mapping for
-  // the given line, provided such a mapping exists.
-  const needle={source:util$2.getArg(aArgs,"source"),originalLine:line,originalColumn:util$2.getArg(aArgs,"column",0)};needle.source=this._findSourceIndex(needle.source);if(needle.source<0){return [];}if(needle.originalLine<1){throw new Error("Line numbers must be >= 1");}if(needle.originalColumn<0){throw new Error("Column numbers must be >= 0");}const mappings=[];let index=this._findMapping(needle,this._originalMappings,"originalLine","originalColumn",util$2.compareByOriginalPositions,binarySearch$1.LEAST_UPPER_BOUND);if(index>=0){let mapping=this._originalMappings[index];if(aArgs.column===undefined){const originalLine=mapping.originalLine;// Iterate until either we run out of mappings, or we run into
-  // a mapping for a different line than the one we found. Since
-  // mappings are sorted, this is guaranteed to find all mappings for
-  // the line we found.
-  while(mapping&&mapping.originalLine===originalLine){let lastColumn=mapping.lastGeneratedColumn;if(this._computedColumnSpans&&lastColumn===null){lastColumn=Infinity;}mappings.push({line:util$2.getArg(mapping,"generatedLine",null),column:util$2.getArg(mapping,"generatedColumn",null),lastColumn});mapping=this._originalMappings[++index];}}else {const originalColumn=mapping.originalColumn;// Iterate until either we run out of mappings, or we run into
-  // a mapping for a different line than the one we were searching for.
-  // Since mappings are sorted, this is guaranteed to find all mappings for
-  // the line we are searching for.
-  while(mapping&&mapping.originalLine===line&&mapping.originalColumn==originalColumn){let lastColumn=mapping.lastGeneratedColumn;if(this._computedColumnSpans&&lastColumn===null){lastColumn=Infinity;}mappings.push({line:util$2.getArg(mapping,"generatedLine",null),column:util$2.getArg(mapping,"generatedColumn",null),lastColumn});mapping=this._originalMappings[++index];}}}return mappings;}destroy(){for(let i=0;i<this._sections.length;i++){this._sections[i].consumer.destroy();}}}/*
-  	 * Cheat to get around inter-twingled classes.  `factory()` can be at the end
-  	 * where it has access to non-hoisted classes, but it gets hoisted itself.
-  	 */function _factory(aSourceMap,aSourceMapURL){let sourceMap=aSourceMap;if(typeof aSourceMap==="string"){sourceMap=util$2.parseSourceMapInput(aSourceMap);}const consumer=sourceMap.sections!=null?new IndexedSourceMapConsumer$1(sourceMap,aSourceMapURL):new BasicSourceMapConsumer$1(sourceMap,aSourceMapURL);return Promise.resolve(consumer);}function _factoryBSM(aSourceMap,aSourceMapURL){return BasicSourceMapConsumer$1.fromSourceMap(aSourceMap,aSourceMapURL);}/*
+  const fs$1=fs;const path=path$1;module.exports=function readWasm(){return new Promise((resolve,reject)=>{const wasmPath=path.join(__dirname,"mappings.wasm");fs$1.readFile(wasmPath,null,(error,data)=>{if(error){reject(error);return;}resolve(data.buffer);});});};module.exports.initialize=_=>{console.debug("SourceMapConsumer.initialize is a no-op when running in node.js");};}});var readWasm_1=readWasm.initialize;/*
   	 * Copyright 2009-2011 Mozilla Foundation and contributors
   	 * Licensed under the New BSD license. See LICENSE.txt or:
   	 * http://opensource.org/licenses/BSD-3-Clause
@@ -5840,7 +5460,7 @@
   	 * @param   { SourceMapGenerator } data.map - source map generated along with the code
   	 * @param   { Object } meta - compilation meta infomration
   	 * @returns { Output } output container object
-  	 */function createOutput(data,meta){const output=Object.assign(Object.assign(Object.assign({},Output),data),{},{meta});if(!output.map&&meta&&meta.options&&meta.options.file)return Object.assign(Object.assign({},output),{},{map:createSourcemap({file:meta.options.file})});return output;}/**
+  	 */function createOutput(data,meta){const output=Object.assign({},Output,data,{meta});if(!output.map&&meta&&meta.options&&meta.options.file)return Object.assign({},output,{map:createSourcemap({file:meta.options.file})});return output;}/**
   	 * Transform the source code received via a compiler function
   	 * @param   { Function } compiler - function needed to generate the output code
   	 * @param   { Object } meta - compilation meta information
@@ -5966,7 +5586,7 @@
   	 * @param   {AST} ast - ast object
   	 * @param   {Object} options - printer options
   	 * @returns {Object} code + map
-  	 */function generateJavascript(ast,options){return main_4$1(ast,Object.assign(Object.assign({},options),{},{tabWidth:2,quote:'single'}));}/**
+  	 */function generateJavascript(ast,options){return main_4$1(ast,Object.assign({},options,{tabWidth:2,quote:'single'}));}/**
   	 * Find whether there is html code outside of the root node
   	 * @param   {RiotParser.Node} root - node generated by the riot compiler
   	 * @param   {string}  code - riot tag source code
@@ -6628,7 +6248,7 @@
   	 * @param   {string} source - javascript source
   	 * @param   {Object} options - parser options
   	 * @returns {AST} AST tree
-  	 */function generateAST(source,options){return main_2$1(source,Object.assign({parser:{parse(source,opts){return Parser.parse(source,Object.assign(Object.assign({},opts),{},{ecmaVersion:2020}));}}},options));}var builtin={"Array":false,"ArrayBuffer":false,Atomics:false,BigInt:false,BigInt64Array:false,BigUint64Array:false,"Boolean":false,constructor:false,"DataView":false,"Date":false,"decodeURI":false,"decodeURIComponent":false,"encodeURI":false,"encodeURIComponent":false,"Error":false,"escape":false,"eval":false,"EvalError":false,"Float32Array":false,"Float64Array":false,"Function":false,globalThis:false,hasOwnProperty:false,"Infinity":false,"Int16Array":false,"Int32Array":false,"Int8Array":false,"isFinite":false,"isNaN":false,isPrototypeOf:false,"JSON":false,"Map":false,"Math":false,"NaN":false,"Number":false,"Object":false,"parseFloat":false,"parseInt":false,"Promise":false,propertyIsEnumerable:false,"Proxy":false,"RangeError":false,"ReferenceError":false,"Reflect":false,"RegExp":false,"Set":false,SharedArrayBuffer:false,"String":false,"Symbol":false,"SyntaxError":false,toLocaleString:false,toString:false,"TypeError":false,"Uint16Array":false,"Uint32Array":false,"Uint8Array":false,"Uint8ClampedArray":false,"undefined":false,"unescape":false,"URIError":false,valueOf:false,"WeakMap":false,"WeakSet":false};var es5={"Array":false,"Boolean":false,constructor:false,"Date":false,"decodeURI":false,"decodeURIComponent":false,"encodeURI":false,"encodeURIComponent":false,"Error":false,"escape":false,"eval":false,"EvalError":false,"Function":false,hasOwnProperty:false,"Infinity":false,"isFinite":false,"isNaN":false,isPrototypeOf:false,"JSON":false,"Math":false,"NaN":false,"Number":false,"Object":false,"parseFloat":false,"parseInt":false,propertyIsEnumerable:false,"RangeError":false,"ReferenceError":false,"RegExp":false,"String":false,"SyntaxError":false,toLocaleString:false,toString:false,"TypeError":false,"undefined":false,"unescape":false,"URIError":false,valueOf:false};var es2015={"Array":false,"ArrayBuffer":false,"Boolean":false,constructor:false,"DataView":false,"Date":false,"decodeURI":false,"decodeURIComponent":false,"encodeURI":false,"encodeURIComponent":false,"Error":false,"escape":false,"eval":false,"EvalError":false,"Float32Array":false,"Float64Array":false,"Function":false,hasOwnProperty:false,"Infinity":false,"Int16Array":false,"Int32Array":false,"Int8Array":false,"isFinite":false,"isNaN":false,isPrototypeOf:false,"JSON":false,"Map":false,"Math":false,"NaN":false,"Number":false,"Object":false,"parseFloat":false,"parseInt":false,"Promise":false,propertyIsEnumerable:false,"Proxy":false,"RangeError":false,"ReferenceError":false,"Reflect":false,"RegExp":false,"Set":false,"String":false,"Symbol":false,"SyntaxError":false,toLocaleString:false,toString:false,"TypeError":false,"Uint16Array":false,"Uint32Array":false,"Uint8Array":false,"Uint8ClampedArray":false,"undefined":false,"unescape":false,"URIError":false,valueOf:false,"WeakMap":false,"WeakSet":false};var es2017={"Array":false,"ArrayBuffer":false,Atomics:false,"Boolean":false,constructor:false,"DataView":false,"Date":false,"decodeURI":false,"decodeURIComponent":false,"encodeURI":false,"encodeURIComponent":false,"Error":false,"escape":false,"eval":false,"EvalError":false,"Float32Array":false,"Float64Array":false,"Function":false,hasOwnProperty:false,"Infinity":false,"Int16Array":false,"Int32Array":false,"Int8Array":false,"isFinite":false,"isNaN":false,isPrototypeOf:false,"JSON":false,"Map":false,"Math":false,"NaN":false,"Number":false,"Object":false,"parseFloat":false,"parseInt":false,"Promise":false,propertyIsEnumerable:false,"Proxy":false,"RangeError":false,"ReferenceError":false,"Reflect":false,"RegExp":false,"Set":false,SharedArrayBuffer:false,"String":false,"Symbol":false,"SyntaxError":false,toLocaleString:false,toString:false,"TypeError":false,"Uint16Array":false,"Uint32Array":false,"Uint8Array":false,"Uint8ClampedArray":false,"undefined":false,"unescape":false,"URIError":false,valueOf:false,"WeakMap":false,"WeakSet":false};var browser={AbortController:false,AbortSignal:false,addEventListener:false,alert:false,AnalyserNode:false,Animation:false,AnimationEffectReadOnly:false,AnimationEffectTiming:false,AnimationEffectTimingReadOnly:false,AnimationEvent:false,AnimationPlaybackEvent:false,AnimationTimeline:false,applicationCache:false,ApplicationCache:false,ApplicationCacheErrorEvent:false,atob:false,Attr:false,Audio:false,AudioBuffer:false,AudioBufferSourceNode:false,AudioContext:false,AudioDestinationNode:false,AudioListener:false,AudioNode:false,AudioParam:false,AudioProcessingEvent:false,AudioScheduledSourceNode:false,"AudioWorkletGlobalScope ":false,AudioWorkletNode:false,AudioWorkletProcessor:false,BarProp:false,BaseAudioContext:false,BatteryManager:false,BeforeUnloadEvent:false,BiquadFilterNode:false,Blob:false,BlobEvent:false,blur:false,BroadcastChannel:false,btoa:false,BudgetService:false,ByteLengthQueuingStrategy:false,Cache:false,caches:false,CacheStorage:false,cancelAnimationFrame:false,cancelIdleCallback:false,CanvasCaptureMediaStreamTrack:false,CanvasGradient:false,CanvasPattern:false,CanvasRenderingContext2D:false,ChannelMergerNode:false,ChannelSplitterNode:false,CharacterData:false,clearInterval:false,clearTimeout:false,clientInformation:false,ClipboardEvent:false,close:false,closed:false,CloseEvent:false,Comment:false,CompositionEvent:false,confirm:false,console:false,ConstantSourceNode:false,ConvolverNode:false,CountQueuingStrategy:false,createImageBitmap:false,Credential:false,CredentialsContainer:false,crypto:false,Crypto:false,CryptoKey:false,CSS:false,CSSConditionRule:false,CSSFontFaceRule:false,CSSGroupingRule:false,CSSImportRule:false,CSSKeyframeRule:false,CSSKeyframesRule:false,CSSMediaRule:false,CSSNamespaceRule:false,CSSPageRule:false,CSSRule:false,CSSRuleList:false,CSSStyleDeclaration:false,CSSStyleRule:false,CSSStyleSheet:false,CSSSupportsRule:false,CustomElementRegistry:false,customElements:false,CustomEvent:false,DataTransfer:false,DataTransferItem:false,DataTransferItemList:false,defaultstatus:false,defaultStatus:false,DelayNode:false,DeviceMotionEvent:false,DeviceOrientationEvent:false,devicePixelRatio:false,dispatchEvent:false,document:false,Document:false,DocumentFragment:false,DocumentType:false,DOMError:false,DOMException:false,DOMImplementation:false,DOMMatrix:false,DOMMatrixReadOnly:false,DOMParser:false,DOMPoint:false,DOMPointReadOnly:false,DOMQuad:false,DOMRect:false,DOMRectReadOnly:false,DOMStringList:false,DOMStringMap:false,DOMTokenList:false,DragEvent:false,DynamicsCompressorNode:false,Element:false,ErrorEvent:false,event:false,Event:false,EventSource:false,EventTarget:false,external:false,fetch:false,File:false,FileList:false,FileReader:false,find:false,focus:false,FocusEvent:false,FontFace:false,FontFaceSetLoadEvent:false,FormData:false,frameElement:false,frames:false,GainNode:false,Gamepad:false,GamepadButton:false,GamepadEvent:false,getComputedStyle:false,getSelection:false,HashChangeEvent:false,Headers:false,history:false,History:false,HTMLAllCollection:false,HTMLAnchorElement:false,HTMLAreaElement:false,HTMLAudioElement:false,HTMLBaseElement:false,HTMLBodyElement:false,HTMLBRElement:false,HTMLButtonElement:false,HTMLCanvasElement:false,HTMLCollection:false,HTMLContentElement:false,HTMLDataElement:false,HTMLDataListElement:false,HTMLDetailsElement:false,HTMLDialogElement:false,HTMLDirectoryElement:false,HTMLDivElement:false,HTMLDListElement:false,HTMLDocument:false,HTMLElement:false,HTMLEmbedElement:false,HTMLFieldSetElement:false,HTMLFontElement:false,HTMLFormControlsCollection:false,HTMLFormElement:false,HTMLFrameElement:false,HTMLFrameSetElement:false,HTMLHeadElement:false,HTMLHeadingElement:false,HTMLHRElement:false,HTMLHtmlElement:false,HTMLIFrameElement:false,HTMLImageElement:false,HTMLInputElement:false,HTMLLabelElement:false,HTMLLegendElement:false,HTMLLIElement:false,HTMLLinkElement:false,HTMLMapElement:false,HTMLMarqueeElement:false,HTMLMediaElement:false,HTMLMenuElement:false,HTMLMetaElement:false,HTMLMeterElement:false,HTMLModElement:false,HTMLObjectElement:false,HTMLOListElement:false,HTMLOptGroupElement:false,HTMLOptionElement:false,HTMLOptionsCollection:false,HTMLOutputElement:false,HTMLParagraphElement:false,HTMLParamElement:false,HTMLPictureElement:false,HTMLPreElement:false,HTMLProgressElement:false,HTMLQuoteElement:false,HTMLScriptElement:false,HTMLSelectElement:false,HTMLShadowElement:false,HTMLSlotElement:false,HTMLSourceElement:false,HTMLSpanElement:false,HTMLStyleElement:false,HTMLTableCaptionElement:false,HTMLTableCellElement:false,HTMLTableColElement:false,HTMLTableElement:false,HTMLTableRowElement:false,HTMLTableSectionElement:false,HTMLTemplateElement:false,HTMLTextAreaElement:false,HTMLTimeElement:false,HTMLTitleElement:false,HTMLTrackElement:false,HTMLUListElement:false,HTMLUnknownElement:false,HTMLVideoElement:false,IDBCursor:false,IDBCursorWithValue:false,IDBDatabase:false,IDBFactory:false,IDBIndex:false,IDBKeyRange:false,IDBObjectStore:false,IDBOpenDBRequest:false,IDBRequest:false,IDBTransaction:false,IDBVersionChangeEvent:false,IdleDeadline:false,IIRFilterNode:false,Image:false,ImageBitmap:false,ImageBitmapRenderingContext:false,ImageCapture:false,ImageData:false,indexedDB:false,innerHeight:false,innerWidth:false,InputEvent:false,IntersectionObserver:false,IntersectionObserverEntry:false,"Intl":false,isSecureContext:false,KeyboardEvent:false,KeyframeEffect:false,KeyframeEffectReadOnly:false,length:false,localStorage:false,location:true,Location:false,locationbar:false,matchMedia:false,MediaDeviceInfo:false,MediaDevices:false,MediaElementAudioSourceNode:false,MediaEncryptedEvent:false,MediaError:false,MediaKeyMessageEvent:false,MediaKeySession:false,MediaKeyStatusMap:false,MediaKeySystemAccess:false,MediaList:false,MediaQueryList:false,MediaQueryListEvent:false,MediaRecorder:false,MediaSettingsRange:false,MediaSource:false,MediaStream:false,MediaStreamAudioDestinationNode:false,MediaStreamAudioSourceNode:false,MediaStreamEvent:false,MediaStreamTrack:false,MediaStreamTrackEvent:false,menubar:false,MessageChannel:false,MessageEvent:false,MessagePort:false,MIDIAccess:false,MIDIConnectionEvent:false,MIDIInput:false,MIDIInputMap:false,MIDIMessageEvent:false,MIDIOutput:false,MIDIOutputMap:false,MIDIPort:false,MimeType:false,MimeTypeArray:false,MouseEvent:false,moveBy:false,moveTo:false,MutationEvent:false,MutationObserver:false,MutationRecord:false,name:false,NamedNodeMap:false,NavigationPreloadManager:false,navigator:false,Navigator:false,NetworkInformation:false,Node:false,NodeFilter:false,NodeIterator:false,NodeList:false,Notification:false,OfflineAudioCompletionEvent:false,OfflineAudioContext:false,offscreenBuffering:false,OffscreenCanvas:true,onabort:true,onafterprint:true,onanimationend:true,onanimationiteration:true,onanimationstart:true,onappinstalled:true,onauxclick:true,onbeforeinstallprompt:true,onbeforeprint:true,onbeforeunload:true,onblur:true,oncancel:true,oncanplay:true,oncanplaythrough:true,onchange:true,onclick:true,onclose:true,oncontextmenu:true,oncuechange:true,ondblclick:true,ondevicemotion:true,ondeviceorientation:true,ondeviceorientationabsolute:true,ondrag:true,ondragend:true,ondragenter:true,ondragleave:true,ondragover:true,ondragstart:true,ondrop:true,ondurationchange:true,onemptied:true,onended:true,onerror:true,onfocus:true,ongotpointercapture:true,onhashchange:true,oninput:true,oninvalid:true,onkeydown:true,onkeypress:true,onkeyup:true,onlanguagechange:true,onload:true,onloadeddata:true,onloadedmetadata:true,onloadstart:true,onlostpointercapture:true,onmessage:true,onmessageerror:true,onmousedown:true,onmouseenter:true,onmouseleave:true,onmousemove:true,onmouseout:true,onmouseover:true,onmouseup:true,onmousewheel:true,onoffline:true,ononline:true,onpagehide:true,onpageshow:true,onpause:true,onplay:true,onplaying:true,onpointercancel:true,onpointerdown:true,onpointerenter:true,onpointerleave:true,onpointermove:true,onpointerout:true,onpointerover:true,onpointerup:true,onpopstate:true,onprogress:true,onratechange:true,onrejectionhandled:true,onreset:true,onresize:true,onscroll:true,onsearch:true,onseeked:true,onseeking:true,onselect:true,onstalled:true,onstorage:true,onsubmit:true,onsuspend:true,ontimeupdate:true,ontoggle:true,ontransitionend:true,onunhandledrejection:true,onunload:true,onvolumechange:true,onwaiting:true,onwheel:true,open:false,openDatabase:false,opener:false,Option:false,origin:false,OscillatorNode:false,outerHeight:false,outerWidth:false,PageTransitionEvent:false,pageXOffset:false,pageYOffset:false,PannerNode:false,parent:false,Path2D:false,PaymentAddress:false,PaymentRequest:false,PaymentRequestUpdateEvent:false,PaymentResponse:false,performance:false,Performance:false,PerformanceEntry:false,PerformanceLongTaskTiming:false,PerformanceMark:false,PerformanceMeasure:false,PerformanceNavigation:false,PerformanceNavigationTiming:false,PerformanceObserver:false,PerformanceObserverEntryList:false,PerformancePaintTiming:false,PerformanceResourceTiming:false,PerformanceTiming:false,PeriodicWave:false,Permissions:false,PermissionStatus:false,personalbar:false,PhotoCapabilities:false,Plugin:false,PluginArray:false,PointerEvent:false,PopStateEvent:false,postMessage:false,Presentation:false,PresentationAvailability:false,PresentationConnection:false,PresentationConnectionAvailableEvent:false,PresentationConnectionCloseEvent:false,PresentationConnectionList:false,PresentationReceiver:false,PresentationRequest:false,print:false,ProcessingInstruction:false,ProgressEvent:false,PromiseRejectionEvent:false,prompt:false,PushManager:false,PushSubscription:false,PushSubscriptionOptions:false,queueMicrotask:false,RadioNodeList:false,Range:false,ReadableStream:false,registerProcessor:false,RemotePlayback:false,removeEventListener:false,Request:false,requestAnimationFrame:false,requestIdleCallback:false,resizeBy:false,ResizeObserver:false,ResizeObserverEntry:false,resizeTo:false,Response:false,RTCCertificate:false,RTCDataChannel:false,RTCDataChannelEvent:false,RTCDtlsTransport:false,RTCIceCandidate:false,RTCIceGatherer:false,RTCIceTransport:false,RTCPeerConnection:false,RTCPeerConnectionIceEvent:false,RTCRtpContributingSource:false,RTCRtpReceiver:false,RTCRtpSender:false,RTCSctpTransport:false,RTCSessionDescription:false,RTCStatsReport:false,RTCTrackEvent:false,screen:false,Screen:false,screenLeft:false,ScreenOrientation:false,screenTop:false,screenX:false,screenY:false,ScriptProcessorNode:false,scroll:false,scrollbars:false,scrollBy:false,scrollTo:false,scrollX:false,scrollY:false,SecurityPolicyViolationEvent:false,Selection:false,self:false,ServiceWorker:false,ServiceWorkerContainer:false,ServiceWorkerRegistration:false,sessionStorage:false,setInterval:false,setTimeout:false,ShadowRoot:false,SharedWorker:false,SourceBuffer:false,SourceBufferList:false,speechSynthesis:false,SpeechSynthesisEvent:false,SpeechSynthesisUtterance:false,StaticRange:false,status:false,statusbar:false,StereoPannerNode:false,stop:false,Storage:false,StorageEvent:false,StorageManager:false,styleMedia:false,StyleSheet:false,StyleSheetList:false,SubtleCrypto:false,SVGAElement:false,SVGAngle:false,SVGAnimatedAngle:false,SVGAnimatedBoolean:false,SVGAnimatedEnumeration:false,SVGAnimatedInteger:false,SVGAnimatedLength:false,SVGAnimatedLengthList:false,SVGAnimatedNumber:false,SVGAnimatedNumberList:false,SVGAnimatedPreserveAspectRatio:false,SVGAnimatedRect:false,SVGAnimatedString:false,SVGAnimatedTransformList:false,SVGAnimateElement:false,SVGAnimateMotionElement:false,SVGAnimateTransformElement:false,SVGAnimationElement:false,SVGCircleElement:false,SVGClipPathElement:false,SVGComponentTransferFunctionElement:false,SVGDefsElement:false,SVGDescElement:false,SVGDiscardElement:false,SVGElement:false,SVGEllipseElement:false,SVGFEBlendElement:false,SVGFEColorMatrixElement:false,SVGFEComponentTransferElement:false,SVGFECompositeElement:false,SVGFEConvolveMatrixElement:false,SVGFEDiffuseLightingElement:false,SVGFEDisplacementMapElement:false,SVGFEDistantLightElement:false,SVGFEDropShadowElement:false,SVGFEFloodElement:false,SVGFEFuncAElement:false,SVGFEFuncBElement:false,SVGFEFuncGElement:false,SVGFEFuncRElement:false,SVGFEGaussianBlurElement:false,SVGFEImageElement:false,SVGFEMergeElement:false,SVGFEMergeNodeElement:false,SVGFEMorphologyElement:false,SVGFEOffsetElement:false,SVGFEPointLightElement:false,SVGFESpecularLightingElement:false,SVGFESpotLightElement:false,SVGFETileElement:false,SVGFETurbulenceElement:false,SVGFilterElement:false,SVGForeignObjectElement:false,SVGGElement:false,SVGGeometryElement:false,SVGGradientElement:false,SVGGraphicsElement:false,SVGImageElement:false,SVGLength:false,SVGLengthList:false,SVGLinearGradientElement:false,SVGLineElement:false,SVGMarkerElement:false,SVGMaskElement:false,SVGMatrix:false,SVGMetadataElement:false,SVGMPathElement:false,SVGNumber:false,SVGNumberList:false,SVGPathElement:false,SVGPatternElement:false,SVGPoint:false,SVGPointList:false,SVGPolygonElement:false,SVGPolylineElement:false,SVGPreserveAspectRatio:false,SVGRadialGradientElement:false,SVGRect:false,SVGRectElement:false,SVGScriptElement:false,SVGSetElement:false,SVGStopElement:false,SVGStringList:false,SVGStyleElement:false,SVGSVGElement:false,SVGSwitchElement:false,SVGSymbolElement:false,SVGTextContentElement:false,SVGTextElement:false,SVGTextPathElement:false,SVGTextPositioningElement:false,SVGTitleElement:false,SVGTransform:false,SVGTransformList:false,SVGTSpanElement:false,SVGUnitTypes:false,SVGUseElement:false,SVGViewElement:false,TaskAttributionTiming:false,Text:false,TextDecoder:false,TextEncoder:false,TextEvent:false,TextMetrics:false,TextTrack:false,TextTrackCue:false,TextTrackCueList:false,TextTrackList:false,TimeRanges:false,toolbar:false,top:false,Touch:false,TouchEvent:false,TouchList:false,TrackEvent:false,TransitionEvent:false,TreeWalker:false,UIEvent:false,URL:false,URLSearchParams:false,ValidityState:false,visualViewport:false,VisualViewport:false,VTTCue:false,WaveShaperNode:false,WebAssembly:false,WebGL2RenderingContext:false,WebGLActiveInfo:false,WebGLBuffer:false,WebGLContextEvent:false,WebGLFramebuffer:false,WebGLProgram:false,WebGLQuery:false,WebGLRenderbuffer:false,WebGLRenderingContext:false,WebGLSampler:false,WebGLShader:false,WebGLShaderPrecisionFormat:false,WebGLSync:false,WebGLTexture:false,WebGLTransformFeedback:false,WebGLUniformLocation:false,WebGLVertexArrayObject:false,WebSocket:false,WheelEvent:false,window:false,Window:false,Worker:false,WritableStream:false,XMLDocument:false,XMLHttpRequest:false,XMLHttpRequestEventTarget:false,XMLHttpRequestUpload:false,XMLSerializer:false,XPathEvaluator:false,XPathExpression:false,XPathResult:false,XSLTProcessor:false};var worker={addEventListener:false,applicationCache:false,atob:false,Blob:false,BroadcastChannel:false,btoa:false,Cache:false,caches:false,clearInterval:false,clearTimeout:false,close:true,console:false,fetch:false,FileReaderSync:false,FormData:false,Headers:false,IDBCursor:false,IDBCursorWithValue:false,IDBDatabase:false,IDBFactory:false,IDBIndex:false,IDBKeyRange:false,IDBObjectStore:false,IDBOpenDBRequest:false,IDBRequest:false,IDBTransaction:false,IDBVersionChangeEvent:false,ImageData:false,importScripts:true,indexedDB:false,location:false,MessageChannel:false,MessagePort:false,name:false,navigator:false,Notification:false,onclose:true,onconnect:true,onerror:true,onlanguagechange:true,onmessage:true,onoffline:true,ononline:true,onrejectionhandled:true,onunhandledrejection:true,performance:false,Performance:false,PerformanceEntry:false,PerformanceMark:false,PerformanceMeasure:false,PerformanceNavigation:false,PerformanceResourceTiming:false,PerformanceTiming:false,postMessage:true,"Promise":false,queueMicrotask:false,removeEventListener:false,Request:false,Response:false,self:true,ServiceWorkerRegistration:false,setInterval:false,setTimeout:false,TextDecoder:false,TextEncoder:false,URL:false,URLSearchParams:false,WebSocket:false,Worker:false,WorkerGlobalScope:false,XMLHttpRequest:false};var node={__dirname:false,__filename:false,Buffer:false,clearImmediate:false,clearInterval:false,clearTimeout:false,console:false,exports:true,global:false,"Intl":false,module:false,process:false,queueMicrotask:false,require:false,setImmediate:false,setInterval:false,setTimeout:false,TextDecoder:false,TextEncoder:false,URL:false,URLSearchParams:false};var nodeBuiltin={Buffer:false,clearImmediate:false,clearInterval:false,clearTimeout:false,console:false,global:false,"Intl":false,process:false,queueMicrotask:false,setImmediate:false,setInterval:false,setTimeout:false,TextDecoder:false,TextEncoder:false,URL:false,URLSearchParams:false};var commonjs={exports:true,global:false,module:false,require:false};var amd={define:false,require:false};var mocha={after:false,afterEach:false,before:false,beforeEach:false,context:false,describe:false,it:false,mocha:false,run:false,setup:false,specify:false,suite:false,suiteSetup:false,suiteTeardown:false,teardown:false,test:false,xcontext:false,xdescribe:false,xit:false,xspecify:false};var jasmine={afterAll:false,afterEach:false,beforeAll:false,beforeEach:false,describe:false,expect:false,expectAsync:false,fail:false,fdescribe:false,fit:false,it:false,jasmine:false,pending:false,runs:false,spyOn:false,spyOnAllFunctions:false,spyOnProperty:false,waits:false,waitsFor:false,xdescribe:false,xit:false};var jest={afterAll:false,afterEach:false,beforeAll:false,beforeEach:false,describe:false,expect:false,fdescribe:false,fit:false,it:false,jest:false,pit:false,require:false,test:false,xdescribe:false,xit:false,xtest:false};var qunit={asyncTest:false,deepEqual:false,equal:false,expect:false,module:false,notDeepEqual:false,notEqual:false,notOk:false,notPropEqual:false,notStrictEqual:false,ok:false,propEqual:false,QUnit:false,raises:false,start:false,stop:false,strictEqual:false,test:false,throws:false};var phantomjs={console:true,exports:true,phantom:true,require:true,WebPage:true};var couch={emit:false,exports:false,getRow:false,log:false,module:false,provides:false,require:false,respond:false,send:false,start:false,sum:false};var rhino={defineClass:false,deserialize:false,gc:false,help:false,importClass:false,importPackage:false,java:false,load:false,loadClass:false,Packages:false,print:false,quit:false,readFile:false,readUrl:false,runCommand:false,seal:false,serialize:false,spawn:false,sync:false,toint32:false,version:false};var nashorn={__DIR__:false,__FILE__:false,__LINE__:false,com:false,edu:false,exit:false,java:false,Java:false,javafx:false,JavaImporter:false,javax:false,JSAdapter:false,load:false,loadWithNewGlobal:false,org:false,Packages:false,print:false,quit:false};var wsh={ActiveXObject:false,CollectGarbage:false,Debug:false,Enumerator:false,GetObject:false,RuntimeObject:false,ScriptEngine:false,ScriptEngineBuildVersion:false,ScriptEngineMajorVersion:false,ScriptEngineMinorVersion:false,VBArray:false,WScript:false,WSH:false};var jquery={$:false,jQuery:false};var yui={YAHOO:false,YAHOO_config:false,YUI:false,YUI_config:false};var shelljs={cat:false,cd:false,chmod:false,config:false,cp:false,dirs:false,echo:false,env:false,error:false,exec:false,exit:false,find:false,grep:false,ln:false,ls:false,mkdir:false,mv:false,popd:false,pushd:false,pwd:false,rm:false,sed:false,set:false,target:false,tempdir:false,test:false,touch:false,which:false};var prototypejs={$:false,$$:false,$A:false,$break:false,$continue:false,$F:false,$H:false,$R:false,$w:false,Abstract:false,Ajax:false,Autocompleter:false,Builder:false,Class:false,Control:false,Draggable:false,Draggables:false,Droppables:false,Effect:false,Element:false,Enumerable:false,Event:false,Field:false,Form:false,Hash:false,Insertion:false,ObjectRange:false,PeriodicalExecuter:false,Position:false,Prototype:false,Scriptaculous:false,Selector:false,Sortable:false,SortableObserver:false,Sound:false,Template:false,Toggle:false,Try:false};var meteor={$:false,Accounts:false,AccountsClient:false,AccountsCommon:false,AccountsServer:false,App:false,Assets:false,Blaze:false,check:false,Cordova:false,DDP:false,DDPRateLimiter:false,DDPServer:false,Deps:false,EJSON:false,Email:false,HTTP:false,Log:false,Match:false,Meteor:false,Mongo:false,MongoInternals:false,Npm:false,Package:false,Plugin:false,process:false,Random:false,ReactiveDict:false,ReactiveVar:false,Router:false,ServiceConfiguration:false,Session:false,share:false,Spacebars:false,Template:false,Tinytest:false,Tracker:false,UI:false,Utils:false,WebApp:false,WebAppInternals:false};var mongo={_isWindows:false,_rand:false,BulkWriteResult:false,cat:false,cd:false,connect:false,db:false,getHostName:false,getMemInfo:false,hostname:false,ISODate:false,listFiles:false,load:false,ls:false,md5sumFile:false,mkdir:false,Mongo:false,NumberInt:false,NumberLong:false,ObjectId:false,PlanCache:false,print:false,printjson:false,pwd:false,quit:false,removeFile:false,rs:false,sh:false,UUID:false,version:false,WriteResult:false};var applescript={$:false,Application:false,Automation:false,console:false,delay:false,Library:false,ObjC:false,ObjectSpecifier:false,Path:false,Progress:false,Ref:false};var serviceworker={addEventListener:false,applicationCache:false,atob:false,Blob:false,BroadcastChannel:false,btoa:false,Cache:false,caches:false,CacheStorage:false,clearInterval:false,clearTimeout:false,Client:false,clients:false,Clients:false,close:true,console:false,ExtendableEvent:false,ExtendableMessageEvent:false,fetch:false,FetchEvent:false,FileReaderSync:false,FormData:false,Headers:false,IDBCursor:false,IDBCursorWithValue:false,IDBDatabase:false,IDBFactory:false,IDBIndex:false,IDBKeyRange:false,IDBObjectStore:false,IDBOpenDBRequest:false,IDBRequest:false,IDBTransaction:false,IDBVersionChangeEvent:false,ImageData:false,importScripts:false,indexedDB:false,location:false,MessageChannel:false,MessagePort:false,name:false,navigator:false,Notification:false,onclose:true,onconnect:true,onerror:true,onfetch:true,oninstall:true,onlanguagechange:true,onmessage:true,onmessageerror:true,onnotificationclick:true,onnotificationclose:true,onoffline:true,ononline:true,onpush:true,onpushsubscriptionchange:true,onrejectionhandled:true,onsync:true,onunhandledrejection:true,performance:false,Performance:false,PerformanceEntry:false,PerformanceMark:false,PerformanceMeasure:false,PerformanceNavigation:false,PerformanceResourceTiming:false,PerformanceTiming:false,postMessage:true,"Promise":false,queueMicrotask:false,registration:false,removeEventListener:false,Request:false,Response:false,self:false,ServiceWorker:false,ServiceWorkerContainer:false,ServiceWorkerGlobalScope:false,ServiceWorkerMessageEvent:false,ServiceWorkerRegistration:false,setInterval:false,setTimeout:false,skipWaiting:false,TextDecoder:false,TextEncoder:false,URL:false,URLSearchParams:false,WebSocket:false,WindowClient:false,Worker:false,WorkerGlobalScope:false,XMLHttpRequest:false};var atomtest={advanceClock:false,fakeClearInterval:false,fakeClearTimeout:false,fakeSetInterval:false,fakeSetTimeout:false,resetTimeouts:false,waitsForPromise:false};var embertest={andThen:false,click:false,currentPath:false,currentRouteName:false,currentURL:false,fillIn:false,find:false,findAll:false,findWithAssert:false,keyEvent:false,pauseTest:false,resumeTest:false,triggerEvent:false,visit:false,wait:false};var protractor={$:false,$$:false,browser:false,by:false,By:false,DartObject:false,element:false,protractor:false};var webextensions={browser:false,chrome:false,opr:false};var greasemonkey={cloneInto:false,createObjectIn:false,exportFunction:false,GM:false,GM_addStyle:false,GM_deleteValue:false,GM_getResourceText:false,GM_getResourceURL:false,GM_getValue:false,GM_info:false,GM_listValues:false,GM_log:false,GM_openInTab:false,GM_registerMenuCommand:false,GM_setClipboard:false,GM_setValue:false,GM_xmlhttpRequest:false,unsafeWindow:false};var devtools={$:false,$_:false,$$:false,$0:false,$1:false,$2:false,$3:false,$4:false,$x:false,chrome:false,clear:false,copy:false,debug:false,dir:false,dirxml:false,getEventListeners:false,inspect:false,keys:false,monitor:false,monitorEvents:false,profile:false,profileEnd:false,queryObjects:false,table:false,undebug:false,unmonitor:false,unmonitorEvents:false,values:false};var globals={builtin:builtin,es5:es5,es2015:es2015,es2017:es2017,browser:browser,worker:worker,node:node,nodeBuiltin:nodeBuiltin,commonjs:commonjs,amd:amd,mocha:mocha,jasmine:jasmine,jest:jest,qunit:qunit,phantomjs:phantomjs,couch:couch,rhino:rhino,nashorn:nashorn,wsh:wsh,jquery:jquery,yui:yui,shelljs:shelljs,prototypejs:prototypejs,meteor:meteor,mongo:mongo,applescript:applescript,serviceworker:serviceworker,atomtest:atomtest,embertest:embertest,protractor:protractor,"shared-node-browser":{clearInterval:false,clearTimeout:false,console:false,setInterval:false,setTimeout:false,URL:false,URLSearchParams:false},webextensions:webextensions,greasemonkey:greasemonkey,devtools:devtools};var globals$1=/*#__PURE__*/Object.freeze({__proto__:null,builtin:builtin,es5:es5,es2015:es2015,es2017:es2017,browser:browser,worker:worker,node:node,nodeBuiltin:nodeBuiltin,commonjs:commonjs,amd:amd,mocha:mocha,jasmine:jasmine,jest:jest,qunit:qunit,phantomjs:phantomjs,couch:couch,rhino:rhino,nashorn:nashorn,wsh:wsh,jquery:jquery,yui:yui,shelljs:shelljs,prototypejs:prototypejs,meteor:meteor,mongo:mongo,applescript:applescript,serviceworker:serviceworker,atomtest:atomtest,embertest:embertest,protractor:protractor,webextensions:webextensions,greasemonkey:greasemonkey,devtools:devtools,'default':globals});var require$$0=getCjsExportFromNamespace(globals$1);var globals$2=require$$0;const browserAPIs=Object.keys(globals$2.browser);const builtinAPIs=Object.keys(globals$2.builtin);const isIdentifier=n=>namedTypes.Identifier.check(n);const isLiteral=n=>namedTypes.Literal.check(n);const isExpressionStatement=n=>namedTypes.ExpressionStatement.check(n);const isThisExpression=n=>namedTypes.ThisExpression.check(n);const isNewExpression=n=>namedTypes.NewExpression.check(n);const isSequenceExpression=n=>namedTypes.SequenceExpression.check(n);const isBinaryExpression=n=>namedTypes.BinaryExpression.check(n);const isExportDefaultStatement=n=>namedTypes.ExportDefaultDeclaration.check(n);const isMemberExpression=n=>namedTypes.MemberExpression.check(n);const isArrayExpression=n=>namedTypes.ArrayExpression.check(n);const isBrowserAPI=(_ref)=>{let{name}=_ref;return browserAPIs.includes(name);};const isBuiltinAPI=(_ref2)=>{let{name}=_ref2;return builtinAPIs.includes(name);};const isRaw=n=>n&&n.raw;/**
+  	 */function generateAST(source,options){return main_2$1(source,Object.assign({parser:{parse(source,opts){return Parser.parse(source,Object.assign({},opts,{ecmaVersion:2020}));}}},options));}var builtin={"Array":false,"ArrayBuffer":false,Atomics:false,BigInt:false,BigInt64Array:false,BigUint64Array:false,"Boolean":false,constructor:false,"DataView":false,"Date":false,"decodeURI":false,"decodeURIComponent":false,"encodeURI":false,"encodeURIComponent":false,"Error":false,"escape":false,"eval":false,"EvalError":false,"Float32Array":false,"Float64Array":false,"Function":false,globalThis:false,hasOwnProperty:false,"Infinity":false,"Int16Array":false,"Int32Array":false,"Int8Array":false,"isFinite":false,"isNaN":false,isPrototypeOf:false,"JSON":false,"Map":false,"Math":false,"NaN":false,"Number":false,"Object":false,"parseFloat":false,"parseInt":false,"Promise":false,propertyIsEnumerable:false,"Proxy":false,"RangeError":false,"ReferenceError":false,"Reflect":false,"RegExp":false,"Set":false,SharedArrayBuffer:false,"String":false,"Symbol":false,"SyntaxError":false,toLocaleString:false,toString:false,"TypeError":false,"Uint16Array":false,"Uint32Array":false,"Uint8Array":false,"Uint8ClampedArray":false,"undefined":false,"unescape":false,"URIError":false,valueOf:false,"WeakMap":false,"WeakSet":false};var es5={"Array":false,"Boolean":false,constructor:false,"Date":false,"decodeURI":false,"decodeURIComponent":false,"encodeURI":false,"encodeURIComponent":false,"Error":false,"escape":false,"eval":false,"EvalError":false,"Function":false,hasOwnProperty:false,"Infinity":false,"isFinite":false,"isNaN":false,isPrototypeOf:false,"JSON":false,"Math":false,"NaN":false,"Number":false,"Object":false,"parseFloat":false,"parseInt":false,propertyIsEnumerable:false,"RangeError":false,"ReferenceError":false,"RegExp":false,"String":false,"SyntaxError":false,toLocaleString:false,toString:false,"TypeError":false,"undefined":false,"unescape":false,"URIError":false,valueOf:false};var es2015={"Array":false,"ArrayBuffer":false,"Boolean":false,constructor:false,"DataView":false,"Date":false,"decodeURI":false,"decodeURIComponent":false,"encodeURI":false,"encodeURIComponent":false,"Error":false,"escape":false,"eval":false,"EvalError":false,"Float32Array":false,"Float64Array":false,"Function":false,hasOwnProperty:false,"Infinity":false,"Int16Array":false,"Int32Array":false,"Int8Array":false,"isFinite":false,"isNaN":false,isPrototypeOf:false,"JSON":false,"Map":false,"Math":false,"NaN":false,"Number":false,"Object":false,"parseFloat":false,"parseInt":false,"Promise":false,propertyIsEnumerable:false,"Proxy":false,"RangeError":false,"ReferenceError":false,"Reflect":false,"RegExp":false,"Set":false,"String":false,"Symbol":false,"SyntaxError":false,toLocaleString:false,toString:false,"TypeError":false,"Uint16Array":false,"Uint32Array":false,"Uint8Array":false,"Uint8ClampedArray":false,"undefined":false,"unescape":false,"URIError":false,valueOf:false,"WeakMap":false,"WeakSet":false};var es2017={"Array":false,"ArrayBuffer":false,Atomics:false,"Boolean":false,constructor:false,"DataView":false,"Date":false,"decodeURI":false,"decodeURIComponent":false,"encodeURI":false,"encodeURIComponent":false,"Error":false,"escape":false,"eval":false,"EvalError":false,"Float32Array":false,"Float64Array":false,"Function":false,hasOwnProperty:false,"Infinity":false,"Int16Array":false,"Int32Array":false,"Int8Array":false,"isFinite":false,"isNaN":false,isPrototypeOf:false,"JSON":false,"Map":false,"Math":false,"NaN":false,"Number":false,"Object":false,"parseFloat":false,"parseInt":false,"Promise":false,propertyIsEnumerable:false,"Proxy":false,"RangeError":false,"ReferenceError":false,"Reflect":false,"RegExp":false,"Set":false,SharedArrayBuffer:false,"String":false,"Symbol":false,"SyntaxError":false,toLocaleString:false,toString:false,"TypeError":false,"Uint16Array":false,"Uint32Array":false,"Uint8Array":false,"Uint8ClampedArray":false,"undefined":false,"unescape":false,"URIError":false,valueOf:false,"WeakMap":false,"WeakSet":false};var browser={AbortController:false,AbortSignal:false,addEventListener:false,alert:false,AnalyserNode:false,Animation:false,AnimationEffectReadOnly:false,AnimationEffectTiming:false,AnimationEffectTimingReadOnly:false,AnimationEvent:false,AnimationPlaybackEvent:false,AnimationTimeline:false,applicationCache:false,ApplicationCache:false,ApplicationCacheErrorEvent:false,atob:false,Attr:false,Audio:false,AudioBuffer:false,AudioBufferSourceNode:false,AudioContext:false,AudioDestinationNode:false,AudioListener:false,AudioNode:false,AudioParam:false,AudioProcessingEvent:false,AudioScheduledSourceNode:false,"AudioWorkletGlobalScope ":false,AudioWorkletNode:false,AudioWorkletProcessor:false,BarProp:false,BaseAudioContext:false,BatteryManager:false,BeforeUnloadEvent:false,BiquadFilterNode:false,Blob:false,BlobEvent:false,blur:false,BroadcastChannel:false,btoa:false,BudgetService:false,ByteLengthQueuingStrategy:false,Cache:false,caches:false,CacheStorage:false,cancelAnimationFrame:false,cancelIdleCallback:false,CanvasCaptureMediaStreamTrack:false,CanvasGradient:false,CanvasPattern:false,CanvasRenderingContext2D:false,ChannelMergerNode:false,ChannelSplitterNode:false,CharacterData:false,clearInterval:false,clearTimeout:false,clientInformation:false,ClipboardEvent:false,close:false,closed:false,CloseEvent:false,Comment:false,CompositionEvent:false,confirm:false,console:false,ConstantSourceNode:false,ConvolverNode:false,CountQueuingStrategy:false,createImageBitmap:false,Credential:false,CredentialsContainer:false,crypto:false,Crypto:false,CryptoKey:false,CSS:false,CSSConditionRule:false,CSSFontFaceRule:false,CSSGroupingRule:false,CSSImportRule:false,CSSKeyframeRule:false,CSSKeyframesRule:false,CSSMediaRule:false,CSSNamespaceRule:false,CSSPageRule:false,CSSRule:false,CSSRuleList:false,CSSStyleDeclaration:false,CSSStyleRule:false,CSSStyleSheet:false,CSSSupportsRule:false,CustomElementRegistry:false,customElements:false,CustomEvent:false,DataTransfer:false,DataTransferItem:false,DataTransferItemList:false,defaultstatus:false,defaultStatus:false,DelayNode:false,DeviceMotionEvent:false,DeviceOrientationEvent:false,devicePixelRatio:false,dispatchEvent:false,document:false,Document:false,DocumentFragment:false,DocumentType:false,DOMError:false,DOMException:false,DOMImplementation:false,DOMMatrix:false,DOMMatrixReadOnly:false,DOMParser:false,DOMPoint:false,DOMPointReadOnly:false,DOMQuad:false,DOMRect:false,DOMRectReadOnly:false,DOMStringList:false,DOMStringMap:false,DOMTokenList:false,DragEvent:false,DynamicsCompressorNode:false,Element:false,ErrorEvent:false,event:false,Event:false,EventSource:false,EventTarget:false,external:false,fetch:false,File:false,FileList:false,FileReader:false,find:false,focus:false,FocusEvent:false,FontFace:false,FontFaceSetLoadEvent:false,FormData:false,frameElement:false,frames:false,GainNode:false,Gamepad:false,GamepadButton:false,GamepadEvent:false,getComputedStyle:false,getSelection:false,HashChangeEvent:false,Headers:false,history:false,History:false,HTMLAllCollection:false,HTMLAnchorElement:false,HTMLAreaElement:false,HTMLAudioElement:false,HTMLBaseElement:false,HTMLBodyElement:false,HTMLBRElement:false,HTMLButtonElement:false,HTMLCanvasElement:false,HTMLCollection:false,HTMLContentElement:false,HTMLDataElement:false,HTMLDataListElement:false,HTMLDetailsElement:false,HTMLDialogElement:false,HTMLDirectoryElement:false,HTMLDivElement:false,HTMLDListElement:false,HTMLDocument:false,HTMLElement:false,HTMLEmbedElement:false,HTMLFieldSetElement:false,HTMLFontElement:false,HTMLFormControlsCollection:false,HTMLFormElement:false,HTMLFrameElement:false,HTMLFrameSetElement:false,HTMLHeadElement:false,HTMLHeadingElement:false,HTMLHRElement:false,HTMLHtmlElement:false,HTMLIFrameElement:false,HTMLImageElement:false,HTMLInputElement:false,HTMLLabelElement:false,HTMLLegendElement:false,HTMLLIElement:false,HTMLLinkElement:false,HTMLMapElement:false,HTMLMarqueeElement:false,HTMLMediaElement:false,HTMLMenuElement:false,HTMLMetaElement:false,HTMLMeterElement:false,HTMLModElement:false,HTMLObjectElement:false,HTMLOListElement:false,HTMLOptGroupElement:false,HTMLOptionElement:false,HTMLOptionsCollection:false,HTMLOutputElement:false,HTMLParagraphElement:false,HTMLParamElement:false,HTMLPictureElement:false,HTMLPreElement:false,HTMLProgressElement:false,HTMLQuoteElement:false,HTMLScriptElement:false,HTMLSelectElement:false,HTMLShadowElement:false,HTMLSlotElement:false,HTMLSourceElement:false,HTMLSpanElement:false,HTMLStyleElement:false,HTMLTableCaptionElement:false,HTMLTableCellElement:false,HTMLTableColElement:false,HTMLTableElement:false,HTMLTableRowElement:false,HTMLTableSectionElement:false,HTMLTemplateElement:false,HTMLTextAreaElement:false,HTMLTimeElement:false,HTMLTitleElement:false,HTMLTrackElement:false,HTMLUListElement:false,HTMLUnknownElement:false,HTMLVideoElement:false,IDBCursor:false,IDBCursorWithValue:false,IDBDatabase:false,IDBFactory:false,IDBIndex:false,IDBKeyRange:false,IDBObjectStore:false,IDBOpenDBRequest:false,IDBRequest:false,IDBTransaction:false,IDBVersionChangeEvent:false,IdleDeadline:false,IIRFilterNode:false,Image:false,ImageBitmap:false,ImageBitmapRenderingContext:false,ImageCapture:false,ImageData:false,indexedDB:false,innerHeight:false,innerWidth:false,InputEvent:false,IntersectionObserver:false,IntersectionObserverEntry:false,"Intl":false,isSecureContext:false,KeyboardEvent:false,KeyframeEffect:false,KeyframeEffectReadOnly:false,length:false,localStorage:false,location:true,Location:false,locationbar:false,matchMedia:false,MediaDeviceInfo:false,MediaDevices:false,MediaElementAudioSourceNode:false,MediaEncryptedEvent:false,MediaError:false,MediaKeyMessageEvent:false,MediaKeySession:false,MediaKeyStatusMap:false,MediaKeySystemAccess:false,MediaList:false,MediaQueryList:false,MediaQueryListEvent:false,MediaRecorder:false,MediaSettingsRange:false,MediaSource:false,MediaStream:false,MediaStreamAudioDestinationNode:false,MediaStreamAudioSourceNode:false,MediaStreamEvent:false,MediaStreamTrack:false,MediaStreamTrackEvent:false,menubar:false,MessageChannel:false,MessageEvent:false,MessagePort:false,MIDIAccess:false,MIDIConnectionEvent:false,MIDIInput:false,MIDIInputMap:false,MIDIMessageEvent:false,MIDIOutput:false,MIDIOutputMap:false,MIDIPort:false,MimeType:false,MimeTypeArray:false,MouseEvent:false,moveBy:false,moveTo:false,MutationEvent:false,MutationObserver:false,MutationRecord:false,name:false,NamedNodeMap:false,NavigationPreloadManager:false,navigator:false,Navigator:false,NetworkInformation:false,Node:false,NodeFilter:false,NodeIterator:false,NodeList:false,Notification:false,OfflineAudioCompletionEvent:false,OfflineAudioContext:false,offscreenBuffering:false,OffscreenCanvas:true,onabort:true,onafterprint:true,onanimationend:true,onanimationiteration:true,onanimationstart:true,onappinstalled:true,onauxclick:true,onbeforeinstallprompt:true,onbeforeprint:true,onbeforeunload:true,onblur:true,oncancel:true,oncanplay:true,oncanplaythrough:true,onchange:true,onclick:true,onclose:true,oncontextmenu:true,oncuechange:true,ondblclick:true,ondevicemotion:true,ondeviceorientation:true,ondeviceorientationabsolute:true,ondrag:true,ondragend:true,ondragenter:true,ondragleave:true,ondragover:true,ondragstart:true,ondrop:true,ondurationchange:true,onemptied:true,onended:true,onerror:true,onfocus:true,ongotpointercapture:true,onhashchange:true,oninput:true,oninvalid:true,onkeydown:true,onkeypress:true,onkeyup:true,onlanguagechange:true,onload:true,onloadeddata:true,onloadedmetadata:true,onloadstart:true,onlostpointercapture:true,onmessage:true,onmessageerror:true,onmousedown:true,onmouseenter:true,onmouseleave:true,onmousemove:true,onmouseout:true,onmouseover:true,onmouseup:true,onmousewheel:true,onoffline:true,ononline:true,onpagehide:true,onpageshow:true,onpause:true,onplay:true,onplaying:true,onpointercancel:true,onpointerdown:true,onpointerenter:true,onpointerleave:true,onpointermove:true,onpointerout:true,onpointerover:true,onpointerup:true,onpopstate:true,onprogress:true,onratechange:true,onrejectionhandled:true,onreset:true,onresize:true,onscroll:true,onsearch:true,onseeked:true,onseeking:true,onselect:true,onstalled:true,onstorage:true,onsubmit:true,onsuspend:true,ontimeupdate:true,ontoggle:true,ontransitionend:true,onunhandledrejection:true,onunload:true,onvolumechange:true,onwaiting:true,onwheel:true,open:false,openDatabase:false,opener:false,Option:false,origin:false,OscillatorNode:false,outerHeight:false,outerWidth:false,PageTransitionEvent:false,pageXOffset:false,pageYOffset:false,PannerNode:false,parent:false,Path2D:false,PaymentAddress:false,PaymentRequest:false,PaymentRequestUpdateEvent:false,PaymentResponse:false,performance:false,Performance:false,PerformanceEntry:false,PerformanceLongTaskTiming:false,PerformanceMark:false,PerformanceMeasure:false,PerformanceNavigation:false,PerformanceNavigationTiming:false,PerformanceObserver:false,PerformanceObserverEntryList:false,PerformancePaintTiming:false,PerformanceResourceTiming:false,PerformanceTiming:false,PeriodicWave:false,Permissions:false,PermissionStatus:false,personalbar:false,PhotoCapabilities:false,Plugin:false,PluginArray:false,PointerEvent:false,PopStateEvent:false,postMessage:false,Presentation:false,PresentationAvailability:false,PresentationConnection:false,PresentationConnectionAvailableEvent:false,PresentationConnectionCloseEvent:false,PresentationConnectionList:false,PresentationReceiver:false,PresentationRequest:false,print:false,ProcessingInstruction:false,ProgressEvent:false,PromiseRejectionEvent:false,prompt:false,PushManager:false,PushSubscription:false,PushSubscriptionOptions:false,queueMicrotask:false,RadioNodeList:false,Range:false,ReadableStream:false,registerProcessor:false,RemotePlayback:false,removeEventListener:false,Request:false,requestAnimationFrame:false,requestIdleCallback:false,resizeBy:false,ResizeObserver:false,ResizeObserverEntry:false,resizeTo:false,Response:false,RTCCertificate:false,RTCDataChannel:false,RTCDataChannelEvent:false,RTCDtlsTransport:false,RTCIceCandidate:false,RTCIceGatherer:false,RTCIceTransport:false,RTCPeerConnection:false,RTCPeerConnectionIceEvent:false,RTCRtpContributingSource:false,RTCRtpReceiver:false,RTCRtpSender:false,RTCSctpTransport:false,RTCSessionDescription:false,RTCStatsReport:false,RTCTrackEvent:false,screen:false,Screen:false,screenLeft:false,ScreenOrientation:false,screenTop:false,screenX:false,screenY:false,ScriptProcessorNode:false,scroll:false,scrollbars:false,scrollBy:false,scrollTo:false,scrollX:false,scrollY:false,SecurityPolicyViolationEvent:false,Selection:false,self:false,ServiceWorker:false,ServiceWorkerContainer:false,ServiceWorkerRegistration:false,sessionStorage:false,setInterval:false,setTimeout:false,ShadowRoot:false,SharedWorker:false,SourceBuffer:false,SourceBufferList:false,speechSynthesis:false,SpeechSynthesisEvent:false,SpeechSynthesisUtterance:false,StaticRange:false,status:false,statusbar:false,StereoPannerNode:false,stop:false,Storage:false,StorageEvent:false,StorageManager:false,styleMedia:false,StyleSheet:false,StyleSheetList:false,SubtleCrypto:false,SVGAElement:false,SVGAngle:false,SVGAnimatedAngle:false,SVGAnimatedBoolean:false,SVGAnimatedEnumeration:false,SVGAnimatedInteger:false,SVGAnimatedLength:false,SVGAnimatedLengthList:false,SVGAnimatedNumber:false,SVGAnimatedNumberList:false,SVGAnimatedPreserveAspectRatio:false,SVGAnimatedRect:false,SVGAnimatedString:false,SVGAnimatedTransformList:false,SVGAnimateElement:false,SVGAnimateMotionElement:false,SVGAnimateTransformElement:false,SVGAnimationElement:false,SVGCircleElement:false,SVGClipPathElement:false,SVGComponentTransferFunctionElement:false,SVGDefsElement:false,SVGDescElement:false,SVGDiscardElement:false,SVGElement:false,SVGEllipseElement:false,SVGFEBlendElement:false,SVGFEColorMatrixElement:false,SVGFEComponentTransferElement:false,SVGFECompositeElement:false,SVGFEConvolveMatrixElement:false,SVGFEDiffuseLightingElement:false,SVGFEDisplacementMapElement:false,SVGFEDistantLightElement:false,SVGFEDropShadowElement:false,SVGFEFloodElement:false,SVGFEFuncAElement:false,SVGFEFuncBElement:false,SVGFEFuncGElement:false,SVGFEFuncRElement:false,SVGFEGaussianBlurElement:false,SVGFEImageElement:false,SVGFEMergeElement:false,SVGFEMergeNodeElement:false,SVGFEMorphologyElement:false,SVGFEOffsetElement:false,SVGFEPointLightElement:false,SVGFESpecularLightingElement:false,SVGFESpotLightElement:false,SVGFETileElement:false,SVGFETurbulenceElement:false,SVGFilterElement:false,SVGForeignObjectElement:false,SVGGElement:false,SVGGeometryElement:false,SVGGradientElement:false,SVGGraphicsElement:false,SVGImageElement:false,SVGLength:false,SVGLengthList:false,SVGLinearGradientElement:false,SVGLineElement:false,SVGMarkerElement:false,SVGMaskElement:false,SVGMatrix:false,SVGMetadataElement:false,SVGMPathElement:false,SVGNumber:false,SVGNumberList:false,SVGPathElement:false,SVGPatternElement:false,SVGPoint:false,SVGPointList:false,SVGPolygonElement:false,SVGPolylineElement:false,SVGPreserveAspectRatio:false,SVGRadialGradientElement:false,SVGRect:false,SVGRectElement:false,SVGScriptElement:false,SVGSetElement:false,SVGStopElement:false,SVGStringList:false,SVGStyleElement:false,SVGSVGElement:false,SVGSwitchElement:false,SVGSymbolElement:false,SVGTextContentElement:false,SVGTextElement:false,SVGTextPathElement:false,SVGTextPositioningElement:false,SVGTitleElement:false,SVGTransform:false,SVGTransformList:false,SVGTSpanElement:false,SVGUnitTypes:false,SVGUseElement:false,SVGViewElement:false,TaskAttributionTiming:false,Text:false,TextDecoder:false,TextEncoder:false,TextEvent:false,TextMetrics:false,TextTrack:false,TextTrackCue:false,TextTrackCueList:false,TextTrackList:false,TimeRanges:false,toolbar:false,top:false,Touch:false,TouchEvent:false,TouchList:false,TrackEvent:false,TransitionEvent:false,TreeWalker:false,UIEvent:false,URL:false,URLSearchParams:false,ValidityState:false,visualViewport:false,VisualViewport:false,VTTCue:false,WaveShaperNode:false,WebAssembly:false,WebGL2RenderingContext:false,WebGLActiveInfo:false,WebGLBuffer:false,WebGLContextEvent:false,WebGLFramebuffer:false,WebGLProgram:false,WebGLQuery:false,WebGLRenderbuffer:false,WebGLRenderingContext:false,WebGLSampler:false,WebGLShader:false,WebGLShaderPrecisionFormat:false,WebGLSync:false,WebGLTexture:false,WebGLTransformFeedback:false,WebGLUniformLocation:false,WebGLVertexArrayObject:false,WebSocket:false,WheelEvent:false,window:false,Window:false,Worker:false,WritableStream:false,XMLDocument:false,XMLHttpRequest:false,XMLHttpRequestEventTarget:false,XMLHttpRequestUpload:false,XMLSerializer:false,XPathEvaluator:false,XPathExpression:false,XPathResult:false,XSLTProcessor:false};var worker={addEventListener:false,applicationCache:false,atob:false,Blob:false,BroadcastChannel:false,btoa:false,Cache:false,caches:false,clearInterval:false,clearTimeout:false,close:true,console:false,fetch:false,FileReaderSync:false,FormData:false,Headers:false,IDBCursor:false,IDBCursorWithValue:false,IDBDatabase:false,IDBFactory:false,IDBIndex:false,IDBKeyRange:false,IDBObjectStore:false,IDBOpenDBRequest:false,IDBRequest:false,IDBTransaction:false,IDBVersionChangeEvent:false,ImageData:false,importScripts:true,indexedDB:false,location:false,MessageChannel:false,MessagePort:false,name:false,navigator:false,Notification:false,onclose:true,onconnect:true,onerror:true,onlanguagechange:true,onmessage:true,onoffline:true,ononline:true,onrejectionhandled:true,onunhandledrejection:true,performance:false,Performance:false,PerformanceEntry:false,PerformanceMark:false,PerformanceMeasure:false,PerformanceNavigation:false,PerformanceResourceTiming:false,PerformanceTiming:false,postMessage:true,"Promise":false,queueMicrotask:false,removeEventListener:false,Request:false,Response:false,self:true,ServiceWorkerRegistration:false,setInterval:false,setTimeout:false,TextDecoder:false,TextEncoder:false,URL:false,URLSearchParams:false,WebSocket:false,Worker:false,WorkerGlobalScope:false,XMLHttpRequest:false};var node={__dirname:false,__filename:false,Buffer:false,clearImmediate:false,clearInterval:false,clearTimeout:false,console:false,exports:true,global:false,"Intl":false,module:false,process:false,queueMicrotask:false,require:false,setImmediate:false,setInterval:false,setTimeout:false,TextDecoder:false,TextEncoder:false,URL:false,URLSearchParams:false};var nodeBuiltin={Buffer:false,clearImmediate:false,clearInterval:false,clearTimeout:false,console:false,global:false,"Intl":false,process:false,queueMicrotask:false,setImmediate:false,setInterval:false,setTimeout:false,TextDecoder:false,TextEncoder:false,URL:false,URLSearchParams:false};var commonjs={exports:true,global:false,module:false,require:false};var amd={define:false,require:false};var mocha={after:false,afterEach:false,before:false,beforeEach:false,context:false,describe:false,it:false,mocha:false,run:false,setup:false,specify:false,suite:false,suiteSetup:false,suiteTeardown:false,teardown:false,test:false,xcontext:false,xdescribe:false,xit:false,xspecify:false};var jasmine={afterAll:false,afterEach:false,beforeAll:false,beforeEach:false,describe:false,expect:false,expectAsync:false,fail:false,fdescribe:false,fit:false,it:false,jasmine:false,pending:false,runs:false,spyOn:false,spyOnAllFunctions:false,spyOnProperty:false,waits:false,waitsFor:false,xdescribe:false,xit:false};var jest={afterAll:false,afterEach:false,beforeAll:false,beforeEach:false,describe:false,expect:false,fdescribe:false,fit:false,it:false,jest:false,pit:false,require:false,test:false,xdescribe:false,xit:false,xtest:false};var qunit={asyncTest:false,deepEqual:false,equal:false,expect:false,module:false,notDeepEqual:false,notEqual:false,notOk:false,notPropEqual:false,notStrictEqual:false,ok:false,propEqual:false,QUnit:false,raises:false,start:false,stop:false,strictEqual:false,test:false,throws:false};var phantomjs={console:true,exports:true,phantom:true,require:true,WebPage:true};var couch={emit:false,exports:false,getRow:false,log:false,module:false,provides:false,require:false,respond:false,send:false,start:false,sum:false};var rhino={defineClass:false,deserialize:false,gc:false,help:false,importClass:false,importPackage:false,java:false,load:false,loadClass:false,Packages:false,print:false,quit:false,readFile:false,readUrl:false,runCommand:false,seal:false,serialize:false,spawn:false,sync:false,toint32:false,version:false};var nashorn={__DIR__:false,__FILE__:false,__LINE__:false,com:false,edu:false,exit:false,java:false,Java:false,javafx:false,JavaImporter:false,javax:false,JSAdapter:false,load:false,loadWithNewGlobal:false,org:false,Packages:false,print:false,quit:false};var wsh={ActiveXObject:false,CollectGarbage:false,Debug:false,Enumerator:false,GetObject:false,RuntimeObject:false,ScriptEngine:false,ScriptEngineBuildVersion:false,ScriptEngineMajorVersion:false,ScriptEngineMinorVersion:false,VBArray:false,WScript:false,WSH:false};var jquery={$:false,jQuery:false};var yui={YAHOO:false,YAHOO_config:false,YUI:false,YUI_config:false};var shelljs={cat:false,cd:false,chmod:false,config:false,cp:false,dirs:false,echo:false,env:false,error:false,exec:false,exit:false,find:false,grep:false,ln:false,ls:false,mkdir:false,mv:false,popd:false,pushd:false,pwd:false,rm:false,sed:false,set:false,target:false,tempdir:false,test:false,touch:false,which:false};var prototypejs={$:false,$$:false,$A:false,$break:false,$continue:false,$F:false,$H:false,$R:false,$w:false,Abstract:false,Ajax:false,Autocompleter:false,Builder:false,Class:false,Control:false,Draggable:false,Draggables:false,Droppables:false,Effect:false,Element:false,Enumerable:false,Event:false,Field:false,Form:false,Hash:false,Insertion:false,ObjectRange:false,PeriodicalExecuter:false,Position:false,Prototype:false,Scriptaculous:false,Selector:false,Sortable:false,SortableObserver:false,Sound:false,Template:false,Toggle:false,Try:false};var meteor={$:false,Accounts:false,AccountsClient:false,AccountsCommon:false,AccountsServer:false,App:false,Assets:false,Blaze:false,check:false,Cordova:false,DDP:false,DDPRateLimiter:false,DDPServer:false,Deps:false,EJSON:false,Email:false,HTTP:false,Log:false,Match:false,Meteor:false,Mongo:false,MongoInternals:false,Npm:false,Package:false,Plugin:false,process:false,Random:false,ReactiveDict:false,ReactiveVar:false,Router:false,ServiceConfiguration:false,Session:false,share:false,Spacebars:false,Template:false,Tinytest:false,Tracker:false,UI:false,Utils:false,WebApp:false,WebAppInternals:false};var mongo={_isWindows:false,_rand:false,BulkWriteResult:false,cat:false,cd:false,connect:false,db:false,getHostName:false,getMemInfo:false,hostname:false,ISODate:false,listFiles:false,load:false,ls:false,md5sumFile:false,mkdir:false,Mongo:false,NumberInt:false,NumberLong:false,ObjectId:false,PlanCache:false,print:false,printjson:false,pwd:false,quit:false,removeFile:false,rs:false,sh:false,UUID:false,version:false,WriteResult:false};var applescript={$:false,Application:false,Automation:false,console:false,delay:false,Library:false,ObjC:false,ObjectSpecifier:false,Path:false,Progress:false,Ref:false};var serviceworker={addEventListener:false,applicationCache:false,atob:false,Blob:false,BroadcastChannel:false,btoa:false,Cache:false,caches:false,CacheStorage:false,clearInterval:false,clearTimeout:false,Client:false,clients:false,Clients:false,close:true,console:false,ExtendableEvent:false,ExtendableMessageEvent:false,fetch:false,FetchEvent:false,FileReaderSync:false,FormData:false,Headers:false,IDBCursor:false,IDBCursorWithValue:false,IDBDatabase:false,IDBFactory:false,IDBIndex:false,IDBKeyRange:false,IDBObjectStore:false,IDBOpenDBRequest:false,IDBRequest:false,IDBTransaction:false,IDBVersionChangeEvent:false,ImageData:false,importScripts:false,indexedDB:false,location:false,MessageChannel:false,MessagePort:false,name:false,navigator:false,Notification:false,onclose:true,onconnect:true,onerror:true,onfetch:true,oninstall:true,onlanguagechange:true,onmessage:true,onmessageerror:true,onnotificationclick:true,onnotificationclose:true,onoffline:true,ononline:true,onpush:true,onpushsubscriptionchange:true,onrejectionhandled:true,onsync:true,onunhandledrejection:true,performance:false,Performance:false,PerformanceEntry:false,PerformanceMark:false,PerformanceMeasure:false,PerformanceNavigation:false,PerformanceResourceTiming:false,PerformanceTiming:false,postMessage:true,"Promise":false,queueMicrotask:false,registration:false,removeEventListener:false,Request:false,Response:false,self:false,ServiceWorker:false,ServiceWorkerContainer:false,ServiceWorkerGlobalScope:false,ServiceWorkerMessageEvent:false,ServiceWorkerRegistration:false,setInterval:false,setTimeout:false,skipWaiting:false,TextDecoder:false,TextEncoder:false,URL:false,URLSearchParams:false,WebSocket:false,WindowClient:false,Worker:false,WorkerGlobalScope:false,XMLHttpRequest:false};var atomtest={advanceClock:false,fakeClearInterval:false,fakeClearTimeout:false,fakeSetInterval:false,fakeSetTimeout:false,resetTimeouts:false,waitsForPromise:false};var embertest={andThen:false,click:false,currentPath:false,currentRouteName:false,currentURL:false,fillIn:false,find:false,findAll:false,findWithAssert:false,keyEvent:false,pauseTest:false,resumeTest:false,triggerEvent:false,visit:false,wait:false};var protractor={$:false,$$:false,browser:false,by:false,By:false,DartObject:false,element:false,protractor:false};var webextensions={browser:false,chrome:false,opr:false};var greasemonkey={cloneInto:false,createObjectIn:false,exportFunction:false,GM:false,GM_addStyle:false,GM_deleteValue:false,GM_getResourceText:false,GM_getResourceURL:false,GM_getValue:false,GM_info:false,GM_listValues:false,GM_log:false,GM_openInTab:false,GM_registerMenuCommand:false,GM_setClipboard:false,GM_setValue:false,GM_xmlhttpRequest:false,unsafeWindow:false};var devtools={$:false,$_:false,$$:false,$0:false,$1:false,$2:false,$3:false,$4:false,$x:false,chrome:false,clear:false,copy:false,debug:false,dir:false,dirxml:false,getEventListeners:false,inspect:false,keys:false,monitor:false,monitorEvents:false,profile:false,profileEnd:false,queryObjects:false,table:false,undebug:false,unmonitor:false,unmonitorEvents:false,values:false};var globals={builtin:builtin,es5:es5,es2015:es2015,es2017:es2017,browser:browser,worker:worker,node:node,nodeBuiltin:nodeBuiltin,commonjs:commonjs,amd:amd,mocha:mocha,jasmine:jasmine,jest:jest,qunit:qunit,phantomjs:phantomjs,couch:couch,rhino:rhino,nashorn:nashorn,wsh:wsh,jquery:jquery,yui:yui,shelljs:shelljs,prototypejs:prototypejs,meteor:meteor,mongo:mongo,applescript:applescript,serviceworker:serviceworker,atomtest:atomtest,embertest:embertest,protractor:protractor,"shared-node-browser":{clearInterval:false,clearTimeout:false,console:false,setInterval:false,setTimeout:false,URL:false,URLSearchParams:false},webextensions:webextensions,greasemonkey:greasemonkey,devtools:devtools};var globals$1=/*#__PURE__*/Object.freeze({__proto__:null,builtin:builtin,es5:es5,es2015:es2015,es2017:es2017,browser:browser,worker:worker,node:node,nodeBuiltin:nodeBuiltin,commonjs:commonjs,amd:amd,mocha:mocha,jasmine:jasmine,jest:jest,qunit:qunit,phantomjs:phantomjs,couch:couch,rhino:rhino,nashorn:nashorn,wsh:wsh,jquery:jquery,yui:yui,shelljs:shelljs,prototypejs:prototypejs,meteor:meteor,mongo:mongo,applescript:applescript,serviceworker:serviceworker,atomtest:atomtest,embertest:embertest,protractor:protractor,webextensions:webextensions,greasemonkey:greasemonkey,devtools:devtools,'default':globals});var require$$0=getCjsExportFromNamespace(globals$1);var globals$2=require$$0;const browserAPIs=Object.keys(globals$2.browser);const builtinAPIs=Object.keys(globals$2.builtin);const isIdentifier=n=>namedTypes.Identifier.check(n);const isLiteral=n=>namedTypes.Literal.check(n);const isExpressionStatement=n=>namedTypes.ExpressionStatement.check(n);const isThisExpression=n=>namedTypes.ThisExpression.check(n);const isNewExpression=n=>namedTypes.NewExpression.check(n);const isSequenceExpression=n=>namedTypes.SequenceExpression.check(n);const isBinaryExpression=n=>namedTypes.BinaryExpression.check(n);const isExportDefaultStatement=n=>namedTypes.ExportDefaultDeclaration.check(n);const isMemberExpression=n=>namedTypes.MemberExpression.check(n);const isArrayExpression=n=>namedTypes.ArrayExpression.check(n);const isBrowserAPI=(_ref)=>{let{name}=_ref;return browserAPIs.includes(name);};const isBuiltinAPI=(_ref2)=>{let{name}=_ref2;return builtinAPIs.includes(name);};const isRaw=n=>n&&n.raw;/**
   	 * Find the export default statement
   	 * @param   { Array } body - tree structure containing the program code
   	 * @returns { Object } node containing only the code of the export default statement
@@ -6652,7 +6272,7 @@
   	 * @param   { Object } meta - compilation meta information
   	 * @param   { AST } ast - current AST output
   	 * @returns { AST } the AST generated
-  	 */function javascript(sourceNode,source,meta,ast){const preprocessorName=getPreprocessorTypeByAttribute(sourceNode);const javascriptNode=addLineOffset(sourceNode.text.text,source,sourceNode);const{options}=meta;const preprocessorOutput=preprocess('javascript',preprocessorName,meta,Object.assign(Object.assign({},sourceNode),{},{text:javascriptNode}));const inputSourceMap=sourcemapAsJSON(preprocessorOutput.map);const generatedAst=generateAST(preprocessorOutput.code,{sourceFileName:options.file,inputSourceMap:isEmptySourcemap(inputSourceMap)?null:inputSourceMap});const generatedAstBody=getProgramBody(generatedAst);const bodyWithoutExportDefault=filterNonExportDefaultStatements(generatedAstBody);const exportDefaultNode=findExportDefaultStatement(generatedAstBody);const outputBody=getProgramBody(ast);// add to the ast the "private" javascript content of our tag script node
+  	 */function javascript(sourceNode,source,meta,ast){const preprocessorName=getPreprocessorTypeByAttribute(sourceNode);const javascriptNode=addLineOffset(sourceNode.text.text,source,sourceNode);const{options}=meta;const preprocessorOutput=preprocess('javascript',preprocessorName,meta,Object.assign({},sourceNode,{text:javascriptNode}));const inputSourceMap=sourcemapAsJSON(preprocessorOutput.map);const generatedAst=generateAST(preprocessorOutput.code,{sourceFileName:options.file,inputSourceMap:isEmptySourcemap(inputSourceMap)?null:inputSourceMap});const generatedAstBody=getProgramBody(generatedAst);const bodyWithoutExportDefault=filterNonExportDefaultStatements(generatedAstBody);const exportDefaultNode=findExportDefaultStatement(generatedAstBody);const outputBody=getProgramBody(ast);// add to the ast the "private" javascript content of our tag script node
   outputBody.unshift(...bodyWithoutExportDefault);// convert the export default adding its content to the "tag" property exported
   if(exportDefaultNode)extendTagProperty(ast,exportDefaultNode);return ast;}const JAVASCRIPT_OUTPUT_NAME='javascript';const CSS_OUTPUT_NAME='css';const TEMPLATE_OUTPUT_NAME='template';// Tag names
   const JAVASCRIPT_TAG='script';const STYLE_TAG='style';const TEXTAREA_TAG='textarea';// Boolean attributes
@@ -7357,7 +6977,7 @@
   	 * Try to get the expression of an attribute node
   	 * @param   { RiotParser.Node.Attribute } attribute - riot parser attribute node
   	 * @returns { RiotParser.Node.Expression } attribute expression value
-  	 */function getAttributeExpression(attribute){return attribute.expressions?attribute.expressions[0]:Object.assign(Object.assign({},attribute),{},{text:attribute.value});}/**
+  	 */function getAttributeExpression(attribute){return attribute.expressions?attribute.expressions[0]:Object.assign({},attribute,{text:attribute.value});}/**
   	 * Wrap the ast generated in a function call providing the scope argument
   	 * @param   {Object} ast - function body
   	 * @returns {FunctionExpresion} function having the scope argument injected
@@ -7401,7 +7021,7 @@
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @param   {string} selectorAttribute - name of the selector attribute to filter out
   	 * @returns {RiotParser.Node} the node with the attribute cleaned up
-  	 */function cloneNodeWithoutSelectorAttribute(node,selectorAttribute){return Object.assign(Object.assign({},node),{},{attributes:getAttributesWithoutSelector(getNodeAttributes(node),selectorAttribute)});}/**
+  	 */function cloneNodeWithoutSelectorAttribute(node,selectorAttribute){return Object.assign({},node,{attributes:getAttributesWithoutSelector(getNodeAttributes(node),selectorAttribute)});}/**
   	 * Get the node attributes without the selector one
   	 * @param   {Array<RiotParser.Attr>} attributes - attributes list
   	 * @param   {string} selectorAttribute - name of the selector attribute to filter out
@@ -7418,17 +7038,17 @@
   	 * Create a root node proxing only its nodes and attributes
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {RiotParser.Node} root node
-  	 */function createRootNode(node){return Object.assign(Object.assign({},rootNodeFactory(node)),{},{attributes:compose(// root nodes should always have attribute expressions
+  	 */function createRootNode(node){return Object.assign({},rootNodeFactory(node),{attributes:compose(// root nodes should always have attribute expressions
   transformStatiAttributesIntoExpressions,// root nodes shuold't have directives
   cleanAttributes)(node)});}/**
   	 * Create nested root node. Each and If directives create nested root nodes for example
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {RiotParser.Node} root node
-  	 */function createNestedRootNode(node){return Object.assign(Object.assign({},rootNodeFactory(node)),{},{attributes:cleanAttributes(node)});}/**
+  	 */function createNestedRootNode(node){return Object.assign({},rootNodeFactory(node),{attributes:cleanAttributes(node)});}/**
   	 * Transform the static node attributes into expressions, useful for the root nodes
   	 * @param   {Array<RiotParser.Node.Attr>} attributes - riot parser node
   	 * @returns {Array<RiotParser.Node.Attr>} all the attributes received as attribute expressions
-  	 */function transformStatiAttributesIntoExpressions(attributes){return attributes.map(attribute=>{if(attribute.expressions)return attribute;return Object.assign(Object.assign({},attribute),{},{expressions:[{start:attribute.valueStart,end:attribute.end,text:`'${attribute.value}'`}]});});}/**
+  	 */function transformStatiAttributesIntoExpressions(attributes){return attributes.map(attribute=>{if(attribute.expressions)return attribute;return Object.assign({},attribute,{expressions:[{start:attribute.valueStart,end:attribute.end,text:`'${attribute.value}'`}]});});}/**
   	 * Get all the child nodes of a RiotParser.Node
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {Array<RiotParser.Node>} all the child nodes found
@@ -7440,7 +7060,7 @@
   	 * Get the name of a custom node transforming it into an expression node
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {RiotParser.Node.Attr} the node name as expression attribute
-  	 */function getCustomNodeNameAsExpression(node){const isAttribute=findIsAttribute(node);const toRawString=val=>`'${val}'`;if(isAttribute){return isAttribute.expressions?isAttribute.expressions[0]:Object.assign(Object.assign({},isAttribute),{},{text:toRawString(isAttribute.value)});}return Object.assign(Object.assign({},node),{},{text:toRawString(getName$1(node))});}/**
+  	 */function getCustomNodeNameAsExpression(node){const isAttribute=findIsAttribute(node);const toRawString=val=>`'${val}'`;if(isAttribute){return isAttribute.expressions?isAttribute.expressions[0]:Object.assign({},isAttribute,{text:toRawString(isAttribute.value)});}return Object.assign({},node,{text:toRawString(getName$1(node))});}/**
   	 * Convert all the node static attributes to strings
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {string} all the node static concatenated as string
@@ -7449,7 +7069,7 @@
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @param   {string} key - key property to unescape
   	 * @returns {RiotParser.Node} node with the text property unescaped
-  	 */function unescapeNode(node,key){if(node.unescape){return Object.assign(Object.assign({},node),{},{[key]:unescapeChar(node[key],node.unescape)});}return node;}/**
+  	 */function unescapeNode(node,key){if(node.unescape){return Object.assign({},node,{[key]:unescapeChar(node[key],node.unescape)});}return node;}/**
   	 * Convert a riot parser opening node into a string
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {string} the node as string
@@ -7491,7 +7111,7 @@
   	 * Simple clone deep function, do not use it for classes or recursive objects!
   	 * @param   {*} source - possibily an object to clone
   	 * @returns {*} the object we wanted to clone
-  	 */function cloneDeep(source){return JSON.parse(JSON.stringify(source));}const getEachItemName=expression=>isSequenceExpression(expression.left)?expression.left.expressions[0]:expression.left;const getEachIndexName=expression=>isSequenceExpression(expression.left)?expression.left.expressions[1]:null;const getEachValue=expression=>expression.right;const nameToliteral=compose(builders.literal,getName$1);const generateEachItemNameKey=expression=>simplePropertyNode(BINDING_ITEM_NAME_KEY,compose(nameToliteral,getEachItemName)(expression));const generateEachIndexNameKey=expression=>simplePropertyNode(BINDING_INDEX_NAME_KEY,compose(nameToliteral,getEachIndexName)(expression));const generateEachEvaluateKey=(expression,eachExpression,sourceFile,sourceCode)=>simplePropertyNode(BINDING_EVALUATE_KEY,compose(e=>toScopedFunction(e,sourceFile,sourceCode),e=>Object.assign(Object.assign({},eachExpression),{},{text:generateJavascript(e).code}),getEachValue)(expression));/**
+  	 */function cloneDeep(source){return JSON.parse(JSON.stringify(source));}const getEachItemName=expression=>isSequenceExpression(expression.left)?expression.left.expressions[0]:expression.left;const getEachIndexName=expression=>isSequenceExpression(expression.left)?expression.left.expressions[1]:null;const getEachValue=expression=>expression.right;const nameToliteral=compose(builders.literal,getName$1);const generateEachItemNameKey=expression=>simplePropertyNode(BINDING_ITEM_NAME_KEY,compose(nameToliteral,getEachItemName)(expression));const generateEachIndexNameKey=expression=>simplePropertyNode(BINDING_INDEX_NAME_KEY,compose(nameToliteral,getEachIndexName)(expression));const generateEachEvaluateKey=(expression,eachExpression,sourceFile,sourceCode)=>simplePropertyNode(BINDING_EVALUATE_KEY,compose(e=>toScopedFunction(e,sourceFile,sourceCode),e=>Object.assign({},eachExpression,{text:generateJavascript(e).code}),getEachValue)(expression));/**
   	 * Get the each expression properties to create properly the template binding
   	 * @param   { DomBinding.Expression } eachExpression - original each expression data
   	 * @param   { string } sourceFile - original tag file
@@ -7531,7 +7151,7 @@
   	 * @param   { string } sourceFile - source file path
   	 * @param   { string } sourceCode - original source
   	 * @returns { AST.Node } a slot binding node
-  	 */function createSlotBinding(sourceNode,selectorAttribute,sourceFile,sourceCode){const slotNameAttribute=findAttribute(NAME_ATTRIBUTE,sourceNode);const slotName=slotNameAttribute?slotNameAttribute.value:DEFAULT_SLOT_NAME;return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(BINDING_TYPES),builders.identifier(SLOT_BINDING_TYPE),false)),simplePropertyNode(BINDING_ATTRIBUTES_KEY,createBindingAttributes(Object.assign(Object.assign({},sourceNode),{},{// filter the name attribute
+  	 */function createSlotBinding(sourceNode,selectorAttribute,sourceFile,sourceCode){const slotNameAttribute=findAttribute(NAME_ATTRIBUTE,sourceNode);const slotName=slotNameAttribute?slotNameAttribute.value:DEFAULT_SLOT_NAME;return builders.objectExpression([simplePropertyNode(BINDING_TYPE_KEY,builders.memberExpression(builders.identifier(BINDING_TYPES),builders.identifier(SLOT_BINDING_TYPE),false)),simplePropertyNode(BINDING_ATTRIBUTES_KEY,createBindingAttributes(Object.assign({},sourceNode,{// filter the name attribute
   attributes:getNodeAttributes(sourceNode).filter(attribute=>getName$1(attribute)!==NAME_ATTRIBUTE)}),selectorAttribute,sourceFile,sourceCode)),simplePropertyNode(BINDING_NAME_KEY,builders.literal(slotName)),...createSelectorProperties(selectorAttribute)]);}/**
   	 * Find the slots in the current component and group them under the same id
   	 * @param   {RiotParser.Node.Tag} sourceNode - the custom tag
@@ -7543,8 +7163,7 @@
   	 * @param   {string} sourceFile - source file path
   	 * @param   {string} sourceCode - original source
   	 * @returns {AST.Node} ast node containing the slot object properties
-  	 */function buildSlot(id,sourceNode,sourceFile,sourceCode){const cloneNode=Object.assign(Object.assign({},sourceNode),{},{// avoid to render the slot attribute
-  attributes:getNodeAttributes(sourceNode).filter(attribute=>attribute.name!==SLOT_ATTRIBUTE)});const[html,bindings]=build(cloneNode,sourceFile,sourceCode);return builders.objectExpression([simplePropertyNode(BINDING_ID_KEY,builders.literal(id)),simplePropertyNode(BINDING_HTML_KEY,builders.literal(html)),simplePropertyNode(BINDING_BINDINGS_KEY,builders.arrayExpression(bindings))]);}/**
+  	 */function buildSlot(id,sourceNode,sourceFile,sourceCode){const cloneNode=Object.assign({},sourceNode,{attributes:getNodeAttributes(sourceNode)});const[html,bindings]=build(cloneNode,sourceFile,sourceCode);return builders.objectExpression([simplePropertyNode(BINDING_ID_KEY,builders.literal(id)),simplePropertyNode(BINDING_HTML_KEY,builders.literal(html)),simplePropertyNode(BINDING_BINDINGS_KEY,builders.arrayExpression(bindings))]);}/**
   	 * Create the AST array containing the slots
   	 * @param   { RiotParser.Node.Tag } sourceNode - the custom tag
   	 * @param   { string } sourceFile - source file path
@@ -7566,7 +7185,7 @@
   	 * @param   {RiotParser.Node} sourceNode - any kind of node parsed via riot parser
   	 * @param   {string} bindingsSelector - temporary string to identify the current node
   	 * @returns {RiotParser.Node} the original node parsed having the new binding selector attribute
-  	 */function createBindingsTag(sourceNode,bindingsSelector){if(!bindingsSelector)return sourceNode;return Object.assign(Object.assign({},sourceNode),{},{// inject the selector bindings into the node attributes
+  	 */function createBindingsTag(sourceNode,bindingsSelector){if(!bindingsSelector)return sourceNode;return Object.assign({},sourceNode,{// inject the selector bindings into the node attributes
   attributes:[{name:bindingsSelector,value:bindingsSelector},...getNodeAttributes(sourceNode)]});}/**
   	 * Create a generic dynamic node (text or tag) and generate its bindings
   	 * @param   {RiotParser.Node} sourceNode - any kind of node parsed via riot parser
@@ -7609,7 +7228,7 @@
   	 * @param   {string} sourceCode - original source
   	 * @param   {BuildingState} state - state representing the current building tree state during the recursion
   	 * @returns {Array} array containing the html output and the dom bindings
-  	 */function build(sourceNode,sourceFile,sourceCode,state){if(!sourceNode)panic('Something went wrong with your tag DOM parsing, your tag template can\'t be created');const[nodeHTML,nodeBindings]=parseNode(sourceNode,sourceFile,sourceCode);const childrenNodes=getChildrenNodes(sourceNode);const currentState=Object.assign(Object.assign({},cloneDeep(BuildingState)),state);// mutate the original arrays
+  	 */function build(sourceNode,sourceFile,sourceCode,state){if(!sourceNode)panic('Something went wrong with your tag DOM parsing, your tag template can\'t be created');const[nodeHTML,nodeBindings]=parseNode(sourceNode,sourceFile,sourceCode);const childrenNodes=getChildrenNodes(sourceNode);const currentState=Object.assign({},cloneDeep(BuildingState),state);// mutate the original arrays
   currentState.html.push(...nodeHTML);currentState.bindings.push(...nodeBindings);// do recursion if
   // this tag has children and it has no special directives bound to it
   if(childrenNodes.length&&!hasItsOwnTemplate(sourceNode)){childrenNodes.forEach(node=>build(node,sourceFile,sourceCode,Object.assign({parent:sourceNode},currentState)));}// close the tag if it's not a void one
@@ -7656,19 +7275,19 @@
   	 * @param   {Object} map - sourcemap as json
   	 * @param   {string} source - component source code
   	 * @returns {Object} original source map with the "sourcesContent" property overriden
-  	 */function overrideSourcemapContent(map,source){return Object.assign(Object.assign({},map),{},{sourcesContent:[source]});}/**
+  	 */function overrideSourcemapContent(map,source){return Object.assign({},map,{sourcesContent:[source]});}/**
   	 * Create the compilation meta object
   	 * @param { string } source - source code of the tag we will need to compile
   	 * @param { string } options - compiling options
   	 * @returns {Object} meta object
-  	 */function createMeta(source,options){return {tagName:null,fragments:null,options:Object.assign(Object.assign({},DEFAULT_OPTIONS),options),source};}/**
+  	 */function createMeta(source,options){return {tagName:null,fragments:null,options:Object.assign({},DEFAULT_OPTIONS,options),source};}/**
   	 * Generate the output code source together with the sourcemap
   	 * @param { string } source - source code of the tag we will need to compile
   	 * @param { Object } opts - compiling options
   	 * @returns { Output } object containing output code and source map
   	 */function compile(source,opts){if(opts===void 0){opts={};}const meta=createMeta(source,opts);const{options}=meta;const{code,map}=execute$1('template',options.template,meta,source);const{parse}=parser$1(options);const{template:template$1,css:css$1,javascript:javascript$1}=parse(code).output;// see also https://github.com/riot/compiler/issues/130
   if(hasHTMLOutsideRootNode(template$1||css$1||javascript$1,code,parse)){throw new Error('Multiple HTML root nodes are not supported');}// extend the meta object with the result of the parsing
-  Object.assign(meta,{tagName:template$1.name,fragments:{template:template$1,css:css$1,javascript:javascript$1}});return compose(result=>Object.assign(Object.assign({},result),{},{meta}),result=>execute(result,meta),result=>Object.assign(Object.assign({},result),{},{map:overrideSourcemapContent(result.map,source)}),ast=>meta.ast=ast&&generateJavascript(ast,{sourceMapName:`${options.file}.map`,inputSourceMap:normaliseInputSourceMap(map)}),hookGenerator(template,template$1,code,meta),hookGenerator(javascript,javascript$1,code,meta),hookGenerator(css,css$1,code,meta))(createInitialInput(meta));}/**
+  Object.assign(meta,{tagName:template$1.name,fragments:{template:template$1,css:css$1,javascript:javascript$1}});return compose(result=>Object.assign({},result,{meta}),result=>execute(result,meta),result=>Object.assign({},result,{map:overrideSourcemapContent(result.map,source)}),ast=>meta.ast=ast&&generateJavascript(ast,{sourceMapName:`${options.file}.map`,inputSourceMap:normaliseInputSourceMap(map)}),hookGenerator(template,template$1,code,meta),hookGenerator(javascript,javascript$1,code,meta),hookGenerator(css,css$1,code,meta))(createInitialInput(meta));}/**
   	 * Prepare the riot parser node transformers
   	 * @param   { Function } transformer - transformer function
   	 * @param   { Object } sourceNode - riot parser node
@@ -7737,7 +7356,7 @@
     });
   }
 
-  var riot_compiler = Object.assign(Object.assign({}, riot), {}, {
+  var riot_compiler = Object.assign({}, riot, {
     compile,
     inject,
     compileFromUrl,
