@@ -6,6 +6,7 @@ import {
   register,
   unregister,
 } from '../riot'
+import { template } from '@riotjs/dom-bindings'
 
 interface TodoItem {
   summary: string
@@ -29,7 +30,9 @@ interface TodoComponent extends RiotComponent<TodoProps, TodoState> {
 
 //  equivalent to `import todo from "todo"`
 const todo: TodoComponentShell = {
-  template() {}
+  template(template, expressionTypes, bindingTypes, getComponent) {
+    return template('Hello')
+  }
 }
 
 const component: TodoComponent = mount<TodoProps, TodoState>('todo', {

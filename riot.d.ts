@@ -1,4 +1,4 @@
-import { SlotBindingData, AttributeExpressionData } from '@riotjs/dom-bindings'
+import { SlotBindingData, TemplateChunk, AttributeExpressionData, ExpressionType, BindingType } from '@riotjs/dom-bindings'
 
 // This interface is only exposed and any Riot component will receive the following properties
 export interface RiotCoreComponent<Props = object, State = object> {
@@ -6,7 +6,6 @@ export interface RiotCoreComponent<Props = object, State = object> {
   readonly props: Props
   readonly root: HTMLElement
   readonly name?: string
-  // TODO: add the @riotjs/dom-bindings types
   readonly slots: SlotBindingData[]
   mount(
     element: HTMLElement,
@@ -45,8 +44,7 @@ export interface RiotComponentShell<Props = object, State = object> {
   readonly css?: string
   readonly exports?: () => RiotComponentExport<Props, State>|object
   readonly name?: string
-  // TODO: add the @riotjs/dom-bindings types
-  template(): any
+  template(template: Function, expressionTypes: ExpressionType, bindingTypes: BindingType, getComponent: (componentName: string) => any): TemplateChunk
 }
 
 // Interface that can be used when creating the components export
