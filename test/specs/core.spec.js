@@ -11,6 +11,7 @@ import ExpressionParts from '../components/expression-parts.riot'
 import GlobalComponents from '../components/global-components.riot'
 import InvalidPureCssComponent from '../components/invalid-pure-css-component.riot'
 import InvalidPureHtmlComponent from '../components/invalid-pure-html-component.riot'
+import LoopWithSlots from '../components/loop-with-slots.riot'
 import MergeAttributes from '../components/merge-attributes.riot'
 import MessageConsumer from '../components/message-consumer.riot'
 import NamedSlotsParent from '../components/named-slots-parent.riot'
@@ -866,6 +867,30 @@ describe('Riot core api', () => {
       expect(component.$('simple-slot').innerHTML).to.be.equal('goodbye')
 
       component.unmount()
+    })
+
+    it('Loop index can be passed to slot content', () => {
+      const element = document.createElement('loop-with-slots')
+      const component = riot.component(LoopWithSlots)(element)
+
+      const bTagsBefore = component.$$('b')
+
+      expect(bTagsBefore).to.have.length(component.state.people.length)
+
+      bTagsBefore.forEach((node, index) => {
+        expect(node.innerHTML).to.be.equal(String(index))
+      })
+
+      component.state.people.reverse() // eslint-disable-line
+      component.update()
+
+      const bTagsAfter = component.$$('b')
+
+      expect(bTagsAfter).to.have.length(component.state.people.length)
+
+      bTagsAfter.forEach((node, index) => {
+        expect(node.innerHTML).to.be.equal(String(index))
+      })
     })
   })
 

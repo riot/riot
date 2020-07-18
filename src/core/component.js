@@ -359,6 +359,7 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
         },
         update(state = {}, parentScope) {
           if (parentScope) {
+            this[PARENT_KEY_SYMBOL] = parentScope
             this[ATTRIBUTES_KEY_SYMBOL].update(parentScope)
           }
 

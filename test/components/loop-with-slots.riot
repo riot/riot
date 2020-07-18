@@ -1,0 +1,29 @@
+<loop-with-slots>
+  <simple-slot each={(person, index) in state.people} key={person.id}>
+    <p>{person.name} <b>{index}</b></p>
+  </simple-slot>
+
+  <script>
+    import SimpleSlot from './simple-slot.riot'
+    export default {
+      components: {
+        SimpleSlot
+      },
+      state: {
+        people: [{
+          name: 'John',
+          id: 0
+        }, {
+          name: 'Sarah',
+          id: 1
+        },  {
+          name: 'Mag',
+          id: 3
+        }, {
+          name: 'Rob',
+          id: 4
+        }]
+      }
+    }
+  </script>
+</loop-with-slots>
