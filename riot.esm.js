@@ -1,4 +1,4 @@
-/* Riot v4.13.3, @license MIT */
+/* Riot v4.13.4, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -2433,6 +2433,7 @@ function enhanceComponentAPI(component, _ref6) {
       }
 
       if (parentScope) {
+        this[PARENT_KEY_SYMBOL] = parentScope;
         this[ATTRIBUTES_KEY_SYMBOL].update(parentScope);
       }
 
@@ -2626,7 +2627,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.13.3'; // expose some internal stuff that might be used from external tools
+const version = 'v4.13.4'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,

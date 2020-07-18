@@ -1,4 +1,4 @@
-/* Riot v4.13.3, @license MIT */
+/* Riot v4.13.4, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2439,6 +2439,7 @@
         }
 
         if (parentScope) {
+          this[PARENT_KEY_SYMBOL] = parentScope;
           this[ATTRIBUTES_KEY_SYMBOL].update(parentScope);
         }
 
@@ -2632,7 +2633,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.13.3'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.13.4'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
