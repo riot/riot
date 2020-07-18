@@ -1,9 +1,22 @@
-const {builtinModules}= require('module')
-const commonjs = require('rollup-plugin-commonjs')
-const ignore = require('rollup-plugin-ignore')
-const json = require('rollup-plugin-json')
-const resolve = require('rollup-plugin-node-resolve')
+const commonjs = require('@rollup/plugin-commonjs')
+const json = require('@rollup/plugin-json')
+const {nodeResolve} = require('@rollup/plugin-node-resolve')
 const babel = require('rollup-plugin-babel')
+const emptyFile = 'export default undefined'
+
+// ignore builtin requires
+function ignore() {
+  return {
+    transform(code, id) {
+      if (!id.includes('commonjs-external')) return
+
+      return {
+        code: emptyFile,
+        map: null
+      }
+    }
+  }
+}
 
 module.exports = {
   output: [{
@@ -15,10 +28,8 @@ module.exports = {
     console.error(error.message) // eslint-disable-line
   },
   plugins: [
-    ignore(builtinModules),
-    resolve({
-      mainFields: ['module', 'main', 'next']
-    }),
+    ignore(),
+    nodeResolve(),
     commonjs(),
     json(),
     babel({
