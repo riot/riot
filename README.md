@@ -125,7 +125,7 @@ If you are reading this it's already a good sign and I am thankful for it! I try
 
 If you want to contribute to riot helping the project maintenance please check first the list of [open issues](https://github.com/riot/riot/issues) to understand whether there is a task where you could help.
 
-Riot is mainly developed on UNIX systems so you will be able to run all the commands necessary to build and test the library using our [Makefile](Makefile). If you are on a Microsoft machine it could be harder to set up you development environment properly.
+Riot is mainly developed on UNIX systems so you will be able to run all the commands necessary to build and test the library using our [Makefile](Makefile). If you are on a Microsoft machine it could be harder to set up your development environment properly.
 
 Following the steps below you should be able to properly submit your patch to the project
 
