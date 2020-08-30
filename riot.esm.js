@@ -1,4 +1,4 @@
-/* Riot v4.13.5, @license MIT */
+/* Riot v4.13.6, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -1416,7 +1416,7 @@ function slotBindings(slots) {
 
 function slotsToMarkup(slots) {
   return slots.reduce((acc, slot) => {
-    return acc + slot.html;
+    return `${acc}<slot name="${slot.id}">${slot.html}</slot>`;
   }, '');
 }
 
@@ -2627,7 +2627,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.13.5'; // expose some internal stuff that might be used from external tools
+const version = 'v4.13.6'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
