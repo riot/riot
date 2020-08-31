@@ -1,4 +1,4 @@
-/* Riot v4.13.6, @license MIT */
+/* Riot v4.14.0, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -1260,7 +1260,7 @@ function extendParentScope(attributes, scope, parentScope) {
 // https://github.com/riot/riot/issues/2842
 
 
-const getRealParent = (scope, parentScope) => parentScope ? parentScope === scope ? scope[PARENT_KEY_SYMBOL] : parentScope : undefined;
+const getRealParent = (scope, parentScope) => scope[PARENT_KEY_SYMBOL] || parentScope;
 
 const SlotBinding = Object.seal({
   // dynamic binding properties
@@ -1416,7 +1416,7 @@ function slotBindings(slots) {
 
 function slotsToMarkup(slots) {
   return slots.reduce((acc, slot) => {
-    return `${acc}<slot name="${slot.id}">${slot.html}</slot>`;
+    return acc + slot.html;
   }, '');
 }
 
@@ -2627,7 +2627,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.13.6'; // expose some internal stuff that might be used from external tools
+const version = 'v4.14.0'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,

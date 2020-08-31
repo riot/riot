@@ -1,4 +1,4 @@
-/* Riot v4.13.6, @license MIT */
+/* Riot v4.14.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1266,7 +1266,7 @@
   // https://github.com/riot/riot/issues/2842
 
 
-  const getRealParent = (scope, parentScope) => parentScope ? parentScope === scope ? scope[PARENT_KEY_SYMBOL] : parentScope : undefined;
+  const getRealParent = (scope, parentScope) => scope[PARENT_KEY_SYMBOL] || parentScope;
 
   const SlotBinding = Object.seal({
     // dynamic binding properties
@@ -1422,7 +1422,7 @@
 
   function slotsToMarkup(slots) {
     return slots.reduce((acc, slot) => {
-      return `${acc}<slot name="${slot.id}">${slot.html}</slot>`;
+      return acc + slot.html;
     }, '');
   }
 
@@ -2633,7 +2633,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v4.13.6'; // expose some internal stuff that might be used from external tools
+  const version = 'v4.14.0'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
