@@ -34,7 +34,7 @@
     "riot.js"
   ],
   "dependencies": {
-    "@riotjs/compiler": "^4.10.1",
+    "@riotjs/compiler": "^4.11.0",
     "@riotjs/dom-bindings": "^4.8.3",
     "@riotjs/util": "^1.3.1",
     "bianco.attr": "^1.0.0",
