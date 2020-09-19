@@ -6,6 +6,7 @@
   "repository": "riot/riot",
   "author": "Gianluca Guarini <gianluca.guarini@gmail.com> (http://gianlucaguarini.com)",
   "license": "MIT",
+  "sideEffects": false,
   "engines": {
     "node": ">=8.0.0"
   },
