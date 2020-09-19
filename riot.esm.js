@@ -1,4 +1,4 @@
-/* Riot v4.14.0, @license MIT */
+/* Riot v5.0.0-alpha.1, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -114,385 +114,6 @@ function createTemplateMeta(componentTemplate) {
   };
 }
 
-const {
-  indexOf,
-  slice
-} = [];
-
-const append = (get, parent, children, start, end, before) => {
-  const isSelect = ('selectedIndex' in parent);
-  let noSelection = isSelect;
-
-  while (start < end) {
-    const child = get(children[start], 1);
-    parent.insertBefore(child, before);
-
-    if (isSelect && noSelection && child.selected) {
-      noSelection = !noSelection;
-      let {
-        selectedIndex
-      } = parent;
-      parent.selectedIndex = selectedIndex < 0 ? start : indexOf.call(parent.querySelectorAll('option'), child);
-    }
-
-    start++;
-  }
-};
-const eqeq = (a, b) => a == b;
-const identity = O => O;
-const indexOf$1 = (moreNodes, moreStart, moreEnd, lessNodes, lessStart, lessEnd, compare) => {
-  const length = lessEnd - lessStart;
-  /* istanbul ignore if */
-
-  if (length < 1) return -1;
-
-  while (moreEnd - moreStart >= length) {
-    let m = moreStart;
-    let l = lessStart;
-
-    while (m < moreEnd && l < lessEnd && compare(moreNodes[m], lessNodes[l])) {
-      m++;
-      l++;
-    }
-
-    if (l === lessEnd) return moreStart;
-    moreStart = m + 1;
-  }
-
-  return -1;
-};
-const isReversed = (futureNodes, futureEnd, currentNodes, currentStart, currentEnd, compare) => {
-  while (currentStart < currentEnd && compare(currentNodes[currentStart], futureNodes[futureEnd - 1])) {
-    currentStart++;
-    futureEnd--;
-  }
-  return futureEnd === 0;
-};
-const next = (get, list, i, length, before) => i < length ? get(list[i], 0) : 0 < i ? get(list[i - 1], -0).nextSibling : before;
-const remove = (get, children, start, end) => {
-  while (start < end) drop(get(children[start++], -1));
-}; // - - - - - - - - - - - - - - - - - - -
-// diff related constants and utilities
-// - - - - - - - - - - - - - - - - - - -
-
-const DELETION = -1;
-const INSERTION = 1;
-const SKIP = 0;
-const SKIP_OND = 50;
-
-const HS = (futureNodes, futureStart, futureEnd, futureChanges, currentNodes, currentStart, currentEnd, currentChanges) => {
-  let k = 0;
-  /* istanbul ignore next */
-
-  let minLen = futureChanges < currentChanges ? futureChanges : currentChanges;
-  const link = Array(minLen++);
-  const tresh = Array(minLen);
-  tresh[0] = -1;
-
-  for (let i = 1; i < minLen; i++) tresh[i] = currentEnd;
-
-  const nodes = currentNodes.slice(currentStart, currentEnd);
-
-  for (let i = futureStart; i < futureEnd; i++) {
-    const index = nodes.indexOf(futureNodes[i]);
-
-    if (-1 < index) {
-      const idxInOld = index + currentStart;
-      k = findK(tresh, minLen, idxInOld);
-      /* istanbul ignore else */
-
-      if (-1 < k) {
-        tresh[k] = idxInOld;
-        link[k] = {
-          newi: i,
-          oldi: idxInOld,
-          prev: link[k - 1]
-        };
-      }
-    }
-  }
-
-  k = --minLen;
-  --currentEnd;
-
-  while (tresh[k] > currentEnd) --k;
-
-  minLen = currentChanges + futureChanges - k;
-  const diff = Array(minLen);
-  let ptr = link[k];
-  --futureEnd;
-
-  while (ptr) {
-    const {
-      newi,
-      oldi
-    } = ptr;
-
-    while (futureEnd > newi) {
-      diff[--minLen] = INSERTION;
-      --futureEnd;
-    }
-
-    while (currentEnd > oldi) {
-      diff[--minLen] = DELETION;
-      --currentEnd;
-    }
-
-    diff[--minLen] = SKIP;
-    --futureEnd;
-    --currentEnd;
-    ptr = ptr.prev;
-  }
-
-  while (futureEnd >= futureStart) {
-    diff[--minLen] = INSERTION;
-    --futureEnd;
-  }
-
-  while (currentEnd >= currentStart) {
-    diff[--minLen] = DELETION;
-    --currentEnd;
-  }
-
-  return diff;
-}; // this is pretty much the same petit-dom code without the delete map part
-// https://github.com/yelouafi/petit-dom/blob/bd6f5c919b5ae5297be01612c524c40be45f14a7/src/vdom.js#L556-L561
-
-
-const OND = (futureNodes, futureStart, rows, currentNodes, currentStart, cols, compare) => {
-  const length = rows + cols;
-  const v = [];
-  let d, k, r, c, pv, cv, pd;
-
-  outer: for (d = 0; d <= length; d++) {
-    /* istanbul ignore if */
-    if (d > SKIP_OND) return null;
-    pd = d - 1;
-    /* istanbul ignore next */
-
-    pv = d ? v[d - 1] : [0, 0];
-    cv = v[d] = [];
-
-    for (k = -d; k <= d; k += 2) {
-      if (k === -d || k !== d && pv[pd + k - 1] < pv[pd + k + 1]) {
-        c = pv[pd + k + 1];
-      } else {
-        c = pv[pd + k - 1] + 1;
-      }
-
-      r = c - k;
-
-      while (c < cols && r < rows && compare(currentNodes[currentStart + c], futureNodes[futureStart + r])) {
-        c++;
-        r++;
-      }
-
-      if (c === cols && r === rows) {
-        break outer;
-      }
-
-      cv[d + k] = c;
-    }
-  }
-
-  const diff = Array(d / 2 + length / 2);
-  let diffIdx = diff.length - 1;
-
-  for (d = v.length - 1; d >= 0; d--) {
-    while (c > 0 && r > 0 && compare(currentNodes[currentStart + c - 1], futureNodes[futureStart + r - 1])) {
-      // diagonal edge = equality
-      diff[diffIdx--] = SKIP;
-      c--;
-      r--;
-    }
-
-    if (!d) break;
-    pd = d - 1;
-    /* istanbul ignore next */
-
-    pv = d ? v[d - 1] : [0, 0];
-    k = c - r;
-
-    if (k === -d || k !== d && pv[pd + k - 1] < pv[pd + k + 1]) {
-      // vertical edge = insertion
-      r--;
-      diff[diffIdx--] = INSERTION;
-    } else {
-      // horizontal edge = deletion
-      c--;
-      diff[diffIdx--] = DELETION;
-    }
-  }
-
-  return diff;
-};
-
-const applyDiff = (diff, get, parentNode, futureNodes, futureStart, currentNodes, currentStart, currentLength, before) => {
-  const live = [];
-  const length = diff.length;
-  let currentIndex = currentStart;
-  let i = 0;
-
-  while (i < length) {
-    switch (diff[i++]) {
-      case SKIP:
-        futureStart++;
-        currentIndex++;
-        break;
-
-      case INSERTION:
-        // TODO: bulk appends for sequential nodes
-        live.push(futureNodes[futureStart]);
-        append(get, parentNode, futureNodes, futureStart++, futureStart, currentIndex < currentLength ? get(currentNodes[currentIndex], 0) : before);
-        break;
-
-      case DELETION:
-        currentIndex++;
-        break;
-    }
-  }
-
-  i = 0;
-
-  while (i < length) {
-    switch (diff[i++]) {
-      case SKIP:
-        currentStart++;
-        break;
-
-      case DELETION:
-        // TODO: bulk removes for sequential nodes
-        if (-1 < live.indexOf(currentNodes[currentStart])) currentStart++;else remove(get, currentNodes, currentStart++, currentStart);
-        break;
-    }
-  }
-};
-
-const findK = (ktr, length, j) => {
-  let lo = 1;
-  let hi = length;
-
-  while (lo < hi) {
-    const mid = (lo + hi) / 2 >>> 0;
-    if (j < ktr[mid]) hi = mid;else lo = mid + 1;
-  }
-
-  return lo;
-};
-
-const smartDiff = (get, parentNode, futureNodes, futureStart, futureEnd, futureChanges, currentNodes, currentStart, currentEnd, currentChanges, currentLength, compare, before) => {
-  applyDiff(OND(futureNodes, futureStart, futureChanges, currentNodes, currentStart, currentChanges, compare) || HS(futureNodes, futureStart, futureEnd, futureChanges, currentNodes, currentStart, currentEnd, currentChanges), get, parentNode, futureNodes, futureStart, currentNodes, currentStart, currentLength, before);
-};
-
-const drop = node => (node.remove || dropChild).call(node);
-
-function dropChild() {
-  const {
-    parentNode
-  } = this;
-  /* istanbul ignore else */
-
-  if (parentNode) parentNode.removeChild(this);
-}
-
-/*! (c) 2018 Andrea Giammarchi (ISC) */
-
-const domdiff = (parentNode, // where changes happen
-currentNodes, // Array of current items/nodes
-futureNodes, // Array of future items/nodes
-options // optional object with one of the following properties
-//  before: domNode
-//  compare(generic, generic) => true if same generic
-//  node(generic) => Node
-) => {
-  if (!options) options = {};
-  const compare = options.compare || eqeq;
-  const get = options.node || identity;
-  const before = options.before == null ? null : get(options.before, 0);
-  const currentLength = currentNodes.length;
-  let currentEnd = currentLength;
-  let currentStart = 0;
-  let futureEnd = futureNodes.length;
-  let futureStart = 0; // common prefix
-
-  while (currentStart < currentEnd && futureStart < futureEnd && compare(currentNodes[currentStart], futureNodes[futureStart])) {
-    currentStart++;
-    futureStart++;
-  } // common suffix
-
-
-  while (currentStart < currentEnd && futureStart < futureEnd && compare(currentNodes[currentEnd - 1], futureNodes[futureEnd - 1])) {
-    currentEnd--;
-    futureEnd--;
-  }
-
-  const currentSame = currentStart === currentEnd;
-  const futureSame = futureStart === futureEnd; // same list
-
-  if (currentSame && futureSame) return futureNodes; // only stuff to add
-
-  if (currentSame && futureStart < futureEnd) {
-    append(get, parentNode, futureNodes, futureStart, futureEnd, next(get, currentNodes, currentStart, currentLength, before));
-    return futureNodes;
-  } // only stuff to remove
-
-
-  if (futureSame && currentStart < currentEnd) {
-    remove(get, currentNodes, currentStart, currentEnd);
-    return futureNodes;
-  }
-
-  const currentChanges = currentEnd - currentStart;
-  const futureChanges = futureEnd - futureStart;
-  let i = -1; // 2 simple indels: the shortest sequence is a subsequence of the longest
-
-  if (currentChanges < futureChanges) {
-    i = indexOf$1(futureNodes, futureStart, futureEnd, currentNodes, currentStart, currentEnd, compare); // inner diff
-
-    if (-1 < i) {
-      append(get, parentNode, futureNodes, futureStart, i, get(currentNodes[currentStart], 0));
-      append(get, parentNode, futureNodes, i + currentChanges, futureEnd, next(get, currentNodes, currentEnd, currentLength, before));
-      return futureNodes;
-    }
-  }
-  /* istanbul ignore else */
-  else if (futureChanges < currentChanges) {
-      i = indexOf$1(currentNodes, currentStart, currentEnd, futureNodes, futureStart, futureEnd, compare); // outer diff
-
-      if (-1 < i) {
-        remove(get, currentNodes, currentStart, i);
-        remove(get, currentNodes, i + futureChanges, currentEnd);
-        return futureNodes;
-      }
-    } // common case with one replacement for many nodes
-  // or many nodes replaced for a single one
-
-  /* istanbul ignore else */
-
-
-  if (currentChanges < 2 || futureChanges < 2) {
-    append(get, parentNode, futureNodes, futureStart, futureEnd, get(currentNodes[currentStart], 0));
-    remove(get, currentNodes, currentStart, currentEnd);
-    return futureNodes;
-  } // the half match diff part has been skipped in petit-dom
-  // https://github.com/yelouafi/petit-dom/blob/bd6f5c919b5ae5297be01612c524c40be45f14a7/src/vdom.js#L391-L397
-  // accordingly, I think it's safe to skip in here too
-  // if one day it'll come out like the speediest thing ever to do
-  // then I might add it in here too
-  // Extra: before going too fancy, what about reversed lists ?
-  //        This should bail out pretty quickly if that's not the case.
-
-
-  if (currentChanges === futureChanges && isReversed(futureNodes, futureEnd, currentNodes, currentStart, currentEnd, compare)) {
-    append(get, parentNode, futureNodes, futureStart, futureEnd, next(get, currentNodes, currentEnd, currentLength, before));
-    return futureNodes;
-  } // last resort through a smart diff
-
-
-  smartDiff(get, parentNode, futureNodes, futureStart, futureEnd, futureChanges, currentNodes, currentStart, currentEnd, currentChanges, currentLength, compare, before);
-  return futureNodes;
-};
-
 /**
  * Quick type checking
  * @param   {*} element - anything
@@ -558,6 +179,164 @@ function isNil(value) {
   return value === null || value === undefined;
 }
 
+/**
+ * ISC License
+ *
+ * Copyright (c) 2020, Andrea Giammarchi, @WebReflection
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+ * REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+ * INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+ * LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
+ * OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+ * PERFORMANCE OF THIS SOFTWARE.
+ */
+// fork of https://github.com/WebReflection/udomdiff
+// due to https://github.com/WebReflection/udomdiff/pull/2
+
+/* eslint-disable */
+
+/**
+ * Remove a node from the DOM
+ * @param   {HTMLElement} node - target node to remove
+ * @returns {undefined} void function
+ */
+const drop = node => {
+  const {
+    parentNode
+  } = node;
+
+  if (parentNode) {
+    if (node.remove) node.remove();else parentNode.removeChild(node);
+  }
+};
+/**
+ * @param {Node} parentNode The container where children live
+ * @param {Node[]} a The list of current/live children
+ * @param {Node[]} b The list of future children
+ * @param {(entry: Node, action: number) => Node} get
+ * The callback invoked per each entry related DOM operation.
+ * @param {Node} [before] The optional node used as anchor to insert before.
+ * @returns {Node[]} The same list of future children.
+ */
+
+
+var udomdiff = ((parentNode, a, b, get, before) => {
+  const bLength = b.length;
+  let aEnd = a.length;
+  let bEnd = bLength;
+  let aStart = 0;
+  let bStart = 0;
+  let map = null;
+
+  while (aStart < aEnd || bStart < bEnd) {
+    // append head, tail, or nodes in between: fast path
+    if (aEnd === aStart) {
+      // we could be in a situation where the rest of nodes that
+      // need to be added are not at the end, and in such case
+      // the node to `insertBefore`, if the index is more than 0
+      // must be retrieved, otherwise it's gonna be the first item.
+      const node = bEnd < bLength ? bStart ? get(b[bStart - 1], -0).nextSibling : get(b[bEnd - bStart], 0) : before;
+
+      while (bStart < bEnd) parentNode.insertBefore(get(b[bStart++], 1), node);
+    } // remove head or tail: fast path
+    else if (bEnd === bStart) {
+        while (aStart < aEnd) {
+          // remove the node only if it's unknown or not live
+          if (!map || !map.has(a[aStart])) drop(get(a[aStart], -1));
+          aStart++;
+        }
+      } // same node: fast path
+      else if (a[aStart] === b[bStart]) {
+          aStart++;
+          bStart++;
+        } // same tail: fast path
+        else if (a[aEnd - 1] === b[bEnd - 1]) {
+            aEnd--;
+            bEnd--;
+          } // The once here single last swap "fast path" has been removed in v1.1.0
+          // https://github.com/WebReflection/udomdiff/blob/single-final-swap/esm/index.js#L69-L85
+          // reverse swap: also fast path
+          else if (a[aStart] === b[bEnd - 1] && b[bStart] === a[aEnd - 1]) {
+              // this is a "shrink" operation that could happen in these cases:
+              // [1, 2, 3, 4, 5]
+              // [1, 4, 3, 2, 5]
+              // or asymmetric too
+              // [1, 2, 3, 4, 5]
+              // [1, 2, 3, 5, 6, 4]
+              const node = get(a[--aEnd], -1).nextSibling;
+              parentNode.insertBefore(get(b[bStart++], 1), get(a[aStart++], -1).nextSibling);
+              parentNode.insertBefore(get(b[--bEnd], 1), node); // mark the future index as identical (yeah, it's dirty, but cheap 👍)
+              // The main reason to do this, is that when a[aEnd] will be reached,
+              // the loop will likely be on the fast path, as identical to b[bEnd].
+              // In the best case scenario, the next loop will skip the tail,
+              // but in the worst one, this node will be considered as already
+              // processed, bailing out pretty quickly from the map index check
+
+              a[aEnd] = b[bEnd];
+            } // map based fallback, "slow" path
+            else {
+                // the map requires an O(bEnd - bStart) operation once
+                // to store all future nodes indexes for later purposes.
+                // In the worst case scenario, this is a full O(N) cost,
+                // and such scenario happens at least when all nodes are different,
+                // but also if both first and last items of the lists are different
+                if (!map) {
+                  map = new Map();
+                  let i = bStart;
+
+                  while (i < bEnd) map.set(b[i], i++);
+                } // if it's a future node, hence it needs some handling
+
+
+                if (map.has(a[aStart])) {
+                  // grab the index of such node, 'cause it might have been processed
+                  const index = map.get(a[aStart]); // if it's not already processed, look on demand for the next LCS
+
+                  if (bStart < index && index < bEnd) {
+                    let i = aStart; // counts the amount of nodes that are the same in the future
+
+                    let sequence = 1;
+
+                    while (++i < aEnd && i < bEnd && map.get(a[i]) === index + sequence) sequence++; // effort decision here: if the sequence is longer than replaces
+                    // needed to reach such sequence, which would brings again this loop
+                    // to the fast path, prepend the difference before a sequence,
+                    // and move only the future list index forward, so that aStart
+                    // and bStart will be aligned again, hence on the fast path.
+                    // An example considering aStart and bStart are both 0:
+                    // a: [1, 2, 3, 4]
+                    // b: [7, 1, 2, 3, 6]
+                    // this would place 7 before 1 and, from that time on, 1, 2, and 3
+                    // will be processed at zero cost
+
+
+                    if (sequence > index - bStart) {
+                      const node = get(a[aStart], 0);
+
+                      while (bStart < index) parentNode.insertBefore(get(b[bStart++], 1), node);
+                    } // if the effort wasn't good enough, fallback to a replace,
+                    // moving both source and target indexes forward, hoping that some
+                    // similar node will be found later on, to go back to the fast path
+                    else {
+                        parentNode.replaceChild(get(b[bStart++], 1), get(a[aStart++], -1));
+                      }
+                  } // otherwise move the source forward, 'cause there's nothing to do
+                  else aStart++;
+                } // this node has no meaning in the future list, so it's more than safe
+                // to remove it, and check the next live node out instead, meaning
+                // that only the live list index should be forwarded
+                else drop(get(a[aStart++], -1));
+              }
+  }
+
+  return b;
+});
+
 const UNMOUNT_SCOPE = Symbol('unmount');
 const EachBinding = Object.seal({
   // dynamic binding properties
@@ -596,10 +375,7 @@ const EachBinding = Object.seal({
       futureNodes
     } = createPatch(items, scope, parentScope, this); // patch the DOM only if there are new nodes
 
-    domdiff(parent, nodes, futureNodes, {
-      before: placeholder,
-      node: patch(Array.from(childrenMap.values()), parentScope)
-    }); // trigger the mounts and the updates
+    udomdiff(parent, nodes, futureNodes, patch(Array.from(childrenMap.values()), parentScope), placeholder); // trigger the mounts and the updates
 
     batches.forEach(fn => fn()); // update the children map
 
@@ -2627,7 +2403,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v4.14.0'; // expose some internal stuff that might be used from external tools
+const version = 'v5.0.0-alpha.1'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
