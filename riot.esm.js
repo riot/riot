@@ -1,4 +1,4 @@
-/* Riot v5.0.0-alpha.2, @license MIT */
+/* Riot v5.0.0-alpha.3, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -59,22 +59,31 @@ function cleanNode(node) {
  */
 
 function clearChildren(children) {
-  Array.from(children).forEach(removeNode);
+  Array.from(children).forEach(removeChild);
 }
 /**
- * Remove a node from the DOM
- * @param   {HTMLElement} node - target node
+ * Remove a node
+ * @param {HTMLElement}node - node to remove
  * @returns {undefined}
  */
 
-function removeNode(node) {
-  const {
-    parentNode
-  } = node;
-  if (node.remove) node.remove();
-  /* istanbul ignore else */
-  else if (parentNode) parentNode.removeChild(node);
-}
+const removeChild = node => node && node.parentNode && node.parentNode.removeChild(node);
+/**
+ * Insert before a node
+ * @param {HTMLElement} newNode - node to insert
+ * @param {HTMLElement} refNode - ref child
+ * @returns {undefined}
+ */
+
+const insertBefore = (newNode, refNode) => refNode && refNode.parentNode && refNode.parentNode.insertBefore(newNode, refNode);
+/**
+ * Replace a node
+ * @param {HTMLElement} newNode - new node to add to the DOM
+ * @param {HTMLElement} replaced - node to replace
+ * @returns {undefined}
+ */
+
+const replaceChild = (newNode, replaced) => replaced && replaced.parentNode && replaced.parentNode.replaceChild(newNode, replaced);
 
 const EACH = 0;
 const IF = 1;
@@ -200,12 +209,7 @@ function isNil(value) {
 // due to https://github.com/WebReflection/udomdiff/pull/2
 
 /* eslint-disable */
-// DOM manipulation helper functions
-const drop = node => node && node.parentNode && node.parentNode.removeChild(node);
 
-const append = (node, prev) => prev && prev.parentNode && prev.parentNode.insertBefore(node, prev);
-
-const replace = (node, prev) => prev && prev.parentNode && prev.parentNode.replaceChild(node, prev);
 /**
  * @param {Node} parentNode The container where children live
  * @param {Node[]} a The list of current/live children
@@ -215,7 +219,6 @@ const replace = (node, prev) => prev && prev.parentNode && prev.parentNode.repla
  * @param {Node} [before] The optional node used as anchor to insert before.
  * @returns {Node[]} The same list of future children.
  */
-
 
 var udomdiff = ((parentNode, a, b, get, before) => {
   const bLength = b.length;
@@ -234,12 +237,12 @@ var udomdiff = ((parentNode, a, b, get, before) => {
       // must be retrieved, otherwise it's gonna be the first item.
       const node = bEnd < bLength ? bStart ? get(b[bStart - 1], -0).nextSibling : get(b[bEnd - bStart], 0) : before;
 
-      while (bStart < bEnd) append(get(b[bStart++], 1), node);
+      while (bStart < bEnd) insertBefore(get(b[bStart++], 1), node);
     } // remove head or tail: fast path
     else if (bEnd === bStart) {
         while (aStart < aEnd) {
           // remove the node only if it's unknown or not live
-          if (!map || !map.has(a[aStart])) drop(get(a[aStart], -1));
+          if (!map || !map.has(a[aStart])) removeChild(get(a[aStart], -1));
           aStart++;
         }
       } // same node: fast path
@@ -261,8 +264,8 @@ var udomdiff = ((parentNode, a, b, get, before) => {
               // [1, 2, 3, 4, 5]
               // [1, 2, 3, 5, 6, 4]
               const node = get(a[--aEnd], -1).nextSibling;
-              append(get(b[bStart++], 1), get(a[aStart++], -1).nextSibling);
-              append(get(b[--bEnd], 1), node); // mark the future index as identical (yeah, it's dirty, but cheap 👍)
+              insertBefore(get(b[bStart++], 1), get(a[aStart++], -1).nextSibling);
+              insertBefore(get(b[--bEnd], 1), node); // mark the future index as identical (yeah, it's dirty, but cheap 👍)
               // The main reason to do this, is that when a[aEnd] will be reached,
               // the loop will likely be on the fast path, as identical to b[bEnd].
               // In the best case scenario, the next loop will skip the tail,
@@ -309,19 +312,19 @@ var udomdiff = ((parentNode, a, b, get, before) => {
                     if (sequence > index - bStart) {
                       const node = get(a[aStart], 0);
 
-                      while (bStart < index) append(get(b[bStart++], 1), node);
+                      while (bStart < index) insertBefore(get(b[bStart++], 1), node);
                     } // if the effort wasn't good enough, fallback to a replace,
                     // moving both source and target indexes forward, hoping that some
                     // similar node will be found later on, to go back to the fast path
                     else {
-                        replace(get(b[bStart++], 1), get(a[aStart++], -1));
+                        replaceChild(get(b[bStart++], 1), get(a[aStart++], -1));
                       }
                   } // otherwise move the source forward, 'cause there's nothing to do
                   else aStart++;
                 } // this node has no meaning in the future list, so it's more than safe
                 // to remove it, and check the next live node out instead, meaning
                 // that only the live list index should be forwarded
-                else drop(get(a[aStart++], -1));
+                else removeChild(get(a[aStart++], -1));
               }
   }
 
@@ -527,10 +530,9 @@ function create(node, _ref2) {
     template
   } = _ref2;
   const placeholder = document.createTextNode('');
-  const parent = node.parentNode;
   const root = node.cloneNode();
-  parent.insertBefore(placeholder, node);
-  removeNode(node);
+  insertBefore(placeholder, node);
+  removeChild(node);
   return Object.assign({}, EachBinding, {
     childrenMap: new Map(),
     node,
@@ -569,7 +571,7 @@ const IfBinding = Object.seal({
 
     const mount = () => {
       const pristine = this.node.cloneNode();
-      this.placeholder.parentNode.insertBefore(pristine, this.placeholder);
+      insertBefore(pristine, this.placeholder);
       this.template = this.template.clone();
       this.template.mount(pristine, scope, parentScope);
     };
@@ -602,10 +604,9 @@ function create$1(node, _ref) {
     evaluate,
     template
   } = _ref;
-  const parent = node.parentNode;
   const placeholder = document.createTextNode('');
-  parent.insertBefore(placeholder, node);
-  removeNode(node);
+  insertBefore(placeholder, node);
+  removeChild(node);
   return Object.assign({}, IfBinding, {
     node,
     evaluate,
@@ -1059,7 +1060,7 @@ const SlotBinding = Object.seal({
       this.template.children = moveSlotInnerContent(this.node);
     }
 
-    removeNode(this.node);
+    removeChild(this.node);
     return this;
   },
 
@@ -1083,7 +1084,7 @@ const SlotBinding = Object.seal({
 });
 /**
  * Move the inner content of the slots outside of them
- * @param   {HTMLNode} slot - slot node
+ * @param   {HTMLElement} slot - slot node
  * @param   {HTMLElement} children - array to fill with the child nodes detected
  * @returns {HTMLElement[]} list of the node moved
  */
@@ -1096,7 +1097,7 @@ function moveSlotInnerContent(slot, children) {
   const child = slot.firstChild;
 
   if (child) {
-    slot.parentNode.insertBefore(child, slot);
+    insertBefore(child, slot);
     return [child, ...moveSlotInnerContent(slot)];
   }
 
@@ -1462,7 +1463,7 @@ const TemplateChunk = Object.freeze({
         // remove the root node only if the mustRemoveRoot === true
 
         case mustRemoveRoot === true:
-          removeNode(this.el);
+          removeChild(this.el);
           break;
         // otherwise we clean the node children
 
@@ -2394,7 +2395,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v5.0.0-alpha.2'; // expose some internal stuff that might be used from external tools
+const version = 'v5.0.0-alpha.3'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,

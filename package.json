@@ -1,6 +1,6 @@
 {
   "name": "riot",
-  "version": "5.0.0-alpha.2",
+  "version": "5.0.0-alpha.3",
   "description": "Simple and elegant component-based UI library",
   "homepage": "http://riot.js.org/",
   "repository": "riot/riot",
@@ -36,8 +36,8 @@
   ],
   "dependencies": {
     "@riotjs/compiler": "^4.11.0",
-    "@riotjs/dom-bindings": "5.0.0-alpha.1",
-    "@riotjs/util": "^1.3.1",
+    "@riotjs/dom-bindings": "5.0.0-alpha.2",
+    "@riotjs/util": "^2.0.0",
     "bianco.attr": "^1.0.0",
     "bianco.query": "^1.0.0",
     "cumpa": "^1.0.1",
