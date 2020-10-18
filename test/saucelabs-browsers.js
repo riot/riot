@@ -1,32 +1,19 @@
 module.exports = {
   browsers: {
-    slIpadLatest: {
+    slPhone: {
       base: 'SauceLabs',
-      browserName: 'safari',
-      deviceName: 'iPad',
-      version: 'latest',
-      platform: 'iOS'
+      browserName: 'iphone',
+      version: '12.0',
     },
-    slIpadOld: {
+    slIpad: {
       base: 'SauceLabs',
-      browserName: 'safari',
-      deviceName: 'iPad',
-      version: 'latest-1',
-      platform: 'iOS'
+      browserName: 'ipad',
+      version: '12.0',
     },
-    slIphoneLatest: {
+    slAndroid: {
       base: 'SauceLabs',
-      browserName: 'safari',
-      deviceName: 'iPhone',
-      version: 'latest',
-      platform: 'iOS'
-    },
-    slIphoneOld: {
-      base: 'SauceLabs',
-      browserName: 'safari',
-      deviceName: 'iPhone',
-      version: 'latest-1',
-      platform: 'iOS'
+      browserName: 'android',
+      version: '10.0',
     },
     slSafari12: {
       base: 'SauceLabs',
