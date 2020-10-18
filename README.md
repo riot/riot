@@ -197,11 +197,22 @@ Become a sponsor to get your logo on our README. [Become a sponsor][support-url]
 
 ## Thanks
 
-Special thanks to Browserstack for their support
+Special thanks to Browserstack and JetBrains for their support
 
-<a href='https://www.browserstack.com/'>
-  <img width='70px' src="https://cdn.worldvectorlogo.com/logos/browserstack.svg" alt="browser stack">
-</a>
+<table cellpadding="8">
+    <tr>
+        <td>
+          <a href='https://www.jetbrains.com/?from=riotjs'>
+            <img width='70px' src="https://cdn.worldvectorlogo.com/logos/jetbrains-1.svg" alt="jetbrains">
+          </a>
+        </td>
+        <td>
+          <a href='https://www.browserstack.com/?from=riotjs'>
+            <img width='70px' src="https://cdn.worldvectorlogo.com/logos/browserstack.svg" alt="browser stack">
+          </a>
+        </td>
+    </tr>
+</table>
 
 [travis-image]:https://img.shields.io/travis/riot/riot.svg?style=flat-square
 [travis-url]:https://travis-ci.org/riot/riot
