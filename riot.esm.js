@@ -1,4 +1,4 @@
-/* Riot v5.0.0, @license MIT */
+/* Riot v5.1.0, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -332,7 +332,7 @@ var udomdiff = ((parentNode, a, b, get, before) => {
 });
 
 const UNMOUNT_SCOPE = Symbol('unmount');
-const EachBinding = Object.seal({
+const EachBinding = {
   // dynamic binding properties
   // childrenMap: null,
   // node: null,
@@ -383,7 +383,7 @@ const EachBinding = Object.seal({
     return this;
   }
 
-});
+};
 /**
  * Patch the DOM while diffing
  * @param   {TemplateChunk[]} redundant - redundant tepmplate chunks
@@ -552,7 +552,7 @@ function create(node, _ref2) {
  * Binding responsible for the `if` directive
  */
 
-const IfBinding = Object.seal({
+const IfBinding = {
   // dynamic binding properties
   // node: null,
   // evaluate: null,
@@ -598,7 +598,7 @@ const IfBinding = Object.seal({
     return this;
   }
 
-});
+};
 function create$1(node, _ref) {
   let {
     evaluate,
@@ -876,7 +876,7 @@ var expressions = {
   [VALUE]: valueExpression
 };
 
-const Expression = Object.seal({
+const Expression = {
   // Static props
   // node: null,
   // value: null,
@@ -923,7 +923,7 @@ const Expression = Object.seal({
     return this;
   }
 
-});
+};
 /**
  * IO() function to handle the DOM updates
  * @param {Expression} expression - expression object
@@ -1030,7 +1030,7 @@ function extendParentScope(attributes, scope, parentScope) {
 
 const getRealParent = (scope, parentScope) => scope[PARENT_KEY_SYMBOL] || parentScope;
 
-const SlotBinding = Object.seal({
+const SlotBinding = {
   // dynamic binding properties
   // node: null,
   // name: null,
@@ -1057,7 +1057,8 @@ const SlotBinding = Object.seal({
 
     if (this.template) {
       this.template.mount(this.node, this.getTemplateScope(scope, realParent), realParent);
-      this.template.children = moveSlotInnerContent(this.node);
+      this.template.children = Array.from(this.node.childNodes);
+      moveSlotInnerContent(this.node);
     }
 
     removeChild(this.node);
@@ -1081,27 +1082,18 @@ const SlotBinding = Object.seal({
     return this;
   }
 
-});
+};
 /**
  * Move the inner content of the slots outside of them
  * @param   {HTMLElement} slot - slot node
- * @param   {HTMLElement} children - array to fill with the child nodes detected
- * @returns {HTMLElement[]} list of the node moved
+ * @returns {undefined} it's a void method ¯\_(ツ)_/¯
  */
 
-function moveSlotInnerContent(slot, children) {
-  if (children === void 0) {
-    children = [];
-  }
-
-  const child = slot.firstChild;
-
-  if (child) {
-    insertBefore(child, slot);
-    return [child, ...moveSlotInnerContent(slot)];
-  }
-
-  return children;
+function moveSlotInnerContent(slot) {
+  const child = slot && slot.firstChild;
+  if (!child) return;
+  insertBefore(child, slot);
+  moveSlotInnerContent(slot);
 }
 /**
  * Create a single slot binding
@@ -1188,7 +1180,7 @@ function slotsToMarkup(slots) {
   }, '');
 }
 
-const TagBinding = Object.seal({
+const TagBinding = {
   // dynamic binding properties
   // node: null,
   // evaluate: null,
@@ -1227,7 +1219,7 @@ const TagBinding = Object.seal({
     return this;
   }
 
-});
+};
 function create$4(node, _ref2) {
   let {
     evaluate,
@@ -2395,7 +2387,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v5.0.0'; // expose some internal stuff that might be used from external tools
+const version = 'v5.1.0'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,

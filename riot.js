@@ -1,4 +1,4 @@
-/* Riot v5.0.0, @license MIT */
+/* Riot v5.1.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -338,7 +338,7 @@
   });
 
   const UNMOUNT_SCOPE = Symbol('unmount');
-  const EachBinding = Object.seal({
+  const EachBinding = {
     // dynamic binding properties
     // childrenMap: null,
     // node: null,
@@ -389,7 +389,7 @@
       return this;
     }
 
-  });
+  };
   /**
    * Patch the DOM while diffing
    * @param   {TemplateChunk[]} redundant - redundant tepmplate chunks
@@ -558,7 +558,7 @@
    * Binding responsible for the `if` directive
    */
 
-  const IfBinding = Object.seal({
+  const IfBinding = {
     // dynamic binding properties
     // node: null,
     // evaluate: null,
@@ -604,7 +604,7 @@
       return this;
     }
 
-  });
+  };
   function create$1(node, _ref) {
     let {
       evaluate,
@@ -882,7 +882,7 @@
     [VALUE]: valueExpression
   };
 
-  const Expression = Object.seal({
+  const Expression = {
     // Static props
     // node: null,
     // value: null,
@@ -929,7 +929,7 @@
       return this;
     }
 
-  });
+  };
   /**
    * IO() function to handle the DOM updates
    * @param {Expression} expression - expression object
@@ -1036,7 +1036,7 @@
 
   const getRealParent = (scope, parentScope) => scope[PARENT_KEY_SYMBOL] || parentScope;
 
-  const SlotBinding = Object.seal({
+  const SlotBinding = {
     // dynamic binding properties
     // node: null,
     // name: null,
@@ -1063,7 +1063,8 @@
 
       if (this.template) {
         this.template.mount(this.node, this.getTemplateScope(scope, realParent), realParent);
-        this.template.children = moveSlotInnerContent(this.node);
+        this.template.children = Array.from(this.node.childNodes);
+        moveSlotInnerContent(this.node);
       }
 
       removeChild(this.node);
@@ -1087,27 +1088,18 @@
       return this;
     }
 
-  });
+  };
   /**
    * Move the inner content of the slots outside of them
    * @param   {HTMLElement} slot - slot node
-   * @param   {HTMLElement} children - array to fill with the child nodes detected
-   * @returns {HTMLElement[]} list of the node moved
+   * @returns {undefined} it's a void method ¯\_(ツ)_/¯
    */
 
-  function moveSlotInnerContent(slot, children) {
-    if (children === void 0) {
-      children = [];
-    }
-
-    const child = slot.firstChild;
-
-    if (child) {
-      insertBefore(child, slot);
-      return [child, ...moveSlotInnerContent(slot)];
-    }
-
-    return children;
+  function moveSlotInnerContent(slot) {
+    const child = slot && slot.firstChild;
+    if (!child) return;
+    insertBefore(child, slot);
+    moveSlotInnerContent(slot);
   }
   /**
    * Create a single slot binding
@@ -1194,7 +1186,7 @@
     }, '');
   }
 
-  const TagBinding = Object.seal({
+  const TagBinding = {
     // dynamic binding properties
     // node: null,
     // evaluate: null,
@@ -1233,7 +1225,7 @@
       return this;
     }
 
-  });
+  };
   function create$4(node, _ref2) {
     let {
       evaluate,
@@ -2401,7 +2393,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v5.0.0'; // expose some internal stuff that might be used from external tools
+  const version = 'v5.1.0'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
