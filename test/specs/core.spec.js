@@ -31,6 +31,7 @@ import SimpleComponent from '../components/simple.riot'
 import SimpleSlot from '../components/simple-slot.riot'
 import SpreadAttribute from '../components/spread-attribute.riot'
 import StaticAttribute from '../components/static-attribute.riot'
+import TemplateSlot from '../components/template-slot.riot'
 import TitleProps from '../components/title-prop.riot'
 import VirtualEach from '../components/virtual-each.riot'
 
@@ -891,6 +892,16 @@ describe('Riot core api', () => {
       bTagsAfter.forEach((node, index) => {
         expect(node.innerHTML).to.be.equal(String(index))
       })
+    })
+
+    it('template slot tags will be removed', () => {
+      const element = document.createElement('template-slot')
+      const component = riot.component(TemplateSlot)(element, { message: 'hello' })
+
+      expect(normalizeInnerHTML(component.$('simple-slot').innerHTML)).to.be.equal('hello')
+      expect(component.$('template')).to.be.not.ok
+
+      component.unmount()
     })
   })
 
