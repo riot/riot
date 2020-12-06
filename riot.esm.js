@@ -1,4 +1,4 @@
-/* Riot v5.1.0, @license MIT */
+/* Riot v5.1.1, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -2387,7 +2387,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v5.1.0'; // expose some internal stuff that might be used from external tools
+const version = 'v5.1.1'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
