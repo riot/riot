@@ -1,4 +1,4 @@
-/* Riot v5.1.1, @license MIT */
+/* Riot v5.1.2, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -84,6 +84,58 @@ const insertBefore = (newNode, refNode) => refNode && refNode.parentNode && refN
  */
 
 const replaceChild = (newNode, replaced) => replaced && replaced.parentNode && replaced.parentNode.replaceChild(newNode, replaced);
+
+// Riot.js constants that can be used accross more modules
+const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
+      DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
+      PLUGINS_SET = new Set(),
+      IS_DIRECTIVE = 'is',
+      VALUE_ATTRIBUTE = 'value',
+      MOUNT_METHOD_KEY = 'mount',
+      UPDATE_METHOD_KEY = 'update',
+      UNMOUNT_METHOD_KEY = 'unmount',
+      SHOULD_UPDATE_KEY = 'shouldUpdate',
+      ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
+      ON_MOUNTED_KEY = 'onMounted',
+      ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
+      ON_UPDATED_KEY = 'onUpdated',
+      ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
+      ON_UNMOUNTED_KEY = 'onUnmounted',
+      PROPS_KEY = 'props',
+      STATE_KEY = 'state',
+      SLOTS_KEY = 'slots',
+      ROOT_KEY = 'root',
+      IS_PURE_SYMBOL = Symbol.for('pure'),
+      PARENT_KEY_SYMBOL = Symbol('parent'),
+      ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
+      TEMPLATE_KEY_SYMBOL = Symbol('template');
+
+var globals = /*#__PURE__*/Object.freeze({
+  __proto__: null,
+  COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
+  DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY,
+  PLUGINS_SET: PLUGINS_SET,
+  IS_DIRECTIVE: IS_DIRECTIVE,
+  VALUE_ATTRIBUTE: VALUE_ATTRIBUTE,
+  MOUNT_METHOD_KEY: MOUNT_METHOD_KEY,
+  UPDATE_METHOD_KEY: UPDATE_METHOD_KEY,
+  UNMOUNT_METHOD_KEY: UNMOUNT_METHOD_KEY,
+  SHOULD_UPDATE_KEY: SHOULD_UPDATE_KEY,
+  ON_BEFORE_MOUNT_KEY: ON_BEFORE_MOUNT_KEY,
+  ON_MOUNTED_KEY: ON_MOUNTED_KEY,
+  ON_BEFORE_UPDATE_KEY: ON_BEFORE_UPDATE_KEY,
+  ON_UPDATED_KEY: ON_UPDATED_KEY,
+  ON_BEFORE_UNMOUNT_KEY: ON_BEFORE_UNMOUNT_KEY,
+  ON_UNMOUNTED_KEY: ON_UNMOUNTED_KEY,
+  PROPS_KEY: PROPS_KEY,
+  STATE_KEY: STATE_KEY,
+  SLOTS_KEY: SLOTS_KEY,
+  ROOT_KEY: ROOT_KEY,
+  IS_PURE_SYMBOL: IS_PURE_SYMBOL,
+  PARENT_KEY_SYMBOL: PARENT_KEY_SYMBOL,
+  ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
+  TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL
+});
 
 const EACH = 0;
 const IF = 1;
@@ -966,58 +1018,6 @@ function create$3(node, _ref) {
   return Object.assign({}, flattenCollectionMethods(expressions.map(expression => create$2(node, expression)), ['mount', 'update', 'unmount']));
 }
 
-// Riot.js constants that can be used accross more modules
-const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
-      DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
-      PLUGINS_SET = new Set(),
-      IS_DIRECTIVE = 'is',
-      VALUE_ATTRIBUTE = 'value',
-      MOUNT_METHOD_KEY = 'mount',
-      UPDATE_METHOD_KEY = 'update',
-      UNMOUNT_METHOD_KEY = 'unmount',
-      SHOULD_UPDATE_KEY = 'shouldUpdate',
-      ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
-      ON_MOUNTED_KEY = 'onMounted',
-      ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
-      ON_UPDATED_KEY = 'onUpdated',
-      ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
-      ON_UNMOUNTED_KEY = 'onUnmounted',
-      PROPS_KEY = 'props',
-      STATE_KEY = 'state',
-      SLOTS_KEY = 'slots',
-      ROOT_KEY = 'root',
-      IS_PURE_SYMBOL = Symbol.for('pure'),
-      PARENT_KEY_SYMBOL = Symbol('parent'),
-      ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
-      TEMPLATE_KEY_SYMBOL = Symbol('template');
-
-var globals = /*#__PURE__*/Object.freeze({
-  __proto__: null,
-  COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
-  DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY,
-  PLUGINS_SET: PLUGINS_SET,
-  IS_DIRECTIVE: IS_DIRECTIVE,
-  VALUE_ATTRIBUTE: VALUE_ATTRIBUTE,
-  MOUNT_METHOD_KEY: MOUNT_METHOD_KEY,
-  UPDATE_METHOD_KEY: UPDATE_METHOD_KEY,
-  UNMOUNT_METHOD_KEY: UNMOUNT_METHOD_KEY,
-  SHOULD_UPDATE_KEY: SHOULD_UPDATE_KEY,
-  ON_BEFORE_MOUNT_KEY: ON_BEFORE_MOUNT_KEY,
-  ON_MOUNTED_KEY: ON_MOUNTED_KEY,
-  ON_BEFORE_UPDATE_KEY: ON_BEFORE_UPDATE_KEY,
-  ON_UPDATED_KEY: ON_UPDATED_KEY,
-  ON_BEFORE_UNMOUNT_KEY: ON_BEFORE_UNMOUNT_KEY,
-  ON_UNMOUNTED_KEY: ON_UNMOUNTED_KEY,
-  PROPS_KEY: PROPS_KEY,
-  STATE_KEY: STATE_KEY,
-  SLOTS_KEY: SLOTS_KEY,
-  ROOT_KEY: ROOT_KEY,
-  IS_PURE_SYMBOL: IS_PURE_SYMBOL,
-  PARENT_KEY_SYMBOL: PARENT_KEY_SYMBOL,
-  ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
-  TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL
-});
-
 function extendParentScope(attributes, scope, parentScope) {
   if (!attributes || !attributes.length) return parentScope;
   const expressions = attributes.map(attr => Object.assign({}, attr, {
@@ -1446,9 +1446,13 @@ const TemplateChunk = Object.freeze({
       this.bindings.forEach(b => b.unmount(scope, parentScope, mustRemoveRoot));
 
       switch (true) {
+        // pure components should handle the DOM unmount updates by themselves
+        case this.el[IS_PURE_SYMBOL]:
+          break;
         // <template> tags should be treated a bit differently
         // we need to clear their children only if it's explicitly required by the caller
         // via mustRemoveRoot !== null
+
         case this.children && mustRemoveRoot !== null:
           clearChildren(this.children);
           break;
@@ -1972,7 +1976,9 @@ function createPureComponent(pureFactoryFunction, _ref) {
     // intercept the mount calls to bind the DOM node to the pure object created
     // see also https://github.com/riot/riot/issues/2806
     if (method === MOUNT_METHOD_KEY) {
-      const [el] = args;
+      const [el] = args; // mark this node as pure element
+
+      el[IS_PURE_SYMBOL] = true;
       bindDOMNodeToComponentObject(el, component);
     }
 
@@ -2387,7 +2393,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v5.1.1'; // expose some internal stuff that might be used from external tools
+const version = 'v5.1.2'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
