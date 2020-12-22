@@ -5,27 +5,7 @@ Please make sure to [search the issue tracker](https://github.com/riot/riot/issu
 
 ### Development Process
 
-`master` is considered safe and should be identical to the last release tag. When submitting pull requests please use the `dev` branch.
-
-### Coding Guidelines
-
-Please follow the coding style established in the rest of the codebase.
-
-**Semicolons**<br>
-[No](http://blog.izs.me/post/2353458699/an-open-letter-to-javascript-leaders-regarding) [semicolons](http://inimino.org/~inimino/blog/javascript_semicolons), [please](https://www.youtube.com/watch?v=gsfbh17Ax9I)!
-
-**Spacing**<br>
-Use two spaces for indentation. No tabs.
-Spacing around brackets: `if (foo) {` instead of `if(foo){`
-
-**Quotes**<br>
-Single-quoted strings are preferred to double-quoted strings.
-
-**Equality Checking**<br>
-Prefer `==` over `===` unless it's a must.
-
-**Bitwise Operations**<br>
-Prefer classic conditionals `i < 0` over bitwise operators `!~pos`
+`main` is considered safe and should be identical to the last release tag. When submitting pull requests please use the `dev` branch.
 
 ### Create a test
 

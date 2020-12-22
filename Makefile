@@ -86,7 +86,7 @@ build:
 
 
 bump:
-	# grab all latest changes to master
+	# grab all latest changes to main
 	# (if there's any uncommited changes, it will stop here)
 	# bump version in *.json files
 	@ sed -i '' 's/\("version": "\)[^"]*/\1'$(VERSION)'/' package.json
@@ -99,7 +99,7 @@ bump-undo:
 
 
 version:
-	# @ git checkout master
+	# @ git checkout main
 	# create version commit
 	@ git status --short
 	@ git add --all
@@ -128,7 +128,7 @@ publish:
 	# push new version to npm and github
 	# (github tag will also trigger an update in bower, component, cdnjs, etc)
 	@ npm publish
-	@ git push origin master
-	@ git push origin master --tags
+	@ git push origin main
+	@ git push origin main --tags
 
 .PHONY: test min eslint test-coveralls test-sauce raw riot build bump bump-undo version version-undo release-undo publish

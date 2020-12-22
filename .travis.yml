@@ -4,9 +4,8 @@ node_js:
 
 branches:
   only:
-    - master
+    - main
     - dev
-    # - next
 
 script:
   make riot
