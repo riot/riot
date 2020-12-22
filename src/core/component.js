@@ -163,6 +163,8 @@ function createPureComponent(pureFactoryFunction, { slots, attributes, props, cs
     // see also https://github.com/riot/riot/issues/2806
     if (method === MOUNT_METHOD_KEY) {
       const [el] = args
+      // mark this node as pure element
+      el[IS_PURE_SYMBOL] = true
       bindDOMNodeToComponentObject(el, component)
     }
 
