@@ -1,4 +1,4 @@
-/* Riot v5.1.2, @license MIT */
+/* Riot v5.1.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -269,7 +269,29 @@
   /* eslint-disable */
 
   /**
-   * @param {Node} parentNode The container where children live
+   * udomdiff assumes that nodes can not be inserted or modified by other scripts
+   * That's not the case in Riot.js, so we need to create a safeSibling method to assure that the DOM mutations
+   * will be properly applied
+   * @param {Node[]} list - node list
+   * @param {number} index - index were we will search the nextSibling node to use
+    * @param {(entry: Node, action: number) => Node} get
+   * The callback invoked per each entry related DOM operation.
+   * @param {number} info - parameter provided to the get function
+   * @returns {Node} the node we were looking for
+   */
+
+  const getSafeNextSibling = (list, index, get, info) => {
+    let node;
+
+    while (node = get(list[index], info)) {
+      const {
+        nextSibling
+      } = node;
+      if (nextSibling) return nextSibling;
+      index--;
+    }
+  };
+  /**
    * @param {Node[]} a The list of current/live children
    * @param {Node[]} b The list of future children
    * @param {(entry: Node, action: number) => Node} get
@@ -278,7 +300,8 @@
    * @returns {Node[]} The same list of future children.
    */
 
-  var udomdiff = ((parentNode, a, b, get, before) => {
+
+  var udomdiff = ((a, b, get, before) => {
     const bLength = b.length;
     let aEnd = a.length;
     let bEnd = bLength;
@@ -293,9 +316,11 @@
         // need to be added are not at the end, and in such case
         // the node to `insertBefore`, if the index is more than 0
         // must be retrieved, otherwise it's gonna be the first item.
-        const node = bEnd < bLength ? bStart ? get(b[bStart - 1], -0).nextSibling : get(b[bEnd - bStart], 0) : before;
+        const node = bEnd < bLength ? bStart ? getSafeNextSibling(b, bStart - 1, get, -1) : get(b[bEnd - bStart], 0) : before;
 
-        while (bStart < bEnd) insertBefore(get(b[bStart++], 1), node);
+        while (bStart < bEnd) {
+          insertBefore(get(b[bStart++], 1), node);
+        }
       } // remove head or tail: fast path
       else if (bEnd === bStart) {
           while (aStart < aEnd) {
@@ -321,8 +346,8 @@
                 // or asymmetric too
                 // [1, 2, 3, 4, 5]
                 // [1, 2, 3, 5, 6, 4]
-                const node = get(a[--aEnd], -1).nextSibling;
-                insertBefore(get(b[bStart++], 1), get(a[aStart++], -1).nextSibling);
+                const node = getSafeNextSibling(a, --aEnd, get, -1);
+                insertBefore(get(b[bStart++], 1), getSafeNextSibling(a, aStart++, get, -1));
                 insertBefore(get(b[--bEnd], 1), node); // mark the future index as identical (yeah, it's dirty, but cheap 👍)
                 // The main reason to do this, is that when a[aEnd] will be reached,
                 // the loop will likely be on the fast path, as identical to b[bEnd].
@@ -418,8 +443,8 @@
         childrenMap
       } = this;
       const collection = scope === UNMOUNT_SCOPE ? null : this.evaluate(scope);
-      const items = collection ? Array.from(collection) : [];
-      const parent = placeholder.parentNode; // prepare the diffing
+      const items = collection ? Array.from(collection) : []; //const parent = placeholder.parentNode
+      // prepare the diffing
 
       const {
         newChildrenMap,
@@ -427,7 +452,7 @@
         futureNodes
       } = createPatch(items, scope, parentScope, this); // patch the DOM only if there are new nodes
 
-      udomdiff(parent, nodes, futureNodes, patch(Array.from(childrenMap.values()), parentScope), placeholder); // trigger the mounts and the updates
+      udomdiff(nodes, futureNodes, patch(Array.from(childrenMap.values()), parentScope), placeholder); // trigger the mounts and the updates
 
       batches.forEach(fn => fn()); // update the children map
 
@@ -444,7 +469,7 @@
   };
   /**
    * Patch the DOM while diffing
-   * @param   {TemplateChunk[]} redundant - redundant tepmplate chunks
+   * @param   {any[]} redundant - list of all the children (template, nodes, context) added via each
    * @param   {*} parentScope - scope of the parent template
    * @returns {Function} patch function used by domdiff
    */
@@ -452,16 +477,25 @@
   function patch(redundant, parentScope) {
     return (item, info) => {
       if (info < 0) {
-        const element = redundant.pop();
+        // get the last element added to the childrenMap saved previously
+        const element = redundant[redundant.length - 1];
 
         if (element) {
+          // get the nodes and the template in stored in the last child of the childrenMap
           const {
             template,
+            nodes,
             context
-          } = element; // notice that we pass null as last argument because
+          } = element; // remove the last node (notice <template> tags might have more children nodes)
+
+          nodes.pop(); // notice that we pass null as last argument because
           // the root node and its children will be removed by domdiff
 
-          template.unmount(context, parentScope, null);
+          if (nodes.length === 0) {
+            // we have cleared all the children nodes and we can unmount this template
+            redundant.pop();
+            template.unmount(context, parentScope, null);
+          }
         }
       }
 
@@ -537,14 +571,15 @@
       });
       const key = getKey ? getKey(context) : index;
       const oldItem = childrenMap.get(key);
+      const nodes = [];
 
       if (mustFilterItem(condition, context)) {
         return;
       }
 
-      const componentTemplate = oldItem ? oldItem.template : template.clone();
-      const el = oldItem ? componentTemplate.el : root.cloneNode();
       const mustMount = !oldItem;
+      const componentTemplate = oldItem ? oldItem.template : template.clone();
+      const el = componentTemplate.el || root.cloneNode();
       const meta = isTemplateTag && mustMount ? createTemplateMeta(componentTemplate) : {};
 
       if (mustMount) {
@@ -557,15 +592,17 @@
 
       if (isTemplateTag) {
         const children = meta.children || componentTemplate.children;
-        futureNodes.push(...children);
+        nodes.push(...children);
       } else {
-        futureNodes.push(el);
+        nodes.push(el);
       } // delete the old item from the children map
 
 
-      childrenMap.delete(key); // update the children map
+      childrenMap.delete(key);
+      futureNodes.push(...nodes); // update the children map
 
       newChildrenMap.set(key, {
+        nodes,
         template: componentTemplate,
         context,
         index
@@ -2399,7 +2436,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v5.1.2'; // expose some internal stuff that might be used from external tools
+  const version = 'v5.1.3'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,

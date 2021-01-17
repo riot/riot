@@ -1,4 +1,4 @@
-/* Riot v5.1.2, @license MIT */
+/* Riot v5.1.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('fs'), require('path')) :
   typeof define === 'function' && define.amd ? define(['fs', 'path'], factory) :
@@ -269,7 +269,29 @@
   /* eslint-disable */
 
   /**
-   * @param {Node} parentNode The container where children live
+   * udomdiff assumes that nodes can not be inserted or modified by other scripts
+   * That's not the case in Riot.js, so we need to create a safeSibling method to assure that the DOM mutations
+   * will be properly applied
+   * @param {Node[]} list - node list
+   * @param {number} index - index were we will search the nextSibling node to use
+    * @param {(entry: Node, action: number) => Node} get
+   * The callback invoked per each entry related DOM operation.
+   * @param {number} info - parameter provided to the get function
+   * @returns {Node} the node we were looking for
+   */
+
+  const getSafeNextSibling = (list, index, get, info) => {
+    let node;
+
+    while (node = get(list[index], info)) {
+      const {
+        nextSibling
+      } = node;
+      if (nextSibling) return nextSibling;
+      index--;
+    }
+  };
+  /**
    * @param {Node[]} a The list of current/live children
    * @param {Node[]} b The list of future children
    * @param {(entry: Node, action: number) => Node} get
@@ -278,7 +300,8 @@
    * @returns {Node[]} The same list of future children.
    */
 
-  var udomdiff = ((parentNode, a, b, get, before) => {
+
+  var udomdiff = ((a, b, get, before) => {
     const bLength = b.length;
     let aEnd = a.length;
     let bEnd = bLength;
@@ -293,9 +316,11 @@
         // need to be added are not at the end, and in such case
         // the node to `insertBefore`, if the index is more than 0
         // must be retrieved, otherwise it's gonna be the first item.
-        const node = bEnd < bLength ? bStart ? get(b[bStart - 1], -0).nextSibling : get(b[bEnd - bStart], 0) : before;
+        const node = bEnd < bLength ? bStart ? getSafeNextSibling(b, bStart - 1, get, -1) : get(b[bEnd - bStart], 0) : before;
 
-        while (bStart < bEnd) insertBefore(get(b[bStart++], 1), node);
+        while (bStart < bEnd) {
+          insertBefore(get(b[bStart++], 1), node);
+        }
       } // remove head or tail: fast path
       else if (bEnd === bStart) {
           while (aStart < aEnd) {
@@ -321,8 +346,8 @@
                 // or asymmetric too
                 // [1, 2, 3, 4, 5]
                 // [1, 2, 3, 5, 6, 4]
-                const node = get(a[--aEnd], -1).nextSibling;
-                insertBefore(get(b[bStart++], 1), get(a[aStart++], -1).nextSibling);
+                const node = getSafeNextSibling(a, --aEnd, get, -1);
+                insertBefore(get(b[bStart++], 1), getSafeNextSibling(a, aStart++, get, -1));
                 insertBefore(get(b[--bEnd], 1), node); // mark the future index as identical (yeah, it's dirty, but cheap 👍)
                 // The main reason to do this, is that when a[aEnd] will be reached,
                 // the loop will likely be on the fast path, as identical to b[bEnd].
@@ -418,8 +443,8 @@
         childrenMap
       } = this;
       const collection = scope === UNMOUNT_SCOPE ? null : this.evaluate(scope);
-      const items = collection ? Array.from(collection) : [];
-      const parent = placeholder.parentNode; // prepare the diffing
+      const items = collection ? Array.from(collection) : []; //const parent = placeholder.parentNode
+      // prepare the diffing
 
       const {
         newChildrenMap,
@@ -427,7 +452,7 @@
         futureNodes
       } = createPatch(items, scope, parentScope, this); // patch the DOM only if there are new nodes
 
-      udomdiff(parent, nodes, futureNodes, patch(Array.from(childrenMap.values()), parentScope), placeholder); // trigger the mounts and the updates
+      udomdiff(nodes, futureNodes, patch(Array.from(childrenMap.values()), parentScope), placeholder); // trigger the mounts and the updates
 
       batches.forEach(fn => fn()); // update the children map
 
@@ -444,7 +469,7 @@
   };
   /**
    * Patch the DOM while diffing
-   * @param   {TemplateChunk[]} redundant - redundant tepmplate chunks
+   * @param   {any[]} redundant - list of all the children (template, nodes, context) added via each
    * @param   {*} parentScope - scope of the parent template
    * @returns {Function} patch function used by domdiff
    */
@@ -452,16 +477,25 @@
   function patch(redundant, parentScope) {
     return (item, info) => {
       if (info < 0) {
-        const element = redundant.pop();
+        // get the last element added to the childrenMap saved previously
+        const element = redundant[redundant.length - 1];
 
         if (element) {
+          // get the nodes and the template in stored in the last child of the childrenMap
           const {
             template,
+            nodes,
             context
-          } = element; // notice that we pass null as last argument because
+          } = element; // remove the last node (notice <template> tags might have more children nodes)
+
+          nodes.pop(); // notice that we pass null as last argument because
           // the root node and its children will be removed by domdiff
 
-          template.unmount(context, parentScope, null);
+          if (nodes.length === 0) {
+            // we have cleared all the children nodes and we can unmount this template
+            redundant.pop();
+            template.unmount(context, parentScope, null);
+          }
         }
       }
 
@@ -537,14 +571,15 @@
       });
       const key = getKey ? getKey(context) : index;
       const oldItem = childrenMap.get(key);
+      const nodes = [];
 
       if (mustFilterItem(condition, context)) {
         return;
       }
 
-      const componentTemplate = oldItem ? oldItem.template : template.clone();
-      const el = oldItem ? componentTemplate.el : root.cloneNode();
       const mustMount = !oldItem;
+      const componentTemplate = oldItem ? oldItem.template : template.clone();
+      const el = componentTemplate.el || root.cloneNode();
       const meta = isTemplateTag && mustMount ? createTemplateMeta(componentTemplate) : {};
 
       if (mustMount) {
@@ -557,15 +592,17 @@
 
       if (isTemplateTag) {
         const children = meta.children || componentTemplate.children;
-        futureNodes.push(...children);
+        nodes.push(...children);
       } else {
-        futureNodes.push(el);
+        nodes.push(el);
       } // delete the old item from the children map
 
 
-      childrenMap.delete(key); // update the children map
+      childrenMap.delete(key);
+      futureNodes.push(...nodes); // update the children map
 
       newChildrenMap.set(key, {
+        nodes,
         template: componentTemplate,
         context,
         index
@@ -2399,7 +2436,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v5.1.2'; // expose some internal stuff that might be used from external tools
+  const version = 'v5.1.3'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2815,7 +2852,7 @@
   var TSTypeMember=or(def("TSCallSignatureDeclaration"),def("TSConstructSignatureDeclaration"),def("TSIndexSignature"),def("TSMethodSignature"),def("TSPropertySignature"));def("TSTypeLiteral").bases("TSType").build("members").field("members",[TSTypeMember]);def("TSTypeParameter").bases("Identifier").build("name","constraint","default").field("name",String).field("constraint",or(def("TSType"),void 0),defaults["undefined"]).field("default",or(def("TSType"),void 0),defaults["undefined"]);def("TSTypeAssertion").bases("Expression","Pattern").build("typeAnnotation","expression").field("typeAnnotation",def("TSType")).field("expression",def("Expression")).field("extra",or({parenthesized:Boolean},null),defaults["null"]);def("TSTypeParameterDeclaration").bases("Declaration").build("params").field("params",[def("TSTypeParameter")]);def("TSTypeParameterInstantiation").bases("Node").build("params").field("params",[def("TSType")]);def("TSEnumDeclaration").bases("Declaration").build("id","members").field("id",def("Identifier")).field("const",Boolean,defaults["false"]).field("declare",Boolean,defaults["false"]).field("members",[def("TSEnumMember")]).field("initializer",or(def("Expression"),null),defaults["null"]);def("TSTypeAliasDeclaration").bases("Declaration","TSHasOptionalTypeParameters").build("id","typeAnnotation").field("id",def("Identifier")).field("declare",Boolean,defaults["false"]).field("typeAnnotation",def("TSType"));def("TSModuleBlock").bases("Node").build("body").field("body",[def("Statement")]);def("TSModuleDeclaration").bases("Declaration").build("id","body").field("id",or(StringLiteral,TSEntityName)).field("declare",Boolean,defaults["false"]).field("global",Boolean,defaults["false"]).field("body",or(def("TSModuleBlock"),def("TSModuleDeclaration"),null),defaults["null"]);def("TSImportType").bases("TSType","TSHasOptionalTypeParameterInstantiation").build("argument","qualifier","typeParameters").field("argument",StringLiteral).field("qualifier",or(TSEntityName,void 0),defaults["undefined"]);def("TSImportEqualsDeclaration").bases("Declaration").build("id","moduleReference").field("id",def("Identifier")).field("isExport",Boolean,defaults["false"]).field("moduleReference",or(TSEntityName,def("TSExternalModuleReference")));def("TSExternalModuleReference").bases("Declaration").build("expression").field("expression",StringLiteral);def("TSExportAssignment").bases("Statement").build("expression").field("expression",def("Expression"));def("TSNamespaceExportDeclaration").bases("Declaration").build("id").field("id",def("Identifier"));def("TSInterfaceBody").bases("Node").build("body").field("body",[TSTypeMember]);def("TSExpressionWithTypeArguments").bases("TSType","TSHasOptionalTypeParameterInstantiation").build("expression","typeParameters").field("expression",TSEntityName);def("TSInterfaceDeclaration").bases("Declaration","TSHasOptionalTypeParameters").build("id","body").field("id",TSEntityName).field("declare",Boolean,defaults["false"]).field("extends",or([def("TSExpressionWithTypeArguments")],null),defaults["null"]).field("body",def("TSInterfaceBody"));def("TSParameterProperty").bases("Pattern").build("parameter").field("accessibility",or("public","private","protected",void 0),defaults["undefined"]).field("readonly",Boolean,defaults["false"]).field("parameter",or(def("Identifier"),def("AssignmentPattern")));def("ClassProperty").field("access",// Not "accessibility"?
   or("public","private","protected",void 0),defaults["undefined"]);// Defined already in es6 and babel-core.
   def("ClassBody").field("body",[or(def("MethodDefinition"),def("VariableDeclarator"),def("ClassPropertyDefinition"),def("ClassProperty"),def("ClassPrivateProperty"),def("ClassMethod"),def("ClassPrivateMethod"),// Just need to add these types:
-  def("TSDeclareMethod"),TSTypeMember)]);}exports.default=default_1;module.exports=exports["default"];});unwrapExports(typescript);var namedTypes_1=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.namedTypes=void 0;var namedTypes;(function(namedTypes){})(namedTypes=exports.namedTypes||(exports.namedTypes={}));});unwrapExports(namedTypes_1);var namedTypes_2=namedTypes_1.namedTypes;var main=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.visit=exports.use=exports.Type=exports.someField=exports.PathVisitor=exports.Path=exports.NodePath=exports.namedTypes=exports.getSupertypeNames=exports.getFieldValue=exports.getFieldNames=exports.getBuilderName=exports.finalize=exports.eachField=exports.defineMethod=exports.builtInTypes=exports.builders=exports.astNodesAreEquivalent=void 0;var fork_1=tslib_es6.__importDefault(fork);var core_1=tslib_es6.__importDefault(core);var es6_1=tslib_es6.__importDefault(es6);var es2016_1=tslib_es6.__importDefault(es2016);var es2017_1=tslib_es6.__importDefault(es2017);var es2018_1=tslib_es6.__importDefault(es2018);var es2019_1=tslib_es6.__importDefault(es2019);var es2020_1=tslib_es6.__importDefault(es2020);var jsx_1=tslib_es6.__importDefault(jsx);var flow_1=tslib_es6.__importDefault(flow);var esprima_1=tslib_es6.__importDefault(esprima);var babel_1=tslib_es6.__importDefault(babel);var typescript_1=tslib_es6.__importDefault(typescript);var es_proposals_1=tslib_es6.__importDefault(esProposals);Object.defineProperty(exports,"namedTypes",{enumerable:true,get:function get(){return namedTypes_1.namedTypes;}});var _a=fork_1.default([// This core module of AST types captures ES5 as it is parsed today by
+  def("TSDeclareMethod"),TSTypeMember)]);}exports.default=default_1;module.exports=exports["default"];});unwrapExports(typescript);var namedTypes_1=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.namedTypes=void 0;(function(namedTypes){})(exports.namedTypes||(exports.namedTypes={}));});unwrapExports(namedTypes_1);var namedTypes_2=namedTypes_1.namedTypes;var main=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.visit=exports.use=exports.Type=exports.someField=exports.PathVisitor=exports.Path=exports.NodePath=exports.namedTypes=exports.getSupertypeNames=exports.getFieldValue=exports.getFieldNames=exports.getBuilderName=exports.finalize=exports.eachField=exports.defineMethod=exports.builtInTypes=exports.builders=exports.astNodesAreEquivalent=void 0;var fork_1=tslib_es6.__importDefault(fork);var core_1=tslib_es6.__importDefault(core);var es6_1=tslib_es6.__importDefault(es6);var es2016_1=tslib_es6.__importDefault(es2016);var es2017_1=tslib_es6.__importDefault(es2017);var es2018_1=tslib_es6.__importDefault(es2018);var es2019_1=tslib_es6.__importDefault(es2019);var es2020_1=tslib_es6.__importDefault(es2020);var jsx_1=tslib_es6.__importDefault(jsx);var flow_1=tslib_es6.__importDefault(flow);var esprima_1=tslib_es6.__importDefault(esprima);var babel_1=tslib_es6.__importDefault(babel);var typescript_1=tslib_es6.__importDefault(typescript);var es_proposals_1=tslib_es6.__importDefault(esProposals);Object.defineProperty(exports,"namedTypes",{enumerable:true,get:function get(){return namedTypes_1.namedTypes;}});var _a=fork_1.default([// This core module of AST types captures ES5 as it is parsed today by
   // git://github.com/ariya/esprima.git#master.
   core_1.default,// Feel free to add to or remove from this list of extension modules to
   // configure the precise type hierarchy that you need.
