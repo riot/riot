@@ -1,4 +1,4 @@
-/* Riot v5.1.3, @license MIT */
+/* Riot v5.1.4, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('fs'), require('path')) :
   typeof define === 'function' && define.amd ? define(['fs', 'path'], factory) :
@@ -167,18 +167,84 @@
     VALUE
   };
 
+  const HEAD_SYMBOL = Symbol('head');
+  const TAIL_SYMBOL = Symbol('tail');
+
+  /**
+   * Create the <template> fragments comment nodes
+   * @return {Object} {{head: Comment, tail: Comment}}
+   */
+
+  function createHeadTailPlaceholders() {
+    const head = document.createComment('fragment head');
+    const tail = document.createComment('fragment tail');
+    head[HEAD_SYMBOL] = true;
+    tail[TAIL_SYMBOL] = true;
+    return {
+      head,
+      tail
+    };
+  }
+
   /**
    * Create the template meta object in case of <template> fragments
    * @param   {TemplateChunk} componentTemplate - template chunk object
    * @returns {Object} the meta property that will be passed to the mount function of the TemplateChunk
    */
+
   function createTemplateMeta(componentTemplate) {
     const fragment = componentTemplate.dom.cloneNode(true);
+    const {
+      head,
+      tail
+    } = createHeadTailPlaceholders();
     return {
       avoidDOMInjection: true,
       fragment,
-      children: Array.from(fragment.childNodes)
+      head,
+      tail,
+      children: [head, ...Array.from(fragment.childNodes), tail]
     };
+  }
+
+  /**
+   * Get the current <template> fragment children located in between the head and tail comments
+   * @param {Comment} head - head comment node
+   * @param {Comment} tail - tail comment node
+   * @return {Array[]} children list of the nodes found in this template fragment
+   */
+
+  function getFragmentChildren(_ref) {
+    let {
+      head,
+      tail
+    } = _ref;
+    const nodes = walkNodes([head], head.nextSibling, n => n === tail, false);
+    nodes.push(tail);
+    return nodes;
+  }
+  /**
+   * Recursive function to walk all the <template> children nodes
+   * @param {Array[]} children - children nodes collection
+   * @param {ChildNode} node - current node
+   * @param {Function} check - exit function check
+   * @param {boolean} isFilterActive - filter flag to skip nodes managed by other bindings
+   * @returns {Array[]} children list of the nodes found in this template fragment
+   */
+
+  function walkNodes(children, node, check, isFilterActive) {
+    const {
+      nextSibling
+    } = node; // filter tail and head nodes together with all the nodes in between
+    // this is needed only to fix a really ugly edge case https://github.com/riot/riot/issues/2892
+
+    if (!isFilterActive && !node[HEAD_SYMBOL] && !node[TAIL_SYMBOL]) {
+      children.push(node);
+    }
+
+    if (!nextSibling || check(node)) return children;
+    return walkNodes(children, nextSibling, check, // activate the filters to skip nodes between <template> fragments that will be managed by other bindings
+    isFilterActive && !node[TAIL_SYMBOL] || nextSibling[HEAD_SYMBOL]);
   }
 
   /**
@@ -269,29 +335,6 @@
   /* eslint-disable */
 
   /**
-   * udomdiff assumes that nodes can not be inserted or modified by other scripts
-   * That's not the case in Riot.js, so we need to create a safeSibling method to assure that the DOM mutations
-   * will be properly applied
-   * @param {Node[]} list - node list
-   * @param {number} index - index were we will search the nextSibling node to use
-    * @param {(entry: Node, action: number) => Node} get
-   * The callback invoked per each entry related DOM operation.
-   * @param {number} info - parameter provided to the get function
-   * @returns {Node} the node we were looking for
-   */
-
-  const getSafeNextSibling = (list, index, get, info) => {
-    let node;
-
-    while (node = get(list[index], info)) {
-      const {
-        nextSibling
-      } = node;
-      if (nextSibling) return nextSibling;
-      index--;
-    }
-  };
-  /**
    * @param {Node[]} a The list of current/live children
    * @param {Node[]} b The list of future children
    * @param {(entry: Node, action: number) => Node} get
@@ -299,7 +342,6 @@
    * @param {Node} [before] The optional node used as anchor to insert before.
    * @returns {Node[]} The same list of future children.
    */
-
 
   var udomdiff = ((a, b, get, before) => {
     const bLength = b.length;
@@ -316,11 +358,9 @@
         // need to be added are not at the end, and in such case
         // the node to `insertBefore`, if the index is more than 0
         // must be retrieved, otherwise it's gonna be the first item.
-        const node = bEnd < bLength ? bStart ? getSafeNextSibling(b, bStart - 1, get, -1) : get(b[bEnd - bStart], 0) : before;
+        const node = bEnd < bLength ? bStart ? get(b[bStart - 1], -0).nextSibling : get(b[bEnd - bStart], 0) : before;
 
-        while (bStart < bEnd) {
-          insertBefore(get(b[bStart++], 1), node);
-        }
+        while (bStart < bEnd) insertBefore(get(b[bStart++], 1), node);
       } // remove head or tail: fast path
       else if (bEnd === bStart) {
           while (aStart < aEnd) {
@@ -346,8 +386,8 @@
                 // or asymmetric too
                 // [1, 2, 3, 4, 5]
                 // [1, 2, 3, 5, 6, 4]
-                const node = getSafeNextSibling(a, --aEnd, get, -1);
-                insertBefore(get(b[bStart++], 1), getSafeNextSibling(a, aStart++, get, -1));
+                const node = get(a[--aEnd], -1).nextSibling;
+                insertBefore(get(b[bStart++], 1), get(a[aStart++], -1).nextSibling);
                 insertBefore(get(b[--bEnd], 1), node); // mark the future index as identical (yeah, it's dirty, but cheap 👍)
                 // The main reason to do this, is that when a[aEnd] will be reached,
                 // the loop will likely be on the fast path, as identical to b[bEnd].
@@ -443,8 +483,7 @@
         childrenMap
       } = this;
       const collection = scope === UNMOUNT_SCOPE ? null : this.evaluate(scope);
-      const items = collection ? Array.from(collection) : []; //const parent = placeholder.parentNode
-      // prepare the diffing
+      const items = collection ? Array.from(collection) : []; // prepare the diffing
 
       const {
         newChildrenMap,
@@ -457,7 +496,9 @@
       batches.forEach(fn => fn()); // update the children map
 
       this.childrenMap = newChildrenMap;
-      this.nodes = futureNodes;
+      this.nodes = futureNodes; // make sure that the loop edge nodes are marked
+
+      markEdgeNodes(this.nodes);
       return this;
     },
 
@@ -536,6 +577,19 @@
     return scope;
   }
   /**
+   * Mark the first and last nodes in order to ignore them in case we need to retrieve the <template> fragment nodes
+   * @param {Array[]} nodes - each binding nodes list
+   * @returns {undefined} void function
+   */
+
+
+  function markEdgeNodes(nodes) {
+    const first = nodes[0];
+    const last = nodes[nodes.length - 1];
+    if (first) first[HEAD_SYMBOL] = true;
+    if (last) last[TAIL_SYMBOL] = true;
+  }
+  /**
    * Loop the current template items
    * @param   {Array} items - expression collection value
    * @param   {*} scope - template scope
@@ -580,7 +634,7 @@
       const mustMount = !oldItem;
       const componentTemplate = oldItem ? oldItem.template : template.clone();
       const el = componentTemplate.el || root.cloneNode();
-      const meta = isTemplateTag && mustMount ? createTemplateMeta(componentTemplate) : {};
+      const meta = isTemplateTag && mustMount ? createTemplateMeta(componentTemplate) : componentTemplate.meta;
 
       if (mustMount) {
         batches.push(() => componentTemplate.mount(el, context, parentScope, meta));
@@ -591,8 +645,7 @@
 
 
       if (isTemplateTag) {
-        const children = meta.children || componentTemplate.children;
-        nodes.push(...children);
+        nodes.push(...(mustMount ? meta.children : getFragmentChildren(meta)));
       } else {
         nodes.push(el);
       } // delete the old item from the children map
@@ -1461,7 +1514,9 @@
       if (!avoidDOMInjection && this.fragment) injectDOM(el, this.fragment); // create the bindings
 
       this.bindings = this.bindingsData.map(binding => create$5(this.el, binding, templateTagOffset));
-      this.bindings.forEach(b => b.mount(scope, parentScope));
+      this.bindings.forEach(b => b.mount(scope, parentScope)); // store the template meta properties
+
+      this.meta = meta;
       return this;
     },
 
@@ -1523,6 +1578,7 @@
      */
     clone() {
       return Object.assign({}, this, {
+        meta: {},
         el: null
       });
     }
@@ -2436,7 +2492,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v5.1.3'; // expose some internal stuff that might be used from external tools
+  const version = 'v5.1.4'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2600,7 +2656,7 @@
   if(hasOwn.call(lastSeen,typeName)){delete list[lastSeen[typeName]];}// Record the new index of the last-seen occurrence of typeName.
   lastSeen[typeName]=pos;// Enqueue the base names of this type.
   list.push.apply(list,d.baseNames);}// Compaction loop to remove array holes.
-  for(var to=0,from=to,len=list.length;from<len;++from){if(hasOwn.call(list,from)){list[to++]=list[from];}}list.length=to;}function extend(into,from){Object.keys(from).forEach(function(name){into[name]=from[name];});return into;}function finalize(){Object.keys(defCache).forEach(function(name){defCache[name].finalize();});}return {Type:Type,builtInTypes:builtInTypes,getSupertypeNames:getSupertypeNames,computeSupertypeLookupTable:computeSupertypeLookupTable,builders:builders,defineMethod:defineMethod,getBuilderName:getBuilderName,getStatementBuilderName:getStatementBuilderName,namedTypes:namedTypes,getFieldNames:getFieldNames,getFieldValue:getFieldValue,eachField:eachField,someField:someField,finalize:finalize};}exports.default=typesPlugin;});unwrapExports(types);var types_1=types.Def;var path=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});var types_1=tslib_es6.__importDefault(types);var Op=Object.prototype;var hasOwn=Op.hasOwnProperty;function pathPlugin(fork){var types=fork.use(types_1.default);var isArray=types.builtInTypes.array;var isNumber=types.builtInTypes.number;var Path=function Path(value,parentPath,name){if(!(this instanceof Path)){throw new Error("Path constructor cannot be invoked without 'new'");}if(parentPath){if(!(parentPath instanceof Path)){throw new Error("");}}else {parentPath=null;name=null;}// The value encapsulated by this Path, generally equal to
+  for(var to=0,from=to,len=list.length;from<len;++from){if(hasOwn.call(list,from)){list[to++]=list[from];}}list.length=to;}function extend(into,from){Object.keys(from).forEach(function(name){into[name]=from[name];});return into;}function finalize(){Object.keys(defCache).forEach(function(name){defCache[name].finalize();});}return {Type:Type,builtInTypes:builtInTypes,getSupertypeNames:getSupertypeNames,computeSupertypeLookupTable:computeSupertypeLookupTable,builders:builders,defineMethod:defineMethod,getBuilderName:getBuilderName,getStatementBuilderName:getStatementBuilderName,namedTypes:namedTypes,getFieldNames:getFieldNames,getFieldValue:getFieldValue,eachField:eachField,someField:someField,finalize:finalize};}exports.default=typesPlugin;});unwrapExports(types);types.Def;var path=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});var types_1=tslib_es6.__importDefault(types);var Op=Object.prototype;var hasOwn=Op.hasOwnProperty;function pathPlugin(fork){var types=fork.use(types_1.default);var isArray=types.builtInTypes.array;var isNumber=types.builtInTypes.number;var Path=function Path(value,parentPath,name){if(!(this instanceof Path)){throw new Error("Path constructor cannot be invoked without 'new'");}if(parentPath){if(!(parentPath instanceof Path)){throw new Error("");}}else {parentPath=null;name=null;}// The value encapsulated by this Path, generally equal to
   // parentPath.value[name] if we have a parentPath.
   this.value=value;// The immediate parent Path of this Path.
   this.parentPath=parentPath;// The name of the property of parentPath.value through which this
@@ -2717,7 +2773,7 @@
   this.traverse(this.currentPath);}}if(this.needToCallTraverse!==false){throw new Error("Must either call this.traverse or return false in "+methodName);}var path=this.currentPath;return path&&path.value;};sharedContextProtoMethods.traverse=function traverse(path,newVisitor){if(!(this instanceof this.Context)){throw new Error("");}if(!(path instanceof NodePath)){throw new Error("");}if(!(this.currentPath instanceof NodePath)){throw new Error("");}this.needToCallTraverse=false;return visitChildren(path,PathVisitor.fromMethodsObject(newVisitor||this.visitor));};sharedContextProtoMethods.visit=function visit(path,newVisitor){if(!(this instanceof this.Context)){throw new Error("");}if(!(path instanceof NodePath)){throw new Error("");}if(!(this.currentPath instanceof NodePath)){throw new Error("");}this.needToCallTraverse=false;return PathVisitor.fromMethodsObject(newVisitor||this.visitor).visitWithoutReset(path);};sharedContextProtoMethods.reportChanged=function reportChanged(){this.visitor.reportChanged();};sharedContextProtoMethods.abort=function abort(){this.needToCallTraverse=false;this.visitor.abort();};return PathVisitor;}exports.default=pathVisitorPlugin;module.exports=exports["default"];});unwrapExports(pathVisitor);var equiv=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});var types_1=tslib_es6.__importDefault(types);function default_1(fork){var types=fork.use(types_1.default);var getFieldNames=types.getFieldNames;var getFieldValue=types.getFieldValue;var isArray=types.builtInTypes.array;var isObject=types.builtInTypes.object;var isDate=types.builtInTypes.Date;var isRegExp=types.builtInTypes.RegExp;var hasOwn=Object.prototype.hasOwnProperty;function astNodesAreEquivalent(a,b,problemPath){if(isArray.check(problemPath)){problemPath.length=0;}else {problemPath=null;}return areEquivalent(a,b,problemPath);}astNodesAreEquivalent.assert=function(a,b){var problemPath=[];if(!astNodesAreEquivalent(a,b,problemPath)){if(problemPath.length===0){if(a!==b){throw new Error("Nodes must be equal");}}else {throw new Error("Nodes differ in the following path: "+problemPath.map(subscriptForProperty).join(""));}}};function subscriptForProperty(property){if(/[_$a-z][_$a-z0-9]*/i.test(property)){return "."+property;}return "["+JSON.stringify(property)+"]";}function areEquivalent(a,b,problemPath){if(a===b){return true;}if(isArray.check(a)){return arraysAreEquivalent(a,b,problemPath);}if(isObject.check(a)){return objectsAreEquivalent(a,b,problemPath);}if(isDate.check(a)){return isDate.check(b)&&+a===+b;}if(isRegExp.check(a)){return isRegExp.check(b)&&a.source===b.source&&a.global===b.global&&a.multiline===b.multiline&&a.ignoreCase===b.ignoreCase;}return a==b;}function arraysAreEquivalent(a,b,problemPath){isArray.assert(a);var aLength=a.length;if(!isArray.check(b)||b.length!==aLength){if(problemPath){problemPath.push("length");}return false;}for(var i=0;i<aLength;++i){if(problemPath){problemPath.push(i);}if(i in a!==i in b){return false;}if(!areEquivalent(a[i],b[i],problemPath)){return false;}if(problemPath){var problemPathTail=problemPath.pop();if(problemPathTail!==i){throw new Error(""+problemPathTail);}}}return true;}function objectsAreEquivalent(a,b,problemPath){isObject.assert(a);if(!isObject.check(b)){return false;}// Fast path for a common property of AST nodes.
   if(a.type!==b.type){if(problemPath){problemPath.push("type");}return false;}var aNames=getFieldNames(a);var aNameCount=aNames.length;var bNames=getFieldNames(b);var bNameCount=bNames.length;if(aNameCount===bNameCount){for(var i=0;i<aNameCount;++i){var name=aNames[i];var aChild=getFieldValue(a,name);var bChild=getFieldValue(b,name);if(problemPath){problemPath.push(name);}if(!areEquivalent(aChild,bChild,problemPath)){return false;}if(problemPath){var problemPathTail=problemPath.pop();if(problemPathTail!==name){throw new Error(""+problemPathTail);}}}return true;}if(!problemPath){return false;}// Since aNameCount !== bNameCount, we need to find some name that's
   // missing in aNames but present in bNames, or vice-versa.
-  var seenNames=Object.create(null);for(i=0;i<aNameCount;++i){seenNames[aNames[i]]=true;}for(i=0;i<bNameCount;++i){name=bNames[i];if(!hasOwn.call(seenNames,name)){problemPath.push(name);return false;}delete seenNames[name];}for(name in seenNames){problemPath.push(name);break;}return false;}return astNodesAreEquivalent;}exports.default=default_1;module.exports=exports["default"];});unwrapExports(equiv);var fork=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});var types_1=tslib_es6.__importDefault(types);var path_visitor_1=tslib_es6.__importDefault(pathVisitor);var equiv_1=tslib_es6.__importDefault(equiv);var path_1=tslib_es6.__importDefault(path);var node_path_1=tslib_es6.__importDefault(nodePath);function default_1(defs){var fork=createFork();var types=fork.use(types_1.default);defs.forEach(fork.use);types.finalize();var PathVisitor=fork.use(path_visitor_1.default);return {Type:types.Type,builtInTypes:types.builtInTypes,namedTypes:types.namedTypes,builders:types.builders,defineMethod:types.defineMethod,getFieldNames:types.getFieldNames,getFieldValue:types.getFieldValue,eachField:types.eachField,someField:types.someField,getSupertypeNames:types.getSupertypeNames,getBuilderName:types.getBuilderName,astNodesAreEquivalent:fork.use(equiv_1.default),finalize:types.finalize,Path:fork.use(path_1.default),NodePath:fork.use(node_path_1.default),PathVisitor:PathVisitor,use:fork.use,visit:PathVisitor.visit};}exports.default=default_1;function createFork(){var used=[];var usedResult=[];function use(plugin){var idx=used.indexOf(plugin);if(idx===-1){idx=used.length;used.push(plugin);usedResult[idx]=plugin(fork);}return usedResult[idx];}var fork={use:use};return fork;}module.exports=exports["default"];});unwrapExports(fork);var coreOperators=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.LogicalOperators=exports.AssignmentOperators=exports.BinaryOperators=void 0;exports.BinaryOperators=["==","!=","===","!==","<","<=",">",">=","<<",">>",">>>","+","-","*","/","%","&","|","^","in","instanceof"];exports.AssignmentOperators=["=","+=","-=","*=","/=","%=","<<=",">>=",">>>=","|=","^=","&="];exports.LogicalOperators=["||","&&"];});unwrapExports(coreOperators);var coreOperators_1=coreOperators.LogicalOperators;var coreOperators_2=coreOperators.AssignmentOperators;var coreOperators_3=coreOperators.BinaryOperators;var shared=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});var types_1=tslib_es6.__importDefault(types);function default_1(fork){var types=fork.use(types_1.default);var Type=types.Type;var builtin=types.builtInTypes;var isNumber=builtin.number;// An example of constructing a new type with arbitrary constraints from
+  var seenNames=Object.create(null);for(i=0;i<aNameCount;++i){seenNames[aNames[i]]=true;}for(i=0;i<bNameCount;++i){name=bNames[i];if(!hasOwn.call(seenNames,name)){problemPath.push(name);return false;}delete seenNames[name];}for(name in seenNames){problemPath.push(name);break;}return false;}return astNodesAreEquivalent;}exports.default=default_1;module.exports=exports["default"];});unwrapExports(equiv);var fork=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});var types_1=tslib_es6.__importDefault(types);var path_visitor_1=tslib_es6.__importDefault(pathVisitor);var equiv_1=tslib_es6.__importDefault(equiv);var path_1=tslib_es6.__importDefault(path);var node_path_1=tslib_es6.__importDefault(nodePath);function default_1(defs){var fork=createFork();var types=fork.use(types_1.default);defs.forEach(fork.use);types.finalize();var PathVisitor=fork.use(path_visitor_1.default);return {Type:types.Type,builtInTypes:types.builtInTypes,namedTypes:types.namedTypes,builders:types.builders,defineMethod:types.defineMethod,getFieldNames:types.getFieldNames,getFieldValue:types.getFieldValue,eachField:types.eachField,someField:types.someField,getSupertypeNames:types.getSupertypeNames,getBuilderName:types.getBuilderName,astNodesAreEquivalent:fork.use(equiv_1.default),finalize:types.finalize,Path:fork.use(path_1.default),NodePath:fork.use(node_path_1.default),PathVisitor:PathVisitor,use:fork.use,visit:PathVisitor.visit};}exports.default=default_1;function createFork(){var used=[];var usedResult=[];function use(plugin){var idx=used.indexOf(plugin);if(idx===-1){idx=used.length;used.push(plugin);usedResult[idx]=plugin(fork);}return usedResult[idx];}var fork={use:use};return fork;}module.exports=exports["default"];});unwrapExports(fork);var coreOperators=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.LogicalOperators=exports.AssignmentOperators=exports.BinaryOperators=void 0;exports.BinaryOperators=["==","!=","===","!==","<","<=",">",">=","<<",">>",">>>","+","-","*","/","%","&","|","^","in","instanceof"];exports.AssignmentOperators=["=","+=","-=","*=","/=","%=","<<=",">>=",">>>=","|=","^=","&="];exports.LogicalOperators=["||","&&"];});unwrapExports(coreOperators);coreOperators.LogicalOperators;coreOperators.AssignmentOperators;coreOperators.BinaryOperators;var shared=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});var types_1=tslib_es6.__importDefault(types);function default_1(fork){var types=fork.use(types_1.default);var Type=types.Type;var builtin=types.builtInTypes;var isNumber=builtin.number;// An example of constructing a new type with arbitrary constraints from
   // an existing type.
   function geq(than){return Type.from(function(value){return isNumber.check(value)&&value>=than;},isNumber+" >= "+than);}// Default value-returning functions that may optionally be passed as a
   // third argument to Def.prototype.field.
@@ -2852,13 +2908,13 @@
   var TSTypeMember=or(def("TSCallSignatureDeclaration"),def("TSConstructSignatureDeclaration"),def("TSIndexSignature"),def("TSMethodSignature"),def("TSPropertySignature"));def("TSTypeLiteral").bases("TSType").build("members").field("members",[TSTypeMember]);def("TSTypeParameter").bases("Identifier").build("name","constraint","default").field("name",String).field("constraint",or(def("TSType"),void 0),defaults["undefined"]).field("default",or(def("TSType"),void 0),defaults["undefined"]);def("TSTypeAssertion").bases("Expression","Pattern").build("typeAnnotation","expression").field("typeAnnotation",def("TSType")).field("expression",def("Expression")).field("extra",or({parenthesized:Boolean},null),defaults["null"]);def("TSTypeParameterDeclaration").bases("Declaration").build("params").field("params",[def("TSTypeParameter")]);def("TSTypeParameterInstantiation").bases("Node").build("params").field("params",[def("TSType")]);def("TSEnumDeclaration").bases("Declaration").build("id","members").field("id",def("Identifier")).field("const",Boolean,defaults["false"]).field("declare",Boolean,defaults["false"]).field("members",[def("TSEnumMember")]).field("initializer",or(def("Expression"),null),defaults["null"]);def("TSTypeAliasDeclaration").bases("Declaration","TSHasOptionalTypeParameters").build("id","typeAnnotation").field("id",def("Identifier")).field("declare",Boolean,defaults["false"]).field("typeAnnotation",def("TSType"));def("TSModuleBlock").bases("Node").build("body").field("body",[def("Statement")]);def("TSModuleDeclaration").bases("Declaration").build("id","body").field("id",or(StringLiteral,TSEntityName)).field("declare",Boolean,defaults["false"]).field("global",Boolean,defaults["false"]).field("body",or(def("TSModuleBlock"),def("TSModuleDeclaration"),null),defaults["null"]);def("TSImportType").bases("TSType","TSHasOptionalTypeParameterInstantiation").build("argument","qualifier","typeParameters").field("argument",StringLiteral).field("qualifier",or(TSEntityName,void 0),defaults["undefined"]);def("TSImportEqualsDeclaration").bases("Declaration").build("id","moduleReference").field("id",def("Identifier")).field("isExport",Boolean,defaults["false"]).field("moduleReference",or(TSEntityName,def("TSExternalModuleReference")));def("TSExternalModuleReference").bases("Declaration").build("expression").field("expression",StringLiteral);def("TSExportAssignment").bases("Statement").build("expression").field("expression",def("Expression"));def("TSNamespaceExportDeclaration").bases("Declaration").build("id").field("id",def("Identifier"));def("TSInterfaceBody").bases("Node").build("body").field("body",[TSTypeMember]);def("TSExpressionWithTypeArguments").bases("TSType","TSHasOptionalTypeParameterInstantiation").build("expression","typeParameters").field("expression",TSEntityName);def("TSInterfaceDeclaration").bases("Declaration","TSHasOptionalTypeParameters").build("id","body").field("id",TSEntityName).field("declare",Boolean,defaults["false"]).field("extends",or([def("TSExpressionWithTypeArguments")],null),defaults["null"]).field("body",def("TSInterfaceBody"));def("TSParameterProperty").bases("Pattern").build("parameter").field("accessibility",or("public","private","protected",void 0),defaults["undefined"]).field("readonly",Boolean,defaults["false"]).field("parameter",or(def("Identifier"),def("AssignmentPattern")));def("ClassProperty").field("access",// Not "accessibility"?
   or("public","private","protected",void 0),defaults["undefined"]);// Defined already in es6 and babel-core.
   def("ClassBody").field("body",[or(def("MethodDefinition"),def("VariableDeclarator"),def("ClassPropertyDefinition"),def("ClassProperty"),def("ClassPrivateProperty"),def("ClassMethod"),def("ClassPrivateMethod"),// Just need to add these types:
-  def("TSDeclareMethod"),TSTypeMember)]);}exports.default=default_1;module.exports=exports["default"];});unwrapExports(typescript);var namedTypes_1=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.namedTypes=void 0;(function(namedTypes){})(exports.namedTypes||(exports.namedTypes={}));});unwrapExports(namedTypes_1);var namedTypes_2=namedTypes_1.namedTypes;var main=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.visit=exports.use=exports.Type=exports.someField=exports.PathVisitor=exports.Path=exports.NodePath=exports.namedTypes=exports.getSupertypeNames=exports.getFieldValue=exports.getFieldNames=exports.getBuilderName=exports.finalize=exports.eachField=exports.defineMethod=exports.builtInTypes=exports.builders=exports.astNodesAreEquivalent=void 0;var fork_1=tslib_es6.__importDefault(fork);var core_1=tslib_es6.__importDefault(core);var es6_1=tslib_es6.__importDefault(es6);var es2016_1=tslib_es6.__importDefault(es2016);var es2017_1=tslib_es6.__importDefault(es2017);var es2018_1=tslib_es6.__importDefault(es2018);var es2019_1=tslib_es6.__importDefault(es2019);var es2020_1=tslib_es6.__importDefault(es2020);var jsx_1=tslib_es6.__importDefault(jsx);var flow_1=tslib_es6.__importDefault(flow);var esprima_1=tslib_es6.__importDefault(esprima);var babel_1=tslib_es6.__importDefault(babel);var typescript_1=tslib_es6.__importDefault(typescript);var es_proposals_1=tslib_es6.__importDefault(esProposals);Object.defineProperty(exports,"namedTypes",{enumerable:true,get:function get(){return namedTypes_1.namedTypes;}});var _a=fork_1.default([// This core module of AST types captures ES5 as it is parsed today by
+  def("TSDeclareMethod"),TSTypeMember)]);}exports.default=default_1;module.exports=exports["default"];});unwrapExports(typescript);var namedTypes_1=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.namedTypes=void 0;(function(namedTypes){})(exports.namedTypes||(exports.namedTypes={}));});unwrapExports(namedTypes_1);namedTypes_1.namedTypes;var main=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.visit=exports.use=exports.Type=exports.someField=exports.PathVisitor=exports.Path=exports.NodePath=exports.namedTypes=exports.getSupertypeNames=exports.getFieldValue=exports.getFieldNames=exports.getBuilderName=exports.finalize=exports.eachField=exports.defineMethod=exports.builtInTypes=exports.builders=exports.astNodesAreEquivalent=void 0;var fork_1=tslib_es6.__importDefault(fork);var core_1=tslib_es6.__importDefault(core);var es6_1=tslib_es6.__importDefault(es6);var es2016_1=tslib_es6.__importDefault(es2016);var es2017_1=tslib_es6.__importDefault(es2017);var es2018_1=tslib_es6.__importDefault(es2018);var es2019_1=tslib_es6.__importDefault(es2019);var es2020_1=tslib_es6.__importDefault(es2020);var jsx_1=tslib_es6.__importDefault(jsx);var flow_1=tslib_es6.__importDefault(flow);var esprima_1=tslib_es6.__importDefault(esprima);var babel_1=tslib_es6.__importDefault(babel);var typescript_1=tslib_es6.__importDefault(typescript);var es_proposals_1=tslib_es6.__importDefault(esProposals);Object.defineProperty(exports,"namedTypes",{enumerable:true,get:function get(){return namedTypes_1.namedTypes;}});var _a=fork_1.default([// This core module of AST types captures ES5 as it is parsed today by
   // git://github.com/ariya/esprima.git#master.
   core_1.default,// Feel free to add to or remove from this list of extension modules to
   // configure the precise type hierarchy that you need.
   es6_1.default,es2016_1.default,es2017_1.default,es2018_1.default,es2019_1.default,es2020_1.default,jsx_1.default,flow_1.default,esprima_1.default,babel_1.default,typescript_1.default,es_proposals_1.default]),astNodesAreEquivalent=_a.astNodesAreEquivalent,builders=_a.builders,builtInTypes=_a.builtInTypes,defineMethod=_a.defineMethod,eachField=_a.eachField,finalize=_a.finalize,getBuilderName=_a.getBuilderName,getFieldNames=_a.getFieldNames,getFieldValue=_a.getFieldValue,getSupertypeNames=_a.getSupertypeNames,n=_a.namedTypes,NodePath=_a.NodePath,Path=_a.Path,PathVisitor=_a.PathVisitor,someField=_a.someField,Type=_a.Type,use=_a.use,visit=_a.visit;exports.astNodesAreEquivalent=astNodesAreEquivalent;exports.builders=builders;exports.builtInTypes=builtInTypes;exports.defineMethod=defineMethod;exports.eachField=eachField;exports.finalize=finalize;exports.getBuilderName=getBuilderName;exports.getFieldNames=getFieldNames;exports.getFieldValue=getFieldValue;exports.getSupertypeNames=getSupertypeNames;exports.NodePath=NodePath;exports.Path=Path;exports.PathVisitor=PathVisitor;exports.someField=someField;exports.Type=Type;exports.use=use;exports.visit=visit;// Populate the exported fields of the namedTypes namespace, while still
   // retaining its member types.
-  Object.assign(namedTypes_1.namedTypes,n);});unwrapExports(main);var main_1=main.visit;var main_2=main.use;var main_3=main.Type;var main_4=main.someField;var main_5=main.PathVisitor;var main_6=main.Path;var main_7=main.NodePath;var main_8=main.namedTypes;var main_9=main.getSupertypeNames;var main_10=main.getFieldValue;var main_11=main.getFieldNames;var main_12=main.getBuilderName;var main_13=main.finalize;var main_14=main.eachField;var main_15=main.defineMethod;var main_16=main.builtInTypes;var main_17=main.builders;var main_18=main.astNodesAreEquivalent;var lookup=[];var revLookup=[];var Arr=typeof Uint8Array!=='undefined'?Uint8Array:Array;var inited=false;function init(){inited=true;var code='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';for(var i=0,len=code.length;i<len;++i){lookup[i]=code[i];revLookup[code.charCodeAt(i)]=i;}revLookup['-'.charCodeAt(0)]=62;revLookup['_'.charCodeAt(0)]=63;}function toByteArray(b64){if(!inited){init();}var i,j,l,tmp,placeHolders,arr;var len=b64.length;if(len%4>0){throw new Error('Invalid string. Length must be a multiple of 4');}// the number of equal signs (place holders)
+  Object.assign(namedTypes_1.namedTypes,n);});unwrapExports(main);main.visit;main.use;main.Type;main.someField;main.PathVisitor;main.Path;main.NodePath;main.namedTypes;main.getSupertypeNames;main.getFieldValue;main.getFieldNames;main.getBuilderName;main.finalize;main.eachField;main.defineMethod;main.builtInTypes;main.builders;main.astNodesAreEquivalent;var lookup=[];var revLookup=[];var Arr=typeof Uint8Array!=='undefined'?Uint8Array:Array;var inited=false;function init(){inited=true;var code='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';for(var i=0,len=code.length;i<len;++i){lookup[i]=code[i];revLookup[code.charCodeAt(i)]=i;}revLookup['-'.charCodeAt(0)]=62;revLookup['_'.charCodeAt(0)]=63;}function toByteArray(b64){if(!inited){init();}var i,j,l,tmp,placeHolders,arr;var len=b64.length;if(len%4>0){throw new Error('Invalid string. Length must be a multiple of 4');}// the number of equal signs (place holders)
   // if there are two placeholders, than the two characters before it
   // represent one byte
   // if there is only one, then the three characters before it represent 2 bytes
@@ -3323,7 +3379,7 @@
   //   “sourceRoot”, the sources are resolved relative to the
   //   SourceMap (like resolving script src in a html document).
   if(sourceMapURL){var parsed=urlParse(sourceMapURL);if(!parsed){throw new Error("sourceMapURL could not be parsed");}if(parsed.path){// Strip the last path component, but keep the "/".
-  var index=parsed.path.lastIndexOf('/');if(index>=0){parsed.path=parsed.path.substring(0,index+1);}}sourceURL=join(urlGenerate(parsed),sourceURL);}return normalize(sourceURL);}exports.computeSourceURL=computeSourceURL;});var util_1=util.getArg;var util_2=util.urlParse;var util_3=util.urlGenerate;var util_4=util.normalize;var util_5=util.join;var util_6=util.isAbsolute;var util_7=util.relative;var util_8=util.toSetString;var util_9=util.fromSetString;var util_10=util.compareByOriginalPositions;var util_11=util.compareByGeneratedPositionsDeflated;var util_12=util.compareByGeneratedPositionsInflated;var util_13=util.parseSourceMapInput;var util_14=util.computeSourceURL;/* -*- Mode: js; js-indent-level: 2; -*- */ /*
+  var index=parsed.path.lastIndexOf('/');if(index>=0){parsed.path=parsed.path.substring(0,index+1);}}sourceURL=join(urlGenerate(parsed),sourceURL);}return normalize(sourceURL);}exports.computeSourceURL=computeSourceURL;});util.getArg;util.urlParse;util.urlGenerate;util.normalize;util.join;util.isAbsolute;util.relative;util.toSetString;util.fromSetString;util.compareByOriginalPositions;util.compareByGeneratedPositionsDeflated;util.compareByGeneratedPositionsInflated;util.parseSourceMapInput;util.computeSourceURL;/* -*- Mode: js; js-indent-level: 2; -*- */ /*
   	 * Copyright 2011 Mozilla Foundation and contributors
   	 * Licensed under the New BSD license. See LICENSE or:
   	 * http://opensource.org/licenses/BSD-3-Clause
@@ -3519,7 +3575,7 @@
   	 */exports.search=function search(aNeedle,aHaystack,aCompare,aBias){if(aHaystack.length===0){return -1;}var index=recursiveSearch(-1,aHaystack.length,aNeedle,aHaystack,aCompare,aBias||exports.GREATEST_LOWER_BOUND);if(index<0){return -1;}// We have found either the exact element, or the next-closest element than
   // the one we are searching for. However, there may be more than one such
   // element. Make sure we always return the smallest of these.
-  while(index-1>=0){if(aCompare(aHaystack[index],aHaystack[index-1],true)!==0){break;}--index;}return index;};});var binarySearch_1=binarySearch.GREATEST_LOWER_BOUND;var binarySearch_2=binarySearch.LEAST_UPPER_BOUND;var binarySearch_3=binarySearch.search;/* -*- Mode: js; js-indent-level: 2; -*- */ /*
+  while(index-1>=0){if(aCompare(aHaystack[index],aHaystack[index-1],true)!==0){break;}--index;}return index;};});binarySearch.GREATEST_LOWER_BOUND;binarySearch.LEAST_UPPER_BOUND;binarySearch.search;/* -*- Mode: js; js-indent-level: 2; -*- */ /*
   	 * Copyright 2011 Mozilla Foundation and contributors
   	 * Licensed under the New BSD license. See LICENSE or:
   	 * http://opensource.org/licenses/BSD-3-Clause
@@ -4093,7 +4149,7 @@
   var dollarCurlyPos=lines.skipSpaces(expr.loc.start,true,false);if(lines.prevPos(dollarCurlyPos)&&lines.charAt(dollarCurlyPos)==="{"&&lines.prevPos(dollarCurlyPos)&&lines.charAt(dollarCurlyPos)==="$"){var quasiBefore=node.quasis[i];if(comparePos(dollarCurlyPos,quasiBefore.loc.end)<0){quasiBefore.loc.end=dollarCurlyPos;}}// Likewise, some parsers accidentally include the } that follows
   // the expression in the .loc of the following quasi element.
   var rightCurlyPos=lines.skipSpaces(expr.loc.end,false,false);if(lines.charAt(rightCurlyPos)==="}"){assert_1.default.ok(lines.nextPos(rightCurlyPos));// Now rightCurlyPos is technically the position just after the }.
-  var quasiAfter=node.quasis[i+1];if(comparePos(quasiAfter.loc.start,rightCurlyPos)<0){quasiAfter.loc.start=rightCurlyPos;}}});}function isExportDeclaration(node){if(node)switch(node.type){case"ExportDeclaration":case"ExportDefaultDeclaration":case"ExportDefaultSpecifier":case"DeclareExportDeclaration":case"ExportNamedDeclaration":case"ExportAllDeclaration":return true;}return false;}exports.isExportDeclaration=isExportDeclaration;function getParentExportDeclaration(path){var parentNode=path.getParentNode();if(path.getName()==="declaration"&&isExportDeclaration(parentNode)){return parentNode;}return null;}exports.getParentExportDeclaration=getParentExportDeclaration;function isTrailingCommaEnabled(options,context){var trailingComma=options.trailingComma;if(typeof trailingComma==="object"){return !!trailingComma[context];}return !!trailingComma;}exports.isTrailingCommaEnabled=isTrailingCommaEnabled;});unwrapExports(util$1);var util_1$1=util$1.isTrailingCommaEnabled;var util_2$1=util$1.getParentExportDeclaration;var util_3$1=util$1.isExportDeclaration;var util_4$1=util$1.fixFaultyLocations;var util_5$1=util$1.getTrueLoc;var util_6$1=util$1.composeSourceMaps;var util_7$1=util$1.copyPos;var util_8$1=util$1.comparePos;var util_9$1=util$1.getUnionOfKeys;var util_10$1=util$1.getOption;var esprima$1=createCommonjsModule(function(module,exports){(function webpackUniversalModuleDefinition(root,factory){/* istanbul ignore next */module.exports=factory();})(this,function(){return(/******/function(modules){// webpackBootstrap
+  var quasiAfter=node.quasis[i+1];if(comparePos(quasiAfter.loc.start,rightCurlyPos)<0){quasiAfter.loc.start=rightCurlyPos;}}});}function isExportDeclaration(node){if(node)switch(node.type){case"ExportDeclaration":case"ExportDefaultDeclaration":case"ExportDefaultSpecifier":case"DeclareExportDeclaration":case"ExportNamedDeclaration":case"ExportAllDeclaration":return true;}return false;}exports.isExportDeclaration=isExportDeclaration;function getParentExportDeclaration(path){var parentNode=path.getParentNode();if(path.getName()==="declaration"&&isExportDeclaration(parentNode)){return parentNode;}return null;}exports.getParentExportDeclaration=getParentExportDeclaration;function isTrailingCommaEnabled(options,context){var trailingComma=options.trailingComma;if(typeof trailingComma==="object"){return !!trailingComma[context];}return !!trailingComma;}exports.isTrailingCommaEnabled=isTrailingCommaEnabled;});unwrapExports(util$1);util$1.isTrailingCommaEnabled;util$1.getParentExportDeclaration;util$1.isExportDeclaration;util$1.fixFaultyLocations;util$1.getTrueLoc;var util_6$1=util$1.composeSourceMaps;util$1.copyPos;util$1.comparePos;util$1.getUnionOfKeys;util$1.getOption;var esprima$1=createCommonjsModule(function(module,exports){(function webpackUniversalModuleDefinition(root,factory){/* istanbul ignore next */module.exports=factory();})(this,function(){return(/******/function(modules){// webpackBootstrap
   /******/ // The module cache
   /******/var installedModules={};/******/ // The require function
   /******/function __webpack_require__(moduleId){/******/ // Check if module is in cache
@@ -4367,7 +4423,7 @@
   //     parser: require("recast/parsers/esprima")
   //   });
   //
-  function parse(source,options){var comments=[];var ast=esprima$1.parse(source,{loc:true,locations:true,comment:true,onComment:comments,range:util$1.getOption(options,"range",false),tolerant:util$1.getOption(options,"tolerant",true),tokens:true,jsx:util$1.getOption(options,"jsx",false)});if(!Array.isArray(ast.comments)){ast.comments=comments;}return ast;}exports.parse=parse;});unwrapExports(esprima$2);var esprima_1=esprima$2.parse;/*
+  function parse(source,options){var comments=[];var ast=esprima$1.parse(source,{loc:true,locations:true,comment:true,onComment:comments,range:util$1.getOption(options,"range",false),tolerant:util$1.getOption(options,"tolerant",true),tokens:true,jsx:util$1.getOption(options,"jsx",false)});if(!Array.isArray(ast.comments)){ast.comments=comments;}return ast;}exports.parse=parse;});unwrapExports(esprima$2);esprima$2.parse;/*
   	The MIT License (MIT)
 
   	Copyright (c) 2016 CoderPuppy
@@ -4391,7 +4447,7 @@
   	SOFTWARE.
 
   	*/var _endianness;function endianness(){if(typeof _endianness==='undefined'){var a=new ArrayBuffer(2);var b=new Uint8Array(a);var c=new Uint16Array(a);b[0]=1;b[1]=2;if(c[0]===258){_endianness='BE';}else if(c[0]===513){_endianness='LE';}else {throw new Error('unable to figure out endianess');}}return _endianness;}function hostname(){if(typeof commonjsGlobal.location!=='undefined'){return commonjsGlobal.location.hostname;}else return '';}function loadavg(){return [];}function uptime(){return 0;}function freemem(){return Number.MAX_VALUE;}function totalmem(){return Number.MAX_VALUE;}function cpus(){return [];}function type(){return 'Browser';}function release(){if(typeof commonjsGlobal.navigator!=='undefined'){return commonjsGlobal.navigator.appVersion;}return '';}function networkInterfaces(){}function getNetworkInterfaces(){}function tmpDir(){return '/tmp';}var tmpdir=tmpDir;var EOL='\n';var require$$1={EOL:EOL,tmpdir:tmpdir,tmpDir:tmpDir,networkInterfaces:networkInterfaces,getNetworkInterfaces:getNetworkInterfaces,release:release,type:type,cpus:cpus,totalmem:totalmem,freemem:freemem,uptime:uptime,loadavg:loadavg,hostname:hostname,endianness:endianness};var options=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.normalize=void 0;var defaults={parser:esprima$2,tabWidth:4,useTabs:false,reuseWhitespace:true,lineTerminator:require$$1.EOL,wrapColumn:74,sourceFileName:null,sourceMapName:null,sourceRoot:null,inputSourceMap:null,range:false,tolerant:true,quote:null,trailingComma:false,arrayBracketSpacing:false,objectCurlySpacing:true,arrowParensAlways:false,flowObjectCommas:true,tokens:true};var hasOwn=defaults.hasOwnProperty;// Copy options and fill in default values.
-  function normalize(opts){var options=opts||defaults;function get(key){return hasOwn.call(options,key)?options[key]:defaults[key];}return {tabWidth:+get("tabWidth"),useTabs:!!get("useTabs"),reuseWhitespace:!!get("reuseWhitespace"),lineTerminator:get("lineTerminator"),wrapColumn:Math.max(get("wrapColumn"),0),sourceFileName:get("sourceFileName"),sourceMapName:get("sourceMapName"),sourceRoot:get("sourceRoot"),inputSourceMap:get("inputSourceMap"),parser:get("esprima")||get("parser"),range:get("range"),tolerant:get("tolerant"),quote:get("quote"),trailingComma:get("trailingComma"),arrayBracketSpacing:get("arrayBracketSpacing"),objectCurlySpacing:get("objectCurlySpacing"),arrowParensAlways:get("arrowParensAlways"),flowObjectCommas:get("flowObjectCommas"),tokens:!!get("tokens")};}exports.normalize=normalize;});unwrapExports(options);var options_1=options.normalize;var mapping=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});var assert_1=tslib_es6.__importDefault(assert);var Mapping=/** @class */function(){function Mapping(sourceLines,sourceLoc,targetLoc){if(targetLoc===void 0){targetLoc=sourceLoc;}this.sourceLines=sourceLines;this.sourceLoc=sourceLoc;this.targetLoc=targetLoc;}Mapping.prototype.slice=function(lines,start,end){if(end===void 0){end=lines.lastPos();}var sourceLines=this.sourceLines;var sourceLoc=this.sourceLoc;var targetLoc=this.targetLoc;function skip(name){var sourceFromPos=sourceLoc[name];var targetFromPos=targetLoc[name];var targetToPos=start;if(name==="end"){targetToPos=end;}else {assert_1.default.strictEqual(name,"start");}return skipChars(sourceLines,sourceFromPos,lines,targetFromPos,targetToPos);}if(util$1.comparePos(start,targetLoc.start)<=0){if(util$1.comparePos(targetLoc.end,end)<=0){targetLoc={start:subtractPos(targetLoc.start,start.line,start.column),end:subtractPos(targetLoc.end,start.line,start.column)};// The sourceLoc can stay the same because the contents of the
+  function normalize(opts){var options=opts||defaults;function get(key){return hasOwn.call(options,key)?options[key]:defaults[key];}return {tabWidth:+get("tabWidth"),useTabs:!!get("useTabs"),reuseWhitespace:!!get("reuseWhitespace"),lineTerminator:get("lineTerminator"),wrapColumn:Math.max(get("wrapColumn"),0),sourceFileName:get("sourceFileName"),sourceMapName:get("sourceMapName"),sourceRoot:get("sourceRoot"),inputSourceMap:get("inputSourceMap"),parser:get("esprima")||get("parser"),range:get("range"),tolerant:get("tolerant"),quote:get("quote"),trailingComma:get("trailingComma"),arrayBracketSpacing:get("arrayBracketSpacing"),objectCurlySpacing:get("objectCurlySpacing"),arrowParensAlways:get("arrowParensAlways"),flowObjectCommas:get("flowObjectCommas"),tokens:!!get("tokens")};}exports.normalize=normalize;});unwrapExports(options);options.normalize;var mapping=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});var assert_1=tslib_es6.__importDefault(assert);var Mapping=/** @class */function(){function Mapping(sourceLines,sourceLoc,targetLoc){if(targetLoc===void 0){targetLoc=sourceLoc;}this.sourceLines=sourceLines;this.sourceLoc=sourceLoc;this.targetLoc=targetLoc;}Mapping.prototype.slice=function(lines,start,end){if(end===void 0){end=lines.lastPos();}var sourceLines=this.sourceLines;var sourceLoc=this.sourceLoc;var targetLoc=this.targetLoc;function skip(name){var sourceFromPos=sourceLoc[name];var targetFromPos=targetLoc[name];var targetToPos=start;if(name==="end"){targetToPos=end;}else {assert_1.default.strictEqual(name,"start");}return skipChars(sourceLines,sourceFromPos,lines,targetFromPos,targetToPos);}if(util$1.comparePos(start,targetLoc.start)<=0){if(util$1.comparePos(targetLoc.end,end)<=0){targetLoc={start:subtractPos(targetLoc.start,start.line,start.column),end:subtractPos(targetLoc.end,start.line,start.column)};// The sourceLoc can stay the same because the contents of the
   // targetLoc have not changed.
   }else if(util$1.comparePos(end,targetLoc.start)<=0){return null;}else {sourceLoc={start:sourceLoc.start,end:skip("end")};targetLoc={start:subtractPos(targetLoc.start,start.line,start.column),end:subtractPos(end,start.line,start.column)};}}else {if(util$1.comparePos(targetLoc.end,start)<=0){return null;}if(util$1.comparePos(targetLoc.end,end)<=0){sourceLoc={start:skip("start"),end:sourceLoc.end};targetLoc={// Same as subtractPos(start, start.line, start.column):
   start:{line:1,column:0},end:subtractPos(targetLoc.end,start.line,start.column)};}else {sourceLoc={start:skip("start"),end:skip("end")};targetLoc={// Same as subtractPos(start, start.line, start.column):
@@ -4443,7 +4499,7 @@
   locked:false,sliceStart:spaces.length,sliceEnd:line.length};}),options.normalize(options$1).sourceFileName);if(cacheable)fromStringCache[string]=lines;return lines;}exports.fromString=fromString;function isOnlyWhitespace(string){return !/\S/.test(string);}function sliceInfo(info,startCol,endCol){var sliceStart=info.sliceStart;var sliceEnd=info.sliceEnd;var indent=Math.max(info.indent,0);var lineLength=indent+sliceEnd-sliceStart;if(typeof endCol==="undefined"){endCol=lineLength;}startCol=Math.max(startCol,0);endCol=Math.min(endCol,lineLength);endCol=Math.max(endCol,startCol);if(endCol<indent){indent=endCol;sliceEnd=sliceStart;}else {sliceEnd-=lineLength-endCol;}lineLength=endCol;lineLength-=startCol;if(startCol<indent){indent-=startCol;}else {startCol-=indent;indent=0;sliceStart+=startCol;}assert_1.default.ok(indent>=0);assert_1.default.ok(sliceStart<=sliceEnd);assert_1.default.strictEqual(lineLength,indent+sliceEnd-sliceStart);if(info.indent===indent&&info.sliceStart===sliceStart&&info.sliceEnd===sliceEnd){return info;}return {line:info.line,indent:indent,// A destructive slice always unlocks indentation.
   locked:false,sliceStart:sliceStart,sliceEnd:sliceEnd};}function concat(elements){return emptyLines.join(elements);}exports.concat=concat;// The emptyLines object needs to be created all the way down here so that
   // Lines.prototype will be fully populated.
-  var emptyLines=fromString("");});unwrapExports(lines);var lines_1=lines.concat;var lines_2=lines.fromString;var lines_3=lines.countSpaces;var lines_4=lines.Lines;var comments=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.printComments=exports.attach=void 0;var assert_1=tslib_es6.__importDefault(assert);var types=tslib_es6.__importStar(main);var n=types.namedTypes;var isArray=types.builtInTypes.array;var isObject=types.builtInTypes.object;var childNodesCache=new WeakMap();// TODO Move a non-caching implementation of this function into ast-types,
+  var emptyLines=fromString("");});unwrapExports(lines);lines.concat;lines.fromString;lines.countSpaces;lines.Lines;var comments=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.printComments=exports.attach=void 0;var assert_1=tslib_es6.__importDefault(assert);var types=tslib_es6.__importStar(main);var n=types.namedTypes;var isArray=types.builtInTypes.array;var isObject=types.builtInTypes.object;var childNodesCache=new WeakMap();// TODO Move a non-caching implementation of this function into ast-types,
   // and implement a caching wrapper function here.
   function getSortedChildNodes(node,lines,resultArray){if(!node){return resultArray;}// The .loc checks below are sensitive to some of the problems that
   // are fixed by this utility function. Specifically, if it decides to
@@ -4490,7 +4546,7 @@
   // preserve it exactly as we found it.
   parts.push(leadingSpace);}else {// If the leading space contains newlines, then replace it
   // with just that many newlines, sans all other spaces.
-  parts.push(new Array(leadingSpace.length).join("\n"));}}parts.push(print(commentPath));return lines.concat(parts);}function printComments(path,print){var value=path.getValue();var innerLines=print(path);var comments=n.Node.check(value)&&types.getFieldValue(value,"comments");if(!comments||comments.length===0){return innerLines;}var leadingParts=[];var trailingParts=[innerLines];path.each(function(commentPath){var comment=commentPath.getValue();var leading=types.getFieldValue(comment,"leading");var trailing=types.getFieldValue(comment,"trailing");if(leading||trailing&&!(n.Statement.check(value)||comment.type==="Block"||comment.type==="CommentBlock")){leadingParts.push(printLeadingComment(commentPath,print));}else if(trailing){trailingParts.push(printTrailingComment(commentPath,print));}},"comments");leadingParts.push.apply(leadingParts,trailingParts);return lines.concat(leadingParts);}exports.printComments=printComments;});unwrapExports(comments);var comments_1=comments.printComments;var comments_2=comments.attach;var parser=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.parse=void 0;var assert_1=tslib_es6.__importDefault(assert);var types=tslib_es6.__importStar(main);var b=types.builders;var isObject=types.builtInTypes.object;var isArray=types.builtInTypes.array;var util=tslib_es6.__importStar(util$1);function parse(source,options$1){options$1=options.normalize(options$1);var lines$1=lines.fromString(source,options$1);var sourceWithoutTabs=lines$1.toString({tabWidth:options$1.tabWidth,reuseWhitespace:false,useTabs:false});var comments$1=[];var ast=options$1.parser.parse(sourceWithoutTabs,{jsx:true,loc:true,locations:true,range:options$1.range,comment:true,onComment:comments$1,tolerant:util.getOption(options$1,"tolerant",true),ecmaVersion:6,sourceType:util.getOption(options$1,"sourceType","module")});// Use ast.tokens if possible, and otherwise fall back to the Esprima
+  parts.push(new Array(leadingSpace.length).join("\n"));}}parts.push(print(commentPath));return lines.concat(parts);}function printComments(path,print){var value=path.getValue();var innerLines=print(path);var comments=n.Node.check(value)&&types.getFieldValue(value,"comments");if(!comments||comments.length===0){return innerLines;}var leadingParts=[];var trailingParts=[innerLines];path.each(function(commentPath){var comment=commentPath.getValue();var leading=types.getFieldValue(comment,"leading");var trailing=types.getFieldValue(comment,"trailing");if(leading||trailing&&!(n.Statement.check(value)||comment.type==="Block"||comment.type==="CommentBlock")){leadingParts.push(printLeadingComment(commentPath,print));}else if(trailing){trailingParts.push(printTrailingComment(commentPath,print));}},"comments");leadingParts.push.apply(leadingParts,trailingParts);return lines.concat(leadingParts);}exports.printComments=printComments;});unwrapExports(comments);comments.printComments;comments.attach;var parser=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.parse=void 0;var assert_1=tslib_es6.__importDefault(assert);var types=tslib_es6.__importStar(main);var b=types.builders;var isObject=types.builtInTypes.object;var isArray=types.builtInTypes.array;var util=tslib_es6.__importStar(util$1);function parse(source,options$1){options$1=options.normalize(options$1);var lines$1=lines.fromString(source,options$1);var sourceWithoutTabs=lines$1.toString({tabWidth:options$1.tabWidth,reuseWhitespace:false,useTabs:false});var comments$1=[];var ast=options$1.parser.parse(sourceWithoutTabs,{jsx:true,loc:true,locations:true,range:options$1.range,comment:true,onComment:comments$1,tolerant:util.getOption(options$1,"tolerant",true),ecmaVersion:6,sourceType:util.getOption(options$1,"sourceType","module")});// Use ast.tokens if possible, and otherwise fall back to the Esprima
   // tokenizer. All the preconfigured ../parsers/* expose ast.tokens
   // automatically, but custom parsers might need additional configuration
   // to avoid this fallback.
@@ -4542,7 +4598,7 @@
   while(this.endTokenIndex>this.startTokenIndex){var token=loc.tokens[this.endTokenIndex-1];if(util.comparePos(loc.end,token.loc.end)<0){--this.endTokenIndex;}else break;}// Index into loc.tokens of the first token *after* this node.
   // If loc.start.token === loc.end.token, the node contains no tokens,
   // and the index is that of the next token following this node.
-  loc.end.token=this.endTokenIndex;};});unwrapExports(parser);var parser_1=parser.parse;var fastPath=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});var assert_1=tslib_es6.__importDefault(assert);var types=tslib_es6.__importStar(main);var util=tslib_es6.__importStar(util$1);var n=types.namedTypes;var isArray=types.builtInTypes.array;var isNumber=types.builtInTypes.number;var PRECEDENCE={};[["||"],["&&"],["|"],["^"],["&"],["==","===","!=","!=="],["<",">","<=",">=","in","instanceof"],[">>","<<",">>>"],["+","-"],["*","/","%"],["**"]].forEach(function(tier,i){tier.forEach(function(op){PRECEDENCE[op]=i;});});var FastPath=function FastPath(value){assert_1.default.ok(this instanceof FastPath);this.stack=[value];};var FPp=FastPath.prototype;// Static convenience function for coercing a value to a FastPath.
+  loc.end.token=this.endTokenIndex;};});unwrapExports(parser);parser.parse;var fastPath=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});var assert_1=tslib_es6.__importDefault(assert);var types=tslib_es6.__importStar(main);var util=tslib_es6.__importStar(util$1);var n=types.namedTypes;var isArray=types.builtInTypes.array;var isNumber=types.builtInTypes.number;var PRECEDENCE={};[["||"],["&&"],["|"],["^"],["&"],["==","===","!=","!=="],["<",">","<=",">=","in","instanceof"],[">>","<<",">>>"],["+","-"],["*","/","%"],["**"]].forEach(function(tier,i){tier.forEach(function(op){PRECEDENCE[op]=i;});});var FastPath=function FastPath(value){assert_1.default.ok(this instanceof FastPath);this.stack=[value];};var FPp=FastPath.prototype;// Static convenience function for coercing a value to a FastPath.
   FastPath.from=function(obj){if(obj instanceof FastPath){// Return a defensive copy of any existing FastPath instances.
   return obj.copy();}if(obj instanceof types.NodePath){// For backwards compatibility, unroll NodePath instances into
   // lightweight FastPath [..., name, value] stacks.
@@ -4677,7 +4733,7 @@
   continue;}newPath.stack.push(k,types.getFieldValue(newNode,k));oldPath.stack.push(k,types.getFieldValue(oldNode,k));var canReprint=findAnyReprints(newPath,oldPath,reprints);newPath.stack.length-=2;oldPath.stack.length-=2;if(!canReprint){return false;}}// Return statements might end up running into ASI issues due to
   // comments inserted deep within the tree, so reprint them if anything
   // changed within them.
-  if(ReturnStatement.check(newPath.getNode())&&reprints.length>originalReprintCount){return false;}return true;}});unwrapExports(patcher);var patcher_1=patcher.getReprinter;var patcher_2=patcher.Patcher;var printer=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.Printer=void 0;var assert_1=tslib_es6.__importDefault(assert);var types=tslib_es6.__importStar(main);var namedTypes=types.namedTypes;var isString=types.builtInTypes.string;var isObject=types.builtInTypes.object;var fast_path_1=tslib_es6.__importDefault(fastPath);var util=tslib_es6.__importStar(util$1);var PrintResult=function PrintResult(code,sourceMap){assert_1.default.ok(this instanceof PrintResult);isString.assert(code);this.code=code;if(sourceMap){isObject.assert(sourceMap);this.map=sourceMap;}};var PRp=PrintResult.prototype;var warnedAboutToString=false;PRp.toString=function(){if(!warnedAboutToString){console.warn("Deprecation warning: recast.print now returns an object with "+"a .code property. You appear to be treating the object as a "+"string, which might still work but is strongly discouraged.");warnedAboutToString=true;}return this.code;};var emptyPrintResult=new PrintResult("");var Printer=function Printer(config){assert_1.default.ok(this instanceof Printer);var explicitTabWidth=config&&config.tabWidth;config=options.normalize(config);// It's common for client code to pass the same options into both
+  if(ReturnStatement.check(newPath.getNode())&&reprints.length>originalReprintCount){return false;}return true;}});unwrapExports(patcher);patcher.getReprinter;patcher.Patcher;var printer=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.Printer=void 0;var assert_1=tslib_es6.__importDefault(assert);var types=tslib_es6.__importStar(main);var namedTypes=types.namedTypes;var isString=types.builtInTypes.string;var isObject=types.builtInTypes.object;var fast_path_1=tslib_es6.__importDefault(fastPath);var util=tslib_es6.__importStar(util$1);var PrintResult=function PrintResult(code,sourceMap){assert_1.default.ok(this instanceof PrintResult);isString.assert(code);this.code=code;if(sourceMap){isObject.assert(sourceMap);this.map=sourceMap;}};var PRp=PrintResult.prototype;var warnedAboutToString=false;PRp.toString=function(){if(!warnedAboutToString){console.warn("Deprecation warning: recast.print now returns an object with "+"a .code property. You appear to be treating the object as a "+"string, which might still work but is strongly discouraged.");warnedAboutToString=true;}return this.code;};var emptyPrintResult=new PrintResult("");var Printer=function Printer(config){assert_1.default.ok(this instanceof Printer);var explicitTabWidth=config&&config.tabWidth;config=options.normalize(config);// It's common for client code to pass the same options into both
   // recast.parse and recast.print, but the Printer doesn't need (and
   // can be confused by) config.sourceFileName, so we null it out.
   config.sourceFileName=null;// Non-destructively modifies options with overrides, and returns a
@@ -4815,7 +4871,7 @@
   filtered.push({node:stmt,printed:print(stmtPath)});});if(sawComment){assert_1.default.strictEqual(sawStatement,false,"Comments may appear as statements in otherwise empty statement "+"lists, but may not coexist with non-Comment nodes.");}var prevTrailingSpace=null;var len=filtered.length;var parts=[];filtered.forEach(function(info,i){var printed=info.printed;var stmt=info.node;var multiLine=printed.length>1;var notFirst=i>0;var notLast=i<len-1;var leadingSpace;var trailingSpace;var lines=stmt&&stmt.loc&&stmt.loc.lines;var trueLoc=lines&&options.reuseWhitespace&&util.getTrueLoc(stmt,lines);if(notFirst){if(trueLoc){var beforeStart=lines.skipSpaces(trueLoc.start,true);var beforeStartLine=beforeStart?beforeStart.line:1;var leadingGap=trueLoc.start.line-beforeStartLine;leadingSpace=Array(leadingGap+1).join("\n");}else {leadingSpace=multiLine?"\n\n":"\n";}}else {leadingSpace="";}if(notLast){if(trueLoc){var afterEnd=lines.skipSpaces(trueLoc.end);var afterEndLine=afterEnd?afterEnd.line:lines.length;var trailingGap=afterEndLine-trueLoc.end.line;trailingSpace=Array(trailingGap+1).join("\n");}else {trailingSpace=multiLine?"\n\n":"\n";}}else {trailingSpace="";}parts.push(maxSpace(prevTrailingSpace,leadingSpace),printed);if(notLast){prevTrailingSpace=trailingSpace;}else if(trailingSpace){parts.push(trailingSpace);}});return lines.concat(parts);}function maxSpace(s1,s2){if(!s1&&!s2){return lines.fromString("");}if(!s1){return lines.fromString(s2);}if(!s2){return lines.fromString(s1);}var spaceLines1=lines.fromString(s1);var spaceLines2=lines.fromString(s2);if(spaceLines2.length>spaceLines1.length){return spaceLines2;}return spaceLines1;}function printMethod(path,options,print){var node=path.getNode();var kind=node.kind;var parts=[];var nodeValue=node.value;if(!namedTypes.FunctionExpression.check(nodeValue)){nodeValue=node;}var access=node.accessibility||node.access;if(typeof access==="string"){parts.push(access," ");}if(node.static){parts.push("static ");}if(node.abstract){parts.push("abstract ");}if(node.readonly){parts.push("readonly ");}if(nodeValue.async){parts.push("async ");}if(nodeValue.generator){parts.push("*");}if(kind==="get"||kind==="set"){parts.push(kind," ");}var key=path.call(print,"key");if(node.computed){key=lines.concat(["[",key,"]"]);}parts.push(key);if(node.optional){parts.push("?");}if(node===nodeValue){parts.push(path.call(print,"typeParameters"),"(",printFunctionParams(path,options,print),")",path.call(print,"returnType"));if(node.body){parts.push(" ",path.call(print,"body"));}else {parts.push(";");}}else {parts.push(path.call(print,"value","typeParameters"),"(",path.call(function(valuePath){return printFunctionParams(valuePath,options,print);},"value"),")",path.call(print,"value","returnType"));if(nodeValue.body){parts.push(" ",path.call(print,"value","body"));}else {parts.push(";");}}return lines.concat(parts);}function printArgumentsList(path,options,print){var printed=path.map(print,"arguments");var trailingComma=util.isTrailingCommaEnabled(options,"parameters");var joined=lines.fromString(", ").join(printed);if(joined.getLineLength(1)>options.wrapColumn){joined=lines.fromString(",\n").join(printed);return lines.concat(["(\n",joined.indent(options.tabWidth),trailingComma?",\n)":"\n)"]);}return lines.concat(["(",joined,")"]);}function printFunctionParams(path,options,print){var fun=path.getValue();var params;var printed=[];if(fun.params){params=fun.params;printed=path.map(print,"params");}else if(fun.parameters){params=fun.parameters;printed=path.map(print,"parameters");}if(fun.defaults){path.each(function(defExprPath){var i=defExprPath.getName();var p=printed[i];if(p&&defExprPath.getValue()){printed[i]=lines.concat([p," = ",print(defExprPath)]);}},"defaults");}if(fun.rest){printed.push(lines.concat(["...",path.call(print,"rest")]));}var joined=lines.fromString(", ").join(printed);if(joined.length>1||joined.getLineLength(1)>options.wrapColumn){joined=lines.fromString(",\n").join(printed);if(util.isTrailingCommaEnabled(options,"parameters")&&!fun.rest&&params[params.length-1].type!=="RestElement"){joined=lines.concat([joined,",\n"]);}else {joined=lines.concat([joined,"\n"]);}return lines.concat(["\n",joined.indent(options.tabWidth)]);}return joined;}function printExportDeclaration(path,options,print){var decl=path.getValue();var parts=["export "];if(decl.exportKind&&decl.exportKind==="type"){if(!decl.declaration){parts.push("type ");}}var shouldPrintSpaces=options.objectCurlySpacing;namedTypes.Declaration.assert(decl);if(decl["default"]||decl.type==="ExportDefaultDeclaration"){parts.push("default ");}if(decl.declaration){parts.push(path.call(print,"declaration"));}else if(decl.specifiers){if(decl.specifiers.length===1&&decl.specifiers[0].type==="ExportBatchSpecifier"){parts.push("*");}else if(decl.specifiers.length===0){parts.push("{}");}else if(decl.specifiers[0].type==="ExportDefaultSpecifier"){var unbracedSpecifiers_2=[];var bracedSpecifiers_2=[];path.each(function(specifierPath){var spec=specifierPath.getValue();if(spec.type==="ExportDefaultSpecifier"){unbracedSpecifiers_2.push(print(specifierPath));}else {bracedSpecifiers_2.push(print(specifierPath));}},"specifiers");unbracedSpecifiers_2.forEach(function(lines,i){if(i>0){parts.push(", ");}parts.push(lines);});if(bracedSpecifiers_2.length>0){var lines_2=lines.fromString(", ").join(bracedSpecifiers_2);if(lines_2.getLineLength(1)>options.wrapColumn){lines_2=lines.concat([lines.fromString(",\n").join(bracedSpecifiers_2).indent(options.tabWidth),","]);}if(unbracedSpecifiers_2.length>0){parts.push(", ");}if(lines_2.length>1){parts.push("{\n",lines_2,"\n}");}else if(options.objectCurlySpacing){parts.push("{ ",lines_2," }");}else {parts.push("{",lines_2,"}");}}}else {parts.push(shouldPrintSpaces?"{ ":"{",lines.fromString(", ").join(path.map(print,"specifiers")),shouldPrintSpaces?" }":"}");}if(decl.source){parts.push(" from ",path.call(print,"source"));}}var lines$1=lines.concat(parts);if(lastNonSpaceCharacter(lines$1)!==";"&&!(decl.declaration&&(decl.declaration.type==="FunctionDeclaration"||decl.declaration.type==="ClassDeclaration"||decl.declaration.type==="TSModuleDeclaration"||decl.declaration.type==="TSInterfaceDeclaration"||decl.declaration.type==="TSEnumDeclaration"))){lines$1=lines.concat([lines$1,";"]);}return lines$1;}function printFlowDeclaration(path,parts){var parentExportDecl=util.getParentExportDeclaration(path);if(parentExportDecl){assert_1.default.strictEqual(parentExportDecl.type,"DeclareExportDeclaration");}else {// If the parent node has type DeclareExportDeclaration, then it
   // will be responsible for printing the "declare" token. Otherwise
   // it needs to be printed with this non-exported declaration node.
-  parts.unshift("declare ");}return lines.concat(parts);}function printVariance(path,print){return path.call(function(variancePath){var value=variancePath.getValue();if(value){if(value==="plus"){return lines.fromString("+");}if(value==="minus"){return lines.fromString("-");}return print(variancePath);}return lines.fromString("");},"variance");}function adjustClause(clause,options){if(clause.length>1)return lines.concat([" ",clause]);return lines.concat(["\n",maybeAddSemicolon(clause).indent(options.tabWidth)]);}function lastNonSpaceCharacter(lines){var pos=lines.lastPos();do{var ch=lines.charAt(pos);if(/\S/.test(ch))return ch;}while(lines.prevPos(pos));}function endsWithBrace(lines){return lastNonSpaceCharacter(lines)==="}";}function swapQuotes(str){return str.replace(/['"]/g,function(m){return m==='"'?"'":'"';});}function nodeStr(str,options){isString.assert(str);switch(options.quote){case"auto":{var double=JSON.stringify(str);var single=swapQuotes(JSON.stringify(swapQuotes(str)));return double.length>single.length?single:double;}case"single":return swapQuotes(JSON.stringify(swapQuotes(str)));case"double":default:return JSON.stringify(str);}}function maybeAddSemicolon(lines$1){var eoc=lastNonSpaceCharacter(lines$1);if(!eoc||"\n};".indexOf(eoc)<0)return lines.concat([lines$1,";"]);return lines$1;}});unwrapExports(printer);var printer_1=printer.Printer;var main$1=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.run=exports.prettyPrint=exports.print=exports.types=exports.parse=void 0;var fs_1=tslib_es6.__importDefault(fs__default['default']);var types=tslib_es6.__importStar(main);exports.types=types;Object.defineProperty(exports,"parse",{enumerable:true,get:function get(){return parser.parse;}});/**
+  parts.unshift("declare ");}return lines.concat(parts);}function printVariance(path,print){return path.call(function(variancePath){var value=variancePath.getValue();if(value){if(value==="plus"){return lines.fromString("+");}if(value==="minus"){return lines.fromString("-");}return print(variancePath);}return lines.fromString("");},"variance");}function adjustClause(clause,options){if(clause.length>1)return lines.concat([" ",clause]);return lines.concat(["\n",maybeAddSemicolon(clause).indent(options.tabWidth)]);}function lastNonSpaceCharacter(lines){var pos=lines.lastPos();do{var ch=lines.charAt(pos);if(/\S/.test(ch))return ch;}while(lines.prevPos(pos));}function endsWithBrace(lines){return lastNonSpaceCharacter(lines)==="}";}function swapQuotes(str){return str.replace(/['"]/g,function(m){return m==='"'?"'":'"';});}function nodeStr(str,options){isString.assert(str);switch(options.quote){case"auto":{var double=JSON.stringify(str);var single=swapQuotes(JSON.stringify(swapQuotes(str)));return double.length>single.length?single:double;}case"single":return swapQuotes(JSON.stringify(swapQuotes(str)));case"double":default:return JSON.stringify(str);}}function maybeAddSemicolon(lines$1){var eoc=lastNonSpaceCharacter(lines$1);if(!eoc||"\n};".indexOf(eoc)<0)return lines.concat([lines$1,";"]);return lines$1;}});unwrapExports(printer);printer.Printer;var main$1=createCommonjsModule(function(module,exports){Object.defineProperty(exports,"__esModule",{value:true});exports.run=exports.prettyPrint=exports.print=exports.types=exports.parse=void 0;var fs_1=tslib_es6.__importDefault(fs__default['default']);var types=tslib_es6.__importStar(main);exports.types=types;Object.defineProperty(exports,"parse",{enumerable:true,get:function get(){return parser.parse;}});/**
   	 * Traverse and potentially modify an abstract syntax tree using a
   	 * convenient visitor syntax:
   	 *
@@ -4834,7 +4890,7 @@
   	 * Print without attempting to reuse any original source code.
   	 */function prettyPrint(node,options){return new printer.Printer(options).printGenerically(node);}exports.prettyPrint=prettyPrint;/**
   	 * Convenient command-line interface (see e.g. example/add-braces).
-  	 */function run(transformer,options){return runFile(process.argv[2],transformer,options);}exports.run=run;function runFile(path,transformer,options){fs_1.default.readFile(path,"utf-8",function(err,code){if(err){console.error(err);return;}runString(code,transformer,options);});}function defaultWriteback(output){process.stdout.write(output);}function runString(code,transformer,options){var writeback=options&&options.writeback||defaultWriteback;transformer(parser.parse(code,options),function(node){writeback(print(node,options).code);});}});unwrapExports(main$1);var main_1$1=main$1.run;var main_2$1=main$1.prettyPrint;var main_3$1=main$1.print;var main_4$1=main$1.types;var main_5$1=main$1.parse;const types$1=main_4$1;const builders=main_4$1.builders;const namedTypes=main_4$1.namedTypes;function nullNode(){return builders.literal(null);}function simplePropertyNode(key,value){return builders.property('init',builders.literal(key),value,false);}/**
+  	 */function run(transformer,options){return runFile(process.argv[2],transformer,options);}exports.run=run;function runFile(path,transformer,options){fs_1.default.readFile(path,"utf-8",function(err,code){if(err){console.error(err);return;}runString(code,transformer,options);});}function defaultWriteback(output){process.stdout.write(output);}function runString(code,transformer,options){var writeback=options&&options.writeback||defaultWriteback;transformer(parser.parse(code,options),function(node){writeback(print(node,options).code);});}});unwrapExports(main$1);main$1.run;main$1.prettyPrint;var main_3$1=main$1.print;var main_4$1=main$1.types;var main_5$1=main$1.parse;const types$1=main_4$1;const builders=main_4$1.builders;const namedTypes=main_4$1.namedTypes;function nullNode(){return builders.literal(null);}function simplePropertyNode(key,value){return builders.property('init',builders.literal(key),value,false);}/**
   	 * Return a source map as JSON, it it has not the toJSON method it means it can
   	 * be used right the way
   	 * @param   { SourceMapGenerator|Object } map - a sourcemap generator or simply an json object
@@ -5043,7 +5099,7 @@
   //   “sourceRoot”, the sources are resolved relative to the
   //   SourceMap (like resolving script src in a html document).
   if(sourceMapURL){const parsed=urlParse(sourceMapURL);if(!parsed){throw new Error("sourceMapURL could not be parsed");}if(parsed.path){// Strip the last path component, but keep the "/".
-  const index=parsed.path.lastIndexOf("/");if(index>=0){parsed.path=parsed.path.substring(0,index+1);}}sourceURL=join(urlGenerate(parsed),sourceURL);}return normalize(sourceURL);}exports.computeSourceURL=computeSourceURL;});var util_1$2=util$2.getArg;var util_2$2=util$2.urlParse;var util_3$2=util$2.urlGenerate;var util_4$2=util$2.normalize;var util_5$2=util$2.join;var util_6$2=util$2.isAbsolute;var util_7$2=util$2.relative;var util_8$2=util$2.toSetString;var util_9$2=util$2.fromSetString;var util_10$2=util$2.compareByOriginalPositions;var util_11$1=util$2.compareByGeneratedPositionsDeflated;var util_12$1=util$2.compareByGeneratedPositionsInflated;var util_13$1=util$2.parseSourceMapInput;var util_14$1=util$2.computeSourceURL;/* -*- Mode: js; js-indent-level: 2; -*- */ /*
+  const index=parsed.path.lastIndexOf("/");if(index>=0){parsed.path=parsed.path.substring(0,index+1);}}sourceURL=join(urlGenerate(parsed),sourceURL);}return normalize(sourceURL);}exports.computeSourceURL=computeSourceURL;});util$2.getArg;util$2.urlParse;util$2.urlGenerate;util$2.normalize;util$2.join;util$2.isAbsolute;util$2.relative;util$2.toSetString;util$2.fromSetString;util$2.compareByOriginalPositions;util$2.compareByGeneratedPositionsDeflated;util$2.compareByGeneratedPositionsInflated;util$2.parseSourceMapInput;util$2.computeSourceURL;/* -*- Mode: js; js-indent-level: 2; -*- */ /*
   	 * Copyright 2011 Mozilla Foundation and contributors
   	 * Licensed under the New BSD license. See LICENSE or:
   	 * http://opensource.org/licenses/BSD-3-Clause
@@ -5237,9 +5293,9 @@
   	 */exports.search=function search(aNeedle,aHaystack,aCompare,aBias){if(aHaystack.length===0){return -1;}let index=recursiveSearch(-1,aHaystack.length,aNeedle,aHaystack,aCompare,aBias||exports.GREATEST_LOWER_BOUND);if(index<0){return -1;}// We have found either the exact element, or the next-closest element than
   // the one we are searching for. However, there may be more than one such
   // element. Make sure we always return the smallest of these.
-  while(index-1>=0){if(aCompare(aHaystack[index],aHaystack[index-1],true)!==0){break;}--index;}return index;};});var binarySearch_1$1=binarySearch$1.GREATEST_LOWER_BOUND;var binarySearch_2$1=binarySearch$1.LEAST_UPPER_BOUND;var binarySearch_3$1=binarySearch$1.search;var readWasm=createCommonjsModule(function(module){if(typeof fetch==="function"){// Web version of reading a wasm file into an array buffer.
+  while(index-1>=0){if(aCompare(aHaystack[index],aHaystack[index-1],true)!==0){break;}--index;}return index;};});binarySearch$1.GREATEST_LOWER_BOUND;binarySearch$1.LEAST_UPPER_BOUND;binarySearch$1.search;var readWasm=createCommonjsModule(function(module){if(typeof fetch==="function"){// Web version of reading a wasm file into an array buffer.
   let mappingsWasmUrl=null;module.exports=function readWasm(){if(typeof mappingsWasmUrl!=="string"){throw new Error("You must provide the URL of lib/mappings.wasm by calling "+"SourceMapConsumer.initialize({ 'lib/mappings.wasm': ... }) "+"before using SourceMapConsumer");}return fetch(mappingsWasmUrl).then(response=>response.arrayBuffer());};module.exports.initialize=url=>mappingsWasmUrl=url;}else {// Node version of reading a wasm file into an array buffer.
-  const fs=fs__default['default'];const path=path__default['default'];module.exports=function readWasm(){return new Promise((resolve,reject)=>{const wasmPath=path.join(__dirname,"mappings.wasm");fs.readFile(wasmPath,null,(error,data)=>{if(error){reject(error);return;}resolve(data.buffer);});});};module.exports.initialize=_=>{console.debug("SourceMapConsumer.initialize is a no-op when running in node.js");};}});var readWasm_1=readWasm.initialize;/*
+  const fs=fs__default['default'];const path=path__default['default'];module.exports=function readWasm(){return new Promise((resolve,reject)=>{const wasmPath=path.join(__dirname,"mappings.wasm");fs.readFile(wasmPath,null,(error,data)=>{if(error){reject(error);return;}resolve(data.buffer);});});};module.exports.initialize=_=>{console.debug("SourceMapConsumer.initialize is a no-op when running in node.js");};}});readWasm.initialize;/*
   	 * Copyright 2009-2011 Mozilla Foundation and contributors
   	 * Licensed under the New BSD license. See LICENSE.txt or:
   	 * http://opensource.org/licenses/BSD-3-Clause
@@ -6642,7 +6698,7 @@
   const BINDING_BINDINGS_KEY='bindings';const BINDING_ID_KEY='id';const BINDING_HTML_KEY='html';const BINDING_ATTRIBUTES_KEY='attributes';// DOM directives
   const IF_DIRECTIVE='if';const EACH_DIRECTIVE='each';const KEY_ATTRIBUTE='key';const SLOT_ATTRIBUTE='slot';const NAME_ATTRIBUTE='name';const IS_DIRECTIVE='is';// Misc
   const DEFAULT_SLOT_NAME='default';const TEXT_NODE_EXPRESSION_PLACEHOLDER=' ';const BINDING_SELECTOR_PREFIX='expr';const SLOT_TAG_NODE_NAME='slot';const PROGRESS_TAG_NODE_NAME='progress';const TEMPLATE_TAG_NODE_NAME='template';// Riot Parser constants
-  const IS_RAW_NODE=constants.IS_RAW;const IS_VOID_NODE=constants.IS_VOID;const IS_CUSTOM_NODE=constants.IS_CUSTOM;const IS_BOOLEAN_ATTRIBUTE=constants.IS_BOOLEAN;const IS_SPREAD_ATTRIBUTE=constants.IS_SPREAD;/**
+  constants.IS_RAW;const IS_VOID_NODE=constants.IS_VOID;const IS_CUSTOM_NODE=constants.IS_CUSTOM;const IS_BOOLEAN_ATTRIBUTE=constants.IS_BOOLEAN;const IS_SPREAD_ATTRIBUTE=constants.IS_SPREAD;/**
   	 * True if the node has not expression set nor bindings directives
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {boolean} true only if it's a static node that doesn't need bindings or expressions
@@ -6720,7 +6776,7 @@
   	 * True if the node is a directive having its own template
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {boolean} true only for the IF EACH and TAG bindings
-  	 */function hasItsOwnTemplate(node){return [findEachAttribute,findIfAttribute,isCustomNode].some(test=>test(node));}const hasIfAttribute=compose(Boolean,findIfAttribute);const hasEachAttribute=compose(Boolean,findEachAttribute);const hasIsAttribute=compose(Boolean,findIsAttribute);const hasKeyAttribute=compose(Boolean,findKeyAttribute);/**
+  	 */function hasItsOwnTemplate(node){return [findEachAttribute,findIfAttribute,isCustomNode].some(test=>test(node));}const hasIfAttribute=compose(Boolean,findIfAttribute);const hasEachAttribute=compose(Boolean,findEachAttribute);const hasIsAttribute=compose(Boolean,findIsAttribute);compose(Boolean,findKeyAttribute);/**
   	 * Find the attribute node
   	 * @param   { string } name -  name of the attribute we want to find
   	 * @param   { riotParser.nodeTypes.TAG } node - a tag node

@@ -1,4 +1,4 @@
-/* Riot v5.1.3, @license MIT */
+/* Riot v5.1.4, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -161,18 +161,84 @@ var expressionTypes = {
   VALUE
 };
 
+const HEAD_SYMBOL = Symbol('head');
+const TAIL_SYMBOL = Symbol('tail');
+
+/**
+ * Create the <template> fragments comment nodes
+ * @return {Object} {{head: Comment, tail: Comment}}
+ */
+
+function createHeadTailPlaceholders() {
+  const head = document.createComment('fragment head');
+  const tail = document.createComment('fragment tail');
+  head[HEAD_SYMBOL] = true;
+  tail[TAIL_SYMBOL] = true;
+  return {
+    head,
+    tail
+  };
+}
+
 /**
  * Create the template meta object in case of <template> fragments
  * @param   {TemplateChunk} componentTemplate - template chunk object
  * @returns {Object} the meta property that will be passed to the mount function of the TemplateChunk
  */
+
 function createTemplateMeta(componentTemplate) {
   const fragment = componentTemplate.dom.cloneNode(true);
+  const {
+    head,
+    tail
+  } = createHeadTailPlaceholders();
   return {
     avoidDOMInjection: true,
     fragment,
-    children: Array.from(fragment.childNodes)
+    head,
+    tail,
+    children: [head, ...Array.from(fragment.childNodes), tail]
   };
+}
+
+/**
+ * Get the current <template> fragment children located in between the head and tail comments
+ * @param {Comment} head - head comment node
+ * @param {Comment} tail - tail comment node
+ * @return {Array[]} children list of the nodes found in this template fragment
+ */
+
+function getFragmentChildren(_ref) {
+  let {
+    head,
+    tail
+  } = _ref;
+  const nodes = walkNodes([head], head.nextSibling, n => n === tail, false);
+  nodes.push(tail);
+  return nodes;
+}
+/**
+ * Recursive function to walk all the <template> children nodes
+ * @param {Array[]} children - children nodes collection
+ * @param {ChildNode} node - current node
+ * @param {Function} check - exit function check
+ * @param {boolean} isFilterActive - filter flag to skip nodes managed by other bindings
+ * @returns {Array[]} children list of the nodes found in this template fragment
+ */
+
+function walkNodes(children, node, check, isFilterActive) {
+  const {
+    nextSibling
+  } = node; // filter tail and head nodes together with all the nodes in between
+  // this is needed only to fix a really ugly edge case https://github.com/riot/riot/issues/2892
+
+  if (!isFilterActive && !node[HEAD_SYMBOL] && !node[TAIL_SYMBOL]) {
+    children.push(node);
+  }
+
+  if (!nextSibling || check(node)) return children;
+  return walkNodes(children, nextSibling, check, // activate the filters to skip nodes between <template> fragments that will be managed by other bindings
+  isFilterActive && !node[TAIL_SYMBOL] || nextSibling[HEAD_SYMBOL]);
 }
 
 /**
@@ -263,29 +329,6 @@ function isNil(value) {
 /* eslint-disable */
 
 /**
- * udomdiff assumes that nodes can not be inserted or modified by other scripts
- * That's not the case in Riot.js, so we need to create a safeSibling method to assure that the DOM mutations
- * will be properly applied
- * @param {Node[]} list - node list
- * @param {number} index - index were we will search the nextSibling node to use
-  * @param {(entry: Node, action: number) => Node} get
- * The callback invoked per each entry related DOM operation.
- * @param {number} info - parameter provided to the get function
- * @returns {Node} the node we were looking for
- */
-
-const getSafeNextSibling = (list, index, get, info) => {
-  let node;
-
-  while (node = get(list[index], info)) {
-    const {
-      nextSibling
-    } = node;
-    if (nextSibling) return nextSibling;
-    index--;
-  }
-};
-/**
  * @param {Node[]} a The list of current/live children
  * @param {Node[]} b The list of future children
  * @param {(entry: Node, action: number) => Node} get
@@ -293,7 +336,6 @@ const getSafeNextSibling = (list, index, get, info) => {
  * @param {Node} [before] The optional node used as anchor to insert before.
  * @returns {Node[]} The same list of future children.
  */
-
 
 var udomdiff = ((a, b, get, before) => {
   const bLength = b.length;
@@ -310,11 +352,9 @@ var udomdiff = ((a, b, get, before) => {
       // need to be added are not at the end, and in such case
       // the node to `insertBefore`, if the index is more than 0
       // must be retrieved, otherwise it's gonna be the first item.
-      const node = bEnd < bLength ? bStart ? getSafeNextSibling(b, bStart - 1, get, -1) : get(b[bEnd - bStart], 0) : before;
+      const node = bEnd < bLength ? bStart ? get(b[bStart - 1], -0).nextSibling : get(b[bEnd - bStart], 0) : before;
 
-      while (bStart < bEnd) {
-        insertBefore(get(b[bStart++], 1), node);
-      }
+      while (bStart < bEnd) insertBefore(get(b[bStart++], 1), node);
     } // remove head or tail: fast path
     else if (bEnd === bStart) {
         while (aStart < aEnd) {
@@ -340,8 +380,8 @@ var udomdiff = ((a, b, get, before) => {
               // or asymmetric too
               // [1, 2, 3, 4, 5]
               // [1, 2, 3, 5, 6, 4]
-              const node = getSafeNextSibling(a, --aEnd, get, -1);
-              insertBefore(get(b[bStart++], 1), getSafeNextSibling(a, aStart++, get, -1));
+              const node = get(a[--aEnd], -1).nextSibling;
+              insertBefore(get(b[bStart++], 1), get(a[aStart++], -1).nextSibling);
               insertBefore(get(b[--bEnd], 1), node); // mark the future index as identical (yeah, it's dirty, but cheap 👍)
               // The main reason to do this, is that when a[aEnd] will be reached,
               // the loop will likely be on the fast path, as identical to b[bEnd].
@@ -437,8 +477,7 @@ const EachBinding = {
       childrenMap
     } = this;
     const collection = scope === UNMOUNT_SCOPE ? null : this.evaluate(scope);
-    const items = collection ? Array.from(collection) : []; //const parent = placeholder.parentNode
-    // prepare the diffing
+    const items = collection ? Array.from(collection) : []; // prepare the diffing
 
     const {
       newChildrenMap,
@@ -451,7 +490,9 @@ const EachBinding = {
     batches.forEach(fn => fn()); // update the children map
 
     this.childrenMap = newChildrenMap;
-    this.nodes = futureNodes;
+    this.nodes = futureNodes; // make sure that the loop edge nodes are marked
+
+    markEdgeNodes(this.nodes);
     return this;
   },
 
@@ -530,6 +571,19 @@ function extendScope(scope, _ref) {
   return scope;
 }
 /**
+ * Mark the first and last nodes in order to ignore them in case we need to retrieve the <template> fragment nodes
+ * @param {Array[]} nodes - each binding nodes list
+ * @returns {undefined} void function
+ */
+
+
+function markEdgeNodes(nodes) {
+  const first = nodes[0];
+  const last = nodes[nodes.length - 1];
+  if (first) first[HEAD_SYMBOL] = true;
+  if (last) last[TAIL_SYMBOL] = true;
+}
+/**
  * Loop the current template items
  * @param   {Array} items - expression collection value
  * @param   {*} scope - template scope
@@ -574,7 +628,7 @@ function createPatch(items, scope, parentScope, binding) {
     const mustMount = !oldItem;
     const componentTemplate = oldItem ? oldItem.template : template.clone();
     const el = componentTemplate.el || root.cloneNode();
-    const meta = isTemplateTag && mustMount ? createTemplateMeta(componentTemplate) : {};
+    const meta = isTemplateTag && mustMount ? createTemplateMeta(componentTemplate) : componentTemplate.meta;
 
     if (mustMount) {
       batches.push(() => componentTemplate.mount(el, context, parentScope, meta));
@@ -585,8 +639,7 @@ function createPatch(items, scope, parentScope, binding) {
 
 
     if (isTemplateTag) {
-      const children = meta.children || componentTemplate.children;
-      nodes.push(...children);
+      nodes.push(...(mustMount ? meta.children : getFragmentChildren(meta)));
     } else {
       nodes.push(el);
     } // delete the old item from the children map
@@ -1455,7 +1508,9 @@ const TemplateChunk = Object.freeze({
     if (!avoidDOMInjection && this.fragment) injectDOM(el, this.fragment); // create the bindings
 
     this.bindings = this.bindingsData.map(binding => create$5(this.el, binding, templateTagOffset));
-    this.bindings.forEach(b => b.mount(scope, parentScope));
+    this.bindings.forEach(b => b.mount(scope, parentScope)); // store the template meta properties
+
+    this.meta = meta;
     return this;
   },
 
@@ -1517,6 +1572,7 @@ const TemplateChunk = Object.freeze({
    */
   clone() {
     return Object.assign({}, this, {
+      meta: {},
       el: null
     });
   }
@@ -2430,7 +2486,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v5.1.3'; // expose some internal stuff that might be used from external tools
+const version = 'v5.1.4'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
