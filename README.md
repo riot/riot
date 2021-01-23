@@ -3,7 +3,7 @@
 
 ## Simple and elegant component-based UI library
 
-[![Build Status][travis-image]][travis-url]
+[![Build Status][ci-image]][ci-url]
 [![MIT License][license-image]][license-url]
 [![Join the discord community channel][discord-image]][discord-url]
 [![Join the chat (ja) at https://riot-jp-slackin.herokuapp.com/][slack-ja-image]][slack-ja-url]
@@ -214,8 +214,8 @@ Special thanks to Browserstack and JetBrains for their support
     </tr>
 </table>
 
-[travis-image]:https://img.shields.io/travis/riot/riot.svg?style=flat-square
-[travis-url]:https://travis-ci.org/riot/riot
+[ci-image]:https://img.shields.io/github/workflow/status/riot/riot/test?style=flat-square
+[ci-url]:https://github.com/riot/riot/actions
 
 [license-image]:https://img.shields.io/badge/license-MIT-000000.svg?style=flat-square
 [license-url]:LICENSE.txt
