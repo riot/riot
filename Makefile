@@ -38,7 +38,7 @@ test-coveralls:
 	@ RIOT_COV=1 cat ./coverage/report-lcov/lcov.info | $(COVERALLS)
 
 test-debug:
-	@ ${KARMA} start test/karma.conf.js --browsers=Chrome --no-single-run --watch
+	@ ${KARMA} start test/karma.conf.js --browsers=Chrome --no-single-run --auto-watch
 
 test-sauce:
 	# run the riot tests on saucelabs
