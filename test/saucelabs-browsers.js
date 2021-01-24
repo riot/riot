@@ -1,9 +1,13 @@
 module.exports = {
   browsers: {
-    slSafari12: {
+    sl_ios_safari: {
       base: 'SauceLabs',
-      browserName: 'safari',
-      platform: 'OS X 10.13'
+      deviceName: 'iPhone 11 Simulator',
+      platformVersion: '13.4',
+      platformName: 'iOS',
+      browserName: 'Safari',
+      appiumVersion: '1.17.1',
+      deviceOrientation: 'portrait'
     },
     slEdge: {
       base: 'SauceLabs',
