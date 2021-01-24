@@ -14,7 +14,6 @@ ESLINT = ./node_modules/eslint/bin/eslint.js
 MOCHA = ./node_modules/mocha/bin/_mocha
 ROLLUP = ./node_modules/.bin/rollup
 MINIFY = ./node_modules/.bin/terser
-COVERALLS = ./node_modules/coveralls/bin/coveralls.js
 RIOT_CLI = ./node_modules/.bin/riot
 TSC = ./node_modules/.bin/tsc
 
@@ -33,9 +32,6 @@ test-karma:
 eslint:
 	# check code style
 	@ $(ESLINT) -c ./.eslintrc src test
-
-test-coveralls:
-	@ RIOT_COV=1 cat ./coverage/report-lcov/lcov.info | $(COVERALLS)
 
 test-debug:
 	@ ${KARMA} start test/karma.conf.js --browsers=Chrome --no-single-run --auto-watch
@@ -131,4 +127,4 @@ publish:
 	@ git push origin main
 	@ git push origin main --tags
 
-.PHONY: test min eslint test-coveralls test-sauce raw riot build bump bump-undo version version-undo release-undo publish
+.PHONY: test min eslint test-sauce raw riot build bump bump-undo version version-undo release-undo publish
