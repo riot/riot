@@ -17,16 +17,16 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-      env:
-        SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-        SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-    - run: npm ci
-    - run: make riot
-    - if: ${{ success() && github.event_name != 'pull_request' && matrix.node-version == '15.x' }}
-    - run: echo "Executing $SAUCE_USERNAME Sacuelabs Tests"
-    - run: make test-sauce && make test-coveralls
+      - uses: actions/checkout@v2
+      - name: Local Unit Test ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: make riot
+      - name: Saucelabs Crossbrowser Testing
+        if: ${{ success() && github.event_name != 'pull_request' && matrix.node-version == '15.x' }}
+        env:
+          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+        run: make test-sauce && make test-coveralls
