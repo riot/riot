@@ -27,5 +27,6 @@ jobs:
         SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
     - run: npm ci
     - run: make riot
-    - if: ${{ github.event_name != 'pull_request' && matrix.node-version == '15.x' }}
-      run: make test-sauce && make test-coveralls
+    - if: ${{ success() && github.event_name != 'pull_request' && matrix.node-version == '15.x' }}
+    - run: echo "Executing $SAUCE_USERNAME Sacuelabs Tests"
+    - run: make test-sauce && make test-coveralls
