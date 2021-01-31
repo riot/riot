@@ -21,6 +21,7 @@ import NestedAliasedImportsComponent from '../components/nested-aliased-imports.
 import NestedHoc from '../components/nested-hoc.riot'
 import NestedImportsComponent from '../components/nested-imports.riot'
 import NestedSlot from '../components/nested-slot.riot'
+import OldSyntaxComponent from '../components/old-syntax.riot'
 import ParentValueProp from '../components/parent-value-prop.riot'
 import ParentWithSlotsComponent from '../components/parent-with-slots.riot'
 import PureComponent from '../components/pure-component.riot'
@@ -472,6 +473,19 @@ describe('Riot core api', () => {
       expect(mountedSpy).to.have.been.calledTwice
 
       components.forEach(c => c.unmount())
+    })
+
+    it('old Riot.js syntax is supported', () => {
+      const element = document.createElement('old-syntax')
+      const component = riot.component(OldSyntaxComponent)(element)
+
+      expect(component.$('p').innerHTML).to.be.equal('Hello')
+
+      fireEvent(component.$('button'), 'click')
+
+      expect(component.$('p').innerHTML).to.be.equal('Goodbye')
+
+      component.unmount()
     })
 
     it('unmounting random DOM nodes will not throw', () => {

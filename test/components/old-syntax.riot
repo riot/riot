@@ -1,0 +1,16 @@
+<old-syntax>
+  <p>{ state.message }</p>
+  <button onclick={onClick}>Click Me</button>
+
+  <script>
+    this.onBeforeMount = () => {
+      this.state.message = 'Hello'
+    }
+
+    this.onClick = () => {
+      this.update({
+        message: 'Goodbye'
+      })
+    }
+  </script>
+</old-syntax>

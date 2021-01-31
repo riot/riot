@@ -47,13 +47,14 @@ import {
   panic
 } from '@riotjs/util/misc'
 
+import {isFunction, isObject} from '@riotjs/util/checks'
+
 import $ from 'bianco.query'
 import {DOMattributesToObject} from '@riotjs/util/dom'
 import {camelToDashCase} from '@riotjs/util/strings'
 import cssManager from './css-manager'
 import curry from 'curri'
 import {getName} from '../utils/dom'
-import {isFunction} from '@riotjs/util/checks'
 import {set as setAttr} from 'bianco.attr'
 
 const COMPONENT_CORE_HELPERS = Object.freeze({
@@ -328,7 +329,7 @@ function addCssHook(element, name) {
 export function enhanceComponentAPI(component, {slots, attributes, props}) {
   return autobindMethods(
     runPlugins(
-      defineProperties(Object.create(component), {
+      defineProperties(isObject(component) ? Object.create(component) : component, {
         mount(element, state = {}, parentScope) {
           this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(element, attributes).mount(parentScope)
 
