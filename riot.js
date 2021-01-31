@@ -1,4 +1,4 @@
-/* Riot v5.1.4, @license MIT */
+/* Riot v5.2.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -300,7 +300,7 @@
    */
 
   function isObject(value) {
-    return !isNil(value) && checkType(value, 'object');
+    return !isNil(value) && value.constructor === Object;
   }
   /**
    * Check if a value is null or undefined
@@ -2265,7 +2265,7 @@
       attributes,
       props
     } = _ref6;
-    return autobindMethods(runPlugins(defineProperties(Object.create(component), {
+    return autobindMethods(runPlugins(defineProperties(isObject(component) ? Object.create(component) : component, {
       mount(element, state, parentScope) {
         if (state === void 0) {
           state = {};
@@ -2492,7 +2492,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v5.1.4'; // expose some internal stuff that might be used from external tools
+  const version = 'v5.2.0'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,

@@ -1,4 +1,4 @@
-/* Riot v5.1.4, @license MIT */
+/* Riot v5.2.0, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -294,7 +294,7 @@ function isBoolean(value) {
  */
 
 function isObject(value) {
-  return !isNil(value) && checkType(value, 'object');
+  return !isNil(value) && value.constructor === Object;
 }
 /**
  * Check if a value is null or undefined
@@ -2259,7 +2259,7 @@ function enhanceComponentAPI(component, _ref6) {
     attributes,
     props
   } = _ref6;
-  return autobindMethods(runPlugins(defineProperties(Object.create(component), {
+  return autobindMethods(runPlugins(defineProperties(isObject(component) ? Object.create(component) : component, {
     mount(element, state, parentScope) {
       if (state === void 0) {
         state = {};
@@ -2486,7 +2486,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v5.1.4'; // expose some internal stuff that might be used from external tools
+const version = 'v5.2.0'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
