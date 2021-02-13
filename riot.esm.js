@@ -1,4 +1,4 @@
-/* Riot v5.2.0, @license MIT */
+/* Riot v5.3.0, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -1986,6 +1986,13 @@ const MOCKED_TEMPLATE_INTERFACE = Object.assign({}, PURE_COMPONENT_API, {
   createDOM: noop
 });
 /**
+ * Performance optimization for the recursive components
+ * @param  {RiotComponentShell} componentShell - riot compiler generated object
+ * @returns {Object} component like interface
+ */
+
+const memoizedCreateComponent = memoize(createComponent);
+/**
  * Evaluate the component properties either from its real attributes or from its initial user properties
  * @param   {HTMLElement} element - component root
  * @param   {Object}  initialProps - initial props
@@ -2024,13 +2031,17 @@ function createCoreAPIMethods(mapFunction) {
 /**
  * Factory function to create the component templates only once
  * @param   {Function} template - component template creation function
- * @param   {Object} components - object containing the nested components
+ * @param   {RiotComponentShell} componentShell - riot compiler generated object
  * @returns {TemplateChunk} template chunk object
  */
 
 
-function componentTemplateFactory(template, components) {
+function componentTemplateFactory(template, componentShell) {
+  const components = createSubcomponents(componentShell.exports ? componentShell.exports.components : {});
   return template(create$6, expressionTypes, bindingTypes, name => {
+    // improve support for recursive components
+    if (name === componentShell.name) return memoizedCreateComponent(componentShell); // return the registered components
+
     return components[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name);
   });
 }
@@ -2081,28 +2092,29 @@ function createPureComponent(pureFactoryFunction, _ref) {
 }
 /**
  * Create the component interface needed for the @riotjs/dom-bindings tag bindings
- * @param   {string} options.css - component css
- * @param   {Function} options.template - functon that will return the dom-bindings template function
- * @param   {Object} options.exports - component interface
- * @param   {string} options.name - component name
+ * @param   {RiotComponentShell} componentShell - riot compiler generated object
+ * @param   {string} componentShell.css - component css
+ * @param   {Function} componentShell.template - function that will return the dom-bindings template function
+ * @param   {Object} componentShell.exports - component interface
+ * @param   {string} componentShell.name - component name
  * @returns {Object} component like interface
  */
 
 
-function createComponent(_ref2) {
-  let {
+function createComponent(componentShell) {
+  const {
     css,
     template,
     exports,
     name
-  } = _ref2;
-  const templateFn = template ? componentTemplateFactory(template, exports ? createSubcomponents(exports.components) : {}) : MOCKED_TEMPLATE_INTERFACE;
-  return (_ref3) => {
+  } = componentShell;
+  const templateFn = template ? componentTemplateFactory(template, componentShell) : MOCKED_TEMPLATE_INTERFACE;
+  return (_ref2) => {
     let {
       slots,
       attributes,
       props
-    } = _ref3;
+    } = _ref2;
     // pure components rendering will be managed by the end user
     if (exports && exports[IS_PURE_SYMBOL]) return createPureComponent(exports, {
       slots,
@@ -2149,13 +2161,13 @@ function createComponent(_ref2) {
  * @returns {Object} a new component implementation object
  */
 
-function defineComponent(_ref4) {
+function defineComponent(_ref3) {
   let {
     css,
     template,
     componentAPI,
     name
-  } = _ref4;
+  } = _ref3;
   // add the component css into the DOM
   if (css && name) cssManager.add(name, css);
   return curry(enhanceComponentAPI)(defineProperties( // set the component defaults without overriding the original component API
@@ -2204,8 +2216,8 @@ function createSubcomponents(components) {
     components = {};
   }
 
-  return Object.entries(callOrAssign(components)).reduce((acc, _ref5) => {
-    let [key, value] = _ref5;
+  return Object.entries(callOrAssign(components)).reduce((acc, _ref4) => {
+    let [key, value] = _ref4;
     acc[camelToDashCase(key)] = createComponent(value);
     return acc;
   }, {});
@@ -2253,12 +2265,12 @@ function addCssHook(element, name) {
  */
 
 
-function enhanceComponentAPI(component, _ref6) {
+function enhanceComponentAPI(component, _ref5) {
   let {
     slots,
     attributes,
     props
-  } = _ref6;
+  } = _ref5;
   return autobindMethods(runPlugins(defineProperties(isObject(component) ? Object.create(component) : component, {
     mount(element, state, parentScope) {
       if (state === void 0) {
@@ -2486,7 +2498,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v5.2.0'; // expose some internal stuff that might be used from external tools
+const version = 'v5.3.0'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
