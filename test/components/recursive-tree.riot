@@ -1,0 +1,4 @@
+<recursive-tree>
+  <p>{ props.name }</p>
+  <recursive-tree if={ props.children.length && props.children } each={ child in props.children } {...child}/>
+</recursive-tree>

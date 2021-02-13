@@ -26,6 +26,7 @@ import ParentValueProp from '../components/parent-value-prop.riot'
 import ParentWithSlotsComponent from '../components/parent-with-slots.riot'
 import PureComponent from '../components/pure-component.riot'
 import PureObject from '../components/pure-object.riot'
+import RecursiveTreeComponent from '../components/recursive-tree.riot'
 import RuntimeIsDirective from '../components/runtime-is-directive.riot'
 import ShorthandAttribute from '../components/shorthand-attribute.riot'
 import SimpleComponent from '../components/simple.riot'
@@ -560,6 +561,24 @@ describe('Riot core api', () => {
       })
 
       expect(normalizeInnerHTML(child.textContent)).to.be.equal('I am a child')
+
+      component.unmount()
+    })
+
+    it('recursive components are properly supported', () => {
+      const element = document.createElement('recursive-tree')
+      const component = riot.component(RecursiveTreeComponent)(element, {
+        name: 'Hello',
+        children: [{
+          name: 'There',
+          children: [{
+            name: 'Child'
+          }]
+        }]
+      })
+
+      expect(component.$$('p')).to.have.length(3)
+      expect(component.$$('recursive-tree')).to.have.length(2)
 
       component.unmount()
     })

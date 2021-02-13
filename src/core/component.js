@@ -44,6 +44,7 @@ import {
 
 import {
   evaluateAttributeExpressions,
+  memoize,
   panic
 } from '@riotjs/util/misc'
 
@@ -86,6 +87,13 @@ const MOCKED_TEMPLATE_INTERFACE = {
 }
 
 /**
+ * Performance optimization for the recursive components
+ * @param  {RiotComponentShell} componentShell - riot compiler generated object
+ * @returns {Object} component like interface
+ */
+const memoizedCreateComponent = memoize(createComponent)
+
+/**
  * Evaluate the component properties either from its real attributes or from its initial user properties
  * @param   {HTMLElement} element - component root
  * @param   {Object}  initialProps - initial props
@@ -126,15 +134,20 @@ function createCoreAPIMethods(mapFunction) {
 /**
  * Factory function to create the component templates only once
  * @param   {Function} template - component template creation function
- * @param   {Object} components - object containing the nested components
+ * @param   {RiotComponentShell} componentShell - riot compiler generated object
  * @returns {TemplateChunk} template chunk object
  */
-function componentTemplateFactory(template, components) {
+function componentTemplateFactory(template, componentShell) {
+  const components = createSubcomponents(componentShell.exports ? componentShell.exports.components : {})
+
   return template(
     createTemplate,
     expressionTypes,
     bindingTypes,
     name => {
+      // improve support for recursive components
+      if (name === componentShell.name) return memoizedCreateComponent(componentShell)
+      // return the registered components
       return components[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
     }
   )
@@ -177,16 +190,18 @@ function createPureComponent(pureFactoryFunction, { slots, attributes, props, cs
 
 /**
  * Create the component interface needed for the @riotjs/dom-bindings tag bindings
- * @param   {string} options.css - component css
- * @param   {Function} options.template - functon that will return the dom-bindings template function
- * @param   {Object} options.exports - component interface
- * @param   {string} options.name - component name
+ * @param   {RiotComponentShell} componentShell - riot compiler generated object
+ * @param   {string} componentShell.css - component css
+ * @param   {Function} componentShell.template - function that will return the dom-bindings template function
+ * @param   {Object} componentShell.exports - component interface
+ * @param   {string} componentShell.name - component name
  * @returns {Object} component like interface
  */
-export function createComponent({css, template, exports, name}) {
+export function createComponent(componentShell) {
+  const {css, template, exports, name} = componentShell
   const templateFn = template ? componentTemplateFactory(
     template,
-    exports ? createSubcomponents(exports.components) : {}
+    componentShell
   ) : MOCKED_TEMPLATE_INTERFACE
 
   return ({slots, attributes, props}) => {

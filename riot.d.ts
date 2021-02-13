@@ -42,7 +42,7 @@ export interface PureComponentFactoryFunction<InitialProps = any, Context = obje
 // This object interface is created anytime a riot file will be compiled into javascript
 export interface RiotComponentShell<Props = object, State = object> {
   readonly css?: string
-  readonly exports?: () => RiotComponentExport<Props, State>|object
+  readonly exports?: (() => RiotComponentExport<Props, State>)|RiotComponentExport<Props, State>
   readonly name?: string
   template(template: Function, expressionTypes: ExpressionType, bindingTypes: BindingType, getComponent: (componentName: string) => any): TemplateChunk
 }
