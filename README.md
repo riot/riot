@@ -111,7 +111,6 @@ The Riot.js ecosystem is completely modular, it's designed to let you pick only 
   - [@riotjs/compiler](https://github.com/riot/compiler) - Advanced tags compiler
   - [@riotjs/parser](https://github.com/riot/parser) - HTML parser
   - [@riotjs/dom-bindings](https://github.com/riot/dom-bindings) - Expressions based template engine
-  - [@riotjs/now](https://github.com/riot/now) - https://zeit.co/ now integration
   - [@riotjs/custom-elements](https://github.com/riot/custom-elements) - native custom elements implementation
 
 ### CDN hosting
