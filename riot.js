@@ -1,4 +1,4 @@
-/* Riot v5.3.0, @license MIT */
+/* Riot v5.3.1, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -92,9 +92,9 @@
   const replaceChild = (newNode, replaced) => replaced && replaced.parentNode && replaced.parentNode.replaceChild(newNode, replaced);
 
   // Riot.js constants that can be used accross more modules
-  const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
-        DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
-        PLUGINS_SET = new Set(),
+  const COMPONENTS_IMPLEMENTATION_MAP$1 = new Map(),
+        DOM_COMPONENT_INSTANCE_PROPERTY$1 = Symbol('riot-component'),
+        PLUGINS_SET$1 = new Set(),
         IS_DIRECTIVE = 'is',
         VALUE_ATTRIBUTE = 'value',
         MOUNT_METHOD_KEY = 'mount',
@@ -111,16 +111,17 @@
         STATE_KEY = 'state',
         SLOTS_KEY = 'slots',
         ROOT_KEY = 'root',
-        IS_PURE_SYMBOL = Symbol.for('pure'),
+        IS_PURE_SYMBOL = Symbol('pure'),
+        IS_COMPONENT_UPDATING = Symbol('is_updating'),
         PARENT_KEY_SYMBOL = Symbol('parent'),
         ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
         TEMPLATE_KEY_SYMBOL = Symbol('template');
 
   var globals = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP,
-    DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY,
-    PLUGINS_SET: PLUGINS_SET,
+    COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP$1,
+    DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY$1,
+    PLUGINS_SET: PLUGINS_SET$1,
     IS_DIRECTIVE: IS_DIRECTIVE,
     VALUE_ATTRIBUTE: VALUE_ATTRIBUTE,
     MOUNT_METHOD_KEY: MOUNT_METHOD_KEY,
@@ -138,6 +139,7 @@
     SLOTS_KEY: SLOTS_KEY,
     ROOT_KEY: ROOT_KEY,
     IS_PURE_SYMBOL: IS_PURE_SYMBOL,
+    IS_COMPONENT_UPDATING: IS_COMPONENT_UPDATING,
     PARENT_KEY_SYMBOL: PARENT_KEY_SYMBOL,
     ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
     TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL
@@ -668,7 +670,7 @@
     };
   }
 
-  function create(node, _ref2) {
+  function create$6(node, _ref2) {
     let {
       evaluate,
       condition,
@@ -747,7 +749,7 @@
     }
 
   };
-  function create$1(node, _ref) {
+  function create$5(node, _ref) {
     let {
       evaluate,
       template
@@ -1083,7 +1085,7 @@
     return expressions[expression.type](expression.node, expression, value, expression.value);
   }
 
-  function create$2(node, data) {
+  function create$4(node, data) {
     return Object.assign({}, Expression, data, {
       node: data.type === TEXT ? getTextNode(node, data.childNodeIndex) : node
     });
@@ -1111,7 +1113,7 @@
     let {
       expressions
     } = _ref;
-    return Object.assign({}, flattenCollectionMethods(expressions.map(expression => create$2(node, expression)), ['mount', 'update', 'unmount']));
+    return Object.assign({}, flattenCollectionMethods(expressions.map(expression => create$4(node, expression)), ['mount', 'update', 'unmount']));
   }
 
   function extendParentScope(attributes, scope, parentScope) {
@@ -1149,7 +1151,7 @@
         parentNode
       } = this.node;
       const realParent = getRealParent(scope, parentScope);
-      this.template = templateData && create$6(templateData.html, templateData.bindings).createDOM(parentNode);
+      this.template = templateData && create(templateData.html, templateData.bindings).createDOM(parentNode);
 
       if (this.template) {
         this.template.mount(this.node, this.getTemplateScope(scope, realParent), realParent);
@@ -1238,7 +1240,7 @@
     } // otherwise we return a template chunk
 
 
-    return create$6(slotsToMarkup(slots), [...slotBindings(slots), {
+    return create(slotsToMarkup(slots), [...slotBindings(slots), {
       // the attributes should be registered as binding
       // if we fallback to a normal template chunk
       expressions: attributes.map(attr => {
@@ -1316,7 +1318,7 @@
     }
 
   };
-  function create$4(node, _ref2) {
+  function create$2(node, _ref2) {
     let {
       evaluate,
       getComponent,
@@ -1333,10 +1335,10 @@
   }
 
   var bindings = {
-    [IF]: create$1,
+    [IF]: create$5,
     [SIMPLE]: create$3,
-    [EACH]: create,
-    [TAG]: create$4,
+    [EACH]: create$6,
+    [TAG]: create$2,
     [SLOT]: createSlot
   };
 
@@ -1362,7 +1364,7 @@
    */
 
 
-  function create$5(root, binding, templateTagOffset) {
+  function create$1(root, binding, templateTagOffset) {
     const {
       selector,
       type,
@@ -1513,7 +1515,7 @@
 
       if (!avoidDOMInjection && this.fragment) injectDOM(el, this.fragment); // create the bindings
 
-      this.bindings = this.bindingsData.map(binding => create$5(this.el, binding, templateTagOffset));
+      this.bindings = this.bindingsData.map(binding => create$1(this.el, binding, templateTagOffset));
       this.bindings.forEach(b => b.mount(scope, parentScope)); // store the template meta properties
 
       this.meta = meta;
@@ -1591,7 +1593,7 @@
    * @returns {TemplateChunk} a new TemplateChunk copy
    */
 
-  function create$6(html, bindings) {
+  function create(html, bindings) {
     if (bindings === void 0) {
       bindings = [];
     }
@@ -1662,9 +1664,9 @@
 
   var DOMBindings = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    template: create$6,
-    createBinding: create$5,
-    createExpression: create$2,
+    template: create,
+    createBinding: create$1,
+    createExpression: create$4,
     bindingTypes: bindingTypes,
     expressionTypes: expressionTypes
   });
@@ -2020,7 +2022,7 @@
    */
 
 
-  const bindDOMNodeToComponentObject = (node, component) => node[DOM_COMPONENT_INSTANCE_PROPERTY] = component;
+  const bindDOMNodeToComponentObject = (node, component) => node[DOM_COMPONENT_INSTANCE_PROPERTY$1] = component;
   /**
    * Wrap the Riot.js core API methods using a mapping function
    * @param   {Function} mapFunction - lifting function
@@ -2044,11 +2046,11 @@
 
   function componentTemplateFactory(template, componentShell) {
     const components = createSubcomponents(componentShell.exports ? componentShell.exports.components : {});
-    return template(create$6, expressionTypes, bindingTypes, name => {
+    return template(create, expressionTypes, bindingTypes, name => {
       // improve support for recursive components
       if (name === componentShell.name) return memoizedCreateComponent(componentShell); // return the registered components
 
-      return components[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name);
+      return components[name] || COMPONENTS_IMPLEMENTATION_MAP$1.get(name);
     });
   }
   /**
@@ -2201,7 +2203,7 @@
       attributes = [];
     }
 
-    const expressions = attributes.map(a => create$2(node, a));
+    const expressions = attributes.map(a => create$4(node, a));
     const binding = {};
     return Object.assign(binding, Object.assign({
       expressions
@@ -2236,7 +2238,7 @@
 
 
   function runPlugins(component) {
-    return [...PLUGINS_SET].reduce((c, fn) => fn(c) || c, component);
+    return [...PLUGINS_SET$1].reduce((c, fn) => fn(c) || c, component);
   }
   /**
    * Compute the component current state merging it with its previous state
@@ -2318,9 +2320,16 @@
         if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false) return;
         defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, this[PROPS_KEY], newProps)));
         this[STATE_KEY] = computeState(this[STATE_KEY], state);
-        this[ON_BEFORE_UPDATE_KEY](this[PROPS_KEY], this[STATE_KEY]);
-        this[TEMPLATE_KEY_SYMBOL].update(this, this[PARENT_KEY_SYMBOL]);
+        this[ON_BEFORE_UPDATE_KEY](this[PROPS_KEY], this[STATE_KEY]); // avoiding recursive updates
+        // see also https://github.com/riot/riot/issues/2895
+
+        if (!this[IS_COMPONENT_UPDATING]) {
+          this[IS_COMPONENT_UPDATING] = true;
+          this[TEMPLATE_KEY_SYMBOL].update(this, this[PARENT_KEY_SYMBOL]);
+        }
+
         this[ON_UPDATED_KEY](this[PROPS_KEY], this[STATE_KEY]);
+        this[IS_COMPONENT_UPDATING] = false;
         return this;
       },
 
@@ -2346,8 +2355,8 @@
 
   function mountComponent(element, initialProps, componentName) {
     const name = componentName || getName(element);
-    if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component named "${name}" was never registered`);
-    const component = COMPONENTS_IMPLEMENTATION_MAP.get(name)({
+    if (!COMPONENTS_IMPLEMENTATION_MAP$1.has(name)) panic(`The component named "${name}" was never registered`);
+    const component = COMPONENTS_IMPLEMENTATION_MAP$1.get(name)({
       props: initialProps
     });
     return component.mount(element);
@@ -2379,9 +2388,9 @@
   }
 
   const {
-    DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY$1,
-    COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP$1,
-    PLUGINS_SET: PLUGINS_SET$1
+    DOM_COMPONENT_INSTANCE_PROPERTY,
+    COMPONENTS_IMPLEMENTATION_MAP,
+    PLUGINS_SET
   } = globals;
   /**
    * Riot public api
@@ -2400,14 +2409,14 @@
       template,
       exports
     } = _ref;
-    if (COMPONENTS_IMPLEMENTATION_MAP$1.has(name)) panic(`The component "${name}" was already registered`);
-    COMPONENTS_IMPLEMENTATION_MAP$1.set(name, createComponent({
+    if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component "${name}" was already registered`);
+    COMPONENTS_IMPLEMENTATION_MAP.set(name, createComponent({
       name,
       css,
       template,
       exports
     }));
-    return COMPONENTS_IMPLEMENTATION_MAP$1;
+    return COMPONENTS_IMPLEMENTATION_MAP;
   }
   /**
    * Unregister a riot web component
@@ -2416,10 +2425,10 @@
    */
 
   function unregister(name) {
-    if (!COMPONENTS_IMPLEMENTATION_MAP$1.has(name)) panic(`The component "${name}" was never registered`);
-    COMPONENTS_IMPLEMENTATION_MAP$1.delete(name);
+    if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component "${name}" was never registered`);
+    COMPONENTS_IMPLEMENTATION_MAP.delete(name);
     cssManager.remove(name);
-    return COMPONENTS_IMPLEMENTATION_MAP$1;
+    return COMPONENTS_IMPLEMENTATION_MAP;
   }
   /**
    * Mounting function that will work only for the components that were globally registered
@@ -2441,8 +2450,8 @@
 
   function unmount(selector, keepRootElement) {
     return $(selector).map(element => {
-      if (element[DOM_COMPONENT_INSTANCE_PROPERTY$1]) {
-        element[DOM_COMPONENT_INSTANCE_PROPERTY$1].unmount(keepRootElement);
+      if (element[DOM_COMPONENT_INSTANCE_PROPERTY]) {
+        element[DOM_COMPONENT_INSTANCE_PROPERTY].unmount(keepRootElement);
       }
 
       return element;
@@ -2456,9 +2465,9 @@
 
   function install(plugin) {
     if (!isFunction(plugin)) panic('Plugins must be of type function');
-    if (PLUGINS_SET$1.has(plugin)) panic('This plugin was already installed');
-    PLUGINS_SET$1.add(plugin);
-    return PLUGINS_SET$1;
+    if (PLUGINS_SET.has(plugin)) panic('This plugin was already installed');
+    PLUGINS_SET.add(plugin);
+    return PLUGINS_SET;
   }
   /**
    * Uninstall a riot plugin
@@ -2467,9 +2476,9 @@
    */
 
   function uninstall(plugin) {
-    if (!PLUGINS_SET$1.has(plugin)) panic('This plugin was never installed');
-    PLUGINS_SET$1.delete(plugin);
-    return PLUGINS_SET$1;
+    if (!PLUGINS_SET.has(plugin)) panic('This plugin was never installed');
+    PLUGINS_SET.delete(plugin);
+    return PLUGINS_SET;
   }
   /**
    * Helper method to create component without relying on the registered ones
@@ -2504,7 +2513,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v5.3.0'; // expose some internal stuff that might be used from external tools
+  const version = 'v5.3.1'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
