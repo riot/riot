@@ -1,5 +1,6 @@
 import * as riot from '../../src/riot'
 
+import Issue2895Parent from '../components/issue-2895-parent.riot'
 import MergeAttributes from '../components/merge-attributes.riot'
 import VirtualEach from '../components/virtual-each.riot'
 
@@ -37,6 +38,16 @@ describe('components rendering', () => {
 
     expect(component.$$('dd')).to.have.length(0)
     expect(component.$('template')).to.be.not.ok
+
+    component.unmount()
+  })
+
+  it.only('avoid recursive child parent infinite event lifecycle loops', () => {
+    const element = document.createElement('issue-2895-parent')
+    const component = riot.component(Issue2895Parent)(element)
+
+    expect(component.$('p').innerHTML).to.be.equal('hello')
+    expect(component.$('h1').innerHTML).to.be.equal('hello')
 
     component.unmount()
   })

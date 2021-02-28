@@ -2,6 +2,7 @@ import {
   ATTRIBUTES_KEY_SYMBOL,
   COMPONENTS_IMPLEMENTATION_MAP,
   DOM_COMPONENT_INSTANCE_PROPERTY,
+  IS_COMPONENT_UPDATING,
   IS_DIRECTIVE,
   IS_PURE_SYMBOL,
   MOUNT_METHOD_KEY,
@@ -393,8 +394,16 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
           this[STATE_KEY] = computeState(this[STATE_KEY], state)
 
           this[ON_BEFORE_UPDATE_KEY](this[PROPS_KEY], this[STATE_KEY])
-          this[TEMPLATE_KEY_SYMBOL].update(this, this[PARENT_KEY_SYMBOL])
+
+          // avoiding recursive updates
+          // see also https://github.com/riot/riot/issues/2895
+          if (!this[IS_COMPONENT_UPDATING]) {
+            this[IS_COMPONENT_UPDATING] = true
+            this[TEMPLATE_KEY_SYMBOL].update(this, this[PARENT_KEY_SYMBOL])
+          }
+
           this[ON_UPDATED_KEY](this[PROPS_KEY], this[STATE_KEY])
+          this[IS_COMPONENT_UPDATING] = false
 
           return this
         },

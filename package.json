@@ -37,7 +37,7 @@
   "dependencies": {
     "@riotjs/compiler": "^5.3.1",
     "@riotjs/dom-bindings": "5.0.3",
-    "@riotjs/util": "^2.0.1",
+    "@riotjs/util": "^2.0.2",
     "bianco.attr": "^1.0.0",
     "bianco.query": "^1.0.0",
     "cumpa": "^1.0.1",
@@ -52,7 +52,7 @@
     "@rollup/plugin-node-resolve": "^11.2.0",
     "babel-plugin-istanbul": "^6.0.0",
     "chai": "^4.3.0",
-    "core-js": "^3.9.0",
+    "core-js": "^3.9.1",
     "eslint": "^7.21.0",
     "eslint-config-riot": "^3.0.0",
     "jsdom": "16.4.0",

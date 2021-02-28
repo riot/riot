@@ -1,5 +1,5 @@
 <issue-2895-parent>
-  <child scope={this}/>
+  <child if={state.scope} {...state}/>
   <p if={state.isMounted}>{state.message}</p>
 
   <script>
@@ -9,10 +9,12 @@
       components: { Child },
       state: {
         message: '',
+        scope: null,
         isMounted: false
       },
       onMounted() {
         this.update({
+          scope: this,
           isMounted: true
         })
       }
