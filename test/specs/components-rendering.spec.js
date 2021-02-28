@@ -42,7 +42,7 @@ describe('components rendering', () => {
     component.unmount()
   })
 
-  it.only('avoid recursive child parent infinite event lifecycle loops', () => {
+  it('avoid recursive child parent infinite event lifecycle loops', () => {
     const element = document.createElement('issue-2895-parent')
     const component = riot.component(Issue2895Parent)(element)
 
