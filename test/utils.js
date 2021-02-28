@@ -3,3 +3,7 @@ export function fireEvent(el, name) {
   e.initEvent(name, false, true)
   el.dispatchEvent(e)
 }
+
+export function normalizeInnerHTML(string) {
+  return string.replace(/\n/g, '').trim()
+}

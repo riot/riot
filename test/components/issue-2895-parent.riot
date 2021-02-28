@@ -1,0 +1,21 @@
+<issue-2895-parent>
+  <child scope={this}/>
+  <p if={state.isMounted}>{state.message}</p>
+
+  <script>
+    import Child from './issue-2895-child.riot'
+
+    export default {
+      components: { Child },
+      state: {
+        message: '',
+        isMounted: false
+      },
+      onMounted() {
+        this.update({
+          isMounted: true
+        })
+      }
+    }
+  </script>
+</issue-2895-parent>
