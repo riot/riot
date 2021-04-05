@@ -1,4 +1,4 @@
-/* Riot v5.3.2, @license MIT */
+/* Riot v5.3.3, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -856,7 +856,7 @@ function removeAllAttributes(node, newAttributes, oldAttributes) {
 
 
 function canRenderAttribute(value) {
-  return value === true || typeof value === 'string';
+  return value === true || ['string', 'number'].includes(typeof value);
 }
 /**
  * Check whether the attribute should be removed
@@ -2519,7 +2519,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v5.3.2'; // expose some internal stuff that might be used from external tools
+const version = 'v5.3.3'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
