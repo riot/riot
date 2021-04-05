@@ -86,6 +86,8 @@ bump:
 	# (if there's any uncommited changes, it will stop here)
 	# bump version in *.json files
 	@ sed -i '' 's/\("version": "\)[^"]*/\1'$(VERSION)'/' package.json
+	# update the lock file as well
+	@ npm i
 	@ make build
 	@ git status --short
 
