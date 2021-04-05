@@ -1,4 +1,4 @@
-/* Riot v5.3.1, @license MIT */
+/* Riot v5.3.2, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -817,8 +817,6 @@ function evaluateAttributeExpressions(attributes) {
   }, {});
 }
 
-const REMOVE_ATTRIBUTE = 'removeAttribute';
-const SET_ATTIBUTE = 'setAttribute';
 const ElementProto = typeof Element === 'undefined' ? {} : Element.prototype;
 const isNativeHtmlProperty = memoize(name => ElementProto.hasOwnProperty(name)); // eslint-disable-line
 
@@ -849,6 +847,26 @@ function setAllAttributes(node, attributes) {
 function removeAllAttributes(node, newAttributes, oldAttributes) {
   const newKeys = newAttributes ? Object.keys(newAttributes) : [];
   Object.keys(oldAttributes).filter(name => !newKeys.includes(name)).forEach(attribute => node.removeAttribute(attribute));
+}
+/**
+ * Check whether the attribute value can be rendered
+ * @param {*} value - expression value
+ * @returns {boolean} true if we can render this attribute value
+ */
+
+
+function canRenderAttribute(value) {
+  return value === true || typeof value === 'string';
+}
+/**
+ * Check whether the attribute should be removed
+ * @param {*} value - expression value
+ * @returns {boolean} boolean - true if the attribute can be removed}
+ */
+
+
+function shouldRemoveAttribute(value) {
+  return isNil(value) || value === false || value === '';
 }
 /**
  * This methods handles the DOM attributes updates
@@ -886,16 +904,11 @@ function attributeExpression(node, _ref2, value, oldValue) {
     node[name] = value;
   }
 
-  node[getMethod(value)](name, normalizeValue(name, value));
-}
-/**
- * Get the attribute modifier method
- * @param   {*} value - if truthy we return `setAttribute` othewise `removeAttribute`
- * @returns {string} the node attribute modifier method name
- */
-
-function getMethod(value) {
-  return isNil(value) || value === false || value === '' || isObject(value) || isFunction(value) ? REMOVE_ATTRIBUTE : SET_ATTIBUTE;
+  if (shouldRemoveAttribute(value)) {
+    node.removeAttribute(name);
+  } else if (canRenderAttribute(value)) {
+    node.setAttribute(name, normalizeValue(name, value));
+  }
 }
 /**
  * Get the value as string
@@ -903,7 +916,6 @@ function getMethod(value) {
  * @param   {*} value - user input value
  * @returns {string} input value as string
  */
-
 
 function normalizeValue(name, value) {
   // be sure that expressions like selected={ true } will be always rendered as selected='selected'
@@ -1288,7 +1300,7 @@ const TagBinding = {
   update(scope, parentScope) {
     const name = this.evaluate(scope); // simple update
 
-    if (name === this.name) {
+    if (name && name === this.name) {
       this.tag.update(scope);
     } else {
       // unmount the old tag if it exists
@@ -2507,7 +2519,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v5.3.1'; // expose some internal stuff that might be used from external tools
+const version = 'v5.3.2'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
