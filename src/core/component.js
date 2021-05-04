@@ -254,6 +254,7 @@ export function defineComponent({css, template, componentAPI, name}) {
     // set the component defaults without overriding the original component API
     defineDefaults(componentAPI, {
       ...COMPONENT_LIFECYCLE_METHODS,
+      [PROPS_KEY]: {},
       [STATE_KEY]: {}
     }), {
       // defined during the component creation

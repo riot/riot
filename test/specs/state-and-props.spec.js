@@ -1,5 +1,6 @@
 import * as riot from '../../src/riot'
 
+import ComponentWithGetters from '../components/component-with-getters.riot'
 import DashedAttributeParent from '../components/dashed-attribute-parent.riot'
 import EachAndSpreadAttribute from '../components/each-and-spread-attribute.riot'
 import EachRootAttributes from '../components/each-root-attributes.riot'
@@ -159,5 +160,20 @@ describe('components state and props', () => {
     expect(component.$('p').classList.contains('something')).to.be.ok
 
     component.unmount()
+  })
+
+  it('components with getters should be properly rendered (issue #2908)', () => {
+    const element = document.createElement('component-with-getters')
+    const component = riot.component(ComponentWithGetters)(element, {message: 'hello'})
+    const h1 = component.$('h1')
+    const p = component.$('p')
+
+    expect(h1.innerHTML).to.be.equal(component.state.message)
+    expect(p.innerHTML).to.be.equal('hello')
+
+    component.update({message: 'goodbye'})
+
+    expect(h1.innerHTML).to.be.equal('goodbye')
+    expect(p.innerHTML).to.be.equal('hello')
   })
 })

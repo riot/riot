@@ -1,0 +1,19 @@
+<component-with-getters>
+  <h1>{ stateMessage }</h1>
+  <p>{ propsMessage }</p>
+
+  <script>
+    export default {
+      state: {
+        message: 'text defined in state',
+      },
+
+      get stateMessage() {
+        return this.state.message;
+      },
+      get propsMessage() {
+        return this.props.message;
+      },
+    }
+  </script>
+</component-with-getters>
