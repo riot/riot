@@ -1,4 +1,4 @@
-/* Riot v5.3.3, @license MIT */
+/* Riot v5.4.0, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -828,7 +828,7 @@ const isNativeHtmlProperty = memoize(name => ElementProto.hasOwnProperty(name));
  */
 
 function setAllAttributes(node, attributes) {
-  Object.entries(attributes).forEach((_ref) => {
+  Object.entries(attributes).forEach(_ref => {
     let [name, value] = _ref;
     return attributeExpression(node, {
       name
@@ -1147,7 +1147,7 @@ const SlotBinding = {
 
   // API methods
   mount(scope, parentScope) {
-    const templateData = scope.slots ? scope.slots.find((_ref) => {
+    const templateData = scope.slots ? scope.slots.find(_ref => {
       let {
         id
       } = _ref;
@@ -1736,7 +1736,7 @@ function defineProperty(source, key, value, options) {
  */
 
 function defineProperties(source, properties, options) {
-  Object.entries(properties).forEach((_ref) => {
+  Object.entries(properties).forEach(_ref => {
     let [key, value] = _ref;
     defineProperty(source, key, value, options);
   });
@@ -1750,7 +1750,7 @@ function defineProperties(source, properties, options) {
  */
 
 function defineDefaults(source, defaults) {
-  Object.entries(defaults).forEach((_ref2) => {
+  Object.entries(defaults).forEach(_ref2 => {
     let [key, value] = _ref2;
     if (!source[key]) source[key] = value;
   });
@@ -2123,7 +2123,7 @@ function createComponent(componentShell) {
     name
   } = componentShell;
   const templateFn = template ? componentTemplateFactory(template, componentShell) : MOCKED_TEMPLATE_INTERFACE;
-  return (_ref2) => {
+  return _ref2 => {
     let {
       slots,
       attributes,
@@ -2519,7 +2519,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v5.3.3'; // expose some internal stuff that might be used from external tools
+const version = 'v5.4.0'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,

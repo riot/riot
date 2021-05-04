@@ -1,4 +1,4 @@
-/* Riot v5.3.3, @license MIT */
+/* Riot v5.4.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -834,7 +834,7 @@
    */
 
   function setAllAttributes(node, attributes) {
-    Object.entries(attributes).forEach((_ref) => {
+    Object.entries(attributes).forEach(_ref => {
       let [name, value] = _ref;
       return attributeExpression(node, {
         name
@@ -1153,7 +1153,7 @@
 
     // API methods
     mount(scope, parentScope) {
-      const templateData = scope.slots ? scope.slots.find((_ref) => {
+      const templateData = scope.slots ? scope.slots.find(_ref => {
         let {
           id
         } = _ref;
@@ -1742,7 +1742,7 @@
    */
 
   function defineProperties(source, properties, options) {
-    Object.entries(properties).forEach((_ref) => {
+    Object.entries(properties).forEach(_ref => {
       let [key, value] = _ref;
       defineProperty(source, key, value, options);
     });
@@ -1756,7 +1756,7 @@
    */
 
   function defineDefaults(source, defaults) {
-    Object.entries(defaults).forEach((_ref2) => {
+    Object.entries(defaults).forEach(_ref2 => {
       let [key, value] = _ref2;
       if (!source[key]) source[key] = value;
     });
@@ -2129,7 +2129,7 @@
       name
     } = componentShell;
     const templateFn = template ? componentTemplateFactory(template, componentShell) : MOCKED_TEMPLATE_INTERFACE;
-    return (_ref2) => {
+    return _ref2 => {
       let {
         slots,
         attributes,
@@ -2525,7 +2525,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v5.3.3'; // expose some internal stuff that might be used from external tools
+  const version = 'v5.4.0'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
