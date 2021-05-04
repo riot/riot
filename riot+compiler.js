@@ -1,4 +1,4 @@
-/* Riot v5.4.0, @license MIT */
+/* Riot v5.4.1, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('fs'), require('path')) :
   typeof define === 'function' && define.amd ? define(['fs', 'path'], factory) :
@@ -2192,6 +2192,7 @@
     if (css && name) cssManager.add(name, css);
     return curry(enhanceComponentAPI)(defineProperties( // set the component defaults without overriding the original component API
     defineDefaults(componentAPI, Object.assign({}, COMPONENT_LIFECYCLE_METHODS, {
+      [PROPS_KEY]: {},
       [STATE_KEY]: {}
     })), Object.assign({
       // defined during the component creation
@@ -2525,7 +2526,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v5.4.0'; // expose some internal stuff that might be used from external tools
+  const version = 'v5.4.1'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
