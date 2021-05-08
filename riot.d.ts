@@ -8,6 +8,7 @@ import {
 } from '@riotjs/dom-bindings'
 
 // Internal Types and shortcuts
+export type Nil = null | undefined
 export type RegisteredComponentsMap = Map<string, () => RiotComponent<any, any>>
 export type ComponentEnhancer = <Props = object, State = object>(component: RiotComponent<Props, State>) => RiotComponent<Props, State>
 export type InstalledPluginsSet = Set<ComponentEnhancer>
@@ -61,14 +62,14 @@ export interface PureComponentFactoryFunction<InitialProps = object, Context = o
 
 // This object interface is created anytime a riot file will be compiled into javascript
 export interface RiotComponentShell<Props = object, State = object, ComponentExport = RiotComponentExport<Props, State>> {
-  readonly css?: string
-  readonly exports?: RiotComponentExportFactoryFunction<ComponentExport> | ComponentExport
-  readonly name?: string
+  readonly css?: string | Nil
+  readonly exports?: RiotComponentExportFactoryFunction<ComponentExport> | ComponentExport | Nil
+  readonly name?: string | Nil
 
   template(
     templateFn: (...params: Parameters<typeof template>) => TemplateChunk<RiotComponent<Props, State>>,
-    expressionTypes: ExpressionType,
-    bindingTypes: BindingType,
+    expressionTypes: Record<keyof typeof ExpressionType, number>,
+    bindingTypes: Record<keyof typeof BindingType, number>,
     getComponent: (componentName: string) => any
   ): TemplateChunk<RiotComponent<Props, State>>
 }
