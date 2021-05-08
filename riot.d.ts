@@ -1,12 +1,20 @@
-import { SlotBindingData, TemplateChunk, AttributeExpressionData, ExpressionType, BindingType, template } from '@riotjs/dom-bindings'
+import {
+  SlotBindingData,
+  TemplateChunk,
+  AttributeExpressionData,
+  ExpressionType,
+  BindingType,
+  template
+} from '@riotjs/dom-bindings'
 
 // This interface is only exposed and any Riot component will receive the following properties
-export interface RiotCoreComponent<Props extends object, State extends object> {
+export interface RiotCoreComponent<Props = object, State = object> {
   // automatically generated on any component instance
   readonly props: Props
   readonly root: HTMLElement
   readonly name?: string
   readonly slots: SlotBindingData[]
+
   mount(
     element: HTMLElement,
     initialState?: State,
@@ -28,7 +36,7 @@ export type RiotComponentsMap = {
 }
 
 // Riot Pure Component interface that should be used together with riot.pure
-export interface RiotPureComponent<Context extends object> {
+export interface RiotPureComponent<Context = object> {
   mount(
     element: HTMLElement,
     context?: Context,
@@ -39,20 +47,36 @@ export interface RiotPureComponent<Context extends object> {
   unmount(keepRootElement: boolean): RiotPureComponent<Context>
 }
 
-export interface PureComponentFactoryFunction<InitialProps extends object, Context extends object> {
-  ({slots, attributes, props}:{ slots?: SlotBindingData[], attributes?: AttributeExpressionData[], props?: InitialProps; }): RiotPureComponent<Context>
+export interface PureComponentFactoryFunction<InitialProps = object, Context = object> {
+  ({
+     slots,
+     attributes,
+     props
+   }: { slots?: SlotBindingData<Context>[], attributes?: AttributeExpressionData<Context>[], props?: InitialProps; }): RiotPureComponent<Context>
+}
+
+
+export interface RiotComponentExportFactoryFunction<ComponentExport = RiotComponentExport> {
+  (): ComponentExport
+  components?: RiotComponentsMap
 }
 
 // This object interface is created anytime a riot file will be compiled into javascript
-export interface RiotComponentShell<Props extends object, State extends object> {
+export interface RiotComponentShell<Props = object, State = object, ComponentExport = RiotComponentExport<Props, State>> {
   readonly css?: string
-  readonly exports?: (() => RiotComponentExport<Props, State>)|RiotComponentExport<Props, State>
+  readonly exports?: RiotComponentExportFactoryFunction<ComponentExport> | ComponentExport
   readonly name?: string
-  template(templateFn: typeof template, expressionTypes: ExpressionType, bindingTypes: BindingType, getComponent: (componentName: string) => any): TemplateChunk
+
+  template(
+    templateFn: (...params: Parameters<typeof template>) => TemplateChunk<RiotComponent<Props, State>>,
+    expressionTypes: ExpressionType,
+    bindingTypes: BindingType,
+    getComponent: (componentName: string) => any
+  ): TemplateChunk<RiotComponent<Props, State>>
 }
 
 // Interface that can be used when creating the components export
-export interface RiotComponentExport<Props extends object, State extends object> {
+export interface RiotComponentExport<Props = object, State = object> {
   // optional on the component object
   state?: State
 
@@ -69,27 +93,31 @@ export interface RiotComponentExport<Props extends object, State extends object>
   onUpdated?(currentProps: Props, currentState: State): void
   onBeforeUnmount?(currentProps: Props, currentState: State): void
   onUnmounted?(currentProps: Props, currentState: State): void
+
   [key: string]: any
 }
 
 // All the RiotComponent Public interface properties are optional
-export interface RiotComponent<Props extends object, State extends object> extends RiotCoreComponent<Props, State>, RiotComponentExport<Props, State> {}
+export interface RiotComponent<Props = object, State = object> extends RiotCoreComponent<Props, State>, RiotComponentExport<Props, State> {
+}
 
 export type RegisteredComponentsMap = Map<string, () => RiotComponent<any, any>>
-export type ComponentEnhancer = <Props extends object, State extends object>(component: RiotComponent<Props, State>) => RiotComponent<Props, State>
+export type ComponentEnhancer = <Props = object, State = object>(component: RiotComponent<Props, State>) => RiotComponent<Props, State>
 export type InstalledPluginsSet = Set<ComponentEnhancer>
 
-export function register<Props extends object, State extends object>(componentName: string, shell: RiotComponentShell<Props, State>): RegisteredComponentsMap
+export function register<Props, State>(componentName: string, shell: RiotComponentShell<Props, State>): RegisteredComponentsMap
 export function unregister(componentName: string): RegisteredComponentsMap
-export function mount<Props extends object, State extends object>(selector: string|HTMLElement, initialProps?: Props, componentName?: string): RiotComponent<Props, State>[]
-export function unmount(selector: string|HTMLElement, keepRootElement: boolean):HTMLElement[]
-export function install(plugin: ComponentEnhancer):InstalledPluginsSet
-export function uninstall(plugin: ComponentEnhancer):InstalledPluginsSet
-export function component<Props extends object, State extends object>(shell: RiotComponentShell<Props, State>):(
+export function mount<Props, State>(selector: string | HTMLElement, initialProps?: Props, componentName?: string): RiotComponent<Props, State>[]
+export function unmount(selector: string | HTMLElement, keepRootElement: boolean): HTMLElement[]
+export function install(plugin: ComponentEnhancer): InstalledPluginsSet
+export function uninstall(plugin: ComponentEnhancer): InstalledPluginsSet
+
+export function component<Props, State>(shell: RiotComponentShell<Props, State>): (
   el: HTMLElement,
   initialProps?: Props,
   meta?: { slots: SlotBindingData[]; attributes: AttributeExpressionData[]; parentScope: any; }
 ) => RiotComponent<Props, State>
 
-export function pure<InitialProps extends object, Context extends object, FactoryFunction = PureComponentFactoryFunction<InitialProps, Context>>(func: FactoryFunction): FactoryFunction
+export function pure<InitialProps = object, Context = object, FactoryFunction = PureComponentFactoryFunction<InitialProps, Context>>(func: FactoryFunction): FactoryFunction
+
 export const version: string
