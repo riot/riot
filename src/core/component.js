@@ -348,6 +348,7 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
     runPlugins(
       defineProperties(isObject(component) ? Object.create(component) : component, {
         mount(element, state = {}, parentScope) {
+          this[PARENT_KEY_SYMBOL] = parentScope
           this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(element, attributes).mount(parentScope)
 
           defineProperty(this, PROPS_KEY, Object.freeze({
@@ -370,7 +371,6 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
 
           // before mount lifecycle event
           this[ON_BEFORE_MOUNT_KEY](this[PROPS_KEY], this[STATE_KEY])
-          this[PARENT_KEY_SYMBOL] = parentScope
           // mount the template
           this[TEMPLATE_KEY_SYMBOL].mount(element, this, parentScope)
           this[ON_MOUNTED_KEY](this[PROPS_KEY], this[STATE_KEY])
