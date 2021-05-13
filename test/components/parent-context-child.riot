@@ -1,0 +1,35 @@
+<parent-context-child>
+  <script>
+    import {PARENT_KEY_SYMBOL} from '@riotjs/util/constants'
+
+    export default {
+      callParent(from) {
+        this[PARENT_KEY_SYMBOL].test.add(from);
+      },
+
+      onBeforeMount() {
+        this.callParent('onBeforeMount')
+      },
+
+      onMounted() {
+        this.callParent('onMounted')
+      },
+
+      onBeforeUpdate() {
+        this.callParent('onBeforeUpdate')
+      },
+
+      onUpdated() {
+        this.callParent('onUpdated')
+      },
+
+      onBeforeUnmount() {
+        this.callParent('onBeforeUnmount')
+      },
+
+      onUnmounted() {
+        this.callParent('onUnmounted')
+      }
+    }
+  </script>
+</parent-context-child>
