@@ -8,6 +8,7 @@ import InvalidPureCssComponent from '../components/invalid-pure-css-component.ri
 import InvalidPureHtmlComponent from '../components/invalid-pure-html-component.riot'
 import NativeAttributes from '../components/native-attributes.riot'
 import NativeInlineEvents from '../components/native-inline-events.riot'
+import ParentContext from '../components/parent-context.riot'
 import ParentValueProp from '../components/parent-value-prop.riot'
 import PureComponent from '../components/pure-component.riot'
 import PureObject from '../components/pure-object.riot'
@@ -242,5 +243,15 @@ describe('lifecycle events', () => {
     expect(h1.innerHTML).to.be.equal('above the commentbelow the comment')
 
     component.unmount()
+  })
+
+  it('child components have access to the parent scope throughout their entire lifecycle', () => {
+    const element = document.createElement('parent-context')
+    const component = riot.component(ParentContext)(element)
+
+    component.update()
+    component.unmount()
+
+    expect([...component.test]).to.eql(['onBeforeMount', 'onMounted', 'onBeforeUpdate', 'onUpdated', 'onBeforeUnmount', 'onUnmounted'])
   })
 })
