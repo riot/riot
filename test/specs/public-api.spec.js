@@ -14,6 +14,7 @@ describe('Riot public api', () => {
       'uninstall',
       'component',
       'pure',
+      'withTypes',
       'version',
       '__'
     ])
