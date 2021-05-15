@@ -1,12 +1,12 @@
 import {
-  RiotComponentShell,
   RiotComponent,
   mount,
   unmount,
   register,
   unregister,
-} from '../riot'
-import { template } from '@riotjs/dom-bindings'
+  version,
+  RiotComponentWrapper
+} from '../../riot'
 
 interface TodoItem {
   summary: string
@@ -22,17 +22,11 @@ interface TodoState {
   doShowDoneItems: boolean
 }
 
-interface TodoComponentShell extends RiotComponentShell<TodoProps, TodoState> {
-}
-
 interface TodoComponent extends RiotComponent<TodoProps, TodoState> {
 }
 
-//  equivalent to `import todo from "todo"`
-const todo: TodoComponentShell = {
-  template(template, expressionTypes, bindingTypes, getComponent) {
-    return template('Hello')
-  }
+const wrapper: RiotComponentWrapper<TodoComponent> =  {
+
 }
 
 const component: TodoComponent = mount<TodoProps, TodoState>('todo', {
@@ -43,3 +37,10 @@ const component: TodoComponent = mount<TodoProps, TodoState>('todo', {
 
 component.update({ doShowDoneItems: false }, { })
 component.unmount(true)
+
+const el = document.createElement('div')
+unmount(el)
+register('todo', wrapper)
+unregister('todo')
+
+el.innerHTML = version
