@@ -13,6 +13,7 @@ describe('Riot compiler api', () => {
       'uninstall',
       'component',
       'pure',
+      'withTypes',
       'version',
       '__',
       // compiler API

@@ -118,6 +118,13 @@ export function pure(func) {
   return func
 }
 
+/**
+ * no-op function needed to add the proper types to your component via typescript
+ * @param {Function|Object} component - component default export
+ * @returns {Function|Object} returns exactly what it has received
+ */
+export const withTypes = component => component
+
 /** @type {string} current riot version */
 export const version = 'WIP'
 
