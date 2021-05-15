@@ -1,4 +1,4 @@
-/* Riot v5.4.1, @license MIT */
+/* Riot v5.4.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('fs'), require('path')) :
   typeof define === 'function' && define.amd ? define(['fs', 'path'], factory) :
@@ -2298,6 +2298,7 @@
           state = {};
         }
 
+        this[PARENT_KEY_SYMBOL] = parentScope;
         this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(element, attributes).mount(parentScope);
         defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, evaluateInitialProps(element, props), evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions))));
         this[STATE_KEY] = computeState(this[STATE_KEY], state);
@@ -2311,8 +2312,7 @@
 
         defineProperty(this, SLOTS_KEY, slots); // before mount lifecycle event
 
-        this[ON_BEFORE_MOUNT_KEY](this[PROPS_KEY], this[STATE_KEY]);
-        this[PARENT_KEY_SYMBOL] = parentScope; // mount the template
+        this[ON_BEFORE_MOUNT_KEY](this[PROPS_KEY], this[STATE_KEY]); // mount the template
 
         this[TEMPLATE_KEY_SYMBOL].mount(element, this, parentScope);
         this[ON_MOUNTED_KEY](this[PROPS_KEY], this[STATE_KEY]);
@@ -2448,7 +2448,7 @@
    * @param   {string|HTMLElement} selector - query for the selection or a DOM element
    * @param   {Object} initialProps - the initial component properties
    * @param   {string} name - optional component name
-   * @returns {Array} list of nodes upgraded
+   * @returns {Array} list of riot components
    */
 
   function mount(selector, initialProps, name) {
@@ -2526,7 +2526,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v5.4.1'; // expose some internal stuff that might be used from external tools
+  const version = 'v5.4.2'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2556,18 +2556,15 @@
   	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
   }
 
-  function createCommonjsModule(fn) {
-    var module = { exports: {} };
-  	return fn(module, module.exports), module.exports;
-  }
-
-  var require$$2 = undefined;
+  var compiler$1 = {exports: {}};
 
   var require$$0 = undefined;
 
   var require$$1 = undefined;
 
-  var compiler=createCommonjsModule(function(module,exports){(function(global,factory){factory(exports,require$$0,require$$1,require$$2);})(commonjsGlobal,function(exports,require$$0$2,require$$1$1,require$$2){var global=window;function _interopDefaultLegacy(e){return e&&typeof e==='object'&&'default'in e?e:{'default':e};}var require$$0__default=/*#__PURE__*/_interopDefaultLegacy(require$$0$2);var require$$1__default=/*#__PURE__*/_interopDefaultLegacy(require$$1$1);var require$$2__default=/*#__PURE__*/_interopDefaultLegacy(require$$2);const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function getAugmentedNamespace(n){if(n.__esModule)return n;var a=Object.defineProperty({},'__esModule',{value:true});Object.keys(n).forEach(function(k){var d=Object.getOwnPropertyDescriptor(n,k);Object.defineProperty(a,k,d.get?d:{enumerable:true,get:function get(){return n[k];}});});return a;}function createCommonjsModule(fn){var module={exports:{}};return fn(module,module.exports),module.exports;}/*! *****************************************************************************
+  var require$$2 = undefined;
+
+  (function(module,exports){(function(global,factory){factory(exports,require$$0,require$$1,require$$2);})(commonjsGlobal,function(exports,require$$0$2,require$$1$1,require$$2){var global=window;function _interopDefaultLegacy(e){return e&&typeof e==='object'&&'default'in e?e:{'default':e};}var require$$0__default=/*#__PURE__*/_interopDefaultLegacy(require$$0$2);var require$$1__default=/*#__PURE__*/_interopDefaultLegacy(require$$1$1);var require$$2__default=/*#__PURE__*/_interopDefaultLegacy(require$$2);const TAG_LOGIC_PROPERTY='exports';const TAG_CSS_PROPERTY='css';const TAG_TEMPLATE_PROPERTY='template';const TAG_NAME_PROPERTY='name';function getAugmentedNamespace(n){if(n.__esModule)return n;var a=Object.defineProperty({},'__esModule',{value:true});Object.keys(n).forEach(function(k){var d=Object.getOwnPropertyDescriptor(n,k);Object.defineProperty(a,k,d.get?d:{enumerable:true,get:function get(){return n[k];}});});return a;}function createCommonjsModule(fn){var module={exports:{}};return fn(module,module.exports),module.exports;}/*! *****************************************************************************
   	Copyright (c) Microsoft Corporation.
 
   	Permission to use, copy, modify, and/or distribute this software for any
@@ -6606,7 +6603,7 @@
   // or the complete tag source file ('template')
   const registerPreprocessor=register;// This function can allow you to register postprocessors that will parse the output code
   // here we can run prettifiers, eslint fixes...
-  const registerPostprocessor=register$1;exports.compile=compile;exports.createInitialInput=createInitialInput;exports.registerPostprocessor=registerPostprocessor;exports.registerPreprocessor=registerPreprocessor;Object.defineProperty(exports,'__esModule',{value:true});});});var compiler$1 = /*@__PURE__*/getDefaultExportFromCjs(compiler);
+  const registerPostprocessor=register$1;exports.compile=compile;exports.createInitialInput=createInitialInput;exports.registerPostprocessor=registerPostprocessor;exports.registerPreprocessor=registerPreprocessor;Object.defineProperty(exports,'__esModule',{value:true});});})(compiler$1,compiler$1.exports);var compiler = /*@__PURE__*/getDefaultExportFromCjs(compiler$1.exports);
 
   const GLOBAL_REGISTRY = '__riot_registry__';
   window[GLOBAL_REGISTRY] = {}; // evaluates a compiled tag within the global context
@@ -6632,13 +6629,13 @@
   }
 
   function compileFromString(string, options) {
-    return compiler$1.compile(string, options);
+    return compiler.compile(string, options);
   }
 
   async function compileFromUrl(url, options) {
     const response = await fetch(url);
     const code = await response.text();
-    return compiler$1.compile(code, Object.assign({
+    return compiler.compile(code, Object.assign({
       file: url
     }, options));
   }
@@ -6665,7 +6662,7 @@
     inject,
     compileFromUrl,
     compileFromString,
-    compiler: compiler$1
+    compiler
   });
 
   return riot_compiler;
