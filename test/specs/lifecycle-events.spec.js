@@ -252,6 +252,6 @@ describe('lifecycle events', () => {
     component.update()
     component.unmount()
 
-    expect([...component.test]).to.eql(['onBeforeMount', 'onMounted', 'onBeforeUpdate', 'onUpdated', 'onBeforeUnmount', 'onUnmounted'])
+    expect([...component.test]).to.be.deep.equal(['onBeforeMount', 'onMounted', 'onBeforeUpdate', 'onUpdated', 'onBeforeUnmount', 'onUnmounted'])
   })
 })
