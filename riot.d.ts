@@ -8,7 +8,6 @@ import {
 } from '@riotjs/dom-bindings'
 
 // Internal Types and shortcuts
-export type Nil = null | undefined
 export type RegisteredComponentsMap = Map<string, () => RiotComponent>
 export type ComponentEnhancer = <Props = any, State = any>(component: RiotComponent<Props, State>) => RiotComponent<Props, State>
 export type InstalledPluginsSet = Set<ComponentEnhancer>
@@ -40,22 +39,22 @@ export interface RiotComponent<Props = any, State = any> {
     newState?: Partial<State>,
     parentScope?: object
   ): RiotComponent<Props, State>
-  unmount(keepRootElement: boolean): RiotComponent<Props, State>
+  unmount(keepRootElement?: boolean): RiotComponent<Props, State>
 
   // Helpers
-  $(selector: string): Element | Nil
+  $(selector: string): Element | null
   $$(selector: string): Element[]
 
   // state handling methods
-  shouldUpdate?(newProps: Props, currentProps: Props): boolean
+  shouldUpdate?(newProps: Props, oldProps: Props): boolean
 
   // lifecycle methods
-  onBeforeMount?(currentProps: Props, currentState: State): void
-  onMounted?(currentProps: Props, currentState: State): void
-  onBeforeUpdate?(currentProps: Props, currentState: State): void
-  onUpdated?(currentProps: Props, currentState: State): void
-  onBeforeUnmount?(currentProps: Props, currentState: State): void
-  onUnmounted?(currentProps: Props, currentState: State): void
+  onBeforeMount?(props: Props, state: State): void
+  onMounted?(props: Props, state: State): void
+  onBeforeUpdate?(props: Props, state: State): void
+  onUpdated?(props: Props, state: State): void
+  onBeforeUnmount?(props: Props, state: State): void
+  onUnmounted?(props: Props, state: State): void
 }
 
 // The Riot component object without the internals
@@ -85,16 +84,16 @@ export interface PureComponentFactoryFunction<InitialProps = any, Context = any>
 
 // This object interface is created anytime a riot file will be compiled into javascript
 export interface RiotComponentWrapper<Component = RiotComponent> {
-  readonly css?: string | Nil
-  readonly exports?: RiotComponentFactoryFunction<Component> | Component | Nil
-  readonly name?: string | Nil
+  readonly css?: string | null
+  readonly exports?: RiotComponentFactoryFunction<Component> | Component | null
+  readonly name?: string | null
 
-  template(
+  template?(
     template: (template: string, bindings?: BindingData<Component>[]) => TemplateChunk<Component>,
     expressionTypes: Record<keyof typeof ExpressionType, number>,
     bindingTypes: Record<keyof typeof BindingType, number>,
     getComponent: (componentName: string) => any
-  ): TemplateChunk<Component>
+  ): TemplateChunk<Component> | null
 }
 
 // Interface for components factory functions
@@ -107,7 +106,7 @@ export interface RiotComponentFactoryFunction<Component> {
 export function register<Props, State>(componentName: string, wrapper: RiotComponentWrapper<RiotComponent<Props, State>>): RegisteredComponentsMap
 export function unregister(componentName: string): RegisteredComponentsMap
 export function mount<Props, State>(selector: string | HTMLElement, initialProps?: Props, componentName?: string): RiotComponent<Props, State>[]
-export function unmount(selector: string | HTMLElement, keepRootElement: boolean): HTMLElement[]
+export function unmount(selector: string | HTMLElement, keepRootElement?: boolean): HTMLElement[]
 export function install(plugin: ComponentEnhancer): InstalledPluginsSet
 export function uninstall(plugin: ComponentEnhancer): InstalledPluginsSet
 export function component<Props, State, Component = RiotComponent<Props, State>>(wrapper: RiotComponentWrapper<Component>): (
