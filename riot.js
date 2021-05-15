@@ -1,4 +1,4 @@
-/* Riot v5.4.1, @license MIT */
+/* Riot v5.4.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2298,6 +2298,7 @@
           state = {};
         }
 
+        this[PARENT_KEY_SYMBOL] = parentScope;
         this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(element, attributes).mount(parentScope);
         defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, evaluateInitialProps(element, props), evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions))));
         this[STATE_KEY] = computeState(this[STATE_KEY], state);
@@ -2311,8 +2312,7 @@
 
         defineProperty(this, SLOTS_KEY, slots); // before mount lifecycle event
 
-        this[ON_BEFORE_MOUNT_KEY](this[PROPS_KEY], this[STATE_KEY]);
-        this[PARENT_KEY_SYMBOL] = parentScope; // mount the template
+        this[ON_BEFORE_MOUNT_KEY](this[PROPS_KEY], this[STATE_KEY]); // mount the template
 
         this[TEMPLATE_KEY_SYMBOL].mount(element, this, parentScope);
         this[ON_MOUNTED_KEY](this[PROPS_KEY], this[STATE_KEY]);
@@ -2448,7 +2448,7 @@
    * @param   {string|HTMLElement} selector - query for the selection or a DOM element
    * @param   {Object} initialProps - the initial component properties
    * @param   {string} name - optional component name
-   * @returns {Array} list of nodes upgraded
+   * @returns {Array} list of riot components
    */
 
   function mount(selector, initialProps, name) {
@@ -2526,7 +2526,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v5.4.1'; // expose some internal stuff that might be used from external tools
+  const version = 'v5.4.2'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
