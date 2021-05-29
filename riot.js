@@ -1,4 +1,4 @@
-/* Riot v5.4.2, @license MIT */
+/* Riot v5.4.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -275,7 +275,7 @@
    */
 
   function isTemplate(el) {
-    return !isNil(el.content);
+    return el.tagName === 'TEMPLATE';
   }
   /**
    * Check that will be passed if its argument is a function
@@ -2526,7 +2526,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v5.4.2'; // expose some internal stuff that might be used from external tools
+  const version = 'v5.4.3'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
