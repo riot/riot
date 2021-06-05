@@ -1,4 +1,4 @@
-/* Riot v5.4.3, @license MIT */
+/* Riot v5.4.4, @license MIT */
 /**
  * Convert a string from camel case to dash-case
  * @param   {string} string - probably a component tag name
@@ -269,7 +269,7 @@ function isSvg(el) {
  */
 
 function isTemplate(el) {
-  return el.tagName === 'TEMPLATE';
+  return el.tagName.toLowerCase() === 'template';
 }
 /**
  * Check that will be passed if its argument is a function
@@ -2520,7 +2520,7 @@ function pure(func) {
 }
 /** @type {string} current riot version */
 
-const version = 'v5.4.3'; // expose some internal stuff that might be used from external tools
+const version = 'v5.4.4'; // expose some internal stuff that might be used from external tools
 
 const __ = {
   cssManager,
