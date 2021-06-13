@@ -1,4 +1,4 @@
-/* Riot v5.4.4, @license MIT */
+/* Riot v5.4.5, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -173,13 +173,13 @@
   const TAIL_SYMBOL = Symbol('tail');
 
   /**
-   * Create the <template> fragments comment nodes
-   * @return {Object} {{head: Comment, tail: Comment}}
+   * Create the <template> fragments text nodes
+   * @return {Object} {{head: TextNode, tail: TextNode}}
    */
 
   function createHeadTailPlaceholders() {
-    const head = document.createComment('fragment head');
-    const tail = document.createComment('fragment tail');
+    const head = document.createTextNode('');
+    const tail = document.createTextNode('');
     head[HEAD_SYMBOL] = true;
     tail[TAIL_SYMBOL] = true;
     return {
@@ -1452,6 +1452,19 @@
     return html && (typeof html === 'string' ? createDOMTree(el, html) : html);
   }
   /**
+   * Get the offset of the <template> tag
+   * @param {HTMLElement} parentNode - template tag parent node
+   * @param {HTMLElement} el - the template tag we want to render
+   * @param   {Object} meta - meta properties needed to handle the <template> tags in loops
+   * @returns {number} offset of the <template> tag calculated from its siblings DOM nodes
+   */
+
+
+  function getTemplateTagOffset(parentNode, el, meta) {
+    const siblings = Array.from(parentNode.childNodes);
+    return Math.max(siblings.indexOf(el), siblings.indexOf(meta.head) + 1, 0);
+  }
+  /**
    * Template Chunk model
    * @type {Object}
    */
@@ -1475,7 +1488,7 @@
      */
     createDOM(el) {
       // make sure that the DOM gets created before cloning the template
-      this.dom = this.dom || createTemplateDOM(el, this.html);
+      this.dom = this.dom || createTemplateDOM(el, this.html) || document.createDocumentFragment();
       return this;
     },
 
@@ -1509,23 +1522,19 @@
         parentNode
       } = children ? children[0] : el;
       const isTemplateTag = isTemplate(el);
-      const templateTagOffset = isTemplateTag ? Math.max(Array.from(parentNode.childNodes).indexOf(el), 0) : null;
-      this.isTemplateTag = isTemplateTag; // create the DOM if it wasn't created before
+      const templateTagOffset = isTemplateTag ? getTemplateTagOffset(parentNode, el, meta) : null; // create the DOM if it wasn't created before
 
-      this.createDOM(el);
+      this.createDOM(el); // create the DOM of this template cloning the original DOM structure stored in this instance
+      // notice that if a documentFragment was passed (via meta) we will use it instead
 
-      if (this.dom) {
-        // create the new template dom fragment if it want already passed in via meta
-        this.fragment = fragment || this.dom.cloneNode(true);
-      } // store root node
+      const cloneNode = fragment || this.dom.cloneNode(true); // store root node
       // notice that for template tags the root note will be the parent tag
 
+      this.el = isTemplateTag ? parentNode : el; // create the children array only for the <template> fragments
 
-      this.el = this.isTemplateTag ? parentNode : el; // create the children array only for the <template> fragments
+      this.children = isTemplateTag ? children || Array.from(cloneNode.childNodes) : null; // inject the DOM into the el only if a fragment is available
 
-      this.children = this.isTemplateTag ? children || Array.from(this.fragment.childNodes) : null; // inject the DOM into the el only if a fragment is available
-
-      if (!avoidDOMInjection && this.fragment) injectDOM(el, this.fragment); // create the bindings
+      if (!avoidDOMInjection && cloneNode) injectDOM(el, cloneNode); // create the bindings
 
       this.bindings = this.bindingsData.map(binding => create$1(this.el, binding, templateTagOffset));
       this.bindings.forEach(b => b.mount(scope, parentScope)); // store the template meta properties
@@ -2526,7 +2535,7 @@
   }
   /** @type {string} current riot version */
 
-  const version = 'v5.4.4'; // expose some internal stuff that might be used from external tools
+  const version = 'v5.4.5'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
