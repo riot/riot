@@ -1,4 +1,4 @@
-/* Riot v5.4.5, @license MIT */
+/* Riot v6.0.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -174,7 +174,7 @@
 
   /**
    * Create the <template> fragments text nodes
-   * @return {Object} {{head: TextNode, tail: TextNode}}
+   * @return {Object} {{head: Text, tail: Text}}
    */
 
   function createHeadTailPlaceholders() {
@@ -207,6 +207,60 @@
       tail,
       children: [head, ...Array.from(fragment.childNodes), tail]
     };
+  }
+
+  /**
+   * Helper function to set an immutable property
+   * @param   {Object} source - object where the new property will be set
+   * @param   {string} key - object key where the new property will be stored
+   * @param   {*} value - value of the new property
+   * @param   {Object} options - set the propery overriding the default options
+   * @returns {Object} - the original object modified
+   */
+  function defineProperty(source, key, value, options) {
+    if (options === void 0) {
+      options = {};
+    }
+
+    /* eslint-disable fp/no-mutating-methods */
+    Object.defineProperty(source, key, Object.assign({
+      value,
+      enumerable: false,
+      writable: false,
+      configurable: true
+    }, options));
+    /* eslint-enable fp/no-mutating-methods */
+
+    return source;
+  }
+  /**
+   * Define multiple properties on a target object
+   * @param   {Object} source - object where the new properties will be set
+   * @param   {Object} properties - object containing as key pair the key + value properties
+   * @param   {Object} options - set the propery overriding the default options
+   * @returns {Object} the original object modified
+   */
+
+  function defineProperties(source, properties, options) {
+    Object.entries(properties).forEach(_ref => {
+      let [key, value] = _ref;
+      defineProperty(source, key, value, options);
+    });
+    return source;
+  }
+  /**
+   * Define default properties if they don't exist on the source object
+   * @param   {Object} source - object that will receive the default properties
+   * @param   {Object} defaults - object containing additional optional keys
+   * @returns {Object} the original object received enhanced
+   */
+
+  function defineDefaults(source, defaults) {
+    Object.entries(defaults).forEach(_ref2 => {
+      let [key, value] = _ref2;
+      if (!source[key]) source[key] = value;
+    });
+    return source;
   }
 
   /**
@@ -534,7 +588,7 @@
           nodes.pop(); // notice that we pass null as last argument because
           // the root node and its children will be removed by domdiff
 
-          if (nodes.length === 0) {
+          if (!nodes.length) {
             // we have cleared all the children nodes and we can unmount this template
             redundant.pop();
             template.unmount(context, parentScope, null);
@@ -554,11 +608,12 @@
 
 
   function mustFilterItem(condition, context) {
-    return condition ? Boolean(condition(context)) === false : false;
+    return condition ? !condition(context) : false;
   }
   /**
    * Extend the scope of the looped template
    * @param   {Object} scope - current template scope
+   * @param   {Object} options - options
    * @param   {string} options.itemName - key to identify the looped item in the new context
    * @param   {string} options.indexName - key to identify the index of the looped item
    * @param   {number} options.index - current index
@@ -574,8 +629,8 @@
       index,
       item
     } = _ref;
-    scope[itemName] = item;
-    if (indexName) scope[indexName] = index;
+    defineProperty(scope, itemName, item);
+    if (indexName) defineProperty(scope, indexName, index);
     return scope;
   }
   /**
@@ -596,7 +651,7 @@
    * @param   {Array} items - expression collection value
    * @param   {*} scope - template scope
    * @param   {*} parentScope - scope of the parent template
-   * @param   {EeachBinding} binding - each binding object instance
+   * @param   {EachBinding} binding - each binding object instance
    * @returns {Object} data
    * @returns {Map} data.newChildrenMap - a Map containing the new children template structure
    * @returns {Array} data.batches - array containing the template lifecycle functions to trigger
@@ -872,7 +927,7 @@
 
 
   function shouldRemoveAttribute(value) {
-    return isNil(value) || value === false || value === '';
+    return !value && value !== 0;
   }
   /**
    * This methods handles the DOM attributes updates
@@ -925,8 +980,7 @@
 
   function normalizeValue(name, value) {
     // be sure that expressions like selected={ true } will be always rendered as selected='selected'
-    if (value === true) return name;
-    return value;
+    return value === true ? name : value;
   }
 
   const RE_EVENTS_PREFIX = /^on/;
@@ -993,7 +1047,7 @@
    * Get the the target text node to update or create one from of a comment node
    * @param   {HTMLElement} node - any html element containing childNodes
    * @param   {number} childNodeIndex - index of the text node in the childNodes list
-   * @returns {HTMLTextNode} the text node to update
+   * @returns {Text} the text node to update
    */
 
   const getTextNode = (node, childNodeIndex) => {
@@ -1166,11 +1220,12 @@
       this.template = templateData && create(templateData.html, templateData.bindings).createDOM(parentNode);
 
       if (this.template) {
+        cleanNode(this.node);
         this.template.mount(this.node, this.getTemplateScope(scope, realParent), realParent);
         this.template.children = Array.from(this.node.childNodes);
-        moveSlotInnerContent(this.node);
       }
 
+      moveSlotInnerContent(this.node);
       removeChild(this.node);
       return this;
     },
@@ -1208,7 +1263,8 @@
   /**
    * Create a single slot binding
    * @param   {HTMLElement} node - slot node
-   * @param   {string} options.name - slot id
+   * @param   {string} name - slot id
+   * @param   {AttributeExpressionData[]} attributes - slot attributes
    * @returns {Object} Slot binding object
    */
 
@@ -1370,7 +1426,7 @@
   /**
    * Bind a new expression object to a DOM node
    * @param   {HTMLElement} root - DOM node where to bind the expression
-   * @param   {Object} binding - binding data
+   * @param   {TagBindingData} binding - binding data
    * @param   {number|null} templateTagOffset - if it's defined we need to fix the text expressions childNodeIndex offset
    * @returns {Binding} Binding object
    */
@@ -1422,7 +1478,7 @@
   /**
    * Inject the DOM tree into a target node
    * @param   {HTMLElement} el - target element
-   * @param   {HTMLFragment|SVGElement} dom - dom tree to inject
+   * @param   {DocumentFragment|SVGElement} dom - dom tree to inject
    * @returns {undefined}
    */
 
@@ -1444,8 +1500,8 @@
   /**
    * Create the Template DOM skeleton
    * @param   {HTMLElement} el - root node where the DOM will be injected
-   * @param   {string} html - markup that will be injected into the root node
-   * @returns {HTMLFragment} fragment that will be injected into the root node
+   * @param   {string|HTMLElement} html - HTML markup or HTMLElement that will be injected into the root node
+   * @returns {?DocumentFragment} fragment that will be injected into the root node
    */
 
   function createTemplateDOM(el, html) {
@@ -1563,35 +1619,42 @@
      * @returns {TemplateChunk} self
      */
     unmount(scope, parentScope, mustRemoveRoot) {
-      if (this.el) {
-        this.bindings.forEach(b => b.unmount(scope, parentScope, mustRemoveRoot));
-
-        switch (true) {
-          // pure components should handle the DOM unmount updates by themselves
-          case this.el[IS_PURE_SYMBOL]:
-            break;
-          // <template> tags should be treated a bit differently
-          // we need to clear their children only if it's explicitly required by the caller
-          // via mustRemoveRoot !== null
-
-          case this.children && mustRemoveRoot !== null:
-            clearChildren(this.children);
-            break;
-          // remove the root node only if the mustRemoveRoot === true
-
-          case mustRemoveRoot === true:
-            removeChild(this.el);
-            break;
-          // otherwise we clean the node children
-
-          case mustRemoveRoot !== null:
-            cleanNode(this.el);
-            break;
-        }
-
-        this.el = null;
+      if (mustRemoveRoot === void 0) {
+        mustRemoveRoot = false;
       }
 
+      const el = this.el;
+
+      if (!el) {
+        return this;
+      }
+
+      this.bindings.forEach(b => b.unmount(scope, parentScope, mustRemoveRoot));
+
+      switch (true) {
+        // pure components should handle the DOM unmount updates by themselves
+        // for mustRemoveRoot === null don't touch the DOM
+        case el[IS_PURE_SYMBOL] || mustRemoveRoot === null:
+          break;
+        // if children are declared, clear them
+        // applicable for <template> and <slot/> bindings
+
+        case Array.isArray(this.children):
+          clearChildren(this.children);
+          break;
+        // clean the node children only
+
+        case !mustRemoveRoot:
+          cleanNode(el);
+          break;
+        // remove the root node only if the mustRemoveRoot is truly
+
+        case !!mustRemoveRoot:
+          removeChild(el);
+          break;
+      }
+
+      this.el = null;
       return this;
     },
 
@@ -1610,7 +1673,7 @@
   /**
    * Create a template chunk wiring also the bindings
    * @param   {string|HTMLElement} html - template string
-   * @param   {Array} bindings - bindings collection
+   * @param   {BindingData[]} bindings - bindings collection
    * @returns {TemplateChunk} a new TemplateChunk copy
    */
 
@@ -1716,60 +1779,6 @@
 
   function callOrAssign(source) {
     return isFunction(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
-  }
-
-  /**
-   * Helper function to set an immutable property
-   * @param   {Object} source - object where the new property will be set
-   * @param   {string} key - object key where the new property will be stored
-   * @param   {*} value - value of the new property
-   * @param   {Object} options - set the propery overriding the default options
-   * @returns {Object} - the original object modified
-   */
-  function defineProperty(source, key, value, options) {
-    if (options === void 0) {
-      options = {};
-    }
-
-    /* eslint-disable fp/no-mutating-methods */
-    Object.defineProperty(source, key, Object.assign({
-      value,
-      enumerable: false,
-      writable: false,
-      configurable: true
-    }, options));
-    /* eslint-enable fp/no-mutating-methods */
-
-    return source;
-  }
-  /**
-   * Define multiple properties on a target object
-   * @param   {Object} source - object where the new properties will be set
-   * @param   {Object} properties - object containing as key pair the key + value properties
-   * @param   {Object} options - set the propery overriding the default options
-   * @returns {Object} the original object modified
-   */
-
-  function defineProperties(source, properties, options) {
-    Object.entries(properties).forEach(_ref => {
-      let [key, value] = _ref;
-      defineProperty(source, key, value, options);
-    });
-    return source;
-  }
-  /**
-   * Define default properties if they don't exist on the source object
-   * @param   {Object} source - object that will receive the default properties
-   * @param   {Object} defaults - object containing additional optional keys
-   * @returns {Object} the original object received enhanced
-   */
-
-  function defineDefaults(source, defaults) {
-    Object.entries(defaults).forEach(_ref2 => {
-      let [key, value] = _ref2;
-      if (!source[key]) source[key] = value;
-    });
-    return source;
   }
 
   /**
@@ -2016,7 +2025,7 @@
   });
   /**
    * Performance optimization for the recursive components
-   * @param  {RiotComponentShell} componentShell - riot compiler generated object
+   * @param  {RiotComponentWrapper} componentWrapper - riot compiler generated object
    * @returns {Object} component like interface
    */
 
@@ -2060,16 +2069,16 @@
   /**
    * Factory function to create the component templates only once
    * @param   {Function} template - component template creation function
-   * @param   {RiotComponentShell} componentShell - riot compiler generated object
+   * @param   {RiotComponentWrapper} componentWrapper - riot compiler generated object
    * @returns {TemplateChunk} template chunk object
    */
 
 
-  function componentTemplateFactory(template, componentShell) {
-    const components = createSubcomponents(componentShell.exports ? componentShell.exports.components : {});
+  function componentTemplateFactory(template, componentWrapper) {
+    const components = createSubcomponents(componentWrapper.exports ? componentWrapper.exports.components : {});
     return template(create, expressionTypes, bindingTypes, name => {
       // improve support for recursive components
-      if (name === componentShell.name) return memoizedCreateComponent(componentShell); // return the registered components
+      if (name === componentWrapper.name) return memoizedCreateComponent(componentWrapper); // return the registered components
 
       return components[name] || COMPONENTS_IMPLEMENTATION_MAP$1.get(name);
     });
@@ -2121,23 +2130,23 @@
   }
   /**
    * Create the component interface needed for the @riotjs/dom-bindings tag bindings
-   * @param   {RiotComponentShell} componentShell - riot compiler generated object
-   * @param   {string} componentShell.css - component css
-   * @param   {Function} componentShell.template - function that will return the dom-bindings template function
-   * @param   {Object} componentShell.exports - component interface
-   * @param   {string} componentShell.name - component name
+   * @param   {RiotComponentWrapper} componentWrapper - riot compiler generated object
+   * @param   {string} componentWrapper.css - component css
+   * @param   {Function} componentWrapper.template - function that will return the dom-bindings template function
+   * @param   {Object} componentWrapper.exports - component interface
+   * @param   {string} componentWrapper.name - component name
    * @returns {Object} component like interface
    */
 
 
-  function createComponent(componentShell) {
+  function createComponent(componentWrapper) {
     const {
       css,
       template,
       exports,
       name
-    } = componentShell;
-    const templateFn = template ? componentTemplateFactory(template, componentShell) : MOCKED_TEMPLATE_INTERFACE;
+    } = componentWrapper;
+    const templateFn = template ? componentTemplateFactory(template, componentWrapper) : MOCKED_TEMPLATE_INTERFACE;
     return _ref2 => {
       let {
         slots,
@@ -2533,9 +2542,16 @@
     func[IS_PURE_SYMBOL] = true;
     return func;
   }
+  /**
+   * no-op function needed to add the proper types to your component via typescript
+   * @param {Function|Object} component - component default export
+   * @returns {Function|Object} returns exactly what it has received
+   */
+
+  const withTypes = component => component;
   /** @type {string} current riot version */
 
-  const version = 'v5.4.5'; // expose some internal stuff that might be used from external tools
+  const version = 'v6.0.0'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2555,6 +2571,7 @@
   exports.unmount = unmount;
   exports.unregister = unregister;
   exports.version = version;
+  exports.withTypes = withTypes;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
