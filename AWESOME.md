@@ -84,6 +84,7 @@
 - [Nest UI](https://github.com/fengzilong/Nest) - [(Demo)](https://fengzilong.github.io/Nest/)
 - [rGrid](https://github.com/limodou/rgrid) - [(Demo)](https://limodou.github.io/rgrid/examples.html)
 - [typewriter](https://github.com/amitguptagwl/web-snippets/tree/master/riotjs-components/typewriter) - [(Demo)](http://amitkumargupta.work)
+- [Riot Particles](https://github.com/matteobruni/tsparticles/tree/main/components/riot) - Particles, confetti, fireworks and other animations component 
 
 ### Resources
 - [create-riot-app](https://github.com/alexstep/create-riot-app-ejected) dev environment
