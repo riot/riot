@@ -3,6 +3,7 @@ ratings:
   - "src/**.js"
 
 exclude_paths:
+  - "riot.d.ts"
   - "riot+compiler.js"
   - "riot+compiler.min.js"
   - "riot.js"

@@ -177,10 +177,10 @@ function createPureComponent(pureFactoryFunction, { slots, attributes, props, cs
     // intercept the mount calls to bind the DOM node to the pure object created
     // see also https://github.com/riot/riot/issues/2806
     if (method === MOUNT_METHOD_KEY) {
-      const [el] = args
+      const [element] = args
       // mark this node as pure element
-      el[IS_PURE_SYMBOL] = true
-      bindDOMNodeToComponentObject(el, component)
+      defineProperty(element, IS_PURE_SYMBOL, true)
+      bindDOMNodeToComponentObject(element, component)
     }
 
     component[method](...args)
@@ -348,6 +348,8 @@ export function enhanceComponentAPI(component, {slots, attributes, props}) {
     runPlugins(
       defineProperties(isObject(component) ? Object.create(component) : component, {
         mount(element, state = {}, parentScope) {
+          // any element mounted passing through this function can't be a pure component
+          defineProperty(element, IS_PURE_SYMBOL, false)
           this[PARENT_KEY_SYMBOL] = parentScope
           this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(element, attributes).mount(parentScope)
 
