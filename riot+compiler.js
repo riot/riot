@@ -1,4 +1,4 @@
-/* Riot v6.0.1, @license MIT */
+/* Riot v6.0.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('fs'), require('path')) :
   typeof define === 'function' && define.amd ? define(['fs', 'path'], factory) :
@@ -419,92 +419,92 @@
         while (bStart < bEnd) insertBefore(get(b[bStart++], 1), node);
       } // remove head or tail: fast path
       else if (bEnd === bStart) {
-          while (aStart < aEnd) {
-            // remove the node only if it's unknown or not live
-            if (!map || !map.has(a[aStart])) removeChild(get(a[aStart], -1));
-            aStart++;
-          }
-        } // same node: fast path
-        else if (a[aStart] === b[bStart]) {
-            aStart++;
-            bStart++;
-          } // same tail: fast path
-          else if (a[aEnd - 1] === b[bEnd - 1]) {
-              aEnd--;
-              bEnd--;
-            } // The once here single last swap "fast path" has been removed in v1.1.0
-            // https://github.com/WebReflection/udomdiff/blob/single-final-swap/esm/index.js#L69-L85
-            // reverse swap: also fast path
-            else if (a[aStart] === b[bEnd - 1] && b[bStart] === a[aEnd - 1]) {
-                // this is a "shrink" operation that could happen in these cases:
-                // [1, 2, 3, 4, 5]
-                // [1, 4, 3, 2, 5]
-                // or asymmetric too
-                // [1, 2, 3, 4, 5]
-                // [1, 2, 3, 5, 6, 4]
-                const node = get(a[--aEnd], -1).nextSibling;
-                insertBefore(get(b[bStart++], 1), get(a[aStart++], -1).nextSibling);
-                insertBefore(get(b[--bEnd], 1), node); // mark the future index as identical (yeah, it's dirty, but cheap 👍)
-                // The main reason to do this, is that when a[aEnd] will be reached,
-                // the loop will likely be on the fast path, as identical to b[bEnd].
-                // In the best case scenario, the next loop will skip the tail,
-                // but in the worst one, this node will be considered as already
-                // processed, bailing out pretty quickly from the map index check
+        while (aStart < aEnd) {
+          // remove the node only if it's unknown or not live
+          if (!map || !map.has(a[aStart])) removeChild(get(a[aStart], -1));
+          aStart++;
+        }
+      } // same node: fast path
+      else if (a[aStart] === b[bStart]) {
+        aStart++;
+        bStart++;
+      } // same tail: fast path
+      else if (a[aEnd - 1] === b[bEnd - 1]) {
+        aEnd--;
+        bEnd--;
+      } // The once here single last swap "fast path" has been removed in v1.1.0
+      // https://github.com/WebReflection/udomdiff/blob/single-final-swap/esm/index.js#L69-L85
+      // reverse swap: also fast path
+      else if (a[aStart] === b[bEnd - 1] && b[bStart] === a[aEnd - 1]) {
+        // this is a "shrink" operation that could happen in these cases:
+        // [1, 2, 3, 4, 5]
+        // [1, 4, 3, 2, 5]
+        // or asymmetric too
+        // [1, 2, 3, 4, 5]
+        // [1, 2, 3, 5, 6, 4]
+        const node = get(a[--aEnd], -1).nextSibling;
+        insertBefore(get(b[bStart++], 1), get(a[aStart++], -1).nextSibling);
+        insertBefore(get(b[--bEnd], 1), node); // mark the future index as identical (yeah, it's dirty, but cheap 👍)
+        // The main reason to do this, is that when a[aEnd] will be reached,
+        // the loop will likely be on the fast path, as identical to b[bEnd].
+        // In the best case scenario, the next loop will skip the tail,
+        // but in the worst one, this node will be considered as already
+        // processed, bailing out pretty quickly from the map index check
 
-                a[aEnd] = b[bEnd];
-              } // map based fallback, "slow" path
-              else {
-                  // the map requires an O(bEnd - bStart) operation once
-                  // to store all future nodes indexes for later purposes.
-                  // In the worst case scenario, this is a full O(N) cost,
-                  // and such scenario happens at least when all nodes are different,
-                  // but also if both first and last items of the lists are different
-                  if (!map) {
-                    map = new Map();
-                    let i = bStart;
+        a[aEnd] = b[bEnd];
+      } // map based fallback, "slow" path
+      else {
+        // the map requires an O(bEnd - bStart) operation once
+        // to store all future nodes indexes for later purposes.
+        // In the worst case scenario, this is a full O(N) cost,
+        // and such scenario happens at least when all nodes are different,
+        // but also if both first and last items of the lists are different
+        if (!map) {
+          map = new Map();
+          let i = bStart;
 
-                    while (i < bEnd) map.set(b[i], i++);
-                  } // if it's a future node, hence it needs some handling
-
-
-                  if (map.has(a[aStart])) {
-                    // grab the index of such node, 'cause it might have been processed
-                    const index = map.get(a[aStart]); // if it's not already processed, look on demand for the next LCS
-
-                    if (bStart < index && index < bEnd) {
-                      let i = aStart; // counts the amount of nodes that are the same in the future
-
-                      let sequence = 1;
-
-                      while (++i < aEnd && i < bEnd && map.get(a[i]) === index + sequence) sequence++; // effort decision here: if the sequence is longer than replaces
-                      // needed to reach such sequence, which would brings again this loop
-                      // to the fast path, prepend the difference before a sequence,
-                      // and move only the future list index forward, so that aStart
-                      // and bStart will be aligned again, hence on the fast path.
-                      // An example considering aStart and bStart are both 0:
-                      // a: [1, 2, 3, 4]
-                      // b: [7, 1, 2, 3, 6]
-                      // this would place 7 before 1 and, from that time on, 1, 2, and 3
-                      // will be processed at zero cost
+          while (i < bEnd) map.set(b[i], i++);
+        } // if it's a future node, hence it needs some handling
 
 
-                      if (sequence > index - bStart) {
-                        const node = get(a[aStart], 0);
+        if (map.has(a[aStart])) {
+          // grab the index of such node, 'cause it might have been processed
+          const index = map.get(a[aStart]); // if it's not already processed, look on demand for the next LCS
 
-                        while (bStart < index) insertBefore(get(b[bStart++], 1), node);
-                      } // if the effort wasn't good enough, fallback to a replace,
-                      // moving both source and target indexes forward, hoping that some
-                      // similar node will be found later on, to go back to the fast path
-                      else {
-                          replaceChild(get(b[bStart++], 1), get(a[aStart++], -1));
-                        }
-                    } // otherwise move the source forward, 'cause there's nothing to do
-                    else aStart++;
-                  } // this node has no meaning in the future list, so it's more than safe
-                  // to remove it, and check the next live node out instead, meaning
-                  // that only the live list index should be forwarded
-                  else removeChild(get(a[aStart++], -1));
-                }
+          if (bStart < index && index < bEnd) {
+            let i = aStart; // counts the amount of nodes that are the same in the future
+
+            let sequence = 1;
+
+            while (++i < aEnd && i < bEnd && map.get(a[i]) === index + sequence) sequence++; // effort decision here: if the sequence is longer than replaces
+            // needed to reach such sequence, which would brings again this loop
+            // to the fast path, prepend the difference before a sequence,
+            // and move only the future list index forward, so that aStart
+            // and bStart will be aligned again, hence on the fast path.
+            // An example considering aStart and bStart are both 0:
+            // a: [1, 2, 3, 4]
+            // b: [7, 1, 2, 3, 6]
+            // this would place 7 before 1 and, from that time on, 1, 2, and 3
+            // will be processed at zero cost
+
+
+            if (sequence > index - bStart) {
+              const node = get(a[aStart], 0);
+
+              while (bStart < index) insertBefore(get(b[bStart++], 1), node);
+            } // if the effort wasn't good enough, fallback to a replace,
+            // moving both source and target indexes forward, hoping that some
+            // similar node will be found later on, to go back to the fast path
+            else {
+              replaceChild(get(b[bStart++], 1), get(a[aStart++], -1));
+            }
+          } // otherwise move the source forward, 'cause there's nothing to do
+          else aStart++;
+        } // this node has no meaning in the future list, so it's more than safe
+        // to remove it, and check the next live node out instead, meaning
+        // that only the live list index should be forwarded
+        else removeChild(get(a[aStart++], -1));
+      }
     }
 
     return b;
@@ -2118,10 +2118,10 @@
       // intercept the mount calls to bind the DOM node to the pure object created
       // see also https://github.com/riot/riot/issues/2806
       if (method === MOUNT_METHOD_KEY) {
-        const [el] = args; // mark this node as pure element
+        const [element] = args; // mark this node as pure element
 
-        el[IS_PURE_SYMBOL] = true;
-        bindDOMNodeToComponentObject(el, component);
+        defineProperty(element, IS_PURE_SYMBOL, true);
+        bindDOMNodeToComponentObject(element, component);
       }
 
       component[method](...args);
@@ -2316,6 +2316,8 @@
           state = {};
         }
 
+        // any element mounted passing through this function can't be a pure component
+        defineProperty(element, IS_PURE_SYMBOL, false);
         this[PARENT_KEY_SYMBOL] = parentScope;
         this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(element, attributes).mount(parentScope);
         defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, evaluateInitialProps(element, props), evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions))));
@@ -2551,7 +2553,7 @@
   const withTypes = component => component;
   /** @type {string} current riot version */
 
-  const version = 'v6.0.1'; // expose some internal stuff that might be used from external tools
+  const version = 'v6.0.2'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2603,7 +2605,7 @@
   	LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
   	OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
   	PERFORMANCE OF THIS SOFTWARE.
-  	***************************************************************************** */ /* global Reflect, Promise */var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(Object.prototype.hasOwnProperty.call(b,p))d[p]=b[p];};return _extendStatics(d,b);};function __extends(d,b){if(typeof b!=="function"&&b!==null)throw new TypeError("Class extends value "+String(b)+" is not a constructor or null");_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());}var _assign=function __assign(){_assign=Object.assign||function __assign(t){for(var s,i=1,n=arguments.length;i<n;i++){s=arguments[i];for(var p in s)if(Object.prototype.hasOwnProperty.call(s,p))t[p]=s[p];}return t;};return _assign.apply(this,arguments);};function __rest(s,e){var t={};for(var p in s)if(Object.prototype.hasOwnProperty.call(s,p)&&e.indexOf(p)<0)t[p]=s[p];if(s!=null&&typeof Object.getOwnPropertySymbols==="function")for(var i=0,p=Object.getOwnPropertySymbols(s);i<p.length;i++){if(e.indexOf(p[i])<0&&Object.prototype.propertyIsEnumerable.call(s,p[i]))t[p[i]]=s[p[i]];}return t;}function __decorate(decorators,target,key,desc){var c=arguments.length,r=c<3?target:desc===null?desc=Object.getOwnPropertyDescriptor(target,key):desc,d;if(typeof Reflect==="object"&&typeof Reflect.decorate==="function")r=Reflect.decorate(decorators,target,key,desc);else for(var i=decorators.length-1;i>=0;i--)if(d=decorators[i])r=(c<3?d(r):c>3?d(target,key,r):d(target,key))||r;return c>3&&r&&Object.defineProperty(target,key,r),r;}function __param(paramIndex,decorator){return function(target,key){decorator(target,key,paramIndex);};}function __metadata(metadataKey,metadataValue){if(typeof Reflect==="object"&&typeof Reflect.metadata==="function")return Reflect.metadata(metadataKey,metadataValue);}function __awaiter(thisArg,_arguments,P,generator){function adopt(value){return value instanceof P?value:new P(function(resolve){resolve(value);});}return new(P||(P=Promise))(function(resolve,reject){function fulfilled(value){try{step(generator.next(value));}catch(e){reject(e);}}function rejected(value){try{step(generator["throw"](value));}catch(e){reject(e);}}function step(result){result.done?resolve(result.value):adopt(result.value).then(fulfilled,rejected);}step((generator=generator.apply(thisArg,_arguments||[])).next());});}function __generator(thisArg,body){var _={label:0,sent:function sent(){if(t[0]&1)throw t[1];return t[1];},trys:[],ops:[]},f,y,t,g;return g={next:verb(0),"throw":verb(1),"return":verb(2)},typeof Symbol==="function"&&(g[Symbol.iterator]=function(){return this;}),g;function verb(n){return function(v){return step([n,v]);};}function step(op){if(f)throw new TypeError("Generator is already executing.");while(_)try{if(f=1,y&&(t=op[0]&2?y["return"]:op[0]?y["throw"]||((t=y["return"])&&t.call(y),0):y.next)&&!(t=t.call(y,op[1])).done)return t;if(y=0,t)op=[op[0]&2,t.value];switch(op[0]){case 0:case 1:t=op;break;case 4:_.label++;return {value:op[1],done:false};case 5:_.label++;y=op[1];op=[0];continue;case 7:op=_.ops.pop();_.trys.pop();continue;default:if(!(t=_.trys,t=t.length>0&&t[t.length-1])&&(op[0]===6||op[0]===2)){_=0;continue;}if(op[0]===3&&(!t||op[1]>t[0]&&op[1]<t[3])){_.label=op[1];break;}if(op[0]===6&&_.label<t[1]){_.label=t[1];t=op;break;}if(t&&_.label<t[2]){_.label=t[2];_.ops.push(op);break;}if(t[2])_.ops.pop();_.trys.pop();continue;}op=body.call(thisArg,_);}catch(e){op=[6,e];y=0;}finally{f=t=0;}if(op[0]&5)throw op[1];return {value:op[0]?op[1]:void 0,done:true};}}var __createBinding=Object.create?function(o,m,k,k2){if(k2===undefined)k2=k;Object.defineProperty(o,k2,{enumerable:true,get:function get(){return m[k];}});}:function(o,m,k,k2){if(k2===undefined)k2=k;o[k2]=m[k];};function __exportStar(m,o){for(var p in m)if(p!=="default"&&!Object.prototype.hasOwnProperty.call(o,p))__createBinding(o,m,p);}function __values(o){var s=typeof Symbol==="function"&&Symbol.iterator,m=s&&o[s],i=0;if(m)return m.call(o);if(o&&typeof o.length==="number")return {next:function next(){if(o&&i>=o.length)o=void 0;return {value:o&&o[i++],done:!o};}};throw new TypeError(s?"Object is not iterable.":"Symbol.iterator is not defined.");}function __read(o,n){var m=typeof Symbol==="function"&&o[Symbol.iterator];if(!m)return o;var i=m.call(o),r,ar=[],e;try{while((n===void 0||n-->0)&&!(r=i.next()).done)ar.push(r.value);}catch(error){e={error:error};}finally{try{if(r&&!r.done&&(m=i["return"]))m.call(i);}finally{if(e)throw e.error;}}return ar;}/** @deprecated */function __spread(){for(var ar=[],i=0;i<arguments.length;i++)ar=ar.concat(__read(arguments[i]));return ar;}/** @deprecated */function __spreadArrays(){for(var s=0,i=0,il=arguments.length;i<il;i++)s+=arguments[i].length;for(var r=Array(s),k=0,i=0;i<il;i++)for(var a=arguments[i],j=0,jl=a.length;j<jl;j++,k++)r[k]=a[j];return r;}function __spreadArray(to,from,pack){if(pack||arguments.length===2)for(var i=0,l=from.length,ar;i<l;i++){if(ar||!(i in from)){if(!ar)ar=Array.prototype.slice.call(from,0,i);ar[i]=from[i];}}return to.concat(ar||from);}function __await(v){return this instanceof __await?(this.v=v,this):new __await(v);}function __asyncGenerator(thisArg,_arguments,generator){if(!Symbol.asyncIterator)throw new TypeError("Symbol.asyncIterator is not defined.");var g=generator.apply(thisArg,_arguments||[]),i,q=[];return i={},verb("next"),verb("throw"),verb("return"),i[Symbol.asyncIterator]=function(){return this;},i;function verb(n){if(g[n])i[n]=function(v){return new Promise(function(a,b){q.push([n,v,a,b])>1||resume(n,v);});};}function resume(n,v){try{step(g[n](v));}catch(e){settle(q[0][3],e);}}function step(r){r.value instanceof __await?Promise.resolve(r.value.v).then(fulfill,reject):settle(q[0][2],r);}function fulfill(value){resume("next",value);}function reject(value){resume("throw",value);}function settle(f,v){if(f(v),q.shift(),q.length)resume(q[0][0],q[0][1]);}}function __asyncDelegator(o){var i,p;return i={},verb("next"),verb("throw",function(e){throw e;}),verb("return"),i[Symbol.iterator]=function(){return this;},i;function verb(n,f){i[n]=o[n]?function(v){return (p=!p)?{value:__await(o[n](v)),done:n==="return"}:f?f(v):v;}:f;}}function __asyncValues(o){if(!Symbol.asyncIterator)throw new TypeError("Symbol.asyncIterator is not defined.");var m=o[Symbol.asyncIterator],i;return m?m.call(o):(o=typeof __values==="function"?__values(o):o[Symbol.iterator](),i={},verb("next"),verb("throw"),verb("return"),i[Symbol.asyncIterator]=function(){return this;},i);function verb(n){i[n]=o[n]&&function(v){return new Promise(function(resolve,reject){v=o[n](v),settle(resolve,reject,v.done,v.value);});};}function settle(resolve,reject,d,v){Promise.resolve(v).then(function(v){resolve({value:v,done:d});},reject);}}function __makeTemplateObject(cooked,raw){if(Object.defineProperty){Object.defineProperty(cooked,"raw",{value:raw});}else {cooked.raw=raw;}return cooked;}var __setModuleDefault=Object.create?function(o,v){Object.defineProperty(o,"default",{enumerable:true,value:v});}:function(o,v){o["default"]=v;};function __importStar(mod){if(mod&&mod.__esModule)return mod;var result={};if(mod!=null)for(var k in mod)if(k!=="default"&&Object.prototype.hasOwnProperty.call(mod,k))__createBinding(result,mod,k);__setModuleDefault(result,mod);return result;}function __importDefault(mod){return mod&&mod.__esModule?mod:{default:mod};}function __classPrivateFieldGet(receiver,state,kind,f){if(kind==="a"&&!f)throw new TypeError("Private accessor was defined without a getter");if(typeof state==="function"?receiver!==state||!f:!state.has(receiver))throw new TypeError("Cannot read private member from an object whose class did not declare it");return kind==="m"?f:kind==="a"?f.call(receiver):f?f.value:state.get(receiver);}function __classPrivateFieldSet(receiver,state,value,kind,f){if(kind==="m")throw new TypeError("Private method is not writable");if(kind==="a"&&!f)throw new TypeError("Private accessor was defined without a setter");if(typeof state==="function"?receiver!==state||!f:!state.has(receiver))throw new TypeError("Cannot write private member to an object whose class did not declare it");return kind==="a"?f.call(receiver,value):f?f.value=value:state.set(receiver,value),value;}var tslib_es6=/*#__PURE__*/Object.freeze({__proto__:null,__extends:__extends,get __assign(){return _assign;},__rest:__rest,__decorate:__decorate,__param:__param,__metadata:__metadata,__awaiter:__awaiter,__generator:__generator,__createBinding:__createBinding,__exportStar:__exportStar,__values:__values,__read:__read,__spread:__spread,__spreadArrays:__spreadArrays,__spreadArray:__spreadArray,__await:__await,__asyncGenerator:__asyncGenerator,__asyncDelegator:__asyncDelegator,__asyncValues:__asyncValues,__makeTemplateObject:__makeTemplateObject,__importStar:__importStar,__importDefault:__importDefault,__classPrivateFieldGet:__classPrivateFieldGet,__classPrivateFieldSet:__classPrivateFieldSet});var require$$0$1=/*@__PURE__*/getAugmentedNamespace(tslib_es6);var main={};var fork={exports:{}};var types$a={};Object.defineProperty(types$a,"__esModule",{value:true});types$a.Def=void 0;var tslib_1$9=require$$0$1;var Op=Object.prototype;var objToStr=Op.toString;var hasOwn$4=Op.hasOwnProperty;var BaseType=/** @class */function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=/** @class */function(_super){tslib_1$9.__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=/** @class */function(_super){tslib_1$9.__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=/** @class */function(_super){tslib_1$9.__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=/** @class */function(_super){tslib_1$9.__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=/** @class */function(_super){tslib_1$9.__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=/** @class */function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
+  	***************************************************************************** */ /* global Reflect, Promise */var _extendStatics=function extendStatics(d,b){_extendStatics=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(d,b){d.__proto__=b;}||function(d,b){for(var p in b)if(Object.prototype.hasOwnProperty.call(b,p))d[p]=b[p];};return _extendStatics(d,b);};function __extends(d,b){if(typeof b!=="function"&&b!==null)throw new TypeError("Class extends value "+String(b)+" is not a constructor or null");_extendStatics(d,b);function __(){this.constructor=d;}d.prototype=b===null?Object.create(b):(__.prototype=b.prototype,new __());}var _assign=function __assign(){_assign=Object.assign||function __assign(t){for(var s,i=1,n=arguments.length;i<n;i++){s=arguments[i];for(var p in s)if(Object.prototype.hasOwnProperty.call(s,p))t[p]=s[p];}return t;};return _assign.apply(this,arguments);};function __rest(s,e){var t={};for(var p in s)if(Object.prototype.hasOwnProperty.call(s,p)&&e.indexOf(p)<0)t[p]=s[p];if(s!=null&&typeof Object.getOwnPropertySymbols==="function")for(var i=0,p=Object.getOwnPropertySymbols(s);i<p.length;i++){if(e.indexOf(p[i])<0&&Object.prototype.propertyIsEnumerable.call(s,p[i]))t[p[i]]=s[p[i]];}return t;}function __decorate(decorators,target,key,desc){var c=arguments.length,r=c<3?target:desc===null?desc=Object.getOwnPropertyDescriptor(target,key):desc,d;if(typeof Reflect==="object"&&typeof Reflect.decorate==="function")r=Reflect.decorate(decorators,target,key,desc);else for(var i=decorators.length-1;i>=0;i--)if(d=decorators[i])r=(c<3?d(r):c>3?d(target,key,r):d(target,key))||r;return c>3&&r&&Object.defineProperty(target,key,r),r;}function __param(paramIndex,decorator){return function(target,key){decorator(target,key,paramIndex);};}function __metadata(metadataKey,metadataValue){if(typeof Reflect==="object"&&typeof Reflect.metadata==="function")return Reflect.metadata(metadataKey,metadataValue);}function __awaiter(thisArg,_arguments,P,generator){function adopt(value){return value instanceof P?value:new P(function(resolve){resolve(value);});}return new(P||(P=Promise))(function(resolve,reject){function fulfilled(value){try{step(generator.next(value));}catch(e){reject(e);}}function rejected(value){try{step(generator["throw"](value));}catch(e){reject(e);}}function step(result){result.done?resolve(result.value):adopt(result.value).then(fulfilled,rejected);}step((generator=generator.apply(thisArg,_arguments||[])).next());});}function __generator(thisArg,body){var _={label:0,sent:function sent(){if(t[0]&1)throw t[1];return t[1];},trys:[],ops:[]},f,y,t,g;return g={next:verb(0),"throw":verb(1),"return":verb(2)},typeof Symbol==="function"&&(g[Symbol.iterator]=function(){return this;}),g;function verb(n){return function(v){return step([n,v]);};}function step(op){if(f)throw new TypeError("Generator is already executing.");while(_)try{if(f=1,y&&(t=op[0]&2?y["return"]:op[0]?y["throw"]||((t=y["return"])&&t.call(y),0):y.next)&&!(t=t.call(y,op[1])).done)return t;if(y=0,t)op=[op[0]&2,t.value];switch(op[0]){case 0:case 1:t=op;break;case 4:_.label++;return {value:op[1],done:false};case 5:_.label++;y=op[1];op=[0];continue;case 7:op=_.ops.pop();_.trys.pop();continue;default:if(!(t=_.trys,t=t.length>0&&t[t.length-1])&&(op[0]===6||op[0]===2)){_=0;continue;}if(op[0]===3&&(!t||op[1]>t[0]&&op[1]<t[3])){_.label=op[1];break;}if(op[0]===6&&_.label<t[1]){_.label=t[1];t=op;break;}if(t&&_.label<t[2]){_.label=t[2];_.ops.push(op);break;}if(t[2])_.ops.pop();_.trys.pop();continue;}op=body.call(thisArg,_);}catch(e){op=[6,e];y=0;}finally{f=t=0;}if(op[0]&5)throw op[1];return {value:op[0]?op[1]:void 0,done:true};}}var __createBinding=Object.create?function(o,m,k,k2){if(k2===undefined)k2=k;Object.defineProperty(o,k2,{enumerable:true,get:function get(){return m[k];}});}:function(o,m,k,k2){if(k2===undefined)k2=k;o[k2]=m[k];};function __exportStar(m,o){for(var p in m)if(p!=="default"&&!Object.prototype.hasOwnProperty.call(o,p))__createBinding(o,m,p);}function __values(o){var s=typeof Symbol==="function"&&Symbol.iterator,m=s&&o[s],i=0;if(m)return m.call(o);if(o&&typeof o.length==="number")return {next:function next(){if(o&&i>=o.length)o=void 0;return {value:o&&o[i++],done:!o};}};throw new TypeError(s?"Object is not iterable.":"Symbol.iterator is not defined.");}function __read(o,n){var m=typeof Symbol==="function"&&o[Symbol.iterator];if(!m)return o;var i=m.call(o),r,ar=[],e;try{while((n===void 0||n-->0)&&!(r=i.next()).done)ar.push(r.value);}catch(error){e={error:error};}finally{try{if(r&&!r.done&&(m=i["return"]))m.call(i);}finally{if(e)throw e.error;}}return ar;}/** @deprecated */function __spread(){for(var ar=[],i=0;i<arguments.length;i++)ar=ar.concat(__read(arguments[i]));return ar;}/** @deprecated */function __spreadArrays(){for(var s=0,i=0,il=arguments.length;i<il;i++)s+=arguments[i].length;for(var r=Array(s),k=0,i=0;i<il;i++)for(var a=arguments[i],j=0,jl=a.length;j<jl;j++,k++)r[k]=a[j];return r;}function __spreadArray(to,from,pack){if(pack||arguments.length===2)for(var i=0,l=from.length,ar;i<l;i++){if(ar||!(i in from)){if(!ar)ar=Array.prototype.slice.call(from,0,i);ar[i]=from[i];}}return to.concat(ar||from);}function __await(v){return this instanceof __await?(this.v=v,this):new __await(v);}function __asyncGenerator(thisArg,_arguments,generator){if(!Symbol.asyncIterator)throw new TypeError("Symbol.asyncIterator is not defined.");var g=generator.apply(thisArg,_arguments||[]),i,q=[];return i={},verb("next"),verb("throw"),verb("return"),i[Symbol.asyncIterator]=function(){return this;},i;function verb(n){if(g[n])i[n]=function(v){return new Promise(function(a,b){q.push([n,v,a,b])>1||resume(n,v);});};}function resume(n,v){try{step(g[n](v));}catch(e){settle(q[0][3],e);}}function step(r){r.value instanceof __await?Promise.resolve(r.value.v).then(fulfill,reject):settle(q[0][2],r);}function fulfill(value){resume("next",value);}function reject(value){resume("throw",value);}function settle(f,v){if(f(v),q.shift(),q.length)resume(q[0][0],q[0][1]);}}function __asyncDelegator(o){var i,p;return i={},verb("next"),verb("throw",function(e){throw e;}),verb("return"),i[Symbol.iterator]=function(){return this;},i;function verb(n,f){i[n]=o[n]?function(v){return (p=!p)?{value:__await(o[n](v)),done:n==="return"}:f?f(v):v;}:f;}}function __asyncValues(o){if(!Symbol.asyncIterator)throw new TypeError("Symbol.asyncIterator is not defined.");var m=o[Symbol.asyncIterator],i;return m?m.call(o):(o=typeof __values==="function"?__values(o):o[Symbol.iterator](),i={},verb("next"),verb("throw"),verb("return"),i[Symbol.asyncIterator]=function(){return this;},i);function verb(n){i[n]=o[n]&&function(v){return new Promise(function(resolve,reject){v=o[n](v),settle(resolve,reject,v.done,v.value);});};}function settle(resolve,reject,d,v){Promise.resolve(v).then(function(v){resolve({value:v,done:d});},reject);}}function __makeTemplateObject(cooked,raw){if(Object.defineProperty){Object.defineProperty(cooked,"raw",{value:raw});}else {cooked.raw=raw;}return cooked;}var __setModuleDefault=Object.create?function(o,v){Object.defineProperty(o,"default",{enumerable:true,value:v});}:function(o,v){o["default"]=v;};function __importStar(mod){if(mod&&mod.__esModule)return mod;var result={};if(mod!=null)for(var k in mod)if(k!=="default"&&Object.prototype.hasOwnProperty.call(mod,k))__createBinding(result,mod,k);__setModuleDefault(result,mod);return result;}function __importDefault(mod){return mod&&mod.__esModule?mod:{default:mod};}function __classPrivateFieldGet(receiver,state,kind,f){if(kind==="a"&&!f)throw new TypeError("Private accessor was defined without a getter");if(typeof state==="function"?receiver!==state||!f:!state.has(receiver))throw new TypeError("Cannot read private member from an object whose class did not declare it");return kind==="m"?f:kind==="a"?f.call(receiver):f?f.value:state.get(receiver);}function __classPrivateFieldSet(receiver,state,value,kind,f){if(kind==="m")throw new TypeError("Private method is not writable");if(kind==="a"&&!f)throw new TypeError("Private accessor was defined without a setter");if(typeof state==="function"?receiver!==state||!f:!state.has(receiver))throw new TypeError("Cannot write private member to an object whose class did not declare it");return kind==="a"?f.call(receiver,value):f?f.value=value:state.set(receiver,value),value;}var tslib_es6=/*#__PURE__*/Object.freeze({__proto__:null,__extends:__extends,get __assign(){return _assign;},__rest:__rest,__decorate:__decorate,__param:__param,__metadata:__metadata,__awaiter:__awaiter,__generator:__generator,__createBinding:__createBinding,__exportStar:__exportStar,__values:__values,__read:__read,__spread:__spread,__spreadArrays:__spreadArrays,__spreadArray:__spreadArray,__await:__await,__asyncGenerator:__asyncGenerator,__asyncDelegator:__asyncDelegator,__asyncValues:__asyncValues,__makeTemplateObject:__makeTemplateObject,__importStar:__importStar,__importDefault:__importDefault,__classPrivateFieldGet:__classPrivateFieldGet,__classPrivateFieldSet:__classPrivateFieldSet});var require$$0$1=/*@__PURE__*/getAugmentedNamespace(tslib_es6);var main={};var fork={exports:{}};var types$a={};Object.defineProperty(types$a,"__esModule",{value:true});types$a.Def=void 0;var tslib_1$9=require$$0$1;var Op=Object.prototype;var objToStr=Op.toString;var hasOwn$4=Op.hasOwnProperty;var BaseType=function(){function BaseType(){}BaseType.prototype.assert=function(value,deep){if(!this.check(value,deep)){var str=shallowStringify(value);throw new Error(str+" does not match type "+this);}return true;};BaseType.prototype.arrayOf=function(){var elemType=this;return new ArrayType(elemType);};return BaseType;}();var ArrayType=function(_super){tslib_1$9.__extends(ArrayType,_super);function ArrayType(elemType){var _this=_super.call(this)||this;_this.elemType=elemType;_this.kind="ArrayType";return _this;}ArrayType.prototype.toString=function(){return "["+this.elemType+"]";};ArrayType.prototype.check=function(value,deep){var _this=this;return Array.isArray(value)&&value.every(function(elem){return _this.elemType.check(elem,deep);});};return ArrayType;}(BaseType);var IdentityType=function(_super){tslib_1$9.__extends(IdentityType,_super);function IdentityType(value){var _this=_super.call(this)||this;_this.value=value;_this.kind="IdentityType";return _this;}IdentityType.prototype.toString=function(){return String(this.value);};IdentityType.prototype.check=function(value,deep){var result=value===this.value;if(!result&&typeof deep==="function"){deep(this,value);}return result;};return IdentityType;}(BaseType);var ObjectType=function(_super){tslib_1$9.__extends(ObjectType,_super);function ObjectType(fields){var _this=_super.call(this)||this;_this.fields=fields;_this.kind="ObjectType";return _this;}ObjectType.prototype.toString=function(){return "{ "+this.fields.join(", ")+" }";};ObjectType.prototype.check=function(value,deep){return objToStr.call(value)===objToStr.call({})&&this.fields.every(function(field){return field.type.check(value[field.name],deep);});};return ObjectType;}(BaseType);var OrType=function(_super){tslib_1$9.__extends(OrType,_super);function OrType(types){var _this=_super.call(this)||this;_this.types=types;_this.kind="OrType";return _this;}OrType.prototype.toString=function(){return this.types.join(" | ");};OrType.prototype.check=function(value,deep){return this.types.some(function(type){return type.check(value,deep);});};return OrType;}(BaseType);var PredicateType=function(_super){tslib_1$9.__extends(PredicateType,_super);function PredicateType(name,predicate){var _this=_super.call(this)||this;_this.name=name;_this.predicate=predicate;_this.kind="PredicateType";return _this;}PredicateType.prototype.toString=function(){return this.name;};PredicateType.prototype.check=function(value,deep){var result=this.predicate(value,deep);if(!result&&typeof deep==="function"){deep(this,value);}return result;};return PredicateType;}(BaseType);var Def=function(){function Def(type,typeName){this.type=type;this.typeName=typeName;this.baseNames=[];this.ownFields=Object.create(null);// Includes own typeName. Populated during finalization.
   this.allSupertypes=Object.create(null);// Linear inheritance hierarchy. Populated during finalization.
   this.supertypeList=[];// Includes inherited fields.
   this.allFields=Object.create(null);// Non-hidden keys of allFields.
@@ -2613,7 +2615,7 @@
   this.buildable=false;this.buildParams=[];}Def.prototype.isSupertypeOf=function(that){if(that instanceof Def){if(this.finalized!==true||that.finalized!==true){throw new Error("");}return hasOwn$4.call(that.allSupertypes,this.typeName);}else {throw new Error(that+" is not a Def");}};Def.prototype.checkAllFields=function(value,deep){var allFields=this.allFields;if(this.finalized!==true){throw new Error(""+this.typeName);}function checkFieldByName(name){var field=allFields[name];var type=field.type;var child=field.getValue(value);return type.check(child,deep);}return value!==null&&typeof value==="object"&&Object.keys(allFields).every(checkFieldByName);};Def.prototype.bases=function(){var supertypeNames=[];for(var _i=0;_i<arguments.length;_i++){supertypeNames[_i]=arguments[_i];}var bases=this.baseNames;if(this.finalized){if(supertypeNames.length!==bases.length){throw new Error("");}for(var i=0;i<supertypeNames.length;i++){if(supertypeNames[i]!==bases[i]){throw new Error("");}}return this;}supertypeNames.forEach(function(baseName){// This indexOf lookup may be O(n), but the typical number of base
   // names is very small, and indexOf is a native Array method.
   if(bases.indexOf(baseName)<0){bases.push(baseName);}});return this;// For chaining.
-  };return Def;}();types$a.Def=Def;var Field=/** @class */function(){function Field(name,type,defaultFn,hidden){this.name=name;this.type=type;this.defaultFn=defaultFn;this.hidden=!!hidden;}Field.prototype.toString=function(){return JSON.stringify(this.name)+": "+this.type;};Field.prototype.getValue=function(obj){var value=obj[this.name];if(typeof value!=="undefined"){return value;}if(typeof this.defaultFn==="function"){value=this.defaultFn.call(obj);}return value;};return Field;}();function shallowStringify(value){if(Array.isArray(value)){return "["+value.map(shallowStringify).join(", ")+"]";}if(value&&typeof value==="object"){return "{ "+Object.keys(value).map(function(key){return key+": "+value[key];}).join(", ")+" }";}return JSON.stringify(value);}function typesPlugin(_fork){var Type={or:function or(){var types=[];for(var _i=0;_i<arguments.length;_i++){types[_i]=arguments[_i];}return new OrType(types.map(function(type){return Type.from(type);}));},from:function from(value,name){if(value instanceof ArrayType||value instanceof IdentityType||value instanceof ObjectType||value instanceof OrType||value instanceof PredicateType){return value;}// The Def type is used as a helper for constructing compound
+  };return Def;}();types$a.Def=Def;var Field=function(){function Field(name,type,defaultFn,hidden){this.name=name;this.type=type;this.defaultFn=defaultFn;this.hidden=!!hidden;}Field.prototype.toString=function(){return JSON.stringify(this.name)+": "+this.type;};Field.prototype.getValue=function(obj){var value=obj[this.name];if(typeof value!=="undefined"){return value;}if(typeof this.defaultFn==="function"){value=this.defaultFn.call(obj);}return value;};return Field;}();function shallowStringify(value){if(Array.isArray(value)){return "["+value.map(shallowStringify).join(", ")+"]";}if(value&&typeof value==="object"){return "{ "+Object.keys(value).map(function(key){return key+": "+value[key];}).join(", ")+" }";}return JSON.stringify(value);}function typesPlugin(_fork){var Type={or:function or(){var types=[];for(var _i=0;_i<arguments.length;_i++){types[_i]=arguments[_i];}return new OrType(types.map(function(type){return Type.from(type);}));},from:function from(value,name){if(value instanceof ArrayType||value instanceof IdentityType||value instanceof ObjectType||value instanceof OrType||value instanceof PredicateType){return value;}// The Def type is used as a helper for constructing compound
   // interface types for AST nodes.
   if(value instanceof Def){return value.type;}// Support [ElemType] syntax.
   if(isArray.check(value)){if(value.length!==1){throw new Error("only one element type is permitted for typed arrays");}return new ArrayType(Type.from(value[0]));}// Support { someField: FieldType, ... } syntax.
@@ -2632,7 +2634,7 @@
   // returns false for [], /./, new Date, and null.
   var isString=defBuiltInType("string","truthy");var isFunction=defBuiltInType("function",function(){});var isArray=defBuiltInType("array",[]);var isObject=defBuiltInType("object",{});var isRegExp=defBuiltInType("RegExp",/./);var isDate=defBuiltInType("Date",new Date());var isNumber=defBuiltInType("number",3);var isBoolean=defBuiltInType("boolean",true);var isNull=defBuiltInType("null",null);var isUndefined=defBuiltInType("undefined",undefined);var builtInTypes={string:isString,function:isFunction,array:isArray,object:isObject,RegExp:isRegExp,Date:isDate,number:isNumber,boolean:isBoolean,null:isNull,undefined:isUndefined};// In order to return the same Def instance every time Type.def is called
   // with a particular name, those instances need to be stored in a cache.
-  var defCache=Object.create(null);function defFromValue(value){if(value&&typeof value==="object"){var type=value.type;if(typeof type==="string"&&hasOwn$4.call(defCache,type)){var d=defCache[type];if(d.finalized){return d;}}}return null;}var DefImpl=/** @class */function(_super){tslib_1$9.__extends(DefImpl,_super);function DefImpl(typeName){var _this=_super.call(this,new PredicateType(typeName,function(value,deep){return _this.check(value,deep);}),typeName)||this;return _this;}DefImpl.prototype.check=function(value,deep){if(this.finalized!==true){throw new Error("prematurely checking unfinalized type "+this.typeName);}// A Def type can only match an object value.
+  var defCache=Object.create(null);function defFromValue(value){if(value&&typeof value==="object"){var type=value.type;if(typeof type==="string"&&hasOwn$4.call(defCache,type)){var d=defCache[type];if(d.finalized){return d;}}}return null;}var DefImpl=function(_super){tslib_1$9.__extends(DefImpl,_super);function DefImpl(typeName){var _this=_super.call(this,new PredicateType(typeName,function(value,deep){return _this.check(value,deep);}),typeName)||this;return _this;}DefImpl.prototype.check=function(value,deep){if(this.finalized!==true){throw new Error("prematurely checking unfinalized type "+this.typeName);}// A Def type can only match an object value.
   if(value===null||typeof value!=="object"){return false;}var vDef=defFromValue(value);if(!vDef){// If we couldn't infer the Def associated with the given value,
   // and we expected it to be a SourceLocation or a Position, it was
   // probably just missing a "type" field (because Esprima does not
@@ -4074,7 +4076,7 @@
   /******/__webpack_require__.m=modules;/******/ // expose the module cache
   /******/__webpack_require__.c=installedModules;/******/ // __webpack_public_path__
   /******/__webpack_require__.p="";/******/ // Load entry module and return exports
-  /******/return __webpack_require__(0);/******/}(/************************************************************************/ /******/[/* 0 */ /***/function(module,exports,__webpack_require__){/*
+  /******/return __webpack_require__(0);/******/}([/* 0 */ /***/function(module,exports,__webpack_require__){/*
   		  Copyright JS Foundation and other contributors, https://js.foundation/
 
   		  Redistribution and use in source and binary forms, with or without
@@ -4360,7 +4362,7 @@
   	SOFTWARE.
 
   	*/var _endianness;function endianness(){if(typeof _endianness==='undefined'){var a=new ArrayBuffer(2);var b=new Uint8Array(a);var c=new Uint16Array(a);b[0]=1;b[1]=2;if(c[0]===258){_endianness='BE';}else if(c[0]===513){_endianness='LE';}else {throw new Error('unable to figure out endianess');}}return _endianness;}function hostname(){if(typeof global.location!=='undefined'){return global.location.hostname;}else return '';}function loadavg(){return [];}function uptime(){return 0;}function freemem(){return Number.MAX_VALUE;}function totalmem(){return Number.MAX_VALUE;}function cpus(){return [];}function type(){return 'Browser';}function release(){if(typeof global.navigator!=='undefined'){return global.navigator.appVersion;}return '';}function networkInterfaces(){}function getNetworkInterfaces(){}function arch(){return 'javascript';}function platform(){return 'browser';}function tmpDir(){return '/tmp';}var tmpdir=tmpDir;var EOL='\n';var os={EOL:EOL,tmpdir:tmpdir,tmpDir:tmpDir,networkInterfaces:networkInterfaces,getNetworkInterfaces:getNetworkInterfaces,release:release,type:type,cpus:cpus,totalmem:totalmem,freemem:freemem,uptime:uptime,loadavg:loadavg,hostname:hostname,endianness:endianness};var os$1=/*#__PURE__*/Object.freeze({__proto__:null,endianness:endianness,hostname:hostname,loadavg:loadavg,uptime:uptime,freemem:freemem,totalmem:totalmem,cpus:cpus,type:type,release:release,networkInterfaces:networkInterfaces,getNetworkInterfaces:getNetworkInterfaces,arch:arch,platform:platform,tmpDir:tmpDir,tmpdir:tmpdir,EOL:EOL,'default':os});var require$$1=/*@__PURE__*/getAugmentedNamespace(os$1);Object.defineProperty(options,"__esModule",{value:true});options.normalize=void 0;var defaults={parser:esprima$1,tabWidth:4,useTabs:false,reuseWhitespace:true,lineTerminator:require$$1.EOL||"\n",wrapColumn:74,sourceFileName:null,sourceMapName:null,sourceRoot:null,inputSourceMap:null,range:false,tolerant:true,quote:null,trailingComma:false,arrayBracketSpacing:false,objectCurlySpacing:true,arrowParensAlways:false,flowObjectCommas:true,tokens:true};var hasOwn$1=defaults.hasOwnProperty;// Copy options and fill in default values.
-  function normalize$1(opts){var options=opts||defaults;function get(key){return hasOwn$1.call(options,key)?options[key]:defaults[key];}return {tabWidth:+get("tabWidth"),useTabs:!!get("useTabs"),reuseWhitespace:!!get("reuseWhitespace"),lineTerminator:get("lineTerminator"),wrapColumn:Math.max(get("wrapColumn"),0),sourceFileName:get("sourceFileName"),sourceMapName:get("sourceMapName"),sourceRoot:get("sourceRoot"),inputSourceMap:get("inputSourceMap"),parser:get("esprima")||get("parser"),range:get("range"),tolerant:get("tolerant"),quote:get("quote"),trailingComma:get("trailingComma"),arrayBracketSpacing:get("arrayBracketSpacing"),objectCurlySpacing:get("objectCurlySpacing"),arrowParensAlways:get("arrowParensAlways"),flowObjectCommas:get("flowObjectCommas"),tokens:!!get("tokens")};}options.normalize=normalize$1;var lines={};var mapping={};Object.defineProperty(mapping,"__esModule",{value:true});var tslib_1$7=require$$0$1;var assert_1$6=tslib_1$7.__importDefault(require$$1$1);var util_1$4=util$d;var Mapping$1=/** @class */function(){function Mapping(sourceLines,sourceLoc,targetLoc){if(targetLoc===void 0){targetLoc=sourceLoc;}this.sourceLines=sourceLines;this.sourceLoc=sourceLoc;this.targetLoc=targetLoc;}Mapping.prototype.slice=function(lines,start,end){if(end===void 0){end=lines.lastPos();}var sourceLines=this.sourceLines;var sourceLoc=this.sourceLoc;var targetLoc=this.targetLoc;function skip(name){var sourceFromPos=sourceLoc[name];var targetFromPos=targetLoc[name];var targetToPos=start;if(name==="end"){targetToPos=end;}else {assert_1$6.default.strictEqual(name,"start");}return skipChars(sourceLines,sourceFromPos,lines,targetFromPos,targetToPos);}if(util_1$4.comparePos(start,targetLoc.start)<=0){if(util_1$4.comparePos(targetLoc.end,end)<=0){targetLoc={start:subtractPos(targetLoc.start,start.line,start.column),end:subtractPos(targetLoc.end,start.line,start.column)};// The sourceLoc can stay the same because the contents of the
+  function normalize$1(opts){var options=opts||defaults;function get(key){return hasOwn$1.call(options,key)?options[key]:defaults[key];}return {tabWidth:+get("tabWidth"),useTabs:!!get("useTabs"),reuseWhitespace:!!get("reuseWhitespace"),lineTerminator:get("lineTerminator"),wrapColumn:Math.max(get("wrapColumn"),0),sourceFileName:get("sourceFileName"),sourceMapName:get("sourceMapName"),sourceRoot:get("sourceRoot"),inputSourceMap:get("inputSourceMap"),parser:get("esprima")||get("parser"),range:get("range"),tolerant:get("tolerant"),quote:get("quote"),trailingComma:get("trailingComma"),arrayBracketSpacing:get("arrayBracketSpacing"),objectCurlySpacing:get("objectCurlySpacing"),arrowParensAlways:get("arrowParensAlways"),flowObjectCommas:get("flowObjectCommas"),tokens:!!get("tokens")};}options.normalize=normalize$1;var lines={};var mapping={};Object.defineProperty(mapping,"__esModule",{value:true});var tslib_1$7=require$$0$1;var assert_1$6=tslib_1$7.__importDefault(require$$1$1);var util_1$4=util$d;var Mapping$1=function(){function Mapping(sourceLines,sourceLoc,targetLoc){if(targetLoc===void 0){targetLoc=sourceLoc;}this.sourceLines=sourceLines;this.sourceLoc=sourceLoc;this.targetLoc=targetLoc;}Mapping.prototype.slice=function(lines,start,end){if(end===void 0){end=lines.lastPos();}var sourceLines=this.sourceLines;var sourceLoc=this.sourceLoc;var targetLoc=this.targetLoc;function skip(name){var sourceFromPos=sourceLoc[name];var targetFromPos=targetLoc[name];var targetToPos=start;if(name==="end"){targetToPos=end;}else {assert_1$6.default.strictEqual(name,"start");}return skipChars(sourceLines,sourceFromPos,lines,targetFromPos,targetToPos);}if(util_1$4.comparePos(start,targetLoc.start)<=0){if(util_1$4.comparePos(targetLoc.end,end)<=0){targetLoc={start:subtractPos(targetLoc.start,start.line,start.column),end:subtractPos(targetLoc.end,start.line,start.column)};// The sourceLoc can stay the same because the contents of the
   // targetLoc have not changed.
   }else if(util_1$4.comparePos(end,targetLoc.start)<=0){return null;}else {sourceLoc={start:sourceLoc.start,end:skip("end")};targetLoc={start:subtractPos(targetLoc.start,start.line,start.column),end:subtractPos(end,start.line,start.column)};}}else {if(util_1$4.comparePos(targetLoc.end,start)<=0){return null;}if(util_1$4.comparePos(targetLoc.end,end)<=0){sourceLoc={start:skip("start"),end:sourceLoc.end};targetLoc={// Same as subtractPos(start, start.line, start.column):
   start:{line:1,column:0},end:subtractPos(targetLoc.end,start.line,start.column)};}else {sourceLoc={start:skip("start"),end:skip("end")};targetLoc={// Same as subtractPos(start, start.line, start.column):
@@ -4371,7 +4373,7 @@
   sourceCursor.column=0;targetCursor.column=0;}else {assert_1$6.default.strictEqual(lineDiff,0);}while(util_1$4.comparePos(targetCursor,targetToPos)<0&&targetLines.nextPos(targetCursor,true)){assert_1$6.default.ok(sourceLines.nextPos(sourceCursor,true));assert_1$6.default.strictEqual(sourceLines.charAt(sourceCursor),targetLines.charAt(targetCursor));}}else {// Skipping backward.
   sourceCursor=sourceLines.skipSpaces(sourceFromPos,true)||sourceLines.firstPos();targetCursor=targetLines.skipSpaces(targetFromPos,true)||targetLines.firstPos();var lineDiff=targetToPos.line-targetCursor.line;sourceCursor.line+=lineDiff;targetCursor.line+=lineDiff;if(lineDiff<0){// If jumping to earlier lines, reset columns to the ends of
   // those lines.
-  sourceCursor.column=sourceLines.getLineLength(sourceCursor.line);targetCursor.column=targetLines.getLineLength(targetCursor.line);}else {assert_1$6.default.strictEqual(lineDiff,0);}while(util_1$4.comparePos(targetToPos,targetCursor)<0&&targetLines.prevPos(targetCursor,true)){assert_1$6.default.ok(sourceLines.prevPos(sourceCursor,true));assert_1$6.default.strictEqual(sourceLines.charAt(sourceCursor),targetLines.charAt(targetCursor));}}return sourceCursor;}Object.defineProperty(lines,"__esModule",{value:true});lines.concat=lines.fromString=lines.countSpaces=lines.Lines=void 0;var tslib_1$6=require$$0$1;var assert_1$5=tslib_1$6.__importDefault(require$$1$1);var source_map_1=tslib_1$6.__importDefault(sourceMap);var options_1$2=options;var util_1$3=util$d;var mapping_1=tslib_1$6.__importDefault(mapping);var Lines=/** @class */function(){function Lines(infos,sourceFileName){if(sourceFileName===void 0){sourceFileName=null;}this.infos=infos;this.mappings=[];this.cachedSourceMap=null;this.cachedTabWidth=void 0;assert_1$5.default.ok(infos.length>0);this.length=infos.length;this.name=sourceFileName||null;if(this.name){this.mappings.push(new mapping_1.default(this,{start:this.firstPos(),end:this.lastPos()}));}}Lines.prototype.toString=function(options){return this.sliceString(this.firstPos(),this.lastPos(),options);};Lines.prototype.getSourceMap=function(sourceMapName,sourceRoot){if(!sourceMapName){// Although we could make up a name or generate an anonymous
+  sourceCursor.column=sourceLines.getLineLength(sourceCursor.line);targetCursor.column=targetLines.getLineLength(targetCursor.line);}else {assert_1$6.default.strictEqual(lineDiff,0);}while(util_1$4.comparePos(targetToPos,targetCursor)<0&&targetLines.prevPos(targetCursor,true)){assert_1$6.default.ok(sourceLines.prevPos(sourceCursor,true));assert_1$6.default.strictEqual(sourceLines.charAt(sourceCursor),targetLines.charAt(targetCursor));}}return sourceCursor;}Object.defineProperty(lines,"__esModule",{value:true});lines.concat=lines.fromString=lines.countSpaces=lines.Lines=void 0;var tslib_1$6=require$$0$1;var assert_1$5=tslib_1$6.__importDefault(require$$1$1);var source_map_1=tslib_1$6.__importDefault(sourceMap);var options_1$2=options;var util_1$3=util$d;var mapping_1=tslib_1$6.__importDefault(mapping);var Lines=function(){function Lines(infos,sourceFileName){if(sourceFileName===void 0){sourceFileName=null;}this.infos=infos;this.mappings=[];this.cachedSourceMap=null;this.cachedTabWidth=void 0;assert_1$5.default.ok(infos.length>0);this.length=infos.length;this.name=sourceFileName||null;if(this.name){this.mappings.push(new mapping_1.default(this,{start:this.firstPos(),end:this.lastPos()}));}}Lines.prototype.toString=function(options){return this.sliceString(this.firstPos(),this.lastPos(),options);};Lines.prototype.getSourceMap=function(sourceMapName,sourceRoot){if(!sourceMapName){// Although we could make up a name or generate an anonymous
   // source map, instead we assume that any consumer who does not
   // provide a name does not actually want a source map.
   return null;}var targetLines=this;function updateJSON(json){json=json||{};json.file=sourceMapName;if(sourceRoot){json.sourceRoot=sourceRoot;}return json;}if(targetLines.cachedSourceMap){// Since Lines objects are immutable, we can reuse any source map
@@ -4447,9 +4449,7 @@
   // comment must be separated from fn by an unbroken series of
   // whitespace-only gaps (or other comments).
   var indexOfFirstLeadingComment=tieCount;var comment;for(;indexOfFirstLeadingComment>0;--indexOfFirstLeadingComment){comment=tiesToBreak[indexOfFirstLeadingComment-1];assert_1$4.default.strictEqual(comment.precedingNode,pn);assert_1$4.default.strictEqual(comment.followingNode,fn);var gap=lines.sliceString(comment.loc.end,gapEndPos);if(/\S/.test(gap)){// The gap string contained something other than whitespace.
-  break;}gapEndPos=comment.loc.start;}while(indexOfFirstLeadingComment<=tieCount&&(comment=tiesToBreak[indexOfFirstLeadingComment])&&(// If the comment is a //-style comment and indented more
-  // deeply than the node itself, reconsider it as trailing.
-  comment.type==="Line"||comment.type==="CommentLine")&&comment.loc.start.column>fn.loc.start.column){++indexOfFirstLeadingComment;}tiesToBreak.forEach(function(comment,i){if(i<indexOfFirstLeadingComment){addTrailingComment(pn,comment);}else {addLeadingComment(fn,comment);}});tiesToBreak.length=0;}function addCommentHelper(node,comment){var comments=node.comments||(node.comments=[]);comments.push(comment);}function addLeadingComment(node,comment){comment.leading=true;comment.trailing=false;addCommentHelper(node,comment);}function addDanglingComment(node,comment){comment.leading=false;comment.trailing=false;addCommentHelper(node,comment);}function addTrailingComment(node,comment){comment.leading=false;comment.trailing=true;addCommentHelper(node,comment);}function printLeadingComment(commentPath,print){var comment=commentPath.getValue();n$1.Comment.assert(comment);var loc=comment.loc;var lines=loc&&loc.lines;var parts=[print(commentPath)];if(comment.trailing){// When we print trailing comments as leading comments, we don't
+  break;}gapEndPos=comment.loc.start;}while(indexOfFirstLeadingComment<=tieCount&&(comment=tiesToBreak[indexOfFirstLeadingComment])&&(comment.type==="Line"||comment.type==="CommentLine")&&comment.loc.start.column>fn.loc.start.column){++indexOfFirstLeadingComment;}tiesToBreak.forEach(function(comment,i){if(i<indexOfFirstLeadingComment){addTrailingComment(pn,comment);}else {addLeadingComment(fn,comment);}});tiesToBreak.length=0;}function addCommentHelper(node,comment){var comments=node.comments||(node.comments=[]);comments.push(comment);}function addLeadingComment(node,comment){comment.leading=true;comment.trailing=false;addCommentHelper(node,comment);}function addDanglingComment(node,comment){comment.leading=false;comment.trailing=false;addCommentHelper(node,comment);}function addTrailingComment(node,comment){comment.leading=false;comment.trailing=true;addCommentHelper(node,comment);}function printLeadingComment(commentPath,print){var comment=commentPath.getValue();n$1.Comment.assert(comment);var loc=comment.loc;var lines=loc&&loc.lines;var parts=[print(commentPath)];if(comment.trailing){// When we print trailing comments as leading comments, we don't
   // want to bring any trailing spaces along.
   parts.push("\n");}else if(lines instanceof lines_1$2.Lines){var trailingSpace=lines.slice(loc.end,lines.skipSpaces(loc.end)||lines.lastPos());if(trailingSpace.length===1){// If the trailing space contains no newlines, then we want to
   // preserve it exactly as we found it.
@@ -6422,9 +6422,7 @@
   	 * True if the node has expressions or expression attributes
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {boolean} ditto
-  	 */function hasExpressions(node){return !!(node.expressions||// has expression attributes
-  getNodeAttributes(node).some(attribute=>hasExpressions(attribute))||// has child text nodes with expressions
-  node.nodes&&node.nodes.some(node=>isTextNode(node)&&hasExpressions(node)));}/**
+  	 */function hasExpressions(node){return !!(node.expressions||getNodeAttributes(node).some(attribute=>hasExpressions(attribute))||node.nodes&&node.nodes.some(node=>isTextNode(node)&&hasExpressions(node)));}/**
   	 * True if the node is a directive having its own template
   	 * @param   {RiotParser.Node} node - riot parser node
   	 * @returns {boolean} true only for the IF EACH and TAG bindings
@@ -6875,9 +6873,7 @@
   	 * @param   { Object } meta - compilation meta information
   	 * @returns { Promise<Output> } object containing output code and source map
   	 */function hookGenerator(transformer,sourceNode,source,meta){if(// filter missing nodes
-  !sourceNode||// filter nodes without children
-  sourceNode.nodes&&!sourceNode.nodes.length||// filter empty javascript and css nodes
-  !sourceNode.nodes&&!sourceNode.text){return result=>result;}return curry(transformer)(sourceNode,source,meta);}// This function can be used to register new preprocessors
+  !sourceNode||sourceNode.nodes&&!sourceNode.nodes.length||!sourceNode.nodes&&!sourceNode.text){return result=>result;}return curry(transformer)(sourceNode,source,meta);}// This function can be used to register new preprocessors
   // a preprocessor can target either only the css or javascript nodes
   // or the complete tag source file ('template')
   const registerPreprocessor=register;// This function can allow you to register postprocessors that will parse the output code
