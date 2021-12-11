@@ -1,9 +1,9 @@
-/* Riot v6.0.4, @license MIT */
+/* Riot v6.1.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.riot = {}));
-}(this, (function (exports) { 'use strict';
+})(this, (function (exports) { 'use strict';
 
   /**
    * Convert a string from camel case to dash-case
@@ -2553,7 +2553,7 @@
   const withTypes = component => component;
   /** @type {string} current riot version */
 
-  const version = 'v6.0.4'; // expose some internal stuff that might be used from external tools
+  const version = 'v6.1.0'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
@@ -2577,4 +2577,4 @@
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
-})));
+}));
