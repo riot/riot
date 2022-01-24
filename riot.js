@@ -1,4 +1,4 @@
-/* Riot v6.1.1, @license MIT */
+/* Riot v6.1.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -264,46 +264,6 @@
   }
 
   /**
-   * Get the current <template> fragment children located in between the head and tail comments
-   * @param {Comment} head - head comment node
-   * @param {Comment} tail - tail comment node
-   * @return {Array[]} children list of the nodes found in this template fragment
-   */
-
-  function getFragmentChildren(_ref) {
-    let {
-      head,
-      tail
-    } = _ref;
-    const nodes = walkNodes([head], head.nextSibling, n => n === tail, false);
-    nodes.push(tail);
-    return nodes;
-  }
-  /**
-   * Recursive function to walk all the <template> children nodes
-   * @param {Array[]} children - children nodes collection
-   * @param {ChildNode} node - current node
-   * @param {Function} check - exit function check
-   * @param {boolean} isFilterActive - filter flag to skip nodes managed by other bindings
-   * @returns {Array[]} children list of the nodes found in this template fragment
-   */
-
-  function walkNodes(children, node, check, isFilterActive) {
-    const {
-      nextSibling
-    } = node; // filter tail and head nodes together with all the nodes in between
-    // this is needed only to fix a really ugly edge case https://github.com/riot/riot/issues/2892
-
-    if (!isFilterActive && !node[HEAD_SYMBOL] && !node[TAIL_SYMBOL]) {
-      children.push(node);
-    }
-
-    if (!nextSibling || check(node)) return children;
-    return walkNodes(children, nextSibling, check, // activate the filters to skip nodes between <template> fragments that will be managed by other bindings
-    isFilterActive && !node[TAIL_SYMBOL] || nextSibling[HEAD_SYMBOL]);
-  }
-
-  /**
    * Quick type checking
    * @param   {*} element - anything
    * @param   {string} type - type definition
@@ -552,9 +512,7 @@
       batches.forEach(fn => fn()); // update the children map
 
       this.childrenMap = newChildrenMap;
-      this.nodes = futureNodes; // make sure that the loop edge nodes are marked
-
-      markEdgeNodes(this.nodes);
+      this.nodes = futureNodes;
       return this;
     },
 
@@ -634,19 +592,6 @@
     return scope;
   }
   /**
-   * Mark the first and last nodes in order to ignore them in case we need to retrieve the <template> fragment nodes
-   * @param {Array[]} nodes - each binding nodes list
-   * @returns {undefined} void function
-   */
-
-
-  function markEdgeNodes(nodes) {
-    const first = nodes[0];
-    const last = nodes[nodes.length - 1];
-    if (first) first[HEAD_SYMBOL] = true;
-    if (last) last[TAIL_SYMBOL] = true;
-  }
-  /**
    * Loop the current template items
    * @param   {Array} items - expression collection value
    * @param   {*} scope - template scope
@@ -702,7 +647,7 @@
 
 
       if (isTemplateTag) {
-        nodes.push(...(mustMount ? meta.children : getFragmentChildren(meta)));
+        nodes.push(...meta.children);
       } else {
         nodes.push(el);
       } // delete the old item from the children map
@@ -2553,7 +2498,7 @@
   const withTypes = component => component;
   /** @type {string} current riot version */
 
-  const version = 'v6.1.1'; // expose some internal stuff that might be used from external tools
+  const version = 'v6.1.2'; // expose some internal stuff that might be used from external tools
 
   const __ = {
     cssManager,
