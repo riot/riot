@@ -29,8 +29,8 @@ module.exports = function(conf) {
       TEST_FILES
     ],
     sauceLabs: {
-      build: `TRAVIS #${process.env.TRAVIS_BUILD_NUMBER} (${process.env.TRAVIS_BUILD_ID})`,
-      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
+      build: `GITHUB_RUN_NUMBER #${process.env.GITHUB_RUN_NUMBER} (${process.env.GITHUB_RUN_NUMBER})`,
+      tunnelIdentifier: process.env.GITHUB_RUN_ID,
       testName: 'riot'
     },
     captureTimeout: 300000,
