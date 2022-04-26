@@ -4,7 +4,7 @@
 - [**Riot Examples** - Community's Official](https://github.com/riot/examples)
 - [**Riot Animore** - Official Tags Animations Library](https://github.com/riot/animore)
 - [Riot Todo MVC](http://todomvc.com/examples/riotjs/)
-- [Hackernews reader](http://git.io/riot-hn)
+- [Hackernews reader](https://txchen.github.io/riot-hn)
 - [Vuejs examples by Riotjs](https://github.com/txchen/feplay/tree/gh-pages/riot_vue)
 - [Flux-like ES6 Todo](https://github.com/srackham/riot-todo)
 - [Timer](http://jsfiddle.net/gnumanth/h9kuozp5/)
