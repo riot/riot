@@ -1,5 +1,6 @@
+import * as riot from '../../src/riot+compiler'
+import {GLOBAL_REGISTRY} from '../../src/compiler/global-registry'
 import {expect} from 'chai'
-import riot from '../../src/riot+compiler'
 
 describe('Riot compiler api', () => {
   it('riot compiler exports properly its public api', () => {
@@ -38,7 +39,7 @@ describe('Riot compiler api', () => {
     document.body.appendChild(script)
     await riot.compile()
 
-    expect(window['__riot_registry__']['simple']).to.be.ok
+    expect(window[GLOBAL_REGISTRY]['simple']).to.be.ok
 
     riot.unregister('simple')
   })

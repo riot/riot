@@ -1,8 +1,13 @@
 const commonjs = require('@rollup/plugin-commonjs')
-const json = require('@rollup/plugin-json')
 const {nodeResolve} = require('@rollup/plugin-node-resolve')
-const babel = require('rollup-plugin-babel')
 const emptyFile = 'export default undefined'
+const babel = require('rollup-plugin-babel')
+
+const ignoredModules = [
+  'fs',
+  'path',
+  'esprima'
+]
 
 // ignore builtin requires
 function ignore() {
@@ -21,17 +26,20 @@ function ignore() {
 module.exports = {
   output: [{
     banner: '/* Riot WIP, @license MIT */',
-    name: 'riot'
+    name: 'riot',
+    preferConst: true,
+    globals: ignoredModules.reduce((acc, dep) => ({
+      [dep]: dep,
+      ...acc
+    }), {})
   }],
+  external: ignoredModules,
   onwarn: function(error) {
     if (/external dependency|Circular dependency/.test(error.message)) return
     console.error(error.message) // eslint-disable-line
   },
   plugins: [
     ignore(),
-    nodeResolve(),
-    commonjs(),
-    json(),
     babel({
       ignore: [/[/\\]core-js/, /@babel[/\\]runtime/],
       env: {
@@ -49,6 +57,13 @@ module.exports = {
         }
       },
       presets: ['@riotjs/babel-preset']
+    }),
+    nodeResolve(),
+    commonjs({
+      transformMixedEsModules: true,
+      include: 'node_modules/**',
+      ignoreTryCatch: 'remove',
+      exclude: ignoredModules
     })
   ]
 }
