@@ -54,8 +54,10 @@ npm-debug.log
 bower_components
 coverage
 dist
+esm
 
 /dist/*
+/esm/*
 
 !.gitmodules
 !.travis.yml
