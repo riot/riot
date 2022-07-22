@@ -1,4 +1,4 @@
-import {DOM_COMPONENT_INSTANCE_PROPERTY} from '@riotjs/util/constants'
+import {DOM_COMPONENT_INSTANCE_PROPERTY} from '@riotjs/util'
 
 /**
  * Bind a DOM node to its component object

@@ -23,11 +23,11 @@ import {
   UNMOUNT_METHOD_KEY,
   UPDATE_METHOD_KEY,
   VALUE_ATTRIBUTE
-} from '@riotjs/util/constants'
+} from '@riotjs/util'
 import {bindingTypes, createBinding, createExpression,expressionTypes, template} from '@riotjs/dom-bindings'
 import {createComponentFromWrapper} from '../core/create-component-from-wrapper'
 import cssManager from '../core/css-manager'
-import {defineComponent} from '../core/define-component'
+import {instantiateComponent} from '../core/instantiate-component'
 
 // expose some internal stuff that might be used from external tools
 export const __ = {
@@ -40,7 +40,7 @@ export const __ = {
     expressionTypes
   },
   createComponentFromWrapper,
-  defineComponent,
+  instantiateComponent,
   globals: {
     ATTRIBUTES_KEY_SYMBOL,
     COMPONENTS_IMPLEMENTATION_MAP,

@@ -1,6 +1,5 @@
-import {COMPONENTS_IMPLEMENTATION_MAP} from '@riotjs/util/constants'
+import {COMPONENTS_IMPLEMENTATION_MAP, panic} from '@riotjs/util'
 import {createComponentFromWrapper} from '../core/create-component-from-wrapper'
-import {panic} from '@riotjs/util/misc'
 
 /**
  * Register a custom tag by name

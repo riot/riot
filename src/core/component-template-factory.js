@@ -1,6 +1,6 @@
 import {bindingTypes, template as createTemplate, expressionTypes} from '@riotjs/dom-bindings'
-import {COMPONENTS_IMPLEMENTATION_MAP} from '@riotjs/util/constants'
-import {createSubcomponents} from './create-sub-components'
+import {COMPONENTS_IMPLEMENTATION_MAP} from '@riotjs/util'
+import {createChildrenComponentsObject} from './create-children-components-object'
 import {memoizedCreateComponentFromWrapper} from './create-component-from-wrapper'
 
 /**
@@ -10,7 +10,7 @@ import {memoizedCreateComponentFromWrapper} from './create-component-from-wrappe
  * @returns {TemplateChunk} template chunk object
  */
 export function componentTemplateFactory(template, componentWrapper) {
-  const components = createSubcomponents(componentWrapper.exports ? componentWrapper.exports.components : {})
+  const components = createChildrenComponentsObject(componentWrapper.exports ? componentWrapper.exports.components : {})
 
   return template(
     createTemplate,

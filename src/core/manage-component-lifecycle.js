@@ -14,17 +14,17 @@ import {
   SHOULD_UPDATE_KEY,
   SLOTS_KEY,
   STATE_KEY,
-  TEMPLATE_KEY_SYMBOL
-} from '@riotjs/util/constants'
-import {defineProperties, defineProperty} from '@riotjs/util/objects'
-import {isFunction, isObject} from '@riotjs/util/checks'
+  TEMPLATE_KEY_SYMBOL,
+  autobindMethods, defineProperties,
+  defineProperty, evaluateAttributeExpressions,
+  isFunction,
+  isObject
+} from '@riotjs/util'
 import {addCssHook} from './add-css-hook'
-import {autobindMethods} from '@riotjs/util/functions'
 import {bindDOMNodeToComponentInstance} from './bind-dom-node-to-component-instance'
-import {computeState} from './compute-state'
+import {computeComponentState} from './compute-component-state'
+import {computeInitialProps} from './compute-initial-props'
 import {createAttributeBindings} from './create-attribute-bindings'
-import {evaluateAttributeExpressions} from '@riotjs/util/misc'
-import {evaluateInitialProps} from './evaluate-initial-props'
 import {runPlugins} from './run-plugins'
 
 /**
@@ -34,7 +34,7 @@ import {runPlugins} from './run-plugins'
  * @param   {Array} options.attributes - attribute expressions generated via riot compiler
  * @returns {Riot.Component} a riot component instance
  */
-export function createComponent(component, {slots, attributes, props}) {
+export function manageComponentLifecycle(component, {slots, attributes, props}) {
   return autobindMethods(
     runPlugins(
       defineProperties(isObject(component) ? Object.create(component) : component, {
@@ -45,11 +45,11 @@ export function createComponent(component, {slots, attributes, props}) {
           this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(element, attributes).mount(parentScope)
 
           defineProperty(this, PROPS_KEY, Object.freeze({
-            ...evaluateInitialProps(element, props),
+            ...computeInitialProps(element, props),
             ...evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions)
           }))
 
-          this[STATE_KEY] = computeState(this[STATE_KEY], state)
+          this[STATE_KEY] = computeComponentState(this[STATE_KEY], state)
           this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone()
 
           // link this object to the DOM node
@@ -85,7 +85,7 @@ export function createComponent(component, {slots, attributes, props}) {
             ...newProps
           }))
 
-          this[STATE_KEY] = computeState(this[STATE_KEY], state)
+          this[STATE_KEY] = computeComponentState(this[STATE_KEY], state)
 
           this[ON_BEFORE_UPDATE_KEY](this[PROPS_KEY], this[STATE_KEY])
 

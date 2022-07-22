@@ -1,10 +1,8 @@
-import {IS_PURE_SYMBOL} from '@riotjs/util/constants'
+import {IS_PURE_SYMBOL, callOrAssign, memoize} from '@riotjs/util'
 import {MOCKED_TEMPLATE_INTERFACE} from './mocked-template-interface'
-import {callOrAssign} from '@riotjs/util/functions'
 import {componentTemplateFactory} from './component-template-factory'
 import {createPureComponent} from './create-pure-component'
-import {defineComponent} from './define-component'
-import {memoize} from '@riotjs/util/misc'
+import {instantiateComponent} from './instantiate-component'
 
 /**
  * Create the component interface needed for the @riotjs/dom-bindings tag bindings
@@ -32,7 +30,7 @@ export function createComponentFromWrapper(componentWrapper) {
 
     const componentAPI = callOrAssign(exports) || {}
 
-    const component = defineComponent({
+    const component = instantiateComponent({
       css,
       template: templateFn,
       componentAPI,

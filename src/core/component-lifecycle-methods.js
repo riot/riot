@@ -5,9 +5,9 @@ import {
   ON_MOUNTED_KEY,
   ON_UNMOUNTED_KEY,
   ON_UPDATED_KEY,
-  SHOULD_UPDATE_KEY
-} from '@riotjs/util/constants'
-import {noop} from '@riotjs/util/functions'
+  SHOULD_UPDATE_KEY,
+  noop
+} from '@riotjs/util'
 
 export const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
   [SHOULD_UPDATE_KEY]: noop,
