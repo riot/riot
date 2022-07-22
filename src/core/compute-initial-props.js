@@ -1,5 +1,4 @@
-import {DOMattributesToObject} from '@riotjs/util/dom'
-import {callOrAssign} from '@riotjs/util/functions'
+import {DOMattributesToObject, callOrAssign} from '@riotjs/util'
 
 /**
  * Evaluate the component properties either from its real attributes or from its initial user properties
@@ -7,7 +6,7 @@ import {callOrAssign} from '@riotjs/util/functions'
  * @param   {Object}  initialProps - initial props
  * @returns {Object} component props key value pairs
  */
-export function evaluateInitialProps(element, initialProps = {}) {
+export function computeInitialProps(element, initialProps = {}) {
   return {
     ...DOMattributesToObject(element),
     ...callOrAssign(initialProps)

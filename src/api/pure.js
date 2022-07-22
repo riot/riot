@@ -1,6 +1,4 @@
-import {IS_PURE_SYMBOL} from '@riotjs/util/constants'
-import {isFunction} from '@riotjs/util/checks'
-import {panic} from '@riotjs/util/misc'
+import {IS_PURE_SYMBOL, isFunction, panic} from '@riotjs/util'
 
 /**
  * Lift a riot component Interface into a pure riot object

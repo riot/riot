@@ -1,9 +1,8 @@
-import {IS_PURE_SYMBOL, MOUNT_METHOD_KEY} from '@riotjs/util/constants'
-import {defineDefaults, defineProperty} from '@riotjs/util/objects'
+import {IS_PURE_SYMBOL, MOUNT_METHOD_KEY, defineDefaults, defineProperty, panic} from '@riotjs/util'
 import {PURE_COMPONENT_API} from './pure-component-api'
 import {bindDOMNodeToComponentInstance} from './bind-dom-node-to-component-instance'
 import {createCoreAPIMethods} from './create-core-api-methods'
-import {panic} from '@riotjs/util/misc'
+
 
 /**
  * Create a pure component

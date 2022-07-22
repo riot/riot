@@ -1,4 +1,4 @@
-import {COMPONENTS_IMPLEMENTATION_MAP, DOM_COMPONENT_INSTANCE_PROPERTY} from '@riotjs/util/constants'
+import {COMPONENTS_IMPLEMENTATION_MAP, DOM_COMPONENT_INSTANCE_PROPERTY} from '@riotjs/util'
 import {
   bindingTypes,
   expressionTypes,

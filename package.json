@@ -37,7 +37,7 @@
   "dependencies": {
     "@riotjs/compiler": "^6.3.0",
     "@riotjs/dom-bindings": "6.0.3",
-    "@riotjs/util": "^2.0.4",
+    "@riotjs/util": "^2.1.1",
     "bianco.attr": "^1.1.1",
     "bianco.query": "^1.1.4",
     "cumpa": "^1.0.1",
