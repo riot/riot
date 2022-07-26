@@ -67,16 +67,17 @@ riot: clean raw test
 min:
 	# minify riot
 	@ $(MINIFY) $(DIST)riot.js \
-			--comments \
-			--toplevel \
+			--comments false \
+			--compress pure_funcs=['panic'] \
 			--mangle \
-			--compress  \
+			-c unsafe=true,unsafe_symbols=true \
 			-o $(DIST)riot.min.js;
 	# minify the riot+compiler
 	@ $(MINIFY) $(DIST)riot+compiler.js \
-			--comments \
-			--toplevel \
+	        --comments false \
+			--compress pure_funcs=['panic'] \
 			--mangle \
+			-c unsafe=true,unsafe_symbols=true \
 			-o $(DIST)riot+compiler.min.js;
 
 build:
