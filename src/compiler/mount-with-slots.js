@@ -1,4 +1,5 @@
 import $ from 'bianco.query'
+import createRuntimeSlots from '../utils/create-runtime-slots'
 import {mountComponent} from '../core/mount-component'
 
 /**
@@ -9,5 +10,10 @@ import {mountComponent} from '../core/mount-component'
  * @returns {Array} list of riot components
  */
 export function mount(selector, initialProps, name) {
-  return $(selector).map(element => mountComponent(element, initialProps, name))
+  return $(selector).map(element => mountComponent(
+    element,
+    initialProps,
+    name,
+    createRuntimeSlots(element)
+  ))
 }

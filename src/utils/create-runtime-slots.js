@@ -12,7 +12,7 @@ import {generateSlotsFromString} from '@riotjs/compiler/dist/compiler.essential'
  * @returns {[]|null} Slots array
  */
 export default function createRuntimeSlots(el) {
-  if (!el.innerHTML) return null
+  if (!el.innerHTML.trim()) return null
 
   const slotsCode = generateSlotsFromString(el.outerHTML)
 

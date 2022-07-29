@@ -37,7 +37,7 @@ export function createComponentFromWrapper(componentWrapper) {
       name
     })({slots, attributes, props})
 
-    // notice that for the components create via tag binding
+    // notice that for the components created via tag binding
     // we need to invert the mount (state/parentScope) arguments
     // the template bindings will only forward the parentScope updates
     // and never deal with the component state
