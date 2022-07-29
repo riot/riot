@@ -68,16 +68,14 @@ min:
 	# minify riot
 	@ $(MINIFY) $(DIST)riot.js \
 			--comments false \
-			--compress pure_funcs=['panic'] \
+			--compress pure_funcs=['panic'],unsafe=true,unsafe_symbols=true \
 			--mangle \
-			-c unsafe=true,unsafe_symbols=true \
 			-o $(DIST)riot.min.js;
 	# minify the riot+compiler
 	@ $(MINIFY) $(DIST)riot+compiler.js \
 	        --comments false \
-			--compress pure_funcs=['panic'] \
+			--compress pure_funcs=['panic'],unsafe=true,unsafe_symbols=true \
 			--mangle \
-			-c unsafe=true,unsafe_symbols=true \
 			-o $(DIST)riot+compiler.min.js;
 
 build:

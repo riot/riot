@@ -2,13 +2,13 @@
   "name": "riot",
   "version": "6.1.2",
   "description": "Simple and elegant component-based UI library",
-  "homepage": "http://riot.js.org/",
+  "homepage": "https://riot.js.org/",
   "repository": "riot/riot",
-  "author": "Gianluca Guarini <gianluca.guarini@gmail.com> (http://gianlucaguarini.com)",
+  "author": "Gianluca Guarini <gianluca.guarini@gmail.com> (https://gianlucaguarini.com)",
   "license": "MIT",
   "sideEffects": false,
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=12.0.0"
   },
   "scripts": {
     "test": "make riot"
@@ -51,7 +51,7 @@
     "@rollup/plugin-node-resolve": "^13.3.0",
     "babel-plugin-istanbul": "^6.1.1",
     "chai": "^4.3.6",
-    "core-js": "^3.23.5",
+    "core-js": "^3.24.1",
     "eslint": "^8.20.0",
     "eslint-config-riot": "^3.0.0",
     "jsdom": "20.0.0",
@@ -63,7 +63,7 @@
     "karma-rollup-preprocessor": "^7.0.8",
     "karma-sauce-launcher": "^4.3.6",
     "mocha": "^10.0.0",
-    "rollup": "^2.77.0",
+    "rollup": "^2.77.2",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-riot": "^6.0.0",
     "sinon": "^14.0.0",
