@@ -1,6 +1,8 @@
 import * as riot from '../../src/riot+compiler'
 import {GLOBAL_REGISTRY} from '../../src/compiler/global-registry'
-import SimpleSlotComponent from '../components/simple-slot.riot'
+import RuntimeSlotComponent from '../components/runtime-slot.riot'
+import RuntimeSlotWithChildrenComponent from '../components/runtime-slot-with-children.riot'
+import TitlePropComponent from '../components/title-prop.riot'
 import {expect} from 'chai'
 
 describe('Riot compiler api', () => {
@@ -51,16 +53,60 @@ describe('Riot compiler api', () => {
     expect(code).to.be.ok
   })
 
-  it.skip('Runtime slots get properly evaluated', () => {
-    const el = document.createElement('simple-slot')
-    el.innerHTML = '<p>{props.message}</p>'
+  it('Runtime slots get properly evaluated with riot.component', () => {
+    const el = document.createElement('runtime-slot')
+    el.innerHTML = '<p>{message}</p>'
 
-    const component = riot.component(SimpleSlotComponent)(el, {
+    const component = riot.component(RuntimeSlotComponent)(el, {
       message: 'hello'
     })
 
     expect(el.querySelector('p').innerHTML).to.be.equal('hello')
 
     component.unmount()
+  })
+
+  it('Runtime slots with children components get properly evaluated with riot.component', () => {
+    const el = document.createElement('runtime-slot-with-children')
+    el.innerHTML = '<p>{message}</p>'
+    riot.register('title-prop', TitlePropComponent)
+
+    const component = riot.component(RuntimeSlotWithChildrenComponent)(el, {
+      message: 'hello'
+    })
+
+    expect(el.querySelector('p').innerHTML).to.be.equal('hello')
+    expect(el.querySelector('child').innerHTML).to.be.not.empty
+    expect(el.querySelector('title-prop').innerHTML).to.be.not.empty
+
+    component.unmount()
+    riot.unregister('title-prop')
+  })
+
+  it('Empty DOM Components will not mount runtime slots', () => {
+    const el = document.createElement('runtime-slot')
+
+    const component = riot.component(RuntimeSlotComponent)(el, {
+      message: 'hello'
+    })
+
+    expect(el.innerHTML).to.be.equal('')
+
+    component.unmount()
+  })
+
+  it('Runtime slots get properly evaluated with riot.mount', () => {
+    const el = document.createElement('runtime-slot')
+    el.innerHTML = '<p>{message}</p>'
+    riot.register('runtime-slot', RuntimeSlotComponent)
+
+    const [component] = riot.mount(el, {
+      message: 'hello'
+    }, 'runtime-slot')
+
+    expect(el.querySelector('p').innerHTML).to.be.equal('hello')
+
+    component.unmount()
+    riot.unregister('runtime-slot')
   })
 })
