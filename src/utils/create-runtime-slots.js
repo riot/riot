@@ -1,4 +1,3 @@
-import {COMPONENTS_IMPLEMENTATION_MAP, DOM_COMPONENT_INSTANCE_PROPERTY} from '@riotjs/util'
 import {
   bindingTypes,
   expressionTypes,
@@ -23,7 +22,6 @@ export default function createRuntimeSlots(el) {
   return Function(`return ${slotsCode}`)()(
     template,
     expressionTypes,
-    bindingTypes,
-    (name) => el[DOM_COMPONENT_INSTANCE_PROPERTY].components[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
+    bindingTypes
   )
 }

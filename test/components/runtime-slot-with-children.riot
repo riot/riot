@@ -1,0 +1,15 @@
+<runtime-slot-with-children>
+  <slot {...props}/>
+  <child/>
+  <title-prop title={'hello'}/>
+
+  <script>
+    import Child from './child.riot'
+
+    export default {
+      components: {
+        Child
+      }
+    }
+  </script>
+</runtime-slot-with-children>
