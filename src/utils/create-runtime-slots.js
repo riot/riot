@@ -3,7 +3,7 @@ import {
   expressionTypes,
   template
 } from '@riotjs/dom-bindings'
-import {generateSlotsFromString} from '@riotjs/compiler/dist/compiler.essential'
+import {generateSlotsFromString} from '@riotjs/compiler/dist/compiler.essential.esm'
 
 /**
  * Create slots reading the inner HTML of the node
