@@ -1,9 +1,112 @@
-/* Riot v6.1.2, @license MIT */
+/* Riot v7.0.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.riot = {}));
 })(this, (function (exports) { 'use strict';
+
+  const EACH = 0;
+  const IF = 1;
+  const SIMPLE = 2;
+  const TAG = 3;
+  const SLOT = 4;
+  const bindingTypes = {
+    EACH,
+    IF,
+    SIMPLE,
+    TAG,
+    SLOT
+  };
+
+  /**
+   * Quick type checking
+   * @param   {*} element - anything
+   * @param   {string} type - type definition
+   * @returns {boolean} true if the type corresponds
+   */
+  function checkType(element, type) {
+    return typeof element === type;
+  }
+  /**
+   * Check if an element is part of an svg
+   * @param   {HTMLElement}  el - element to check
+   * @returns {boolean} true if we are in an svg context
+   */
+
+  function isSvg(el) {
+    const owner = el.ownerSVGElement;
+    return !!owner || owner === null;
+  }
+  /**
+   * Check if an element is a template tag
+   * @param   {HTMLElement}  el - element to check
+   * @returns {boolean} true if it's a <template>
+   */
+
+  function isTemplate(el) {
+    return el.tagName.toLowerCase() === 'template';
+  }
+  /**
+   * Check that will be passed if its argument is a function
+   * @param   {*} value - value to check
+   * @returns {boolean} - true if the value is a function
+   */
+
+  function isFunction(value) {
+    return checkType(value, 'function');
+  }
+  /**
+   * Check if a value is a Boolean
+   * @param   {*}  value - anything
+   * @returns {boolean} true only for the value is a boolean
+   */
+
+  function isBoolean(value) {
+    return checkType(value, 'boolean');
+  }
+  /**
+   * Check if a value is an Object
+   * @param   {*}  value - anything
+   * @returns {boolean} true only for the value is an object
+   */
+
+  function isObject(value) {
+    return !isNil(value) && value.constructor === Object;
+  }
+  /**
+   * Check if a value is null or undefined
+   * @param   {*}  value - anything
+   * @returns {boolean} true only for the 'undefined' and 'null' types
+   */
+
+  function isNil(value) {
+    return value === null || value === undefined;
+  }
+
+  // Riot.js constants that can be used accross more modules
+  const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
+        DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
+        PLUGINS_SET = new Set(),
+        IS_DIRECTIVE = 'is',
+        MOUNT_METHOD_KEY = 'mount',
+        UPDATE_METHOD_KEY = 'update',
+        UNMOUNT_METHOD_KEY = 'unmount',
+        SHOULD_UPDATE_KEY = 'shouldUpdate',
+        ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
+        ON_MOUNTED_KEY = 'onMounted',
+        ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
+        ON_UPDATED_KEY = 'onUpdated',
+        ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
+        ON_UNMOUNTED_KEY = 'onUnmounted',
+        PROPS_KEY = 'props',
+        STATE_KEY = 'state',
+        SLOTS_KEY = 'slots',
+        ROOT_KEY = 'root',
+        IS_PURE_SYMBOL = Symbol('pure'),
+        IS_COMPONENT_UPDATING = Symbol('is_updating'),
+        PARENT_KEY_SYMBOL = Symbol('parent'),
+        ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
+        TEMPLATE_KEY_SYMBOL = Symbol('template');
 
   /**
    * Convert a string from camel case to dash-case
@@ -91,122 +194,99 @@
 
   const replaceChild = (newNode, replaced) => replaced && replaced.parentNode && replaced.parentNode.replaceChild(newNode, replaced);
 
-  // Riot.js constants that can be used accross more modules
-  const COMPONENTS_IMPLEMENTATION_MAP$1 = new Map(),
-        DOM_COMPONENT_INSTANCE_PROPERTY$1 = Symbol('riot-component'),
-        PLUGINS_SET$1 = new Set(),
-        IS_DIRECTIVE = 'is',
-        VALUE_ATTRIBUTE = 'value',
-        MOUNT_METHOD_KEY = 'mount',
-        UPDATE_METHOD_KEY = 'update',
-        UNMOUNT_METHOD_KEY = 'unmount',
-        SHOULD_UPDATE_KEY = 'shouldUpdate',
-        ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
-        ON_MOUNTED_KEY = 'onMounted',
-        ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
-        ON_UPDATED_KEY = 'onUpdated',
-        ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
-        ON_UNMOUNTED_KEY = 'onUnmounted',
-        PROPS_KEY = 'props',
-        STATE_KEY = 'state',
-        SLOTS_KEY = 'slots',
-        ROOT_KEY = 'root',
-        IS_PURE_SYMBOL = Symbol('pure'),
-        IS_COMPONENT_UPDATING = Symbol('is_updating'),
-        PARENT_KEY_SYMBOL = Symbol('parent'),
-        ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
-        TEMPLATE_KEY_SYMBOL = Symbol('template');
-
-  var globals = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    COMPONENTS_IMPLEMENTATION_MAP: COMPONENTS_IMPLEMENTATION_MAP$1,
-    DOM_COMPONENT_INSTANCE_PROPERTY: DOM_COMPONENT_INSTANCE_PROPERTY$1,
-    PLUGINS_SET: PLUGINS_SET$1,
-    IS_DIRECTIVE: IS_DIRECTIVE,
-    VALUE_ATTRIBUTE: VALUE_ATTRIBUTE,
-    MOUNT_METHOD_KEY: MOUNT_METHOD_KEY,
-    UPDATE_METHOD_KEY: UPDATE_METHOD_KEY,
-    UNMOUNT_METHOD_KEY: UNMOUNT_METHOD_KEY,
-    SHOULD_UPDATE_KEY: SHOULD_UPDATE_KEY,
-    ON_BEFORE_MOUNT_KEY: ON_BEFORE_MOUNT_KEY,
-    ON_MOUNTED_KEY: ON_MOUNTED_KEY,
-    ON_BEFORE_UPDATE_KEY: ON_BEFORE_UPDATE_KEY,
-    ON_UPDATED_KEY: ON_UPDATED_KEY,
-    ON_BEFORE_UNMOUNT_KEY: ON_BEFORE_UNMOUNT_KEY,
-    ON_UNMOUNTED_KEY: ON_UNMOUNTED_KEY,
-    PROPS_KEY: PROPS_KEY,
-    STATE_KEY: STATE_KEY,
-    SLOTS_KEY: SLOTS_KEY,
-    ROOT_KEY: ROOT_KEY,
-    IS_PURE_SYMBOL: IS_PURE_SYMBOL,
-    IS_COMPONENT_UPDATING: IS_COMPONENT_UPDATING,
-    PARENT_KEY_SYMBOL: PARENT_KEY_SYMBOL,
-    ATTRIBUTES_KEY_SYMBOL: ATTRIBUTES_KEY_SYMBOL,
-    TEMPLATE_KEY_SYMBOL: TEMPLATE_KEY_SYMBOL
-  });
-
-  const EACH = 0;
-  const IF = 1;
-  const SIMPLE = 2;
-  const TAG = 3;
-  const SLOT = 4;
-  var bindingTypes = {
-    EACH,
-    IF,
-    SIMPLE,
-    TAG,
-    SLOT
-  };
-
   const ATTRIBUTE = 0;
   const EVENT = 1;
   const TEXT = 2;
   const VALUE = 3;
-  var expressionTypes = {
+  const expressionTypes = {
     ATTRIBUTE,
     EVENT,
     TEXT,
     VALUE
   };
 
-  const HEAD_SYMBOL = Symbol('head');
-  const TAIL_SYMBOL = Symbol('tail');
-
+  function noop() {
+    return this;
+  }
   /**
-   * Create the <template> fragments text nodes
-   * @return {Object} {{head: Text, tail: Text}}
+   * Autobind the methods of a source object to itself
+   * @param   {Object} source - probably a riot tag instance
+   * @param   {Array<string>} methods - list of the methods to autobind
+   * @returns {Object} the original object received
    */
 
-  function createHeadTailPlaceholders() {
-    const head = document.createTextNode('');
-    const tail = document.createTextNode('');
-    head[HEAD_SYMBOL] = true;
-    tail[TAIL_SYMBOL] = true;
-    return {
-      head,
-      tail
-    };
+  function autobindMethods(source, methods) {
+    methods.forEach(method => {
+      source[method] = source[method].bind(source);
+    });
+    return source;
+  }
+  /**
+   * Call the first argument received only if it's a function otherwise return it as it is
+   * @param   {*} source - anything
+   * @returns {*} anything
+   */
+
+  function callOrAssign(source) {
+    return isFunction(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
   }
 
   /**
-   * Create the template meta object in case of <template> fragments
-   * @param   {TemplateChunk} componentTemplate - template chunk object
-   * @returns {Object} the meta property that will be passed to the mount function of the TemplateChunk
+   * Throw an error with a descriptive message
+   * @param   { string } message - error message
+   * @returns { undefined } hoppla.. at this point the program should stop working
    */
 
-  function createTemplateMeta(componentTemplate) {
-    const fragment = componentTemplate.dom.cloneNode(true);
-    const {
-      head,
-      tail
-    } = createHeadTailPlaceholders();
-    return {
-      avoidDOMInjection: true,
-      fragment,
-      head,
-      tail,
-      children: [head, ...Array.from(fragment.childNodes), tail]
+  function panic(message) {
+    throw new Error(message);
+  }
+  /**
+   * Returns the memoized (cached) function.
+   * // borrowed from https://www.30secondsofcode.org/js/s/memoize
+   * @param {Function} fn - function to memoize
+   * @returns {Function} memoize function
+   */
+
+  function memoize(fn) {
+    const cache = new Map();
+
+    const cached = val => {
+      return cache.has(val) ? cache.get(val) : cache.set(val, fn.call(this, val)) && cache.get(val);
     };
+
+    cached.cache = cache;
+    return cached;
+  }
+  /**
+   * Evaluate a list of attribute expressions
+   * @param   {Array} attributes - attribute expressions generated by the riot compiler
+   * @returns {Object} key value pairs with the result of the computation
+   */
+
+  function evaluateAttributeExpressions(attributes) {
+    return attributes.reduce((acc, attribute) => {
+      const {
+        value,
+        type
+      } = attribute;
+
+      switch (true) {
+        // spread attribute
+        case !attribute.name && type === ATTRIBUTE:
+          return Object.assign({}, acc, value);
+        // value attribute
+
+        case type === VALUE:
+          acc.value = attribute.value;
+          break;
+        // normal attributes
+
+        default:
+          acc[dashToCamelCase(attribute.name)] = attribute.value;
+      }
+
+      return acc;
+    }, {});
   }
 
   /**
@@ -263,69 +343,55 @@
     return source;
   }
 
+  const PURE_COMPONENT_API = Object.freeze({
+    [MOUNT_METHOD_KEY]: noop,
+    [UPDATE_METHOD_KEY]: noop,
+    [UNMOUNT_METHOD_KEY]: noop
+  });
+
+  const MOCKED_TEMPLATE_INTERFACE = Object.assign({}, PURE_COMPONENT_API, {
+    clone: noop,
+    createDOM: noop
+  });
+
+  const HEAD_SYMBOL = Symbol('head');
+  const TAIL_SYMBOL = Symbol('tail');
+
   /**
-   * Quick type checking
-   * @param   {*} element - anything
-   * @param   {string} type - type definition
-   * @returns {boolean} true if the type corresponds
-   */
-  function checkType(element, type) {
-    return typeof element === type;
-  }
-  /**
-   * Check if an element is part of an svg
-   * @param   {HTMLElement}  el - element to check
-   * @returns {boolean} true if we are in an svg context
+   * Create the <template> fragments text nodes
+   * @return {Object} {{head: Text, tail: Text}}
    */
 
-  function isSvg(el) {
-    const owner = el.ownerSVGElement;
-    return !!owner || owner === null;
+  function createHeadTailPlaceholders() {
+    const head = document.createTextNode('');
+    const tail = document.createTextNode('');
+    head[HEAD_SYMBOL] = true;
+    tail[TAIL_SYMBOL] = true;
+    return {
+      head,
+      tail
+    };
   }
+
   /**
-   * Check if an element is a template tag
-   * @param   {HTMLElement}  el - element to check
-   * @returns {boolean} true if it's a <template>
+   * Create the template meta object in case of <template> fragments
+   * @param   {TemplateChunk} componentTemplate - template chunk object
+   * @returns {Object} the meta property that will be passed to the mount function of the TemplateChunk
    */
 
-  function isTemplate(el) {
-    return el.tagName.toLowerCase() === 'template';
-  }
-  /**
-   * Check that will be passed if its argument is a function
-   * @param   {*} value - value to check
-   * @returns {boolean} - true if the value is a function
-   */
-
-  function isFunction(value) {
-    return checkType(value, 'function');
-  }
-  /**
-   * Check if a value is a Boolean
-   * @param   {*}  value - anything
-   * @returns {boolean} true only for the value is a boolean
-   */
-
-  function isBoolean(value) {
-    return checkType(value, 'boolean');
-  }
-  /**
-   * Check if a value is an Object
-   * @param   {*}  value - anything
-   * @returns {boolean} true only for the value is an object
-   */
-
-  function isObject(value) {
-    return !isNil(value) && value.constructor === Object;
-  }
-  /**
-   * Check if a value is null or undefined
-   * @param   {*}  value - anything
-   * @returns {boolean} true only for the 'undefined' and 'null' types
-   */
-
-  function isNil(value) {
-    return value === null || value === undefined;
+  function createTemplateMeta(componentTemplate) {
+    const fragment = componentTemplate.dom.cloneNode(true);
+    const {
+      head,
+      tail
+    } = createHeadTailPlaceholders();
+    return {
+      avoidDOMInjection: true,
+      fragment,
+      head,
+      tail,
+      children: [head, ...Array.from(fragment.childNodes), tail]
+    };
   }
 
   /**
@@ -359,7 +425,7 @@
    * @returns {Node[]} The same list of future children.
    */
 
-  var udomdiff = ((a, b, get, before) => {
+  const udomdiff = ((a, b, get, before) => {
     const bLength = b.length;
     let aEnd = a.length;
     let bEnd = bLength;
@@ -765,64 +831,6 @@
     });
   }
 
-  /**
-   * Throw an error with a descriptive message
-   * @param   { string } message - error message
-   * @returns { undefined } hoppla.. at this point the program should stop working
-   */
-
-  function panic(message) {
-    throw new Error(message);
-  }
-  /**
-   * Returns the memoized (cached) function.
-   * // borrowed from https://www.30secondsofcode.org/js/s/memoize
-   * @param {Function} fn - function to memoize
-   * @returns {Function} memoize function
-   */
-
-  function memoize(fn) {
-    const cache = new Map();
-
-    const cached = val => {
-      return cache.has(val) ? cache.get(val) : cache.set(val, fn.call(this, val)) && cache.get(val);
-    };
-
-    cached.cache = cache;
-    return cached;
-  }
-  /**
-   * Evaluate a list of attribute expressions
-   * @param   {Array} attributes - attribute expressions generated by the riot compiler
-   * @returns {Object} key value pairs with the result of the computation
-   */
-
-  function evaluateAttributeExpressions(attributes) {
-    return attributes.reduce((acc, attribute) => {
-      const {
-        value,
-        type
-      } = attribute;
-
-      switch (true) {
-        // spread attribute
-        case !attribute.name && type === ATTRIBUTE:
-          return Object.assign({}, acc, value);
-        // value attribute
-
-        case type === VALUE:
-          acc.value = attribute.value;
-          break;
-        // normal attributes
-
-        default:
-          acc[dashToCamelCase(attribute.name)] = attribute.value;
-      }
-
-      return acc;
-    }, {});
-  }
-
   const ElementProto = typeof Element === 'undefined' ? {} : Element.prototype;
   const isNativeHtmlProperty = memoize(name => ElementProto.hasOwnProperty(name)); // eslint-disable-line
 
@@ -1030,7 +1038,7 @@
     node.value = normalizeStringValue(value);
   }
 
-  var expressions = {
+  const expressions = {
     [ATTRIBUTE]: attributeExpression,
     [EVENT]: eventExpression,
     [TEXT]: textExpression,
@@ -1347,7 +1355,7 @@
     });
   }
 
-  var bindings = {
+  const bindings = {
     [IF]: create$5,
     [SIMPLE]: create$3,
     [EACH]: create$6,
@@ -1634,96 +1642,105 @@
   }
 
   /**
-   * Method used to bind expressions to a DOM node
-   * @param   {string|HTMLElement} html - your static template html structure
-   * @param   {Array} bindings - list of the expressions to bind to update the markup
-   * @returns {TemplateChunk} a new TemplateChunk object having the `update`,`mount`, `unmount` and `clone` methods
-   *
-   * @example
-   *
-   * riotDOMBindings
-   *  .template(
-   *   `<div expr0><!----></div><div><p expr1><!----><section expr2></section></p>`,
-   *   [
-   *     {
-   *       selector: '[expr0]',
-   *       redundantAttribute: 'expr0',
-   *       expressions: [
-   *         {
-   *           type: expressionTypes.TEXT,
-   *           childNodeIndex: 0,
-   *           evaluate(scope) {
-   *             return scope.time;
-   *           },
-   *         },
-   *       ],
-   *     },
-   *     {
-   *       selector: '[expr1]',
-   *       redundantAttribute: 'expr1',
-   *       expressions: [
-   *         {
-   *           type: expressionTypes.TEXT,
-   *           childNodeIndex: 0,
-   *           evaluate(scope) {
-   *             return scope.name;
-   *           },
-   *         },
-   *         {
-   *           type: 'attribute',
-   *           name: 'style',
-   *           evaluate(scope) {
-   *             return scope.style;
-   *           },
-   *         },
-   *       ],
-   *     },
-   *     {
-   *       selector: '[expr2]',
-   *       redundantAttribute: 'expr2',
-   *       type: bindingTypes.IF,
-   *       evaluate(scope) {
-   *         return scope.isVisible;
-   *       },
-   *       template: riotDOMBindings.template('hello there'),
-   *     },
-   *   ]
-   * )
+   * Create the subcomponents that can be included inside a tag in runtime
+   * @param   {Object} components - components imported in runtime
+   * @returns {Object} all the components transformed into Riot.Component factory functions
    */
 
-  var DOMBindings = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    template: create,
-    createBinding: create$1,
-    createExpression: create$4,
-    bindingTypes: bindingTypes,
-    expressionTypes: expressionTypes
-  });
+  function createChildrenComponentsObject(components) {
+    if (components === void 0) {
+      components = {};
+    }
 
-  function noop() {
-    return this;
+    return Object.entries(callOrAssign(components)).reduce((acc, _ref) => {
+      let [key, value] = _ref;
+      acc[camelToDashCase(key)] = createComponentFromWrapper(value);
+      return acc;
+    }, {});
   }
+
   /**
-   * Autobind the methods of a source object to itself
-   * @param   {Object} source - probably a riot tag instance
-   * @param   {Array<string>} methods - list of the methods to autobind
-   * @returns {Object} the original object received
+   * Factory function to create the component templates only once
+   * @param   {Function} template - component template creation function
+   * @param   {RiotComponentWrapper} componentWrapper - riot compiler generated object
+   * @returns {TemplateChunk} template chunk object
    */
 
-  function autobindMethods(source, methods) {
-    methods.forEach(method => {
-      source[method] = source[method].bind(source);
+  function componentTemplateFactory(template, componentWrapper) {
+    const components = createChildrenComponentsObject(componentWrapper.exports ? componentWrapper.exports.components : {});
+    return template(create, expressionTypes, bindingTypes, name => {
+      // improve support for recursive components
+      if (name === componentWrapper.name) return memoizedCreateComponentFromWrapper(componentWrapper); // return the registered components
+
+      return components[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name);
     });
-    return source;
   }
+
   /**
-   * Call the first argument received only if it's a function otherwise return it as it is
-   * @param   {*} source - anything
-   * @returns {*} anything
+   * Bind a DOM node to its component object
+   * @param   {HTMLElement} node - html node mounted
+   * @param   {Object} component - Riot.js component object
+   * @returns {Object} the component object received as second argument
    */
 
-  function callOrAssign(source) {
-    return isFunction(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
+  const bindDOMNodeToComponentInstance = (node, component) => node[DOM_COMPONENT_INSTANCE_PROPERTY] = component;
+
+  /**
+   * Wrap the Riot.js core API methods using a mapping function
+   * @param   {Function} mapFunction - lifting function
+   * @returns {Object} an object having the { mount, update, unmount } functions
+   */
+
+  function createCoreAPIMethods(mapFunction) {
+    return [MOUNT_METHOD_KEY, UPDATE_METHOD_KEY, UNMOUNT_METHOD_KEY].reduce((acc, method) => {
+      acc[method] = mapFunction(method);
+      return acc;
+    }, {});
+  }
+
+  /**
+   * Create a pure component
+   * @param   {Function} pureFactoryFunction - pure component factory function
+   * @param   {Array} options.slots - component slots
+   * @param   {Array} options.attributes - component attributes
+   * @param   {Array} options.template - template factory function
+   * @param   {Array} options.template - template factory function
+   * @param   {any} options.props - initial component properties
+   * @returns {Object} pure component object
+   */
+
+  function createPureComponent(pureFactoryFunction, _ref) {
+    let {
+      slots,
+      attributes,
+      props,
+      css,
+      template
+    } = _ref;
+    if (template) panic('Pure components can not have html');
+    if (css) panic('Pure components do not have css');
+    const component = defineDefaults(pureFactoryFunction({
+      slots,
+      attributes,
+      props
+    }), PURE_COMPONENT_API);
+    return createCoreAPIMethods(method => function () {
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      // intercept the mount calls to bind the DOM node to the pure object created
+      // see also https://github.com/riot/riot/issues/2806
+      if (method === MOUNT_METHOD_KEY) {
+        const [element] = args; // mark this node as pure element
+
+        defineProperty(element, IS_PURE_SYMBOL, true);
+        bindDOMNodeToComponentInstance(element, component);
+      }
+
+      component[method](...args);
+      return component;
+    });
   }
 
   /**
@@ -1747,13 +1764,35 @@
   /**
    * Simple helper to find DOM nodes returning them as array like loopable object
    * @param   { string|DOMNodeList } selector - either the query or the DOM nodes to arraify
-   * @param   { HTMLElement }        ctx      - context defining where the query will search for the DOM nodes
+   * @param   { HTMLElement }        scope      - context defining where the query will search for the DOM nodes
    * @returns { Array } DOM nodes found as array
    */
 
-  function $(selector, ctx) {
-    return domToArray(typeof selector === 'string' ? (ctx || document).querySelectorAll(selector) : selector);
+  function $(selector, scope) {
+    return domToArray(typeof selector === 'string' ? (scope || document).querySelectorAll(selector) : selector);
   }
+
+  const COMPONENT_DOM_SELECTORS = Object.freeze({
+    // component helpers
+    $(selector) {
+      return $(selector, this.root)[0];
+    },
+
+    $$(selector) {
+      return $(selector, this.root);
+    }
+
+  });
+
+  const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
+    [SHOULD_UPDATE_KEY]: noop,
+    [ON_BEFORE_MOUNT_KEY]: noop,
+    [ON_MOUNTED_KEY]: noop,
+    [ON_BEFORE_UPDATE_KEY]: noop,
+    [ON_UPDATED_KEY]: noop,
+    [ON_BEFORE_UNMOUNT_KEY]: noop,
+    [ON_UNMOUNTED_KEY]: noop
+  });
 
   /**
    * Normalize the return values, in case of a single value we avoid to return an array
@@ -1863,7 +1902,7 @@
    */
 
 
-  var cssManager = {
+  const cssManager = {
     CSS_BY_NAME,
 
     /**
@@ -1939,42 +1978,30 @@
     return get(element, IS_DIRECTIVE) || element.tagName.toLowerCase();
   }
 
-  const COMPONENT_CORE_HELPERS = Object.freeze({
-    // component helpers
-    $(selector) {
-      return $(selector, this.root)[0];
-    },
-
-    $$(selector) {
-      return $(selector, this.root);
-    }
-
-  });
-  const PURE_COMPONENT_API = Object.freeze({
-    [MOUNT_METHOD_KEY]: noop,
-    [UPDATE_METHOD_KEY]: noop,
-    [UNMOUNT_METHOD_KEY]: noop
-  });
-  const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
-    [SHOULD_UPDATE_KEY]: noop,
-    [ON_BEFORE_MOUNT_KEY]: noop,
-    [ON_MOUNTED_KEY]: noop,
-    [ON_BEFORE_UPDATE_KEY]: noop,
-    [ON_UPDATED_KEY]: noop,
-    [ON_BEFORE_UNMOUNT_KEY]: noop,
-    [ON_UNMOUNTED_KEY]: noop
-  });
-  const MOCKED_TEMPLATE_INTERFACE = Object.assign({}, PURE_COMPONENT_API, {
-    clone: noop,
-    createDOM: noop
-  });
   /**
-   * Performance optimization for the recursive components
-   * @param  {RiotComponentWrapper} componentWrapper - riot compiler generated object
-   * @returns {Object} component like interface
+   * Add eventually the "is" attribute to link this DOM node to its css
+   * @param {HTMLElement} element - target root node
+   * @param {string} name - name of the component mounted
+   * @returns {undefined} it's a void function
    */
 
-  const memoizedCreateComponent = memoize(createComponent);
+  function addCssHook(element, name) {
+    if (getName(element) !== name) {
+      set(element, IS_DIRECTIVE, name);
+    }
+  }
+
+  /**
+   * Compute the component current state merging it with its previous state
+   * @param   {Object} oldState - previous state object
+   * @param   {Object} newState - new state given to the `update` call
+   * @returns {Object} new object state
+   */
+
+  function computeComponentState(oldState, newState) {
+    return Object.assign({}, oldState, callOrAssign(newState));
+  }
+
   /**
    * Evaluate the component properties either from its real attributes or from its initial user properties
    * @param   {HTMLElement} element - component root
@@ -1982,191 +2009,14 @@
    * @returns {Object} component props key value pairs
    */
 
-  function evaluateInitialProps(element, initialProps) {
+  function computeInitialProps(element, initialProps) {
     if (initialProps === void 0) {
       initialProps = {};
     }
 
     return Object.assign({}, DOMattributesToObject(element), callOrAssign(initialProps));
   }
-  /**
-   * Bind a DOM node to its component object
-   * @param   {HTMLElement} node - html node mounted
-   * @param   {Object} component - Riot.js component object
-   * @returns {Object} the component object received as second argument
-   */
 
-
-  const bindDOMNodeToComponentObject = (node, component) => node[DOM_COMPONENT_INSTANCE_PROPERTY$1] = component;
-  /**
-   * Wrap the Riot.js core API methods using a mapping function
-   * @param   {Function} mapFunction - lifting function
-   * @returns {Object} an object having the { mount, update, unmount } functions
-   */
-
-
-  function createCoreAPIMethods(mapFunction) {
-    return [MOUNT_METHOD_KEY, UPDATE_METHOD_KEY, UNMOUNT_METHOD_KEY].reduce((acc, method) => {
-      acc[method] = mapFunction(method);
-      return acc;
-    }, {});
-  }
-  /**
-   * Factory function to create the component templates only once
-   * @param   {Function} template - component template creation function
-   * @param   {RiotComponentWrapper} componentWrapper - riot compiler generated object
-   * @returns {TemplateChunk} template chunk object
-   */
-
-
-  function componentTemplateFactory(template, componentWrapper) {
-    const components = createSubcomponents(componentWrapper.exports ? componentWrapper.exports.components : {});
-    return template(create, expressionTypes, bindingTypes, name => {
-      // improve support for recursive components
-      if (name === componentWrapper.name) return memoizedCreateComponent(componentWrapper); // return the registered components
-
-      return components[name] || COMPONENTS_IMPLEMENTATION_MAP$1.get(name);
-    });
-  }
-  /**
-   * Create a pure component
-   * @param   {Function} pureFactoryFunction - pure component factory function
-   * @param   {Array} options.slots - component slots
-   * @param   {Array} options.attributes - component attributes
-   * @param   {Array} options.template - template factory function
-   * @param   {Array} options.template - template factory function
-   * @param   {any} options.props - initial component properties
-   * @returns {Object} pure component object
-   */
-
-
-  function createPureComponent(pureFactoryFunction, _ref) {
-    let {
-      slots,
-      attributes,
-      props,
-      css,
-      template
-    } = _ref;
-    if (template) panic('Pure components can not have html');
-    if (css) panic('Pure components do not have css');
-    const component = defineDefaults(pureFactoryFunction({
-      slots,
-      attributes,
-      props
-    }), PURE_COMPONENT_API);
-    return createCoreAPIMethods(method => function () {
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      // intercept the mount calls to bind the DOM node to the pure object created
-      // see also https://github.com/riot/riot/issues/2806
-      if (method === MOUNT_METHOD_KEY) {
-        const [element] = args; // mark this node as pure element
-
-        defineProperty(element, IS_PURE_SYMBOL, true);
-        bindDOMNodeToComponentObject(element, component);
-      }
-
-      component[method](...args);
-      return component;
-    });
-  }
-  /**
-   * Create the component interface needed for the @riotjs/dom-bindings tag bindings
-   * @param   {RiotComponentWrapper} componentWrapper - riot compiler generated object
-   * @param   {string} componentWrapper.css - component css
-   * @param   {Function} componentWrapper.template - function that will return the dom-bindings template function
-   * @param   {Object} componentWrapper.exports - component interface
-   * @param   {string} componentWrapper.name - component name
-   * @returns {Object} component like interface
-   */
-
-
-  function createComponent(componentWrapper) {
-    const {
-      css,
-      template,
-      exports,
-      name
-    } = componentWrapper;
-    const templateFn = template ? componentTemplateFactory(template, componentWrapper) : MOCKED_TEMPLATE_INTERFACE;
-    return _ref2 => {
-      let {
-        slots,
-        attributes,
-        props
-      } = _ref2;
-      // pure components rendering will be managed by the end user
-      if (exports && exports[IS_PURE_SYMBOL]) return createPureComponent(exports, {
-        slots,
-        attributes,
-        props,
-        css,
-        template
-      });
-      const componentAPI = callOrAssign(exports) || {};
-      const component = defineComponent({
-        css,
-        template: templateFn,
-        componentAPI,
-        name
-      })({
-        slots,
-        attributes,
-        props
-      }); // notice that for the components create via tag binding
-      // we need to invert the mount (state/parentScope) arguments
-      // the template bindings will only forward the parentScope updates
-      // and never deal with the component state
-
-      return {
-        mount(element, parentScope, state) {
-          return component.mount(element, state, parentScope);
-        },
-
-        update(parentScope, state) {
-          return component.update(state, parentScope);
-        },
-
-        unmount(preserveRoot) {
-          return component.unmount(preserveRoot);
-        }
-
-      };
-    };
-  }
-  /**
-   * Component definition function
-   * @param   {Object} implementation - the componen implementation will be generated via compiler
-   * @param   {Object} component - the component initial properties
-   * @returns {Object} a new component implementation object
-   */
-
-  function defineComponent(_ref3) {
-    let {
-      css,
-      template,
-      componentAPI,
-      name
-    } = _ref3;
-    // add the component css into the DOM
-    if (css && name) cssManager.add(name, css);
-    return curry(enhanceComponentAPI)(defineProperties( // set the component defaults without overriding the original component API
-    defineDefaults(componentAPI, Object.assign({}, COMPONENT_LIFECYCLE_METHODS, {
-      [PROPS_KEY]: {},
-      [STATE_KEY]: {}
-    })), Object.assign({
-      // defined during the component creation
-      [SLOTS_KEY]: null,
-      [ROOT_KEY]: null
-    }, COMPONENT_CORE_HELPERS, {
-      name,
-      css,
-      template
-    })));
-  }
   /**
    * Create the bindings to update the component attributes
    * @param   {HTMLElement} node - node where we will bind the expressions
@@ -2188,58 +2038,17 @@
       return binding;
     })));
   }
-  /**
-   * Create the subcomponents that can be included inside a tag in runtime
-   * @param   {Object} components - components imported in runtime
-   * @returns {Object} all the components transformed into Riot.Component factory functions
-   */
 
-
-  function createSubcomponents(components) {
-    if (components === void 0) {
-      components = {};
-    }
-
-    return Object.entries(callOrAssign(components)).reduce((acc, _ref4) => {
-      let [key, value] = _ref4;
-      acc[camelToDashCase(key)] = createComponent(value);
-      return acc;
-    }, {});
-  }
   /**
    * Run the component instance through all the plugins set by the user
    * @param   {Object} component - component instance
    * @returns {Object} the component enhanced by the plugins
    */
 
-
   function runPlugins(component) {
-    return [...PLUGINS_SET$1].reduce((c, fn) => fn(c) || c, component);
+    return [...PLUGINS_SET].reduce((c, fn) => fn(c) || c, component);
   }
-  /**
-   * Compute the component current state merging it with its previous state
-   * @param   {Object} oldState - previous state object
-   * @param   {Object} newState - new state givent to the `update` call
-   * @returns {Object} new object state
-   */
 
-
-  function computeState(oldState, newState) {
-    return Object.assign({}, oldState, callOrAssign(newState));
-  }
-  /**
-   * Add eventually the "is" attribute to link this DOM node to its css
-   * @param {HTMLElement} element - target root node
-   * @param {string} name - name of the component mounted
-   * @returns {undefined} it's a void function
-   */
-
-
-  function addCssHook(element, name) {
-    if (getName(element) !== name) {
-      set(element, IS_DIRECTIVE, name);
-    }
-  }
   /**
    * Component creation factory function that will enhance the user provided API
    * @param   {Object} component - a component implementation previously defined
@@ -2248,13 +2057,12 @@
    * @returns {Riot.Component} a riot component instance
    */
 
-
-  function enhanceComponentAPI(component, _ref5) {
+  function manageComponentLifecycle(component, _ref) {
     let {
       slots,
       attributes,
       props
-    } = _ref5;
+    } = _ref;
     return autobindMethods(runPlugins(defineProperties(isObject(component) ? Object.create(component) : component, {
       mount(element, state, parentScope) {
         if (state === void 0) {
@@ -2265,11 +2073,11 @@
         defineProperty(element, IS_PURE_SYMBOL, false);
         this[PARENT_KEY_SYMBOL] = parentScope;
         this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(element, attributes).mount(parentScope);
-        defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, evaluateInitialProps(element, props), evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions))));
-        this[STATE_KEY] = computeState(this[STATE_KEY], state);
+        defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, computeInitialProps(element, props), evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions))));
+        this[STATE_KEY] = computeComponentState(this[STATE_KEY], state);
         this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone(); // link this object to the DOM node
 
-        bindDOMNodeToComponentObject(element, this); // add eventually the 'is' attribute
+        bindDOMNodeToComponentInstance(element, this); // add eventually the 'is' attribute
 
         component.name && addCssHook(element, component.name); // define the root element
 
@@ -2297,7 +2105,7 @@
         const newProps = evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions);
         if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false) return;
         defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, this[PROPS_KEY], newProps)));
-        this[STATE_KEY] = computeState(this[STATE_KEY], state);
+        this[STATE_KEY] = computeComponentState(this[STATE_KEY], state);
         this[ON_BEFORE_UPDATE_KEY](this[PROPS_KEY], this[STATE_KEY]); // avoiding recursive updates
         // see also https://github.com/riot/riot/issues/2895
 
@@ -2323,21 +2131,216 @@
 
     })), Object.keys(component).filter(prop => isFunction(component[prop])));
   }
+
+  /**
+   * Component definition function
+   * @param   {Object} implementation - the component implementation will be generated via compiler
+   * @param   {Object} component - the component initial properties
+   * @returns {Object} a new component implementation object
+   */
+
+  function instantiateComponent(_ref) {
+    let {
+      css,
+      template,
+      componentAPI,
+      name
+    } = _ref;
+    // add the component css into the DOM
+    if (css && name) cssManager.add(name, css);
+    return curry(manageComponentLifecycle)(defineProperties( // set the component defaults without overriding the original component API
+    defineDefaults(componentAPI, Object.assign({}, COMPONENT_LIFECYCLE_METHODS, {
+      [PROPS_KEY]: {},
+      [STATE_KEY]: {}
+    })), Object.assign({
+      // defined during the component creation
+      [SLOTS_KEY]: null,
+      [ROOT_KEY]: null
+    }, COMPONENT_DOM_SELECTORS, {
+      name,
+      css,
+      template
+    })));
+  }
+
+  /**
+   * Create the component interface needed for the @riotjs/dom-bindings tag bindings
+   * @param   {RiotComponentWrapper} componentWrapper - riot compiler generated object
+   * @param   {string} componentWrapper.css - component css
+   * @param   {Function} componentWrapper.template - function that will return the dom-bindings template function
+   * @param   {Object} componentWrapper.exports - component interface
+   * @param   {string} componentWrapper.name - component name
+   * @returns {Object} component like interface
+   */
+
+  function createComponentFromWrapper(componentWrapper) {
+    const {
+      css,
+      template,
+      exports,
+      name
+    } = componentWrapper;
+    const templateFn = template ? componentTemplateFactory(template, componentWrapper) : MOCKED_TEMPLATE_INTERFACE;
+    return _ref => {
+      let {
+        slots,
+        attributes,
+        props
+      } = _ref;
+      // pure components rendering will be managed by the end user
+      if (exports && exports[IS_PURE_SYMBOL]) return createPureComponent(exports, {
+        slots,
+        attributes,
+        props,
+        css,
+        template
+      });
+      const componentAPI = callOrAssign(exports) || {};
+      const component = instantiateComponent({
+        css,
+        template: templateFn,
+        componentAPI,
+        name
+      })({
+        slots,
+        attributes,
+        props
+      }); // notice that for the components created via tag binding
+      // we need to invert the mount (state/parentScope) arguments
+      // the template bindings will only forward the parentScope updates
+      // and never deal with the component state
+
+      return {
+        mount(element, parentScope, state) {
+          return component.mount(element, state, parentScope);
+        },
+
+        update(parentScope, state) {
+          return component.update(state, parentScope);
+        },
+
+        unmount(preserveRoot) {
+          return component.unmount(preserveRoot);
+        }
+
+      };
+    };
+  }
+  /**
+   * Performance optimization for the recursive components
+   * @param  {RiotComponentWrapper} componentWrapper - riot compiler generated object
+   * @returns {Object} component like interface
+   */
+
+  const memoizedCreateComponentFromWrapper = memoize(createComponentFromWrapper);
+
+  /**
+   * Register a custom tag by name
+   * @param   {string} name - component name
+   * @param   {Object} implementation - tag implementation
+   * @returns {Map} map containing all the components implementations
+   */
+
+  function register(name, _ref) {
+    let {
+      css,
+      template,
+      exports
+    } = _ref;
+    if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component "${name}" was already registered`);
+    COMPONENTS_IMPLEMENTATION_MAP.set(name, createComponentFromWrapper({
+      name,
+      css,
+      template,
+      exports
+    }));
+    return COMPONENTS_IMPLEMENTATION_MAP;
+  }
+
+  /**
+   * Unregister a riot web component
+   * @param   {string} name - component name
+   * @returns {Map} map containing all the components implementations
+   */
+
+  function unregister(name) {
+    if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component "${name}" was never registered`);
+    COMPONENTS_IMPLEMENTATION_MAP.delete(name);
+    cssManager.remove(name);
+    return COMPONENTS_IMPLEMENTATION_MAP;
+  }
+
   /**
    * Component initialization function starting from a DOM node
    * @param   {HTMLElement} element - element to upgrade
    * @param   {Object} initialProps - initial component properties
    * @param   {string} componentName - component id
+   * @param   {Array} slots - component slots
    * @returns {Object} a new component instance bound to a DOM node
    */
 
-  function mountComponent(element, initialProps, componentName) {
+  function mountComponent(element, initialProps, componentName, slots) {
     const name = componentName || getName(element);
-    if (!COMPONENTS_IMPLEMENTATION_MAP$1.has(name)) panic(`The component named "${name}" was never registered`);
-    const component = COMPONENTS_IMPLEMENTATION_MAP$1.get(name)({
-      props: initialProps
+    if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component named "${name}" was never registered`);
+    const component = COMPONENTS_IMPLEMENTATION_MAP.get(name)({
+      props: initialProps,
+      slots
     });
     return component.mount(element);
+  }
+
+  /**
+   * Mounting function that will work only for the components that were globally registered
+   * @param   {string|HTMLElement} selector - query for the selection or a DOM element
+   * @param   {Object} initialProps - the initial component properties
+   * @param   {string} name - optional component name
+   * @returns {Array} list of riot components
+   */
+
+  function mount(selector, initialProps, name) {
+    return $(selector).map(element => mountComponent(element, initialProps, name));
+  }
+
+  /**
+   * Sweet unmounting helper function for the DOM node mounted manually by the user
+   * @param   {string|HTMLElement} selector - query for the selection or a DOM element
+   * @param   {boolean|null} keepRootElement - if true keep the root element
+   * @returns {Array} list of nodes unmounted
+   */
+
+  function unmount(selector, keepRootElement) {
+    return $(selector).map(element => {
+      if (element[DOM_COMPONENT_INSTANCE_PROPERTY]) {
+        element[DOM_COMPONENT_INSTANCE_PROPERTY].unmount(keepRootElement);
+      }
+
+      return element;
+    });
+  }
+
+  /**
+   * Define a riot plugin
+   * @param   {Function} plugin - function that will receive all the components created
+   * @returns {Set} the set containing all the plugins installed
+   */
+
+  function install(plugin) {
+    if (!isFunction(plugin)) panic('Plugins must be of type function');
+    if (PLUGINS_SET.has(plugin)) panic('This plugin was already installed');
+    PLUGINS_SET.add(plugin);
+    return PLUGINS_SET;
+  }
+
+  /**
+   * Uninstall a riot plugin
+   * @param   {Function} plugin - plugin previously installed
+   * @returns {Set} the set containing all the plugins installed
+   */
+
+  function uninstall(plugin) {
+    if (!PLUGINS_SET.has(plugin)) panic('This plugin was never installed');
+    PLUGINS_SET.delete(plugin);
+    return PLUGINS_SET;
   }
 
   /**
@@ -2365,99 +2368,6 @@
     });
   }
 
-  const {
-    DOM_COMPONENT_INSTANCE_PROPERTY,
-    COMPONENTS_IMPLEMENTATION_MAP,
-    PLUGINS_SET
-  } = globals;
-  /**
-   * Riot public api
-   */
-
-  /**
-   * Register a custom tag by name
-   * @param   {string} name - component name
-   * @param   {Object} implementation - tag implementation
-   * @returns {Map} map containing all the components implementations
-   */
-
-  function register(name, _ref) {
-    let {
-      css,
-      template,
-      exports
-    } = _ref;
-    if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component "${name}" was already registered`);
-    COMPONENTS_IMPLEMENTATION_MAP.set(name, createComponent({
-      name,
-      css,
-      template,
-      exports
-    }));
-    return COMPONENTS_IMPLEMENTATION_MAP;
-  }
-  /**
-   * Unregister a riot web component
-   * @param   {string} name - component name
-   * @returns {Map} map containing all the components implementations
-   */
-
-  function unregister(name) {
-    if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component "${name}" was never registered`);
-    COMPONENTS_IMPLEMENTATION_MAP.delete(name);
-    cssManager.remove(name);
-    return COMPONENTS_IMPLEMENTATION_MAP;
-  }
-  /**
-   * Mounting function that will work only for the components that were globally registered
-   * @param   {string|HTMLElement} selector - query for the selection or a DOM element
-   * @param   {Object} initialProps - the initial component properties
-   * @param   {string} name - optional component name
-   * @returns {Array} list of riot components
-   */
-
-  function mount(selector, initialProps, name) {
-    return $(selector).map(element => mountComponent(element, initialProps, name));
-  }
-  /**
-   * Sweet unmounting helper function for the DOM node mounted manually by the user
-   * @param   {string|HTMLElement} selector - query for the selection or a DOM element
-   * @param   {boolean|null} keepRootElement - if true keep the root element
-   * @returns {Array} list of nodes unmounted
-   */
-
-  function unmount(selector, keepRootElement) {
-    return $(selector).map(element => {
-      if (element[DOM_COMPONENT_INSTANCE_PROPERTY]) {
-        element[DOM_COMPONENT_INSTANCE_PROPERTY].unmount(keepRootElement);
-      }
-
-      return element;
-    });
-  }
-  /**
-   * Define a riot plugin
-   * @param   {Function} plugin - function that will receive all the components created
-   * @returns {Set} the set containing all the plugins installed
-   */
-
-  function install(plugin) {
-    if (!isFunction(plugin)) panic('Plugins must be of type function');
-    if (PLUGINS_SET.has(plugin)) panic('This plugin was already installed');
-    PLUGINS_SET.add(plugin);
-    return PLUGINS_SET;
-  }
-  /**
-   * Uninstall a riot plugin
-   * @param   {Function} plugin - plugin previously installed
-   * @returns {Set} the set containing all the plugins installed
-   */
-
-  function uninstall(plugin) {
-    if (!PLUGINS_SET.has(plugin)) panic('This plugin was never installed');
-    PLUGINS_SET.delete(plugin);
-    return PLUGINS_SET;
-  }
   /**
    * Helper method to create component without relying on the registered ones
    * @param   {Object} implementation - component implementation
@@ -2475,9 +2385,10 @@
         props,
         slots,
         attributes
-      }), createComponent)(implementation);
+      }), createComponentFromWrapper)(implementation);
     };
   }
+
   /**
    * Lift a riot component Interface into a pure riot object
    * @param   {Function} func - RiotPureComponent factory function
@@ -2489,23 +2400,31 @@
     func[IS_PURE_SYMBOL] = true;
     return func;
   }
+
   /**
    * no-op function needed to add the proper types to your component via typescript
    * @param {Function|Object} component - component default export
    * @returns {Function|Object} returns exactly what it has received
    */
 
+  /* istanbul ignore next */
   const withTypes = component => component;
-  /** @type {string} current riot version */
 
-  const version = 'v6.1.2'; // expose some internal stuff that might be used from external tools
+  /** @type {string} current riot version */
+  const version = 'v7.0.0';
 
   const __ = {
     cssManager,
-    DOMBindings,
-    createComponent,
-    defineComponent,
-    globals
+    DOMBindings: {
+      template: create,
+      createBinding: create$1,
+      createExpression: create$4,
+      bindingTypes,
+      expressionTypes
+    },
+    globals: {
+      DOM_COMPONENT_INSTANCE_PROPERTY
+    }
   };
 
   exports.__ = __;
