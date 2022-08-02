@@ -59,6 +59,8 @@ raw:
 	    --dir $(DIST)esm
 
 clean:
+	# delete old esm folder
+	@ rm -rf esm
 	# clean $(DIST)
 	@ rm -rf $(DIST)
 
@@ -83,7 +85,7 @@ min:
 build:
 	# generate riot.js & riot.min.js
 	@ make min
-	@ cp dist/riot/* .
+	@ cp -r dist/riot/* .
 	# write version in riot.js
 	@ sed -i '' 's/WIP/v$(VERSION)/g' riot*.js
 
