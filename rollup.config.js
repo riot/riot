@@ -59,12 +59,16 @@ module.exports = {
       },
       presets: ['@riotjs/babel-preset']
     }),
-    nodeResolve(),
+    nodeResolve({
+      browser: true
+    }),
     commonjs({
-      transformMixedEsModules: true,
       include: 'node_modules/**',
-      ignoreTryCatch: 'remove',
-      exclude: ignoredModules
+      transformMixedEsModules: true,
+      ignoreTryCatch: false,
+      ignoreDynamicRequires: true,
+      exclude: ignoredModules,
+      ignoreGlobal: true
     })
   ]
 }

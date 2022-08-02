@@ -49,7 +49,7 @@ raw:
 	@ mkdir -p $(DIST)
 	# Default builds UMD
 	@ $(ROLLUP) src/riot.js --format umd --config rollup.config.js --file $(DIST)riot.js
-	@ $(ROLLUP) src/riot+compiler.js --format umd --config rollup.config.js --file $(DIST)riot+compiler.js
+	@ HAS_VISUALIZER=1 $(ROLLUP) src/riot+compiler.js --format umd --config rollup.config.js --file $(DIST)riot+compiler.js
 	@ IGNORE_DEPENDENCIES=1 \
 	    $(ROLLUP) src/riot.js \
 	    --format esm \
@@ -76,7 +76,7 @@ min:
 	@ $(MINIFY) $(DIST)riot+compiler.js \
 	        --comments false \
 	        --toplevel \
-			--compress pure_funcs=['panic'],unsafe=true,unsafe_symbols=true \
+			--compress pure_funcs=['panic'],unsafe=true,unsafe_symbols=true,passes=5 \
 			--mangle \
 			-o $(DIST)riot+compiler.min.js;
 
