@@ -24,7 +24,7 @@ $ make riot
 We use [Github Issues](https://github.com/riot/riot/issues) as the Riot.js bug tracker. The best way to get your bug fixed is to provide a reduced test case. jsFiddle, jsBin, and other sites provide a way to give live examples.
 
 - [Bug Report Template](http://riot.js.org/examples/plunker/?app=bug-reporter) on plnkr (preferred)
-- [Bug Report Template](https://codesandbox.io/s/riotjs-6-bug-template-4umx9?file=/index.html) on codesandbox
+- [Bug Report Template](https://codesandbox.io/s/riot-js-7-bug-template-forked-ffm7jf?file=/index.html) on codesandbox
 
 ### Adding a new Demo
 
