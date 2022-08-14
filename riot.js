@@ -1,4 +1,4 @@
-/* Riot v7.0.2, @license MIT */
+/* Riot v7.0.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -354,8 +354,8 @@
     createDOM: noop
   });
 
-  const HEAD_SYMBOL = Symbol('head');
-  const TAIL_SYMBOL = Symbol('tail');
+  const HEAD_SYMBOL = Symbol();
+  const TAIL_SYMBOL = Symbol();
 
   /**
    * Create the <template> fragments text nodes
@@ -1479,7 +1479,7 @@
    */
 
 
-  const TemplateChunk = Object.freeze({
+  const TemplateChunk = {
     // Static props
     // bindings: null,
     // bindingsData: null,
@@ -1516,7 +1516,7 @@
         meta = {};
       }
 
-      if (!el) throw new Error('Please provide DOM node to mount properly your template');
+      if (!el) panic('Please provide DOM node to mount properly your template');
       if (this.el) this.unmount(scope); // <template> tags require a bit more work
       // the template fragment might be already created via meta outside of this call
 
@@ -1598,7 +1598,7 @@
         // clean the node children only
 
         case !mustRemoveRoot:
-          cleanNode(el);
+          el.innerHTML = '';
           break;
         // remove the root node only if the mustRemoveRoot is truly
 
@@ -1622,7 +1622,7 @@
       });
     }
 
-  });
+  };
   /**
    * Create a template chunk wiring also the bindings
    * @param   {string|HTMLElement} html - template string
@@ -2411,7 +2411,7 @@
   const withTypes = component => component;
 
   /** @type {string} current riot version */
-  const version = 'v7.0.2';
+  const version = 'v7.0.3';
 
   const __ = {
     cssManager,
@@ -2423,7 +2423,8 @@
       expressionTypes
     },
     globals: {
-      DOM_COMPONENT_INSTANCE_PROPERTY
+      DOM_COMPONENT_INSTANCE_PROPERTY,
+      PARENT_KEY_SYMBOL
     }
   };
 
