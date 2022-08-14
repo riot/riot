@@ -1,5 +1,5 @@
 import {bindingTypes, createBinding, createExpression,expressionTypes, template} from '@riotjs/dom-bindings'
-import {DOM_COMPONENT_INSTANCE_PROPERTY} from '@riotjs/util'
+import {DOM_COMPONENT_INSTANCE_PROPERTY, PARENT_KEY_SYMBOL} from '@riotjs/util'
 import cssManager from '../core/css-manager'
 
 // expose some internal stuff that might be used from external tools
@@ -13,6 +13,7 @@ export const __ = {
     expressionTypes
   },
   globals: {
-    DOM_COMPONENT_INSTANCE_PROPERTY
+    DOM_COMPONENT_INSTANCE_PROPERTY,
+    PARENT_KEY_SYMBOL
   }
 }
