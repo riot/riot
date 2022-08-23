@@ -109,4 +109,23 @@ describe('Riot compiler api', () => {
     component.unmount()
     riot.unregister('runtime-slot')
   })
+
+  it('Runtime slots with children components get properly evaluated with riot.mount', () => {
+    const el = document.createElement('runtime-slot')
+
+    el.innerHTML = '<title-prop title="{message}"></title-prop>'
+
+    riot.register('runtime-slot', RuntimeSlotComponent)
+    riot.register('title-prop', TitlePropComponent)
+
+    const [component] = riot.mount(el, {
+      message: 'hello'
+    })
+
+    expect(el.querySelector('h1').innerHTML).to.be.equal('hello')
+
+    component.unmount()
+    riot.unregister('runtime-slot')
+    riot.unregister('title-prop')
+  })
 })

@@ -3,6 +3,7 @@ import {
   expressionTypes,
   template
 } from '@riotjs/dom-bindings'
+import {COMPONENTS_IMPLEMENTATION_MAP} from '@riotjs/util'
 import {generateSlotsFromString} from '@riotjs/compiler/dist/compiler.essential.esm'
 
 /**
@@ -12,7 +13,6 @@ import {generateSlotsFromString} from '@riotjs/compiler/dist/compiler.essential.
  */
 export default function createRuntimeSlots(el) {
   if (!el.innerHTML.trim()) return null
-
   const slotsCode = generateSlotsFromString(el.outerHTML)
 
   // clear the DOM node once read
@@ -22,6 +22,7 @@ export default function createRuntimeSlots(el) {
   return Function(`return ${slotsCode}`)()(
     template,
     expressionTypes,
-    bindingTypes
+    bindingTypes,
+    name => COMPONENTS_IMPLEMENTATION_MAP.get(name)
   )
 }
