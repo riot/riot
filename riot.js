@@ -1,4 +1,4 @@
-/* Riot v7.0.3, @license MIT */
+/* Riot v7.0.4, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -356,7 +356,6 @@
 
   const HEAD_SYMBOL = Symbol();
   const TAIL_SYMBOL = Symbol();
-
   /**
    * Create the <template> fragments text nodes
    * @return {Object} {{head: Text, tail: Text}}
@@ -372,12 +371,12 @@
       tail
     };
   }
-
   /**
    * Create the template meta object in case of <template> fragments
    * @param   {TemplateChunk} componentTemplate - template chunk object
    * @returns {Object} the meta property that will be passed to the mount function of the TemplateChunk
    */
+
 
   function createTemplateMeta(componentTemplate) {
     const fragment = componentTemplate.dom.cloneNode(true);
@@ -393,7 +392,6 @@
       children: [head, ...Array.from(fragment.childNodes), tail]
     };
   }
-
   /**
    * ISC License
    *
@@ -425,7 +423,8 @@
    * @returns {Node[]} The same list of future children.
    */
 
-  const udomdiff = ((a, b, get, before) => {
+
+  var udomdiff = (a, b, get, before) => {
     const bLength = b.length;
     let aEnd = a.length;
     let bEnd = bLength;
@@ -534,7 +533,7 @@
     }
 
     return b;
-  });
+  };
 
   const UNMOUNT_SCOPE = Symbol('unmount');
   const EachBinding = {
@@ -763,10 +762,10 @@
       placeholder
     });
   }
-
   /**
    * Binding responsible for the `if` directive
    */
+
 
   const IfBinding = {
     // dynamic binding properties
@@ -815,11 +814,12 @@
     }
 
   };
-  function create$5(node, _ref) {
+
+  function create$5(node, _ref3) {
     let {
       evaluate,
       template
-    } = _ref;
+    } = _ref3;
     const placeholder = document.createTextNode('');
     insertBefore(placeholder, node);
     removeChild(node);
@@ -842,8 +842,8 @@
    */
 
   function setAllAttributes(node, attributes) {
-    Object.entries(attributes).forEach(_ref => {
-      let [name, value] = _ref;
+    Object.entries(attributes).forEach(_ref4 => {
+      let [name, value] = _ref4;
       return attributeExpression(node, {
         name
       }, value);
@@ -893,10 +893,10 @@
    */
 
 
-  function attributeExpression(node, _ref2, value, oldValue) {
+  function attributeExpression(node, _ref5, value, oldValue) {
     let {
       name
-    } = _ref2;
+    } = _ref5;
 
     // is it a spread operator? {...attributes}
     if (!name) {
@@ -931,6 +931,7 @@
    * @returns {string} input value as string
    */
 
+
   function normalizeValue(name, value) {
     // be sure that expressions like selected={ true } will be always rendered as selected='selected'
     return value === true ? name : value;
@@ -964,10 +965,10 @@
    */
 
 
-  function eventExpression(node, _ref, value) {
+  function eventExpression(node, _ref6, value) {
     let {
       name
-    } = _ref;
+    } = _ref6;
     const normalizedEventName = name.replace(RE_EVENTS_PREFIX, '');
     const eventListener = ListenersWeakMap.get(node) || createListener(node);
     const [callback, options] = getCallbackAndOptions(value);
@@ -985,23 +986,23 @@
 
     eventListener[normalizedEventName] = callback;
   }
-
   /**
    * Normalize the user value in order to render a empty string in case of falsy values
    * @param   {*} value - user input value
    * @returns {string} hopefully a string
    */
 
+
   function normalizeStringValue(value) {
     return isNil(value) ? '' : value;
   }
-
   /**
    * Get the the target text node to update or create one from of a comment node
    * @param   {HTMLElement} node - any html element containing childNodes
    * @param   {number} childNodeIndex - index of the text node in the childNodes list
    * @returns {Text} the text node to update
    */
+
 
   const getTextNode = (node, childNodeIndex) => {
     const target = node.childNodes[childNodeIndex];
@@ -1022,10 +1023,10 @@
    * @returns {undefined}
    */
 
+
   function textExpression(node, data, value) {
     node.data = normalizeStringValue(value);
   }
-
   /**
    * This methods handles the input fileds value updates
    * @param   {HTMLElement} node - target node
@@ -1034,17 +1035,17 @@
    * @returns {undefined}
    */
 
+
   function valueExpression(node, expression, value) {
     node.value = normalizeStringValue(value);
   }
 
-  const expressions = {
+  var expressions = {
     [ATTRIBUTE]: attributeExpression,
     [EVENT]: eventExpression,
     [TEXT]: textExpression,
     [VALUE]: valueExpression
   };
-
   const Expression = {
     // Static props
     // node: null,
@@ -1109,7 +1110,6 @@
       node: data.type === TEXT ? getTextNode(node, data.childNodeIndex) : node
     });
   }
-
   /**
    * Create a flat object having as keys a list of methods that if dispatched will propagate
    * on the whole collection
@@ -1118,6 +1118,8 @@
    * @param   {*} context - context returned by the new methods created
    * @returns {Object} a new object to simplify the the nested methods dispatching
    */
+
+
   function flattenCollectionMethods(collection, methods, context) {
     return methods.reduce((acc, method) => {
       return Object.assign({}, acc, {
@@ -1128,10 +1130,10 @@
     }, {});
   }
 
-  function create$3(node, _ref) {
+  function create$3(node, _ref7) {
     let {
       expressions
-    } = _ref;
+    } = _ref7;
     return Object.assign({}, flattenCollectionMethods(expressions.map(expression => create$4(node, expression)), ['mount', 'update', 'unmount']));
   }
 
@@ -1160,10 +1162,10 @@
 
     // API methods
     mount(scope, parentScope) {
-      const templateData = scope.slots ? scope.slots.find(_ref => {
+      const templateData = scope.slots ? scope.slots.find(_ref8 => {
         let {
           id
-        } = _ref;
+        } = _ref8;
         return id === this.name;
       }) : false;
       const {
@@ -1222,18 +1224,17 @@
    */
 
 
-  function createSlot(node, _ref2) {
+  function createSlot(node, _ref9) {
     let {
       name,
       attributes
-    } = _ref2;
+    } = _ref9;
     return Object.assign({}, SlotBinding, {
       attributes,
       node,
       name
     });
   }
-
   /**
    * Create a new tag object if it was registered before, otherwise fallback to the simple
    * template chunk
@@ -1242,6 +1243,7 @@
    * @param   {Array} attributes - dynamic attributes that will be received by the tag element
    * @returns {TagImplementation|TemplateChunk} a tag implementation or a template chunk as fallback
    */
+
 
   function getTag(component, slots, attributes) {
     if (slots === void 0) {
@@ -1279,10 +1281,10 @@
 
 
   function slotBindings(slots) {
-    return slots.reduce((acc, _ref) => {
+    return slots.reduce((acc, _ref10) => {
       let {
         bindings
-      } = _ref;
+      } = _ref10;
       return acc.concat(bindings);
     }, []);
   }
@@ -1339,13 +1341,14 @@
     }
 
   };
-  function create$2(node, _ref2) {
+
+  function create$2(node, _ref11) {
     let {
       evaluate,
       getComponent,
       slots,
       attributes
-    } = _ref2;
+    } = _ref11;
     return Object.assign({}, TagBinding, {
       node,
       evaluate,
@@ -1355,14 +1358,13 @@
     });
   }
 
-  const bindings = {
+  var bindings = {
     [IF]: create$5,
     [SIMPLE]: create$3,
     [EACH]: create$6,
     [TAG]: create$2,
     [SLOT]: createSlot
   };
-
   /**
    * Text expressions in a template tag will get childNodeIndex value normalized
    * depending on the position of the <template> tag offset
@@ -1401,7 +1403,8 @@
     return (bindings[type] || bindings[SIMPLE])(node, Object.assign({}, binding, {
       expressions: templateTagOffset && !selector ? fixTextExpressionsOffset(bindingExpressions, templateTagOffset) : bindingExpressions
     }));
-  }
+  } // in this case a simple innerHTML is enough
+
 
   function createHTMLTree(html, root) {
     const template = isTemplate(root) ? root : document.createElement('template');
@@ -1427,13 +1430,13 @@
     if (isSvg(root)) return createSVGTree(html, root);
     return createHTMLTree(html, root);
   }
-
   /**
    * Inject the DOM tree into a target node
    * @param   {HTMLElement} el - target element
    * @param   {DocumentFragment|SVGElement} dom - dom tree to inject
    * @returns {undefined}
    */
+
 
   function injectDOM(el, dom) {
     switch (true) {
@@ -1449,13 +1452,13 @@
         el.appendChild(dom);
     }
   }
-
   /**
    * Create the Template DOM skeleton
    * @param   {HTMLElement} el - root node where the DOM will be injected
    * @param   {string|HTMLElement} html - HTML markup or HTMLElement that will be injected into the root node
    * @returns {?DocumentFragment} fragment that will be injected into the root node
    */
+
 
   function createTemplateDOM(el, html) {
     return html && (typeof html === 'string' ? createDOMTree(el, html) : html);
@@ -2411,7 +2414,7 @@
   const withTypes = component => component;
 
   /** @type {string} current riot version */
-  const version = 'v7.0.3';
+  const version = 'v7.0.4';
 
   const __ = {
     cssManager,
