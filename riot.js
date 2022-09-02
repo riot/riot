@@ -1,4 +1,4 @@
-/* Riot v7.0.4, @license MIT */
+/* Riot v7.0.5, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -147,10 +147,7 @@
   // Ignore this helper because it's needed only for svg tags
 
   function moveChildren(source, target) {
-    if (source.firstChild) {
-      target.appendChild(source.firstChild);
-      moveChildren(source, target);
-    }
+    target.replaceChildren(...source.childNodes);
   }
   /**
    * Remove the child nodes from any DOM node
@@ -159,7 +156,8 @@
    */
 
   function cleanNode(node) {
-    clearChildren(node.childNodes);
+    // eslint-disable-next-line fp/no-loops
+    while (node.firstChild) node.removeChild(node.firstChild);
   }
   /**
    * Clear multiple children in a node
@@ -168,7 +166,8 @@
    */
 
   function clearChildren(children) {
-    Array.from(children).forEach(removeChild);
+    // eslint-disable-next-line fp/no-loops,fp/no-let
+    for (let i = 0; i < children.length; i++) removeChild(children[i]);
   }
   /**
    * Remove a node
@@ -424,7 +423,7 @@
    */
 
 
-  var udomdiff = (a, b, get, before) => {
+  const udomdiff = (a, b, get, before) => {
     const bLength = b.length;
     let aEnd = a.length;
     let bEnd = bLength;
@@ -1040,7 +1039,7 @@
     node.value = normalizeStringValue(value);
   }
 
-  var expressions = {
+  const expressions = {
     [ATTRIBUTE]: attributeExpression,
     [EVENT]: eventExpression,
     [TEXT]: textExpression,
@@ -1358,7 +1357,7 @@
     });
   }
 
-  var bindings = {
+  const bindings = {
     [IF]: create$5,
     [SIMPLE]: create$3,
     [EACH]: create$6,
@@ -1601,7 +1600,7 @@
         // clean the node children only
 
         case !mustRemoveRoot:
-          el.innerHTML = '';
+          cleanNode(el);
           break;
         // remove the root node only if the mustRemoveRoot is truly
 
@@ -2414,7 +2413,7 @@
   const withTypes = component => component;
 
   /** @type {string} current riot version */
-  const version = 'v7.0.4';
+  const version = 'v7.0.5';
 
   const __ = {
     cssManager,
