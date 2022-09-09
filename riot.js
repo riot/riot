@@ -1,4 +1,4 @@
-/* Riot v7.0.5, @license MIT */
+/* Riot v7.0.6, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2413,7 +2413,7 @@
   const withTypes = component => component;
 
   /** @type {string} current riot version */
-  const version = 'v7.0.5';
+  const version = 'v7.0.6';
 
   const __ = {
     cssManager,
