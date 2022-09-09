@@ -54,6 +54,7 @@ raw:
 	    $(ROLLUP) src/riot.js \
 	    --format esm \
 	    --preserveModules \
+	    --entryFileNames [name].js \
 	    --preserveModulesRoot src \
 	    --config rollup.config.js \
 	    --dir $(DIST)esm
