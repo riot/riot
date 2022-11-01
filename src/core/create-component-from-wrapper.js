@@ -1,8 +1,47 @@
-import {IS_PURE_SYMBOL, callOrAssign, memoize} from '@riotjs/util'
+import {COMPONENTS_IMPLEMENTATION_MAP, IS_PURE_SYMBOL, callOrAssign, camelToDashCase, memoize} from '@riotjs/util'
 import {MOCKED_TEMPLATE_INTERFACE} from './mocked-template-interface'
 import {componentTemplateFactory} from './component-template-factory'
 import {createPureComponent} from './create-pure-component'
 import {instantiateComponent} from './instantiate-component'
+/**
+ * Create the subcomponents that can be included inside a tag in runtime
+ * @param   {Object} components - components imported in runtime
+ * @returns {Object} all the components transformed into Riot.Component factory functions
+ */
+function createChildrenComponentsObject(components = {}) {
+  return Object.entries(callOrAssign(components))
+    .reduce((acc, [key, value]) => {
+      acc[camelToDashCase(key)] = createComponentFromWrapper(value)
+      return acc
+    }, {})
+}
+
+/**
+ * Create the getter function to render the child components
+ * @param   {RiotComponentWrapper} componentWrapper - riot compiler generated object
+ * @returns {Function} function returning the component factory function
+ */
+const createChildComponentGetter = (componentWrapper) => {
+  const childrenComponents = createChildrenComponentsObject(
+    componentWrapper.exports ?
+      componentWrapper.exports.components :
+      {}
+  )
+
+  return name => {
+    // improve support for recursive components
+    if (name === componentWrapper.name) return memoizedCreateComponentFromWrapper(componentWrapper)
+    // return the registered components
+    return childrenComponents[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
+  }
+}
+
+/**
+ * Performance optimization for the recursive components
+ * @param  {RiotComponentWrapper} componentWrapper - riot compiler generated object
+ * @returns {Object} component like interface
+ */
+const memoizedCreateComponentFromWrapper = memoize(createComponentFromWrapper)
 
 /**
  * Create the component interface needed for the @riotjs/dom-bindings tag bindings
@@ -17,7 +56,8 @@ export function createComponentFromWrapper(componentWrapper) {
   const {css, template, exports, name} = componentWrapper
   const templateFn = template ? componentTemplateFactory(
     template,
-    componentWrapper
+    componentWrapper,
+    createChildComponentGetter(componentWrapper)
   ) : MOCKED_TEMPLATE_INTERFACE
 
   return ({slots, attributes, props}) => {
@@ -54,11 +94,4 @@ export function createComponentFromWrapper(componentWrapper) {
     }
   }
 }
-
-/**
- * Performance optimization for the recursive components
- * @param  {RiotComponentWrapper} componentWrapper - riot compiler generated object
- * @returns {Object} component like interface
- */
-export const memoizedCreateComponentFromWrapper = memoize(createComponentFromWrapper)
 

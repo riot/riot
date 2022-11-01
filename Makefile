@@ -88,7 +88,7 @@ build:
 	@ make min
 	@ cp -r dist/riot/* .
 	# write version in riot.js
-	@ sed -i '' 's/WIP/v$(VERSION)/g' riot*.js
+	@ sed -i '' 's/WIP/v$(VERSION)/g' riot*.js esm/*.js esm/**/*.js
 
 
 bump:
