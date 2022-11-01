@@ -1,4 +1,4 @@
-/* Riot v7.0.6, @license MIT */
+/* Riot v7.0.7, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1559,35 +1559,14 @@
   }
 
   /**
-   * Create the subcomponents that can be included inside a tag in runtime
-   * @param   {Object} components - components imported in runtime
-   * @returns {Object} all the components transformed into Riot.Component factory functions
-   */
-  function createChildrenComponentsObject(components) {
-    if (components === void 0) {
-      components = {};
-    }
-    return Object.entries(callOrAssign(components)).reduce((acc, _ref) => {
-      let [key, value] = _ref;
-      acc[camelToDashCase(key)] = createComponentFromWrapper(value);
-      return acc;
-    }, {});
-  }
-
-  /**
    * Factory function to create the component templates only once
    * @param   {Function} template - component template creation function
    * @param   {RiotComponentWrapper} componentWrapper - riot compiler generated object
+   * @param   {Function} getChildComponent - getter function to return the children components
    * @returns {TemplateChunk} template chunk object
    */
-  function componentTemplateFactory(template, componentWrapper) {
-    const components = createChildrenComponentsObject(componentWrapper.exports ? componentWrapper.exports.components : {});
-    return template(create, expressionTypes, bindingTypes, name => {
-      // improve support for recursive components
-      if (name === componentWrapper.name) return memoizedCreateComponentFromWrapper(componentWrapper);
-      // return the registered components
-      return components[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name);
-    });
+  function componentTemplateFactory(template, componentWrapper, getChildComponent) {
+    return template(create, expressionTypes, bindingTypes, getChildComponent);
   }
 
   /**
@@ -2049,6 +2028,44 @@
   }
 
   /**
+   * Create the subcomponents that can be included inside a tag in runtime
+   * @param   {Object} components - components imported in runtime
+   * @returns {Object} all the components transformed into Riot.Component factory functions
+   */
+  function createChildrenComponentsObject(components) {
+    if (components === void 0) {
+      components = {};
+    }
+    return Object.entries(callOrAssign(components)).reduce((acc, _ref) => {
+      let [key, value] = _ref;
+      acc[camelToDashCase(key)] = createComponentFromWrapper(value);
+      return acc;
+    }, {});
+  }
+
+  /**
+   * Create the getter function to render the child components
+   * @param   {RiotComponentWrapper} componentWrapper - riot compiler generated object
+   * @returns {Function} function returning the component factory function
+   */
+  const createChildComponentGetter = componentWrapper => {
+    const childrenComponents = createChildrenComponentsObject(componentWrapper.exports ? componentWrapper.exports.components : {});
+    return name => {
+      // improve support for recursive components
+      if (name === componentWrapper.name) return memoizedCreateComponentFromWrapper(componentWrapper);
+      // return the registered components
+      return childrenComponents[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name);
+    };
+  };
+
+  /**
+   * Performance optimization for the recursive components
+   * @param  {RiotComponentWrapper} componentWrapper - riot compiler generated object
+   * @returns {Object} component like interface
+   */
+  const memoizedCreateComponentFromWrapper = memoize(createComponentFromWrapper);
+
+  /**
    * Create the component interface needed for the @riotjs/dom-bindings tag bindings
    * @param   {RiotComponentWrapper} componentWrapper - riot compiler generated object
    * @param   {string} componentWrapper.css - component css
@@ -2064,13 +2081,13 @@
       exports,
       name
     } = componentWrapper;
-    const templateFn = template ? componentTemplateFactory(template, componentWrapper) : MOCKED_TEMPLATE_INTERFACE;
-    return _ref => {
+    const templateFn = template ? componentTemplateFactory(template, componentWrapper, createChildComponentGetter(componentWrapper)) : MOCKED_TEMPLATE_INTERFACE;
+    return _ref2 => {
       let {
         slots,
         attributes,
         props
-      } = _ref;
+      } = _ref2;
       // pure components rendering will be managed by the end user
       if (exports && exports[IS_PURE_SYMBOL]) return createPureComponent(exports, {
         slots,
@@ -2108,13 +2125,6 @@
       };
     };
   }
-
-  /**
-   * Performance optimization for the recursive components
-   * @param  {RiotComponentWrapper} componentWrapper - riot compiler generated object
-   * @returns {Object} component like interface
-   */
-  const memoizedCreateComponentFromWrapper = memoize(createComponentFromWrapper);
 
   /**
    * Register a custom tag by name
@@ -2281,7 +2291,7 @@
   const withTypes = component => component;
 
   /** @type {string} current riot version */
-  const version = 'v7.0.6';
+  const version = 'v7.0.7';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
