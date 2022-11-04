@@ -12,15 +12,17 @@ module.exports = {
     slEdge: {
       base: 'SauceLabs',
       browserName: 'MicrosoftEdge',
-      platform: 'Windows 10'
+      platform: 'Windows 11'
     },
     slChrome: {
       base: 'SauceLabs',
-      browserName: 'chrome'
+      browserName: 'chrome',
+      platform: 'macOS 12'
     },
     slFirefox: {
       base: 'SauceLabs',
-      browserName: 'firefox'
+      browserName: 'firefox',
+      platform: 'macOS 12'
     }
   }
 }
