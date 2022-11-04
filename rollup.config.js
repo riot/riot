@@ -1,14 +1,13 @@
 const commonjs = require('@rollup/plugin-commonjs')
 const {nodeResolve} = require('@rollup/plugin-node-resolve')
 const emptyFile = 'export default undefined'
-const pkg = require('./package.json')
 const babel = require('rollup-plugin-babel')
 
 const ignoredModules = [
   'fs',
   'path',
   'esprima'
-].concat(process.env.IGNORE_DEPENDENCIES ? Object.keys(pkg.dependencies) : [])
+]
 
 // ignore builtin requires
 function ignore() {
@@ -28,14 +27,15 @@ module.exports = {
   output: [{
     banner: '/* Riot WIP, @license MIT */',
     name: 'riot',
-    preferConst: true,
+    generatedCode: {
+      constBindings: true
+    },
     globals: ignoredModules.reduce((acc, dep) => ({
       [dep]: dep,
       ...acc
     }), {})
   }],
   external: ignoredModules,
-
   plugins: [
     ignore(),
     babel({

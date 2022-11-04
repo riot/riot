@@ -2,17 +2,13 @@
   "name": "riot",
   "version": "7.0.7",
   "description": "Simple and elegant component-based UI library",
-  "homepage": "https://riot.js.org/",
-  "repository": "riot/riot",
-  "author": "Gianluca Guarini <gianluca.guarini@gmail.com> (https://gianlucaguarini.com)",
   "license": "MIT",
-  "sideEffects": false,
   "engines": {
     "node": ">=12.0.0"
   },
-  "scripts": {
-    "test": "make riot"
-  },
+  "repository": "riot/riot",
+  "homepage": "https://riot.js.org/",
+  "author": "Gianluca Guarini <gianluca.guarini@gmail.com> (https://gianlucaguarini.com)",
   "keywords": [
     "custom tags",
     "custom elements",
@@ -34,21 +30,28 @@
     "riotjs",
     "riot.js"
   ],
-  "dependencies": {
-    "@riotjs/compiler": "^6.4.1",
-    "@riotjs/dom-bindings": "^6.0.7",
-    "@riotjs/util": "^2.2.0",
-    "bianco.attr": "^1.1.1",
-    "bianco.query": "^1.1.4",
-    "cumpa": "^1.0.1",
-    "curri": "^1.0.1"
+  "main": "riot.js",
+  "module": "esm/riot.js",
+  "files": [
+    "esm",
+    "riot.js",
+    "riot.d.ts",
+    "riot.min.js",
+    "riot+compiler.js",
+    "riot+compiler.min.js"
+  ],
+  "scripts": {
+    "test": "make riot"
   },
+  "jsnext:main": "esm/riot.js",
+  "sideEffects": false,
+  "types": "./riot.d.ts",
   "devDependencies": {
-    "@babel/core": "^7.19.6",
-    "@babel/preset-env": "^7.19.4",
+    "@babel/core": "^7.20.2",
+    "@babel/preset-env": "^7.20.2",
     "@riotjs/babel-preset": "1.0.0",
-    "@rollup/plugin-commonjs": "^22.0.2",
-    "@rollup/plugin-node-resolve": "^14.1.0",
+    "@rollup/plugin-commonjs": "^23.0.2",
+    "@rollup/plugin-node-resolve": "^15.0.1",
     "babel-plugin-istanbul": "^6.1.1",
     "chai": "^4.3.6",
     "core-js": "^3.26.0",
@@ -63,24 +66,19 @@
     "karma-rollup-preprocessor": "^7.0.8",
     "karma-sauce-launcher": "^4.3.6",
     "mocha": "^10.1.0",
-    "rollup": "^2.79.1",
+    "rollup": "^3.2.5",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-riot": "^6.0.0",
     "sinon": "^14.0.1",
     "sinon-chai": "^3.7.0",
     "terser": "^5.15.1",
-    "typescript": "^4.8.4"
-  },
-  "files": [
-    "esm",
-    "riot.js",
-    "riot.d.ts",
-    "riot.min.js",
-    "riot+compiler.js",
-    "riot+compiler.min.js"
-  ],
-  "main": "riot.js",
-  "module": "esm/riot.js",
-  "jsnext:main": "esm/riot.js",
-  "types": "./riot.d.ts"
+    "typescript": "^4.8.4",
+    "@riotjs/compiler": "^6.4.2",
+    "@riotjs/dom-bindings": "^6.0.7",
+    "@riotjs/util": "^2.2.0",
+    "bianco.attr": "^1.1.1",
+    "bianco.query": "^1.1.4",
+    "cumpa": "^1.0.1",
+    "curri": "^1.0.1"
+  }
 }

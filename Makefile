@@ -50,10 +50,9 @@ raw:
 	# Default builds UMD
 	@ $(ROLLUP) src/riot.js --format umd --config rollup.config.js --file $(DIST)riot.js
 	@ HAS_VISUALIZER=1 $(ROLLUP) src/riot+compiler.js --format umd --config rollup.config.js --file $(DIST)riot+compiler.js
-	@ IGNORE_DEPENDENCIES=1 \
-	    $(ROLLUP) src/riot.js \
+	@ $(ROLLUP) src/riot.js \
 	    --format esm \
-	    --preserveModules \
+	    --output.preserveModules \
 	    --entryFileNames [name].js \
 	    --preserveModulesRoot src \
 	    --config rollup.config.js \
