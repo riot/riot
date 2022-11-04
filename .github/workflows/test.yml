@@ -31,13 +31,13 @@ jobs:
       - run: npm ci
       - run: make riot
       - name: Saucelabs Crossbrowser Testing
-        if: ${{ success() && github.event_name != 'pull_request' && matrix.node-version == '15.x' }}
+        if: ${{ success() && github.event_name != 'pull_request' && matrix.node-version == '19.x' }}
         env:
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
         run: make test-sauce
       - name: Coveralls
-        if: ${{ success() && github.event_name != 'pull_request' && matrix.node-version == '15.x' }}
+        if: ${{ success() && github.event_name != 'pull_request' && matrix.node-version == '19.x' }}
         uses: coverallsapp/github-action@master
         with:
           path-to-lcov: ./coverage/report-lcov/lcov.info
