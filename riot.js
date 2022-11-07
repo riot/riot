@@ -1,4 +1,4 @@
-/* Riot v7.0.7, @license MIT */
+/* Riot v7.1.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2291,7 +2291,7 @@
   const withTypes = component => component;
 
   /** @type {string} current riot version */
-  const version = 'v7.0.7';
+  const version = 'v7.1.0';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
@@ -2320,7 +2320,5 @@
   exports.unregister = unregister;
   exports.version = version;
   exports.withTypes = withTypes;
-
-  Object.defineProperty(exports, '__esModule', { value: true });
 
 }));

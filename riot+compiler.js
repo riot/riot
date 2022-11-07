@@ -1,4 +1,4 @@
-/* Riot v7.0.7, @license MIT */
+/* Riot v7.1.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2784,7 +2784,7 @@
    */const CSS_SELECTOR=RegExp(`([{}]|^)[; ]*((?:[^@ ;{}][^{}]*)?[^@ ;{}:] ?)(?={)|${S_LINESTR}`,'g');/**
    * Matches the list of css selectors excluding the pseudo selectors
    * @const {RegExp}
-   */const CSS_SELECTOR_LIST=/([^,]+)(?::\w+(?:[\s|\S]*?\))?\s?)+|([^,]+)/g;/**
+   */const CSS_SELECTOR_LIST=/([^,]+)(?::\w+(?:[\s|\S]*?\))?(?:[^,:]*)?)+|([^,]+)/g;/**
    * Scope the css selectors prefixing them with the tag name
    * @param {string} tag - Tag name of the root element
    * @param {string} selectorList - list of selectors we need to scope
@@ -5202,7 +5202,7 @@
   const withTypes = component => component;
 
   /** @type {string} current riot version */
-  const version = 'v7.0.7';
+  const version = 'v7.1.0';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
@@ -5404,7 +5404,5 @@
   exports.unregister = unregister;
   exports.version = version;
   exports.withTypes = withTypes;
-
-  Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
