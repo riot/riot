@@ -213,7 +213,7 @@ Special thanks to Browserstack and JetBrains for their support
     </tr>
 </table>
 
-[ci-image]:https://img.shields.io/github/workflow/status/riot/riot/test?style=flat-square
+[ci-image]:https://img.shields.io/github/actions/workflow/status/riot/riot/test.yml?style=flat-square
 [ci-url]:https://github.com/riot/riot/actions
 
 [license-image]:https://img.shields.io/badge/license-MIT-000000.svg?style=flat-square
