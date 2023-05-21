@@ -28,7 +28,7 @@ GENERATED_FILES = riot.js riot+compiler.js
 test: lint test-karma test-typing
 
 test-karma:
-	@ $(KARMA) start test/karma.conf.js
+	@ $(KARMA) start test/karma.conf.cjs
 
 lint:
     # check if the code looks pretty

@@ -1,15 +1,13 @@
-const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
+const saucelabsBrowsers = require('./saucelabs-browsers.cjs').browsers,
   riotRollup = require('rollup-plugin-riot'),
+  istanbul = require('rollup-plugin-istanbul'),
   isSaucelabs = process.env.SAUCELABS,
   isTravis = !!process.env.TRAVIS_BUILD_NUMBER,
   TEST_FILES = './specs/**/*.spec.js',
   browsers = isSaucelabs
     ? Object.keys(saucelabsBrowsers)
     : ['ChromeHeadlessNoSandbox'],
-  rollupConfig = require('../rollup.config')
-
-// set the babel env in order to enable the babel istanbul plugin
-process.env.BABEL_ENV = 'test'
+  rollupConfig = require('../rollup.config.cjs')
 
 module.exports = function (conf) {
   conf.set({
@@ -59,7 +57,13 @@ module.exports = function (conf) {
 
     rollupPreprocessor: {
       ...rollupConfig,
-      plugins: [riotRollup(), ...rollupConfig.plugins],
+      plugins: [
+        riotRollup(),
+        istanbul({
+          exclude: ['./test/**/*', './node_modules/**/*'],
+        }),
+        ...rollupConfig.plugins,
+      ],
       onwarn: () => {},
       external: ['chai', 'sinon'],
       output: {
