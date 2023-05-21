@@ -1,6 +1,6 @@
-import {IS_DIRECTIVE} from '@riotjs/util'
-import {getName} from '../utils/dom'
-import {set as setAttr} from 'bianco.attr'
+import { IS_DIRECTIVE } from '@riotjs/util'
+import { getName } from '../utils/dom'
+import { set as setAttr } from 'bianco.attr'
 
 /**
  * Add eventually the "is" attribute to link this DOM node to its css
@@ -8,7 +8,6 @@ import {set as setAttr} from 'bianco.attr'
  * @param {string} name - name of the component mounted
  * @returns {undefined} it's a void function
  */
-
 
 export function addCssHook(element, name) {
   if (getName(element) !== name) {

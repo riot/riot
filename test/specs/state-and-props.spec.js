@@ -11,17 +11,19 @@ import SpreadAttribute from '../components/spread-attribute.riot'
 import StaticAttribute from '../components/static-attribute.riot'
 import TitleProps from '../components/title-prop.riot'
 
-import {expect} from 'chai'
-import {spy} from 'sinon'
+import { expect } from 'chai'
+import { spy } from 'sinon'
 
 describe('components state and props', () => {
   it('components will receive and update properly their state property', () => {
     const element = document.createElement('simple-component')
-    const component = riot.component(SimpleComponent)(element, {message: 'hello'})
+    const component = riot.component(SimpleComponent)(element, {
+      message: 'hello',
+    })
     const p = component.$('p')
     expect(p.innerHTML).to.be.equal('hello')
 
-    component.update({message: 'goodbye'})
+    component.update({ message: 'goodbye' })
 
     expect(p.innerHTML).to.be.equal('goodbye')
 
@@ -30,7 +32,7 @@ describe('components state and props', () => {
 
   it('Initial props should not be lost on the consequent updates', () => {
     const element = document.createElement('title-prop')
-    const component = riot.component(TitleProps)(element, {title: 'hello'})
+    const component = riot.component(TitleProps)(element, { title: 'hello' })
 
     expect(component.props.title).to.be.equal('hello')
 
@@ -43,7 +45,9 @@ describe('components state and props', () => {
 
   it('Initial props can be also a function', () => {
     const element = document.createElement('title-prop')
-    const component = riot.component(TitleProps)(element, () => ({title: 'hello'}))
+    const component = riot.component(TitleProps)(element, () => ({
+      title: 'hello',
+    }))
 
     expect(component.props.title).to.be.equal('hello')
 
@@ -57,11 +61,13 @@ describe('components state and props', () => {
   it('nested components can be loaded in runtime via imports statements', () => {
     const element = document.createElement('nested-imports')
 
-    const component = riot.component(NestedImportsComponent)(element, {message: 'hello'})
+    const component = riot.component(NestedImportsComponent)(element, {
+      message: 'hello',
+    })
     const p = component.$('p')
     expect(p.innerHTML).to.be.equal('hello')
 
-    component.update({message: 'goodbye'})
+    component.update({ message: 'goodbye' })
 
     expect(p.innerHTML).to.be.equal('goodbye')
 
@@ -71,7 +77,9 @@ describe('components state and props', () => {
   it('nested components can update properly their internal state', () => {
     const element = document.createElement('nested-imports')
 
-    const component = riot.component(NestedImportsComponent)(element, {message: 'hello'})
+    const component = riot.component(NestedImportsComponent)(element, {
+      message: 'hello',
+    })
     const p = component.$('p')
 
     expect(p.innerHTML).to.be.equal('hello')
@@ -89,8 +97,8 @@ describe('components state and props', () => {
         onMounted() {
           expect(this.props.name).to.be.equal('foo')
           mountedSpy()
-        }
-      }
+        },
+      },
     }
 
     const element = document.createElement('my-component')
@@ -139,7 +147,9 @@ describe('components state and props', () => {
     const element = document.createElement('dashed-attribute-parent')
     const component = riot.component(DashedAttributeParent)(element)
 
-    expect(component.$('dashed-attribute-child p').innerHTML).to.be.equal('hello')
+    expect(component.$('dashed-attribute-child p').innerHTML).to.be.equal(
+      'hello',
+    )
 
     component.unmount()
   })
@@ -164,14 +174,16 @@ describe('components state and props', () => {
 
   it('components with getters should be properly rendered (issue #2908)', () => {
     const element = document.createElement('component-with-getters')
-    const component = riot.component(ComponentWithGetters)(element, {message: 'hello'})
+    const component = riot.component(ComponentWithGetters)(element, {
+      message: 'hello',
+    })
     const h1 = component.$('h1')
     const p = component.$('p')
 
     expect(h1.innerHTML).to.be.equal(component.state.message)
     expect(p.innerHTML).to.be.equal('hello')
 
-    component.update({message: 'goodbye'})
+    component.update({ message: 'goodbye' })
 
     expect(h1.innerHTML).to.be.equal('goodbye')
     expect(p.innerHTML).to.be.equal('hello')

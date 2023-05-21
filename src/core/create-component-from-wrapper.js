@@ -1,19 +1,27 @@
-import {COMPONENTS_IMPLEMENTATION_MAP, IS_PURE_SYMBOL, callOrAssign, camelToDashCase, memoize} from '@riotjs/util'
-import {MOCKED_TEMPLATE_INTERFACE} from './mocked-template-interface'
-import {componentTemplateFactory} from './component-template-factory'
-import {createPureComponent} from './create-pure-component'
-import {instantiateComponent} from './instantiate-component'
+import {
+  COMPONENTS_IMPLEMENTATION_MAP,
+  IS_PURE_SYMBOL,
+  callOrAssign,
+  camelToDashCase,
+  memoize,
+} from '@riotjs/util'
+import { MOCKED_TEMPLATE_INTERFACE } from './mocked-template-interface'
+import { componentTemplateFactory } from './component-template-factory'
+import { createPureComponent } from './create-pure-component'
+import { instantiateComponent } from './instantiate-component'
 /**
  * Create the subcomponents that can be included inside a tag in runtime
  * @param   {Object} components - components imported in runtime
  * @returns {Object} all the components transformed into Riot.Component factory functions
  */
 function createChildrenComponentsObject(components = {}) {
-  return Object.entries(callOrAssign(components))
-    .reduce((acc, [key, value]) => {
+  return Object.entries(callOrAssign(components)).reduce(
+    (acc, [key, value]) => {
       acc[camelToDashCase(key)] = createComponentFromWrapper(value)
       return acc
-    }, {})
+    },
+    {},
+  )
 }
 
 /**
@@ -23,14 +31,13 @@ function createChildrenComponentsObject(components = {}) {
  */
 const createChildComponentGetter = (componentWrapper) => {
   const childrenComponents = createChildrenComponentsObject(
-    componentWrapper.exports ?
-      componentWrapper.exports.components :
-      {}
+    componentWrapper.exports ? componentWrapper.exports.components : {},
   )
 
-  return name => {
+  return (name) => {
     // improve support for recursive components
-    if (name === componentWrapper.name) return memoizedCreateComponentFromWrapper(componentWrapper)
+    if (name === componentWrapper.name)
+      return memoizedCreateComponentFromWrapper(componentWrapper)
     // return the registered components
     return childrenComponents[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
   }
@@ -53,20 +60,25 @@ const memoizedCreateComponentFromWrapper = memoize(createComponentFromWrapper)
  * @returns {Object} component like interface
  */
 export function createComponentFromWrapper(componentWrapper) {
-  const {css, template, exports, name} = componentWrapper
-  const templateFn = template ? componentTemplateFactory(
-    template,
-    componentWrapper,
-    createChildComponentGetter(componentWrapper)
-  ) : MOCKED_TEMPLATE_INTERFACE
+  const { css, template, exports, name } = componentWrapper
+  const templateFn = template
+    ? componentTemplateFactory(
+        template,
+        componentWrapper,
+        createChildComponentGetter(componentWrapper),
+      )
+    : MOCKED_TEMPLATE_INTERFACE
 
-  return ({slots, attributes, props}) => {
+  return ({ slots, attributes, props }) => {
     // pure components rendering will be managed by the end user
     if (exports && exports[IS_PURE_SYMBOL])
-      return createPureComponent(
-        exports,
-        { slots, attributes, props, css, template }
-      )
+      return createPureComponent(exports, {
+        slots,
+        attributes,
+        props,
+        css,
+        template,
+      })
 
     const componentAPI = callOrAssign(exports) || {}
 
@@ -74,8 +86,8 @@ export function createComponentFromWrapper(componentWrapper) {
       css,
       template: templateFn,
       componentAPI,
-      name
-    })({slots, attributes, props})
+      name,
+    })({ slots, attributes, props })
 
     // notice that for the components created via tag binding
     // we need to invert the mount (state/parentScope) arguments
@@ -90,8 +102,7 @@ export function createComponentFromWrapper(componentWrapper) {
       },
       unmount(preserveRoot) {
         return component.unmount(preserveRoot)
-      }
+      },
     }
   }
 }
-

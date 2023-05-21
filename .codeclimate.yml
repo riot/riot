@@ -1,12 +1,12 @@
 ratings:
   paths:
-  - "src/**.js"
+    - 'src/**.js'
 
 exclude_paths:
-  - "riot.d.ts"
-  - "riot+compiler.js"
-  - "riot+compiler.min.js"
-  - "riot.js"
-  - "riot.esm.js"
-  - "riot.min.js"
-  - "test/**"
+  - 'riot.d.ts'
+  - 'riot+compiler.js'
+  - 'riot+compiler.min.js'
+  - 'riot.js'
+  - 'riot.esm.js'
+  - 'riot.min.js'
+  - 'test/**'

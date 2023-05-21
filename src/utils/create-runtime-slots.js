@@ -1,10 +1,6 @@
-import {
-  bindingTypes,
-  expressionTypes,
-  template
-} from '@riotjs/dom-bindings'
-import {COMPONENTS_IMPLEMENTATION_MAP} from '@riotjs/util'
-import {generateSlotsFromString} from '@riotjs/compiler/dist/compiler.essential.esm'
+import { bindingTypes, expressionTypes, template } from '@riotjs/dom-bindings'
+import { COMPONENTS_IMPLEMENTATION_MAP } from '@riotjs/util'
+import { generateSlotsFromString } from '@riotjs/compiler/dist/compiler.essential.esm'
 
 /**
  * Create slots reading the inner HTML of the node
@@ -23,6 +19,6 @@ export default function createRuntimeSlots(el) {
     template,
     expressionTypes,
     bindingTypes,
-    name => COMPONENTS_IMPLEMENTATION_MAP.get(name)
+    (name) => COMPONENTS_IMPLEMENTATION_MAP.get(name),
   )
 }

@@ -1,0 +1,9 @@
+/dist
+/coverage
+/esm
+/node_modules
+/.nyc_output
+/riot.js
+/riot.min.js
+/riot+compiler.js
+/riot+compiler.min.js

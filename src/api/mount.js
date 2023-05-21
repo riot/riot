@@ -1,5 +1,5 @@
 import $ from 'bianco.query'
-import {mountComponent} from '../core/mount-component'
+import { mountComponent } from '../core/mount-component'
 
 /**
  * Mounting function that will work only for the components that were globally registered
@@ -9,5 +9,7 @@ import {mountComponent} from '../core/mount-component'
  * @returns {Array} list of riot components
  */
 export function mount(selector, initialProps, name) {
-  return $(selector).map(element => mountComponent(element, initialProps, name))
+  return $(selector).map((element) =>
+    mountComponent(element, initialProps, name),
+  )
 }

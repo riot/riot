@@ -1,11 +1,11 @@
 import $ from 'bianco.query'
-import {set as setAttr} from 'bianco.attr'
+import { set as setAttr } from 'bianco.attr'
 
 export const CSS_BY_NAME = new Map()
 export const STYLE_NODE_SELECTOR = 'style[riot]'
 
 // memoized curried function
-const getStyleNode = (style => {
+const getStyleNode = ((style) => {
   return () => {
     // lazy evaluation:
     // if this function was already called before
@@ -65,5 +65,5 @@ export default {
     }
 
     return this
-  }
+  },
 }

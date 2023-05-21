@@ -20,5 +20,4 @@ export * from './compiler/inject'
 export * from './compiler/compile-from-url'
 export * from './compiler/compile-from-string'
 
-export {compiler}
-
+export { compiler }

@@ -1,4 +1,4 @@
-import {PLUGINS_SET, panic} from '@riotjs/util'
+import { PLUGINS_SET, panic } from '@riotjs/util'
 
 /**
  * Uninstall a riot plugin

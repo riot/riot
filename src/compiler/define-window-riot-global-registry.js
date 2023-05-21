@@ -1,4 +1,4 @@
-import {GLOBAL_REGISTRY} from './global-registry'
+import { GLOBAL_REGISTRY } from './global-registry'
 
 /* istanbul ignore next */
 export function defineWindowRiotGlobalRegistry() {

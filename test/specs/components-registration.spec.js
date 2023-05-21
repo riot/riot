@@ -1,5 +1,5 @@
 import * as riot from '../../src/riot'
-import {fireEvent, normalizeInnerHTML} from '../utils'
+import { fireEvent, normalizeInnerHTML } from '../utils'
 
 import GlobalComponents from '../components/global-components.riot'
 import NestedAliasedImportsComponent from '../components/nested-aliased-imports.riot'
@@ -9,9 +9,9 @@ import RecursiveTreeComponent from '../components/recursive-tree.riot'
 import RuntimeIsDirective from '../components/runtime-is-directive.riot'
 import SimpleComponent from '../components/simple.riot'
 
-import {expect} from 'chai'
-import {spy} from 'sinon'
-import {template} from '@riotjs/dom-bindings'
+import { expect } from 'chai'
+import { spy } from 'sinon'
+import { template } from '@riotjs/dom-bindings'
 
 describe('components registration', () => {
   it('riot.component will mount properly components with css', () => {
@@ -22,7 +22,9 @@ describe('components registration', () => {
     const tag = component(element, {})
 
     expect(tag.root.getAttribute('is')).to.be.equal('simple')
-    expect(window.getComputedStyle(tag.root).color).to.be.equal('rgb(255, 0, 0)')
+    expect(window.getComputedStyle(tag.root).color).to.be.equal(
+      'rgb(255, 0, 0)',
+    )
 
     tag.unmount()
   })
@@ -34,8 +36,8 @@ describe('components registration', () => {
       exports: {
         onMounted() {
           mountedSpy()
-        }
-      }
+        },
+      },
     })
     const [component] = riot.mount(document.createElement('my-component'))
     expect(mountedSpy).to.have.been.calledOnce
@@ -43,7 +45,7 @@ describe('components registration', () => {
     component.unmount()
   })
 
-  it('custom components have core helpers and the root property', done => {
+  it('custom components have core helpers and the root property', (done) => {
     const MyComponent = {
       css: 'my-component { color: red; }',
       exports: {
@@ -52,15 +54,16 @@ describe('components registration', () => {
           expect(this.$('div')).to.be.ok
           expect(this.$$('div')).to.be.ok
           done()
-        }
+        },
       },
-      template: () => template('<div>hello</div>')
+      template: () => template('<div>hello</div>'),
     }
 
-    const component = riot.component(MyComponent)(document.createElement('my-component'))
+    const component = riot.component(MyComponent)(
+      document.createElement('my-component'),
+    )
     component.unmount()
   })
-
 
   it('custom components can be mounted and unmounted properly', () => {
     const destroyedSpy = spy()
@@ -69,8 +72,8 @@ describe('components registration', () => {
       exports: {
         onUnmounted() {
           destroyedSpy()
-        }
-      }
+        },
+      },
     })
 
     const element = document.createElement('my-component')
@@ -89,8 +92,8 @@ describe('components registration', () => {
       exports: {
         onUnmounted() {
           destroyedSpy()
-        }
-      }
+        },
+      },
     })
     const element = document.createElement('div')
 
@@ -122,8 +125,8 @@ describe('components registration', () => {
       exports: {
         onUnmounted() {
           destroyedSpy()
-        }
-      }
+        },
+      },
     })
     const element = document.createElement('div')
 
@@ -165,19 +168,19 @@ describe('components registration', () => {
         return {
           onMounted() {
             mountedSpy()
-          }
+          },
         }
-      }
+      },
     }
 
     const components = [
       riot.component(MyComponent)(document.createElement('div'), {}),
-      riot.component(MyComponent)(document.createElement('div'), {})
+      riot.component(MyComponent)(document.createElement('div'), {}),
     ]
 
     expect(mountedSpy).to.have.been.calledTwice
 
-    components.forEach(c => c.unmount())
+    components.forEach((c) => c.unmount())
   })
 
   it('custom components be also classes', () => {
@@ -188,17 +191,17 @@ describe('components registration', () => {
         onMounted() {
           mountedSpy()
         }
-      }
+      },
     }
 
     const components = [
       riot.component(MyComponent)(document.createElement('div'), {}),
-      riot.component(MyComponent)(document.createElement('div'), {})
+      riot.component(MyComponent)(document.createElement('div'), {}),
     ]
 
     expect(mountedSpy).to.have.been.calledTwice
 
-    components.forEach(c => c.unmount())
+    components.forEach((c) => c.unmount())
   })
 
   it('old Riot.js syntax is supported', () => {
@@ -232,17 +235,18 @@ describe('components registration', () => {
     expect(() => riot.unregister('my-component')).to.throw()
   })
 
-
   it('nested components can be properly styled', () => {
     const element = document.createElement('nested-aliased-imports')
 
     document.body.appendChild(element)
 
-    const component = riot.component(NestedAliasedImportsComponent)(element, {message: 'hello'})
+    const component = riot.component(NestedAliasedImportsComponent)(element, {
+      message: 'hello',
+    })
     const p = component.$('p')
     expect(p.innerHTML).to.be.equal('hello')
 
-    component.update({message: 'goodbye'})
+    component.update({ message: 'goodbye' })
 
     expect(p.innerHTML).to.be.equal('goodbye')
 
@@ -255,17 +259,18 @@ describe('components registration', () => {
     riot.register('simple', SimpleComponent)
     const element = document.createElement('global-components')
 
-    const component = riot.component(GlobalComponents)(element, {message: 'hello'})
+    const component = riot.component(GlobalComponents)(element, {
+      message: 'hello',
+    })
     expect(component.$('p').innerHTML).to.be.equal('hello')
 
-    component.update({message: 'goodbye'})
+    component.update({ message: 'goodbye' })
 
     expect(component.$('p').innerHTML).to.be.equal('goodbye')
 
     component.unmount()
     riot.unregister('simple')
   })
-
 
   it('is directives can be evaluated in runtime', () => {
     const element = document.createElement('runtime-is-directive')
@@ -276,13 +281,13 @@ describe('components registration', () => {
 
     component.update({
       message: 'I am a message',
-      child: 'simple'
+      child: 'simple',
     })
 
     expect(normalizeInnerHTML(child.textContent)).to.be.equal('I am a message')
 
     component.update({
-      child: 'child'
+      child: 'child',
     })
 
     expect(normalizeInnerHTML(child.textContent)).to.be.equal('I am a child')
@@ -294,12 +299,16 @@ describe('components registration', () => {
     const element = document.createElement('recursive-tree')
     const component = riot.component(RecursiveTreeComponent)(element, {
       name: 'Hello',
-      children: [{
-        name: 'There',
-        children: [{
-          name: 'Child'
-        }]
-      }]
+      children: [
+        {
+          name: 'There',
+          children: [
+            {
+              name: 'Child',
+            },
+          ],
+        },
+      ],
     })
 
     expect(component.$$('p')).to.have.length(3)

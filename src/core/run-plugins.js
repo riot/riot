@@ -1,4 +1,4 @@
-import {PLUGINS_SET} from '@riotjs/util'
+import { PLUGINS_SET } from '@riotjs/util'
 
 /**
  * Run the component instance through all the plugins set by the user

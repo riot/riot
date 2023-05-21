@@ -3,19 +3,21 @@ const saucelabsBrowsers = require('./saucelabs-browsers').browsers,
   isSaucelabs = process.env.SAUCELABS,
   isTravis = !!process.env.TRAVIS_BUILD_NUMBER,
   TEST_FILES = './specs/**/*.spec.js',
-  browsers = isSaucelabs ? Object.keys(saucelabsBrowsers) : ['ChromeHeadlessNoSandbox'],
+  browsers = isSaucelabs
+    ? Object.keys(saucelabsBrowsers)
+    : ['ChromeHeadlessNoSandbox'],
   rollupConfig = require('../rollup.config')
 
 // set the babel env in order to enable the babel istanbul plugin
-process.env.BABEL_ENV= 'test'
+process.env.BABEL_ENV = 'test'
 
-module.exports = function(conf) {
+module.exports = function (conf) {
   conf.set({
     basePath: '',
     autoWatch: true,
     frameworks: ['mocha'],
     proxies: {
-      '/components/': '/base/components/'
+      '/components/': '/base/components/',
     },
     files: [
       '../node_modules/chai/chai.js',
@@ -24,14 +26,14 @@ module.exports = function(conf) {
       {
         pattern: 'components/*.riot',
         served: true,
-        included: false
+        included: false,
       },
-      TEST_FILES
+      TEST_FILES,
     ],
     sauceLabs: {
       build: `GITHUB_RUN_NUMBER #${process.env.GITHUB_RUN_NUMBER} (${process.env.GITHUB_RUN_NUMBER})`,
       tunnelIdentifier: process.env.GITHUB_RUN_ID,
-      testName: 'riot'
+      testName: 'riot',
     },
     captureTimeout: 300000,
     browserNoActivityTimeout: 300000,
@@ -40,10 +42,10 @@ module.exports = function(conf) {
       {
         ChromeHeadlessNoSandbox: {
           base: 'ChromeHeadless',
-          flags: ['--no-sandbox']
-        }
+          flags: ['--no-sandbox'],
+        },
       },
-      saucelabsBrowsers
+      saucelabsBrowsers,
     ),
     browsers: browsers,
 
@@ -52,42 +54,42 @@ module.exports = function(conf) {
       .concat(isTravis ? [] : 'progress'),
 
     preprocessors: {
-      [TEST_FILES]: ['rollup']
+      [TEST_FILES]: ['rollup'],
     },
 
     rollupPreprocessor: {
       ...rollupConfig,
-      plugins: [
-        riotRollup(),
-        ...rollupConfig.plugins
-      ],
+      plugins: [riotRollup(), ...rollupConfig.plugins],
       onwarn: () => {},
       external: ['chai', 'sinon'],
       output: {
-        globals: {'chai': 'chai', 'sinon': 'sinon'},
+        globals: { chai: 'chai', sinon: 'sinon' },
         format: 'iife',
-        sourcemap: 'inline'
-      }
+        sourcemap: 'inline',
+      },
     },
 
     client: {
       mocha: {
         timeout: isSaucelabs ? 30000 : 3000, // saucelab tests can be really really slow
         // change Karma's debug.html to the mocha web reporter
-        reporter: 'html'
-      }
+        reporter: 'html',
+      },
     },
 
     coverageReporter: {
       dir: '../coverage',
-      reporters: [{
-        type: 'lcov',
-        subdir: 'report-lcov'
-      }, {
-        type: 'text'
-      }]
+      reporters: [
+        {
+          type: 'lcov',
+          subdir: 'report-lcov',
+        },
+        {
+          type: 'text',
+        },
+      ],
     },
 
-    singleRun: true
+    singleRun: true,
   })
 }

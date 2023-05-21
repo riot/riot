@@ -1,4 +1,4 @@
-import {callOrAssign} from '@riotjs/util'
+import { callOrAssign } from '@riotjs/util'
 
 /**
  * Compute the component current state merging it with its previous state
@@ -9,6 +9,6 @@ import {callOrAssign} from '@riotjs/util'
 export function computeComponentState(oldState, newState) {
   return {
     ...oldState,
-    ...callOrAssign(newState)
+    ...callOrAssign(newState),
   }
 }

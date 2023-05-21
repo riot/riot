@@ -4,7 +4,7 @@
   "description": "Simple and elegant component-based UI library",
   "license": "MIT",
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=16.0.0"
   },
   "repository": "riot/riot",
   "homepage": "https://riot.js.org/",
@@ -32,6 +32,19 @@
   ],
   "main": "riot.js",
   "module": "esm/riot.js",
+  "type": "module",
+  "exports": {
+    "riot": {
+      "import": "./esm/riot.js",
+      "require": "./riot.js",
+      "types": "./riot.d.ts"
+    },
+    "riot+compiler": {
+      "import": "./esm/riot.js",
+      "require": "./riot+compiler.js",
+      "types": "./riot.d.ts"
+    }
+  },
   "files": [
     "esm",
     "riot.js",
@@ -47,38 +60,34 @@
   "sideEffects": false,
   "types": "./riot.d.ts",
   "devDependencies": {
-    "@babel/core": "^7.20.2",
-    "@babel/preset-env": "^7.20.2",
-    "@riotjs/babel-preset": "1.0.0",
-    "@rollup/plugin-commonjs": "^23.0.2",
-    "@rollup/plugin-node-resolve": "^15.0.1",
-    "babel-plugin-istanbul": "^6.1.1",
-    "chai": "^4.3.6",
-    "core-js": "^3.26.0",
-    "eslint": "^8.26.0",
-    "eslint-config-riot": "^3.0.0",
-    "jsdom": "20.0.2",
+    "@riotjs/prettier-config": "^1.0.1",
+    "@rollup/plugin-commonjs": "^25.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.2",
+    "chai": "^4.3.7",
+    "core-js": "^3.30.2",
+    "eslint": "^8.41.0",
+    "eslint-config-riot": "^4.0.0",
+    "jsdom": "22.0.0",
     "jsdom-global": "3.0.2",
-    "karma": "^6.4.1",
-    "karma-chrome-launcher": "^3.1.1",
+    "karma": "^6.4.2",
+    "karma-chrome-launcher": "^3.2.0",
     "karma-coverage": "^2.2.0",
     "karma-mocha": "^2.0.1",
     "karma-rollup-preprocessor": "^7.0.8",
     "karma-sauce-launcher": "^4.3.6",
-    "mocha": "^10.1.0",
-    "rollup": "^3.2.5",
-    "rollup-plugin-babel": "^4.4.0",
+    "mocha": "^10.2.0",
+    "rollup": "^3.22.1",
     "rollup-plugin-riot": "^6.0.0",
-    "sinon": "^14.0.1",
+    "sinon": "^15.1.0",
     "sinon-chai": "^3.7.0",
-    "terser": "^5.15.1",
-    "typescript": "^4.8.4",
+    "terser": "^5.17.4",
+    "typescript": "^5.0.4",
     "@riotjs/compiler": "^6.4.2",
     "@riotjs/dom-bindings": "^6.0.7",
-    "@riotjs/util": "^2.2.0",
+    "@riotjs/util": "^2.2.1",
     "bianco.attr": "^1.1.1",
     "bianco.query": "^1.1.4",
-    "cumpa": "^1.0.1",
-    "curri": "^1.0.1"
+    "cumpa": "^2.0.1",
+    "curri": "^2.0.3"
   }
 }

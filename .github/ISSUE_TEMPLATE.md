@@ -2,14 +2,12 @@
 
 1. Describe your issue:
 
-
-
-
 2. Can you reproduce the issue?
 
-  Post the link using one of our bug report templates:
-  - [Bug Report Template](https://riot.js.org/examples/plunker/?app=bug-reporter) on plnkr (preferred)
-  - [Bug Report Template](https://codesandbox.io/s/riot-js-7-bug-template-forked-ffm7jf?file=/index.html) on codesandbox
+Post the link using one of our bug report templates:
+
+- [Bug Report Template](https://riot.js.org/examples/plunker/?app=bug-reporter) on plnkr (preferred)
+- [Bug Report Template](https://codesandbox.io/s/riot-js-7-bug-template-forked-ffm7jf?file=/index.html) on codesandbox
 
 3. On which browser/OS does the issue appear?
 
@@ -17,10 +15,10 @@
 
 5. How would you tag this issue?
 
-  - [ ] Question
-  - [ ] Bug
-  - [ ] Discussion
-  - [ ] Feature request
-  - [ ] Tip
-  - [ ] Enhancement
-  - [ ] Performance
+- [ ] Question
+- [ ] Bug
+- [ ] Discussion
+- [ ] Feature request
+- [ ] Tip
+- [ ] Enhancement
+- [ ] Performance

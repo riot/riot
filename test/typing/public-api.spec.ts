@@ -5,7 +5,7 @@ import {
   register,
   unregister,
   version,
-  RiotComponentWrapper
+  RiotComponentWrapper,
 } from '../../riot'
 
 interface TodoItem {
@@ -22,20 +22,19 @@ interface TodoState {
   doShowDoneItems: boolean
 }
 
-interface TodoComponent extends RiotComponent<TodoProps, TodoState> {
-}
+interface TodoComponent extends RiotComponent<TodoProps, TodoState> {}
 
-const wrapper: RiotComponentWrapper<TodoComponent> =  {
+const wrapper: RiotComponentWrapper<TodoComponent> = {}
 
-}
+const component: TodoComponent = mount<TodoProps, TodoState>(
+  'todo',
+  {
+    initialItems: [{ summary: 'buy eggs', done: false }],
+  },
+  'todo',
+)[0]
 
-const component: TodoComponent = mount<TodoProps, TodoState>('todo', {
-  initialItems: [
-    { summary: 'buy eggs', done: false }
-  ]
-}, 'todo')[0]
-
-component.update({ doShowDoneItems: false }, { })
+component.update({ doShowDoneItems: false }, {})
 component.unmount(true)
 
 const el = document.createElement('div')

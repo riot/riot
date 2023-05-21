@@ -1,6 +1,6 @@
 import * as riot from '../../src/riot'
 
-import {expect} from 'chai'
+import { expect } from 'chai'
 
 describe('Riot public api', () => {
   it('riot exports properly its public api', () => {
@@ -16,7 +16,7 @@ describe('Riot public api', () => {
       'pure',
       'withTypes',
       'version',
-      '__'
+      '__',
     ])
   })
 })

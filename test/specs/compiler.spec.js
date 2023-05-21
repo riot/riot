@@ -1,9 +1,9 @@
 import * as riot from '../../src/riot+compiler'
-import {GLOBAL_REGISTRY} from '../../src/compiler/global-registry'
+import { GLOBAL_REGISTRY } from '../../src/compiler/global-registry'
 import RuntimeSlotComponent from '../components/runtime-slot.riot'
 import RuntimeSlotWithChildrenComponent from '../components/runtime-slot-with-children.riot'
 import TitlePropComponent from '../components/title-prop.riot'
-import {expect} from 'chai'
+import { expect } from 'chai'
 
 describe('Riot compiler api', () => {
   it('riot compiler exports properly its public api', () => {
@@ -25,17 +25,17 @@ describe('Riot compiler api', () => {
       'compile',
       'compileFromUrl',
       'compileFromString',
-      'compiler'
+      'compiler',
     ])
   })
 
-  it('compiler can load asynchronously tags via url', async function() {
-    const {code} = await riot.compileFromUrl('/components/simple.riot')
+  it('compiler can load asynchronously tags via url', async function () {
+    const { code } = await riot.compileFromUrl('/components/simple.riot')
 
     expect(code).to.match(/scope\.props\.message/)
   })
 
-  it('compiler can load asynchronously script tags', async function() {
+  it('compiler can load asynchronously script tags', async function () {
     const script = document.createElement('script')
     script.setAttribute('type', 'riot')
     script.setAttribute('data-src', 'components/simple.riot')
@@ -48,7 +48,7 @@ describe('Riot compiler api', () => {
   })
 
   it('compiler can compile string tags', () => {
-    const {code} = riot.compileFromString('<my-tag></my-tag>')
+    const { code } = riot.compileFromString('<my-tag></my-tag>')
 
     expect(code).to.be.ok
   })
@@ -58,7 +58,7 @@ describe('Riot compiler api', () => {
     el.innerHTML = '<p>{message}</p>'
 
     const component = riot.component(RuntimeSlotComponent)(el, {
-      message: 'hello'
+      message: 'hello',
     })
 
     expect(el.querySelector('p').innerHTML).to.be.equal('hello')
@@ -72,7 +72,7 @@ describe('Riot compiler api', () => {
     riot.register('title-prop', TitlePropComponent)
 
     const component = riot.component(RuntimeSlotWithChildrenComponent)(el, {
-      message: 'hello'
+      message: 'hello',
     })
 
     expect(el.querySelector('p').innerHTML).to.be.equal('hello')
@@ -87,7 +87,7 @@ describe('Riot compiler api', () => {
     const el = document.createElement('runtime-slot')
 
     const component = riot.component(RuntimeSlotComponent)(el, {
-      message: 'hello'
+      message: 'hello',
     })
 
     expect(el.innerHTML).to.be.equal('')
@@ -100,9 +100,13 @@ describe('Riot compiler api', () => {
     el.innerHTML = '<p>{message}</p>'
     riot.register('runtime-slot', RuntimeSlotComponent)
 
-    const [component] = riot.mount(el, {
-      message: 'hello'
-    }, 'runtime-slot')
+    const [component] = riot.mount(
+      el,
+      {
+        message: 'hello',
+      },
+      'runtime-slot',
+    )
 
     expect(el.querySelector('p').innerHTML).to.be.equal('hello')
 
@@ -119,7 +123,7 @@ describe('Riot compiler api', () => {
     riot.register('title-prop', TitlePropComponent)
 
     const [component] = riot.mount(el, {
-      message: 'hello'
+      message: 'hello',
     })
 
     expect(el.querySelector('h1').innerHTML).to.be.equal('hello')

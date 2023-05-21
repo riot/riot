@@ -1,4 +1,4 @@
-import {PLUGINS_SET, isFunction, panic} from '@riotjs/util'
+import { PLUGINS_SET, isFunction, panic } from '@riotjs/util'
 
 /**
  * Define a riot plugin

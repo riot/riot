@@ -1,5 +1,5 @@
 import * as riot from '../../src/riot'
-import {bindingTypes, expressionTypes, template} from '@riotjs/dom-bindings'
+import { bindingTypes, expressionTypes, template } from '@riotjs/dom-bindings'
 import CommentsAndExpressions from '../components/comments-and-expressions.riot'
 import ConditionalSelectOption from '../components/conditional-select-option.riot'
 import EachCustomChildrenComponents from '../components/each-custom-children-components.riot'
@@ -14,8 +14,8 @@ import PureComponent from '../components/pure-component.riot'
 import PureObject from '../components/pure-object.riot'
 import SimpleComponent from '../components/simple.riot'
 
-import {expect} from 'chai'
-import {spy} from 'sinon'
+import { expect } from 'chai'
+import { spy } from 'sinon'
 
 describe('lifecycle events', () => {
   it('riot.component can mount anonymous components', () => {
@@ -24,12 +24,12 @@ describe('lifecycle events', () => {
       exports: {
         onMounted() {
           mountedSpy()
-        }
-      }
+        },
+      },
     }
 
     const element = document.createElement('div')
-    const component = riot.component(MyComponent)(element, {isActive: true})
+    const component = riot.component(MyComponent)(element, { isActive: true })
     expect(component.root).to.be.equal(element)
     expect(component.props.isActive).to.be.ok
     expect(mountedSpy).to.have.been.calledOnce
@@ -72,8 +72,8 @@ describe('lifecycle events', () => {
         },
         shouldUpdate() {
           return false
-        }
-      }
+        },
+      },
     }
 
     const element = document.createElement('my-component')
@@ -93,7 +93,7 @@ describe('lifecycle events', () => {
     const element = document.createElement('each-custom-children-components')
     const component = riot.component(EachCustomChildrenComponents)(element, {
       onClick: handler,
-      items: [{value: 'hello'}, {value: 'there'}]
+      items: [{ value: 'hello' }, { value: 'there' }],
     })
 
     expect(handler).to.be.callCount(component.state.items.length)
@@ -105,12 +105,12 @@ describe('lifecycle events', () => {
     const element = document.createElement('each-custom-children-components')
     const component = riot.component(EachCustomChildrenComponents)(element, {
       onClick: handler,
-      items: [{value: 'hello'}, {value: 'there'}]
+      items: [{ value: 'hello' }, { value: 'there' }],
     })
 
     expect(() => {
       component.update({
-        items: [{value: 'goodbye'}]
+        items: [{ value: 'goodbye' }],
       })
     }).to.not.throw()
 
@@ -120,7 +120,7 @@ describe('lifecycle events', () => {
   it('expression mixed with static text will be properly evaluated', () => {
     const element = document.createElement('expression-parts')
     const component = riot.component(ExpressionParts)(element, {
-      val: 'hello'
+      val: 'hello',
     })
 
     expect(component.$('p').innerHTML).to.be.equal('hellothere')
@@ -131,9 +131,8 @@ describe('lifecycle events', () => {
   it('the value attribute will be passed as prop to children tags', () => {
     const element = document.createElement('parent-value-prop')
     const component = riot.component(ParentValueProp)(element, {
-      onClick() {
-      },
-      value: 'hello'
+      onClick() {},
+      value: 'hello',
     })
 
     expect(component.$('input').value).to.be.equal('hello')
@@ -145,7 +144,7 @@ describe('lifecycle events', () => {
     const component = riot.component(NativeAttributes)(element, {
       isHidden: true,
       myId: 'hello',
-      remove: 'remove'
+      remove: 'remove',
     })
     const p = component.$('p')
     expect(p.hidden).to.be.ok
@@ -171,32 +170,43 @@ describe('lifecycle events', () => {
   it('riot.component accepts custom slots and attributes', () => {
     const mountedSpy = spy()
     const MyComponent = {
-      template: () => template('<slot/>', [{
-        type: bindingTypes.SLOT,
-        selector: 'slot',
-        name: 'default'
-      }]),
+      template: () =>
+        template('<slot/>', [
+          {
+            type: bindingTypes.SLOT,
+            selector: 'slot',
+            name: 'default',
+          },
+        ]),
       exports: {
         onMounted() {
           mountedSpy()
-        }
-      }
+        },
+      },
     }
 
     const element = document.createElement('div')
-    const component = riot.component(MyComponent)(element, {}, {
-      slots: [{
-        id: 'default',
-        html: 'hello'
-      }],
-      attributes: [{
-        type: expressionTypes.ATTRIBUTE,
-        name: 'class',
-        evaluate() {
-          return 'hello'
-        }
-      }]
-    })
+    const component = riot.component(MyComponent)(
+      element,
+      {},
+      {
+        slots: [
+          {
+            id: 'default',
+            html: 'hello',
+          },
+        ],
+        attributes: [
+          {
+            type: expressionTypes.ATTRIBUTE,
+            name: 'class',
+            evaluate() {
+              return 'hello'
+            },
+          },
+        ],
+      },
+    )
     expect(component.root).to.be.equal(element)
     expect(component.root.getAttribute('class')).to.be.equal('hello')
     expect(component.root.innerHTML).to.be.equal('hello')
@@ -204,7 +214,7 @@ describe('lifecycle events', () => {
     component.unmount()
   })
 
-  it('riot.pure doesn\'t accept objects', () => {
+  it("riot.pure doesn't accept objects", () => {
     const element = document.createElement('pure-object')
     expect(() => {
       riot.component(PureObject)(element)
@@ -252,6 +262,13 @@ describe('lifecycle events', () => {
     component.update()
     component.unmount()
 
-    expect([...component.test]).to.be.deep.equal(['onBeforeMount', 'onMounted', 'onBeforeUpdate', 'onUpdated', 'onBeforeUnmount', 'onUnmounted'])
+    expect([...component.test]).to.be.deep.equal([
+      'onBeforeMount',
+      'onMounted',
+      'onBeforeUpdate',
+      'onUpdated',
+      'onBeforeUnmount',
+      'onUnmounted',
+    ])
   })
 })

@@ -4,4 +4,4 @@
  * @returns {Function|Object} returns exactly what it has received
  */
 /* istanbul ignore next */
-export const withTypes = component => component
+export const withTypes = (component) => component

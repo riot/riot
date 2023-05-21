@@ -1,0 +1,4 @@
+extends: eslint-config-riot
+
+rules:
+  fp/no-rest-parameters: 0

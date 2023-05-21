@@ -1,5 +1,5 @@
 import $ from 'bianco.query'
-import {DOM_COMPONENT_INSTANCE_PROPERTY} from '@riotjs/util'
+import { DOM_COMPONENT_INSTANCE_PROPERTY } from '@riotjs/util'
 
 /**
  * Sweet unmounting helper function for the DOM node mounted manually by the user
@@ -8,7 +8,7 @@ import {DOM_COMPONENT_INSTANCE_PROPERTY} from '@riotjs/util'
  * @returns {Array} list of nodes unmounted
  */
 export function unmount(selector, keepRootElement) {
-  return $(selector).map(element => {
+  return $(selector).map((element) => {
     if (element[DOM_COMPONENT_INSTANCE_PROPERTY]) {
       element[DOM_COMPONENT_INSTANCE_PROPERTY].unmount(keepRootElement)
     }

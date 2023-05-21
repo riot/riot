@@ -13,6 +13,7 @@ KARMA = ./node_modules/karma/bin/karma
 ESLINT = ./node_modules/eslint/bin/eslint.js
 MOCHA = ./node_modules/mocha/bin/_mocha
 ROLLUP = ./node_modules/.bin/rollup
+PRETTIER = ./node_modules/.bin/prettier
 MINIFY = ./node_modules/.bin/terser
 RIOT_CLI = ./node_modules/.bin/riot
 TSC = ./node_modules/.bin/tsc
@@ -24,14 +25,16 @@ CONFIG = config/
 
 GENERATED_FILES = riot.js riot+compiler.js
 
-test: eslint test-karma test-typing
+test: lint test-karma test-typing
 
 test-karma:
 	@ $(KARMA) start test/karma.conf.js
 
-eslint:
+lint:
+    # check if the code looks pretty
+	@ $(PRETTIER) --check ./
 	# check code style
-	@ $(ESLINT) -c ./.eslintrc src test
+	@ $(ESLINT) src test
 
 test-debug:
 	@ ${KARMA} start test/karma.conf.js --browsers=Chrome --no-single-run --auto-watch
@@ -138,4 +141,4 @@ publish:
 	@ git push origin main
 	@ git push origin main --tags
 
-.PHONY: test min eslint test-sauce raw riot build bump bump-undo version version-undo release-undo publish
+.PHONY: test min lint test-sauce raw riot build bump bump-undo version version-undo release-undo publish

@@ -1,4 +1,4 @@
-import {DOM_COMPONENT_INSTANCE_PROPERTY} from '@riotjs/util'
+import { DOM_COMPONENT_INSTANCE_PROPERTY } from '@riotjs/util'
 
 /**
  * Bind a DOM node to its component object
@@ -7,4 +7,4 @@ import {DOM_COMPONENT_INSTANCE_PROPERTY} from '@riotjs/util'
  * @returns {Object} the component object received as second argument
  */
 export const bindDOMNodeToComponentInstance = (node, component) =>
-  node[DOM_COMPONENT_INSTANCE_PROPERTY] = component
+  (node[DOM_COMPONENT_INSTANCE_PROPERTY] = component)

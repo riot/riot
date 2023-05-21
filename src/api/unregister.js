@@ -1,4 +1,4 @@
-import {COMPONENTS_IMPLEMENTATION_MAP, panic} from '@riotjs/util'
+import { COMPONENTS_IMPLEMENTATION_MAP, panic } from '@riotjs/util'
 import cssManager from '../core/css-manager'
 
 /**
@@ -7,7 +7,8 @@ import cssManager from '../core/css-manager'
  * @returns {Map} map containing all the components implementations
  */
 export function unregister(name) {
-  if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component "${name}" was never registered`)
+  if (!COMPONENTS_IMPLEMENTATION_MAP.has(name))
+    panic(`The component "${name}" was never registered`)
 
   COMPONENTS_IMPLEMENTATION_MAP.delete(name)
   cssManager.remove(name)

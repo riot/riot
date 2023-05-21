@@ -1,5 +1,5 @@
 import * as riot from '../../src/riot'
-import {expect} from 'chai'
+import { expect } from 'chai'
 
 describe('plugins API', () => {
   it('riot can install plugins', () => {
@@ -13,17 +13,19 @@ describe('plugins API', () => {
       exports: {
         onBeforeMount() {
           expect(this.hello).to.be.ok
-        }
-      }
+        },
+      },
     }
 
     riot.install(hello)
-    const component = riot.component(MyComponent)(document.createElement('my-component'))
+    const component = riot.component(MyComponent)(
+      document.createElement('my-component'),
+    )
     riot.uninstall(hello)
     component.unmount()
   })
 
-  it('the same plugin can\'t be installed twice', () => {
+  it("the same plugin can't be installed twice", () => {
     function hello(component) {
       component.hello = 'hello'
     }
@@ -40,6 +42,6 @@ describe('plugins API', () => {
   })
 
   it('uninstalling plugins never registered before must throw', () => {
-    expect(() => riot.uninstall(function() {})).to.throw()
+    expect(() => riot.uninstall(function () {})).to.throw()
   })
 })

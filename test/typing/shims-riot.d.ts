@@ -1,6 +1,6 @@
 declare module '*.riot' {
   // @ts-ignore
-  import {RiotComponetWrapper, RiotComponent} from '../../riot'
+  import { RiotComponetWrapper, RiotComponent } from '../../riot'
 
   const componentWrapper: RiotComponetWrapper<RiotComponent>
 

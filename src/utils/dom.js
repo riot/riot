@@ -1,5 +1,5 @@
-import {IS_DIRECTIVE} from '@riotjs/util'
-import {get as getAttr} from 'bianco.attr'
+import { IS_DIRECTIVE } from '@riotjs/util'
+import { get as getAttr } from 'bianco.attr'
 
 /**
  * Get the tag name of any DOM node
