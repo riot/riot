@@ -51,14 +51,14 @@ raw:
 	# build riot
 	@ mkdir -p $(DIST)
 	# Default builds UMD
-	@ $(ROLLUP) src/riot.js --format umd --config rollup.config.js --file $(DIST)riot.js
-	@ HAS_VISUALIZER=1 $(ROLLUP) src/riot+compiler.js --format umd --config rollup.config.js --file $(DIST)riot+compiler.js
+	@ $(ROLLUP) src/riot.js --format umd --config rollup.config.cjs --file $(DIST)riot.js
+	@ HAS_VISUALIZER=1 $(ROLLUP) src/riot+compiler.js --format umd --config rollup.config.cjs --file $(DIST)riot+compiler.js
 	@ $(ROLLUP) src/riot.js \
 	    --format esm \
 	    --output.preserveModules \
 	    --entryFileNames [name].js \
 	    --preserveModulesRoot src \
-	    --config rollup.config.js \
+	    --config rollup.config.cjs \
 	    --dir $(DIST)esm
 
 clean:
