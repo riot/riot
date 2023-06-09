@@ -1,5 +1,5 @@
 import { COMPONENTS_IMPLEMENTATION_MAP, panic } from '@riotjs/util'
-import { getName } from '../utils/dom'
+import { getName } from '../utils/dom.js'
 
 /**
  * Component initialization function starting from a DOM node

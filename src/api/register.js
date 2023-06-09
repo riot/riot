@@ -1,5 +1,5 @@
 import { COMPONENTS_IMPLEMENTATION_MAP, panic } from '@riotjs/util'
-import { createComponentFromWrapper } from '../core/create-component-from-wrapper'
+import { createComponentFromWrapper } from '../core/create-component-from-wrapper.js'
 
 /**
  * Register a custom tag by name

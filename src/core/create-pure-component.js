@@ -5,9 +5,9 @@ import {
   defineProperty,
   panic,
 } from '@riotjs/util'
-import { PURE_COMPONENT_API } from './pure-component-api'
-import { bindDOMNodeToComponentInstance } from './bind-dom-node-to-component-instance'
-import { createCoreAPIMethods } from './create-core-api-methods'
+import { PURE_COMPONENT_API } from './pure-component-api.js'
+import { bindDOMNodeToComponentInstance } from './bind-dom-node-to-component-instance.js'
+import { createCoreAPIMethods } from './create-core-api-methods.js'
 
 /**
  * Create a pure component

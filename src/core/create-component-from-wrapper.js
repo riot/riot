@@ -5,10 +5,10 @@ import {
   camelToDashCase,
   memoize,
 } from '@riotjs/util'
-import { MOCKED_TEMPLATE_INTERFACE } from './mocked-template-interface'
-import { componentTemplateFactory } from './component-template-factory'
-import { createPureComponent } from './create-pure-component'
-import { instantiateComponent } from './instantiate-component'
+import { MOCKED_TEMPLATE_INTERFACE } from './mocked-template-interface.js'
+import { componentTemplateFactory } from './component-template-factory.js'
+import { createPureComponent } from './create-pure-component.js'
+import { instantiateComponent } from './instantiate-component.js'
 /**
  * Create the subcomponents that can be included inside a tag in runtime
  * @param   {Object} components - components imported in runtime

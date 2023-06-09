@@ -9,7 +9,7 @@ import {
   expressionTypes,
   template,
 } from '@riotjs/dom-bindings'
-import cssManager from '../core/css-manager'
+import cssManager from '../core/css-manager.js'
 
 // expose some internal stuff that might be used from external tools
 export const __ = {

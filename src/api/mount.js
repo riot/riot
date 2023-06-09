@@ -1,5 +1,5 @@
 import $ from 'bianco.query'
-import { mountComponent } from '../core/mount-component'
+import { mountComponent } from '../core/mount-component.js'
 
 /**
  * Mounting function that will work only for the components that were globally registered

@@ -22,12 +22,12 @@ import {
   isFunction,
   isObject,
 } from '@riotjs/util'
-import { addCssHook } from './add-css-hook'
-import { bindDOMNodeToComponentInstance } from './bind-dom-node-to-component-instance'
-import { computeComponentState } from './compute-component-state'
-import { computeInitialProps } from './compute-initial-props'
-import { createAttributeBindings } from './create-attribute-bindings'
-import { runPlugins } from './run-plugins'
+import { addCssHook } from './add-css-hook.js'
+import { bindDOMNodeToComponentInstance } from './bind-dom-node-to-component-instance.js'
+import { computeComponentState } from './compute-component-state.js'
+import { computeInitialProps } from './compute-initial-props.js'
+import { createAttributeBindings } from './create-attribute-bindings.js'
+import { runPlugins } from './run-plugins.js'
 
 /**
  * Component creation factory function that will enhance the user provided API

@@ -6,11 +6,11 @@ import {
   defineDefaults,
   defineProperties,
 } from '@riotjs/util'
-import { COMPONENT_DOM_SELECTORS } from './component-dom-selectors'
-import { COMPONENT_LIFECYCLE_METHODS } from './component-lifecycle-methods'
-import cssManager from './css-manager'
+import { COMPONENT_DOM_SELECTORS } from './component-dom-selectors.js'
+import { COMPONENT_LIFECYCLE_METHODS } from './component-lifecycle-methods.js'
+import cssManager from './css-manager.js'
 import curry from 'curri'
-import { manageComponentLifecycle } from './manage-component-lifecycle'
+import { manageComponentLifecycle } from './manage-component-lifecycle.js'
 
 /**
  * Component definition function

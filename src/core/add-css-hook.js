@@ -1,5 +1,5 @@
 import { IS_DIRECTIVE } from '@riotjs/util'
-import { getName } from '../utils/dom'
+import { getName } from '../utils/dom.js'
 import { set as setAttr } from 'bianco.attr'
 
 /**

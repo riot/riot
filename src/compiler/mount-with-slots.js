@@ -1,6 +1,6 @@
 import $ from 'bianco.query'
-import createRuntimeSlots from '../utils/create-runtime-slots'
-import { mountComponent } from '../core/mount-component'
+import createRuntimeSlots from '../utils/create-runtime-slots.js'
+import { mountComponent } from '../core/mount-component.js'
 
 /**
  * Mounting function that will work only for the components that were globally registered

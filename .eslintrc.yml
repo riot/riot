@@ -1,4 +1,15 @@
-extends: eslint-config-riot
+extends:
+  - eslint-config-riot
+  - plugin:import/recommended
+
+plugins:
+  - import
 
 rules:
   fp/no-rest-parameters: 0
+  import/extensions: [2, 'always']
+
+overrides:
+  - files: 'test/**/*'
+    rules:
+      import/extensions: 0

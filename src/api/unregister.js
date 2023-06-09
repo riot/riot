@@ -1,5 +1,5 @@
 import { COMPONENTS_IMPLEMENTATION_MAP, panic } from '@riotjs/util'
-import cssManager from '../core/css-manager'
+import cssManager from '../core/css-manager.js'
 
 /**
  * Unregister a riot web component

@@ -56,6 +56,15 @@ raw:
 	@ $(ROLLUP) src/riot.js \
 	    --format esm \
 	    --output.preserveModules \
+	    --amd.forceJsExtensionForImports \
+	    --entryFileNames [name].js \
+	    --preserveModulesRoot src \
+	    --config rollup.config.cjs \
+	    --dir $(DIST)esm
+	@ $(ROLLUP) src/riot+compiler.js \
+	    --format esm \
+	    --output.preserveModules \
+	    --amd.forceJsExtensionForImports \
 	    --entryFileNames [name].js \
 	    --preserveModulesRoot src \
 	    --config rollup.config.cjs \

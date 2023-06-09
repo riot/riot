@@ -1,5 +1,5 @@
 import compose from 'cumpa'
-import { createComponentFromWrapper } from '../core/create-component-from-wrapper'
+import { createComponentFromWrapper } from '../core/create-component-from-wrapper.js'
 /**
  * Helper method to create component without relying on the registered ones
  * @param   {Object} implementation - component implementation

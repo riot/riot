@@ -1,7 +1,7 @@
 import $ from 'bianco.query'
-import { compileFromUrl } from './compile-from-url'
+import { compileFromUrl } from './compile-from-url.js'
 import { get as getAttr } from 'bianco.attr'
-import { inject } from './inject'
+import { inject } from './inject.js'
 
 export async function compile(options) {
   const scripts = $('script[type="riot"]')

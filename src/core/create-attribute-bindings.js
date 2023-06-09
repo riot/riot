@@ -1,4 +1,4 @@
-import { createCoreAPIMethods } from './create-core-api-methods'
+import { createCoreAPIMethods } from './create-core-api-methods.js'
 import { createExpression } from '@riotjs/dom-bindings'
 
 /**

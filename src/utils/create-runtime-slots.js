@@ -1,6 +1,6 @@
 import { bindingTypes, expressionTypes, template } from '@riotjs/dom-bindings'
 import { COMPONENTS_IMPLEMENTATION_MAP } from '@riotjs/util'
-import { generateSlotsFromString } from '@riotjs/compiler/dist/compiler.essential.esm'
+import { generateSlotsFromString } from '@riotjs/compiler/dist/compiler.essential.esm.js'
 
 /**
  * Create slots reading the inner HTML of the node
