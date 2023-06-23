@@ -10,6 +10,7 @@ import SimpleComponent from '../components/simple.riot'
 import SpreadAttribute from '../components/spread-attribute.riot'
 import StaticAttribute from '../components/static-attribute.riot'
 import TitleProps from '../components/title-prop.riot'
+import Issue2978Parent from '../components/issue-2978-parent.riot'
 
 import { expect } from 'chai'
 import { spy } from 'sinon'
@@ -187,5 +188,18 @@ describe('components state and props', () => {
 
     expect(h1.innerHTML).to.be.equal('goodbye')
     expect(p.innerHTML).to.be.equal('hello')
+  })
+
+  it("props passed to children shouldn't be merged (issue #2978)", () => {
+    const element = document.createElement('issue-2978-parent')
+    const component = riot.component(Issue2978Parent)(element)
+    const p = component.$('p')
+
+    expect(p.innerHTML).to.be.equal(JSON.stringify(component.state))
+
+    component.state = { b: 'b' }
+    component.update()
+
+    expect(p.innerHTML).to.be.equal(JSON.stringify(component.state))
   })
 })

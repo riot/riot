@@ -103,7 +103,9 @@ export function manageComponentLifecycle(
               this,
               PROPS_KEY,
               Object.freeze({
-                ...this[PROPS_KEY],
+                // only root components will merge their initial props with the new ones
+                // children components will just get them overridden see also https://github.com/riot/riot/issues/2978
+                ...(parentScope ? null : this[PROPS_KEY]),
                 ...newProps,
               }),
             )
