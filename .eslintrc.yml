@@ -7,7 +7,8 @@ plugins:
 
 rules:
   fp/no-rest-parameters: 0
-  import/extensions: [2, 'always']
+  import/no-unresolved: 0
+  import/extensions: [2, 'always', { ignorePackages: true }]
 
 overrides:
   - files: 'test/**/*'

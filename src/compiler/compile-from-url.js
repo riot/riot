@@ -1,4 +1,4 @@
-import * as compiler from '@riotjs/compiler/dist/compiler.essential.esm.js'
+import * as compiler from '@riotjs/compiler/essential'
 
 export async function compileFromUrl(url, options) {
   const response = await fetch(url)

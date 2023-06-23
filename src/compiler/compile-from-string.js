@@ -1,4 +1,4 @@
-import * as compiler from '@riotjs/compiler/dist/compiler.essential.esm.js'
+import * as compiler from '@riotjs/compiler/essential'
 
 export function compileFromString(string, options) {
   return compiler.compile(string, options)
