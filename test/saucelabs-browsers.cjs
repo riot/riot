@@ -19,11 +19,10 @@ module.exports = {
       browserName: 'chrome',
       platform: 'Windows 11',
     },
-    // Firefox seems to be no longer working on saucelabs https://github.com/mochajs/mocha/pull/4933
-    /*slFirefox: {
+    slFirefox: {
       base: 'SauceLabs',
       browserName: 'firefox',
-      platform: 'Windows 11'
-    }*/
+      platform: 'Windows 11',
+    },
   },
 }
