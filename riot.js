@@ -1,4 +1,4 @@
-/* Riot v7.1.0, @license MIT */
+/* Riot v9.0.0-rc, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -10,12 +10,13 @@
   const SIMPLE = 2;
   const TAG = 3;
   const SLOT = 4;
+
   const bindingTypes = {
     EACH,
     IF,
     SIMPLE,
     TAG,
-    SLOT
+    SLOT,
   };
 
   /**
@@ -25,7 +26,7 @@
    * @returns {boolean} true if the type corresponds
    */
   function checkType(element, type) {
-    return typeof element === type;
+    return typeof element === type
   }
 
   /**
@@ -35,7 +36,8 @@
    */
   function isSvg(el) {
     const owner = el.ownerSVGElement;
-    return !!owner || owner === null;
+
+    return !!owner || owner === null
   }
 
   /**
@@ -44,7 +46,7 @@
    * @returns {boolean} true if it's a <template>
    */
   function isTemplate(el) {
-    return el.tagName.toLowerCase() === 'template';
+    return el.tagName.toLowerCase() === 'template'
   }
 
   /**
@@ -53,7 +55,7 @@
    * @returns {boolean} - true if the value is a function
    */
   function isFunction(value) {
-    return checkType(value, 'function');
+    return checkType(value, 'function')
   }
 
   /**
@@ -62,7 +64,7 @@
    * @returns {boolean} true only for the value is a boolean
    */
   function isBoolean(value) {
-    return checkType(value, 'boolean');
+    return checkType(value, 'boolean')
   }
 
   /**
@@ -71,7 +73,7 @@
    * @returns {boolean} true only for the value is an object
    */
   function isObject(value) {
-    return !isNil(value) && value.constructor === Object;
+    return !isNil(value) && value.constructor === Object
   }
 
   /**
@@ -80,7 +82,7 @@
    * @returns {boolean} true only for the 'undefined' and 'null' types
    */
   function isNil(value) {
-    return value === null || value === undefined;
+    return value === null || value === undefined
   }
 
   // Riot.js constants that can be used across more modules
@@ -115,7 +117,7 @@
    * @returns {string} component name normalized
    */
   function camelToDashCase(string) {
-    return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+    return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
   }
 
   /**
@@ -124,7 +126,7 @@
    * @returns {string} my-string -> myString
    */
   function dashToCamelCase(string) {
-    return string.replace(/-(\w)/g, (_, c) => c.toUpperCase());
+    return string.replace(/-(\w)/g, (_, c) => c.toUpperCase())
   }
 
   /**
@@ -135,8 +137,8 @@
   function DOMattributesToObject(element) {
     return Array.from(element.attributes).reduce((acc, attribute) => {
       acc[dashToCamelCase(attribute.name)] = attribute.value;
-      return acc;
-    }, {});
+      return acc
+    }, {})
   }
 
   /**
@@ -177,7 +179,7 @@
    * @param {HTMLElement}node - node to remove
    * @returns {undefined}
    */
-  const removeChild = node => node.remove();
+  const removeChild = (node) => node.remove();
 
   /**
    * Insert before a node
@@ -185,7 +187,10 @@
    * @param {HTMLElement} refNode - ref child
    * @returns {undefined}
    */
-  const insertBefore = (newNode, refNode) => refNode && refNode.parentNode && refNode.parentNode.insertBefore(newNode, refNode);
+  const insertBefore = (newNode, refNode) =>
+    refNode &&
+    refNode.parentNode &&
+    refNode.parentNode.insertBefore(newNode, refNode);
 
   /**
    * Replace a node
@@ -193,22 +198,26 @@
    * @param {HTMLElement} replaced - node to replace
    * @returns {undefined}
    */
-  const replaceChild = (newNode, replaced) => replaced && replaced.parentNode && replaced.parentNode.replaceChild(newNode, replaced);
+  const replaceChild = (newNode, replaced) =>
+    replaced &&
+    replaced.parentNode &&
+    replaced.parentNode.replaceChild(newNode, replaced);
 
   const ATTRIBUTE = 0;
   const EVENT = 1;
   const TEXT = 2;
   const VALUE = 3;
+
   const expressionTypes = {
     ATTRIBUTE,
     EVENT,
     TEXT,
-    VALUE
+    VALUE,
   };
 
   // does simply nothing
   function noop() {
-    return this;
+    return this
   }
 
   /**
@@ -218,10 +227,11 @@
    * @returns {Object} the original object received
    */
   function autobindMethods(source, methods) {
-    methods.forEach(method => {
+    methods.forEach((method) => {
       source[method] = source[method].bind(source);
     });
-    return source;
+
+    return source
   }
 
   /**
@@ -230,7 +240,11 @@
    * @returns {*} anything
    */
   function callOrAssign(source) {
-    return isFunction(source) ? source.prototype && source.prototype.constructor ? new source() : source() : source;
+    return isFunction(source)
+      ? source.prototype && source.prototype.constructor
+        ? new source()
+        : source()
+      : source
   }
 
   /**
@@ -240,9 +254,7 @@
    * @returns { undefined } hoppla... at this point the program should stop working
    */
   function panic(message, cause) {
-    throw new Error(message, {
-      cause
-    });
+    throw new Error(message, { cause })
   }
   /**
    * Returns the memoized (cached) function.
@@ -252,11 +264,13 @@
    */
   function memoize(fn) {
     const cache = new Map();
-    const cached = val => {
-      return cache.has(val) ? cache.get(val) : cache.set(val, fn.call(this, val)) && cache.get(val);
+    const cached = (val) => {
+      return cache.has(val)
+        ? cache.get(val)
+        : cache.set(val, fn.call(this, val)) && cache.get(val)
     };
     cached.cache = cache;
-    return cached;
+    return cached
   }
 
   /**
@@ -266,24 +280,26 @@
    */
   function evaluateAttributeExpressions(attributes) {
     return attributes.reduce((acc, attribute) => {
-      const {
-        value,
-        type
-      } = attribute;
+      const { value, type } = attribute;
+
       switch (true) {
         // spread attribute
         case !attribute.name && type === ATTRIBUTE:
-          return Object.assign({}, acc, value);
+          return {
+            ...acc,
+            ...value,
+          }
         // value attribute
         case type === VALUE:
           acc.value = attribute.value;
-          break;
+          break
         // normal attributes
         default:
           acc[dashToCamelCase(attribute.name)] = attribute.value;
       }
-      return acc;
-    }, {});
+
+      return acc
+    }, {})
   }
 
   /**
@@ -294,20 +310,18 @@
    * @param   {Object} options - set the property overriding the default options
    * @returns {Object} - the original object modified
    */
-  function defineProperty(source, key, value, options) {
-    if (options === void 0) {
-      options = {};
-    }
+  function defineProperty(source, key, value, options = {}) {
     /* eslint-disable fp/no-mutating-methods */
-    Object.defineProperty(source, key, Object.assign({
+    Object.defineProperty(source, key, {
       value,
       enumerable: false,
       writable: false,
-      configurable: true
-    }, options));
+      configurable: true,
+      ...options,
+    });
     /* eslint-enable fp/no-mutating-methods */
 
-    return source;
+    return source
   }
 
   /**
@@ -318,11 +332,11 @@
    * @returns {Object} the original object modified
    */
   function defineProperties(source, properties, options) {
-    Object.entries(properties).forEach(_ref => {
-      let [key, value] = _ref;
+    Object.entries(properties).forEach(([key, value]) => {
       defineProperty(source, key, value, options);
     });
-    return source;
+
+    return source
   }
 
   /**
@@ -332,23 +346,24 @@
    * @returns {Object} the original object received enhanced
    */
   function defineDefaults(source, defaults) {
-    Object.entries(defaults).forEach(_ref2 => {
-      let [key, value] = _ref2;
+    Object.entries(defaults).forEach(([key, value]) => {
       if (!source[key]) source[key] = value;
     });
-    return source;
+
+    return source
   }
 
   const PURE_COMPONENT_API = Object.freeze({
     [MOUNT_METHOD_KEY]: noop,
     [UPDATE_METHOD_KEY]: noop,
-    [UNMOUNT_METHOD_KEY]: noop
+    [UNMOUNT_METHOD_KEY]: noop,
   });
 
-  const MOCKED_TEMPLATE_INTERFACE = Object.assign({}, PURE_COMPONENT_API, {
+  const MOCKED_TEMPLATE_INTERFACE = {
+    ...PURE_COMPONENT_API,
     clone: noop,
-    createDOM: noop
-  });
+    createDOM: noop,
+  };
 
   const HEAD_SYMBOL = Symbol();
   const TAIL_SYMBOL = Symbol();
@@ -360,12 +375,11 @@
   function createHeadTailPlaceholders() {
     const head = document.createTextNode('');
     const tail = document.createTextNode('');
+
     head[HEAD_SYMBOL] = true;
     tail[TAIL_SYMBOL] = true;
-    return {
-      head,
-      tail
-    };
+
+    return { head, tail }
   }
 
   /**
@@ -375,19 +389,18 @@
    */
   function createTemplateMeta(componentTemplate) {
     const fragment = componentTemplate.dom.cloneNode(true);
-    const {
-      head,
-      tail
-    } = createHeadTailPlaceholders();
+    const { head, tail } = createHeadTailPlaceholders();
+
     return {
       avoidDOMInjection: true,
       fragment,
       head,
       tail,
-      children: [head, ...Array.from(fragment.childNodes), tail]
-    };
+      children: [head, ...Array.from(fragment.childNodes), tail],
+    }
   }
 
+  /* c8 ignore start */
   /**
    * ISC License
    *
@@ -432,7 +445,12 @@
         // need to be added are not at the end, and in such case
         // the node to `insertBefore`, if the index is more than 0
         // must be retrieved, otherwise it's gonna be the first item.
-        const node = bEnd < bLength ? bStart ? get(b[bStart - 1], -0).nextSibling : get(b[bEnd - bStart], 0) : before;
+        const node =
+          bEnd < bLength
+            ? bStart
+              ? get(b[bStart - 1], -0).nextSibling
+              : get(b[bEnd - bStart], 0)
+            : before;
         while (bStart < bEnd) insertBefore(get(b[bStart++], 1), node);
       }
       // remove head or tail: fast path
@@ -495,7 +513,8 @@
             let i = aStart;
             // counts the amount of nodes that are the same in the future
             let sequence = 1;
-            while (++i < aEnd && i < bEnd && map.get(a[i]) === index + sequence) sequence++;
+            while (++i < aEnd && i < bEnd && map.get(a[i]) === index + sequence)
+              sequence++;
             // effort decision here: if the sequence is longer than replaces
             // needed to reach such sequence, which would brings again this loop
             // to the fast path, prepend the difference before a sequence,
@@ -526,9 +545,11 @@
         else removeChild(get(a[aStart++], -1));
       }
     }
-    return b;
+    return b
   };
+
   const UNMOUNT_SCOPE = Symbol('unmount');
+
   const EachBinding = {
     // dynamic binding properties
     // childrenMap: null,
@@ -547,39 +568,43 @@
 
     // API methods
     mount(scope, parentScope) {
-      return this.update(scope, parentScope);
+      return this.update(scope, parentScope)
     },
     update(scope, parentScope) {
-      const {
-        placeholder,
-        nodes,
-        childrenMap
-      } = this;
+      const { placeholder, nodes, childrenMap } = this;
       const collection = scope === UNMOUNT_SCOPE ? null : this.evaluate(scope);
       const items = collection ? Array.from(collection) : [];
 
       // prepare the diffing
-      const {
-        newChildrenMap,
-        batches,
-        futureNodes
-      } = createPatch(items, scope, parentScope, this);
+      const { newChildrenMap, batches, futureNodes } = createPatch(
+        items,
+        scope,
+        parentScope,
+        this,
+      );
 
       // patch the DOM only if there are new nodes
-      udomdiff(nodes, futureNodes, patch(Array.from(childrenMap.values()), parentScope), placeholder);
+      udomdiff(
+        nodes,
+        futureNodes,
+        patch(Array.from(childrenMap.values()), parentScope),
+        placeholder,
+      );
 
       // trigger the mounts and the updates
-      batches.forEach(fn => fn());
+      batches.forEach((fn) => fn());
 
       // update the children map
       this.childrenMap = newChildrenMap;
       this.nodes = futureNodes;
-      return this;
+
+      return this
     },
     unmount(scope, parentScope) {
       this.update(UNMOUNT_SCOPE, parentScope);
-      return this;
-    }
+
+      return this
+    },
   };
 
   /**
@@ -593,13 +618,10 @@
       if (info < 0) {
         // get the last element added to the childrenMap saved previously
         const element = redundant[redundant.length - 1];
+
         if (element) {
           // get the nodes and the template in stored in the last child of the childrenMap
-          const {
-            template,
-            nodes,
-            context
-          } = element;
+          const { template, nodes, context } = element;
           // remove the last node (notice <template> tags might have more children nodes)
           nodes.pop();
 
@@ -612,8 +634,9 @@
           }
         }
       }
-      return item;
-    };
+
+      return item
+    }
   }
 
   /**
@@ -623,7 +646,7 @@
    * @returns {boolean} true if this item should be skipped
    */
   function mustFilterItem(condition, context) {
-    return condition ? !condition(context) : false;
+    return condition ? !condition(context) : false
   }
 
   /**
@@ -636,16 +659,11 @@
    * @param   {*} options.item - collection item looped
    * @returns {Object} enhanced scope object
    */
-  function extendScope(scope, _ref) {
-    let {
-      itemName,
-      indexName,
-      index,
-      item
-    } = _ref;
+  function extendScope(scope, { itemName, indexName, index, item }) {
     defineProperty(scope, itemName, item);
     if (indexName) defineProperty(scope, indexName, index);
-    return scope;
+
+    return scope
   }
 
   /**
@@ -668,30 +686,39 @@
       getKey,
       indexName,
       root,
-      isTemplateTag
+      isTemplateTag,
     } = binding;
     const newChildrenMap = new Map();
     const batches = [];
     const futureNodes = [];
+
     items.forEach((item, index) => {
       const context = extendScope(Object.create(scope), {
         itemName,
         indexName,
         index,
-        item
+        item,
       });
       const key = getKey ? getKey(context) : index;
       const oldItem = childrenMap.get(key);
       const nodes = [];
+
       if (mustFilterItem(condition, context)) {
-        return;
+        return
       }
+
       const mustMount = !oldItem;
       const componentTemplate = oldItem ? oldItem.template : template.clone();
       const el = componentTemplate.el || root.cloneNode();
-      const meta = isTemplateTag && mustMount ? createTemplateMeta(componentTemplate) : componentTemplate.meta;
+      const meta =
+        isTemplateTag && mustMount
+          ? createTemplateMeta(componentTemplate)
+          : componentTemplate.meta;
+
       if (mustMount) {
-        batches.push(() => componentTemplate.mount(el, context, parentScope, meta));
+        batches.push(() =>
+          componentTemplate.mount(el, context, parentScope, meta),
+        );
       } else {
         batches.push(() => componentTemplate.update(context, parentScope));
       }
@@ -713,29 +740,29 @@
         nodes,
         template: componentTemplate,
         context,
-        index
+        index,
       });
     });
+
     return {
       newChildrenMap,
       batches,
-      futureNodes
-    };
+      futureNodes,
+    }
   }
-  function create$6(node, _ref2) {
-    let {
-      evaluate,
-      condition,
-      itemName,
-      indexName,
-      getKey,
-      template
-    } = _ref2;
+
+  function create$6(
+    node,
+    { evaluate, condition, itemName, indexName, getKey, template },
+  ) {
     const placeholder = document.createTextNode('');
     const root = node.cloneNode();
+
     insertBefore(placeholder, node);
     removeChild(node);
-    return Object.assign({}, EachBinding, {
+
+    return {
+      ...EachBinding,
       childrenMap: new Map(),
       node,
       root,
@@ -746,8 +773,8 @@
       getKey,
       indexName,
       itemName,
-      placeholder
-    });
+      placeholder,
+    }
   }
 
   /**
@@ -763,7 +790,7 @@
 
     // API methods
     mount(scope, parentScope) {
-      return this.update(scope, parentScope);
+      return this.update(scope, parentScope)
     },
     update(scope, parentScope) {
       const value = !!this.evaluate(scope);
@@ -771,45 +798,53 @@
       const mustUnmount = this.value && !value;
       const mount = () => {
         const pristine = this.node.cloneNode();
+
         insertBefore(pristine, this.placeholder);
         this.template = this.template.clone();
         this.template.mount(pristine, scope, parentScope);
       };
+
       switch (true) {
         case mustMount:
           mount();
-          break;
+          break
         case mustUnmount:
           this.unmount(scope);
-          break;
+          break
         default:
           if (value) this.template.update(scope, parentScope);
       }
+
       this.value = value;
-      return this;
+
+      return this
     },
     unmount(scope, parentScope) {
       this.template.unmount(scope, parentScope, true);
-      return this;
-    }
+
+      return this
+    },
   };
-  function create$5(node, _ref3) {
-    let {
-      evaluate,
-      template
-    } = _ref3;
+
+  function create$5(node, { evaluate, template }) {
     const placeholder = document.createTextNode('');
+
     insertBefore(placeholder, node);
     removeChild(node);
-    return Object.assign({}, IfBinding, {
+
+    return {
+      ...IfBinding,
       node,
       evaluate,
       placeholder,
-      template: template.createDOM(node)
-    });
+      template: template.createDOM(node),
+    }
   }
+
   const ElementProto = typeof Element === 'undefined' ? {} : Element.prototype;
-  const isNativeHtmlProperty = memoize(name => ElementProto.hasOwnProperty(name)); // eslint-disable-line
+  const isNativeHtmlProperty = memoize(
+    (name) => ElementProto.hasOwnProperty(name), // eslint-disable-line
+  );
 
   /**
    * Add all the attributes provided
@@ -818,12 +853,9 @@
    * @returns {undefined} sorry it's a void function :(
    */
   function setAllAttributes(node, attributes) {
-    Object.entries(attributes).forEach(_ref4 => {
-      let [name, value] = _ref4;
-      return attributeExpression(node, {
-        name
-      }, value);
-    });
+    Object.entries(attributes).forEach(([name, value]) =>
+      attributeExpression(node, { name }, value),
+    );
   }
 
   /**
@@ -835,7 +867,10 @@
    */
   function removeAllAttributes(node, newAttributes, oldAttributes) {
     const newKeys = newAttributes ? Object.keys(newAttributes) : [];
-    Object.keys(oldAttributes).filter(name => !newKeys.includes(name)).forEach(attribute => node.removeAttribute(attribute));
+
+    Object.keys(oldAttributes)
+      .filter((name) => !newKeys.includes(name))
+      .forEach((attribute) => node.removeAttribute(attribute));
   }
 
   /**
@@ -844,7 +879,7 @@
    * @returns {boolean} true if we can render this attribute value
    */
   function canRenderAttribute(value) {
-    return value === true || ['string', 'number'].includes(typeof value);
+    return ['string', 'number', 'boolean'].includes(typeof value)
   }
 
   /**
@@ -853,7 +888,7 @@
    * @returns {boolean} boolean - true if the attribute can be removed}
    */
   function shouldRemoveAttribute(value) {
-    return !value && value !== 0;
+    return typeof value === 'undefined' || value === null
   }
 
   /**
@@ -861,14 +896,17 @@
    * @param   {HTMLElement} node - target node
    * @param   {Object} expression - expression object
    * @param   {string} expression.name - attribute name
+   * @param   {boolean} expression.isBoolean - flag to handle boolean attributes
    * @param   {*} value - new expression value
    * @param   {*} oldValue - the old expression cached value
    * @returns {undefined}
    */
-  function attributeExpression(node, _ref5, value, oldValue) {
-    let {
-      name
-    } = _ref5;
+  function attributeExpression(
+    node,
+    { name, isBoolean: isBoolean$1 },
+    value,
+    oldValue,
+  ) {
     // is it a spread operator? {...attributes}
     if (!name) {
       if (oldValue) {
@@ -880,17 +918,22 @@
       if (value) {
         setAllAttributes(node, value);
       }
-      return;
+
+      return
     }
 
-    // handle boolean attributes
-    if (!isNativeHtmlProperty(name) && (isBoolean(value) || isObject(value) || isFunction(value))) {
+    // store the attribute on the node to make it compatible with native custom elements
+    if (
+      !isNativeHtmlProperty(name) &&
+      (isBoolean(value) || isObject(value) || isFunction(value))
+    ) {
       node[name] = value;
     }
+
     if (shouldRemoveAttribute(value)) {
       node.removeAttribute(name);
     } else if (canRenderAttribute(value)) {
-      node.setAttribute(name, normalizeValue(name, value));
+      node.setAttribute(name, normalizeValue(name, value, isBoolean$1));
     }
   }
 
@@ -898,26 +941,32 @@
    * Get the value as string
    * @param   {string} name - attribute name
    * @param   {*} value - user input value
+   * @param   {boolean} isBoolean - boolean attributes flag
    * @returns {string} input value as string
    */
-  function normalizeValue(name, value) {
-    // be sure that expressions like selected={ true } will be always rendered as selected='selected'
-    return value === true ? name : value;
+  function normalizeValue(name, value, isBoolean) {
+    // be sure that expressions like selected={ true } will always be rendered as selected='selected'
+    // fix https://github.com/riot/riot/issues/2975
+    return value === true && isBoolean ? name : value
   }
+
   const RE_EVENTS_PREFIX = /^on/;
-  const getCallbackAndOptions = value => Array.isArray(value) ? value : [value, false];
+
+  const getCallbackAndOptions = (value) =>
+    Array.isArray(value) ? value : [value, false];
 
   // see also https://medium.com/@WebReflection/dom-handleevent-a-cross-platform-standard-since-year-2000-5bf17287fd38
   const EventListener = {
     handleEvent(event) {
       this[event.type](event);
-    }
+    },
   };
   const ListenersWeakMap = new WeakMap();
-  const createListener = node => {
+
+  const createListener = (node) => {
     const listener = Object.create(EventListener);
     ListenersWeakMap.set(node, listener);
-    return listener;
+    return listener
   };
 
   /**
@@ -928,22 +977,22 @@
    * @param   {*} value - new expression value
    * @returns {value} the callback just received
    */
-  function eventExpression(node, _ref6, value) {
-    let {
-      name
-    } = _ref6;
+  function eventExpression(node, { name }, value) {
     const normalizedEventName = name.replace(RE_EVENTS_PREFIX, '');
     const eventListener = ListenersWeakMap.get(node) || createListener(node);
     const [callback, options] = getCallbackAndOptions(value);
     const handler = eventListener[normalizedEventName];
     const mustRemoveEvent = handler && !callback;
     const mustAddEvent = callback && !handler;
+
     if (mustRemoveEvent) {
       node.removeEventListener(normalizedEventName, eventListener);
     }
+
     if (mustAddEvent) {
       node.addEventListener(normalizedEventName, eventListener, options);
     }
+
     eventListener[normalizedEventName] = callback;
   }
 
@@ -953,7 +1002,7 @@
    * @returns {string} hopefully a string
    */
   function normalizeStringValue(value) {
-    return isNil(value) ? '' : value;
+    return isNil(value) ? '' : value
   }
 
   /**
@@ -964,12 +1013,15 @@
    */
   const getTextNode = (node, childNodeIndex) => {
     const target = node.childNodes[childNodeIndex];
+
     if (target.nodeType === Node.COMMENT_NODE) {
       const textNode = document.createTextNode('');
       node.replaceChild(textNode, target);
-      return textNode;
+
+      return textNode
     }
-    return target;
+
+    return target
   };
 
   /**
@@ -984,7 +1036,7 @@
   }
 
   /**
-   * This methods handles the input fileds value updates
+   * This methods handles the input fields value updates
    * @param   {HTMLElement} node - target node
    * @param   {Object} expression - expression object
    * @param   {*} value - new expression value
@@ -993,12 +1045,14 @@
   function valueExpression(node, expression, value) {
     node.value = normalizeStringValue(value);
   }
+
   const expressions = {
     [ATTRIBUTE]: attributeExpression,
     [EVENT]: eventExpression,
     [TEXT]: textExpression,
-    [VALUE]: valueExpression
+    [VALUE]: valueExpression,
   };
+
   const Expression = {
     // Static props
     // node: null,
@@ -1016,7 +1070,8 @@
 
       // IO() DOM updates
       apply(this, this.value);
-      return this;
+
+      return this
     },
     /**
      * Update the expression if its value changed
@@ -1026,12 +1081,14 @@
     update(scope) {
       // pure function
       const value = this.evaluate(scope);
+
       if (this.value !== value) {
         // IO() DOM updates
         apply(this, value);
         this.value = value;
       }
-      return this;
+
+      return this
     },
     /**
      * Expression teardown method
@@ -1040,8 +1097,9 @@
     unmount() {
       // unmount only the event handling expressions
       if (this.type === EVENT) apply(this, null);
-      return this;
-    }
+
+      return this
+    },
   };
 
   /**
@@ -1051,12 +1109,20 @@
    * @returns {undefined}
    */
   function apply(expression, value) {
-    return expressions[expression.type](expression.node, expression, value, expression.value);
+    return expressions[expression.type](
+      expression.node,
+      expression,
+      value,
+      expression.value,
+    )
   }
+
   function create$4(node, data) {
-    return Object.assign({}, Expression, data, {
-      node: data.type === TEXT ? getTextNode(node, data.childNodeIndex) : node
-    });
+    return {
+      ...Expression,
+      ...data,
+      node: data.type === TEXT ? getTextNode(node, data.childNodeIndex) : node,
+    }
   }
 
   /**
@@ -1069,30 +1135,43 @@
    */
   function flattenCollectionMethods(collection, methods, context) {
     return methods.reduce((acc, method) => {
-      return Object.assign({}, acc, {
-        [method]: scope => {
-          return collection.map(item => item[method](scope)) && context;
-        }
-      });
-    }, {});
+      return {
+        ...acc,
+        [method]: (scope) => {
+          return collection.map((item) => item[method](scope)) && context
+        },
+      }
+    }, {})
   }
-  function create$3(node, _ref7) {
-    let {
-      expressions
-    } = _ref7;
-    return Object.assign({}, flattenCollectionMethods(expressions.map(expression => create$4(node, expression)), ['mount', 'update', 'unmount']));
+
+  function create$3(node, { expressions }) {
+    return {
+      ...flattenCollectionMethods(
+        expressions.map((expression) => create$4(node, expression)),
+        ['mount', 'update', 'unmount'],
+      ),
+    }
   }
+
   function extendParentScope(attributes, scope, parentScope) {
-    if (!attributes || !attributes.length) return parentScope;
-    const expressions = attributes.map(attr => Object.assign({}, attr, {
-      value: attr.evaluate(scope)
+    if (!attributes || !attributes.length) return parentScope
+
+    const expressions = attributes.map((attr) => ({
+      ...attr,
+      value: attr.evaluate(scope),
     }));
-    return Object.assign(Object.create(parentScope || null), evaluateAttributeExpressions(expressions));
+
+    return Object.assign(
+      Object.create(parentScope || null),
+      evaluateAttributeExpressions(expressions),
+    )
   }
 
   // this function is only meant to fix an edge case
   // https://github.com/riot/riot/issues/2842
-  const getRealParent = (scope, parentScope) => scope[PARENT_KEY_SYMBOL] || parentScope;
+  const getRealParent = (scope, parentScope) =>
+    scope[PARENT_KEY_SYMBOL] || parentScope;
+
   const SlotBinding = {
     // dynamic binding properties
     // node: null,
@@ -1101,43 +1180,55 @@
     // template: null,
 
     getTemplateScope(scope, parentScope) {
-      return extendParentScope(this.attributes, scope, parentScope);
+      return extendParentScope(this.attributes, scope, parentScope)
     },
+
     // API methods
     mount(scope, parentScope) {
-      const templateData = scope.slots ? scope.slots.find(_ref8 => {
-        let {
-          id
-        } = _ref8;
-        return id === this.name;
-      }) : false;
-      const {
-        parentNode
-      } = this.node;
+      const templateData = scope.slots
+        ? scope.slots.find(({ id }) => id === this.name)
+        : false;
+      const { parentNode } = this.node;
       const realParent = getRealParent(scope, parentScope);
-      this.template = templateData && create(templateData.html, templateData.bindings).createDOM(parentNode);
+
+      this.template =
+        templateData &&
+        create(templateData.html, templateData.bindings).createDOM(parentNode);
+
       if (this.template) {
         cleanNode(this.node);
-        this.template.mount(this.node, this.getTemplateScope(scope, realParent), realParent);
+        this.template.mount(
+          this.node,
+          this.getTemplateScope(scope, realParent),
+          realParent,
+        );
         this.template.children = Array.from(this.node.childNodes);
       }
+
       moveSlotInnerContent(this.node);
       removeChild(this.node);
-      return this;
+
+      return this
     },
     update(scope, parentScope) {
       if (this.template) {
         const realParent = getRealParent(scope, parentScope);
         this.template.update(this.getTemplateScope(scope, realParent), realParent);
       }
-      return this;
+
+      return this
     },
     unmount(scope, parentScope, mustRemoveRoot) {
       if (this.template) {
-        this.template.unmount(this.getTemplateScope(scope, parentScope), null, mustRemoveRoot);
+        this.template.unmount(
+          this.getTemplateScope(scope, parentScope),
+          null,
+          mustRemoveRoot,
+        );
       }
-      return this;
-    }
+
+      return this
+    },
   };
 
   /**
@@ -1147,7 +1238,9 @@
    */
   function moveSlotInnerContent(slot) {
     const child = slot && slot.firstChild;
-    if (!child) return;
+
+    if (!child) return
+
     insertBefore(child, slot);
     moveSlotInnerContent(slot);
   }
@@ -1159,16 +1252,13 @@
    * @param   {AttributeExpressionData[]} attributes - slot attributes
    * @returns {Object} Slot binding object
    */
-  function createSlot(node, _ref9) {
-    let {
-      name,
-      attributes
-    } = _ref9;
-    return Object.assign({}, SlotBinding, {
+  function createSlot(node, { name, attributes }) {
+    return {
+      ...SlotBinding,
       attributes,
       node,
-      name
-    });
+      name,
+    }
   }
 
   /**
@@ -1179,31 +1269,26 @@
    * @param   {Array} attributes - dynamic attributes that will be received by the tag element
    * @returns {TagImplementation|TemplateChunk} a tag implementation or a template chunk as fallback
    */
-  function getTag(component, slots, attributes) {
-    if (slots === void 0) {
-      slots = [];
-    }
-    if (attributes === void 0) {
-      attributes = [];
-    }
+  function getTag(component, slots = [], attributes = []) {
     // if this tag was registered before we will return its implementation
     if (component) {
-      return component({
-        slots,
-        attributes
-      });
+      return component({ slots, attributes })
     }
 
     // otherwise we return a template chunk
-    return create(slotsToMarkup(slots), [...slotBindings(slots), {
-      // the attributes should be registered as binding
-      // if we fallback to a normal template chunk
-      expressions: attributes.map(attr => {
-        return Object.assign({
-          type: ATTRIBUTE
-        }, attr);
-      })
-    }]);
+    return create(slotsToMarkup(slots), [
+      ...slotBindings(slots),
+      {
+        // the attributes should be registered as binding
+        // if we fallback to a normal template chunk
+        expressions: attributes.map((attr) => {
+          return {
+            type: ATTRIBUTE,
+            ...attr,
+          }
+        }),
+      },
+    ])
   }
 
   /**
@@ -1212,12 +1297,7 @@
    * @returns {Array<Bindings>} flatten bindings array
    */
   function slotBindings(slots) {
-    return slots.reduce((acc, _ref10) => {
-      let {
-        bindings
-      } = _ref10;
-      return acc.concat(bindings);
-    }, []);
+    return slots.reduce((acc, { bindings }) => acc.concat(bindings), [])
   }
 
   /**
@@ -1227,9 +1307,10 @@
    */
   function slotsToMarkup(slots) {
     return slots.reduce((acc, slot) => {
-      return acc + slot.html;
-    }, '');
+      return acc + slot.html
+    }, '')
   }
+
   const TagBinding = {
     // dynamic binding properties
     // node: null,
@@ -1241,7 +1322,7 @@
     // getComponent: null,
 
     mount(scope) {
-      return this.update(scope);
+      return this.update(scope)
     },
     update(scope, parentScope) {
       const name = this.evaluate(scope);
@@ -1258,37 +1339,39 @@
         this.tag = getTag(this.getComponent(name), this.slots, this.attributes);
         this.tag.mount(this.node, scope);
       }
-      return this;
+
+      return this
     },
     unmount(scope, parentScope, keepRootTag) {
       if (this.tag) {
         // keep the root tag
         this.tag.unmount(keepRootTag);
       }
-      return this;
-    }
+
+      return this
+    },
   };
-  function create$2(node, _ref11) {
-    let {
-      evaluate,
-      getComponent,
-      slots,
-      attributes
-    } = _ref11;
-    return Object.assign({}, TagBinding, {
+
+  function create$2(
+    node,
+    { evaluate, getComponent, slots, attributes },
+  ) {
+    return {
+      ...TagBinding,
       node,
       evaluate,
       slots,
       attributes,
-      getComponent
-    });
+      getComponent,
+    }
   }
+
   const bindings = {
     [IF]: create$5,
     [SIMPLE]: create$3,
     [EACH]: create$6,
     [TAG]: create$2,
-    [SLOT]: createSlot
+    [SLOT]: createSlot,
   };
 
   /**
@@ -1299,9 +1382,14 @@
    * @returns {Expression[]} expressions containing the text expressions normalized
    */
   function fixTextExpressionsOffset(expressions, textExpressionsOffset) {
-    return expressions.map(e => e.type === TEXT ? Object.assign({}, e, {
-      childNodeIndex: e.childNodeIndex + textExpressionsOffset
-    }) : e);
+    return expressions.map((e) =>
+      e.type === TEXT
+        ? {
+            ...e,
+            childNodeIndex: e.childNodeIndex + textExpressionsOffset,
+          }
+        : e,
+    )
   }
 
   /**
@@ -1312,12 +1400,7 @@
    * @returns {Binding} Binding object
    */
   function create$1(root, binding, templateTagOffset) {
-    const {
-      selector,
-      type,
-      redundantAttribute,
-      expressions
-    } = binding;
+    const { selector, type, redundantAttribute, expressions } = binding;
     // find the node to apply the bindings
     const node = selector ? root.querySelector(selector) : root;
 
@@ -1326,24 +1409,37 @@
     const bindingExpressions = expressions || [];
 
     // init the binding
-    return (bindings[type] || bindings[SIMPLE])(node, Object.assign({}, binding, {
-      expressions: templateTagOffset && !selector ? fixTextExpressionsOffset(bindingExpressions, templateTagOffset) : bindingExpressions
-    }));
+    return (bindings[type] || bindings[SIMPLE])(node, {
+      ...binding,
+      expressions:
+        templateTagOffset && !selector
+          ? fixTextExpressionsOffset(bindingExpressions, templateTagOffset)
+          : bindingExpressions,
+    })
   }
 
   // in this case a simple innerHTML is enough
   function createHTMLTree(html, root) {
     const template = isTemplate(root) ? root : document.createElement('template');
     template.innerHTML = html;
-    return template.content;
+    return template.content
   }
 
   // for svg nodes we need a bit more work
+  /* c8 ignore start */
   function createSVGTree(html, container) {
     // create the SVGNode
-    const svgNode = container.ownerDocument.importNode(new window.DOMParser().parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${html}</svg>`, 'application/xml').documentElement, true);
-    return svgNode;
+    const svgNode = container.ownerDocument.importNode(
+      new window.DOMParser().parseFromString(
+        `<svg xmlns="http://www.w3.org/2000/svg">${html}</svg>`,
+        'application/xml',
+      ).documentElement,
+      true,
+    );
+
+    return svgNode
   }
+  /* c8 ignore end */
 
   /**
    * Create the DOM that will be injected
@@ -1352,8 +1448,10 @@
    * @returns {HTMLDocumentFragment|HTMLElement} a new html fragment
    */
   function createDOMTree(root, html) {
-    if (isSvg(root)) return createSVGTree(html, root);
-    return createHTMLTree(html, root);
+    /* c8 ignore next */
+    if (isSvg(root)) return createSVGTree(html, root)
+
+    return createHTMLTree(html, root)
   }
 
   /**
@@ -1366,10 +1464,10 @@
     switch (true) {
       case isSvg(el):
         moveChildren(dom, el);
-        break;
+        break
       case isTemplate(el):
         el.parentNode.replaceChild(dom, el);
-        break;
+        break
       default:
         el.appendChild(dom);
     }
@@ -1382,7 +1480,7 @@
    * @returns {?DocumentFragment} fragment that will be injected into the root node
    */
   function createTemplateDOM(el, html) {
-    return html && (typeof html === 'string' ? createDOMTree(el, html) : html);
+    return html && (typeof html === 'string' ? createDOMTree(el, html) : html)
   }
 
   /**
@@ -1394,7 +1492,8 @@
    */
   function getTemplateTagOffset(parentNode, el, meta) {
     const siblings = Array.from(parentNode.childNodes);
-    return Math.max(siblings.indexOf(el), siblings.indexOf(meta.head) + 1, 0);
+
+    return Math.max(siblings.indexOf(el), siblings.indexOf(meta.head) + 1, 0)
   }
 
   /**
@@ -1419,9 +1518,14 @@
      */
     createDOM(el) {
       // make sure that the DOM gets created before cloning the template
-      this.dom = this.dom || createTemplateDOM(el, this.html) || document.createDocumentFragment();
-      return this;
+      this.dom =
+        this.dom ||
+        createTemplateDOM(el, this.html) ||
+        document.createDocumentFragment();
+
+      return this
     },
+
     // API methods
     /**
      * Attach the template to a DOM node
@@ -1431,27 +1535,21 @@
      * @param   {Object} meta - meta properties needed to handle the <template> tags in loops
      * @returns {TemplateChunk} self
      */
-    mount(el, scope, parentScope, meta) {
-      if (meta === void 0) {
-        meta = {};
-      }
+    mount(el, scope, parentScope, meta = {}) {
       if (!el) panic('Please provide DOM node to mount properly your template');
+
       if (this.el) this.unmount(scope);
 
       // <template> tags require a bit more work
       // the template fragment might be already created via meta outside of this call
-      const {
-        fragment,
-        children,
-        avoidDOMInjection
-      } = meta;
+      const { fragment, children, avoidDOMInjection } = meta;
       // <template> bindings of course can not have a root element
       // so we check the parent node to set the query selector bindings
-      const {
-        parentNode
-      } = children ? children[0] : el;
+      const { parentNode } = children ? children[0] : el;
       const isTemplateTag = isTemplate(el);
-      const templateTagOffset = isTemplateTag ? getTemplateTagOffset(parentNode, el, meta) : null;
+      const templateTagOffset = isTemplateTag
+        ? getTemplateTagOffset(parentNode, el, meta)
+        : null;
 
       // create the DOM if it wasn't created before
       this.createDOM(el);
@@ -1465,19 +1563,25 @@
       this.el = isTemplateTag ? parentNode : el;
 
       // create the children array only for the <template> fragments
-      this.children = isTemplateTag ? children || Array.from(cloneNode.childNodes) : null;
+      this.children = isTemplateTag
+        ? children || Array.from(cloneNode.childNodes)
+        : null;
 
       // inject the DOM into the el only if a fragment is available
       if (!avoidDOMInjection && cloneNode) injectDOM(el, cloneNode);
 
       // create the bindings
-      this.bindings = this.bindingsData.map(binding => create$1(this.el, binding, templateTagOffset));
-      this.bindings.forEach(b => b.mount(scope, parentScope));
+      this.bindings = this.bindingsData.map((binding) =>
+        create$1(this.el, binding, templateTagOffset),
+      );
+      this.bindings.forEach((b) => b.mount(scope, parentScope));
 
       // store the template meta properties
       this.meta = meta;
-      return this;
+
+      return this
     },
+
     /**
      * Update the template with fresh data
      * @param   {*} scope - template data
@@ -1485,9 +1589,11 @@
      * @returns {TemplateChunk} self
      */
     update(scope, parentScope) {
-      this.bindings.forEach(b => b.update(scope, parentScope));
-      return this;
+      this.bindings.forEach((b) => b.update(scope, parentScope));
+
+      return this
     },
+
     /**
      * Remove the template from the node where it was initially mounted
      * @param   {*} scope - template data
@@ -1496,50 +1602,54 @@
      * if false or undefined clean the root tag content, if null don't touch the DOM
      * @returns {TemplateChunk} self
      */
-    unmount(scope, parentScope, mustRemoveRoot) {
-      if (mustRemoveRoot === void 0) {
-        mustRemoveRoot = false;
-      }
+    unmount(scope, parentScope, mustRemoveRoot = false) {
       const el = this.el;
+
       if (!el) {
-        return this;
+        return this
       }
-      this.bindings.forEach(b => b.unmount(scope, parentScope, mustRemoveRoot));
+
+      this.bindings.forEach((b) => b.unmount(scope, parentScope, mustRemoveRoot));
+
       switch (true) {
         // pure components should handle the DOM unmount updates by themselves
         // for mustRemoveRoot === null don't touch the DOM
         case el[IS_PURE_SYMBOL] || mustRemoveRoot === null:
-          break;
+          break
 
         // if children are declared, clear them
         // applicable for <template> and <slot/> bindings
         case Array.isArray(this.children):
           clearChildren(this.children);
-          break;
+          break
 
         // clean the node children only
         case !mustRemoveRoot:
           cleanNode(el);
-          break;
+          break
 
         // remove the root node only if the mustRemoveRoot is truly
         case !!mustRemoveRoot:
           removeChild(el);
-          break;
+          break
       }
+
       this.el = null;
-      return this;
+
+      return this
     },
+
     /**
      * Clone the template chunk
      * @returns {TemplateChunk} a clone of this object resetting the this.el property
      */
     clone() {
-      return Object.assign({}, this, {
+      return {
+        ...this,
         meta: {},
-        el: null
-      });
-    }
+        el: null,
+      }
+    },
   };
 
   /**
@@ -1548,14 +1658,12 @@
    * @param   {BindingData[]} bindings - bindings collection
    * @returns {TemplateChunk} a new TemplateChunk copy
    */
-  function create(html, bindings) {
-    if (bindings === void 0) {
-      bindings = [];
-    }
-    return Object.assign({}, TemplateChunk, {
+  function create(html, bindings = []) {
+    return {
+      ...TemplateChunk,
       html,
-      bindingsData: bindings
-    });
+      bindingsData: bindings,
+    }
   }
 
   /**
@@ -1565,8 +1673,17 @@
    * @param   {Function} getChildComponent - getter function to return the children components
    * @returns {TemplateChunk} template chunk object
    */
-  function componentTemplateFactory(template, componentWrapper, getChildComponent) {
-    return template(create, expressionTypes, bindingTypes, getChildComponent);
+  function componentTemplateFactory(
+    template,
+    componentWrapper,
+    getChildComponent,
+  ) {
+    return template(
+      create,
+      expressionTypes,
+      bindingTypes,
+      getChildComponent,
+    )
   }
 
   /**
@@ -1575,7 +1692,8 @@
    * @param   {Object} component - Riot.js component object
    * @returns {Object} the component object received as second argument
    */
-  const bindDOMNodeToComponentInstance = (node, component) => node[DOM_COMPONENT_INSTANCE_PROPERTY] = component;
+  const bindDOMNodeToComponentInstance = (node, component) =>
+    (node[DOM_COMPONENT_INSTANCE_PROPERTY] = component);
 
   /**
    * Wrap the Riot.js core API methods using a mapping function
@@ -1583,10 +1701,14 @@
    * @returns {Object} an object having the { mount, update, unmount } functions
    */
   function createCoreAPIMethods(mapFunction) {
-    return [MOUNT_METHOD_KEY, UPDATE_METHOD_KEY, UNMOUNT_METHOD_KEY].reduce((acc, method) => {
-      acc[method] = mapFunction(method);
-      return acc;
-    }, {});
+    return [MOUNT_METHOD_KEY, UPDATE_METHOD_KEY, UNMOUNT_METHOD_KEY].reduce(
+      (acc, method) => {
+        acc[method] = mapFunction(method);
+
+        return acc
+      },
+      {},
+    )
   }
 
   /**
@@ -1599,25 +1721,19 @@
    * @param   {any} options.props - initial component properties
    * @returns {Object} pure component object
    */
-  function createPureComponent(pureFactoryFunction, _ref) {
-    let {
-      slots,
-      attributes,
-      props,
-      css,
-      template
-    } = _ref;
+  function createPureComponent(
+    pureFactoryFunction,
+    { slots, attributes, props, css, template },
+  ) {
     if (template) panic('Pure components can not have html');
     if (css) panic('Pure components do not have css');
-    const component = defineDefaults(pureFactoryFunction({
-      slots,
-      attributes,
-      props
-    }), PURE_COMPONENT_API);
-    return createCoreAPIMethods(method => function () {
-      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
+
+    const component = defineDefaults(
+      pureFactoryFunction({ slots, attributes, props }),
+      PURE_COMPONENT_API,
+    );
+
+    return createCoreAPIMethods((method) => (...args) => {
       // intercept the mount calls to bind the DOM node to the pure object created
       // see also https://github.com/riot/riot/issues/2806
       if (method === MOUNT_METHOD_KEY) {
@@ -1626,9 +1742,11 @@
         defineProperty(element, IS_PURE_SYMBOL, true);
         bindDOMNodeToComponentInstance(element, component);
       }
+
       component[method](...args);
-      return component;
-    });
+
+      return component
+    })
   }
 
   /**
@@ -1640,13 +1758,19 @@
     // can this object be already looped?
     if (!Array.isArray(els)) {
       // is it a node list?
-      if (/^\[object (HTMLCollection|NodeList|Object)\]$/.test(Object.prototype.toString.call(els)) && typeof els.length === 'number') return Array.from(els);else
+      if (
+        /^\[object (HTMLCollection|NodeList|Object)\]$/
+          .test(Object.prototype.toString.call(els))
+          && typeof els.length === 'number'
+      )
+        return Array.from(els)
+      else
         // if it's a single node
         // it will be returned as "array" with one single entry
-        return [els];
+        return [els]
     }
     // this object could be looped out of the box
-    return els;
+    return els
   }
 
   /**
@@ -1656,17 +1780,20 @@
    * @returns { Array } DOM nodes found as array
    */
   function $(selector, scope) {
-    return domToArray(typeof selector === 'string' ? (scope || document).querySelectorAll(selector) : selector);
+    return domToArray(typeof selector === 'string' ?
+      (scope || document).querySelectorAll(selector) :
+      selector
+    )
   }
 
   const COMPONENT_DOM_SELECTORS = Object.freeze({
     // component helpers
     $(selector) {
-      return $(selector, this.root)[0];
+      return $(selector, this.root)[0]
     },
     $$(selector) {
-      return $(selector, this.root);
-    }
+      return $(selector, this.root)
+    },
   });
 
   const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
@@ -1676,7 +1803,7 @@
     [ON_BEFORE_UPDATE_KEY]: noop,
     [ON_UPDATED_KEY]: noop,
     [ON_BEFORE_UNMOUNT_KEY]: noop,
-    [ON_UNMOUNTED_KEY]: noop
+    [ON_UNMOUNTED_KEY]: noop,
   });
 
   /**
@@ -1698,8 +1825,8 @@
   function parseNodes(els, name, method) {
     const names = typeof name === 'string' ? [name] : name;
     return normalize(domToArray(els).map(el => {
-      return normalize(names.map(n => el[method](n)));
-    }));
+      return normalize(names.map(n => el[method](n)))
+    }))
   }
 
   /**
@@ -1726,14 +1853,13 @@
    *
    */
   function set(els, name, value) {
-    const attrs = typeof name === 'object' ? name : {
-      [name]: value
-    };
+    const attrs = typeof name === 'object' ? name : { [name]: value };
     const props = Object.keys(attrs);
+
     domToArray(els).forEach(el => {
       props.forEach(prop => el.setAttribute(prop, attrs[prop]));
     });
-    return els;
+    return els
   }
 
   /**
@@ -1757,19 +1883,19 @@
    * get([img1, img2], ['width', 'height']) // => [['200', '300'], ['500', '200']]
    */
   function get(els, name) {
-    return parseNodes(els, name, 'getAttribute');
+    return parseNodes(els, name, 'getAttribute')
   }
 
   const CSS_BY_NAME = new Map();
   const STYLE_NODE_SELECTOR = 'style[riot]';
 
   // memoized curried function
-  const getStyleNode = (style => {
+  const getStyleNode = ((style) => {
     return () => {
       // lazy evaluation:
       // if this function was already called before
       // we return its cached result
-      if (style) return style;
+      if (style) return style
 
       // create a new style element or use an existing one
       // and cache it internally
@@ -1778,8 +1904,9 @@
 
       /* istanbul ignore next */
       if (!style.parentNode) document.head.appendChild(style);
-      return style;
-    };
+
+      return style
+    }
   })();
 
   /**
@@ -1798,7 +1925,8 @@
         CSS_BY_NAME.set(name, css);
         this.inject();
       }
-      return this;
+
+      return this
     },
     /**
      * Inject all previously saved tag styles into DOM
@@ -1807,8 +1935,9 @@
      */
     inject() {
       getStyleNode().innerHTML = [...CSS_BY_NAME.values()].join('\n');
-      return this;
+      return this
     },
+
     /**
      * Remove a tag style from the DOM
      * @param {string} name a registered tagname
@@ -1819,8 +1948,9 @@
         CSS_BY_NAME.delete(name);
         this.inject();
       }
-      return this;
-    }
+
+      return this
+    },
   };
 
   /**
@@ -1830,17 +1960,14 @@
    * @returns {Function|*} it will return a function until the target function
    *                       will receive all of its arguments
    */
-  function curry(fn) {
-    for (var _len = arguments.length, acc = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      acc[_key - 1] = arguments[_key];
-    }
-    return function () {
-      for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-        args[_key2] = arguments[_key2];
-      }
+  function curry(fn, ...acc) {
+    return (...args) => {
       args = [...acc, ...args];
-      return args.length < fn.length ? curry(fn, ...args) : fn(...args);
-    };
+
+      return args.length < fn.length ?
+        curry(fn, ...args) :
+        fn(...args)
+    }
   }
 
   /**
@@ -1849,7 +1976,7 @@
    * @returns {string} name to identify this dom node in riot
    */
   function getName(element) {
-    return get(element, IS_DIRECTIVE) || element.tagName.toLowerCase();
+    return get(element, IS_DIRECTIVE) || element.tagName.toLowerCase()
   }
 
   /**
@@ -1872,7 +1999,10 @@
    * @returns {Object} new object state
    */
   function computeComponentState(oldState, newState) {
-    return Object.assign({}, oldState, callOrAssign(newState));
+    return {
+      ...oldState,
+      ...callOrAssign(newState),
+    }
   }
 
   /**
@@ -1881,11 +2011,11 @@
    * @param   {Object}  initialProps - initial props
    * @returns {Object} component props key value pairs
    */
-  function computeInitialProps(element, initialProps) {
-    if (initialProps === void 0) {
-      initialProps = {};
+  function computeInitialProps(element, initialProps = {}) {
+    return {
+      ...DOMattributesToObject(element),
+      ...callOrAssign(initialProps),
     }
-    return Object.assign({}, DOMattributesToObject(element), callOrAssign(initialProps));
   }
 
   /**
@@ -1894,18 +2024,18 @@
    * @param   {Array} attributes - list of attribute bindings
    * @returns {TemplateChunk} - template bindings object
    */
-  function createAttributeBindings(node, attributes) {
-    if (attributes === void 0) {
-      attributes = [];
-    }
-    const expressions = attributes.map(a => create$4(node, a));
+  function createAttributeBindings(node, attributes = []) {
+    const expressions = attributes.map((a) => create$4(node, a));
     const binding = {};
-    return Object.assign(binding, Object.assign({
-      expressions
-    }, createCoreAPIMethods(method => scope => {
-      expressions.forEach(e => e[method](scope));
-      return binding;
-    })));
+
+    return Object.assign(binding, {
+      expressions,
+      ...createCoreAPIMethods((method) => (scope) => {
+        expressions.forEach((e) => e[method](scope));
+
+        return binding
+      }),
+    })
   }
 
   /**
@@ -1914,7 +2044,7 @@
    * @returns {Object} the component enhanced by the plugins
    */
   function runPlugins(component) {
-    return [...PLUGINS_SET].reduce((c, fn) => fn(c) || c, component);
+    return [...PLUGINS_SET].reduce((c, fn) => fn(c) || c, component)
   }
 
   /**
@@ -1924,76 +2054,115 @@
    * @param   {Array} options.attributes - attribute expressions generated via riot compiler
    * @returns {Riot.Component} a riot component instance
    */
-  function manageComponentLifecycle(component, _ref) {
-    let {
-      slots,
-      attributes,
-      props
-    } = _ref;
-    return autobindMethods(runPlugins(defineProperties(isObject(component) ? Object.create(component) : component, {
-      mount(element, state, parentScope) {
-        if (state === void 0) {
-          state = {};
-        }
-        // any element mounted passing through this function can't be a pure component
-        defineProperty(element, IS_PURE_SYMBOL, false);
-        this[PARENT_KEY_SYMBOL] = parentScope;
-        this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(element, attributes).mount(parentScope);
-        defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, computeInitialProps(element, props), evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions))));
-        this[STATE_KEY] = computeComponentState(this[STATE_KEY], state);
-        this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone();
+  function manageComponentLifecycle(
+    component,
+    { slots, attributes, props },
+  ) {
+    return autobindMethods(
+      runPlugins(
+        defineProperties(
+          isObject(component) ? Object.create(component) : component,
+          {
+            mount(element, state = {}, parentScope) {
+              // any element mounted passing through this function can't be a pure component
+              defineProperty(element, IS_PURE_SYMBOL, false);
+              this[PARENT_KEY_SYMBOL] = parentScope;
+              this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(
+                element,
+                attributes,
+              ).mount(parentScope);
 
-        // link this object to the DOM node
-        bindDOMNodeToComponentInstance(element, this);
-        // add eventually the 'is' attribute
-        component.name && addCssHook(element, component.name);
+              defineProperty(
+                this,
+                PROPS_KEY,
+                Object.freeze({
+                  ...computeInitialProps(element, props),
+                  ...evaluateAttributeExpressions(
+                    this[ATTRIBUTES_KEY_SYMBOL].expressions,
+                  ),
+                }),
+              );
 
-        // define the root element
-        defineProperty(this, ROOT_KEY, element);
-        // define the slots array
-        defineProperty(this, SLOTS_KEY, slots);
+              this[STATE_KEY] = computeComponentState(this[STATE_KEY], state);
+              this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone();
 
-        // before mount lifecycle event
-        this[ON_BEFORE_MOUNT_KEY](this[PROPS_KEY], this[STATE_KEY]);
-        // mount the template
-        this[TEMPLATE_KEY_SYMBOL].mount(element, this, parentScope);
-        this[ON_MOUNTED_KEY](this[PROPS_KEY], this[STATE_KEY]);
-        return this;
-      },
-      update(state, parentScope) {
-        if (state === void 0) {
-          state = {};
-        }
-        if (parentScope) {
-          this[PARENT_KEY_SYMBOL] = parentScope;
-          this[ATTRIBUTES_KEY_SYMBOL].update(parentScope);
-        }
-        const newProps = evaluateAttributeExpressions(this[ATTRIBUTES_KEY_SYMBOL].expressions);
-        if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false) return;
-        defineProperty(this, PROPS_KEY, Object.freeze(Object.assign({}, this[PROPS_KEY], newProps)));
-        this[STATE_KEY] = computeComponentState(this[STATE_KEY], state);
-        this[ON_BEFORE_UPDATE_KEY](this[PROPS_KEY], this[STATE_KEY]);
+              // link this object to the DOM node
+              bindDOMNodeToComponentInstance(element, this);
+              // add eventually the 'is' attribute
+              component.name && addCssHook(element, component.name);
 
-        // avoiding recursive updates
-        // see also https://github.com/riot/riot/issues/2895
-        if (!this[IS_COMPONENT_UPDATING]) {
-          this[IS_COMPONENT_UPDATING] = true;
-          this[TEMPLATE_KEY_SYMBOL].update(this, this[PARENT_KEY_SYMBOL]);
-        }
-        this[ON_UPDATED_KEY](this[PROPS_KEY], this[STATE_KEY]);
-        this[IS_COMPONENT_UPDATING] = false;
-        return this;
-      },
-      unmount(preserveRoot) {
-        this[ON_BEFORE_UNMOUNT_KEY](this[PROPS_KEY], this[STATE_KEY]);
-        this[ATTRIBUTES_KEY_SYMBOL].unmount();
-        // if the preserveRoot is null the template html will be left untouched
-        // in that case the DOM cleanup will happen differently from a parent node
-        this[TEMPLATE_KEY_SYMBOL].unmount(this, this[PARENT_KEY_SYMBOL], preserveRoot === null ? null : !preserveRoot);
-        this[ON_UNMOUNTED_KEY](this[PROPS_KEY], this[STATE_KEY]);
-        return this;
-      }
-    })), Object.keys(component).filter(prop => isFunction(component[prop])));
+              // define the root element
+              defineProperty(this, ROOT_KEY, element);
+              // define the slots array
+              defineProperty(this, SLOTS_KEY, slots);
+
+              // before mount lifecycle event
+              this[ON_BEFORE_MOUNT_KEY](this[PROPS_KEY], this[STATE_KEY]);
+              // mount the template
+              this[TEMPLATE_KEY_SYMBOL].mount(element, this, parentScope);
+              this[ON_MOUNTED_KEY](this[PROPS_KEY], this[STATE_KEY]);
+
+              return this
+            },
+            update(state = {}, parentScope) {
+              if (parentScope) {
+                this[PARENT_KEY_SYMBOL] = parentScope;
+                this[ATTRIBUTES_KEY_SYMBOL].update(parentScope);
+              }
+
+              const newProps = evaluateAttributeExpressions(
+                this[ATTRIBUTES_KEY_SYMBOL].expressions,
+              );
+
+              if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false)
+                return
+
+              defineProperty(
+                this,
+                PROPS_KEY,
+                Object.freeze({
+                  // only root components will merge their initial props with the new ones
+                  // children components will just get them overridden see also https://github.com/riot/riot/issues/2978
+                  ...(parentScope ? null : this[PROPS_KEY]),
+                  ...newProps,
+                }),
+              );
+
+              this[STATE_KEY] = computeComponentState(this[STATE_KEY], state);
+
+              this[ON_BEFORE_UPDATE_KEY](this[PROPS_KEY], this[STATE_KEY]);
+
+              // avoiding recursive updates
+              // see also https://github.com/riot/riot/issues/2895
+              if (!this[IS_COMPONENT_UPDATING]) {
+                this[IS_COMPONENT_UPDATING] = true;
+                this[TEMPLATE_KEY_SYMBOL].update(this, this[PARENT_KEY_SYMBOL]);
+              }
+
+              this[ON_UPDATED_KEY](this[PROPS_KEY], this[STATE_KEY]);
+              this[IS_COMPONENT_UPDATING] = false;
+
+              return this
+            },
+            unmount(preserveRoot) {
+              this[ON_BEFORE_UNMOUNT_KEY](this[PROPS_KEY], this[STATE_KEY]);
+              this[ATTRIBUTES_KEY_SYMBOL].unmount();
+              // if the preserveRoot is null the template html will be left untouched
+              // in that case the DOM cleanup will happen differently from a parent node
+              this[TEMPLATE_KEY_SYMBOL].unmount(
+                this,
+                this[PARENT_KEY_SYMBOL],
+                preserveRoot === null ? null : !preserveRoot,
+              );
+              this[ON_UNMOUNTED_KEY](this[PROPS_KEY], this[STATE_KEY]);
+
+              return this
+            },
+          },
+        ),
+      ),
+      Object.keys(component).filter((prop) => isFunction(component[prop])),
+    )
   }
 
   /**
@@ -2002,29 +2171,30 @@
    * @param   {Object} component - the component initial properties
    * @returns {Object} a new component implementation object
    */
-  function instantiateComponent(_ref) {
-    let {
-      css,
-      template,
-      componentAPI,
-      name
-    } = _ref;
+  function instantiateComponent({ css, template, componentAPI, name }) {
     // add the component css into the DOM
     if (css && name) cssManager.add(name, css);
-    return curry(manageComponentLifecycle)(defineProperties(
-    // set the component defaults without overriding the original component API
-    defineDefaults(componentAPI, Object.assign({}, COMPONENT_LIFECYCLE_METHODS, {
-      [PROPS_KEY]: {},
-      [STATE_KEY]: {}
-    })), Object.assign({
-      // defined during the component creation
-      [SLOTS_KEY]: null,
-      [ROOT_KEY]: null
-    }, COMPONENT_DOM_SELECTORS, {
-      name,
-      css,
-      template
-    })));
+
+    return curry(manageComponentLifecycle)(
+      defineProperties(
+        // set the component defaults without overriding the original component API
+        defineDefaults(componentAPI, {
+          ...COMPONENT_LIFECYCLE_METHODS,
+          [PROPS_KEY]: {},
+          [STATE_KEY]: {},
+        }),
+        {
+          // defined during the component creation
+          [SLOTS_KEY]: null,
+          [ROOT_KEY]: null,
+          // these properties should not be overriden
+          ...COMPONENT_DOM_SELECTORS,
+          name,
+          css,
+          template,
+        },
+      ),
+    )
   }
 
   /**
@@ -2032,15 +2202,14 @@
    * @param   {Object} components - components imported in runtime
    * @returns {Object} all the components transformed into Riot.Component factory functions
    */
-  function createChildrenComponentsObject(components) {
-    if (components === void 0) {
-      components = {};
-    }
-    return Object.entries(callOrAssign(components)).reduce((acc, _ref) => {
-      let [key, value] = _ref;
-      acc[camelToDashCase(key)] = createComponentFromWrapper(value);
-      return acc;
-    }, {});
+  function createChildrenComponentsObject(components = {}) {
+    return Object.entries(callOrAssign(components)).reduce(
+      (acc, [key, value]) => {
+        acc[camelToDashCase(key)] = createComponentFromWrapper(value);
+        return acc
+      },
+      {},
+    )
   }
 
   /**
@@ -2048,14 +2217,18 @@
    * @param   {RiotComponentWrapper} componentWrapper - riot compiler generated object
    * @returns {Function} function returning the component factory function
    */
-  const createChildComponentGetter = componentWrapper => {
-    const childrenComponents = createChildrenComponentsObject(componentWrapper.exports ? componentWrapper.exports.components : {});
-    return name => {
+  const createChildComponentGetter = (componentWrapper) => {
+    const childrenComponents = createChildrenComponentsObject(
+      componentWrapper.exports ? componentWrapper.exports.components : {},
+    );
+
+    return (name) => {
       // improve support for recursive components
-      if (name === componentWrapper.name) return memoizedCreateComponentFromWrapper(componentWrapper);
+      if (name === componentWrapper.name)
+        return memoizedCreateComponentFromWrapper(componentWrapper)
       // return the registered components
-      return childrenComponents[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name);
-    };
+      return childrenComponents[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
+    }
   };
 
   /**
@@ -2075,38 +2248,34 @@
    * @returns {Object} component like interface
    */
   function createComponentFromWrapper(componentWrapper) {
-    const {
-      css,
-      template,
-      exports,
-      name
-    } = componentWrapper;
-    const templateFn = template ? componentTemplateFactory(template, componentWrapper, createChildComponentGetter(componentWrapper)) : MOCKED_TEMPLATE_INTERFACE;
-    return _ref2 => {
-      let {
-        slots,
-        attributes,
-        props
-      } = _ref2;
+    const { css, template, exports, name } = componentWrapper;
+    const templateFn = template
+      ? componentTemplateFactory(
+          template,
+          componentWrapper,
+          createChildComponentGetter(componentWrapper),
+        )
+      : MOCKED_TEMPLATE_INTERFACE;
+
+    return ({ slots, attributes, props }) => {
       // pure components rendering will be managed by the end user
-      if (exports && exports[IS_PURE_SYMBOL]) return createPureComponent(exports, {
-        slots,
-        attributes,
-        props,
-        css,
-        template
-      });
+      if (exports && exports[IS_PURE_SYMBOL])
+        return createPureComponent(exports, {
+          slots,
+          attributes,
+          props,
+          css,
+          template,
+        })
+
       const componentAPI = callOrAssign(exports) || {};
+
       const component = instantiateComponent({
         css,
         template: templateFn,
         componentAPI,
-        name
-      })({
-        slots,
-        attributes,
-        props
-      });
+        name,
+      })({ slots, attributes, props });
 
       // notice that for the components created via tag binding
       // we need to invert the mount (state/parentScope) arguments
@@ -2114,16 +2283,16 @@
       // and never deal with the component state
       return {
         mount(element, parentScope, state) {
-          return component.mount(element, state, parentScope);
+          return component.mount(element, state, parentScope)
         },
         update(parentScope, state) {
-          return component.update(state, parentScope);
+          return component.update(state, parentScope)
         },
         unmount(preserveRoot) {
-          return component.unmount(preserveRoot);
-        }
-      };
-    };
+          return component.unmount(preserveRoot)
+        },
+      }
+    }
   }
 
   /**
@@ -2132,20 +2301,16 @@
    * @param   {Object} implementation - tag implementation
    * @returns {Map} map containing all the components implementations
    */
-  function register(name, _ref) {
-    let {
-      css,
-      template,
-      exports
-    } = _ref;
-    if (COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component "${name}" was already registered`);
-    COMPONENTS_IMPLEMENTATION_MAP.set(name, createComponentFromWrapper({
+  function register(name, { css, template, exports }) {
+    if (COMPONENTS_IMPLEMENTATION_MAP.has(name))
+      panic(`The component "${name}" was already registered`);
+
+    COMPONENTS_IMPLEMENTATION_MAP.set(
       name,
-      css,
-      template,
-      exports
-    }));
-    return COMPONENTS_IMPLEMENTATION_MAP;
+      createComponentFromWrapper({ name, css, template, exports }),
+    );
+
+    return COMPONENTS_IMPLEMENTATION_MAP
   }
 
   /**
@@ -2154,10 +2319,13 @@
    * @returns {Map} map containing all the components implementations
    */
   function unregister(name) {
-    if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component "${name}" was never registered`);
+    if (!COMPONENTS_IMPLEMENTATION_MAP.has(name))
+      panic(`The component "${name}" was never registered`);
+
     COMPONENTS_IMPLEMENTATION_MAP.delete(name);
     cssManager.remove(name);
-    return COMPONENTS_IMPLEMENTATION_MAP;
+
+    return COMPONENTS_IMPLEMENTATION_MAP
   }
 
   /**
@@ -2170,12 +2338,15 @@
    */
   function mountComponent(element, initialProps, componentName, slots) {
     const name = componentName || getName(element);
-    if (!COMPONENTS_IMPLEMENTATION_MAP.has(name)) panic(`The component named "${name}" was never registered`);
+    if (!COMPONENTS_IMPLEMENTATION_MAP.has(name))
+      panic(`The component named "${name}" was never registered`);
+
     const component = COMPONENTS_IMPLEMENTATION_MAP.get(name)({
       props: initialProps,
-      slots
+      slots,
     });
-    return component.mount(element);
+
+    return component.mount(element)
   }
 
   /**
@@ -2186,7 +2357,9 @@
    * @returns {Array} list of riot components
    */
   function mount(selector, initialProps, name) {
-    return $(selector).map(element => mountComponent(element, initialProps, name));
+    return $(selector).map((element) =>
+      mountComponent(element, initialProps, name),
+    )
   }
 
   /**
@@ -2196,12 +2369,12 @@
    * @returns {Array} list of nodes unmounted
    */
   function unmount(selector, keepRootElement) {
-    return $(selector).map(element => {
+    return $(selector).map((element) => {
       if (element[DOM_COMPONENT_INSTANCE_PROPERTY]) {
         element[DOM_COMPONENT_INSTANCE_PROPERTY].unmount(keepRootElement);
       }
-      return element;
-    });
+      return element
+    })
   }
 
   /**
@@ -2212,8 +2385,10 @@
   function install(plugin) {
     if (!isFunction(plugin)) panic('Plugins must be of type function');
     if (PLUGINS_SET.has(plugin)) panic('This plugin was already installed');
+
     PLUGINS_SET.add(plugin);
-    return PLUGINS_SET;
+
+    return PLUGINS_SET
   }
 
   /**
@@ -2223,8 +2398,10 @@
    */
   function uninstall(plugin) {
     if (!PLUGINS_SET.has(plugin)) panic('This plugin was never installed');
+
     PLUGINS_SET.delete(plugin);
-    return PLUGINS_SET;
+
+    return PLUGINS_SET
   }
 
   /**
@@ -2242,13 +2419,8 @@
    * @param   {...[function]} fns) - list of unary function
    * @returns {*} result of the computation
    */
-  function compose() {
-    for (var _len2 = arguments.length, fns = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      fns[_key2] = arguments[_key2];
-    }
-    return fns.reduce((f, g) => function () {
-      return f(g(...arguments));
-    });
+  function compose(...fns) {
+    return fns.reduce((f, g) => (...args) => f(g(...args)))
   }
 
   /**
@@ -2257,18 +2429,12 @@
    * @returns {Function} function that will allow you to mount a riot component on a DOM node
    */
   function component(implementation) {
-    return function (el, props, _temp) {
-      let {
-        slots,
-        attributes,
-        parentScope
-      } = _temp === void 0 ? {} : _temp;
-      return compose(c => c.mount(el, parentScope), c => c({
-        props,
-        slots,
-        attributes
-      }), createComponentFromWrapper)(implementation);
-    };
+    return (el, props, { slots, attributes, parentScope } = {}) =>
+      compose(
+        (c) => c.mount(el, parentScope),
+        (c) => c({ props, slots, attributes }),
+        createComponentFromWrapper,
+      )(implementation)
   }
 
   /**
@@ -2277,9 +2443,10 @@
    * @returns {Function} the lifted original function received as argument
    */
   function pure(func) {
-    if (!isFunction(func)) panic('riot.pure accepts only arguments of type "function"');
+    if (!isFunction(func))
+      panic('riot.pure accepts only arguments of type "function"');
     func[IS_PURE_SYMBOL] = true;
-    return func;
+    return func
   }
 
   /**
@@ -2288,10 +2455,10 @@
    * @returns {Function|Object} returns exactly what it has received
    */
   /* istanbul ignore next */
-  const withTypes = component => component;
+  const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v7.1.0';
+  const version = 'v9.0.0-rc';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
@@ -2301,12 +2468,12 @@
       createBinding: create$1,
       createExpression: create$4,
       bindingTypes,
-      expressionTypes
+      expressionTypes,
     },
     globals: {
       DOM_COMPONENT_INSTANCE_PROPERTY,
-      PARENT_KEY_SYMBOL
-    }
+      PARENT_KEY_SYMBOL,
+    },
   };
 
   exports.__ = __;
