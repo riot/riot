@@ -19,22 +19,25 @@ function ignore() {
 }
 
 module.exports = {
-  output: [
-    {
-      banner: '/* Riot WIP, @license MIT */',
-      name: 'riot',
-      generatedCode: {
-        constBindings: true,
-      },
-      globals: ignoredModules.reduce(
-        (acc, dep) => ({
-          [dep]: dep,
-          ...acc,
-        }),
-        {},
-      ),
+  output: {
+    banner: '/* Riot WIP, @license MIT */',
+    name: 'riot',
+    generatedCode: {
+      constBindings: true,
     },
-  ],
+    globals: ignoredModules.reduce(
+      (acc, dep) => ({
+        [dep]: dep,
+        ...acc,
+      }),
+      {},
+    ),
+    entryFileNames: (chunkInfo) =>
+      chunkInfo.name.includes('node_modules')
+        ? // replace the node_modules from the path in order to avoid nodejs esm conflicts
+          `${chunkInfo.name.replace('node_modules', 'dependencies')}.js`
+        : '[name].js',
+  },
   external: ignoredModules,
   plugins: [
     ignore(),

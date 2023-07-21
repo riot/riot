@@ -25,6 +25,19 @@ CONFIG = config/
 
 GENERATED_FILES = riot.js riot+compiler.js
 
+# Options needed to generate the rollup esm bundle
+ROLLUP_ESM_OPTIONS = --format esm \
+					 --output.preserveModules \
+					 --amd.forceJsExtensionForImports \
+					 --preserveModulesRoot src \
+					 --config rollup.config.cjs \
+					 --dir $(DIST)esm
+# Options we will pass to the minifier
+MINIFY_OPTIONS = --comments false \
+				 --toplevel \
+				 --compress pure_funcs=['panic'],unsafe=true,unsafe_symbols=true,passes=5 \
+				 --mangle \
+
 test: lint test-karma test-typing
 
 test-karma:
@@ -53,22 +66,8 @@ raw:
 	# Default builds UMD
 	@ $(ROLLUP) src/riot.js --format umd --config rollup.config.cjs --file $(DIST)riot.js
 	@ HAS_VISUALIZER=1 $(ROLLUP) src/riot+compiler.js --format umd --config rollup.config.cjs --file $(DIST)riot+compiler.js
-	@ $(ROLLUP) src/riot.js \
-	    --format esm \
-	    --output.preserveModules \
-	    --amd.forceJsExtensionForImports \
-	    --entryFileNames [name].js \
-	    --preserveModulesRoot src \
-	    --config rollup.config.cjs \
-	    --dir $(DIST)esm
-	@ $(ROLLUP) src/riot+compiler.js \
-	    --format esm \
-	    --output.preserveModules \
-	    --amd.forceJsExtensionForImports \
-	    --entryFileNames [name].js \
-	    --preserveModulesRoot src \
-	    --config rollup.config.cjs \
-	    --dir $(DIST)esm
+	@ $(ROLLUP) src/riot.js $(ROLLUP_ESM_OPTIONS)
+	@ $(ROLLUP) src/riot+compiler.js $(ROLLUP_ESM_OPTIONS)
 
 clean:
 	# delete old esm folder
@@ -80,19 +79,9 @@ riot: clean raw test
 
 min:
 	# minify riot
-	@ $(MINIFY) $(DIST)riot.js \
-			--comments false \
-			--toplevel \
-			--compress pure_funcs=['panic'],unsafe=true,unsafe_symbols=true,passes=5 \
-			--mangle \
-			-o $(DIST)riot.min.js;
+	@ $(MINIFY) $(DIST)riot.js $(MINIFY_OPTIONS) -o $(DIST)riot.min.js;
 	# minify the riot+compiler
-	@ $(MINIFY) $(DIST)riot+compiler.js \
-	        --comments false \
-	        --toplevel \
-			--compress pure_funcs=['panic'],unsafe=true,unsafe_symbols=true,passes=5 \
-			--mangle \
-			-o $(DIST)riot+compiler.min.js;
+	@ $(MINIFY) $(DIST)riot+compiler.js $(MINIFY_OPTIONS) -o $(DIST)riot+compiler.min.js;
 
 build:
 	# generate riot.js & riot.min.js

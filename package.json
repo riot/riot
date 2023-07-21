@@ -34,12 +34,12 @@
   "module": "esm/riot.js",
   "type": "module",
   "exports": {
-    "riot": {
+    ".": {
       "import": "./esm/riot.js",
       "require": "./riot.js",
       "types": "./riot.d.ts"
     },
-    "riot+compiler": {
+    "./riot+compiler": {
       "import": "./esm/riot_compiler.js",
       "require": "./riot+compiler.js",
       "types": "./riot.d.ts"
@@ -83,13 +83,13 @@
     "karma-rollup-preprocessor": "^7.0.8",
     "karma-sauce-launcher": "^4.3.6",
     "mocha": "^10.2.0",
-    "prettier": "^2.8.8",
-    "rollup": "^3.26.2",
+    "prettier": "^3.0.0",
+    "rollup": "^3.26.3",
     "rollup-plugin-istanbul": "^4.0.0",
     "rollup-plugin-riot": "^7.0.0",
     "sinon": "^15.2.0",
     "sinon-chai": "^3.7.0",
-    "terser": "^5.19.0",
+    "terser": "^5.19.2",
     "typescript": "^5.1.6"
   }
 }
