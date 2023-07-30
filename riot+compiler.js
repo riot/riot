@@ -1,4 +1,4 @@
-/* Riot v9.0.1, @license MIT */
+/* Riot v9.0.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -24630,9 +24630,13 @@
   /**
    * Check whether the attribute should be removed
    * @param {*} value - expression value
+   * @param   {boolean} isBoolean - flag to handle boolean attributes
    * @returns {boolean} boolean - true if the attribute can be removed}
    */
-  function shouldRemoveAttribute(value) {
+  function shouldRemoveAttribute(value, isBoolean) {
+    // boolean attributes should be removed if the value is falsy
+    if (isBoolean) return !value && value !== 0
+    // otherwise we can try to render it
     return typeof value === 'undefined' || value === null
   }
 
@@ -24675,7 +24679,7 @@
       node[name] = value;
     }
 
-    if (shouldRemoveAttribute(value)) {
+    if (shouldRemoveAttribute(value, isBoolean$1)) {
       node.removeAttribute(name);
     } else if (canRenderAttribute(value)) {
       node.setAttribute(name, normalizeValue(name, value, isBoolean$1));
@@ -26136,7 +26140,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.0.1';
+  const version = 'v9.0.2';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
