@@ -35,14 +35,14 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./riot.d.ts",
       "import": "./esm/riot.js",
-      "require": "./riot.js",
-      "types": "./riot.d.ts"
+      "require": "./riot.js"
     },
     "./riot+compiler": {
+      "types": "./riot.d.ts",
       "import": "./esm/riot_compiler.js",
-      "require": "./riot+compiler.js",
-      "types": "./riot.d.ts"
+      "require": "./riot+compiler.js"
     }
   },
   "files": [
@@ -60,7 +60,7 @@
   "sideEffects": false,
   "types": "./riot.d.ts",
   "devDependencies": {
-    "@riotjs/compiler": "^9.0.1",
+    "@riotjs/compiler": "^9.0.2",
     "@riotjs/dom-bindings": "^9.0.2",
     "@riotjs/prettier-config": "^1.1.0",
     "@riotjs/util": "^2.2.1",
