@@ -1,4 +1,4 @@
-/* Riot v9.0.2, @license MIT */
+/* Riot v9.0.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2462,7 +2462,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.0.2';
+  const version = 'v9.0.3';
 
   // expose some internal stuff that might be used from external tools
   const __ = {

@@ -1,4 +1,4 @@
-/* Riot v9.0.2, @license MIT */
+/* Riot v9.0.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -7,7 +7,7 @@
 
   const require$$3 = undefined;
 
-  const require$$4 = undefined;
+  const require$$5 = undefined;
 
   /**
    * Quick type checking
@@ -2087,242 +2087,361 @@
   OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
   PERFORMANCE OF THIS SOFTWARE.
   ***************************************************************************** */
-  /* global Reflect, Promise */
+  /* global Reflect, Promise, SuppressedError, Symbol */
 
   var extendStatics = function(d, b) {
-      extendStatics = Object.setPrototypeOf ||
-          ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-          function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-      return extendStatics(d, b);
+    extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+    return extendStatics(d, b);
   };
 
   function __extends(d, b) {
-      if (typeof b !== "function" && b !== null)
-          throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-      extendStatics(d, b);
-      function __() { this.constructor = d; }
-      d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    if (typeof b !== "function" && b !== null)
+        throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+    extendStatics(d, b);
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
   }
 
   var __assign = function() {
-      __assign = Object.assign || function __assign(t) {
-          for (var s, i = 1, n = arguments.length; i < n; i++) {
-              s = arguments[i];
-              for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-          }
-          return t;
-      };
-      return __assign.apply(this, arguments);
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
   };
 
   function __rest(s, e) {
-      var t = {};
-      for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-          t[p] = s[p];
-      if (s != null && typeof Object.getOwnPropertySymbols === "function")
-          for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-              if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                  t[p[i]] = s[p[i]];
-          }
-      return t;
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
   }
 
   function __decorate(decorators, target, key, desc) {
-      var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-      if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-      else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-      return c > 3 && r && Object.defineProperty(target, key, r), r;
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
   }
 
   function __param(paramIndex, decorator) {
-      return function (target, key) { decorator(target, key, paramIndex); }
+    return function (target, key) { decorator(target, key, paramIndex); }
   }
 
+  function __esDecorate(ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
+    function accept(f) { if (f !== void 0 && typeof f !== "function") throw new TypeError("Function expected"); return f; }
+    var kind = contextIn.kind, key = kind === "getter" ? "get" : kind === "setter" ? "set" : "value";
+    var target = !descriptorIn && ctor ? contextIn["static"] ? ctor : ctor.prototype : null;
+    var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});
+    var _, done = false;
+    for (var i = decorators.length - 1; i >= 0; i--) {
+        var context = {};
+        for (var p in contextIn) context[p] = p === "access" ? {} : contextIn[p];
+        for (var p in contextIn.access) context.access[p] = contextIn.access[p];
+        context.addInitializer = function (f) { if (done) throw new TypeError("Cannot add initializers after decoration has completed"); extraInitializers.push(accept(f || null)); };
+        var result = (0, decorators[i])(kind === "accessor" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);
+        if (kind === "accessor") {
+            if (result === void 0) continue;
+            if (result === null || typeof result !== "object") throw new TypeError("Object expected");
+            if (_ = accept(result.get)) descriptor.get = _;
+            if (_ = accept(result.set)) descriptor.set = _;
+            if (_ = accept(result.init)) initializers.unshift(_);
+        }
+        else if (_ = accept(result)) {
+            if (kind === "field") initializers.unshift(_);
+            else descriptor[key] = _;
+        }
+    }
+    if (target) Object.defineProperty(target, contextIn.name, descriptor);
+    done = true;
+  }
+  function __runInitializers(thisArg, initializers, value) {
+    var useValue = arguments.length > 2;
+    for (var i = 0; i < initializers.length; i++) {
+        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);
+    }
+    return useValue ? value : void 0;
+  }
+  function __propKey(x) {
+    return typeof x === "symbol" ? x : "".concat(x);
+  }
+  function __setFunctionName(f, name, prefix) {
+    if (typeof name === "symbol") name = name.description ? "[".concat(name.description, "]") : "";
+    return Object.defineProperty(f, "name", { configurable: true, value: prefix ? "".concat(prefix, " ", name) : name });
+  }
   function __metadata(metadataKey, metadataValue) {
-      if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(metadataKey, metadataValue);
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(metadataKey, metadataValue);
   }
 
   function __awaiter(thisArg, _arguments, P, generator) {
-      function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-      return new (P || (P = Promise))(function (resolve, reject) {
-          function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-          function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-          function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-          step((generator = generator.apply(thisArg, _arguments || [])).next());
-      });
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
   }
 
   function __generator(thisArg, body) {
-      var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-      return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-      function verb(n) { return function (v) { return step([n, v]); }; }
-      function step(op) {
-          if (f) throw new TypeError("Generator is already executing.");
-          while (_) try {
-              if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-              if (y = 0, t) op = [op[0] & 2, t.value];
-              switch (op[0]) {
-                  case 0: case 1: t = op; break;
-                  case 4: _.label++; return { value: op[1], done: false };
-                  case 5: _.label++; y = op[1]; op = [0]; continue;
-                  case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                  default:
-                      if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                      if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                      if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                      if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                      if (t[2]) _.ops.pop();
-                      _.trys.pop(); continue;
-              }
-              op = body.call(thisArg, _);
-          } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-          if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-      }
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
   }
 
   var __createBinding = Object.create ? (function(o, m, k, k2) {
-      if (k2 === undefined) k2 = k;
-      var desc = Object.getOwnPropertyDescriptor(m, k);
-      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-          desc = { enumerable: true, get: function() { return m[k]; } };
-      }
-      Object.defineProperty(o, k2, desc);
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
   }) : (function(o, m, k, k2) {
-      if (k2 === undefined) k2 = k;
-      o[k2] = m[k];
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
   });
 
   function __exportStar(m, o) {
-      for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(o, p)) __createBinding(o, m, p);
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(o, p)) __createBinding(o, m, p);
   }
 
   function __values(o) {
-      var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
-      if (m) return m.call(o);
-      if (o && typeof o.length === "number") return {
-          next: function () {
-              if (o && i >= o.length) o = void 0;
-              return { value: o && o[i++], done: !o };
-          }
-      };
-      throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
   }
 
   function __read(o, n) {
-      var m = typeof Symbol === "function" && o[Symbol.iterator];
-      if (!m) return o;
-      var i = m.call(o), r, ar = [], e;
-      try {
-          while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-      }
-      catch (error) { e = { error: error }; }
-      finally {
-          try {
-              if (r && !r.done && (m = i["return"])) m.call(i);
-          }
-          finally { if (e) throw e.error; }
-      }
-      return ar;
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
   }
 
   /** @deprecated */
   function __spread() {
-      for (var ar = [], i = 0; i < arguments.length; i++)
-          ar = ar.concat(__read(arguments[i]));
-      return ar;
+    for (var ar = [], i = 0; i < arguments.length; i++)
+        ar = ar.concat(__read(arguments[i]));
+    return ar;
   }
 
   /** @deprecated */
   function __spreadArrays() {
-      for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
-      for (var r = Array(s), k = 0, i = 0; i < il; i++)
-          for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
-              r[k] = a[j];
-      return r;
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
   }
 
   function __spreadArray(to, from, pack) {
-      if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-          if (ar || !(i in from)) {
-              if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-              ar[i] = from[i];
-          }
-      }
-      return to.concat(ar || Array.prototype.slice.call(from));
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
   }
 
   function __await(v) {
-      return this instanceof __await ? (this.v = v, this) : new __await(v);
+    return this instanceof __await ? (this.v = v, this) : new __await(v);
   }
 
   function __asyncGenerator(thisArg, _arguments, generator) {
-      if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-      var g = generator.apply(thisArg, _arguments || []), i, q = [];
-      return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i;
-      function verb(n) { if (g[n]) i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; }
-      function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
-      function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }
-      function fulfill(value) { resume("next", value); }
-      function reject(value) { resume("throw", value); }
-      function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var g = generator.apply(thisArg, _arguments || []), i, q = [];
+    return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i;
+    function verb(n) { if (g[n]) i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; }
+    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
+    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }
+    function fulfill(value) { resume("next", value); }
+    function reject(value) { resume("throw", value); }
+    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }
   }
 
   function __asyncDelegator(o) {
-      var i, p;
-      return i = {}, verb("next"), verb("throw", function (e) { throw e; }), verb("return"), i[Symbol.iterator] = function () { return this; }, i;
-      function verb(n, f) { i[n] = o[n] ? function (v) { return (p = !p) ? { value: __await(o[n](v)), done: n === "return" } : f ? f(v) : v; } : f; }
+    var i, p;
+    return i = {}, verb("next"), verb("throw", function (e) { throw e; }), verb("return"), i[Symbol.iterator] = function () { return this; }, i;
+    function verb(n, f) { i[n] = o[n] ? function (v) { return (p = !p) ? { value: __await(o[n](v)), done: false } : f ? f(v) : v; } : f; }
   }
 
   function __asyncValues(o) {
-      if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-      var m = o[Symbol.asyncIterator], i;
-      return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-      function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-      function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
   }
 
   function __makeTemplateObject(cooked, raw) {
-      if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
-      return cooked;
+    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+    return cooked;
   }
   var __setModuleDefault = Object.create ? (function(o, v) {
-      Object.defineProperty(o, "default", { enumerable: true, value: v });
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
   }) : function(o, v) {
-      o["default"] = v;
+    o["default"] = v;
   };
 
   function __importStar(mod) {
-      if (mod && mod.__esModule) return mod;
-      var result = {};
-      if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-      __setModuleDefault(result, mod);
-      return result;
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
   }
 
   function __importDefault(mod) {
-      return (mod && mod.__esModule) ? mod : { default: mod };
+    return (mod && mod.__esModule) ? mod : { default: mod };
   }
 
   function __classPrivateFieldGet(receiver, state, kind, f) {
-      if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-      if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-      return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
   }
 
   function __classPrivateFieldSet(receiver, state, value, kind, f) {
-      if (kind === "m") throw new TypeError("Private method is not writable");
-      if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-      if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-      return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+    if (kind === "m") throw new TypeError("Private method is not writable");
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
   }
 
   function __classPrivateFieldIn(state, receiver) {
-      if (receiver === null || (typeof receiver !== "object" && typeof receiver !== "function")) throw new TypeError("Cannot use 'in' operator on non-object");
-      return typeof state === "function" ? receiver === state : state.has(receiver);
+    if (receiver === null || (typeof receiver !== "object" && typeof receiver !== "function")) throw new TypeError("Cannot use 'in' operator on non-object");
+    return typeof state === "function" ? receiver === state : state.has(receiver);
   }
 
-  var tslib_es6 = /*#__PURE__*/Object.freeze({
+  function __addDisposableResource(env, value, async) {
+    if (value !== null && value !== void 0) {
+      if (typeof value !== "object" && typeof value !== "function") throw new TypeError("Object expected.");
+      var dispose;
+      if (async) {
+          if (!Symbol.asyncDispose) throw new TypeError("Symbol.asyncDispose is not defined.");
+          dispose = value[Symbol.asyncDispose];
+      }
+      if (dispose === void 0) {
+          if (!Symbol.dispose) throw new TypeError("Symbol.dispose is not defined.");
+          dispose = value[Symbol.dispose];
+      }
+      if (typeof dispose !== "function") throw new TypeError("Object not disposable.");
+      env.stack.push({ value: value, dispose: dispose, async: async });
+    }
+    else if (async) {
+      env.stack.push({ async: true });
+    }
+    return value;
+  }
+
+  var _SuppressedError = typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+  };
+
+  function __disposeResources(env) {
+    function fail(e) {
+      env.error = env.hasError ? new _SuppressedError(e, env.error, "An error was suppressed during disposal.") : e;
+      env.hasError = true;
+    }
+    function next() {
+      while (env.stack.length) {
+        var rec = env.stack.pop();
+        try {
+          var result = rec.dispose && rec.dispose.call(rec.value);
+          if (rec.async) return Promise.resolve(result).then(next, function(e) { fail(e); return next(); });
+        }
+        catch (e) {
+            fail(e);
+        }
+      }
+      if (env.hasError) throw env.error;
+    }
+    return next();
+  }
+
+  var tslib_es6 = {
+    __extends,
+    __assign,
+    __rest,
+    __decorate,
+    __param,
+    __metadata,
+    __awaiter,
+    __generator,
+    __createBinding,
+    __exportStar,
+    __values,
+    __read,
+    __spread,
+    __spreadArrays,
+    __spreadArray,
+    __await,
+    __asyncGenerator,
+    __asyncDelegator,
+    __asyncValues,
+    __makeTemplateObject,
+    __importStar,
+    __importDefault,
+    __classPrivateFieldGet,
+    __classPrivateFieldSet,
+    __classPrivateFieldIn,
+    __addDisposableResource,
+    __disposeResources,
+  };
+
+  var tslib_es6$1 = /*#__PURE__*/Object.freeze({
     __proto__: null,
+    __addDisposableResource: __addDisposableResource,
     get __assign () { return __assign; },
     __asyncDelegator: __asyncDelegator,
     __asyncGenerator: __asyncGenerator,
@@ -2334,6 +2453,8 @@
     __classPrivateFieldSet: __classPrivateFieldSet,
     __createBinding: __createBinding,
     __decorate: __decorate,
+    __disposeResources: __disposeResources,
+    __esDecorate: __esDecorate,
     __exportStar: __exportStar,
     __extends: __extends,
     __generator: __generator,
@@ -2342,806 +2463,923 @@
     __makeTemplateObject: __makeTemplateObject,
     __metadata: __metadata,
     __param: __param,
+    __propKey: __propKey,
     __read: __read,
     __rest: __rest,
+    __runInitializers: __runInitializers,
+    __setFunctionName: __setFunctionName,
     __spread: __spread,
     __spreadArray: __spreadArray,
     __spreadArrays: __spreadArrays,
-    __values: __values
+    __values: __values,
+    default: tslib_es6
   });
 
-  var require$$0 = /*@__PURE__*/getAugmentedNamespace(tslib_es6);
+  var require$$0 = /*@__PURE__*/getAugmentedNamespace(tslib_es6$1);
 
   var main = {};
 
   var fork = {exports: {}};
 
-  var types$2 = {};
+  var types$2 = {exports: {}};
+
+  var shared = {};
+
+  var hasRequiredShared;
+
+  function requireShared () {
+  	if (hasRequiredShared) return shared;
+  	hasRequiredShared = 1;
+  	Object.defineProperty(shared, "__esModule", { value: true });
+  	shared.maybeSetModuleExports = void 0;
+  	var tslib_1 = require$$0;
+  	var types_1 = tslib_1.__importDefault(requireTypes());
+  	function default_1(fork) {
+  	    var types = fork.use(types_1.default);
+  	    var Type = types.Type;
+  	    var builtin = types.builtInTypes;
+  	    var isNumber = builtin.number;
+  	    // An example of constructing a new type with arbitrary constraints from
+  	    // an existing type.
+  	    function geq(than) {
+  	        return Type.from(function (value) { return isNumber.check(value) && value >= than; }, isNumber + " >= " + than);
+  	    }
+  	    // Default value-returning functions that may optionally be passed as a
+  	    // third argument to Def.prototype.field.
+  	    var defaults = {
+  	        // Functions were used because (among other reasons) that's the most
+  	        // elegant way to allow for the emptyArray one always to give a new
+  	        // array instance.
+  	        "null": function () { return null; },
+  	        "emptyArray": function () { return []; },
+  	        "false": function () { return false; },
+  	        "true": function () { return true; },
+  	        "undefined": function () { },
+  	        "use strict": function () { return "use strict"; }
+  	    };
+  	    var naiveIsPrimitive = Type.or(builtin.string, builtin.number, builtin.boolean, builtin.null, builtin.undefined);
+  	    var isPrimitive = Type.from(function (value) {
+  	        if (value === null)
+  	            return true;
+  	        var type = typeof value;
+  	        if (type === "object" ||
+  	            type === "function") {
+  	            return false;
+  	        }
+  	        return true;
+  	    }, naiveIsPrimitive.toString());
+  	    return {
+  	        geq: geq,
+  	        defaults: defaults,
+  	        isPrimitive: isPrimitive,
+  	    };
+  	}
+  	shared.default = default_1;
+  	// This function accepts a getter function that should return an object
+  	// conforming to the NodeModule interface above. Typically, this means calling
+  	// maybeSetModuleExports(() => module) at the very end of any module that has a
+  	// default export, so the default export value can replace module.exports and
+  	// thus CommonJS consumers can continue to rely on require("./that/module")
+  	// returning the default-exported value, rather than always returning an exports
+  	// object with a default property equal to that value. This function should help
+  	// preserve backwards compatibility for CommonJS consumers, as a replacement for
+  	// the ts-add-module-exports package.
+  	function maybeSetModuleExports(moduleGetter) {
+  	    try {
+  	        var nodeModule = moduleGetter();
+  	        var originalExports = nodeModule.exports;
+  	        var defaultExport = originalExports["default"];
+  	    }
+  	    catch (_a) {
+  	        // It's normal/acceptable for this code to throw a ReferenceError due to
+  	        // the moduleGetter function attempting to access a non-existent global
+  	        // `module` variable. That's the reason we use a getter function here:
+  	        // so the calling code doesn't have to do its own typeof module ===
+  	        // "object" checking (because it's always safe to pass `() => module` as
+  	        // an argument, even when `module` is not defined in the calling scope).
+  	        return;
+  	    }
+  	    if (defaultExport &&
+  	        defaultExport !== originalExports &&
+  	        typeof originalExports === "object") {
+  	        // Make all properties found in originalExports properties of the
+  	        // default export, including the default property itself, so that
+  	        // require(nodeModule.id).default === require(nodeModule.id).
+  	        Object.assign(defaultExport, originalExports, { "default": defaultExport });
+  	        // Object.assign only transfers enumerable properties, and
+  	        // __esModule is (and should remain) non-enumerable.
+  	        if (originalExports.__esModule) {
+  	            Object.defineProperty(defaultExport, "__esModule", { value: true });
+  	        }
+  	        // This line allows require(nodeModule.id) === defaultExport, rather
+  	        // than (only) require(nodeModule.id).default === defaultExport.
+  	        nodeModule.exports = defaultExport;
+  	    }
+  	}
+  	shared.maybeSetModuleExports = maybeSetModuleExports;
+  	
+  	return shared;
+  }
+
+  types$2.exports;
 
   var hasRequiredTypes;
 
   function requireTypes () {
-  	if (hasRequiredTypes) return types$2;
+  	if (hasRequiredTypes) return types$2.exports;
   	hasRequiredTypes = 1;
-  	Object.defineProperty(types$2, "__esModule", { value: true });
-  	types$2.Def = void 0;
-  	var tslib_1 = require$$0;
-  	var Op = Object.prototype;
-  	var objToStr = Op.toString;
-  	var hasOwn = Op.hasOwnProperty;
-  	var BaseType = /** @class */ (function () {
-  	    function BaseType() {
-  	    }
-  	    BaseType.prototype.assert = function (value, deep) {
-  	        if (!this.check(value, deep)) {
-  	            var str = shallowStringify(value);
-  	            throw new Error(str + " does not match type " + this);
-  	        }
-  	        return true;
-  	    };
-  	    BaseType.prototype.arrayOf = function () {
-  	        var elemType = this;
-  	        return new ArrayType(elemType);
-  	    };
-  	    return BaseType;
-  	}());
-  	var ArrayType = /** @class */ (function (_super) {
-  	    tslib_1.__extends(ArrayType, _super);
-  	    function ArrayType(elemType) {
-  	        var _this = _super.call(this) || this;
-  	        _this.elemType = elemType;
-  	        _this.kind = "ArrayType";
-  	        return _this;
-  	    }
-  	    ArrayType.prototype.toString = function () {
-  	        return "[" + this.elemType + "]";
-  	    };
-  	    ArrayType.prototype.check = function (value, deep) {
-  	        var _this = this;
-  	        return Array.isArray(value) && value.every(function (elem) { return _this.elemType.check(elem, deep); });
-  	    };
-  	    return ArrayType;
-  	}(BaseType));
-  	var IdentityType = /** @class */ (function (_super) {
-  	    tslib_1.__extends(IdentityType, _super);
-  	    function IdentityType(value) {
-  	        var _this = _super.call(this) || this;
-  	        _this.value = value;
-  	        _this.kind = "IdentityType";
-  	        return _this;
-  	    }
-  	    IdentityType.prototype.toString = function () {
-  	        return String(this.value);
-  	    };
-  	    IdentityType.prototype.check = function (value, deep) {
-  	        var result = value === this.value;
-  	        if (!result && typeof deep === "function") {
-  	            deep(this, value);
-  	        }
-  	        return result;
-  	    };
-  	    return IdentityType;
-  	}(BaseType));
-  	var ObjectType = /** @class */ (function (_super) {
-  	    tslib_1.__extends(ObjectType, _super);
-  	    function ObjectType(fields) {
-  	        var _this = _super.call(this) || this;
-  	        _this.fields = fields;
-  	        _this.kind = "ObjectType";
-  	        return _this;
-  	    }
-  	    ObjectType.prototype.toString = function () {
-  	        return "{ " + this.fields.join(", ") + " }";
-  	    };
-  	    ObjectType.prototype.check = function (value, deep) {
-  	        return (objToStr.call(value) === objToStr.call({}) &&
-  	            this.fields.every(function (field) {
-  	                return field.type.check(value[field.name], deep);
-  	            }));
-  	    };
-  	    return ObjectType;
-  	}(BaseType));
-  	var OrType = /** @class */ (function (_super) {
-  	    tslib_1.__extends(OrType, _super);
-  	    function OrType(types) {
-  	        var _this = _super.call(this) || this;
-  	        _this.types = types;
-  	        _this.kind = "OrType";
-  	        return _this;
-  	    }
-  	    OrType.prototype.toString = function () {
-  	        return this.types.join(" | ");
-  	    };
-  	    OrType.prototype.check = function (value, deep) {
-  	        return this.types.some(function (type) {
-  	            return type.check(value, deep);
-  	        });
-  	    };
-  	    return OrType;
-  	}(BaseType));
-  	var PredicateType = /** @class */ (function (_super) {
-  	    tslib_1.__extends(PredicateType, _super);
-  	    function PredicateType(name, predicate) {
-  	        var _this = _super.call(this) || this;
-  	        _this.name = name;
-  	        _this.predicate = predicate;
-  	        _this.kind = "PredicateType";
-  	        return _this;
-  	    }
-  	    PredicateType.prototype.toString = function () {
-  	        return this.name;
-  	    };
-  	    PredicateType.prototype.check = function (value, deep) {
-  	        var result = this.predicate(value, deep);
-  	        if (!result && typeof deep === "function") {
-  	            deep(this, value);
-  	        }
-  	        return result;
-  	    };
-  	    return PredicateType;
-  	}(BaseType));
-  	var Def = /** @class */ (function () {
-  	    function Def(type, typeName) {
-  	        this.type = type;
-  	        this.typeName = typeName;
-  	        this.baseNames = [];
-  	        this.ownFields = Object.create(null);
-  	        // Includes own typeName. Populated during finalization.
-  	        this.allSupertypes = Object.create(null);
-  	        // Linear inheritance hierarchy. Populated during finalization.
-  	        this.supertypeList = [];
-  	        // Includes inherited fields.
-  	        this.allFields = Object.create(null);
-  	        // Non-hidden keys of allFields.
-  	        this.fieldNames = [];
-  	        // This property will be overridden as true by individual Def instances
-  	        // when they are finalized.
-  	        this.finalized = false;
-  	        // False by default until .build(...) is called on an instance.
-  	        this.buildable = false;
-  	        this.buildParams = [];
-  	    }
-  	    Def.prototype.isSupertypeOf = function (that) {
-  	        if (that instanceof Def) {
-  	            if (this.finalized !== true ||
-  	                that.finalized !== true) {
-  	                throw new Error("");
-  	            }
-  	            return hasOwn.call(that.allSupertypes, this.typeName);
-  	        }
-  	        else {
-  	            throw new Error(that + " is not a Def");
-  	        }
-  	    };
-  	    Def.prototype.checkAllFields = function (value, deep) {
-  	        var allFields = this.allFields;
-  	        if (this.finalized !== true) {
-  	            throw new Error("" + this.typeName);
-  	        }
-  	        function checkFieldByName(name) {
-  	            var field = allFields[name];
-  	            var type = field.type;
-  	            var child = field.getValue(value);
-  	            return type.check(child, deep);
-  	        }
-  	        return value !== null &&
-  	            typeof value === "object" &&
-  	            Object.keys(allFields).every(checkFieldByName);
-  	    };
-  	    Def.prototype.bases = function () {
-  	        var supertypeNames = [];
-  	        for (var _i = 0; _i < arguments.length; _i++) {
-  	            supertypeNames[_i] = arguments[_i];
-  	        }
-  	        var bases = this.baseNames;
-  	        if (this.finalized) {
-  	            if (supertypeNames.length !== bases.length) {
-  	                throw new Error("");
-  	            }
-  	            for (var i = 0; i < supertypeNames.length; i++) {
-  	                if (supertypeNames[i] !== bases[i]) {
-  	                    throw new Error("");
-  	                }
-  	            }
-  	            return this;
-  	        }
-  	        supertypeNames.forEach(function (baseName) {
-  	            // This indexOf lookup may be O(n), but the typical number of base
-  	            // names is very small, and indexOf is a native Array method.
-  	            if (bases.indexOf(baseName) < 0) {
-  	                bases.push(baseName);
-  	            }
-  	        });
-  	        return this; // For chaining.
-  	    };
-  	    return Def;
-  	}());
-  	types$2.Def = Def;
-  	var Field = /** @class */ (function () {
-  	    function Field(name, type, defaultFn, hidden) {
-  	        this.name = name;
-  	        this.type = type;
-  	        this.defaultFn = defaultFn;
-  	        this.hidden = !!hidden;
-  	    }
-  	    Field.prototype.toString = function () {
-  	        return JSON.stringify(this.name) + ": " + this.type;
-  	    };
-  	    Field.prototype.getValue = function (obj) {
-  	        var value = obj[this.name];
-  	        if (typeof value !== "undefined") {
-  	            return value;
-  	        }
-  	        if (typeof this.defaultFn === "function") {
-  	            value = this.defaultFn.call(obj);
-  	        }
-  	        return value;
-  	    };
-  	    return Field;
-  	}());
-  	function shallowStringify(value) {
-  	    if (Array.isArray(value)) {
-  	        return "[" + value.map(shallowStringify).join(", ") + "]";
-  	    }
-  	    if (value && typeof value === "object") {
-  	        return "{ " + Object.keys(value).map(function (key) {
-  	            return key + ": " + value[key];
-  	        }).join(", ") + " }";
-  	    }
-  	    return JSON.stringify(value);
-  	}
-  	function typesPlugin(_fork) {
-  	    var Type = {
-  	        or: function () {
-  	            var types = [];
-  	            for (var _i = 0; _i < arguments.length; _i++) {
-  	                types[_i] = arguments[_i];
-  	            }
-  	            return new OrType(types.map(function (type) { return Type.from(type); }));
-  	        },
-  	        from: function (value, name) {
-  	            if (value instanceof ArrayType ||
-  	                value instanceof IdentityType ||
-  	                value instanceof ObjectType ||
-  	                value instanceof OrType ||
-  	                value instanceof PredicateType) {
-  	                return value;
-  	            }
-  	            // The Def type is used as a helper for constructing compound
-  	            // interface types for AST nodes.
-  	            if (value instanceof Def) {
-  	                return value.type;
-  	            }
-  	            // Support [ElemType] syntax.
-  	            if (isArray.check(value)) {
-  	                if (value.length !== 1) {
-  	                    throw new Error("only one element type is permitted for typed arrays");
-  	                }
-  	                return new ArrayType(Type.from(value[0]));
-  	            }
-  	            // Support { someField: FieldType, ... } syntax.
-  	            if (isObject.check(value)) {
-  	                return new ObjectType(Object.keys(value).map(function (name) {
-  	                    return new Field(name, Type.from(value[name], name));
-  	                }));
-  	            }
-  	            if (typeof value === "function") {
-  	                var bicfIndex = builtInCtorFns.indexOf(value);
-  	                if (bicfIndex >= 0) {
-  	                    return builtInCtorTypes[bicfIndex];
-  	                }
-  	                if (typeof name !== "string") {
-  	                    throw new Error("missing name");
-  	                }
-  	                return new PredicateType(name, value);
-  	            }
-  	            // As a last resort, toType returns a type that matches any value that
-  	            // is === from. This is primarily useful for literal values like
-  	            // toType(null), but it has the additional advantage of allowing
-  	            // toType to be a total function.
-  	            return new IdentityType(value);
-  	        },
-  	        // Define a type whose name is registered in a namespace (the defCache) so
-  	        // that future definitions will return the same type given the same name.
-  	        // In particular, this system allows for circular and forward definitions.
-  	        // The Def object d returned from Type.def may be used to configure the
-  	        // type d.type by calling methods such as d.bases, d.build, and d.field.
-  	        def: function (typeName) {
-  	            return hasOwn.call(defCache, typeName)
-  	                ? defCache[typeName]
-  	                : defCache[typeName] = new DefImpl(typeName);
-  	        },
-  	        hasDef: function (typeName) {
-  	            return hasOwn.call(defCache, typeName);
-  	        }
-  	    };
-  	    var builtInCtorFns = [];
-  	    var builtInCtorTypes = [];
-  	    function defBuiltInType(name, example) {
-  	        var objStr = objToStr.call(example);
-  	        var type = new PredicateType(name, function (value) { return objToStr.call(value) === objStr; });
-  	        if (example && typeof example.constructor === "function") {
-  	            builtInCtorFns.push(example.constructor);
-  	            builtInCtorTypes.push(type);
-  	        }
-  	        return type;
-  	    }
-  	    // These types check the underlying [[Class]] attribute of the given
-  	    // value, rather than using the problematic typeof operator. Note however
-  	    // that no subtyping is considered; so, for instance, isObject.check
-  	    // returns false for [], /./, new Date, and null.
-  	    var isString = defBuiltInType("string", "truthy");
-  	    var isFunction = defBuiltInType("function", function () { });
-  	    var isArray = defBuiltInType("array", []);
-  	    var isObject = defBuiltInType("object", {});
-  	    var isRegExp = defBuiltInType("RegExp", /./);
-  	    var isDate = defBuiltInType("Date", new Date());
-  	    var isNumber = defBuiltInType("number", 3);
-  	    var isBoolean = defBuiltInType("boolean", true);
-  	    var isNull = defBuiltInType("null", null);
-  	    var isUndefined = defBuiltInType("undefined", undefined);
-  	    var builtInTypes = {
-  	        string: isString,
-  	        function: isFunction,
-  	        array: isArray,
-  	        object: isObject,
-  	        RegExp: isRegExp,
-  	        Date: isDate,
-  	        number: isNumber,
-  	        boolean: isBoolean,
-  	        null: isNull,
-  	        undefined: isUndefined,
-  	    };
-  	    // In order to return the same Def instance every time Type.def is called
-  	    // with a particular name, those instances need to be stored in a cache.
-  	    var defCache = Object.create(null);
-  	    function defFromValue(value) {
-  	        if (value && typeof value === "object") {
-  	            var type = value.type;
-  	            if (typeof type === "string" &&
-  	                hasOwn.call(defCache, type)) {
-  	                var d = defCache[type];
-  	                if (d.finalized) {
-  	                    return d;
-  	                }
-  	            }
-  	        }
-  	        return null;
-  	    }
-  	    var DefImpl = /** @class */ (function (_super) {
-  	        tslib_1.__extends(DefImpl, _super);
-  	        function DefImpl(typeName) {
-  	            var _this = _super.call(this, new PredicateType(typeName, function (value, deep) { return _this.check(value, deep); }), typeName) || this;
-  	            return _this;
-  	        }
-  	        DefImpl.prototype.check = function (value, deep) {
-  	            if (this.finalized !== true) {
-  	                throw new Error("prematurely checking unfinalized type " + this.typeName);
-  	            }
-  	            // A Def type can only match an object value.
-  	            if (value === null || typeof value !== "object") {
-  	                return false;
-  	            }
-  	            var vDef = defFromValue(value);
-  	            if (!vDef) {
-  	                // If we couldn't infer the Def associated with the given value,
-  	                // and we expected it to be a SourceLocation or a Position, it was
-  	                // probably just missing a "type" field (because Esprima does not
-  	                // assign a type property to such nodes). Be optimistic and let
-  	                // this.checkAllFields make the final decision.
-  	                if (this.typeName === "SourceLocation" ||
-  	                    this.typeName === "Position") {
-  	                    return this.checkAllFields(value, deep);
-  	                }
-  	                // Calling this.checkAllFields for any other type of node is both
-  	                // bad for performance and way too forgiving.
-  	                return false;
-  	            }
-  	            // If checking deeply and vDef === this, then we only need to call
-  	            // checkAllFields once. Calling checkAllFields is too strict when deep
-  	            // is false, because then we only care about this.isSupertypeOf(vDef).
-  	            if (deep && vDef === this) {
-  	                return this.checkAllFields(value, deep);
-  	            }
-  	            // In most cases we rely exclusively on isSupertypeOf to make O(1)
-  	            // subtyping determinations. This suffices in most situations outside
-  	            // of unit tests, since interface conformance is checked whenever new
-  	            // instances are created using builder functions.
-  	            if (!this.isSupertypeOf(vDef)) {
-  	                return false;
-  	            }
-  	            // The exception is when deep is true; then, we recursively check all
-  	            // fields.
-  	            if (!deep) {
-  	                return true;
-  	            }
-  	            // Use the more specific Def (vDef) to perform the deep check, but
-  	            // shallow-check fields defined by the less specific Def (this).
-  	            return vDef.checkAllFields(value, deep)
-  	                && this.checkAllFields(value, false);
-  	        };
-  	        DefImpl.prototype.build = function () {
-  	            var _this = this;
-  	            var buildParams = [];
-  	            for (var _i = 0; _i < arguments.length; _i++) {
-  	                buildParams[_i] = arguments[_i];
-  	            }
-  	            // Calling Def.prototype.build multiple times has the effect of merely
-  	            // redefining this property.
-  	            this.buildParams = buildParams;
-  	            if (this.buildable) {
-  	                // If this Def is already buildable, update self.buildParams and
-  	                // continue using the old builder function.
-  	                return this;
-  	            }
-  	            // Every buildable type will have its "type" field filled in
-  	            // automatically. This includes types that are not subtypes of Node,
-  	            // like SourceLocation, but that seems harmless (TODO?).
-  	            this.field("type", String, function () { return _this.typeName; });
-  	            // Override Dp.buildable for this Def instance.
-  	            this.buildable = true;
-  	            var addParam = function (built, param, arg, isArgAvailable) {
-  	                if (hasOwn.call(built, param))
-  	                    return;
-  	                var all = _this.allFields;
-  	                if (!hasOwn.call(all, param)) {
-  	                    throw new Error("" + param);
-  	                }
-  	                var field = all[param];
-  	                var type = field.type;
-  	                var value;
-  	                if (isArgAvailable) {
-  	                    value = arg;
-  	                }
-  	                else if (field.defaultFn) {
-  	                    // Expose the partially-built object to the default
-  	                    // function as its `this` object.
-  	                    value = field.defaultFn.call(built);
-  	                }
-  	                else {
-  	                    var message = "no value or default function given for field " +
-  	                        JSON.stringify(param) + " of " + _this.typeName + "(" +
-  	                        _this.buildParams.map(function (name) {
-  	                            return all[name];
-  	                        }).join(", ") + ")";
-  	                    throw new Error(message);
-  	                }
-  	                if (!type.check(value)) {
-  	                    throw new Error(shallowStringify(value) +
-  	                        " does not match field " + field +
-  	                        " of type " + _this.typeName);
-  	                }
-  	                built[param] = value;
-  	            };
-  	            // Calling the builder function will construct an instance of the Def,
-  	            // with positional arguments mapped to the fields original passed to .build.
-  	            // If not enough arguments are provided, the default value for the remaining fields
-  	            // will be used.
-  	            var builder = function () {
-  	                var args = [];
-  	                for (var _i = 0; _i < arguments.length; _i++) {
-  	                    args[_i] = arguments[_i];
-  	                }
-  	                var argc = args.length;
-  	                if (!_this.finalized) {
-  	                    throw new Error("attempting to instantiate unfinalized type " +
-  	                        _this.typeName);
-  	                }
-  	                var built = Object.create(nodePrototype);
-  	                _this.buildParams.forEach(function (param, i) {
-  	                    if (i < argc) {
-  	                        addParam(built, param, args[i], true);
-  	                    }
-  	                    else {
-  	                        addParam(built, param, null, false);
-  	                    }
-  	                });
-  	                Object.keys(_this.allFields).forEach(function (param) {
-  	                    // Use the default value.
-  	                    addParam(built, param, null, false);
-  	                });
-  	                // Make sure that the "type" field was filled automatically.
-  	                if (built.type !== _this.typeName) {
-  	                    throw new Error("");
-  	                }
-  	                return built;
-  	            };
-  	            // Calling .from on the builder function will construct an instance of the Def,
-  	            // using field values from the passed object. For fields missing from the passed object,
-  	            // their default value will be used.
-  	            builder.from = function (obj) {
-  	                if (!_this.finalized) {
-  	                    throw new Error("attempting to instantiate unfinalized type " +
-  	                        _this.typeName);
-  	                }
-  	                var built = Object.create(nodePrototype);
-  	                Object.keys(_this.allFields).forEach(function (param) {
-  	                    if (hasOwn.call(obj, param)) {
-  	                        addParam(built, param, obj[param], true);
-  	                    }
-  	                    else {
-  	                        addParam(built, param, null, false);
-  	                    }
-  	                });
-  	                // Make sure that the "type" field was filled automatically.
-  	                if (built.type !== _this.typeName) {
-  	                    throw new Error("");
-  	                }
-  	                return built;
-  	            };
-  	            Object.defineProperty(builders, getBuilderName(this.typeName), {
-  	                enumerable: true,
-  	                value: builder
-  	            });
-  	            return this;
-  	        };
-  	        // The reason fields are specified using .field(...) instead of an object
-  	        // literal syntax is somewhat subtle: the object literal syntax would
-  	        // support only one key and one value, but with .field(...) we can pass
-  	        // any number of arguments to specify the field.
-  	        DefImpl.prototype.field = function (name, type, defaultFn, hidden) {
-  	            if (this.finalized) {
-  	                console.error("Ignoring attempt to redefine field " +
-  	                    JSON.stringify(name) + " of finalized type " +
-  	                    JSON.stringify(this.typeName));
-  	                return this;
-  	            }
-  	            this.ownFields[name] = new Field(name, Type.from(type), defaultFn, hidden);
-  	            return this; // For chaining.
-  	        };
-  	        DefImpl.prototype.finalize = function () {
-  	            var _this = this;
-  	            // It's not an error to finalize a type more than once, but only the
-  	            // first call to .finalize does anything.
-  	            if (!this.finalized) {
-  	                var allFields = this.allFields;
-  	                var allSupertypes = this.allSupertypes;
-  	                this.baseNames.forEach(function (name) {
-  	                    var def = defCache[name];
-  	                    if (def instanceof Def) {
-  	                        def.finalize();
-  	                        extend(allFields, def.allFields);
-  	                        extend(allSupertypes, def.allSupertypes);
-  	                    }
-  	                    else {
-  	                        var message = "unknown supertype name " +
-  	                            JSON.stringify(name) +
-  	                            " for subtype " +
-  	                            JSON.stringify(_this.typeName);
-  	                        throw new Error(message);
-  	                    }
-  	                });
-  	                // TODO Warn if fields are overridden with incompatible types.
-  	                extend(allFields, this.ownFields);
-  	                allSupertypes[this.typeName] = this;
-  	                this.fieldNames.length = 0;
-  	                for (var fieldName in allFields) {
-  	                    if (hasOwn.call(allFields, fieldName) &&
-  	                        !allFields[fieldName].hidden) {
-  	                        this.fieldNames.push(fieldName);
-  	                    }
-  	                }
-  	                // Types are exported only once they have been finalized.
-  	                Object.defineProperty(namedTypes, this.typeName, {
-  	                    enumerable: true,
-  	                    value: this.type
-  	                });
-  	                this.finalized = true;
-  	                // A linearization of the inheritance hierarchy.
-  	                populateSupertypeList(this.typeName, this.supertypeList);
-  	                if (this.buildable &&
-  	                    this.supertypeList.lastIndexOf("Expression") >= 0) {
-  	                    wrapExpressionBuilderWithStatement(this.typeName);
-  	                }
-  	            }
-  	        };
-  	        return DefImpl;
-  	    }(Def));
-  	    // Note that the list returned by this function is a copy of the internal
-  	    // supertypeList, *without* the typeName itself as the first element.
-  	    function getSupertypeNames(typeName) {
-  	        if (!hasOwn.call(defCache, typeName)) {
-  	            throw new Error("");
-  	        }
-  	        var d = defCache[typeName];
-  	        if (d.finalized !== true) {
-  	            throw new Error("");
-  	        }
-  	        return d.supertypeList.slice(1);
-  	    }
-  	    // Returns an object mapping from every known type in the defCache to the
-  	    // most specific supertype whose name is an own property of the candidates
-  	    // object.
-  	    function computeSupertypeLookupTable(candidates) {
-  	        var table = {};
-  	        var typeNames = Object.keys(defCache);
-  	        var typeNameCount = typeNames.length;
-  	        for (var i = 0; i < typeNameCount; ++i) {
-  	            var typeName = typeNames[i];
-  	            var d = defCache[typeName];
-  	            if (d.finalized !== true) {
-  	                throw new Error("" + typeName);
-  	            }
-  	            for (var j = 0; j < d.supertypeList.length; ++j) {
-  	                var superTypeName = d.supertypeList[j];
-  	                if (hasOwn.call(candidates, superTypeName)) {
-  	                    table[typeName] = superTypeName;
-  	                    break;
-  	                }
-  	            }
-  	        }
-  	        return table;
-  	    }
-  	    var builders = Object.create(null);
-  	    // This object is used as prototype for any node created by a builder.
-  	    var nodePrototype = {};
-  	    // Call this function to define a new method to be shared by all AST
-  	    // nodes. The replaced method (if any) is returned for easy wrapping.
-  	    function defineMethod(name, func) {
-  	        var old = nodePrototype[name];
-  	        // Pass undefined as func to delete nodePrototype[name].
-  	        if (isUndefined.check(func)) {
-  	            delete nodePrototype[name];
-  	        }
-  	        else {
-  	            isFunction.assert(func);
-  	            Object.defineProperty(nodePrototype, name, {
-  	                enumerable: true,
-  	                configurable: true,
-  	                value: func
-  	            });
-  	        }
-  	        return old;
-  	    }
-  	    function getBuilderName(typeName) {
-  	        return typeName.replace(/^[A-Z]+/, function (upperCasePrefix) {
-  	            var len = upperCasePrefix.length;
-  	            switch (len) {
-  	                case 0: return "";
-  	                // If there's only one initial capital letter, just lower-case it.
-  	                case 1: return upperCasePrefix.toLowerCase();
-  	                default:
-  	                    // If there's more than one initial capital letter, lower-case
-  	                    // all but the last one, so that XMLDefaultDeclaration (for
-  	                    // example) becomes xmlDefaultDeclaration.
-  	                    return upperCasePrefix.slice(0, len - 1).toLowerCase() +
-  	                        upperCasePrefix.charAt(len - 1);
-  	            }
-  	        });
-  	    }
-  	    function getStatementBuilderName(typeName) {
-  	        typeName = getBuilderName(typeName);
-  	        return typeName.replace(/(Expression)?$/, "Statement");
-  	    }
-  	    var namedTypes = {};
-  	    // Like Object.keys, but aware of what fields each AST type should have.
-  	    function getFieldNames(object) {
-  	        var d = defFromValue(object);
-  	        if (d) {
-  	            return d.fieldNames.slice(0);
-  	        }
-  	        if ("type" in object) {
-  	            throw new Error("did not recognize object of type " +
-  	                JSON.stringify(object.type));
-  	        }
-  	        return Object.keys(object);
-  	    }
-  	    // Get the value of an object property, taking object.type and default
-  	    // functions into account.
-  	    function getFieldValue(object, fieldName) {
-  	        var d = defFromValue(object);
-  	        if (d) {
-  	            var field = d.allFields[fieldName];
-  	            if (field) {
-  	                return field.getValue(object);
-  	            }
-  	        }
-  	        return object && object[fieldName];
-  	    }
-  	    // Iterate over all defined fields of an object, including those missing
-  	    // or undefined, passing each field name and effective value (as returned
-  	    // by getFieldValue) to the callback. If the object has no corresponding
-  	    // Def, the callback will never be called.
-  	    function eachField(object, callback, context) {
-  	        getFieldNames(object).forEach(function (name) {
-  	            callback.call(this, name, getFieldValue(object, name));
-  	        }, context);
-  	    }
-  	    // Similar to eachField, except that iteration stops as soon as the
-  	    // callback returns a truthy value. Like Array.prototype.some, the final
-  	    // result is either true or false to indicates whether the callback
-  	    // returned true for any element or not.
-  	    function someField(object, callback, context) {
-  	        return getFieldNames(object).some(function (name) {
-  	            return callback.call(this, name, getFieldValue(object, name));
-  	        }, context);
-  	    }
-  	    // Adds an additional builder for Expression subtypes
-  	    // that wraps the built Expression in an ExpressionStatements.
-  	    function wrapExpressionBuilderWithStatement(typeName) {
-  	        var wrapperName = getStatementBuilderName(typeName);
-  	        // skip if the builder already exists
-  	        if (builders[wrapperName])
-  	            return;
-  	        // the builder function to wrap with builders.ExpressionStatement
-  	        var wrapped = builders[getBuilderName(typeName)];
-  	        // skip if there is nothing to wrap
-  	        if (!wrapped)
-  	            return;
-  	        var builder = function () {
-  	            var args = [];
-  	            for (var _i = 0; _i < arguments.length; _i++) {
-  	                args[_i] = arguments[_i];
-  	            }
-  	            return builders.expressionStatement(wrapped.apply(builders, args));
-  	        };
-  	        builder.from = function () {
-  	            var args = [];
-  	            for (var _i = 0; _i < arguments.length; _i++) {
-  	                args[_i] = arguments[_i];
-  	            }
-  	            return builders.expressionStatement(wrapped.from.apply(builders, args));
-  	        };
-  	        builders[wrapperName] = builder;
-  	    }
-  	    function populateSupertypeList(typeName, list) {
-  	        list.length = 0;
-  	        list.push(typeName);
-  	        var lastSeen = Object.create(null);
-  	        for (var pos = 0; pos < list.length; ++pos) {
-  	            typeName = list[pos];
-  	            var d = defCache[typeName];
-  	            if (d.finalized !== true) {
-  	                throw new Error("");
-  	            }
-  	            // If we saw typeName earlier in the breadth-first traversal,
-  	            // delete the last-seen occurrence.
-  	            if (hasOwn.call(lastSeen, typeName)) {
-  	                delete list[lastSeen[typeName]];
-  	            }
-  	            // Record the new index of the last-seen occurrence of typeName.
-  	            lastSeen[typeName] = pos;
-  	            // Enqueue the base names of this type.
-  	            list.push.apply(list, d.baseNames);
-  	        }
-  	        // Compaction loop to remove array holes.
-  	        for (var to = 0, from = to, len = list.length; from < len; ++from) {
-  	            if (hasOwn.call(list, from)) {
-  	                list[to++] = list[from];
-  	            }
-  	        }
-  	        list.length = to;
-  	    }
-  	    function extend(into, from) {
-  	        Object.keys(from).forEach(function (name) {
-  	            into[name] = from[name];
-  	        });
-  	        return into;
-  	    }
-  	    function finalize() {
-  	        Object.keys(defCache).forEach(function (name) {
-  	            defCache[name].finalize();
-  	        });
-  	    }
-  	    return {
-  	        Type: Type,
-  	        builtInTypes: builtInTypes,
-  	        getSupertypeNames: getSupertypeNames,
-  	        computeSupertypeLookupTable: computeSupertypeLookupTable,
-  	        builders: builders,
-  	        defineMethod: defineMethod,
-  	        getBuilderName: getBuilderName,
-  	        getStatementBuilderName: getStatementBuilderName,
-  	        namedTypes: namedTypes,
-  	        getFieldNames: getFieldNames,
-  	        getFieldValue: getFieldValue,
-  	        eachField: eachField,
-  	        someField: someField,
-  	        finalize: finalize,
-  	    };
-  	}
-  	types$2.default = typesPlugin;
-  	return types$2;
+  	(function (module, exports) {
+  		Object.defineProperty(exports, "__esModule", { value: true });
+  		exports.Def = void 0;
+  		var tslib_1 = require$$0;
+  		var shared_1 = requireShared();
+  		var Op = Object.prototype;
+  		var objToStr = Op.toString;
+  		var hasOwn = Op.hasOwnProperty;
+  		var BaseType = /** @class */ (function () {
+  		    function BaseType() {
+  		    }
+  		    BaseType.prototype.assert = function (value, deep) {
+  		        if (!this.check(value, deep)) {
+  		            var str = shallowStringify(value);
+  		            throw new Error(str + " does not match type " + this);
+  		        }
+  		        return true;
+  		    };
+  		    BaseType.prototype.arrayOf = function () {
+  		        var elemType = this;
+  		        return new ArrayType(elemType);
+  		    };
+  		    return BaseType;
+  		}());
+  		var ArrayType = /** @class */ (function (_super) {
+  		    tslib_1.__extends(ArrayType, _super);
+  		    function ArrayType(elemType) {
+  		        var _this = _super.call(this) || this;
+  		        _this.elemType = elemType;
+  		        _this.kind = "ArrayType";
+  		        return _this;
+  		    }
+  		    ArrayType.prototype.toString = function () {
+  		        return "[" + this.elemType + "]";
+  		    };
+  		    ArrayType.prototype.check = function (value, deep) {
+  		        var _this = this;
+  		        return Array.isArray(value) && value.every(function (elem) { return _this.elemType.check(elem, deep); });
+  		    };
+  		    return ArrayType;
+  		}(BaseType));
+  		var IdentityType = /** @class */ (function (_super) {
+  		    tslib_1.__extends(IdentityType, _super);
+  		    function IdentityType(value) {
+  		        var _this = _super.call(this) || this;
+  		        _this.value = value;
+  		        _this.kind = "IdentityType";
+  		        return _this;
+  		    }
+  		    IdentityType.prototype.toString = function () {
+  		        return String(this.value);
+  		    };
+  		    IdentityType.prototype.check = function (value, deep) {
+  		        var result = value === this.value;
+  		        if (!result && typeof deep === "function") {
+  		            deep(this, value);
+  		        }
+  		        return result;
+  		    };
+  		    return IdentityType;
+  		}(BaseType));
+  		var ObjectType = /** @class */ (function (_super) {
+  		    tslib_1.__extends(ObjectType, _super);
+  		    function ObjectType(fields) {
+  		        var _this = _super.call(this) || this;
+  		        _this.fields = fields;
+  		        _this.kind = "ObjectType";
+  		        return _this;
+  		    }
+  		    ObjectType.prototype.toString = function () {
+  		        return "{ " + this.fields.join(", ") + " }";
+  		    };
+  		    ObjectType.prototype.check = function (value, deep) {
+  		        return (objToStr.call(value) === objToStr.call({}) &&
+  		            this.fields.every(function (field) {
+  		                return field.type.check(value[field.name], deep);
+  		            }));
+  		    };
+  		    return ObjectType;
+  		}(BaseType));
+  		var OrType = /** @class */ (function (_super) {
+  		    tslib_1.__extends(OrType, _super);
+  		    function OrType(types) {
+  		        var _this = _super.call(this) || this;
+  		        _this.types = types;
+  		        _this.kind = "OrType";
+  		        return _this;
+  		    }
+  		    OrType.prototype.toString = function () {
+  		        return this.types.join(" | ");
+  		    };
+  		    OrType.prototype.check = function (value, deep) {
+  		        if (this.types.some(function (type) { return type.check(value, !!deep); })) {
+  		            return true;
+  		        }
+  		        if (typeof deep === "function") {
+  		            deep(this, value);
+  		        }
+  		        return false;
+  		    };
+  		    return OrType;
+  		}(BaseType));
+  		var PredicateType = /** @class */ (function (_super) {
+  		    tslib_1.__extends(PredicateType, _super);
+  		    function PredicateType(name, predicate) {
+  		        var _this = _super.call(this) || this;
+  		        _this.name = name;
+  		        _this.predicate = predicate;
+  		        _this.kind = "PredicateType";
+  		        return _this;
+  		    }
+  		    PredicateType.prototype.toString = function () {
+  		        return this.name;
+  		    };
+  		    PredicateType.prototype.check = function (value, deep) {
+  		        var result = this.predicate(value, deep);
+  		        if (!result && typeof deep === "function") {
+  		            deep(this, value);
+  		        }
+  		        return result;
+  		    };
+  		    return PredicateType;
+  		}(BaseType));
+  		var Def = /** @class */ (function () {
+  		    function Def(type, typeName) {
+  		        this.type = type;
+  		        this.typeName = typeName;
+  		        this.baseNames = [];
+  		        this.ownFields = Object.create(null);
+  		        // Includes own typeName. Populated during finalization.
+  		        this.allSupertypes = Object.create(null);
+  		        // Linear inheritance hierarchy. Populated during finalization.
+  		        this.supertypeList = [];
+  		        // Includes inherited fields.
+  		        this.allFields = Object.create(null);
+  		        // Non-hidden keys of allFields.
+  		        this.fieldNames = [];
+  		        // This property will be overridden as true by individual Def instances
+  		        // when they are finalized.
+  		        this.finalized = false;
+  		        // False by default until .build(...) is called on an instance.
+  		        this.buildable = false;
+  		        this.buildParams = [];
+  		    }
+  		    Def.prototype.isSupertypeOf = function (that) {
+  		        if (that instanceof Def) {
+  		            if (this.finalized !== true ||
+  		                that.finalized !== true) {
+  		                throw new Error("");
+  		            }
+  		            return hasOwn.call(that.allSupertypes, this.typeName);
+  		        }
+  		        else {
+  		            throw new Error(that + " is not a Def");
+  		        }
+  		    };
+  		    Def.prototype.checkAllFields = function (value, deep) {
+  		        var allFields = this.allFields;
+  		        if (this.finalized !== true) {
+  		            throw new Error("" + this.typeName);
+  		        }
+  		        function checkFieldByName(name) {
+  		            var field = allFields[name];
+  		            var type = field.type;
+  		            var child = field.getValue(value);
+  		            return type.check(child, deep);
+  		        }
+  		        return value !== null &&
+  		            typeof value === "object" &&
+  		            Object.keys(allFields).every(checkFieldByName);
+  		    };
+  		    Def.prototype.bases = function () {
+  		        var supertypeNames = [];
+  		        for (var _i = 0; _i < arguments.length; _i++) {
+  		            supertypeNames[_i] = arguments[_i];
+  		        }
+  		        var bases = this.baseNames;
+  		        if (this.finalized) {
+  		            if (supertypeNames.length !== bases.length) {
+  		                throw new Error("");
+  		            }
+  		            for (var i = 0; i < supertypeNames.length; i++) {
+  		                if (supertypeNames[i] !== bases[i]) {
+  		                    throw new Error("");
+  		                }
+  		            }
+  		            return this;
+  		        }
+  		        supertypeNames.forEach(function (baseName) {
+  		            // This indexOf lookup may be O(n), but the typical number of base
+  		            // names is very small, and indexOf is a native Array method.
+  		            if (bases.indexOf(baseName) < 0) {
+  		                bases.push(baseName);
+  		            }
+  		        });
+  		        return this; // For chaining.
+  		    };
+  		    return Def;
+  		}());
+  		exports.Def = Def;
+  		var Field = /** @class */ (function () {
+  		    function Field(name, type, defaultFn, hidden) {
+  		        this.name = name;
+  		        this.type = type;
+  		        this.defaultFn = defaultFn;
+  		        this.hidden = !!hidden;
+  		    }
+  		    Field.prototype.toString = function () {
+  		        return JSON.stringify(this.name) + ": " + this.type;
+  		    };
+  		    Field.prototype.getValue = function (obj) {
+  		        var value = obj[this.name];
+  		        if (typeof value !== "undefined") {
+  		            return value;
+  		        }
+  		        if (typeof this.defaultFn === "function") {
+  		            value = this.defaultFn.call(obj);
+  		        }
+  		        return value;
+  		    };
+  		    return Field;
+  		}());
+  		function shallowStringify(value) {
+  		    if (Array.isArray(value)) {
+  		        return "[" + value.map(shallowStringify).join(", ") + "]";
+  		    }
+  		    if (value && typeof value === "object") {
+  		        return "{ " + Object.keys(value).map(function (key) {
+  		            return key + ": " + value[key];
+  		        }).join(", ") + " }";
+  		    }
+  		    return JSON.stringify(value);
+  		}
+  		function typesPlugin(_fork) {
+  		    var Type = {
+  		        or: function () {
+  		            var types = [];
+  		            for (var _i = 0; _i < arguments.length; _i++) {
+  		                types[_i] = arguments[_i];
+  		            }
+  		            return new OrType(types.map(function (type) { return Type.from(type); }));
+  		        },
+  		        from: function (value, name) {
+  		            if (value instanceof ArrayType ||
+  		                value instanceof IdentityType ||
+  		                value instanceof ObjectType ||
+  		                value instanceof OrType ||
+  		                value instanceof PredicateType) {
+  		                return value;
+  		            }
+  		            // The Def type is used as a helper for constructing compound
+  		            // interface types for AST nodes.
+  		            if (value instanceof Def) {
+  		                return value.type;
+  		            }
+  		            // Support [ElemType] syntax.
+  		            if (isArray.check(value)) {
+  		                if (value.length !== 1) {
+  		                    throw new Error("only one element type is permitted for typed arrays");
+  		                }
+  		                return new ArrayType(Type.from(value[0]));
+  		            }
+  		            // Support { someField: FieldType, ... } syntax.
+  		            if (isObject.check(value)) {
+  		                return new ObjectType(Object.keys(value).map(function (name) {
+  		                    return new Field(name, Type.from(value[name], name));
+  		                }));
+  		            }
+  		            if (typeof value === "function") {
+  		                var bicfIndex = builtInCtorFns.indexOf(value);
+  		                if (bicfIndex >= 0) {
+  		                    return builtInCtorTypes[bicfIndex];
+  		                }
+  		                if (typeof name !== "string") {
+  		                    throw new Error("missing name");
+  		                }
+  		                return new PredicateType(name, value);
+  		            }
+  		            // As a last resort, toType returns a type that matches any value that
+  		            // is === from. This is primarily useful for literal values like
+  		            // toType(null), but it has the additional advantage of allowing
+  		            // toType to be a total function.
+  		            return new IdentityType(value);
+  		        },
+  		        // Define a type whose name is registered in a namespace (the defCache) so
+  		        // that future definitions will return the same type given the same name.
+  		        // In particular, this system allows for circular and forward definitions.
+  		        // The Def object d returned from Type.def may be used to configure the
+  		        // type d.type by calling methods such as d.bases, d.build, and d.field.
+  		        def: function (typeName) {
+  		            return hasOwn.call(defCache, typeName)
+  		                ? defCache[typeName]
+  		                : defCache[typeName] = new DefImpl(typeName);
+  		        },
+  		        hasDef: function (typeName) {
+  		            return hasOwn.call(defCache, typeName);
+  		        }
+  		    };
+  		    var builtInCtorFns = [];
+  		    var builtInCtorTypes = [];
+  		    function defBuiltInType(name, example) {
+  		        var objStr = objToStr.call(example);
+  		        var type = new PredicateType(name, function (value) { return objToStr.call(value) === objStr; });
+  		        if (example && typeof example.constructor === "function") {
+  		            builtInCtorFns.push(example.constructor);
+  		            builtInCtorTypes.push(type);
+  		        }
+  		        return type;
+  		    }
+  		    // These types check the underlying [[Class]] attribute of the given
+  		    // value, rather than using the problematic typeof operator. Note however
+  		    // that no subtyping is considered; so, for instance, isObject.check
+  		    // returns false for [], /./, new Date, and null.
+  		    var isString = defBuiltInType("string", "truthy");
+  		    var isFunction = defBuiltInType("function", function () { });
+  		    var isArray = defBuiltInType("array", []);
+  		    var isObject = defBuiltInType("object", {});
+  		    var isRegExp = defBuiltInType("RegExp", /./);
+  		    var isDate = defBuiltInType("Date", new Date());
+  		    var isNumber = defBuiltInType("number", 3);
+  		    var isBoolean = defBuiltInType("boolean", true);
+  		    var isNull = defBuiltInType("null", null);
+  		    var isUndefined = defBuiltInType("undefined", undefined);
+  		    var isBigInt = typeof BigInt === "function"
+  		        ? defBuiltInType("BigInt", BigInt(1234))
+  		        : new PredicateType("BigInt", function () { return false; });
+  		    var builtInTypes = {
+  		        string: isString,
+  		        function: isFunction,
+  		        array: isArray,
+  		        object: isObject,
+  		        RegExp: isRegExp,
+  		        Date: isDate,
+  		        number: isNumber,
+  		        boolean: isBoolean,
+  		        null: isNull,
+  		        undefined: isUndefined,
+  		        BigInt: isBigInt,
+  		    };
+  		    // In order to return the same Def instance every time Type.def is called
+  		    // with a particular name, those instances need to be stored in a cache.
+  		    var defCache = Object.create(null);
+  		    function defFromValue(value) {
+  		        if (value && typeof value === "object") {
+  		            var type = value.type;
+  		            if (typeof type === "string" &&
+  		                hasOwn.call(defCache, type)) {
+  		                var d = defCache[type];
+  		                if (d.finalized) {
+  		                    return d;
+  		                }
+  		            }
+  		        }
+  		        return null;
+  		    }
+  		    var DefImpl = /** @class */ (function (_super) {
+  		        tslib_1.__extends(DefImpl, _super);
+  		        function DefImpl(typeName) {
+  		            var _this = _super.call(this, new PredicateType(typeName, function (value, deep) { return _this.check(value, deep); }), typeName) || this;
+  		            return _this;
+  		        }
+  		        DefImpl.prototype.check = function (value, deep) {
+  		            if (this.finalized !== true) {
+  		                throw new Error("prematurely checking unfinalized type " + this.typeName);
+  		            }
+  		            // A Def type can only match an object value.
+  		            if (value === null || typeof value !== "object") {
+  		                return false;
+  		            }
+  		            var vDef = defFromValue(value);
+  		            if (!vDef) {
+  		                // If we couldn't infer the Def associated with the given value,
+  		                // and we expected it to be a SourceLocation or a Position, it was
+  		                // probably just missing a "type" field (because Esprima does not
+  		                // assign a type property to such nodes). Be optimistic and let
+  		                // this.checkAllFields make the final decision.
+  		                if (this.typeName === "SourceLocation" ||
+  		                    this.typeName === "Position") {
+  		                    return this.checkAllFields(value, deep);
+  		                }
+  		                // Calling this.checkAllFields for any other type of node is both
+  		                // bad for performance and way too forgiving.
+  		                return false;
+  		            }
+  		            // If checking deeply and vDef === this, then we only need to call
+  		            // checkAllFields once. Calling checkAllFields is too strict when deep
+  		            // is false, because then we only care about this.isSupertypeOf(vDef).
+  		            if (deep && vDef === this) {
+  		                return this.checkAllFields(value, deep);
+  		            }
+  		            // In most cases we rely exclusively on isSupertypeOf to make O(1)
+  		            // subtyping determinations. This suffices in most situations outside
+  		            // of unit tests, since interface conformance is checked whenever new
+  		            // instances are created using builder functions.
+  		            if (!this.isSupertypeOf(vDef)) {
+  		                return false;
+  		            }
+  		            // The exception is when deep is true; then, we recursively check all
+  		            // fields.
+  		            if (!deep) {
+  		                return true;
+  		            }
+  		            // Use the more specific Def (vDef) to perform the deep check, but
+  		            // shallow-check fields defined by the less specific Def (this).
+  		            return vDef.checkAllFields(value, deep)
+  		                && this.checkAllFields(value, false);
+  		        };
+  		        DefImpl.prototype.build = function () {
+  		            var _this = this;
+  		            var buildParams = [];
+  		            for (var _i = 0; _i < arguments.length; _i++) {
+  		                buildParams[_i] = arguments[_i];
+  		            }
+  		            // Calling Def.prototype.build multiple times has the effect of merely
+  		            // redefining this property.
+  		            this.buildParams = buildParams;
+  		            if (this.buildable) {
+  		                // If this Def is already buildable, update self.buildParams and
+  		                // continue using the old builder function.
+  		                return this;
+  		            }
+  		            // Every buildable type will have its "type" field filled in
+  		            // automatically. This includes types that are not subtypes of Node,
+  		            // like SourceLocation, but that seems harmless (TODO?).
+  		            this.field("type", String, function () { return _this.typeName; });
+  		            // Override Dp.buildable for this Def instance.
+  		            this.buildable = true;
+  		            var addParam = function (built, param, arg, isArgAvailable) {
+  		                if (hasOwn.call(built, param))
+  		                    return;
+  		                var all = _this.allFields;
+  		                if (!hasOwn.call(all, param)) {
+  		                    throw new Error("" + param);
+  		                }
+  		                var field = all[param];
+  		                var type = field.type;
+  		                var value;
+  		                if (isArgAvailable) {
+  		                    value = arg;
+  		                }
+  		                else if (field.defaultFn) {
+  		                    // Expose the partially-built object to the default
+  		                    // function as its `this` object.
+  		                    value = field.defaultFn.call(built);
+  		                }
+  		                else {
+  		                    var message = "no value or default function given for field " +
+  		                        JSON.stringify(param) + " of " + _this.typeName + "(" +
+  		                        _this.buildParams.map(function (name) {
+  		                            return all[name];
+  		                        }).join(", ") + ")";
+  		                    throw new Error(message);
+  		                }
+  		                if (!type.check(value)) {
+  		                    throw new Error(shallowStringify(value) +
+  		                        " does not match field " + field +
+  		                        " of type " + _this.typeName);
+  		                }
+  		                built[param] = value;
+  		            };
+  		            // Calling the builder function will construct an instance of the Def,
+  		            // with positional arguments mapped to the fields original passed to .build.
+  		            // If not enough arguments are provided, the default value for the remaining fields
+  		            // will be used.
+  		            var builder = function () {
+  		                var args = [];
+  		                for (var _i = 0; _i < arguments.length; _i++) {
+  		                    args[_i] = arguments[_i];
+  		                }
+  		                var argc = args.length;
+  		                if (!_this.finalized) {
+  		                    throw new Error("attempting to instantiate unfinalized type " +
+  		                        _this.typeName);
+  		                }
+  		                var built = Object.create(nodePrototype);
+  		                _this.buildParams.forEach(function (param, i) {
+  		                    if (i < argc) {
+  		                        addParam(built, param, args[i], true);
+  		                    }
+  		                    else {
+  		                        addParam(built, param, null, false);
+  		                    }
+  		                });
+  		                Object.keys(_this.allFields).forEach(function (param) {
+  		                    // Use the default value.
+  		                    addParam(built, param, null, false);
+  		                });
+  		                // Make sure that the "type" field was filled automatically.
+  		                if (built.type !== _this.typeName) {
+  		                    throw new Error("");
+  		                }
+  		                return built;
+  		            };
+  		            // Calling .from on the builder function will construct an instance of the Def,
+  		            // using field values from the passed object. For fields missing from the passed object,
+  		            // their default value will be used.
+  		            builder.from = function (obj) {
+  		                if (!_this.finalized) {
+  		                    throw new Error("attempting to instantiate unfinalized type " +
+  		                        _this.typeName);
+  		                }
+  		                var built = Object.create(nodePrototype);
+  		                Object.keys(_this.allFields).forEach(function (param) {
+  		                    if (hasOwn.call(obj, param)) {
+  		                        addParam(built, param, obj[param], true);
+  		                    }
+  		                    else {
+  		                        addParam(built, param, null, false);
+  		                    }
+  		                });
+  		                // Make sure that the "type" field was filled automatically.
+  		                if (built.type !== _this.typeName) {
+  		                    throw new Error("");
+  		                }
+  		                return built;
+  		            };
+  		            Object.defineProperty(builders, getBuilderName(this.typeName), {
+  		                enumerable: true,
+  		                value: builder
+  		            });
+  		            return this;
+  		        };
+  		        // The reason fields are specified using .field(...) instead of an object
+  		        // literal syntax is somewhat subtle: the object literal syntax would
+  		        // support only one key and one value, but with .field(...) we can pass
+  		        // any number of arguments to specify the field.
+  		        DefImpl.prototype.field = function (name, type, defaultFn, hidden) {
+  		            if (this.finalized) {
+  		                console.error("Ignoring attempt to redefine field " +
+  		                    JSON.stringify(name) + " of finalized type " +
+  		                    JSON.stringify(this.typeName));
+  		                return this;
+  		            }
+  		            this.ownFields[name] = new Field(name, Type.from(type), defaultFn, hidden);
+  		            return this; // For chaining.
+  		        };
+  		        DefImpl.prototype.finalize = function () {
+  		            var _this = this;
+  		            // It's not an error to finalize a type more than once, but only the
+  		            // first call to .finalize does anything.
+  		            if (!this.finalized) {
+  		                var allFields = this.allFields;
+  		                var allSupertypes = this.allSupertypes;
+  		                this.baseNames.forEach(function (name) {
+  		                    var def = defCache[name];
+  		                    if (def instanceof Def) {
+  		                        def.finalize();
+  		                        extend(allFields, def.allFields);
+  		                        extend(allSupertypes, def.allSupertypes);
+  		                    }
+  		                    else {
+  		                        var message = "unknown supertype name " +
+  		                            JSON.stringify(name) +
+  		                            " for subtype " +
+  		                            JSON.stringify(_this.typeName);
+  		                        throw new Error(message);
+  		                    }
+  		                });
+  		                // TODO Warn if fields are overridden with incompatible types.
+  		                extend(allFields, this.ownFields);
+  		                allSupertypes[this.typeName] = this;
+  		                this.fieldNames.length = 0;
+  		                for (var fieldName in allFields) {
+  		                    if (hasOwn.call(allFields, fieldName) &&
+  		                        !allFields[fieldName].hidden) {
+  		                        this.fieldNames.push(fieldName);
+  		                    }
+  		                }
+  		                // Types are exported only once they have been finalized.
+  		                Object.defineProperty(namedTypes, this.typeName, {
+  		                    enumerable: true,
+  		                    value: this.type
+  		                });
+  		                this.finalized = true;
+  		                // A linearization of the inheritance hierarchy.
+  		                populateSupertypeList(this.typeName, this.supertypeList);
+  		                if (this.buildable &&
+  		                    this.supertypeList.lastIndexOf("Expression") >= 0) {
+  		                    wrapExpressionBuilderWithStatement(this.typeName);
+  		                }
+  		            }
+  		        };
+  		        return DefImpl;
+  		    }(Def));
+  		    // Note that the list returned by this function is a copy of the internal
+  		    // supertypeList, *without* the typeName itself as the first element.
+  		    function getSupertypeNames(typeName) {
+  		        if (!hasOwn.call(defCache, typeName)) {
+  		            throw new Error("");
+  		        }
+  		        var d = defCache[typeName];
+  		        if (d.finalized !== true) {
+  		            throw new Error("");
+  		        }
+  		        return d.supertypeList.slice(1);
+  		    }
+  		    // Returns an object mapping from every known type in the defCache to the
+  		    // most specific supertype whose name is an own property of the candidates
+  		    // object.
+  		    function computeSupertypeLookupTable(candidates) {
+  		        var table = {};
+  		        var typeNames = Object.keys(defCache);
+  		        var typeNameCount = typeNames.length;
+  		        for (var i = 0; i < typeNameCount; ++i) {
+  		            var typeName = typeNames[i];
+  		            var d = defCache[typeName];
+  		            if (d.finalized !== true) {
+  		                throw new Error("" + typeName);
+  		            }
+  		            for (var j = 0; j < d.supertypeList.length; ++j) {
+  		                var superTypeName = d.supertypeList[j];
+  		                if (hasOwn.call(candidates, superTypeName)) {
+  		                    table[typeName] = superTypeName;
+  		                    break;
+  		                }
+  		            }
+  		        }
+  		        return table;
+  		    }
+  		    var builders = Object.create(null);
+  		    // This object is used as prototype for any node created by a builder.
+  		    var nodePrototype = {};
+  		    // Call this function to define a new method to be shared by all AST
+  		    // nodes. The replaced method (if any) is returned for easy wrapping.
+  		    function defineMethod(name, func) {
+  		        var old = nodePrototype[name];
+  		        // Pass undefined as func to delete nodePrototype[name].
+  		        if (isUndefined.check(func)) {
+  		            delete nodePrototype[name];
+  		        }
+  		        else {
+  		            isFunction.assert(func);
+  		            Object.defineProperty(nodePrototype, name, {
+  		                enumerable: true,
+  		                configurable: true,
+  		                value: func
+  		            });
+  		        }
+  		        return old;
+  		    }
+  		    function getBuilderName(typeName) {
+  		        return typeName.replace(/^[A-Z]+/, function (upperCasePrefix) {
+  		            var len = upperCasePrefix.length;
+  		            switch (len) {
+  		                case 0: return "";
+  		                // If there's only one initial capital letter, just lower-case it.
+  		                case 1: return upperCasePrefix.toLowerCase();
+  		                default:
+  		                    // If there's more than one initial capital letter, lower-case
+  		                    // all but the last one, so that XMLDefaultDeclaration (for
+  		                    // example) becomes xmlDefaultDeclaration.
+  		                    return upperCasePrefix.slice(0, len - 1).toLowerCase() +
+  		                        upperCasePrefix.charAt(len - 1);
+  		            }
+  		        });
+  		    }
+  		    function getStatementBuilderName(typeName) {
+  		        typeName = getBuilderName(typeName);
+  		        return typeName.replace(/(Expression)?$/, "Statement");
+  		    }
+  		    var namedTypes = {};
+  		    // Like Object.keys, but aware of what fields each AST type should have.
+  		    function getFieldNames(object) {
+  		        var d = defFromValue(object);
+  		        if (d) {
+  		            return d.fieldNames.slice(0);
+  		        }
+  		        if ("type" in object) {
+  		            throw new Error("did not recognize object of type " +
+  		                JSON.stringify(object.type));
+  		        }
+  		        return Object.keys(object);
+  		    }
+  		    // Get the value of an object property, taking object.type and default
+  		    // functions into account.
+  		    function getFieldValue(object, fieldName) {
+  		        var d = defFromValue(object);
+  		        if (d) {
+  		            var field = d.allFields[fieldName];
+  		            if (field) {
+  		                return field.getValue(object);
+  		            }
+  		        }
+  		        return object && object[fieldName];
+  		    }
+  		    // Iterate over all defined fields of an object, including those missing
+  		    // or undefined, passing each field name and effective value (as returned
+  		    // by getFieldValue) to the callback. If the object has no corresponding
+  		    // Def, the callback will never be called.
+  		    function eachField(object, callback, context) {
+  		        getFieldNames(object).forEach(function (name) {
+  		            callback.call(this, name, getFieldValue(object, name));
+  		        }, context);
+  		    }
+  		    // Similar to eachField, except that iteration stops as soon as the
+  		    // callback returns a truthy value. Like Array.prototype.some, the final
+  		    // result is either true or false to indicates whether the callback
+  		    // returned true for any element or not.
+  		    function someField(object, callback, context) {
+  		        return getFieldNames(object).some(function (name) {
+  		            return callback.call(this, name, getFieldValue(object, name));
+  		        }, context);
+  		    }
+  		    // Adds an additional builder for Expression subtypes
+  		    // that wraps the built Expression in an ExpressionStatements.
+  		    function wrapExpressionBuilderWithStatement(typeName) {
+  		        var wrapperName = getStatementBuilderName(typeName);
+  		        // skip if the builder already exists
+  		        if (builders[wrapperName])
+  		            return;
+  		        // the builder function to wrap with builders.ExpressionStatement
+  		        var wrapped = builders[getBuilderName(typeName)];
+  		        // skip if there is nothing to wrap
+  		        if (!wrapped)
+  		            return;
+  		        var builder = function () {
+  		            var args = [];
+  		            for (var _i = 0; _i < arguments.length; _i++) {
+  		                args[_i] = arguments[_i];
+  		            }
+  		            return builders.expressionStatement(wrapped.apply(builders, args));
+  		        };
+  		        builder.from = function () {
+  		            var args = [];
+  		            for (var _i = 0; _i < arguments.length; _i++) {
+  		                args[_i] = arguments[_i];
+  		            }
+  		            return builders.expressionStatement(wrapped.from.apply(builders, args));
+  		        };
+  		        builders[wrapperName] = builder;
+  		    }
+  		    function populateSupertypeList(typeName, list) {
+  		        list.length = 0;
+  		        list.push(typeName);
+  		        var lastSeen = Object.create(null);
+  		        for (var pos = 0; pos < list.length; ++pos) {
+  		            typeName = list[pos];
+  		            var d = defCache[typeName];
+  		            if (d.finalized !== true) {
+  		                throw new Error("");
+  		            }
+  		            // If we saw typeName earlier in the breadth-first traversal,
+  		            // delete the last-seen occurrence.
+  		            if (hasOwn.call(lastSeen, typeName)) {
+  		                delete list[lastSeen[typeName]];
+  		            }
+  		            // Record the new index of the last-seen occurrence of typeName.
+  		            lastSeen[typeName] = pos;
+  		            // Enqueue the base names of this type.
+  		            list.push.apply(list, d.baseNames);
+  		        }
+  		        // Compaction loop to remove array holes.
+  		        for (var to = 0, from = to, len = list.length; from < len; ++from) {
+  		            if (hasOwn.call(list, from)) {
+  		                list[to++] = list[from];
+  		            }
+  		        }
+  		        list.length = to;
+  		    }
+  		    function extend(into, from) {
+  		        Object.keys(from).forEach(function (name) {
+  		            into[name] = from[name];
+  		        });
+  		        return into;
+  		    }
+  		    function finalize() {
+  		        Object.keys(defCache).forEach(function (name) {
+  		            defCache[name].finalize();
+  		        });
+  		    }
+  		    return {
+  		        Type: Type,
+  		        builtInTypes: builtInTypes,
+  		        getSupertypeNames: getSupertypeNames,
+  		        computeSupertypeLookupTable: computeSupertypeLookupTable,
+  		        builders: builders,
+  		        defineMethod: defineMethod,
+  		        getBuilderName: getBuilderName,
+  		        getStatementBuilderName: getStatementBuilderName,
+  		        namedTypes: namedTypes,
+  		        getFieldNames: getFieldNames,
+  		        getFieldValue: getFieldValue,
+  		        eachField: eachField,
+  		        someField: someField,
+  		        finalize: finalize,
+  		    };
+  		}
+  		exports.default = typesPlugin;
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
+  	} (types$2, types$2.exports));
+  	return types$2.exports;
   }
 
   var pathVisitor = {exports: {}};
@@ -3149,6 +3387,8 @@
   var nodePath = {exports: {}};
 
   var path = {exports: {}};
+
+  path.exports;
 
   var hasRequiredPath;
 
@@ -3158,6 +3398,7 @@
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
   		var tslib_1 = require$$0;
+  		var shared_1 = requireShared();
   		var types_1 = tslib_1.__importDefault(requireTypes());
   		var Op = Object.prototype;
   		var hasOwn = Op.hasOwnProperty;
@@ -3485,12 +3726,15 @@
   		    return Path;
   		}
   		exports.default = pathPlugin;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (path, path.exports));
   	return path.exports;
   }
 
   var scope$1 = {exports: {}};
+
+  scope$1.exports;
 
   var hasRequiredScope;
 
@@ -3500,6 +3744,7 @@
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
   		var tslib_1 = require$$0;
+  		var shared_1 = requireShared();
   		var types_1 = tslib_1.__importDefault(requireTypes());
   		var hasOwn = Object.prototype.hasOwnProperty;
   		function scopePlugin(fork) {
@@ -3514,7 +3759,9 @@
   		        if (!(this instanceof Scope)) {
   		            throw new Error("Scope constructor cannot be invoked without 'new'");
   		        }
-  		        ScopeType.assert(path.value);
+  		        if (!TypeParameterScopeType.check(path.value)) {
+  		            ScopeType.assert(path.value);
+  		        }
   		        var depth;
   		        if (parentScope) {
   		            if (!(parentScope instanceof Scope)) {
@@ -3536,19 +3783,21 @@
   		            types: { value: {} },
   		        });
   		    };
-  		    var scopeTypes = [
-  		        // Program nodes introduce global scopes.
-  		        namedTypes.Program,
-  		        // Function is the supertype of FunctionExpression,
-  		        // FunctionDeclaration, ArrowExpression, etc.
-  		        namedTypes.Function,
-  		        // In case you didn't know, the caught parameter shadows any variable
-  		        // of the same name in an outer scope.
-  		        namedTypes.CatchClause
-  		    ];
-  		    var ScopeType = Type.or.apply(Type, scopeTypes);
+  		    var ScopeType = Type.or(
+  		    // Program nodes introduce global scopes.
+  		    namedTypes.Program, 
+  		    // Function is the supertype of FunctionExpression,
+  		    // FunctionDeclaration, ArrowExpression, etc.
+  		    namedTypes.Function, 
+  		    // In case you didn't know, the caught parameter shadows any variable
+  		    // of the same name in an outer scope.
+  		    namedTypes.CatchClause);
+  		    // These types introduce scopes that are restricted to type parameters in
+  		    // Flow (this doesn't apply to ECMAScript).
+  		    var TypeParameterScopeType = Type.or(namedTypes.Function, namedTypes.ClassDeclaration, namedTypes.ClassExpression, namedTypes.InterfaceDeclaration, namedTypes.TSInterfaceDeclaration, namedTypes.TypeAlias, namedTypes.TSTypeAliasDeclaration);
+  		    var FlowOrTSTypeParameterType = Type.or(namedTypes.TypeParameter, namedTypes.TSTypeParameter);
   		    Scope.isEstablishedBy = function (node) {
-  		        return ScopeType.check(node);
+  		        return ScopeType.check(node) || TypeParameterScopeType.check(node);
   		    };
   		    var Sp = Scope.prototype;
   		    // Will be overridden after an instance lazily calls scanScope.
@@ -3596,6 +3845,10 @@
   		                // Empty out this.bindings, just in cases.
   		                delete this.bindings[name];
   		            }
+  		            for (var name in this.types) {
+  		                // Empty out this.types, just in cases.
+  		                delete this.types[name];
+  		            }
   		            scanScope(this.path, this.bindings, this.types);
   		            this.didScan = true;
   		        }
@@ -3610,18 +3863,24 @@
   		    };
   		    function scanScope(path, bindings, scopeTypes) {
   		        var node = path.value;
-  		        ScopeType.assert(node);
-  		        if (namedTypes.CatchClause.check(node)) {
-  		            // A catch clause establishes a new scope but the only variable
-  		            // bound in that scope is the catch parameter. Any other
-  		            // declarations create bindings in the outer scope.
-  		            var param = path.get("param");
-  		            if (param.value) {
-  		                addPattern(param, bindings);
+  		        if (TypeParameterScopeType.check(node)) {
+  		            var params = path.get('typeParameters', 'params');
+  		            if (isArray.check(params.value)) {
+  		                params.each(function (childPath) {
+  		                    addTypeParameter(childPath, scopeTypes);
+  		                });
   		            }
   		        }
-  		        else {
-  		            recursiveScanScope(path, bindings, scopeTypes);
+  		        if (ScopeType.check(node)) {
+  		            if (namedTypes.CatchClause.check(node)) {
+  		                // A catch clause establishes a new scope but the only variable
+  		                // bound in that scope is the catch parameter. Any other
+  		                // declarations create bindings in the outer scope.
+  		                addPattern(path.get("param"), bindings);
+  		            }
+  		            else {
+  		                recursiveScanScope(path, bindings, scopeTypes);
+  		            }
   		        }
   		    }
   		    function recursiveScanScope(path, bindings, scopeTypes) {
@@ -3642,6 +3901,7 @@
   		                addPattern(paramPath, bindings);
   		            });
   		            recursiveScanChild(path.get("body"), bindings, scopeTypes);
+  		            recursiveScanScope(path.get("typeParameters"), bindings, scopeTypes);
   		        }
   		        else if ((namedTypes.TypeAlias && namedTypes.TypeAlias.check(node)) ||
   		            (namedTypes.InterfaceDeclaration && namedTypes.InterfaceDeclaration.check(node)) ||
@@ -3696,8 +3956,16 @@
   		            addPattern(path.get("id"), bindings);
   		        }
   		        else if (namedTypes.ClassDeclaration &&
-  		            namedTypes.ClassDeclaration.check(node)) {
+  		            namedTypes.ClassDeclaration.check(node) &&
+  		            node.id !== null) {
   		            addPattern(path.get("id"), bindings);
+  		            recursiveScanScope(path.get("typeParameters"), bindings, scopeTypes);
+  		        }
+  		        else if ((namedTypes.InterfaceDeclaration &&
+  		            namedTypes.InterfaceDeclaration.check(node)) ||
+  		            (namedTypes.TSInterfaceDeclaration &&
+  		                namedTypes.TSInterfaceDeclaration.check(node))) {
+  		            addTypePattern(path.get("id"), scopeTypes);
   		        }
   		        else if (ScopeType.check(node)) {
   		            if (namedTypes.CatchClause.check(node) &&
@@ -3744,7 +4012,9 @@
   		                if (namedTypes.Pattern.check(property)) {
   		                    addPattern(propertyPath, bindings);
   		                }
-  		                else if (namedTypes.Property.check(property)) {
+  		                else if (namedTypes.Property.check(property) ||
+  		                    (namedTypes.ObjectProperty &&
+  		                        namedTypes.ObjectProperty.check(property))) {
   		                    addPattern(propertyPath.get('value'), bindings);
   		                }
   		                else if (namedTypes.SpreadProperty &&
@@ -3791,6 +4061,16 @@
   		            }
   		        }
   		    }
+  		    function addTypeParameter(parameterPath, types) {
+  		        var parameter = parameterPath.value;
+  		        FlowOrTSTypeParameterType.assert(parameter);
+  		        if (hasOwn.call(types, parameter.name)) {
+  		            types[parameter.name].push(parameterPath);
+  		        }
+  		        else {
+  		            types[parameter.name] = [parameterPath];
+  		        }
+  		    }
   		    Sp.lookup = function (name) {
   		        for (var scope = this; scope; scope = scope.parent)
   		            if (scope.declares(name))
@@ -3812,10 +4092,13 @@
   		    return Scope;
   		}
   		exports.default = scopePlugin;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (scope$1, scope$1.exports));
   	return scope$1.exports;
   }
+
+  nodePath.exports;
 
   var hasRequiredNodePath;
 
@@ -3828,6 +4111,7 @@
   		var types_1 = tslib_1.__importDefault(requireTypes());
   		var path_1 = tslib_1.__importDefault(requirePath());
   		var scope_1 = tslib_1.__importDefault(requireScope());
+  		var shared_1 = requireShared();
   		function nodePathPlugin(fork) {
   		    var types = fork.use(types_1.default);
   		    var n = types.namedTypes;
@@ -4224,10 +4508,13 @@
   		    return NodePath;
   		}
   		exports.default = nodePathPlugin;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (nodePath, nodePath.exports));
   	return nodePath.exports;
   }
+
+  pathVisitor.exports;
 
   var hasRequiredPathVisitor;
 
@@ -4239,6 +4526,7 @@
   		var tslib_1 = require$$0;
   		var types_1 = tslib_1.__importDefault(requireTypes());
   		var node_path_1 = tslib_1.__importDefault(requireNodePath());
+  		var shared_1 = requireShared();
   		var hasOwn = Object.prototype.hasOwnProperty;
   		function pathVisitorPlugin(fork) {
   		    var types = fork.use(types_1.default);
@@ -4574,12 +4862,15 @@
   		    return PathVisitor;
   		}
   		exports.default = pathVisitorPlugin;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (pathVisitor, pathVisitor.exports));
   	return pathVisitor.exports;
   }
 
   var equiv$1 = {exports: {}};
+
+  equiv$1.exports;
 
   var hasRequiredEquiv;
 
@@ -4589,6 +4880,7 @@
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
   		var tslib_1 = require$$0;
+  		var shared_1 = requireShared();
   		var types_1 = tslib_1.__importDefault(requireTypes());
   		function default_1(fork) {
   		    var types = fork.use(types_1.default);
@@ -4739,10 +5031,13 @@
   		    return astNodesAreEquivalent;
   		}
   		exports.default = default_1;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (equiv$1, equiv$1.exports));
   	return equiv$1.exports;
   }
+
+  fork.exports;
 
   var hasRequiredFork;
 
@@ -4757,10 +5052,11 @@
   		var equiv_1 = tslib_1.__importDefault(requireEquiv());
   		var path_1 = tslib_1.__importDefault(requirePath());
   		var node_path_1 = tslib_1.__importDefault(requireNodePath());
-  		function default_1(defs) {
+  		var shared_1 = requireShared();
+  		function default_1(plugins) {
   		    var fork = createFork();
   		    var types = fork.use(types_1.default);
-  		    defs.forEach(fork.use);
+  		    plugins.forEach(fork.use);
   		    types.finalize();
   		    var PathVisitor = fork.use(path_visitor_1.default);
   		    return {
@@ -4800,98 +5096,170 @@
   		    var fork = { use: use };
   		    return fork;
   		}
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (fork, fork.exports));
   	return fork.exports;
   }
 
-  var core = {exports: {}};
+  var esProposals = {exports: {}};
 
-  var coreOperators = {};
+  var es2022 = {exports: {}};
 
-  var hasRequiredCoreOperators;
+  var es2021$2 = {exports: {}};
 
-  function requireCoreOperators () {
-  	if (hasRequiredCoreOperators) return coreOperators;
-  	hasRequiredCoreOperators = 1;
-  	Object.defineProperty(coreOperators, "__esModule", { value: true });
-  	coreOperators.LogicalOperators = coreOperators.AssignmentOperators = coreOperators.BinaryOperators = void 0;
-  	coreOperators.BinaryOperators = [
-  	    "==", "!=", "===", "!==",
-  	    "<", "<=", ">", ">=",
-  	    "<<", ">>", ">>>",
-  	    "+", "-", "*", "/", "%",
-  	    "&",
-  	    "|", "^", "in",
-  	    "instanceof",
-  	];
-  	coreOperators.AssignmentOperators = [
-  	    "=", "+=", "-=", "*=", "/=", "%=",
-  	    "<<=", ">>=", ">>>=",
-  	    "|=", "^=", "&=",
-  	];
-  	coreOperators.LogicalOperators = [
-  	    "||", "&&",
-  	];
-  	return coreOperators;
-  }
+  var es2021$1 = {exports: {}};
 
-  var shared = {exports: {}};
+  var es2020$2 = {exports: {}};
 
-  var hasRequiredShared;
+  var es2016$1 = {exports: {}};
 
-  function requireShared () {
-  	if (hasRequiredShared) return shared.exports;
-  	hasRequiredShared = 1;
+  var core$1 = {exports: {}};
+
+  core$1.exports;
+
+  var hasRequiredCore$1;
+
+  function requireCore$1 () {
+  	if (hasRequiredCore$1) return core$1.exports;
+  	hasRequiredCore$1 = 1;
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
-  		var tslib_1 = require$$0;
-  		var types_1 = tslib_1.__importDefault(requireTypes());
-  		function default_1(fork) {
-  		    var types = fork.use(types_1.default);
-  		    var Type = types.Type;
-  		    var builtin = types.builtInTypes;
-  		    var isNumber = builtin.number;
-  		    // An example of constructing a new type with arbitrary constraints from
-  		    // an existing type.
-  		    function geq(than) {
-  		        return Type.from(function (value) { return isNumber.check(value) && value >= than; }, isNumber + " >= " + than);
-  		    }
-  		    // Default value-returning functions that may optionally be passed as a
-  		    // third argument to Def.prototype.field.
-  		    var defaults = {
-  		        // Functions were used because (among other reasons) that's the most
-  		        // elegant way to allow for the emptyArray one always to give a new
-  		        // array instance.
-  		        "null": function () { return null; },
-  		        "emptyArray": function () { return []; },
-  		        "false": function () { return false; },
-  		        "true": function () { return true; },
-  		        "undefined": function () { },
-  		        "use strict": function () { return "use strict"; }
-  		    };
-  		    var naiveIsPrimitive = Type.or(builtin.string, builtin.number, builtin.boolean, builtin.null, builtin.undefined);
-  		    var isPrimitive = Type.from(function (value) {
-  		        if (value === null)
-  		            return true;
-  		        var type = typeof value;
-  		        if (type === "object" ||
-  		            type === "function") {
-  		            return false;
-  		        }
-  		        return true;
-  		    }, naiveIsPrimitive.toString());
+  		var shared_1 = requireShared();
+  		function default_1() {
   		    return {
-  		        geq: geq,
-  		        defaults: defaults,
-  		        isPrimitive: isPrimitive,
+  		        BinaryOperators: [
+  		            "==", "!=", "===", "!==",
+  		            "<", "<=", ">", ">=",
+  		            "<<", ">>", ">>>",
+  		            "+", "-", "*", "/", "%",
+  		            "&",
+  		            "|", "^", "in",
+  		            "instanceof",
+  		        ],
+  		        AssignmentOperators: [
+  		            "=", "+=", "-=", "*=", "/=", "%=",
+  		            "<<=", ">>=", ">>>=",
+  		            "|=", "^=", "&=",
+  		        ],
+  		        LogicalOperators: [
+  		            "||", "&&",
+  		        ],
   		    };
   		}
   		exports.default = default_1;
-  		module.exports = exports["default"]; 
-  	} (shared, shared.exports));
-  	return shared.exports;
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
+  	} (core$1, core$1.exports));
+  	return core$1.exports;
   }
+
+  es2016$1.exports;
+
+  var hasRequiredEs2016$1;
+
+  function requireEs2016$1 () {
+  	if (hasRequiredEs2016$1) return es2016$1.exports;
+  	hasRequiredEs2016$1 = 1;
+  	(function (module, exports) {
+  		Object.defineProperty(exports, "__esModule", { value: true });
+  		var tslib_1 = require$$0;
+  		var shared_1 = requireShared();
+  		var core_1 = tslib_1.__importDefault(requireCore$1());
+  		function default_1(fork) {
+  		    var result = fork.use(core_1.default);
+  		    // Exponentiation operators. Must run before BinaryOperators or
+  		    // AssignmentOperators are used (hence before fork.use(es6Def)).
+  		    // https://github.com/tc39/proposal-exponentiation-operator
+  		    if (result.BinaryOperators.indexOf("**") < 0) {
+  		        result.BinaryOperators.push("**");
+  		    }
+  		    if (result.AssignmentOperators.indexOf("**=") < 0) {
+  		        result.AssignmentOperators.push("**=");
+  		    }
+  		    return result;
+  		}
+  		exports.default = default_1;
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
+  	} (es2016$1, es2016$1.exports));
+  	return es2016$1.exports;
+  }
+
+  es2020$2.exports;
+
+  var hasRequiredEs2020$1;
+
+  function requireEs2020$1 () {
+  	if (hasRequiredEs2020$1) return es2020$2.exports;
+  	hasRequiredEs2020$1 = 1;
+  	(function (module, exports) {
+  		Object.defineProperty(exports, "__esModule", { value: true });
+  		var tslib_1 = require$$0;
+  		var shared_1 = requireShared();
+  		var es2016_1 = tslib_1.__importDefault(requireEs2016$1());
+  		function default_1(fork) {
+  		    var result = fork.use(es2016_1.default);
+  		    // Nullish coalescing. Must run before LogicalOperators is used.
+  		    // https://github.com/tc39/proposal-nullish-coalescing
+  		    if (result.LogicalOperators.indexOf("??") < 0) {
+  		        result.LogicalOperators.push("??");
+  		    }
+  		    return result;
+  		}
+  		exports.default = default_1;
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
+  	} (es2020$2, es2020$2.exports));
+  	return es2020$2.exports;
+  }
+
+  es2021$1.exports;
+
+  var hasRequiredEs2021$1;
+
+  function requireEs2021$1 () {
+  	if (hasRequiredEs2021$1) return es2021$1.exports;
+  	hasRequiredEs2021$1 = 1;
+  	(function (module, exports) {
+  		Object.defineProperty(exports, "__esModule", { value: true });
+  		var tslib_1 = require$$0;
+  		var shared_1 = requireShared();
+  		var es2020_1 = tslib_1.__importDefault(requireEs2020$1());
+  		function default_1(fork) {
+  		    var result = fork.use(es2020_1.default);
+  		    // Logical assignment operators. Must run before AssignmentOperators is used.
+  		    // https://github.com/tc39/proposal-logical-assignment
+  		    result.LogicalOperators.forEach(function (op) {
+  		        var assignOp = op + "=";
+  		        if (result.AssignmentOperators.indexOf(assignOp) < 0) {
+  		            result.AssignmentOperators.push(assignOp);
+  		        }
+  		    });
+  		    return result;
+  		}
+  		exports.default = default_1;
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
+  	} (es2021$1, es2021$1.exports));
+  	return es2021$1.exports;
+  }
+
+  var es2020$1 = {exports: {}};
+
+  var es2019 = {exports: {}};
+
+  var es2018 = {exports: {}};
+
+  var es2017$1 = {exports: {}};
+
+  var es2016 = {exports: {}};
+
+  var es6 = {exports: {}};
+
+  var core = {exports: {}};
+
+  core.exports;
 
   var hasRequiredCore;
 
@@ -4901,9 +5269,9 @@
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
   		var tslib_1 = require$$0;
-  		var core_operators_1 = requireCoreOperators();
+  		var core_1 = tslib_1.__importDefault(requireCore$1());
   		var types_1 = tslib_1.__importDefault(requireTypes());
-  		var shared_1 = tslib_1.__importDefault(requireShared());
+  		var shared_1 = tslib_1.__importStar(requireShared());
   		function default_1(fork) {
   		    var types = fork.use(types_1.default);
   		    var Type = types.Type;
@@ -4912,6 +5280,7 @@
   		    var shared = fork.use(shared_1.default);
   		    var defaults = shared.defaults;
   		    var geq = shared.geq;
+  		    var _a = fork.use(core_1.default), BinaryOperators = _a.BinaryOperators, AssignmentOperators = _a.AssignmentOperators, LogicalOperators = _a.LogicalOperators;
   		    // Abstract supertype of all syntactic entities that are allowed to have a
   		    // .loc field.
   		    def("Printable")
@@ -5085,14 +5454,14 @@
   		        // Esprima doesn't bother with this field, presumably because it's
   		        // always true for unary operators.
   		        .field("prefix", Boolean, defaults["true"]);
-  		    var BinaryOperator = or.apply(void 0, core_operators_1.BinaryOperators);
+  		    var BinaryOperator = or.apply(void 0, BinaryOperators);
   		    def("BinaryExpression")
   		        .bases("Expression")
   		        .build("operator", "left", "right")
   		        .field("operator", BinaryOperator)
   		        .field("left", def("Expression"))
   		        .field("right", def("Expression"));
-  		    var AssignmentOperator = or.apply(void 0, core_operators_1.AssignmentOperators);
+  		    var AssignmentOperator = or.apply(void 0, AssignmentOperators);
   		    def("AssignmentExpression")
   		        .bases("Expression")
   		        .build("operator", "left", "right")
@@ -5106,7 +5475,7 @@
   		        .field("operator", UpdateOperator)
   		        .field("argument", def("Expression"))
   		        .field("prefix", Boolean);
-  		    var LogicalOperator = or.apply(void 0, core_operators_1.LogicalOperators);
+  		    var LogicalOperator = or.apply(void 0, LogicalOperators);
   		    def("LogicalExpression")
   		        .bases("Expression")
   		        .build("operator", "left", "right")
@@ -5161,26 +5530,7 @@
   		    def("Literal")
   		        .bases("Expression")
   		        .build("value")
-  		        .field("value", or(String, Boolean, null, Number, RegExp))
-  		        .field("regex", or({
-  		        pattern: String,
-  		        flags: String
-  		    }, null), function () {
-  		        if (this.value instanceof RegExp) {
-  		            var flags = "";
-  		            if (this.value.ignoreCase)
-  		                flags += "i";
-  		            if (this.value.multiline)
-  		                flags += "m";
-  		            if (this.value.global)
-  		                flags += "g";
-  		            return {
-  		                pattern: this.value.source,
-  		                flags: flags
-  		            };
-  		        }
-  		        return null;
-  		    });
+  		        .field("value", or(String, Boolean, null, Number, RegExp, BigInt));
   		    // Abstract (non-buildable) comment supertype. Not a Node.
   		    def("Comment")
   		        .bases("Printable")
@@ -5194,12 +5544,13 @@
   		        .field("trailing", Boolean, defaults["false"]);
   		}
   		exports.default = default_1;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (core, core.exports));
   	return core.exports;
   }
 
-  var es6 = {exports: {}};
+  es6.exports;
 
   var hasRequiredEs6;
 
@@ -5211,7 +5562,7 @@
   		var tslib_1 = require$$0;
   		var core_1 = tslib_1.__importDefault(requireCore());
   		var types_1 = tslib_1.__importDefault(requireTypes());
-  		var shared_1 = tslib_1.__importDefault(requireShared());
+  		var shared_1 = tslib_1.__importStar(requireShared());
   		function default_1(fork) {
   		    fork.use(core_1.default);
   		    var types = fork.use(types_1.default);
@@ -5332,7 +5683,7 @@
   		        .field("value", def("Function"))
   		        .field("computed", Boolean, defaults["false"])
   		        .field("static", Boolean, defaults["false"]);
-  		    var ClassBodyElement = or(def("MethodDefinition"), def("VariableDeclarator"), def("ClassPropertyDefinition"), def("ClassProperty"));
+  		    var ClassBodyElement = or(def("MethodDefinition"), def("VariableDeclarator"), def("ClassPropertyDefinition"), def("ClassProperty"), def("StaticBlock"));
   		    def("ClassProperty")
   		        .bases("Declaration")
   		        .build("key")
@@ -5441,12 +5792,13 @@
   		        .field("property", def("Identifier"));
   		}
   		exports.default = default_1;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (es6, es6.exports));
   	return es6.exports;
   }
 
-  var es2016 = {exports: {}};
+  es2016.exports;
 
   var hasRequiredEs2016;
 
@@ -5456,28 +5808,24 @@
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
   		var tslib_1 = require$$0;
-  		var core_operators_1 = requireCoreOperators();
+  		var es2016_1 = tslib_1.__importDefault(requireEs2016$1());
   		var es6_1 = tslib_1.__importDefault(requireEs6());
-  		var types_1 = tslib_1.__importDefault(requireTypes());
+  		var shared_1 = requireShared();
   		function default_1(fork) {
+  		    // The es2016OpsDef plugin comes before es6Def so BinaryOperators and
+  		    // AssignmentOperators will be appropriately augmented before they are first
+  		    // used in the core definitions for this fork.
+  		    fork.use(es2016_1.default);
   		    fork.use(es6_1.default);
-  		    var types = fork.use(types_1.default);
-  		    var def = types.Type.def;
-  		    var or = types.Type.or;
-  		    var BinaryOperator = or.apply(void 0, tslib_1.__spreadArrays(core_operators_1.BinaryOperators, ["**"]));
-  		    def("BinaryExpression")
-  		        .field("operator", BinaryOperator);
-  		    var AssignmentOperator = or.apply(void 0, tslib_1.__spreadArrays(core_operators_1.AssignmentOperators, ["**="]));
-  		    def("AssignmentExpression")
-  		        .field("operator", AssignmentOperator);
   		}
   		exports.default = default_1;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (es2016, es2016.exports));
   	return es2016.exports;
   }
 
-  var es2017$1 = {exports: {}};
+  es2017$1.exports;
 
   var hasRequiredEs2017;
 
@@ -5489,7 +5837,7 @@
   		var tslib_1 = require$$0;
   		var es2016_1 = tslib_1.__importDefault(requireEs2016());
   		var types_1 = tslib_1.__importDefault(requireTypes());
-  		var shared_1 = tslib_1.__importDefault(requireShared());
+  		var shared_1 = tslib_1.__importStar(requireShared());
   		function default_1(fork) {
   		    fork.use(es2016_1.default);
   		    var types = fork.use(types_1.default);
@@ -5503,12 +5851,13 @@
   		        .field("argument", def("Expression"));
   		}
   		exports.default = default_1;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (es2017$1, es2017$1.exports));
   	return es2017$1.exports;
   }
 
-  var es2018 = {exports: {}};
+  es2018.exports;
 
   var hasRequiredEs2018;
 
@@ -5520,7 +5869,7 @@
   		var tslib_1 = require$$0;
   		var es2017_1 = tslib_1.__importDefault(requireEs2017());
   		var types_1 = tslib_1.__importDefault(requireTypes());
-  		var shared_1 = tslib_1.__importDefault(requireShared());
+  		var shared_1 = tslib_1.__importStar(requireShared());
   		function default_1(fork) {
   		    fork.use(es2017_1.default);
   		    var types = fork.use(types_1.default);
@@ -5548,12 +5897,13 @@
   		        .field("properties", [or(def("PropertyPattern"), def("Property"), def("RestElement"), def("SpreadPropertyPattern"))]);
   		}
   		exports.default = default_1;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (es2018, es2018.exports));
   	return es2018.exports;
   }
 
-  var es2019 = {exports: {}};
+  es2019.exports;
 
   var hasRequiredEs2019;
 
@@ -5565,7 +5915,7 @@
   		var tslib_1 = require$$0;
   		var es2018_1 = tslib_1.__importDefault(requireEs2018());
   		var types_1 = tslib_1.__importDefault(requireTypes());
-  		var shared_1 = tslib_1.__importDefault(requireShared());
+  		var shared_1 = tslib_1.__importStar(requireShared());
   		function default_1(fork) {
   		    fork.use(es2018_1.default);
   		    var types = fork.use(types_1.default);
@@ -5576,12 +5926,13 @@
   		        .field("param", or(def("Pattern"), null), defaults["null"]);
   		}
   		exports.default = default_1;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (es2019, es2019.exports));
   	return es2019.exports;
   }
 
-  var es2020$1 = {exports: {}};
+  es2020$1.exports;
 
   var hasRequiredEs2020;
 
@@ -5591,11 +5942,14 @@
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
   		var tslib_1 = require$$0;
-  		var core_operators_1 = requireCoreOperators();
+  		var es2020_1 = tslib_1.__importDefault(requireEs2020$1());
   		var es2019_1 = tslib_1.__importDefault(requireEs2019());
   		var types_1 = tslib_1.__importDefault(requireTypes());
-  		var shared_1 = tslib_1.__importDefault(requireShared());
+  		var shared_1 = tslib_1.__importStar(requireShared());
   		function default_1(fork) {
+  		    // The es2020OpsDef plugin comes before es2019Def so LogicalOperators will be
+  		    // appropriately augmented before first used.
+  		    fork.use(es2020_1.default);
   		    fork.use(es2019_1.default);
   		    var types = fork.use(types_1.default);
   		    var def = types.Type.def;
@@ -5607,9 +5961,10 @@
   		        .build("source")
   		        .field("source", def("Expression"));
   		    def("ExportAllDeclaration")
+  		        .bases("Declaration")
   		        .build("source", "exported")
   		        .field("source", def("Literal"))
-  		        .field("exported", or(def("Identifier"), null));
+  		        .field("exported", or(def("Identifier"), null, void 0), defaults["null"]);
   		    // Optional chaining
   		    def("ChainElement")
   		        .bases("Node")
@@ -5631,18 +5986,152 @@
   		        .bases("MemberExpression")
   		        .build("object", "property", "computed", "optional")
   		        .field("optional", Boolean, defaults["true"]);
-  		    // Nullish coalescing
-  		    var LogicalOperator = or.apply(void 0, tslib_1.__spreadArrays(core_operators_1.LogicalOperators, ["??"]));
-  		    def("LogicalExpression")
-  		        .field("operator", LogicalOperator);
   		}
   		exports.default = default_1;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (es2020$1, es2020$1.exports));
   	return es2020$1.exports;
   }
 
+  es2021$2.exports;
+
+  var hasRequiredEs2021;
+
+  function requireEs2021 () {
+  	if (hasRequiredEs2021) return es2021$2.exports;
+  	hasRequiredEs2021 = 1;
+  	(function (module, exports) {
+  		Object.defineProperty(exports, "__esModule", { value: true });
+  		var tslib_1 = require$$0;
+  		var es2021_1 = tslib_1.__importDefault(requireEs2021$1());
+  		var es2020_1 = tslib_1.__importDefault(requireEs2020());
+  		var shared_1 = requireShared();
+  		function default_1(fork) {
+  		    // The es2021OpsDef plugin comes before es2020Def so AssignmentOperators will
+  		    // be appropriately augmented before first used.
+  		    fork.use(es2021_1.default);
+  		    fork.use(es2020_1.default);
+  		}
+  		exports.default = default_1;
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
+  	} (es2021$2, es2021$2.exports));
+  	return es2021$2.exports;
+  }
+
+  es2022.exports;
+
+  var hasRequiredEs2022;
+
+  function requireEs2022 () {
+  	if (hasRequiredEs2022) return es2022.exports;
+  	hasRequiredEs2022 = 1;
+  	(function (module, exports) {
+  		Object.defineProperty(exports, "__esModule", { value: true });
+  		var tslib_1 = require$$0;
+  		var es2021_1 = tslib_1.__importDefault(requireEs2021());
+  		var types_1 = tslib_1.__importDefault(requireTypes());
+  		var shared_1 = requireShared();
+  		function default_1(fork) {
+  		    fork.use(es2021_1.default);
+  		    var types = fork.use(types_1.default);
+  		    var def = types.Type.def;
+  		    def("StaticBlock")
+  		        .bases("Declaration")
+  		        .build("body")
+  		        .field("body", [def("Statement")]);
+  		}
+  		exports.default = default_1;
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
+  	} (es2022, es2022.exports));
+  	return es2022.exports;
+  }
+
+  esProposals.exports;
+
+  var hasRequiredEsProposals;
+
+  function requireEsProposals () {
+  	if (hasRequiredEsProposals) return esProposals.exports;
+  	hasRequiredEsProposals = 1;
+  	(function (module, exports) {
+  		Object.defineProperty(exports, "__esModule", { value: true });
+  		var tslib_1 = require$$0;
+  		var types_1 = tslib_1.__importDefault(requireTypes());
+  		var shared_1 = tslib_1.__importStar(requireShared());
+  		var es2022_1 = tslib_1.__importDefault(requireEs2022());
+  		function default_1(fork) {
+  		    fork.use(es2022_1.default);
+  		    var types = fork.use(types_1.default);
+  		    var Type = types.Type;
+  		    var def = types.Type.def;
+  		    var or = Type.or;
+  		    var shared = fork.use(shared_1.default);
+  		    var defaults = shared.defaults;
+  		    def("AwaitExpression")
+  		        .build("argument", "all")
+  		        .field("argument", or(def("Expression"), null))
+  		        .field("all", Boolean, defaults["false"]);
+  		    // Decorators
+  		    def("Decorator")
+  		        .bases("Node")
+  		        .build("expression")
+  		        .field("expression", def("Expression"));
+  		    def("Property")
+  		        .field("decorators", or([def("Decorator")], null), defaults["null"]);
+  		    def("MethodDefinition")
+  		        .field("decorators", or([def("Decorator")], null), defaults["null"]);
+  		    // Private names
+  		    def("PrivateName")
+  		        .bases("Expression", "Pattern")
+  		        .build("id")
+  		        .field("id", def("Identifier"));
+  		    def("ClassPrivateProperty")
+  		        .bases("ClassProperty")
+  		        .build("key", "value")
+  		        .field("key", def("PrivateName"))
+  		        .field("value", or(def("Expression"), null), defaults["null"]);
+  		    // https://github.com/tc39/proposal-import-assertions
+  		    def("ImportAttribute")
+  		        .bases("Node")
+  		        .build("key", "value")
+  		        .field("key", or(def("Identifier"), def("Literal")))
+  		        .field("value", def("Expression"));
+  		    ["ImportDeclaration",
+  		        "ExportAllDeclaration",
+  		        "ExportNamedDeclaration",
+  		    ].forEach(function (decl) {
+  		        def(decl).field("assertions", [def("ImportAttribute")], defaults.emptyArray);
+  		    });
+  		    // https://github.com/tc39/proposal-record-tuple
+  		    // https://github.com/babel/babel/pull/10865
+  		    def("RecordExpression")
+  		        .bases("Expression")
+  		        .build("properties")
+  		        .field("properties", [or(def("ObjectProperty"), def("ObjectMethod"), def("SpreadElement"))]);
+  		    def("TupleExpression")
+  		        .bases("Expression")
+  		        .build("elements")
+  		        .field("elements", [or(def("Expression"), def("SpreadElement"), null)]);
+  		    // https://github.com/tc39/proposal-js-module-blocks
+  		    // https://github.com/babel/babel/pull/12469
+  		    def("ModuleExpression")
+  		        .bases("Node")
+  		        .build("body")
+  		        .field("body", def("Program"));
+  		}
+  		exports.default = default_1;
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
+  	} (esProposals, esProposals.exports));
+  	return esProposals.exports;
+  }
+
   var jsx = {exports: {}};
+
+  jsx.exports;
 
   var hasRequiredJsx;
 
@@ -5652,11 +6141,11 @@
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
   		var tslib_1 = require$$0;
-  		var es2020_1 = tslib_1.__importDefault(requireEs2020());
+  		var es_proposals_1 = tslib_1.__importDefault(requireEsProposals());
   		var types_1 = tslib_1.__importDefault(requireTypes());
-  		var shared_1 = tslib_1.__importDefault(requireShared());
+  		var shared_1 = tslib_1.__importStar(requireShared());
   		function default_1(fork) {
-  		    fork.use(es2020_1.default);
+  		    fork.use(es_proposals_1.default);
   		    var types = fork.use(types_1.default);
   		    var def = types.Type.def;
   		    var or = types.Type.or;
@@ -5756,65 +6245,17 @@
   		        .field("expression", def("Expression"));
   		}
   		exports.default = default_1;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (jsx, jsx.exports));
   	return jsx.exports;
   }
 
   var flow = {exports: {}};
 
-  var esProposals = {exports: {}};
-
-  var hasRequiredEsProposals;
-
-  function requireEsProposals () {
-  	if (hasRequiredEsProposals) return esProposals.exports;
-  	hasRequiredEsProposals = 1;
-  	(function (module, exports) {
-  		Object.defineProperty(exports, "__esModule", { value: true });
-  		var tslib_1 = require$$0;
-  		var types_1 = tslib_1.__importDefault(requireTypes());
-  		var shared_1 = tslib_1.__importDefault(requireShared());
-  		var es2020_1 = tslib_1.__importDefault(requireEs2020());
-  		function default_1(fork) {
-  		    fork.use(es2020_1.default);
-  		    var types = fork.use(types_1.default);
-  		    var Type = types.Type;
-  		    var def = types.Type.def;
-  		    var or = Type.or;
-  		    var shared = fork.use(shared_1.default);
-  		    var defaults = shared.defaults;
-  		    def("AwaitExpression")
-  		        .build("argument", "all")
-  		        .field("argument", or(def("Expression"), null))
-  		        .field("all", Boolean, defaults["false"]);
-  		    // Decorators
-  		    def("Decorator")
-  		        .bases("Node")
-  		        .build("expression")
-  		        .field("expression", def("Expression"));
-  		    def("Property")
-  		        .field("decorators", or([def("Decorator")], null), defaults["null"]);
-  		    def("MethodDefinition")
-  		        .field("decorators", or([def("Decorator")], null), defaults["null"]);
-  		    // Private names
-  		    def("PrivateName")
-  		        .bases("Expression", "Pattern")
-  		        .build("id")
-  		        .field("id", def("Identifier"));
-  		    def("ClassPrivateProperty")
-  		        .bases("ClassProperty")
-  		        .build("key", "value")
-  		        .field("key", def("PrivateName"))
-  		        .field("value", or(def("Expression"), null), defaults["null"]);
-  		}
-  		exports.default = default_1;
-  		module.exports = exports["default"]; 
-  	} (esProposals, esProposals.exports));
-  	return esProposals.exports;
-  }
-
   var typeAnnotations = {exports: {}};
+
+  typeAnnotations.exports;
 
   var hasRequiredTypeAnnotations;
 
@@ -5830,7 +6271,7 @@
   		Object.defineProperty(exports, "__esModule", { value: true });
   		var tslib_1 = require$$0;
   		var types_1 = tslib_1.__importDefault(requireTypes());
-  		var shared_1 = tslib_1.__importDefault(requireShared());
+  		var shared_1 = tslib_1.__importStar(requireShared());
   		function default_1(fork) {
   		    var types = fork.use(types_1.default);
   		    var def = types.Type.def;
@@ -5860,10 +6301,13 @@
   		    });
   		}
   		exports.default = default_1;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (typeAnnotations, typeAnnotations.exports));
   	return typeAnnotations.exports;
   }
+
+  flow.exports;
 
   var hasRequiredFlow;
 
@@ -5876,7 +6320,7 @@
   		var es_proposals_1 = tslib_1.__importDefault(requireEsProposals());
   		var type_annotations_1 = tslib_1.__importDefault(requireTypeAnnotations());
   		var types_1 = tslib_1.__importDefault(requireTypes());
-  		var shared_1 = tslib_1.__importDefault(requireShared());
+  		var shared_1 = tslib_1.__importStar(requireShared());
   		function default_1(fork) {
   		    fork.use(es_proposals_1.default);
   		    fork.use(type_annotations_1.default);
@@ -6033,6 +6477,17 @@
   		        .build("object", "property")
   		        .field("object", def("Identifier"))
   		        .field("property", or(def("MemberTypeAnnotation"), def("GenericTypeAnnotation")));
+  		    def("IndexedAccessType")
+  		        .bases("FlowType")
+  		        .build("objectType", "indexType")
+  		        .field("objectType", def("FlowType"))
+  		        .field("indexType", def("FlowType"));
+  		    def("OptionalIndexedAccessType")
+  		        .bases("FlowType")
+  		        .build("objectType", "indexType", "optional")
+  		        .field("objectType", def("FlowType"))
+  		        .field("indexType", def("FlowType"))
+  		        .field('optional', Boolean);
   		    def("UnionTypeAnnotation")
   		        .bases("FlowType")
   		        .build("types")
@@ -6218,12 +6673,15 @@
   		        .field("id", def("Identifier"));
   		}
   		exports.default = default_1;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (flow, flow.exports));
   	return flow.exports;
   }
 
   var esprima$1 = {exports: {}};
+
+  esprima$1.exports;
 
   var hasRequiredEsprima$1;
 
@@ -6233,11 +6691,11 @@
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
   		var tslib_1 = require$$0;
-  		var es2020_1 = tslib_1.__importDefault(requireEs2020());
+  		var es_proposals_1 = tslib_1.__importDefault(requireEsProposals());
   		var types_1 = tslib_1.__importDefault(requireTypes());
-  		var shared_1 = tslib_1.__importDefault(requireShared());
+  		var shared_1 = tslib_1.__importStar(requireShared());
   		function default_1(fork) {
-  		    fork.use(es2020_1.default);
+  		    fork.use(es_proposals_1.default);
   		    var types = fork.use(types_1.default);
   		    var defaults = fork.use(shared_1.default).defaults;
   		    var def = types.Type.def;
@@ -6278,7 +6736,8 @@
   		        .build("value", /*optional:*/ "leading", "trailing");
   		}
   		exports.default = default_1;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (esprima$1, esprima$1.exports));
   	return esprima$1.exports;
   }
@@ -6286,6 +6745,8 @@
   var babel = {exports: {}};
 
   var babelCore = {exports: {}};
+
+  babelCore.exports;
 
   var hasRequiredBabelCore;
 
@@ -6297,13 +6758,15 @@
   		var tslib_1 = require$$0;
   		var es_proposals_1 = tslib_1.__importDefault(requireEsProposals());
   		var types_1 = tslib_1.__importDefault(requireTypes());
-  		var shared_1 = tslib_1.__importDefault(requireShared());
+  		var shared_1 = tslib_1.__importStar(requireShared());
   		function default_1(fork) {
+  		    var _a, _b, _c, _d, _e;
   		    fork.use(es_proposals_1.default);
   		    var types = fork.use(types_1.default);
   		    var defaults = fork.use(shared_1.default).defaults;
   		    var def = types.Type.def;
   		    var or = types.Type.or;
+  		    var isUndefined = types.builtInTypes.undefined;
   		    def("Noop")
   		        .bases("Statement")
   		        .build();
@@ -6357,40 +6820,49 @@
   		        .field("body", [def("Statement")])
   		        .field("directives", [def("Directive")], defaults.emptyArray)
   		        .field("interpreter", or(def("InterpreterDirective"), null), defaults["null"]);
+  		    function makeLiteralExtra(rawValueType, toRaw) {
+  		        if (rawValueType === void 0) { rawValueType = String; }
+  		        return [
+  		            "extra",
+  		            {
+  		                rawValue: rawValueType,
+  		                raw: String,
+  		            },
+  		            function getDefault() {
+  		                var value = types.getFieldValue(this, "value");
+  		                return {
+  		                    rawValue: value,
+  		                    raw: toRaw ? toRaw(value) : String(value),
+  		                };
+  		            },
+  		        ];
+  		    }
   		    // Split Literal
-  		    def("StringLiteral")
+  		    (_a = def("StringLiteral")
   		        .bases("Literal")
   		        .build("value")
-  		        .field("value", String);
-  		    def("NumericLiteral")
+  		        .field("value", String))
+  		        .field.apply(_a, makeLiteralExtra(String, function (val) { return JSON.stringify(val); }));
+  		    (_b = def("NumericLiteral")
   		        .bases("Literal")
   		        .build("value")
   		        .field("value", Number)
-  		        .field("raw", or(String, null), defaults["null"])
-  		        .field("extra", {
-  		        rawValue: Number,
-  		        raw: String
-  		    }, function getDefault() {
-  		        return {
-  		            rawValue: this.value,
-  		            raw: this.value + ""
-  		        };
-  		    });
-  		    def("BigIntLiteral")
+  		        .field("raw", or(String, null), defaults["null"]))
+  		        .field.apply(_b, makeLiteralExtra(Number));
+  		    (_c = def("BigIntLiteral")
   		        .bases("Literal")
   		        .build("value")
   		        // Only String really seems appropriate here, since BigInt values
   		        // often exceed the limits of JS numbers.
-  		        .field("value", or(String, Number))
-  		        .field("extra", {
-  		        rawValue: String,
-  		        raw: String
-  		    }, function getDefault() {
-  		        return {
-  		            rawValue: String(this.value),
-  		            raw: this.value + "n"
-  		        };
-  		    });
+  		        .field("value", or(String, Number)))
+  		        .field.apply(_c, makeLiteralExtra(String, function (val) { return val + "n"; }));
+  		    // https://github.com/tc39/proposal-decimal
+  		    // https://github.com/babel/babel/pull/11640
+  		    (_d = def("DecimalLiteral")
+  		        .bases("Literal")
+  		        .build("value")
+  		        .field("value", String))
+  		        .field.apply(_d, makeLiteralExtra(String, function (val) { return val + "m"; }));
   		    def("NullLiteral")
   		        .bases("Literal")
   		        .build()
@@ -6399,13 +6871,22 @@
   		        .bases("Literal")
   		        .build("value")
   		        .field("value", Boolean);
-  		    def("RegExpLiteral")
+  		    (_e = def("RegExpLiteral")
   		        .bases("Literal")
   		        .build("pattern", "flags")
   		        .field("pattern", String)
   		        .field("flags", String)
   		        .field("value", RegExp, function () {
   		        return new RegExp(this.pattern, this.flags);
+  		    }))
+  		        .field.apply(_e, makeLiteralExtra(or(RegExp, isUndefined), function (exp) { return "/".concat(exp.pattern, "/").concat(exp.flags || ""); })).field("regex", {
+  		        pattern: String,
+  		        flags: String
+  		    }, function () {
+  		        return {
+  		            pattern: this.pattern,
+  		            flags: this.flags,
+  		        };
   		    });
   		    var ObjectExpressionProperty = or(def("Property"), def("ObjectMethod"), def("ObjectProperty"), def("SpreadProperty"), def("SpreadElement"));
   		    // Split Property -> ObjectProperty and ObjectMethod
@@ -6435,7 +6916,7 @@
   		        .field("accessibility", // TypeScript
   		    or(def("Literal"), null), defaults["null"])
   		        .field("computed", Boolean, defaults["false"]);
-  		    var ClassBodyElement = or(def("MethodDefinition"), def("VariableDeclarator"), def("ClassPropertyDefinition"), def("ClassProperty"), def("ClassPrivateProperty"), def("ClassMethod"), def("ClassPrivateMethod"));
+  		    var ClassBodyElement = or(def("MethodDefinition"), def("VariableDeclarator"), def("ClassPropertyDefinition"), def("ClassProperty"), def("ClassPrivateProperty"), def("ClassMethod"), def("ClassPrivateMethod"), def("ClassAccessorProperty"), def("StaticBlock"));
   		    // MethodDefinition -> ClassMethod
   		    def("ClassBody")
   		        .bases("Declaration")
@@ -6449,24 +6930,41 @@
   		        .bases("Declaration", "Function")
   		        .build("key", "params", "body", "kind", "computed", "static")
   		        .field("key", def("PrivateName"));
+  		    def("ClassAccessorProperty")
+  		        .bases("Declaration")
+  		        .build("key", "value", "decorators", "computed", "static")
+  		        .field("key", or(def("Literal"), def("Identifier"), def("PrivateName"), 
+  		    // Only when .computed is true (TODO enforce this)
+  		    def("Expression")))
+  		        .field("value", or(def("Expression"), null), defaults["null"]);
   		    ["ClassMethod",
   		        "ClassPrivateMethod",
   		    ].forEach(function (typeName) {
   		        def(typeName)
   		            .field("kind", or("get", "set", "method", "constructor"), function () { return "method"; })
   		            .field("body", def("BlockStatement"))
+  		            // For backwards compatibility only. Expect accessibility instead (see below).
+  		            .field("access", or("public", "private", "protected", null), defaults["null"]);
+  		    });
+  		    ["ClassMethod",
+  		        "ClassPrivateMethod",
+  		        "ClassAccessorProperty",
+  		    ].forEach(function (typeName) {
+  		        def(typeName)
   		            .field("computed", Boolean, defaults["false"])
-  		            .field("static", or(Boolean, null), defaults["null"])
-  		            .field("abstract", or(Boolean, null), defaults["null"])
-  		            .field("access", or("public", "private", "protected", null), defaults["null"])
+  		            .field("static", Boolean, defaults["false"])
+  		            .field("abstract", Boolean, defaults["false"])
   		            .field("accessibility", or("public", "private", "protected", null), defaults["null"])
   		            .field("decorators", or([def("Decorator")], null), defaults["null"])
-  		            .field("optional", or(Boolean, null), defaults["null"]);
+  		            .field("definite", Boolean, defaults["false"])
+  		            .field("optional", Boolean, defaults["false"])
+  		            .field("override", Boolean, defaults["false"])
+  		            .field("readonly", Boolean, defaults["false"]);
   		    });
   		    var ObjectPatternProperty = or(def("Property"), def("PropertyPattern"), def("SpreadPropertyPattern"), def("SpreadProperty"), // Used by Esprima
   		    def("ObjectProperty"), // Babel 6
-  		    def("RestProperty") // Babel 6
-  		    );
+  		    def("RestProperty"), // Babel 6
+  		    def("RestElement"));
   		    // Split into RestProperty and SpreadProperty
   		    def("ObjectPattern")
   		        .bases("Pattern")
@@ -6493,10 +6991,13 @@
   		        .build();
   		}
   		exports.default = default_1;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (babelCore, babelCore.exports));
   	return babelCore.exports;
   }
+
+  babel.exports;
 
   var hasRequiredBabel;
 
@@ -6506,19 +7007,36 @@
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
   		var tslib_1 = require$$0;
+  		var types_1 = tslib_1.__importDefault(requireTypes());
   		var babel_core_1 = tslib_1.__importDefault(requireBabelCore());
   		var flow_1 = tslib_1.__importDefault(requireFlow());
+  		var shared_1 = requireShared();
   		function default_1(fork) {
+  		    var types = fork.use(types_1.default);
+  		    var def = types.Type.def;
   		    fork.use(babel_core_1.default);
   		    fork.use(flow_1.default);
+  		    // https://github.com/babel/babel/pull/10148
+  		    def("V8IntrinsicIdentifier")
+  		        .bases("Expression")
+  		        .build("name")
+  		        .field("name", String);
+  		    // https://github.com/babel/babel/pull/13191
+  		    // https://github.com/babel/website/pull/2541
+  		    def("TopicReference")
+  		        .bases("Expression")
+  		        .build();
   		}
   		exports.default = default_1;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (babel, babel.exports));
   	return babel.exports;
   }
 
   var typescript = {exports: {}};
+
+  typescript.exports;
 
   var hasRequiredTypescript;
 
@@ -6531,7 +7049,7 @@
   		var babel_core_1 = tslib_1.__importDefault(requireBabelCore());
   		var type_annotations_1 = tslib_1.__importDefault(requireTypeAnnotations());
   		var types_1 = tslib_1.__importDefault(requireTypes());
-  		var shared_1 = tslib_1.__importDefault(requireShared());
+  		var shared_1 = tslib_1.__importStar(requireShared());
   		function default_1(fork) {
   		    // Since TypeScript is parsed by Babylon, include the core Babylon types
   		    // but omit the Flow-related types.
@@ -6584,6 +7102,16 @@
   		        .field("expression", def("Expression"))
   		        .field("typeAnnotation", def("TSType"))
   		        .field("extra", or({ parenthesized: Boolean }, null), defaults["null"]);
+  		    def("TSTypeCastExpression")
+  		        .bases("Expression")
+  		        .build("expression", "typeAnnotation")
+  		        .field("expression", def("Expression"))
+  		        .field("typeAnnotation", def("TSType"));
+  		    def("TSSatisfiesExpression")
+  		        .bases("Expression", "Pattern")
+  		        .build("expression", "typeAnnotation")
+  		        .field("expression", def("Expression"))
+  		        .field("typeAnnotation", def("TSType"));
   		    def("TSNonNullExpression")
   		        .bases("Expression", "Pattern")
   		        .build("expression")
@@ -6601,6 +7129,7 @@
   		        "TSUndefinedKeyword",
   		        "TSUnknownKeyword",
   		        "TSVoidKeyword",
+  		        "TSIntrinsicKeyword",
   		        "TSThisType",
   		    ].forEach(function (keywordType) {
   		        def(keywordType)
@@ -6614,7 +7143,13 @@
   		    def("TSLiteralType")
   		        .bases("TSType")
   		        .build("literal")
-  		        .field("literal", or(def("NumericLiteral"), def("StringLiteral"), def("BooleanLiteral"), def("TemplateLiteral"), def("UnaryExpression")));
+  		        .field("literal", or(def("NumericLiteral"), def("StringLiteral"), def("BooleanLiteral"), def("TemplateLiteral"), def("UnaryExpression"), def("BigIntLiteral")));
+  		    def("TemplateLiteral")
+  		        // The TemplateLiteral type appears to be reused for TypeScript template
+  		        // literal types (instead of introducing a new TSTemplateLiteralType type),
+  		        // so we allow the templateLiteral.expressions array to be either all
+  		        // expressions or all TypeScript types.
+  		        .field("expressions", or([def("Expression")], [def("TSType")]));
   		    ["TSUnionType",
   		        "TSIntersectionType",
   		    ].forEach(function (typeName) {
@@ -6772,7 +7307,7 @@
   		    def("TSTypeParameter")
   		        .bases("Identifier")
   		        .build("name", "constraint", "default")
-  		        .field("name", String)
+  		        .field("name", or(def("Identifier"), String))
   		        .field("constraint", or(def("TSType"), void 0), defaults["undefined"])
   		        .field("default", or(def("TSType"), void 0), defaults["undefined"]);
   		    def("TSTypeAssertion")
@@ -6785,6 +7320,10 @@
   		        .bases("Declaration")
   		        .build("params")
   		        .field("params", [def("TSTypeParameter")]);
+  		    def("TSInstantiationExpression")
+  		        .bases("Expression", "TSHasOptionalTypeParameterInstantiation")
+  		        .build("expression", "typeParameters")
+  		        .field("expression", def("Expression"));
   		    def("TSTypeParameterInstantiation")
   		        .bases("Node")
   		        .build("params")
@@ -6861,14 +7400,17 @@
   		    def("ClassProperty")
   		        .field("access", // Not "accessibility"?
   		    or("public", "private", "protected", void 0), defaults["undefined"]);
+  		    def("ClassAccessorProperty")
+  		        .bases("Declaration", "TSHasOptionalTypeAnnotation");
   		    // Defined already in es6 and babel-core.
   		    def("ClassBody")
-  		        .field("body", [or(def("MethodDefinition"), def("VariableDeclarator"), def("ClassPropertyDefinition"), def("ClassProperty"), def("ClassPrivateProperty"), def("ClassMethod"), def("ClassPrivateMethod"), 
+  		        .field("body", [or(def("MethodDefinition"), def("VariableDeclarator"), def("ClassPropertyDefinition"), def("ClassProperty"), def("ClassPrivateProperty"), def("ClassAccessorProperty"), def("ClassMethod"), def("ClassPrivateMethod"), def("StaticBlock"), 
   		        // Just need to add these types:
   		        def("TSDeclareMethod"), TSTypeMember)]);
   		}
   		exports.default = default_1;
-  		module.exports = exports["default"]; 
+  		(0, shared_1.maybeSetModuleExports)(function () { return module; });
+  		
   	} (typescript, typescript.exports));
   	return typescript.exports;
   }
@@ -6884,7 +7426,8 @@
   		Object.defineProperty(exports, "__esModule", { value: true });
   		exports.namedTypes = void 0;
   		(function (namedTypes) {
-  		})(exports.namedTypes || (exports.namedTypes = {})); 
+  		})(exports.namedTypes || (exports.namedTypes = {}));
+  		
   	} (namedTypes$1));
   	return namedTypes$1;
   }
@@ -6899,39 +7442,23 @@
   		exports.visit = exports.use = exports.Type = exports.someField = exports.PathVisitor = exports.Path = exports.NodePath = exports.namedTypes = exports.getSupertypeNames = exports.getFieldValue = exports.getFieldNames = exports.getBuilderName = exports.finalize = exports.eachField = exports.defineMethod = exports.builtInTypes = exports.builders = exports.astNodesAreEquivalent = void 0;
   		var tslib_1 = require$$0;
   		var fork_1 = tslib_1.__importDefault(requireFork());
-  		var core_1 = tslib_1.__importDefault(requireCore());
-  		var es6_1 = tslib_1.__importDefault(requireEs6());
-  		var es2016_1 = tslib_1.__importDefault(requireEs2016());
-  		var es2017_1 = tslib_1.__importDefault(requireEs2017());
-  		var es2018_1 = tslib_1.__importDefault(requireEs2018());
-  		var es2019_1 = tslib_1.__importDefault(requireEs2019());
-  		var es2020_1 = tslib_1.__importDefault(requireEs2020());
+  		var es_proposals_1 = tslib_1.__importDefault(requireEsProposals());
   		var jsx_1 = tslib_1.__importDefault(requireJsx());
   		var flow_1 = tslib_1.__importDefault(requireFlow());
   		var esprima_1 = tslib_1.__importDefault(requireEsprima$1());
   		var babel_1 = tslib_1.__importDefault(requireBabel());
   		var typescript_1 = tslib_1.__importDefault(requireTypescript());
-  		var es_proposals_1 = tslib_1.__importDefault(requireEsProposals());
   		var namedTypes_1 = requireNamedTypes();
   		Object.defineProperty(exports, "namedTypes", { enumerable: true, get: function () { return namedTypes_1.namedTypes; } });
-  		var _a = fork_1.default([
-  		    // This core module of AST types captures ES5 as it is parsed today by
-  		    // git://github.com/ariya/esprima.git#master.
-  		    core_1.default,
+  		var _a = (0, fork_1.default)([
   		    // Feel free to add to or remove from this list of extension modules to
   		    // configure the precise type hierarchy that you need.
-  		    es6_1.default,
-  		    es2016_1.default,
-  		    es2017_1.default,
-  		    es2018_1.default,
-  		    es2019_1.default,
-  		    es2020_1.default,
+  		    es_proposals_1.default,
   		    jsx_1.default,
   		    flow_1.default,
   		    esprima_1.default,
   		    babel_1.default,
   		    typescript_1.default,
-  		    es_proposals_1.default,
   		]), astNodesAreEquivalent = _a.astNodesAreEquivalent, builders = _a.builders, builtInTypes = _a.builtInTypes, defineMethod = _a.defineMethod, eachField = _a.eachField, finalize = _a.finalize, getBuilderName = _a.getBuilderName, getFieldNames = _a.getFieldNames, getFieldValue = _a.getFieldValue, getSupertypeNames = _a.getSupertypeNames, n = _a.namedTypes, NodePath = _a.NodePath, Path = _a.Path, PathVisitor = _a.PathVisitor, someField = _a.someField, Type = _a.Type, use = _a.use, visit = _a.visit;
   		exports.astNodesAreEquivalent = astNodesAreEquivalent;
   		exports.builders = builders;
@@ -6952,7 +7479,8 @@
   		exports.visit = visit;
   		// Populate the exported fields of the namedTypes namespace, while still
   		// retaining its member types.
-  		Object.assign(namedTypes_1.namedTypes, n); 
+  		Object.assign(namedTypes_1.namedTypes, n);
+  		
   	} (main));
   	return main;
   }
@@ -6970,11 +7498,9 @@
     default: assert
   });
 
-  var require$$1$1 = /*@__PURE__*/getAugmentedNamespace(assertMockApi);
+  var require$$1 = /*@__PURE__*/getAugmentedNamespace(assertMockApi);
 
   var options = {};
-
-  var esprima = {};
 
   var util = {};
 
@@ -7008,16 +7534,33 @@
 
   var require$$2 = /*@__PURE__*/getAugmentedNamespace(sourcemapMockApi$1);
 
+  const EOL = '\n';
+
+  var osMockApi = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    EOL: EOL
+  });
+
+  var require$$4 = /*@__PURE__*/getAugmentedNamespace(osMockApi);
+
   Object.defineProperty(util, "__esModule", { value: true });
-  util.isTrailingCommaEnabled = util.getParentExportDeclaration = util.isExportDeclaration = util.fixFaultyLocations = util.getTrueLoc = composeSourceMaps_1 = util.composeSourceMaps = util.copyPos = util.comparePos = util.getUnionOfKeys = util.getOption = void 0;
+  util.isTrailingCommaEnabled = util.getParentExportDeclaration = util.isExportDeclaration = util.fixFaultyLocations = util.getTrueLoc = composeSourceMaps_1 = util.composeSourceMaps = util.copyPos = util.comparePos = util.getUnionOfKeys = util.getOption = util.isBrowser = util.getLineTerminator = void 0;
   var tslib_1 = require$$0;
-  var assert_1 = tslib_1.__importDefault(require$$1$1);
+  var assert_1 = tslib_1.__importDefault(require$$1);
   var types$1 = tslib_1.__importStar(requireMain());
   var n = types$1.namedTypes;
   var source_map_1 = tslib_1.__importDefault(require$$2);
   var SourceMapConsumer = source_map_1.default.SourceMapConsumer;
   var SourceMapGenerator = source_map_1.default.SourceMapGenerator;
   var hasOwn = Object.prototype.hasOwnProperty;
+  function getLineTerminator() {
+      return isBrowser() ? "\n" : require$$4.EOL || "\n";
+  }
+  util.getLineTerminator = getLineTerminator;
+  function isBrowser() {
+      return (typeof window !== "undefined" && typeof window.document !== "undefined");
+  }
+  util.isBrowser = isBrowser;
   function getOption(options, key, defaultValue) {
       if (options && hasOwn.call(options, key)) {
           return options[key];
@@ -7331,6 +7874,8 @@
   }
   util.isTrailingCommaEnabled = isTrailingCommaEnabled;
 
+  var esprima = {};
+
   var hasRequiredEsprima;
 
   function requireEsprima () {
@@ -7353,10 +7898,11 @@
   	        locations: true,
   	        comment: true,
   	        onComment: comments,
-  	        range: util_1.getOption(options, "range", false),
-  	        tolerant: util_1.getOption(options, "tolerant", true),
+  	        range: (0, util_1.getOption)(options, "range", false),
+  	        tolerant: (0, util_1.getOption)(options, "tolerant", true),
   	        tokens: true,
-  	        jsx: util_1.getOption(options, "jsx", false)
+  	        jsx: (0, util_1.getOption)(options, "jsx", false),
+  	        sourceType: (0, util_1.getOption)(options, "sourceType", "module"),
   	    });
   	    if (!Array.isArray(ast.comments)) {
   	        ast.comments = comments;
@@ -7367,15 +7913,6 @@
   	return esprima;
   }
 
-  const EOL = '\n';
-
-  var osMockApi = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    EOL: EOL
-  });
-
-  var require$$1 = /*@__PURE__*/getAugmentedNamespace(osMockApi);
-
   var hasRequiredOptions;
 
   function requireOptions () {
@@ -7383,12 +7920,13 @@
   	hasRequiredOptions = 1;
   	Object.defineProperty(options, "__esModule", { value: true });
   	options.normalize = void 0;
+  	var util_1 = util;
   	var defaults = {
   	    parser: requireEsprima(),
   	    tabWidth: 4,
   	    useTabs: false,
   	    reuseWhitespace: true,
-  	    lineTerminator: require$$1.EOL || "\n",
+  	    lineTerminator: (0, util_1.getLineTerminator)(),
   	    wrapColumn: 74,
   	    sourceFileName: null,
   	    sourceMapName: null,
@@ -7448,7 +7986,7 @@
   	hasRequiredMapping = 1;
   	Object.defineProperty(mapping, "__esModule", { value: true });
   	var tslib_1 = require$$0;
-  	var assert_1 = tslib_1.__importDefault(require$$1$1);
+  	var assert_1 = tslib_1.__importDefault(require$$1);
   	var util_1 = util;
   	var Mapping = /** @class */ (function () {
   	    function Mapping(sourceLines, sourceLoc, targetLoc) {
@@ -7474,8 +8012,8 @@
   	            }
   	            return skipChars(sourceLines, sourceFromPos, lines, targetFromPos, targetToPos);
   	        }
-  	        if (util_1.comparePos(start, targetLoc.start) <= 0) {
-  	            if (util_1.comparePos(targetLoc.end, end) <= 0) {
+  	        if ((0, util_1.comparePos)(start, targetLoc.start) <= 0) {
+  	            if ((0, util_1.comparePos)(targetLoc.end, end) <= 0) {
   	                targetLoc = {
   	                    start: subtractPos(targetLoc.start, start.line, start.column),
   	                    end: subtractPos(targetLoc.end, start.line, start.column),
@@ -7483,7 +8021,7 @@
   	                // The sourceLoc can stay the same because the contents of the
   	                // targetLoc have not changed.
   	            }
-  	            else if (util_1.comparePos(end, targetLoc.start) <= 0) {
+  	            else if ((0, util_1.comparePos)(end, targetLoc.start) <= 0) {
   	                return null;
   	            }
   	            else {
@@ -7498,10 +8036,10 @@
   	            }
   	        }
   	        else {
-  	            if (util_1.comparePos(targetLoc.end, start) <= 0) {
+  	            if ((0, util_1.comparePos)(targetLoc.end, start) <= 0) {
   	                return null;
   	            }
-  	            if (util_1.comparePos(targetLoc.end, end) <= 0) {
+  	            if ((0, util_1.comparePos)(targetLoc.end, end) <= 0) {
   	                sourceLoc = {
   	                    start: skip("start"),
   	                    end: sourceLoc.end,
@@ -7586,7 +8124,7 @@
   	    };
   	}
   	function skipChars(sourceLines, sourceFromPos, targetLines, targetFromPos, targetToPos) {
-  	    var targetComparison = util_1.comparePos(targetFromPos, targetToPos);
+  	    var targetComparison = (0, util_1.comparePos)(targetFromPos, targetToPos);
   	    if (targetComparison === 0) {
   	        // Trivial case: no characters to skip.
   	        return sourceFromPos;
@@ -7610,7 +8148,7 @@
   	        else {
   	            assert_1.default.strictEqual(lineDiff, 0);
   	        }
-  	        while (util_1.comparePos(targetCursor, targetToPos) < 0 &&
+  	        while ((0, util_1.comparePos)(targetCursor, targetToPos) < 0 &&
   	            targetLines.nextPos(targetCursor, true)) {
   	            assert_1.default.ok(sourceLines.nextPos(sourceCursor, true));
   	            assert_1.default.strictEqual(sourceLines.charAt(sourceCursor), targetLines.charAt(targetCursor));
@@ -7634,7 +8172,7 @@
   	        else {
   	            assert_1.default.strictEqual(lineDiff, 0);
   	        }
-  	        while (util_1.comparePos(targetToPos, targetCursor) < 0 &&
+  	        while ((0, util_1.comparePos)(targetToPos, targetCursor) < 0 &&
   	            targetLines.prevPos(targetCursor, true)) {
   	            assert_1.default.ok(sourceLines.prevPos(sourceCursor, true));
   	            assert_1.default.strictEqual(sourceLines.charAt(sourceCursor), targetLines.charAt(targetCursor));
@@ -7653,7 +8191,7 @@
   	Object.defineProperty(lines, "__esModule", { value: true });
   	lines.concat = lines.fromString = lines.countSpaces = lines.Lines = void 0;
   	var tslib_1 = require$$0;
-  	var assert_1 = tslib_1.__importDefault(require$$1$1);
+  	var assert_1 = tslib_1.__importDefault(require$$1);
   	var source_map_1 = tslib_1.__importDefault(require$$2);
   	var options_1 = requireOptions();
   	var util_1 = util;
@@ -7708,8 +8246,8 @@
   	                mapping.sourceLines.lastPos();
   	            var targetCursor = targetLines.skipSpaces(mapping.targetLoc.start) ||
   	                targetLines.lastPos();
-  	            while (util_1.comparePos(sourceCursor, mapping.sourceLoc.end) < 0 &&
-  	                util_1.comparePos(targetCursor, mapping.targetLoc.end) < 0) {
+  	            while ((0, util_1.comparePos)(sourceCursor, mapping.sourceLoc.end) < 0 &&
+  	                (0, util_1.comparePos)(targetCursor, mapping.targetLoc.end) < 0) {
   	                var sourceChar = mapping.sourceLines.charAt(sourceCursor);
   	                var targetChar = targetLines.charAt(targetCursor);
   	                assert_1.default.strictEqual(sourceChar, targetChar);
@@ -8054,7 +8592,7 @@
   	    Lines.prototype.sliceString = function (start, end, options) {
   	        if (start === void 0) { start = this.firstPos(); }
   	        if (end === void 0) { end = this.lastPos(); }
-  	        var _a = options_1.normalize(options), tabWidth = _a.tabWidth, useTabs = _a.useTabs, reuseWhitespace = _a.reuseWhitespace, lineTerminator = _a.lineTerminator;
+  	        var _a = (0, options_1.normalize)(options), tabWidth = _a.tabWidth, useTabs = _a.useTabs, reuseWhitespace = _a.reuseWhitespace, lineTerminator = _a.lineTerminator;
   	        var parts = [];
   	        for (var line = start.line; line <= end.line; ++line) {
   	            var info = this.infos[line - 1];
@@ -8242,7 +8780,7 @@
   	            sliceStart: spaces.length,
   	            sliceEnd: line.length,
   	        };
-  	    }), options_1.normalize(options).sourceFileName);
+  	    }), (0, options_1.normalize)(options).sourceFileName);
   	    if (cacheable)
   	        fromStringCache[string] = lines;
   	    return lines;
@@ -8316,7 +8854,7 @@
   	Object.defineProperty(comments, "__esModule", { value: true });
   	comments.printComments = comments.attach = void 0;
   	var tslib_1 = require$$0;
-  	var assert_1 = tslib_1.__importDefault(require$$1$1);
+  	var assert_1 = tslib_1.__importDefault(require$$1);
   	var types = tslib_1.__importStar(requireMain());
   	var n = types.namedTypes;
   	var isArray = types.builtInTypes.array;
@@ -8334,7 +8872,7 @@
   	    // are fixed by this utility function. Specifically, if it decides to
   	    // set node.loc to null, indicating that the node's .loc information
   	    // is unreliable, then we don't want to add node to the resultArray.
-  	    util_1.fixFaultyLocations(node, lines);
+  	    (0, util_1.fixFaultyLocations)(node, lines);
   	    if (resultArray) {
   	        if (n.Node.check(node) && n.SourceLocation.check(node.loc)) {
   	            // This reverse insertion sort almost always takes constant
@@ -8345,7 +8883,7 @@
   	                var child = resultArray[i];
   	                if (child &&
   	                    child.loc &&
-  	                    util_1.comparePos(child.loc.end, node.loc.start) <= 0) {
+  	                    (0, util_1.comparePos)(child.loc.end, node.loc.start) <= 0) {
   	                    break;
   	                }
   	            }
@@ -8390,13 +8928,13 @@
   	    while (typeof right === "number" && left < right) {
   	        var middle = (left + right) >> 1;
   	        var child = childNodes[middle];
-  	        if (util_1.comparePos(child.loc.start, comment.loc.start) <= 0 &&
-  	            util_1.comparePos(comment.loc.end, child.loc.end) <= 0) {
+  	        if ((0, util_1.comparePos)(child.loc.start, comment.loc.start) <= 0 &&
+  	            (0, util_1.comparePos)(comment.loc.end, child.loc.end) <= 0) {
   	            // The comment is completely contained by this child node.
   	            decorateComment((comment.enclosingNode = child), comment, lines);
   	            return; // Abandon the binary search at this level.
   	        }
-  	        if (util_1.comparePos(child.loc.end, comment.loc.start) <= 0) {
+  	        if ((0, util_1.comparePos)(child.loc.end, comment.loc.start) <= 0) {
   	            // This child node falls completely before the comment.
   	            // Because we will never consider this node or any nodes
   	            // before it again, this node must be the closest preceding
@@ -8405,7 +8943,7 @@
   	            left = middle + 1;
   	            continue;
   	        }
-  	        if (util_1.comparePos(comment.loc.end, child.loc.start) <= 0) {
+  	        if ((0, util_1.comparePos)(comment.loc.end, child.loc.start) <= 0) {
   	            // This child node falls completely after the comment.
   	            // Because we will never consider this node or any nodes after
   	            // it again, this node must be the closest following node we
@@ -8509,6 +9047,12 @@
   	        comment.loc.start.column > fn.loc.start.column) {
   	        ++indexOfFirstLeadingComment;
   	    }
+  	    if (indexOfFirstLeadingComment) {
+  	        var enclosingNode = tiesToBreak[indexOfFirstLeadingComment - 1].enclosingNode;
+  	        if ((enclosingNode === null || enclosingNode === void 0 ? void 0 : enclosingNode.type) === "CallExpression") {
+  	            --indexOfFirstLeadingComment;
+  	        }
+  	    }
   	    tiesToBreak.forEach(function (comment, i) {
   	        if (i < indexOfFirstLeadingComment) {
   	            addTrailingComment(pn, comment);
@@ -8565,7 +9109,7 @@
   	    else {
   	        parts.push("\n");
   	    }
-  	    return lines_1.concat(parts);
+  	    return (0, lines_1.concat)(parts);
   	}
   	function printTrailingComment(commentPath, print) {
   	    var comment = commentPath.getValue(commentPath);
@@ -8588,7 +9132,7 @@
   	        }
   	    }
   	    parts.push(print(commentPath));
-  	    return lines_1.concat(parts);
+  	    return (0, lines_1.concat)(parts);
   	}
   	function printComments(path, print) {
   	    var value = path.getValue();
@@ -8615,7 +9159,7 @@
   	        }
   	    }, "comments");
   	    leadingParts.push.apply(leadingParts, trailingParts);
-  	    return lines_1.concat(leadingParts);
+  	    return (0, lines_1.concat)(leadingParts);
   	}
   	comments.printComments = printComments;
   	return comments;
@@ -8629,7 +9173,7 @@
   	Object.defineProperty(parser, "__esModule", { value: true });
   	parser.parse = void 0;
   	var tslib_1 = require$$0;
-  	var assert_1 = tslib_1.__importDefault(require$$1$1);
+  	var assert_1 = tslib_1.__importDefault(require$$1);
   	var types = tslib_1.__importStar(requireMain());
   	var b = types.builders;
   	var isObject = types.builtInTypes.object;
@@ -8639,8 +9183,8 @@
   	var comments_1 = requireComments();
   	var util$1 = tslib_1.__importStar(util);
   	function parse(source, options) {
-  	    options = options_1.normalize(options);
-  	    var lines = lines_1.fromString(source, options);
+  	    options = (0, options_1.normalize)(options);
+  	    var lines = (0, lines_1.fromString)(source, options);
   	    var sourceWithoutTabs = lines.toString({
   	        tabWidth: options.tabWidth,
   	        reuseWhitespace: false,
@@ -8731,7 +9275,7 @@
   	    program.loc.end = trueProgramLoc.end;
   	    // Passing file.program here instead of just file means that initial
   	    // comments will be attached to program.body[0] instead of program.
-  	    comments_1.attach(comments, program.body.length ? file.program : file, lines);
+  	    (0, comments_1.attach)(comments, program.body.length ? file.program : file, lines);
   	    // Return a copy of the original AST so that any changes made may be
   	    // compared to the original.
   	    return new TreeCopier(lines, tokens).copy(file);
@@ -8880,8 +9424,6 @@
 
   var printer = {};
 
-  var patcher = {};
-
   var fastPath = {};
 
   var hasRequiredFastPath;
@@ -8891,7 +9433,7 @@
   	hasRequiredFastPath = 1;
   	Object.defineProperty(fastPath, "__esModule", { value: true });
   	var tslib_1 = require$$0;
-  	var assert_1 = tslib_1.__importDefault(require$$1$1);
+  	var assert_1 = tslib_1.__importDefault(require$$1);
   	var types = tslib_1.__importStar(requireMain());
   	var util$1 = tslib_1.__importStar(util);
   	var n = types.namedTypes;
@@ -8899,6 +9441,7 @@
   	var isNumber = types.builtInTypes.number;
   	var PRECEDENCE = {};
   	[
+  	    ["??"],
   	    ["||"],
   	    ["&&"],
   	    ["|"],
@@ -9151,9 +9694,6 @@
   	        return true;
   	    }
   	    var parent = this.getParentNode();
-  	    if (!parent) {
-  	        return false;
-  	    }
   	    var name = this.getName();
   	    // If the value of this path is some child of a Node and not a Node
   	    // itself, then it doesn't need parentheses. Only Node objects (in fact,
@@ -9169,10 +9709,14 @@
   	    if (node.type === "Identifier") {
   	        return false;
   	    }
-  	    if (parent.type === "ParenthesizedExpression" ||
-  	        (node.extra && node.extra.parenthesized)) {
+  	    if (parent && parent.type === "ParenthesizedExpression") {
   	        return false;
   	    }
+  	    if (node.extra && node.extra.parenthesized) {
+  	        return true;
+  	    }
+  	    if (!parent)
+  	        return false;
   	    switch (node.type) {
   	        case "UnaryExpression":
   	        case "SpreadElement":
@@ -9226,6 +9770,8 @@
   	                    // explicit exceptions above if this proves overzealous.
   	                    return true;
   	            }
+  	        case "OptionalIndexedAccessType":
+  	            return node.optional && parent.type === "IndexedAccessType";
   	        case "IntersectionTypeAnnotation":
   	        case "UnionTypeAnnotation":
   	            return parent.type === "NullableTypeAnnotation";
@@ -9374,8 +9920,10 @@
   	            assert_1.default.strictEqual(parent.body, child);
   	            return true;
   	        }
+  	        // s[i + 1] and s[i + 2] represent the array between the parent
+  	        // SequenceExpression node and its child nodes
   	        if (n.SequenceExpression.check(parent) &&
-  	            parentName === "expressions" &&
+  	            s[i + 1] === "expressions" &&
   	            childName === 0) {
   	            assert_1.default.strictEqual(parent.expressions[0], child);
   	            continue;
@@ -9410,6 +9958,8 @@
   	return fastPath;
   }
 
+  var patcher = {};
+
   var hasRequiredPatcher;
 
   function requirePatcher () {
@@ -9418,7 +9968,7 @@
   	Object.defineProperty(patcher, "__esModule", { value: true });
   	patcher.getReprinter = patcher.Patcher = void 0;
   	var tslib_1 = require$$0;
-  	var assert_1 = tslib_1.__importDefault(require$$1$1);
+  	var assert_1 = tslib_1.__importDefault(require$$1);
   	var linesModule = tslib_1.__importStar(requireLines());
   	var types = tslib_1.__importStar(requireMain());
   	var Printable = types.namedTypes.Printable;
@@ -9452,13 +10002,13 @@
   	        };
   	        var sliceFrom = loc.start, toConcat = [];
   	        function pushSlice(from, to) {
-  	            assert_1.default.ok(util_1.comparePos(from, to) <= 0);
+  	            assert_1.default.ok((0, util_1.comparePos)(from, to) <= 0);
   	            toConcat.push(lines.slice(from, to));
   	        }
   	        replacements
-  	            .sort(function (a, b) { return util_1.comparePos(a.start, b.start); })
+  	            .sort(function (a, b) { return (0, util_1.comparePos)(a.start, b.start); })
   	            .forEach(function (rep) {
-  	            if (util_1.comparePos(sliceFrom, rep.start) > 0) ;
+  	            if ((0, util_1.comparePos)(sliceFrom, rep.start) > 0) ;
   	            else {
   	                pushSlice(sliceFrom, rep.start);
   	                toConcat.push(rep.lines);
@@ -9601,7 +10151,7 @@
   	// are both identifier characters, they must be separated by a space,
   	// otherwise they will most likely get fused together into a single token.
   	function needsLeadingSpace(oldLines, oldLoc, newLines) {
-  	    var posBeforeOldLoc = util_1.copyPos(oldLoc.start);
+  	    var posBeforeOldLoc = (0, util_1.copyPos)(oldLoc.start);
   	    // The character just before the location occupied by oldNode.
   	    var charBeforeOldLoc = oldLines.prevPos(posBeforeOldLoc) && oldLines.charAt(posBeforeOldLoc);
   	    // First character of the reprinted node.
@@ -9765,7 +10315,7 @@
   	    if (newPath.needsParens() && !oldPath.hasParens()) {
   	        return false;
   	    }
-  	    var keys = util_1.getUnionOfKeys(oldNode, newNode);
+  	    var keys = (0, util_1.getUnionOfKeys)(oldNode, newNode);
   	    if (oldNode.type === "File" || newNode.type === "File") {
   	        // Don't bother traversing file.tokens, an often very large array
   	        // returned by Babylon, and useless for our purposes.
@@ -9809,17 +10359,17 @@
   	Object.defineProperty(printer, "__esModule", { value: true });
   	printer.Printer = void 0;
   	var tslib_1 = require$$0;
-  	var assert_1 = tslib_1.__importDefault(require$$1$1);
+  	var assert_1 = tslib_1.__importDefault(require$$1);
+  	var types = tslib_1.__importStar(requireMain());
   	var comments_1 = requireComments();
+  	var fast_path_1 = tslib_1.__importDefault(requireFastPath());
   	var lines_1 = requireLines();
   	var options_1 = requireOptions();
   	var patcher_1 = requirePatcher();
-  	var types = tslib_1.__importStar(requireMain());
+  	var util$1 = tslib_1.__importStar(util);
   	var namedTypes = types.namedTypes;
   	var isString = types.builtInTypes.string;
   	var isObject = types.builtInTypes.object;
-  	var fast_path_1 = tslib_1.__importDefault(requireFastPath());
-  	var util$1 = tslib_1.__importStar(util);
   	var PrintResult = function PrintResult(code, sourceMap) {
   	    assert_1.default.ok(this instanceof PrintResult);
   	    isString.assert(code);
@@ -9844,7 +10394,7 @@
   	var Printer = function Printer(config) {
   	    assert_1.default.ok(this instanceof Printer);
   	    var explicitTabWidth = config && config.tabWidth;
-  	    config = options_1.normalize(config);
+  	    config = (0, options_1.normalize)(config);
   	    // It's common for client code to pass the same options into both
   	    // recast.parse and recast.print, but the Printer doesn't need (and
   	    // can be confused by) config.sourceFileName, so we null it out.
@@ -9859,7 +10409,7 @@
   	        assert_1.default.ok(path instanceof fast_path_1.default);
   	        options = options || {};
   	        if (options.includeComments) {
-  	            return comments_1.printComments(path, makePrintFunctionWith(options, {
+  	            return (0, comments_1.printComments)(path, makePrintFunctionWith(options, {
   	                includeComments: false,
   	            }));
   	        }
@@ -9870,7 +10420,7 @@
   	                config.tabWidth = loc.lines.guessTabWidth();
   	            }
   	        }
-  	        var reprinter = patcher_1.getReprinter(path);
+  	        var reprinter = (0, patcher_1.getReprinter)(path);
   	        var lines = reprinter
   	            ? // Since the print function that we pass to the reprinter will
   	                // be used to print "new" nodes, it's tempting to think we
@@ -9904,7 +10454,7 @@
   	        }
   	        // Print the entire AST generically.
   	        function printGenerically(path) {
-  	            return comments_1.printComments(path, function (path) {
+  	            return (0, comments_1.printComments)(path, function (path) {
   	                return genericPrint(path, config, {
   	                    includeComments: true,
   	                    avoidRootParens: false,
@@ -9931,13 +10481,13 @@
   	    if (!node || linesWithoutParens.isEmpty()) {
   	        return linesWithoutParens;
   	    }
-  	    var shouldAddParens = node.extra ? node.extra.parenthesized : false;
+  	    var shouldAddParens = false;
   	    var decoratorsLines = printDecorators(path, printPath);
   	    if (decoratorsLines.isEmpty()) {
   	        // Nodes with decorators can't have parentheses, so we can avoid
   	        // computing path.needsParens() except in this case.
   	        if (!options.avoidRootParens) {
-  	            shouldAddParens = shouldAddParens || path.needsParens();
+  	            shouldAddParens = path.needsParens();
   	        }
   	    }
   	    else {
@@ -9950,7 +10500,7 @@
   	    if (shouldAddParens) {
   	        parts.push(")");
   	    }
-  	    return lines_1.concat(parts);
+  	    return (0, lines_1.concat)(parts);
   	}
   	// Note that the `options` parameter of this function is what other
   	// functions in this file call the `config` object (that is, the
@@ -9959,10 +10509,10 @@
   	function genericPrintNoParens(path, options, print) {
   	    var n = path.getValue();
   	    if (!n) {
-  	        return lines_1.fromString("");
+  	        return (0, lines_1.fromString)("");
   	    }
   	    if (typeof n === "string") {
-  	        return lines_1.fromString(n, options);
+  	        return (0, lines_1.fromString)(n, options);
   	    }
   	    namedTypes.Printable.assert(n);
   	    var parts = [];
@@ -9980,24 +10530,24 @@
   	                parts.push(path.call(print, "interpreter"));
   	            }
   	            parts.push(path.call(function (bodyPath) { return printStatementSequence(bodyPath, options, print); }, "body"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "Noop": // Babel extension.
   	        case "EmptyStatement":
-  	            return lines_1.fromString("");
+  	            return (0, lines_1.fromString)("");
   	        case "ExpressionStatement":
-  	            return lines_1.concat([path.call(print, "expression"), ";"]);
+  	            return (0, lines_1.concat)([path.call(print, "expression"), ";"]);
   	        case "ParenthesizedExpression": // Babel extension.
-  	            return lines_1.concat(["(", path.call(print, "expression"), ")"]);
+  	            return (0, lines_1.concat)(["(", path.call(print, "expression"), ")"]);
   	        case "BinaryExpression":
   	        case "LogicalExpression":
   	        case "AssignmentExpression":
-  	            return lines_1.fromString(" ").join([
+  	            return (0, lines_1.fromString)(" ").join([
   	                path.call(print, "left"),
   	                n.operator,
   	                path.call(print, "right"),
   	            ]);
   	        case "AssignmentPattern":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                path.call(print, "left"),
   	                " = ",
   	                path.call(print, "right"),
@@ -10015,12 +10565,12 @@
   	            else {
   	                parts.push(optional ? "?." : ".", property);
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "ChainExpression":
   	            return path.call(print, "expression");
   	        case "MetaProperty":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                path.call(print, "meta"),
   	                ".",
   	                path.call(print, "property"),
@@ -10030,12 +10580,12 @@
   	                parts.push(path.call(print, "object"));
   	            }
   	            parts.push("::", path.call(print, "callee"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "Path":
-  	            return lines_1.fromString(".").join(n.body);
+  	            return (0, lines_1.fromString)(".").join(n.body);
   	        case "Identifier":
-  	            return lines_1.concat([
-  	                lines_1.fromString(n.name, options),
+  	            return (0, lines_1.concat)([
+  	                (0, lines_1.fromString)(n.name, options),
   	                n.optional ? "?" : "",
   	                path.call(print, "typeAnnotation"),
   	            ]);
@@ -10046,7 +10596,7 @@
   	        case "SpreadPropertyPattern":
   	        case "ObjectTypeSpreadProperty":
   	        case "RestElement":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                "...",
   	                path.call(print, "argument"),
   	                path.call(print, "typeAnnotation"),
@@ -10075,7 +10625,7 @@
   	            if (n.body) {
   	                parts.push(" ", path.call(print, "body"));
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "ArrowFunctionExpression":
   	            if (n.async) {
   	                parts.push("async ");
@@ -10095,7 +10645,7 @@
   	                parts.push("(", printFunctionParams(path, options, print), ")", path.call(print, "returnType"));
   	            }
   	            parts.push(" => ", path.call(print, "body"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "MethodDefinition":
   	            return printMethod(path, options, print);
   	        case "YieldExpression":
@@ -10104,14 +10654,20 @@
   	                parts.push("*");
   	            if (n.argument)
   	                parts.push(" ", path.call(print, "argument"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "AwaitExpression":
   	            parts.push("await");
   	            if (n.all)
   	                parts.push("*");
   	            if (n.argument)
   	                parts.push(" ", path.call(print, "argument"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
+  	        case "ModuleExpression":
+  	            return (0, lines_1.concat)([
+  	                "module {\n",
+  	                path.call(print, "body").indent(options.tabWidth),
+  	                "\n}",
+  	            ]);
   	        case "ModuleDeclaration":
   	            parts.push("module", path.call(print, "id"));
   	            if (n.source) {
@@ -10121,7 +10677,7 @@
   	            else {
   	                parts.push(path.call(print, "body"));
   	            }
-  	            return lines_1.fromString(" ").join(parts);
+  	            return (0, lines_1.fromString)(" ").join(parts);
   	        case "ImportSpecifier":
   	            if (n.importKind && n.importKind !== "value") {
   	                parts.push(n.importKind + " ");
@@ -10138,8 +10694,11 @@
   	                    parts.push(" as ", path.call(print, "name"));
   	                }
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "ExportSpecifier":
+  	            if (n.exportKind && n.exportKind !== "value") {
+  	                parts.push(n.exportKind + " ");
+  	            }
   	            if (n.local) {
   	                parts.push(path.call(print, "local"));
   	                if (n.exported && n.exported.name !== n.local.name) {
@@ -10152,9 +10711,9 @@
   	                    parts.push(" as ", path.call(print, "name"));
   	                }
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "ExportBatchSpecifier":
-  	            return lines_1.fromString("*");
+  	            return (0, lines_1.fromString)("*");
   	        case "ImportNamespaceSpecifier":
   	            parts.push("* as ");
   	            if (n.local) {
@@ -10163,14 +10722,14 @@
   	            else if (n.id) {
   	                parts.push(path.call(print, "id"));
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "ImportDefaultSpecifier":
   	            if (n.local) {
   	                return path.call(print, "local");
   	            }
   	            return path.call(print, "id");
   	        case "TSExportAssignment":
-  	            return lines_1.concat(["export = ", path.call(print, "expression")]);
+  	            return (0, lines_1.concat)(["export = ", path.call(print, "expression")]);
   	        case "ExportDeclaration":
   	        case "ExportDefaultDeclaration":
   	        case "ExportNamedDeclaration":
@@ -10181,22 +10740,22 @@
   	                parts.push(" as ", path.call(print, "exported"));
   	            }
   	            parts.push(" from ", path.call(print, "source"), ";");
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "TSNamespaceExportDeclaration":
   	            parts.push("export as namespace ", path.call(print, "id"));
-  	            return maybeAddSemicolon(lines_1.concat(parts));
+  	            return maybeAddSemicolon((0, lines_1.concat)(parts));
   	        case "ExportNamespaceSpecifier":
-  	            return lines_1.concat(["* as ", path.call(print, "exported")]);
+  	            return (0, lines_1.concat)(["* as ", path.call(print, "exported")]);
   	        case "ExportDefaultSpecifier":
   	            return path.call(print, "exported");
   	        case "Import":
-  	            return lines_1.fromString("import", options);
+  	            return (0, lines_1.fromString)("import", options);
   	        // Recast and ast-types currently support dynamic import(...) using
   	        // either this dedicated ImportExpression type or a CallExpression
   	        // whose callee has type Import.
   	        // https://github.com/benjamn/ast-types/pull/365#issuecomment-605214486
   	        case "ImportExpression":
-  	            return lines_1.concat(["import(", path.call(print, "source"), ")"]);
+  	            return (0, lines_1.concat)(["import(", path.call(print, "source"), ")"]);
   	        case "ImportDeclaration": {
   	            parts.push("import ");
   	            if (n.importKind && n.importKind !== "value") {
@@ -10222,10 +10781,10 @@
   	                    parts.push(lines);
   	                });
   	                if (bracedSpecifiers_1.length > 0) {
-  	                    var lines = lines_1.fromString(", ").join(bracedSpecifiers_1);
+  	                    var lines = (0, lines_1.fromString)(", ").join(bracedSpecifiers_1);
   	                    if (lines.getLineLength(1) > options.wrapColumn) {
-  	                        lines = lines_1.concat([
-  	                            lines_1.fromString(",\n").join(bracedSpecifiers_1).indent(options.tabWidth),
+  	                        lines = (0, lines_1.concat)([
+  	                            (0, lines_1.fromString)(",\n").join(bracedSpecifiers_1).indent(options.tabWidth),
   	                            ",",
   	                        ]);
   	                    }
@@ -10244,14 +10803,20 @@
   	                }
   	                parts.push(" from ");
   	            }
-  	            parts.push(path.call(print, "source"), ";");
-  	            return lines_1.concat(parts);
+  	            parts.push(path.call(print, "source"), maybePrintImportAssertions(path, options, print), ";");
+  	            return (0, lines_1.concat)(parts);
   	        }
+  	        case "ImportAttribute":
+  	            return (0, lines_1.concat)([path.call(print, "key"), ": ", path.call(print, "value")]);
+  	        case "StaticBlock":
+  	            parts.push("static ");
+  	        // Intentionally fall through to BlockStatement below.
   	        case "BlockStatement": {
   	            var naked_1 = path.call(function (bodyPath) { return printStatementSequence(bodyPath, options, print); }, "body");
   	            if (naked_1.isEmpty()) {
   	                if (!n.directives || n.directives.length === 0) {
-  	                    return lines_1.fromString("{}");
+  	                    parts.push("{}");
+  	                    return (0, lines_1.concat)(parts);
   	                }
   	            }
   	            parts.push("{\n");
@@ -10263,7 +10828,7 @@
   	            }
   	            parts.push(naked_1.indent(options.tabWidth));
   	            parts.push("\n}");
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "ReturnStatement": {
   	            parts.push("return");
@@ -10280,7 +10845,7 @@
   	                }
   	            }
   	            parts.push(";");
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "CallExpression":
   	        case "OptionalCallExpression":
@@ -10298,7 +10863,10 @@
   	                parts.push("?.");
   	            }
   	            parts.push(printArgumentsList(path, options, print));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
+  	        case "RecordExpression":
+  	            parts.push("#");
+  	        // Intentionally fall through to printing the object literal...
   	        case "ObjectExpression":
   	        case "ObjectPattern":
   	        case "ObjectTypeAnnotation": {
@@ -10357,7 +10925,7 @@
   	                }, field);
   	            });
   	            if (n.inexact) {
-  	                var line = lines_1.fromString("...", options);
+  	                var line = (0, lines_1.fromString)("...", options);
   	                if (oneLine_1) {
   	                    if (len_1 > 0) {
   	                        parts.push(separator_1, " ");
@@ -10377,10 +10945,10 @@
   	            if (n.typeAnnotation) {
   	                parts.push(path.call(print, "typeAnnotation"));
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "PropertyPattern":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                path.call(print, "key"),
   	                ": ",
   	                path.call(print, "pattern"),
@@ -10404,7 +10972,7 @@
   	            if (!n.shorthand || n.key.name !== n.value.name) {
   	                parts.push(": ", path.call(print, "value"));
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "ClassMethod": // Babel 6
   	        case "ObjectMethod": // Babel 6
@@ -10412,15 +10980,18 @@
   	        case "TSDeclareMethod":
   	            return printMethod(path, options, print);
   	        case "PrivateName":
-  	            return lines_1.concat(["#", path.call(print, "id")]);
+  	            return (0, lines_1.concat)(["#", path.call(print, "id")]);
   	        case "Decorator":
-  	            return lines_1.concat(["@", path.call(print, "expression")]);
+  	            return (0, lines_1.concat)(["@", path.call(print, "expression")]);
+  	        case "TupleExpression":
+  	            parts.push("#");
+  	        // Intentionally fall through to printing the tuple elements...
   	        case "ArrayExpression":
   	        case "ArrayPattern": {
   	            var elems = n.elements;
   	            var len_2 = elems.length;
   	            var printed_1 = path.map(print, "elements");
-  	            var joined = lines_1.fromString(", ").join(printed_1);
+  	            var joined = (0, lines_1.fromString)(", ").join(printed_1);
   	            var oneLine_2 = joined.getLineLength(1) <= options.wrapColumn;
   	            if (oneLine_2) {
   	                if (options.arrayBracketSpacing) {
@@ -10470,68 +11041,56 @@
   	            if (n.typeAnnotation) {
   	                parts.push(path.call(print, "typeAnnotation"));
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "SequenceExpression":
-  	            return lines_1.fromString(", ").join(path.map(print, "expressions"));
+  	            return (0, lines_1.fromString)(", ").join(path.map(print, "expressions"));
   	        case "ThisExpression":
-  	            return lines_1.fromString("this");
+  	            return (0, lines_1.fromString)("this");
   	        case "Super":
-  	            return lines_1.fromString("super");
+  	            return (0, lines_1.fromString)("super");
   	        case "NullLiteral": // Babel 6 Literal split
-  	            return lines_1.fromString("null");
+  	            return (0, lines_1.fromString)("null");
   	        case "RegExpLiteral": // Babel 6 Literal split
-  	            return lines_1.fromString(n.extra.raw);
+  	            return (0, lines_1.fromString)(getPossibleRaw(n) || "/".concat(n.pattern, "/").concat(n.flags || ""), options);
   	        case "BigIntLiteral": // Babel 7 Literal split
-  	            return lines_1.fromString(n.value + "n");
+  	            return (0, lines_1.fromString)(getPossibleRaw(n) || n.value + "n", options);
   	        case "NumericLiteral": // Babel 6 Literal Split
-  	            // Keep original representation for numeric values not in base 10.
-  	            if (n.extra &&
-  	                typeof n.extra.raw === "string" &&
-  	                Number(n.extra.raw) === n.value) {
-  	                return lines_1.fromString(n.extra.raw, options);
-  	            }
-  	            return lines_1.fromString(n.value, options);
+  	            return (0, lines_1.fromString)(getPossibleRaw(n) || n.value, options);
+  	        case "DecimalLiteral":
+  	            return (0, lines_1.fromString)(getPossibleRaw(n) || n.value + "m", options);
+  	        case "StringLiteral":
+  	            return (0, lines_1.fromString)(nodeStr(n.value, options));
   	        case "BooleanLiteral": // Babel 6 Literal split
-  	        case "StringLiteral": // Babel 6 Literal split
   	        case "Literal":
-  	            // Numeric values may be in bases other than 10. Use their raw
-  	            // representation if equivalent.
-  	            if (typeof n.value === "number" &&
-  	                typeof n.raw === "string" &&
-  	                Number(n.raw) === n.value) {
-  	                return lines_1.fromString(n.raw, options);
-  	            }
-  	            if (typeof n.value !== "string") {
-  	                return lines_1.fromString(n.value, options);
-  	            }
-  	            return lines_1.fromString(nodeStr(n.value, options), options);
+  	            return (0, lines_1.fromString)(getPossibleRaw(n) ||
+  	                (typeof n.value === "string" ? nodeStr(n.value, options) : n.value), options);
   	        case "Directive": // Babel 6
   	            return path.call(print, "value");
   	        case "DirectiveLiteral": // Babel 6
-  	            return lines_1.fromString(nodeStr(n.value, options));
+  	            return (0, lines_1.fromString)(getPossibleRaw(n) || nodeStr(n.value, options), options);
   	        case "InterpreterDirective":
-  	            return lines_1.fromString("#!" + n.value + "\n", options);
+  	            return (0, lines_1.fromString)("#!".concat(n.value, "\n"), options);
   	        case "ModuleSpecifier":
   	            if (n.local) {
   	                throw new Error("The ESTree ModuleSpecifier type should be abstract");
   	            }
   	            // The Esprima ModuleSpecifier type is just a string-valued
   	            // Literal identifying the imported-from module.
-  	            return lines_1.fromString(nodeStr(n.value, options), options);
+  	            return (0, lines_1.fromString)(nodeStr(n.value, options), options);
   	        case "UnaryExpression":
   	            parts.push(n.operator);
   	            if (/[a-z]$/.test(n.operator))
   	                parts.push(" ");
   	            parts.push(path.call(print, "argument"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "UpdateExpression":
   	            parts.push(path.call(print, "argument"), n.operator);
   	            if (n.prefix)
   	                parts.reverse();
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "ConditionalExpression":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                path.call(print, "test"),
   	                " ? ",
   	                path.call(print, "consequent"),
@@ -10550,7 +11109,7 @@
   	            if (args) {
   	                parts.push(printArgumentsList(path, options, print));
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "VariableDeclaration": {
   	            if (n.declare) {
@@ -10564,10 +11123,10 @@
   	                return lines;
   	            }, "declarations");
   	            if (maxLen_1 === 1) {
-  	                parts.push(lines_1.fromString(", ").join(printed));
+  	                parts.push((0, lines_1.fromString)(", ").join(printed));
   	            }
   	            else if (printed.length > 1) {
-  	                parts.push(lines_1.fromString(",\n")
+  	                parts.push((0, lines_1.fromString)(",\n")
   	                    .join(printed)
   	                    .indentTail(n.kind.length + 1));
   	            }
@@ -10585,17 +11144,17 @@
   	                    namedTypes.ForAwaitStatement.check(parentNode))) {
   	                parts.push(";");
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "VariableDeclarator":
   	            return n.init
-  	                ? lines_1.fromString(" = ").join([
+  	                ? (0, lines_1.fromString)(" = ").join([
   	                    path.call(print, "id"),
   	                    path.call(print, "init"),
   	                ])
   	                : path.call(print, "id");
   	        case "WithStatement":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                "with (",
   	                path.call(print, "object"),
   	                ") ",
@@ -10606,17 +11165,17 @@
   	            parts.push("if (", path.call(print, "test"), ")", con);
   	            if (n.alternate)
   	                parts.push(endsWithBrace(con) ? " else" : "\nelse", adjustClause(path.call(print, "alternate"), options));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "ForStatement": {
   	            // TODO Get the for (;;) case right.
   	            var init = path.call(print, "init");
   	            var sep = init.length > 1 ? ";\n" : "; ";
   	            var forParen = "for (";
-  	            var indented = lines_1.fromString(sep)
+  	            var indented = (0, lines_1.fromString)(sep)
   	                .join([init, path.call(print, "test"), path.call(print, "update")])
   	                .indentTail(forParen.length);
-  	            var head = lines_1.concat([forParen, indented, ")"]);
+  	            var head = (0, lines_1.concat)([forParen, indented, ")"]);
   	            var clause = adjustClause(path.call(print, "body"), options);
   	            parts.push(head);
   	            if (head.length > 1) {
@@ -10624,10 +11183,10 @@
   	                clause = clause.trimLeft();
   	            }
   	            parts.push(clause);
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "WhileStatement":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                "while (",
   	                path.call(print, "test"),
   	                ")",
@@ -10635,7 +11194,7 @@
   	            ]);
   	        case "ForInStatement":
   	            // Note: esprima can't actually parse "for each (".
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                n.each ? "for each (" : "for (",
   	                path.call(print, "left"),
   	                " in ",
@@ -10650,9 +11209,9 @@
   	                parts.push("await ");
   	            }
   	            parts.push("(", path.call(print, "left"), " of ", path.call(print, "right"), ")", adjustClause(path.call(print, "body"), options));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "DoWhileStatement": {
-  	            var doBody = lines_1.concat([
+  	            var doBody = (0, lines_1.concat)([
   	                "do",
   	                adjustClause(path.call(print, "body"), options),
   	            ]);
@@ -10662,26 +11221,26 @@
   	            else
   	                parts.push("\nwhile");
   	            parts.push(" (", path.call(print, "test"), ");");
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "DoExpression": {
   	            var statements = path.call(function (bodyPath) { return printStatementSequence(bodyPath, options, print); }, "body");
-  	            return lines_1.concat(["do {\n", statements.indent(options.tabWidth), "\n}"]);
+  	            return (0, lines_1.concat)(["do {\n", statements.indent(options.tabWidth), "\n}"]);
   	        }
   	        case "BreakStatement":
   	            parts.push("break");
   	            if (n.label)
   	                parts.push(" ", path.call(print, "label"));
   	            parts.push(";");
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "ContinueStatement":
   	            parts.push("continue");
   	            if (n.label)
   	                parts.push(" ", path.call(print, "label"));
   	            parts.push(";");
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "LabeledStatement":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                path.call(print, "label"),
   	                ":\n",
   	                path.call(print, "body"),
@@ -10699,7 +11258,7 @@
   	            if (n.finalizer) {
   	                parts.push(" finally ", path.call(print, "finalizer"));
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "CatchClause":
   	            parts.push("catch ");
   	            if (n.param) {
@@ -10713,15 +11272,15 @@
   	                parts.push(") ");
   	            }
   	            parts.push(path.call(print, "body"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "ThrowStatement":
-  	            return lines_1.concat(["throw ", path.call(print, "argument"), ";"]);
+  	            return (0, lines_1.concat)(["throw ", path.call(print, "argument"), ";"]);
   	        case "SwitchStatement":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                "switch (",
   	                path.call(print, "discriminant"),
   	                ") {\n",
-  	                lines_1.fromString("\n").join(path.map(print, "cases")),
+  	                (0, lines_1.fromString)("\n").join(path.map(print, "cases")),
   	                "\n}",
   	            ]);
   	        // Note: ignoring n.lexical because it has no printing consequences.
@@ -10737,33 +11296,33 @@
   	                }, "consequent")
   	                    .indent(options.tabWidth));
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "DebuggerStatement":
-  	            return lines_1.fromString("debugger;");
+  	            return (0, lines_1.fromString)("debugger;");
   	        // JSX extensions below.
   	        case "JSXAttribute":
   	            parts.push(path.call(print, "name"));
   	            if (n.value)
   	                parts.push("=", path.call(print, "value"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "JSXIdentifier":
-  	            return lines_1.fromString(n.name, options);
+  	            return (0, lines_1.fromString)(n.name, options);
   	        case "JSXNamespacedName":
-  	            return lines_1.fromString(":").join([
+  	            return (0, lines_1.fromString)(":").join([
   	                path.call(print, "namespace"),
   	                path.call(print, "name"),
   	            ]);
   	        case "JSXMemberExpression":
-  	            return lines_1.fromString(".").join([
+  	            return (0, lines_1.fromString)(".").join([
   	                path.call(print, "object"),
   	                path.call(print, "property"),
   	            ]);
   	        case "JSXSpreadAttribute":
-  	            return lines_1.concat(["{...", path.call(print, "argument"), "}"]);
+  	            return (0, lines_1.concat)(["{...", path.call(print, "argument"), "}"]);
   	        case "JSXSpreadChild":
-  	            return lines_1.concat(["{...", path.call(print, "expression"), "}"]);
+  	            return (0, lines_1.concat)(["{...", path.call(print, "expression"), "}"]);
   	        case "JSXExpressionContainer":
-  	            return lines_1.concat(["{", path.call(print, "expression"), "}"]);
+  	            return (0, lines_1.concat)(["{", path.call(print, "expression"), "}"]);
   	        case "JSXElement":
   	        case "JSXFragment": {
   	            var openingPropName = "opening" + (n.type === "JSXElement" ? "Element" : "Fragment");
@@ -10776,7 +11335,7 @@
   	                    n.type);
   	                return openingLines;
   	            }
-  	            var childLines = lines_1.concat(path.map(function (childPath) {
+  	            var childLines = (0, lines_1.concat)(path.map(function (childPath) {
   	                var child = childPath.getValue();
   	                if (namedTypes.Literal.check(child) &&
   	                    typeof child.value === "string") {
@@ -10790,7 +11349,7 @@
   	                return print(childPath);
   	            }, "children")).indentTail(options.tabWidth);
   	            var closingLines = path.call(print, closingPropName);
-  	            return lines_1.concat([openingLines, childLines, closingLines]);
+  	            return (0, lines_1.concat)([openingLines, childLines, closingLines]);
   	        }
   	        case "JSXOpeningElement": {
   	            parts.push("<", path.call(print, "name"));
@@ -10798,7 +11357,7 @@
   	            path.each(function (attrPath) {
   	                attrParts_1.push(" ", print(attrPath));
   	            }, "attributes");
-  	            var attrLines = lines_1.concat(attrParts_1);
+  	            var attrLines = (0, lines_1.concat)(attrParts_1);
   	            var needLineWrap = attrLines.length > 1 || attrLines.getLineLength(1) > options.wrapColumn;
   	            if (needLineWrap) {
   	                attrParts_1.forEach(function (part, i) {
@@ -10807,32 +11366,32 @@
   	                        attrParts_1[i] = "\n";
   	                    }
   	                });
-  	                attrLines = lines_1.concat(attrParts_1).indentTail(options.tabWidth);
+  	                attrLines = (0, lines_1.concat)(attrParts_1).indentTail(options.tabWidth);
   	            }
   	            parts.push(attrLines, n.selfClosing ? " />" : ">");
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "JSXClosingElement":
-  	            return lines_1.concat(["</", path.call(print, "name"), ">"]);
+  	            return (0, lines_1.concat)(["</", path.call(print, "name"), ">"]);
   	        case "JSXOpeningFragment":
-  	            return lines_1.fromString("<>");
+  	            return (0, lines_1.fromString)("<>");
   	        case "JSXClosingFragment":
-  	            return lines_1.fromString("</>");
+  	            return (0, lines_1.fromString)("</>");
   	        case "JSXText":
-  	            return lines_1.fromString(n.value, options);
+  	            return (0, lines_1.fromString)(n.value, options);
   	        case "JSXEmptyExpression":
-  	            return lines_1.fromString("");
+  	            return (0, lines_1.fromString)("");
   	        case "TypeAnnotatedIdentifier":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                path.call(print, "annotation"),
   	                " ",
   	                path.call(print, "identifier"),
   	            ]);
   	        case "ClassBody":
   	            if (n.body.length === 0) {
-  	                return lines_1.fromString("{}");
+  	                return (0, lines_1.fromString)("{}");
   	            }
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                "{\n",
   	                path
   	                    .call(function (bodyPath) { return printStatementSequence(bodyPath, options, print); }, "body")
@@ -10843,7 +11402,7 @@
   	            parts.push("static ", path.call(print, "definition"));
   	            if (!namedTypes.MethodDefinition.check(n.definition))
   	                parts.push(";");
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "ClassProperty": {
   	            if (n.declare) {
   	                parts.push("declare ");
@@ -10863,14 +11422,17 @@
   	            }
   	            var key = path.call(print, "key");
   	            if (n.computed) {
-  	                key = lines_1.concat(["[", key, "]"]);
+  	                key = (0, lines_1.concat)(["[", key, "]"]);
   	            }
   	            if (n.variance) {
-  	                key = lines_1.concat([printVariance(path, print), key]);
+  	                key = (0, lines_1.concat)([printVariance(path, print), key]);
   	            }
   	            parts.push(key);
   	            if (n.optional) {
   	                parts.push("?");
+  	            }
+  	            if (n.definite) {
+  	                parts.push("!");
   	            }
   	            if (n.typeAnnotation) {
   	                parts.push(path.call(print, "typeAnnotation"));
@@ -10879,7 +11441,7 @@
   	                parts.push(" = ", path.call(print, "value"));
   	            }
   	            parts.push(";");
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "ClassPrivateProperty":
   	            if (n.static) {
@@ -10893,9 +11455,33 @@
   	                parts.push(" = ", path.call(print, "value"));
   	            }
   	            parts.push(";");
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
+  	        case "ClassAccessorProperty": {
+  	            parts.push.apply(parts, tslib_1.__spreadArray(tslib_1.__spreadArray([], printClassMemberModifiers(n), false), ["accessor "], false));
+  	            if (n.computed) {
+  	                parts.push("[", path.call(print, "key"), "]");
+  	            }
+  	            else {
+  	                parts.push(path.call(print, "key"));
+  	            }
+  	            if (n.optional) {
+  	                parts.push("?");
+  	            }
+  	            if (n.definite) {
+  	                parts.push("!");
+  	            }
+  	            if (n.typeAnnotation) {
+  	                parts.push(path.call(print, "typeAnnotation"));
+  	            }
+  	            if (n.value) {
+  	                parts.push(" = ", path.call(print, "value"));
+  	            }
+  	            parts.push(";");
+  	            return (0, lines_1.concat)(parts);
+  	        }
   	        case "ClassDeclaration":
   	        case "ClassExpression":
+  	        case "DeclareClass":
   	            if (n.declare) {
   	                parts.push("declare ");
   	            }
@@ -10910,15 +11496,25 @@
   	                parts.push(path.call(print, "typeParameters"));
   	            }
   	            if (n.superClass) {
+  	                // ClassDeclaration and ClassExpression only
   	                parts.push(" extends ", path.call(print, "superClass"), path.call(print, "superTypeParameters"));
   	            }
+  	            if (n.extends && n.extends.length > 0) {
+  	                // DeclareClass only
+  	                parts.push(" extends ", (0, lines_1.fromString)(", ").join(path.map(print, "extends")));
+  	            }
   	            if (n["implements"] && n["implements"].length > 0) {
-  	                parts.push(" implements ", lines_1.fromString(", ").join(path.map(print, "implements")));
+  	                parts.push(" implements ", (0, lines_1.fromString)(", ").join(path.map(print, "implements")));
   	            }
   	            parts.push(" ", path.call(print, "body"));
-  	            return lines_1.concat(parts);
+  	            if (n.type === "DeclareClass") {
+  	                return printFlowDeclaration(path, parts);
+  	            }
+  	            else {
+  	                return (0, lines_1.concat)(parts);
+  	            }
   	        case "TemplateElement":
-  	            return lines_1.fromString(n.value.raw, options).lockIndentTail();
+  	            return (0, lines_1.fromString)(n.value.raw, options).lockIndentTail();
   	        case "TemplateLiteral": {
   	            var expressions_1 = path.map(print, "expressions");
   	            parts.push("`");
@@ -10930,10 +11526,10 @@
   	                }
   	            }, "quasis");
   	            parts.push("`");
-  	            return lines_1.concat(parts).lockIndentTail();
+  	            return (0, lines_1.concat)(parts).lockIndentTail();
   	        }
   	        case "TaggedTemplateExpression":
-  	            return lines_1.concat([path.call(print, "tag"), path.call(print, "quasi")]);
+  	            return (0, lines_1.concat)([path.call(print, "tag"), path.call(print, "quasi")]);
   	        // These types are unprintable because they serve as abstract
   	        // supertypes for other (printable) types.
   	        case "Node":
@@ -10960,10 +11556,10 @@
   	            throw new Error("unprintable type: " + JSON.stringify(n.type));
   	        case "CommentBlock": // Babel block comment.
   	        case "Block": // Esprima block comment.
-  	            return lines_1.concat(["/*", lines_1.fromString(n.value, options), "*/"]);
+  	            return (0, lines_1.concat)(["/*", (0, lines_1.fromString)(n.value, options), "*/"]);
   	        case "CommentLine": // Babel line comment.
   	        case "Line": // Esprima line comment.
-  	            return lines_1.concat(["//", lines_1.fromString(n.value, options)]);
+  	            return (0, lines_1.concat)(["//", (0, lines_1.fromString)(n.value, options)]);
   	        // Type Annotations for Facebook Flow, typically stripped out or
   	        // transformed away before printing.
   	        case "TypeAnnotation":
@@ -10972,23 +11568,23 @@
   	                    parts.push(": ");
   	                }
   	                parts.push(path.call(print, "typeAnnotation"));
-  	                return lines_1.concat(parts);
+  	                return (0, lines_1.concat)(parts);
   	            }
-  	            return lines_1.fromString("");
+  	            return (0, lines_1.fromString)("");
   	        case "ExistentialTypeParam":
   	        case "ExistsTypeAnnotation":
-  	            return lines_1.fromString("*", options);
+  	            return (0, lines_1.fromString)("*", options);
   	        case "EmptyTypeAnnotation":
-  	            return lines_1.fromString("empty", options);
+  	            return (0, lines_1.fromString)("empty", options);
   	        case "AnyTypeAnnotation":
-  	            return lines_1.fromString("any", options);
+  	            return (0, lines_1.fromString)("any", options);
   	        case "MixedTypeAnnotation":
-  	            return lines_1.fromString("mixed", options);
+  	            return (0, lines_1.fromString)("mixed", options);
   	        case "ArrayTypeAnnotation":
-  	            return lines_1.concat([path.call(print, "elementType"), "[]"]);
+  	            return (0, lines_1.concat)([path.call(print, "elementType"), "[]"]);
   	        case "TupleTypeAnnotation": {
   	            var printed_2 = path.map(print, "types");
-  	            var joined = lines_1.fromString(", ").join(printed_2);
+  	            var joined = (0, lines_1.fromString)(", ").join(printed_2);
   	            var oneLine_3 = joined.getLineLength(1) <= options.wrapColumn;
   	            if (oneLine_3) {
   	                if (options.arrayBracketSpacing) {
@@ -11035,27 +11631,20 @@
   	            else {
   	                parts.push("]");
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "BooleanTypeAnnotation":
-  	            return lines_1.fromString("boolean", options);
+  	            return (0, lines_1.fromString)("boolean", options);
   	        case "BooleanLiteralTypeAnnotation":
   	            assert_1.default.strictEqual(typeof n.value, "boolean");
-  	            return lines_1.fromString("" + n.value, options);
+  	            return (0, lines_1.fromString)("" + n.value, options);
   	        case "InterfaceTypeAnnotation":
   	            parts.push("interface");
   	            if (n.extends && n.extends.length > 0) {
-  	                parts.push(" extends ", lines_1.fromString(", ").join(path.map(print, "extends")));
+  	                parts.push(" extends ", (0, lines_1.fromString)(", ").join(path.map(print, "extends")));
   	            }
   	            parts.push(" ", path.call(print, "body"));
-  	            return lines_1.concat(parts);
-  	        case "DeclareClass":
-  	            return printFlowDeclaration(path, [
-  	                "class ",
-  	                path.call(print, "id"),
-  	                " ",
-  	                path.call(print, "body"),
-  	            ]);
+  	            return (0, lines_1.concat)(parts);
   	        case "DeclareFunction":
   	            return printFlowDeclaration(path, [
   	                "function ",
@@ -11078,9 +11667,9 @@
   	            return printFlowDeclaration(path, ["var ", path.call(print, "id"), ";"]);
   	        case "DeclareExportDeclaration":
   	        case "DeclareExportAllDeclaration":
-  	            return lines_1.concat(["declare ", printExportDeclaration(path, options, print)]);
+  	            return (0, lines_1.concat)(["declare ", printExportDeclaration(path, options, print)]);
   	        case "EnumDeclaration":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                "enum ",
   	                path.call(print, "id"),
   	                path.call(print, "body"),
@@ -11094,26 +11683,26 @@
   	                // EnumBooleanBody => boolean, etc.
   	                n.type.slice(4, -4).toLowerCase());
   	            }
-  	            parts.push(" {\n", lines_1.fromString("\n")
+  	            parts.push(" {\n", (0, lines_1.fromString)("\n")
   	                .join(path.map(print, "members"))
   	                .indent(options.tabWidth), "\n}");
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "EnumDefaultedMember":
-  	            return lines_1.concat([path.call(print, "id"), ","]);
+  	            return (0, lines_1.concat)([path.call(print, "id"), ","]);
   	        case "EnumBooleanMember":
   	        case "EnumNumberMember":
   	        case "EnumStringMember":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                path.call(print, "id"),
   	                " = ",
   	                path.call(print, "init"),
   	                ",",
   	            ]);
   	        case "InferredPredicate":
-  	            return lines_1.fromString("%checks", options);
+  	            return (0, lines_1.fromString)("%checks", options);
   	        case "DeclaredPredicate":
-  	            return lines_1.concat(["%checks(", path.call(print, "value"), ")"]);
+  	            return (0, lines_1.concat)(["%checks(", path.call(print, "value"), ")"]);
   	        case "FunctionTypeAnnotation": {
   	            // FunctionTypeAnnotation is ambiguous:
   	            // declare function(a: B): void; OR
@@ -11136,7 +11725,7 @@
   	            if (n.returnType) {
   	                parts.push(isArrowFunctionTypeAnnotation ? " => " : ": ", path.call(print, "returnType"));
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "FunctionTypeParam": {
   	            var name = path.call(print, "name");
@@ -11148,10 +11737,10 @@
   	                parts.push(": ");
   	            }
   	            parts.push(path.call(print, "typeAnnotation"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "GenericTypeAnnotation":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                path.call(print, "id"),
   	                path.call(print, "typeParameters"),
   	            ]);
@@ -11165,28 +11754,28 @@
   	            }
   	            parts.push("interface ", path.call(print, "id"), path.call(print, "typeParameters"), " ");
   	            if (n["extends"] && n["extends"].length > 0) {
-  	                parts.push("extends ", lines_1.fromString(", ").join(path.map(print, "extends")), " ");
+  	                parts.push("extends ", (0, lines_1.fromString)(", ").join(path.map(print, "extends")), " ");
   	            }
   	            if (n.body) {
   	                parts.push(path.call(print, "body"));
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "ClassImplements":
   	        case "InterfaceExtends":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                path.call(print, "id"),
   	                path.call(print, "typeParameters"),
   	            ]);
   	        case "IntersectionTypeAnnotation":
-  	            return lines_1.fromString(" & ").join(path.map(print, "types"));
+  	            return (0, lines_1.fromString)(" & ").join(path.map(print, "types"));
   	        case "NullableTypeAnnotation":
-  	            return lines_1.concat(["?", path.call(print, "typeAnnotation")]);
+  	            return (0, lines_1.concat)(["?", path.call(print, "typeAnnotation")]);
   	        case "NullLiteralTypeAnnotation":
-  	            return lines_1.fromString("null", options);
+  	            return (0, lines_1.fromString)("null", options);
   	        case "ThisTypeAnnotation":
-  	            return lines_1.fromString("this", options);
+  	            return (0, lines_1.fromString)("this", options);
   	        case "NumberTypeAnnotation":
-  	            return lines_1.fromString("number", options);
+  	            return (0, lines_1.fromString)("number", options);
   	        case "ObjectTypeCallProperty":
   	            return path.call(print, "value");
   	        case "ObjectTypeIndexer":
@@ -11198,9 +11787,9 @@
   	                parts.push(path.call(print, "id"), ": ");
   	            }
   	            parts.push(path.call(print, "key"), "]: ", path.call(print, "value"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "ObjectTypeProperty":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                printVariance(path, print),
   	                path.call(print, "key"),
   	                n.optional ? "?" : "",
@@ -11208,7 +11797,7 @@
   	                path.call(print, "value"),
   	            ]);
   	        case "ObjectTypeInternalSlot":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                n.static ? "static " : "",
   	                "[[",
   	                path.call(print, "id"),
@@ -11218,26 +11807,26 @@
   	                path.call(print, "value"),
   	            ]);
   	        case "QualifiedTypeIdentifier":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                path.call(print, "qualification"),
   	                ".",
   	                path.call(print, "id"),
   	            ]);
   	        case "StringLiteralTypeAnnotation":
-  	            return lines_1.fromString(nodeStr(n.value, options), options);
+  	            return (0, lines_1.fromString)(nodeStr(n.value, options), options);
   	        case "NumberLiteralTypeAnnotation":
   	        case "NumericLiteralTypeAnnotation":
   	            assert_1.default.strictEqual(typeof n.value, "number");
-  	            return lines_1.fromString(JSON.stringify(n.value), options);
+  	            return (0, lines_1.fromString)(JSON.stringify(n.value), options);
   	        case "BigIntLiteralTypeAnnotation":
-  	            return lines_1.fromString(n.raw, options);
+  	            return (0, lines_1.fromString)(n.raw, options);
   	        case "StringTypeAnnotation":
-  	            return lines_1.fromString("string", options);
+  	            return (0, lines_1.fromString)("string", options);
   	        case "DeclareTypeAlias":
   	            parts.push("declare ");
   	        // Fall through to TypeAlias...
   	        case "TypeAlias":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                "type ",
   	                path.call(print, "id"),
   	                path.call(print, "typeParameters"),
@@ -11257,9 +11846,9 @@
   	                parts.push(" = ", path.call(print, "impltype"));
   	            }
   	            parts.push(";");
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "TypeCastExpression":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                "(",
   	                path.call(print, "expression"),
   	                path.call(print, "typeAnnotation"),
@@ -11267,19 +11856,19 @@
   	            ]);
   	        case "TypeParameterDeclaration":
   	        case "TypeParameterInstantiation":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                "<",
-  	                lines_1.fromString(", ").join(path.map(print, "params")),
+  	                (0, lines_1.fromString)(", ").join(path.map(print, "params")),
   	                ">",
   	            ]);
   	        case "Variance":
   	            if (n.kind === "plus") {
-  	                return lines_1.fromString("+");
+  	                return (0, lines_1.fromString)("+");
   	            }
   	            if (n.kind === "minus") {
-  	                return lines_1.fromString("-");
+  	                return (0, lines_1.fromString)("-");
   	            }
-  	            return lines_1.fromString("");
+  	            return (0, lines_1.fromString)("");
   	        case "TypeParameter":
   	            if (n.variance) {
   	                parts.push(printVariance(path, print));
@@ -11291,69 +11880,80 @@
   	            if (n["default"]) {
   	                parts.push("=", path.call(print, "default"));
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "TypeofTypeAnnotation":
-  	            return lines_1.concat([
-  	                lines_1.fromString("typeof ", options),
+  	            return (0, lines_1.concat)([
+  	                (0, lines_1.fromString)("typeof ", options),
   	                path.call(print, "argument"),
   	            ]);
+  	        case "IndexedAccessType":
+  	        case "OptionalIndexedAccessType":
+  	            return (0, lines_1.concat)([
+  	                path.call(print, "objectType"),
+  	                n.optional ? "?." : "",
+  	                "[",
+  	                path.call(print, "indexType"),
+  	                "]",
+  	            ]);
   	        case "UnionTypeAnnotation":
-  	            return lines_1.fromString(" | ").join(path.map(print, "types"));
+  	            return (0, lines_1.fromString)(" | ").join(path.map(print, "types"));
   	        case "VoidTypeAnnotation":
-  	            return lines_1.fromString("void", options);
+  	            return (0, lines_1.fromString)("void", options);
   	        case "NullTypeAnnotation":
-  	            return lines_1.fromString("null", options);
+  	            return (0, lines_1.fromString)("null", options);
   	        case "SymbolTypeAnnotation":
-  	            return lines_1.fromString("symbol", options);
+  	            return (0, lines_1.fromString)("symbol", options);
   	        case "BigIntTypeAnnotation":
-  	            return lines_1.fromString("bigint", options);
+  	            return (0, lines_1.fromString)("bigint", options);
   	        // Type Annotations for TypeScript (when using Babylon as parser)
   	        case "TSType":
   	            throw new Error("unprintable type: " + JSON.stringify(n.type));
   	        case "TSNumberKeyword":
-  	            return lines_1.fromString("number", options);
+  	            return (0, lines_1.fromString)("number", options);
   	        case "TSBigIntKeyword":
-  	            return lines_1.fromString("bigint", options);
+  	            return (0, lines_1.fromString)("bigint", options);
   	        case "TSObjectKeyword":
-  	            return lines_1.fromString("object", options);
+  	            return (0, lines_1.fromString)("object", options);
   	        case "TSBooleanKeyword":
-  	            return lines_1.fromString("boolean", options);
+  	            return (0, lines_1.fromString)("boolean", options);
   	        case "TSStringKeyword":
-  	            return lines_1.fromString("string", options);
+  	            return (0, lines_1.fromString)("string", options);
   	        case "TSSymbolKeyword":
-  	            return lines_1.fromString("symbol", options);
+  	            return (0, lines_1.fromString)("symbol", options);
   	        case "TSAnyKeyword":
-  	            return lines_1.fromString("any", options);
+  	            return (0, lines_1.fromString)("any", options);
   	        case "TSVoidKeyword":
-  	            return lines_1.fromString("void", options);
+  	            return (0, lines_1.fromString)("void", options);
+  	        case "TSIntrinsicKeyword":
+  	            return (0, lines_1.fromString)("intrinsic", options);
   	        case "TSThisType":
-  	            return lines_1.fromString("this", options);
+  	            return (0, lines_1.fromString)("this", options);
   	        case "TSNullKeyword":
-  	            return lines_1.fromString("null", options);
+  	            return (0, lines_1.fromString)("null", options);
   	        case "TSUndefinedKeyword":
-  	            return lines_1.fromString("undefined", options);
+  	            return (0, lines_1.fromString)("undefined", options);
   	        case "TSUnknownKeyword":
-  	            return lines_1.fromString("unknown", options);
+  	            return (0, lines_1.fromString)("unknown", options);
   	        case "TSNeverKeyword":
-  	            return lines_1.fromString("never", options);
+  	            return (0, lines_1.fromString)("never", options);
   	        case "TSArrayType":
-  	            return lines_1.concat([path.call(print, "elementType"), "[]"]);
+  	            return (0, lines_1.concat)([path.call(print, "elementType"), "[]"]);
   	        case "TSLiteralType":
   	            return path.call(print, "literal");
   	        case "TSUnionType":
-  	            return lines_1.fromString(" | ").join(path.map(print, "types"));
+  	            return (0, lines_1.fromString)(" | ").join(path.map(print, "types"));
   	        case "TSIntersectionType":
-  	            return lines_1.fromString(" & ").join(path.map(print, "types"));
+  	            return (0, lines_1.fromString)(" & ").join(path.map(print, "types"));
   	        case "TSConditionalType":
   	            parts.push(path.call(print, "checkType"), " extends ", path.call(print, "extendsType"), " ? ", path.call(print, "trueType"), " : ", path.call(print, "falseType"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "TSInferType":
   	            parts.push("infer ", path.call(print, "typeParameter"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "TSParenthesizedType":
-  	            return lines_1.concat(["(", path.call(print, "typeAnnotation"), ")"]);
+  	            return (0, lines_1.concat)(["(", path.call(print, "typeAnnotation"), ")"]);
   	        case "TSFunctionType":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                path.call(print, "typeParameters"),
   	                "(",
   	                printFunctionParams(path, options, print),
@@ -11361,7 +11961,7 @@
   	                path.call(print, "typeAnnotation", "typeAnnotation"),
   	            ]);
   	        case "TSConstructorType":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                "new ",
   	                path.call(print, "typeParameters"),
   	                "(",
@@ -11374,12 +11974,12 @@
   	            if (n.typeAnnotation) {
   	                parts.push(": ", path.call(print, "typeAnnotation"), ";");
   	            }
-  	            return lines_1.concat(["{\n", lines_1.concat(parts).indent(options.tabWidth), "\n}"]);
+  	            return (0, lines_1.concat)(["{\n", (0, lines_1.concat)(parts).indent(options.tabWidth), "\n}"]);
   	        }
   	        case "TSTupleType":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                "[",
-  	                lines_1.fromString(", ").join(path.map(print, "elementTypes")),
+  	                (0, lines_1.fromString)(", ").join(path.map(print, "elementTypes")),
   	                "]",
   	            ]);
   	        case "TSNamedTupleMember":
@@ -11388,40 +11988,45 @@
   	                parts.push("?");
   	            }
   	            parts.push(": ", path.call(print, "elementType"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "TSRestType":
-  	            return lines_1.concat(["...", path.call(print, "typeAnnotation")]);
+  	            return (0, lines_1.concat)(["...", path.call(print, "typeAnnotation")]);
   	        case "TSOptionalType":
-  	            return lines_1.concat([path.call(print, "typeAnnotation"), "?"]);
+  	            return (0, lines_1.concat)([path.call(print, "typeAnnotation"), "?"]);
   	        case "TSIndexedAccessType":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                path.call(print, "objectType"),
   	                "[",
   	                path.call(print, "indexType"),
   	                "]",
   	            ]);
   	        case "TSTypeOperator":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                path.call(print, "operator"),
   	                " ",
   	                path.call(print, "typeAnnotation"),
   	            ]);
   	        case "TSTypeLiteral": {
-  	            var memberLines = lines_1.fromString(",\n").join(path.map(print, "members"));
-  	            if (memberLines.isEmpty()) {
-  	                return lines_1.fromString("{}", options);
+  	            var members = (0, lines_1.fromString)("\n").join(path.map(print, "members").map(function (member) {
+  	                if (lastNonSpaceCharacter(member) !== ";") {
+  	                    return member.concat(";");
+  	                }
+  	                return member;
+  	            }));
+  	            if (members.isEmpty()) {
+  	                return (0, lines_1.fromString)("{}", options);
   	            }
-  	            parts.push("{\n", memberLines.indent(options.tabWidth), "\n}");
-  	            return lines_1.concat(parts);
+  	            parts.push("{\n", members.indent(options.tabWidth), "\n}");
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "TSEnumMember":
   	            parts.push(path.call(print, "id"));
   	            if (n.initializer) {
   	                parts.push(" = ", path.call(print, "initializer"));
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "TSTypeQuery":
-  	            return lines_1.concat(["typeof ", path.call(print, "exprName")]);
+  	            return (0, lines_1.concat)(["typeof ", path.call(print, "exprName")]);
   	        case "TSParameterProperty":
   	            if (n.accessibility) {
   	                parts.push(n.accessibility, " ");
@@ -11436,25 +12041,32 @@
   	                parts.push("readonly ");
   	            }
   	            parts.push(path.call(print, "parameter"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "TSTypeReference":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                path.call(print, "typeName"),
   	                path.call(print, "typeParameters"),
   	            ]);
   	        case "TSQualifiedName":
-  	            return lines_1.concat([path.call(print, "left"), ".", path.call(print, "right")]);
-  	        case "TSAsExpression": {
-  	            var expression = path.call(print, "expression");
-  	            parts.push(expression, lines_1.fromString(" as "), path.call(print, "typeAnnotation"));
-  	            return lines_1.concat(parts);
-  	        }
+  	            return (0, lines_1.concat)([path.call(print, "left"), ".", path.call(print, "right")]);
+  	        case "TSAsExpression":
+  	        case "TSSatisfiesExpression":
+  	            {
+  	                var expression = path.call(print, "expression");
+  	                parts.push(expression, n.type === "TSSatisfiesExpression" ? " satisfies " : " as ", path.call(print, "typeAnnotation"));
+  	                return (0, lines_1.concat)(parts);
+  	            }
+  	        case "TSTypeCastExpression":
+  	            return (0, lines_1.concat)([
+  	                path.call(print, "expression"),
+  	                path.call(print, "typeAnnotation"),
+  	            ]);
   	        case "TSNonNullExpression":
-  	            return lines_1.concat([path.call(print, "expression"), "!"]);
+  	            return (0, lines_1.concat)([path.call(print, "expression"), "!"]);
   	        case "TSTypeAnnotation":
-  	            return lines_1.concat([": ", path.call(print, "typeAnnotation")]);
+  	            return (0, lines_1.concat)([": ", path.call(print, "typeAnnotation")]);
   	        case "TSIndexSignature":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                n.readonly ? "readonly " : "",
   	                "[",
   	                path.map(print, "parameters"),
@@ -11470,7 +12082,7 @@
   	                parts.push(path.call(print, "key"));
   	            }
   	            parts.push(n.optional ? "?" : "", path.call(print, "typeAnnotation"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "TSMethodSignature":
   	            if (n.computed) {
   	                parts.push("[", path.call(print, "key"), "]");
@@ -11482,7 +12094,7 @@
   	                parts.push("?");
   	            }
   	            parts.push(path.call(print, "typeParameters"), "(", printFunctionParams(path, options, print), ")", path.call(print, "typeAnnotation"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "TSTypePredicate":
   	            if (n.asserts) {
   	                parts.push("asserts ");
@@ -11491,9 +12103,9 @@
   	            if (n.typeAnnotation) {
   	                parts.push(" is ", path.call(print, "typeAnnotation", "typeAnnotation"));
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "TSCallSignatureDeclaration":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                path.call(print, "typeParameters"),
   	                "(",
   	                printFunctionParams(path, options, print),
@@ -11508,9 +12120,9 @@
   	                parts.push("new ");
   	            }
   	            parts.push("(", printFunctionParams(path, options, print), ")", path.call(print, "typeAnnotation"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "TSTypeAliasDeclaration":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                n.declare ? "declare " : "",
   	                "type ",
   	                path.call(print, "id"),
@@ -11530,41 +12142,46 @@
   	            if (n["default"]) {
   	                parts.push(" = ", path.call(print, "default"));
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "TSTypeAssertion": {
   	            parts.push("<", path.call(print, "typeAnnotation"), "> ", path.call(print, "expression"));
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "TSTypeParameterDeclaration":
   	        case "TSTypeParameterInstantiation":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                "<",
-  	                lines_1.fromString(", ").join(path.map(print, "params")),
+  	                (0, lines_1.fromString)(", ").join(path.map(print, "params")),
   	                ">",
   	            ]);
   	        case "TSEnumDeclaration": {
   	            parts.push(n.declare ? "declare " : "", n.const ? "const " : "", "enum ", path.call(print, "id"));
-  	            var memberLines = lines_1.fromString(",\n").join(path.map(print, "members"));
+  	            var memberLines = (0, lines_1.fromString)(",\n").join(path.map(print, "members"));
   	            if (memberLines.isEmpty()) {
   	                parts.push(" {}");
   	            }
   	            else {
   	                parts.push(" {\n", memberLines.indent(options.tabWidth), "\n}");
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
   	        case "TSExpressionWithTypeArguments":
-  	            return lines_1.concat([
+  	            return (0, lines_1.concat)([
   	                path.call(print, "expression"),
   	                path.call(print, "typeParameters"),
   	            ]);
   	        case "TSInterfaceBody": {
-  	            var lines = lines_1.fromString(";\n").join(path.map(print, "body"));
+  	            var lines = (0, lines_1.fromString)("\n").join(path.map(print, "body").map(function (element) {
+  	                if (lastNonSpaceCharacter(element) !== ";") {
+  	                    return element.concat(";");
+  	                }
+  	                return element;
+  	            }));
   	            if (lines.isEmpty()) {
-  	                return lines_1.fromString("{}", options);
+  	                return (0, lines_1.fromString)("{}", options);
   	            }
-  	            return lines_1.concat(["{\n", lines.indent(options.tabWidth), ";", "\n}"]);
+  	            return (0, lines_1.concat)(["{\n", lines.indent(options.tabWidth), "\n}"]);
   	        }
   	        case "TSImportType":
   	            parts.push("import(", path.call(print, "argument"), ")");
@@ -11574,15 +12191,15 @@
   	            if (n.typeParameters) {
   	                parts.push(path.call(print, "typeParameters"));
   	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        case "TSImportEqualsDeclaration":
   	            if (n.isExport) {
   	                parts.push("export ");
   	            }
   	            parts.push("import ", path.call(print, "id"), " = ", path.call(print, "moduleReference"));
-  	            return maybeAddSemicolon(lines_1.concat(parts));
+  	            return maybeAddSemicolon((0, lines_1.concat)(parts));
   	        case "TSExternalModuleReference":
-  	            return lines_1.concat(["require(", path.call(print, "expression"), ")"]);
+  	            return (0, lines_1.concat)(["require(", path.call(print, "expression"), ")"]);
   	        case "TSModuleDeclaration": {
   	            var parent = path.getParentNode();
   	            if (parent.type === "TSModuleDeclaration") {
@@ -11617,22 +12234,32 @@
   	                }
   	            }
   	            parts.push(path.call(print, "id"));
-  	            if (n.body && n.body.type === "TSModuleDeclaration") {
+  	            if (n.body) {
+  	                parts.push(" ");
   	                parts.push(path.call(print, "body"));
   	            }
-  	            else if (n.body) {
-  	                var bodyLines = path.call(print, "body");
-  	                if (bodyLines.isEmpty()) {
-  	                    parts.push(" {}");
-  	                }
-  	                else {
-  	                    parts.push(" {\n", bodyLines.indent(options.tabWidth), "\n}");
-  	                }
-  	            }
-  	            return lines_1.concat(parts);
+  	            return (0, lines_1.concat)(parts);
   	        }
-  	        case "TSModuleBlock":
-  	            return path.call(function (bodyPath) { return printStatementSequence(bodyPath, options, print); }, "body");
+  	        case "TSModuleBlock": {
+  	            var naked = path.call(function (bodyPath) { return printStatementSequence(bodyPath, options, print); }, "body");
+  	            if (naked.isEmpty()) {
+  	                parts.push("{}");
+  	            }
+  	            else {
+  	                parts.push("{\n", naked.indent(options.tabWidth), "\n}");
+  	            }
+  	            return (0, lines_1.concat)(parts);
+  	        }
+  	        case "TSInstantiationExpression": {
+  	            parts.push(path.call(print, "expression"), path.call(print, "typeParameters"));
+  	            return (0, lines_1.concat)(parts);
+  	        }
+  	        // https://github.com/babel/babel/pull/10148
+  	        case "V8IntrinsicIdentifier":
+  	            return (0, lines_1.concat)(["%", path.call(print, "name")]);
+  	        // https://github.com/babel/babel/pull/13191
+  	        case "TopicReference":
+  	            return (0, lines_1.fromString)("#");
   	        // Unhandled types below. If encountered, nodes of these types should
   	        // be either left alone or desugared into AST types that are fully
   	        // supported by the pretty-printer.
@@ -11690,7 +12317,7 @@
   	            parts.push(printPath(decoratorPath), "\n");
   	        }, "declaration", "decorators");
   	    }
-  	    return lines_1.concat(parts);
+  	    return (0, lines_1.concat)(parts);
   	}
   	function printStatementSequence(path, options, print) {
   	    var filtered = [];
@@ -11786,24 +12413,47 @@
   	            parts.push(trailingSpace);
   	        }
   	    });
-  	    return lines_1.concat(parts);
+  	    return (0, lines_1.concat)(parts);
   	}
   	function maxSpace(s1, s2) {
   	    if (!s1 && !s2) {
-  	        return lines_1.fromString("");
+  	        return (0, lines_1.fromString)("");
   	    }
   	    if (!s1) {
-  	        return lines_1.fromString(s2);
+  	        return (0, lines_1.fromString)(s2);
   	    }
   	    if (!s2) {
-  	        return lines_1.fromString(s1);
+  	        return (0, lines_1.fromString)(s1);
   	    }
-  	    var spaceLines1 = lines_1.fromString(s1);
-  	    var spaceLines2 = lines_1.fromString(s2);
+  	    var spaceLines1 = (0, lines_1.fromString)(s1);
+  	    var spaceLines2 = (0, lines_1.fromString)(s2);
   	    if (spaceLines2.length > spaceLines1.length) {
   	        return spaceLines2;
   	    }
   	    return spaceLines1;
+  	}
+  	function printClassMemberModifiers(node) {
+  	    var parts = [];
+  	    if (node.declare) {
+  	        parts.push("declare ");
+  	    }
+  	    var access = node.accessibility || node.access;
+  	    if (typeof access === "string") {
+  	        parts.push(access, " ");
+  	    }
+  	    if (node.static) {
+  	        parts.push("static ");
+  	    }
+  	    if (node.override) {
+  	        parts.push("override ");
+  	    }
+  	    if (node.abstract) {
+  	        parts.push("abstract ");
+  	    }
+  	    if (node.readonly) {
+  	        parts.push("readonly ");
+  	    }
+  	    return parts;
   	}
   	function printMethod(path, options, print) {
   	    var node = path.getNode();
@@ -11813,19 +12463,7 @@
   	    if (!namedTypes.FunctionExpression.check(nodeValue)) {
   	        nodeValue = node;
   	    }
-  	    var access = node.accessibility || node.access;
-  	    if (typeof access === "string") {
-  	        parts.push(access, " ");
-  	    }
-  	    if (node.static) {
-  	        parts.push("static ");
-  	    }
-  	    if (node.abstract) {
-  	        parts.push("abstract ");
-  	    }
-  	    if (node.readonly) {
-  	        parts.push("readonly ");
-  	    }
+  	    parts.push.apply(parts, printClassMemberModifiers(node));
   	    if (nodeValue.async) {
   	        parts.push("async ");
   	    }
@@ -11837,7 +12475,7 @@
   	    }
   	    var key = path.call(print, "key");
   	    if (node.computed) {
-  	        key = lines_1.concat(["[", key, "]"]);
+  	        key = (0, lines_1.concat)(["[", key, "]"]);
   	    }
   	    parts.push(key);
   	    if (node.optional) {
@@ -11861,21 +12499,21 @@
   	            parts.push(";");
   	        }
   	    }
-  	    return lines_1.concat(parts);
+  	    return (0, lines_1.concat)(parts);
   	}
   	function printArgumentsList(path, options, print) {
   	    var printed = path.map(print, "arguments");
   	    var trailingComma = util$1.isTrailingCommaEnabled(options, "parameters");
-  	    var joined = lines_1.fromString(", ").join(printed);
+  	    var joined = (0, lines_1.fromString)(", ").join(printed);
   	    if (joined.getLineLength(1) > options.wrapColumn) {
-  	        joined = lines_1.fromString(",\n").join(printed);
-  	        return lines_1.concat([
+  	        joined = (0, lines_1.fromString)(",\n").join(printed);
+  	        return (0, lines_1.concat)([
   	            "(\n",
   	            joined.indent(options.tabWidth),
   	            trailingComma ? ",\n)" : "\n)",
   	        ]);
   	    }
-  	    return lines_1.concat(["(", joined, ")"]);
+  	    return (0, lines_1.concat)(["(", joined, ")"]);
   	}
   	function printFunctionParams(path, options, print) {
   	    var fun = path.getValue();
@@ -11894,27 +12532,43 @@
   	            var i = defExprPath.getName();
   	            var p = printed[i];
   	            if (p && defExprPath.getValue()) {
-  	                printed[i] = lines_1.concat([p, " = ", print(defExprPath)]);
+  	                printed[i] = (0, lines_1.concat)([p, " = ", print(defExprPath)]);
   	            }
   	        }, "defaults");
   	    }
   	    if (fun.rest) {
-  	        printed.push(lines_1.concat(["...", path.call(print, "rest")]));
+  	        printed.push((0, lines_1.concat)(["...", path.call(print, "rest")]));
   	    }
-  	    var joined = lines_1.fromString(", ").join(printed);
+  	    var joined = (0, lines_1.fromString)(", ").join(printed);
   	    if (joined.length > 1 || joined.getLineLength(1) > options.wrapColumn) {
-  	        joined = lines_1.fromString(",\n").join(printed);
+  	        joined = (0, lines_1.fromString)(",\n").join(printed);
   	        if (util$1.isTrailingCommaEnabled(options, "parameters") &&
   	            !fun.rest &&
   	            params[params.length - 1].type !== "RestElement") {
-  	            joined = lines_1.concat([joined, ",\n"]);
+  	            joined = (0, lines_1.concat)([joined, ",\n"]);
   	        }
   	        else {
-  	            joined = lines_1.concat([joined, "\n"]);
+  	            joined = (0, lines_1.concat)([joined, "\n"]);
   	        }
-  	        return lines_1.concat(["\n", joined.indent(options.tabWidth)]);
+  	        return (0, lines_1.concat)(["\n", joined.indent(options.tabWidth)]);
   	    }
   	    return joined;
+  	}
+  	function maybePrintImportAssertions(path, options, print) {
+  	    var n = path.getValue();
+  	    if (n.assertions && n.assertions.length > 0) {
+  	        var parts = [" assert {"];
+  	        var printed = path.map(print, "assertions");
+  	        var flat = (0, lines_1.fromString)(", ").join(printed);
+  	        if (flat.length > 1 || flat.getLineLength(1) > options.wrapColumn) {
+  	            parts.push("\n", (0, lines_1.fromString)(",\n").join(printed).indent(options.tabWidth), "\n}");
+  	        }
+  	        else {
+  	            parts.push(" ", flat, " }");
+  	        }
+  	        return (0, lines_1.concat)(parts);
+  	    }
+  	    return (0, lines_1.fromString)("");
   	}
   	function printExportDeclaration(path, options, print) {
   	    var decl = path.getValue();
@@ -11959,10 +12613,10 @@
   	                parts.push(lines);
   	            });
   	            if (bracedSpecifiers_2.length > 0) {
-  	                var lines_2 = lines_1.fromString(", ").join(bracedSpecifiers_2);
+  	                var lines_2 = (0, lines_1.fromString)(", ").join(bracedSpecifiers_2);
   	                if (lines_2.getLineLength(1) > options.wrapColumn) {
-  	                    lines_2 = lines_1.concat([
-  	                        lines_1.fromString(",\n").join(bracedSpecifiers_2).indent(options.tabWidth),
+  	                    lines_2 = (0, lines_1.concat)([
+  	                        (0, lines_1.fromString)(",\n").join(bracedSpecifiers_2).indent(options.tabWidth),
   	                        ",",
   	                    ]);
   	                }
@@ -11981,13 +12635,13 @@
   	            }
   	        }
   	        else {
-  	            parts.push(shouldPrintSpaces ? "{ " : "{", lines_1.fromString(", ").join(path.map(print, "specifiers")), shouldPrintSpaces ? " }" : "}");
+  	            parts.push(shouldPrintSpaces ? "{ " : "{", (0, lines_1.fromString)(", ").join(path.map(print, "specifiers")), shouldPrintSpaces ? " }" : "}");
   	        }
   	        if (decl.source) {
-  	            parts.push(" from ", path.call(print, "source"));
+  	            parts.push(" from ", path.call(print, "source"), maybePrintImportAssertions(path, options, print));
   	        }
   	    }
-  	    var lines = lines_1.concat(parts);
+  	    var lines = (0, lines_1.concat)(parts);
   	    if (lastNonSpaceCharacter(lines) !== ";" &&
   	        !(decl.declaration &&
   	            (decl.declaration.type === "FunctionDeclaration" ||
@@ -11995,7 +12649,7 @@
   	                decl.declaration.type === "TSModuleDeclaration" ||
   	                decl.declaration.type === "TSInterfaceDeclaration" ||
   	                decl.declaration.type === "TSEnumDeclaration"))) {
-  	        lines = lines_1.concat([lines, ";"]);
+  	        lines = (0, lines_1.concat)([lines, ";"]);
   	    }
   	    return lines;
   	}
@@ -12010,27 +12664,27 @@
   	        // it needs to be printed with this non-exported declaration node.
   	        parts.unshift("declare ");
   	    }
-  	    return lines_1.concat(parts);
+  	    return (0, lines_1.concat)(parts);
   	}
   	function printVariance(path, print) {
   	    return path.call(function (variancePath) {
   	        var value = variancePath.getValue();
   	        if (value) {
   	            if (value === "plus") {
-  	                return lines_1.fromString("+");
+  	                return (0, lines_1.fromString)("+");
   	            }
   	            if (value === "minus") {
-  	                return lines_1.fromString("-");
+  	                return (0, lines_1.fromString)("-");
   	            }
   	            return print(variancePath);
   	        }
-  	        return lines_1.fromString("");
+  	        return (0, lines_1.fromString)("");
   	    }, "variance");
   	}
   	function adjustClause(clause, options) {
   	    if (clause.length > 1)
-  	        return lines_1.concat([" ", clause]);
-  	    return lines_1.concat(["\n", maybeAddSemicolon(clause).indent(options.tabWidth)]);
+  	        return (0, lines_1.concat)([" ", clause]);
+  	    return (0, lines_1.concat)(["\n", maybeAddSemicolon(clause).indent(options.tabWidth)]);
   	}
   	function lastNonSpaceCharacter(lines) {
   	    var pos = lines.lastPos();
@@ -12046,25 +12700,43 @@
   	function swapQuotes(str) {
   	    return str.replace(/['"]/g, function (m) { return (m === '"' ? "'" : '"'); });
   	}
+  	function getPossibleRaw(node) {
+  	    var value = types.getFieldValue(node, "value");
+  	    var extra = types.getFieldValue(node, "extra");
+  	    if (extra && typeof extra.raw === "string" && value == extra.rawValue) {
+  	        return extra.raw;
+  	    }
+  	    if (node.type === "Literal") {
+  	        var raw = node.raw;
+  	        if (typeof raw === "string" && value == raw) {
+  	            return raw;
+  	        }
+  	    }
+  	}
+  	function jsSafeStringify(str) {
+  	    return JSON.stringify(str).replace(/[\u2028\u2029]/g, function (m) {
+  	        return "\\u" + m.charCodeAt(0).toString(16);
+  	    });
+  	}
   	function nodeStr(str, options) {
   	    isString.assert(str);
   	    switch (options.quote) {
   	        case "auto": {
-  	            var double = JSON.stringify(str);
-  	            var single = swapQuotes(JSON.stringify(swapQuotes(str)));
+  	            var double = jsSafeStringify(str);
+  	            var single = swapQuotes(jsSafeStringify(swapQuotes(str)));
   	            return double.length > single.length ? single : double;
   	        }
   	        case "single":
-  	            return swapQuotes(JSON.stringify(swapQuotes(str)));
+  	            return swapQuotes(jsSafeStringify(swapQuotes(str)));
   	        case "double":
   	        default:
-  	            return JSON.stringify(str);
+  	            return jsSafeStringify(str);
   	    }
   	}
   	function maybeAddSemicolon(lines) {
   	    var eoc = lastNonSpaceCharacter(lines);
   	    if (!eoc || "\n};".indexOf(eoc) < 0)
-  	        return lines_1.concat([lines, ";"]);
+  	        return (0, lines_1.concat)([lines, ";"]);
   	    return lines;
   	}
   	return printer;
@@ -12072,9 +12744,9 @@
 
   (function (exports) {
   	Object.defineProperty(exports, "__esModule", { value: true });
-  	exports.run = exports.prettyPrint = exports.print = exports.types = exports.parse = void 0;
+  	exports.run = exports.prettyPrint = exports.print = exports.visit = exports.types = exports.parse = void 0;
   	var tslib_1 = require$$0;
-  	var fs_1 = tslib_1.__importDefault(require$$4);
+  	var fs_1 = tslib_1.__importDefault(require$$5);
   	var types = tslib_1.__importStar(requireMain());
   	exports.types = types;
   	var parser_1 = requireParser();
@@ -12130,8 +12802,8 @@
   	    process.stdout.write(output);
   	}
   	function runString(code, transformer, options) {
-  	    var writeback = options && options.writeback || defaultWriteback;
-  	    transformer(parser_1.parse(code, options), function (node) {
+  	    var writeback = (options && options.writeback) || defaultWriteback;
+  	    transformer((0, parser_1.parse)(code, options), function (node) {
   	        writeback(print(node, options).code);
   	    });
   	} 
@@ -14362,12 +15034,14 @@
   /**
    * Create a simple attribute expression
    * @param   {RiotParser.Node.Attr} sourceNode - the custom tag
+   * @param   {RiotParser.Node} parentNode - the html node that has received the attribute expression
    * @param   {string} sourceFile - source file path
    * @param   {string} sourceCode - original source
    * @returns {AST.Node} object containing the expression binding keys
    */
   function createAttributeExpression(
     sourceNode,
+    parentNode,
     sourceFile,
     sourceCode,
   ) {
@@ -14384,7 +15058,14 @@
       ),
       simplePropertyNode(
         BINDING_IS_BOOLEAN_ATTRIBUTE,
-        builders.literal(!isSpread && !!sourceNode[IS_BOOLEAN_ATTRIBUTE]),
+        builders.literal(
+          // Custom nodes can't handle boolean attrs
+          // Riot.js will handle the bool attrs logic only on native html tags
+          !parentNode[IS_CUSTOM_NODE] &&
+            !isRootNode(parentNode) &&
+            !isSpread &&
+            !!sourceNode[IS_BOOLEAN_ATTRIBUTE],
+        ),
       ),
       simplePropertyNode(
         BINDING_NAME_KEY,
@@ -15521,7 +16202,7 @@
       case isEventAttribute(sourceNode):
         return createEventExpression(sourceNode, sourceFile, sourceCode)
       default:
-        return createAttributeExpression(sourceNode, sourceFile, sourceCode)
+        return createAttributeExpression(sourceNode, parentNode, sourceFile, sourceCode)
     }
   }
 
@@ -21556,8 +22237,8 @@
           allowHashBang: true,
           allowImportExportEverywhere: true,
           allowReturnOutsideFunction: true,
-          ecmaVersion: util_1.getOption(options, "ecmaVersion", 8),
-          sourceType: util_1.getOption(options, "sourceType", "module"),
+          ecmaVersion: (0, util_1.getOption)(options, "ecmaVersion", 8),
+          sourceType: (0, util_1.getOption)(options, "sourceType", "module"),
           locations: true,
           onComment: comments,
           onToken: tokens,
@@ -21601,6 +22282,8 @@
    * @returns {undefined} this is a void function
    */
   function replacePathScope(path, property) {
+    // make sure that for the scope injection the extra parenthesis get removed
+    removeExtraParenthesis(property);
     path.replace(builders.memberExpression(scope, property, false));
   }
 
@@ -21762,7 +22445,7 @@
   function wrapASTInFunctionWithScope(ast) {
     const fn = builders.arrowFunctionExpression([scope], ast);
 
-    // object expressions need to be wrapped in parenthesis
+    // object expressions need to be wrapped in parentheses
     // recast doesn't allow it
     // see also https://github.com/benjamn/recast/issues/985
     if (isObjectExpression(ast)) {
@@ -21805,11 +22488,23 @@
    * @returns {ASTExpression} ast expression generated from the riot parser expression node
    */
   function transformExpression(expression, sourceFile, sourceCode) {
-    return compose$1(getExpressionAST, updateNodesScope, createASTFromExpression)(
-      expression,
-      sourceFile,
-      sourceCode,
-    )
+    return compose$1(
+      removeExtraParenthesis,
+      getExpressionAST,
+      updateNodesScope,
+      createASTFromExpression,
+    )(expression, sourceFile, sourceCode)
+  }
+
+  /**
+   * Remove the extra parents from the compiler generated expressions
+   * @param  {AST.Expression} expr - ast expression
+   * @returns {*}
+   */
+  function removeExtraParenthesis(expr) {
+    if (expr.extra) expr.extra.parenthesized = false;
+
+    return expr
   }
 
   /**
@@ -22323,15 +23018,18 @@
    * @returns { Output } object containing output code and source map
    */
   function execute$1(compilerOutput, meta) {
-    return Array.from(postprocessors).reduce(function (acc, postprocessor) {
-      const { code, map } = acc;
-      const output = postprocessor(code, meta);
+    return Array.from(postprocessors).reduce(
+      function (acc, postprocessor) {
+        const { code, map } = acc;
+        const output = postprocessor(code, meta);
 
-      return {
-        code: output.code,
-        map: composeSourcemaps(map, output.map),
-      }
-    }, createOutput(compilerOutput, meta))
+        return {
+          code: output.code,
+          map: composeSourcemaps(map, output.map),
+        }
+      },
+      createOutput(compilerOutput, meta),
+    )
   }
 
   /**
@@ -26140,7 +26838,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.0.2';
+  const version = 'v9.0.3';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
