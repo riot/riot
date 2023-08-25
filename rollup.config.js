@@ -1,5 +1,6 @@
-const commonjs = require('@rollup/plugin-commonjs')
-const { nodeResolve } = require('@rollup/plugin-node-resolve')
+import commonjs from '@rollup/plugin-commonjs'
+import { nodeResolve } from '@rollup/plugin-node-resolve'
+
 const emptyFile = 'export default undefined'
 
 const ignoredModules = ['fs', 'path', 'esprima']
@@ -18,7 +19,7 @@ function ignore() {
   }
 }
 
-module.exports = {
+export default {
   output: {
     banner: '/* Riot WIP, @license MIT */',
     name: 'riot',

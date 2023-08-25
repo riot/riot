@@ -30,7 +30,7 @@ ROLLUP_ESM_OPTIONS = --format esm \
 					 --output.preserveModules \
 					 --amd.forceJsExtensionForImports \
 					 --preserveModulesRoot src \
-					 --config rollup.config.cjs \
+					 --config rollup.config.js \
 					 --dir $(DIST)esm
 # Options we will pass to the minifier
 MINIFY_OPTIONS = --comments false \
@@ -50,7 +50,7 @@ lint:
 	@ $(ESLINT) src test
 
 test-debug:
-	@ ${KARMA} start test/karma.conf.js --browsers=Chrome --no-single-run --auto-watch
+	@ ${KARMA} start test/karma.conf.cjs --browsers=Chrome --no-single-run --auto-watch
 
 test-sauce:
 	# run the riot tests on saucelabs
@@ -64,8 +64,8 @@ raw:
 	# build riot
 	@ mkdir -p $(DIST)
 	# Default builds UMD
-	@ $(ROLLUP) src/riot.js --format umd --config rollup.config.cjs --file $(DIST)riot.js
-	@ HAS_VISUALIZER=1 $(ROLLUP) src/riot+compiler.js --format umd --config rollup.config.cjs --file $(DIST)riot+compiler.js
+	@ $(ROLLUP) src/riot.js --format umd --config rollup.config.js --file $(DIST)riot.js
+	@ HAS_VISUALIZER=1 $(ROLLUP) src/riot+compiler.js --format umd --config rollup.config.js --file $(DIST)riot+compiler.js
 	@ $(ROLLUP) src/riot.js $(ROLLUP_ESM_OPTIONS)
 	@ $(ROLLUP) src/riot+compiler.js $(ROLLUP_ESM_OPTIONS)
 
