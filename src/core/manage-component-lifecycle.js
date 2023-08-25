@@ -21,6 +21,7 @@ import {
   evaluateAttributeExpressions,
   isFunction,
   isObject,
+  DOMattributesToObject,
 } from '@riotjs/util'
 import { addCssHook } from './add-css-hook.js'
 import { bindDOMNodeToComponentInstance } from './bind-dom-node-to-component-instance.js'
@@ -28,6 +29,7 @@ import { computeComponentState } from './compute-component-state.js'
 import { computeInitialProps } from './compute-initial-props.js'
 import { createAttributeBindings } from './create-attribute-bindings.js'
 import { runPlugins } from './run-plugins.js'
+import { IS_DIRECTIVE } from '@riotjs/util/constants'
 
 /**
  * Component creation factory function that will enhance the user provided API
@@ -92,9 +94,15 @@ export function manageComponentLifecycle(
               this[ATTRIBUTES_KEY_SYMBOL].update(parentScope)
             }
 
-            const newProps = evaluateAttributeExpressions(
-              this[ATTRIBUTES_KEY_SYMBOL].expressions,
-            )
+            // Avoid adding the riot "is" directives to the component props
+            // eslint-disable-next-line no-unused-vars
+            const { [IS_DIRECTIVE]: _, ...newProps } = {
+              // make sure that the root node attributes will be always parsed
+              ...DOMattributesToObject(this[ROOT_KEY]),
+              ...evaluateAttributeExpressions(
+                this[ATTRIBUTES_KEY_SYMBOL].expressions,
+              ),
+            }
 
             if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false)
               return

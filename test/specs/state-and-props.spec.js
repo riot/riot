@@ -161,6 +161,11 @@ describe('components state and props', () => {
 
     expect(component.$('h1').innerHTML).to.be.equal('hello')
 
+    // check if static attributes persist also after an update call
+    // see also https://github.com/riot/riot/issues/2985
+    component.update()
+    expect(component.$('h1').innerHTML).to.be.equal('hello')
+
     component.unmount()
   })
 
