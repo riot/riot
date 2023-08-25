@@ -1,4 +1,4 @@
-export const saucelabsBrowsers = {
+module.exports = {
   browsers: {
     sl_ios_safari: {
       base: 'SauceLabs',

@@ -1,5 +1,5 @@
 import * as riot from '../../src/riot'
-import { fireEvent, normalizeInnerHTML } from '../utils.js'
+import { fireEvent, normalizeInnerHTML } from '../utils.cjs'
 
 import GlobalComponents from '../components/global-components.riot'
 import NestedAliasedImportsComponent from '../components/nested-aliased-imports.riot'
