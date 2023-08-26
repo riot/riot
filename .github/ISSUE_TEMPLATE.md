@@ -7,7 +7,7 @@
 Post the link using one of our bug report templates:
 
 - [Bug Report Template](https://riot.js.org/examples/plunker/?app=bug-reporter) on plnkr (preferred)
-- [Bug Report Template](https://codesandbox.io/s/riot-js-7-bug-template-forked-ffm7jf?file=/index.html) on codesandbox
+- [Bug Report Template](https://codesandbox.io/s/riot-js-9-bug-template-forked-ffm7jf?file=/index.html) on codesandbox
 
 3. On which browser/OS does the issue appear?
 
