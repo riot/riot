@@ -1,4 +1,4 @@
-/* Riot v9.0.3, @license MIT */
+/* Riot v9.0.4, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -353,14 +353,17 @@
     return source
   }
 
-  const PURE_COMPONENT_API = Object.freeze({
-    [MOUNT_METHOD_KEY]: noop,
-    [UPDATE_METHOD_KEY]: noop,
-    [UNMOUNT_METHOD_KEY]: noop,
-  });
-
+  // Components without template use a mocked template interface with some basic functionalities to
+  // guarantee consistent rendering behaviour see https://github.com/riot/riot/issues/2984
   const MOCKED_TEMPLATE_INTERFACE = {
-    ...PURE_COMPONENT_API,
+    [MOUNT_METHOD_KEY](el) {
+      this.el = el;
+    },
+    [UPDATE_METHOD_KEY]: noop,
+    [UNMOUNT_METHOD_KEY](_, __, mustRemoveRoot = false) {
+      if (mustRemoveRoot) removeChild(this.el);
+      else if (!mustRemoveRoot) cleanNode(this.el);
+    },
     clone: noop,
     createDOM: noop,
   };
@@ -1690,6 +1693,12 @@
     )
   }
 
+  const PURE_COMPONENT_API = Object.freeze({
+    [MOUNT_METHOD_KEY]: noop,
+    [UPDATE_METHOD_KEY]: noop,
+    [UNMOUNT_METHOD_KEY]: noop,
+  });
+
   /**
    * Bind a DOM node to its component object
    * @param   {HTMLElement} node - html node mounted
@@ -2114,9 +2123,15 @@
                 this[ATTRIBUTES_KEY_SYMBOL].update(parentScope);
               }
 
-              const newProps = evaluateAttributeExpressions(
-                this[ATTRIBUTES_KEY_SYMBOL].expressions,
-              );
+              // Avoid adding the riot "is" directives to the component props
+              // eslint-disable-next-line no-unused-vars
+              const { [IS_DIRECTIVE]: _, ...newProps } = {
+                // make sure that the root node attributes will be always parsed
+                ...DOMattributesToObject(this[ROOT_KEY]),
+                ...evaluateAttributeExpressions(
+                  this[ATTRIBUTES_KEY_SYMBOL].expressions,
+                ),
+              };
 
               if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false)
                 return
@@ -2462,7 +2477,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.0.3';
+  const version = 'v9.0.4';
 
   // expose some internal stuff that might be used from external tools
   const __ = {

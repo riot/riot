@@ -1,4 +1,4 @@
-/* Riot v9.0.3, @license MIT */
+/* Riot v9.0.4, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -9717,6 +9717,14 @@
   	    }
   	    if (!parent)
   	        return false;
+  	    // Wrap e.g. `-1` in parentheses inside `(-1) ** 2`.
+  	    if (node.type === "UnaryExpression" &&
+  	        parent.type === "BinaryExpression" &&
+  	        name === "left" &&
+  	        parent.left === node &&
+  	        parent.operator === "**") {
+  	        return true;
+  	    }
   	    switch (node.type) {
   	        case "UnaryExpression":
   	        case "SpreadElement":
@@ -13239,6 +13247,7 @@
   	CloseEvent: false,
   	Comment: false,
   	CompositionEvent: false,
+  	CompressionStream: false,
   	confirm: false,
   	console: false,
   	ConstantSourceNode: false,
@@ -13281,6 +13290,7 @@
   	DataTransfer: false,
   	DataTransferItem: false,
   	DataTransferItemList: false,
+  	DecompressionStream: false,
   	defaultstatus: false,
   	defaultStatus: false,
   	DelayNode: false,
@@ -13668,7 +13678,12 @@
   	queueMicrotask: false,
   	RadioNodeList: false,
   	Range: false,
+  	ReadableByteStreamController: false,
   	ReadableStream: false,
+  	ReadableStreamBYOBReader: false,
+  	ReadableStreamBYOBRequest: false,
+  	ReadableStreamDefaultController: false,
+  	ReadableStreamDefaultReader: false,
   	registerProcessor: false,
   	RemotePlayback: false,
   	removeEventListener: false,
@@ -13842,7 +13857,9 @@
   	TaskAttributionTiming: false,
   	Text: false,
   	TextDecoder: false,
+  	TextDecoderStream: false,
   	TextEncoder: false,
+  	TextEncoderStream: false,
   	TextEvent: false,
   	TextMetrics: false,
   	TextTrack: false,
@@ -13857,6 +13874,7 @@
   	TouchList: false,
   	TrackEvent: false,
   	TransformStream: false,
+  	TransformStreamDefaultController: false,
   	TransitionEvent: false,
   	TreeWalker: false,
   	UIEvent: false,
@@ -13891,6 +13909,8 @@
   	Window: false,
   	Worker: false,
   	WritableStream: false,
+  	WritableStreamDefaultController: false,
+  	WritableStreamDefaultWriter: false,
   	XMLDocument: false,
   	XMLHttpRequest: false,
   	XMLHttpRequestEventTarget: false,
@@ -13908,16 +13928,24 @@
   	Blob: false,
   	BroadcastChannel: false,
   	btoa: false,
+  	ByteLengthQueuingStrategy: false,
   	Cache: false,
   	caches: false,
   	clearInterval: false,
   	clearTimeout: false,
   	close: true,
+  	CompressionStream: false,
   	console: false,
+  	CountQueuingStrategy: false,
+  	crypto: false,
+  	Crypto: false,
+  	CryptoKey: false,
   	CustomEvent: false,
+  	DecompressionStream: false,
   	ErrorEvent: false,
   	Event: false,
   	fetch: false,
+  	File: false,
   	FileReaderSync: false,
   	FormData: false,
   	Headers: false,
@@ -13957,11 +13985,19 @@
   	PerformanceMark: false,
   	PerformanceMeasure: false,
   	PerformanceNavigation: false,
+  	PerformanceObserver: false,
+  	PerformanceObserverEntryList: false,
   	PerformanceResourceTiming: false,
   	PerformanceTiming: false,
   	postMessage: true,
   	"Promise": false,
   	queueMicrotask: false,
+  	ReadableByteStreamController: false,
+  	ReadableStream: false,
+  	ReadableStreamBYOBReader: false,
+  	ReadableStreamBYOBRequest: false,
+  	ReadableStreamDefaultController: false,
+  	ReadableStreamDefaultReader: false,
   	removeEventListener: false,
   	reportError: false,
   	Request: false,
@@ -13970,13 +14006,22 @@
   	ServiceWorkerRegistration: false,
   	setInterval: false,
   	setTimeout: false,
+  	SubtleCrypto: false,
   	TextDecoder: false,
+  	TextDecoderStream: false,
   	TextEncoder: false,
+  	TextEncoderStream: false,
+  	TransformStream: false,
+  	TransformStreamDefaultController: false,
   	URL: false,
   	URLSearchParams: false,
+  	WebAssembly: false,
   	WebSocket: false,
   	Worker: false,
   	WorkerGlobalScope: false,
+  	WritableStream: false,
+  	WritableStreamDefaultController: false,
+  	WritableStreamDefaultWriter: false,
   	XMLHttpRequest: false
   };
   const node = {
@@ -13985,17 +14030,28 @@
   	AbortController: false,
   	AbortSignal: false,
   	atob: false,
+  	Blob: false,
+  	BroadcastChannel: false,
   	btoa: false,
   	Buffer: false,
+  	ByteLengthQueuingStrategy: false,
   	clearImmediate: false,
   	clearInterval: false,
   	clearTimeout: false,
+  	CompressionStream: false,
   	console: false,
+  	CountQueuingStrategy: false,
+  	crypto: false,
+  	Crypto: false,
+  	CryptoKey: false,
+  	CustomEvent: false,
+  	DecompressionStream: false,
   	DOMException: false,
   	Event: false,
   	EventTarget: false,
   	exports: true,
   	fetch: false,
+  	File: false,
   	FormData: false,
   	global: false,
   	Headers: false,
@@ -14005,8 +14061,20 @@
   	MessagePort: false,
   	module: false,
   	performance: false,
+  	PerformanceEntry: false,
+  	PerformanceMark: false,
+  	PerformanceMeasure: false,
+  	PerformanceObserver: false,
+  	PerformanceObserverEntryList: false,
+  	PerformanceResourceTiming: false,
   	process: false,
   	queueMicrotask: false,
+  	ReadableByteStreamController: false,
+  	ReadableStream: false,
+  	ReadableStreamBYOBReader: false,
+  	ReadableStreamBYOBRequest: false,
+  	ReadableStreamDefaultController: false,
+  	ReadableStreamDefaultReader: false,
   	Request: false,
   	require: false,
   	Response: false,
@@ -14014,25 +14082,45 @@
   	setInterval: false,
   	setTimeout: false,
   	structuredClone: false,
+  	SubtleCrypto: false,
   	TextDecoder: false,
+  	TextDecoderStream: false,
   	TextEncoder: false,
+  	TextEncoderStream: false,
+  	TransformStream: false,
+  	TransformStreamDefaultController: false,
   	URL: false,
-  	URLSearchParams: false
+  	URLSearchParams: false,
+  	WebAssembly: false,
+  	WritableStream: false,
+  	WritableStreamDefaultController: false,
+  	WritableStreamDefaultWriter: false
   };
   const nodeBuiltin = {
   	AbortController: false,
   	AbortSignal: false,
   	atob: false,
+  	Blob: false,
+  	BroadcastChannel: false,
   	btoa: false,
   	Buffer: false,
+  	ByteLengthQueuingStrategy: false,
   	clearImmediate: false,
   	clearInterval: false,
   	clearTimeout: false,
+  	CompressionStream: false,
   	console: false,
+  	CountQueuingStrategy: false,
+  	crypto: false,
+  	Crypto: false,
+  	CryptoKey: false,
+  	CustomEvent: false,
+  	DecompressionStream: false,
   	DOMException: false,
   	Event: false,
   	EventTarget: false,
   	fetch: false,
+  	File: false,
   	FormData: false,
   	global: false,
   	Headers: false,
@@ -14041,18 +14129,39 @@
   	MessageEvent: false,
   	MessagePort: false,
   	performance: false,
+  	PerformanceEntry: false,
+  	PerformanceMark: false,
+  	PerformanceMeasure: false,
+  	PerformanceObserver: false,
+  	PerformanceObserverEntryList: false,
+  	PerformanceResourceTiming: false,
   	process: false,
   	queueMicrotask: false,
+  	ReadableByteStreamController: false,
+  	ReadableStream: false,
+  	ReadableStreamBYOBReader: false,
+  	ReadableStreamBYOBRequest: false,
+  	ReadableStreamDefaultController: false,
+  	ReadableStreamDefaultReader: false,
   	Request: false,
   	Response: false,
   	setImmediate: false,
   	setInterval: false,
   	setTimeout: false,
   	structuredClone: false,
+  	SubtleCrypto: false,
   	TextDecoder: false,
+  	TextDecoderStream: false,
   	TextEncoder: false,
+  	TextEncoderStream: false,
+  	TransformStream: false,
+  	TransformStreamDefaultController: false,
   	URL: false,
-  	URLSearchParams: false
+  	URLSearchParams: false,
+  	WebAssembly: false,
+  	WritableStream: false,
+  	WritableStreamDefaultController: false,
+  	WritableStreamDefaultWriter: false
   };
   const commonjs = {
   	exports: true,
@@ -14402,6 +14511,7 @@
   	Blob: false,
   	BroadcastChannel: false,
   	btoa: false,
+  	ByteLengthQueuingStrategy: false,
   	Cache: false,
   	caches: false,
   	CacheStorage: false,
@@ -14411,14 +14521,21 @@
   	clients: false,
   	Clients: false,
   	close: true,
+  	CompressionStream: false,
   	console: false,
+  	CountQueuingStrategy: false,
+  	crypto: false,
+  	Crypto: false,
+  	CryptoKey: false,
   	CustomEvent: false,
+  	DecompressionStream: false,
   	ErrorEvent: false,
   	Event: false,
   	ExtendableEvent: false,
   	ExtendableMessageEvent: false,
   	fetch: false,
   	FetchEvent: false,
+  	File: false,
   	FileReaderSync: false,
   	FormData: false,
   	Headers: false,
@@ -14466,11 +14583,19 @@
   	PerformanceMark: false,
   	PerformanceMeasure: false,
   	PerformanceNavigation: false,
+  	PerformanceObserver: false,
+  	PerformanceObserverEntryList: false,
   	PerformanceResourceTiming: false,
   	PerformanceTiming: false,
   	postMessage: true,
   	"Promise": false,
   	queueMicrotask: false,
+  	ReadableByteStreamController: false,
+  	ReadableStream: false,
+  	ReadableStreamBYOBReader: false,
+  	ReadableStreamBYOBRequest: false,
+  	ReadableStreamDefaultController: false,
+  	ReadableStreamDefaultReader: false,
   	registration: false,
   	removeEventListener: false,
   	Request: false,
@@ -14484,14 +14609,23 @@
   	setInterval: false,
   	setTimeout: false,
   	skipWaiting: false,
+  	SubtleCrypto: false,
   	TextDecoder: false,
+  	TextDecoderStream: false,
   	TextEncoder: false,
+  	TextEncoderStream: false,
+  	TransformStream: false,
+  	TransformStreamDefaultController: false,
   	URL: false,
   	URLSearchParams: false,
+  	WebAssembly: false,
   	WebSocket: false,
   	WindowClient: false,
   	Worker: false,
   	WorkerGlobalScope: false,
+  	WritableStream: false,
+  	WritableStreamDefaultController: false,
+  	WritableStreamDefaultWriter: false,
   	XMLHttpRequest: false
   };
   const atomtest = {
@@ -14632,14 +14766,25 @@
   	AbortController: false,
   	AbortSignal: false,
   	atob: false,
+  	Blob: false,
+  	BroadcastChannel: false,
   	btoa: false,
+  	ByteLengthQueuingStrategy: false,
   	clearInterval: false,
   	clearTimeout: false,
+  	CompressionStream: false,
   	console: false,
+  	CountQueuingStrategy: false,
+  	crypto: false,
+  	Crypto: false,
+  	CryptoKey: false,
+  	CustomEvent: false,
+  	DecompressionStream: false,
   	DOMException: false,
   	Event: false,
   	EventTarget: false,
   	fetch: false,
+  	File: false,
   	FormData: false,
   	Headers: false,
   	"Intl": false,
@@ -14647,16 +14792,37 @@
   	MessageEvent: false,
   	MessagePort: false,
   	performance: false,
+  	PerformanceEntry: false,
+  	PerformanceMark: false,
+  	PerformanceMeasure: false,
+  	PerformanceObserver: false,
+  	PerformanceObserverEntryList: false,
+  	PerformanceResourceTiming: false,
   	queueMicrotask: false,
+  	ReadableByteStreamController: false,
+  	ReadableStream: false,
+  	ReadableStreamBYOBReader: false,
+  	ReadableStreamBYOBRequest: false,
+  	ReadableStreamDefaultController: false,
+  	ReadableStreamDefaultReader: false,
   	Request: false,
   	Response: false,
   	setInterval: false,
   	setTimeout: false,
   	structuredClone: false,
+  	SubtleCrypto: false,
   	TextDecoder: false,
+  	TextDecoderStream: false,
   	TextEncoder: false,
+  	TextEncoderStream: false,
+  	TransformStream: false,
+  	TransformStreamDefaultController: false,
   	URL: false,
-  	URLSearchParams: false
+  	URLSearchParams: false,
+  	WebAssembly: false,
+  	WritableStream: false,
+  	WritableStreamDefaultController: false,
+  	WritableStreamDefaultWriter: false
   },
   	webextensions: webextensions,
   	greasemonkey: greasemonkey,
@@ -15059,12 +15225,14 @@
       simplePropertyNode(
         BINDING_IS_BOOLEAN_ATTRIBUTE,
         builders.literal(
-          // Custom nodes can't handle boolean attrs
-          // Riot.js will handle the bool attrs logic only on native html tags
-          !parentNode[IS_CUSTOM_NODE] &&
-            !isRootNode(parentNode) &&
-            !isSpread &&
-            !!sourceNode[IS_BOOLEAN_ATTRIBUTE],
+          // the hidden attribute is always a boolean and can be applied to any DOM node
+          sourceNode.name === 'hidden' ||
+            // Custom nodes can't handle boolean attrs
+            // Riot.js will handle the bool attrs logic only on native html tags
+            (!parentNode[IS_CUSTOM_NODE] &&
+              !isRootNode(parentNode) &&
+              !isSpread &&
+              !!sourceNode[IS_BOOLEAN_ATTRIBUTE]),
         ),
       ),
       simplePropertyNode(
@@ -22367,7 +22535,13 @@
   function visitIdentifier(path) {
     const parentValue = path.parent.value;
 
-    if (!isMemberExpression(parentValue) || parentValue.computed) {
+    if (
+      (!isMemberExpression(parentValue) &&
+        // Esprima seem to behave differently from the default recast ast parser
+        // fix for https://github.com/riot/riot/issues/2983
+        parentValue.key !== path.node) ||
+      parentValue.computed
+    ) {
       updateNodeScope.call(this, path);
     }
 
@@ -22499,7 +22673,7 @@
   /**
    * Remove the extra parents from the compiler generated expressions
    * @param  {AST.Expression} expr - ast expression
-   * @returns {*}
+   * @returns {AST.Expression} program expression output without parenthesis
    */
   function removeExtraParenthesis(expr) {
     if (expr.extra) expr.extra.parenthesized = false;
@@ -24796,14 +24970,17 @@
     return source
   }
 
-  const PURE_COMPONENT_API = Object.freeze({
-    [MOUNT_METHOD_KEY]: noop,
-    [UPDATE_METHOD_KEY]: noop,
-    [UNMOUNT_METHOD_KEY]: noop,
-  });
-
+  // Components without template use a mocked template interface with some basic functionalities to
+  // guarantee consistent rendering behaviour see https://github.com/riot/riot/issues/2984
   const MOCKED_TEMPLATE_INTERFACE = {
-    ...PURE_COMPONENT_API,
+    [MOUNT_METHOD_KEY](el) {
+      this.el = el;
+    },
+    [UPDATE_METHOD_KEY]: noop,
+    [UNMOUNT_METHOD_KEY](_, __, mustRemoveRoot = false) {
+      if (mustRemoveRoot) removeChild(this.el);
+      else if (!mustRemoveRoot) cleanNode(this.el);
+    },
     clone: noop,
     createDOM: noop,
   };
@@ -26133,6 +26310,12 @@
     )
   }
 
+  const PURE_COMPONENT_API = Object.freeze({
+    [MOUNT_METHOD_KEY]: noop,
+    [UPDATE_METHOD_KEY]: noop,
+    [UNMOUNT_METHOD_KEY]: noop,
+  });
+
   /**
    * Bind a DOM node to its component object
    * @param   {HTMLElement} node - html node mounted
@@ -26557,9 +26740,15 @@
                 this[ATTRIBUTES_KEY_SYMBOL].update(parentScope);
               }
 
-              const newProps = evaluateAttributeExpressions(
-                this[ATTRIBUTES_KEY_SYMBOL].expressions,
-              );
+              // Avoid adding the riot "is" directives to the component props
+              // eslint-disable-next-line no-unused-vars
+              const { [IS_DIRECTIVE]: _, ...newProps } = {
+                // make sure that the root node attributes will be always parsed
+                ...DOMattributesToObject(this[ROOT_KEY]),
+                ...evaluateAttributeExpressions(
+                  this[ATTRIBUTES_KEY_SYMBOL].expressions,
+                ),
+              };
 
               if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false)
                 return
@@ -26838,7 +27027,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.0.3';
+  const version = 'v9.0.4';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
