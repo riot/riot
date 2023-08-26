@@ -4,6 +4,7 @@ import CommentsAndExpressions from '../components/comments-and-expressions.riot'
 import ConditionalSelectOption from '../components/conditional-select-option.riot'
 import EachCustomChildrenComponents from '../components/each-custom-children-components.riot'
 import ExpressionParts from '../components/expression-parts.riot'
+import RawComponent from '../components/raw-component.riot'
 import InvalidPureCssComponent from '../components/invalid-pure-css-component.riot'
 import InvalidPureHtmlComponent from '../components/invalid-pure-html-component.riot'
 import NativeAttributes from '../components/native-attributes.riot'
@@ -49,6 +50,19 @@ describe('lifecycle events', () => {
     expect(element.parentNode).to.be.not.ok
   })
 
+  it('unmounting raw components should not preserve the root tag', () => {
+    const component = riot.component(RawComponent)
+    const element = document.createElement('div')
+    document.body.appendChild(element)
+
+    const tag = component(element)
+
+    expect(element.parentNode).to.be.ok
+
+    tag.unmount()
+    expect(element.parentNode).to.be.not.ok
+  })
+
   it('unmounting components can preserve the root tag', () => {
     const component = riot.component(SimpleComponent)
     const element = document.createElement('div')
@@ -59,6 +73,24 @@ describe('lifecycle events', () => {
     expect(element.parentNode).to.be.ok
     tag.unmount(true)
     expect(element.parentNode).to.be.ok
+
+    document.body.removeChild(element)
+  })
+
+  it('unmounting raw components can preserve the root tag', () => {
+    const component = riot.component(RawComponent)
+    const element = document.createElement('div')
+    document.body.appendChild(element)
+
+    const tag = component(element, {
+      html: '<p>hello</p>',
+    })
+
+    expect(element.parentNode).to.be.ok
+    expect(element.querySelector('p')).to.be.ok
+    tag.unmount(true)
+    expect(element.parentNode).to.be.ok
+    expect(element.querySelector('p')).to.be.not.ok
 
     document.body.removeChild(element)
   })

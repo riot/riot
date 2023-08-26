@@ -1,0 +1,17 @@
+<raw>
+  <script>
+    export default {
+      onMounted() {
+        this.updateContent()
+      },
+      onUpdated() {
+        this.updateContent()
+      },
+      updateContent() {
+        if (this.props.html) {
+          this.root.innerHTML = this.props.html
+        }
+      }
+    }
+  </script>
+</raw>
