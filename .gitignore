@@ -58,6 +58,7 @@ esm
 
 /dist/*
 /esm/*
+/cjs/*
 
 !.gitmodules
 !.travis.yml

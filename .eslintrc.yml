@@ -2,6 +2,10 @@ extends:
   - eslint-config-riot
   - plugin:import/recommended
 
+settings:
+  import/ignore:
+    - sinon
+
 plugins:
   - import
 

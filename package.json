@@ -37,16 +37,19 @@
     ".": {
       "types": "./riot.d.ts",
       "import": "./esm/riot.js",
-      "require": "./riot.js"
+      "browser": "./riot.js",
+      "require": "./cjs/riot.cjs"
     },
     "./riot+compiler": {
       "types": "./riot.d.ts",
       "import": "./esm/riot_compiler.js",
-      "require": "./riot+compiler.js"
+      "browser": "./riot+compiler.js",
+      "require": "./cjs/riot+compiler.cjs"
     }
   },
   "files": [
     "esm",
+    "cjs",
     "riot.js",
     "riot.d.ts",
     "riot.min.js",
@@ -64,14 +67,14 @@
     "@riotjs/dom-bindings": "^9.0.3",
     "@riotjs/prettier-config": "^1.1.0",
     "@riotjs/util": "^2.2.3",
-    "@rollup/plugin-commonjs": "^25.0.4",
-    "@rollup/plugin-node-resolve": "^15.2.1",
+    "@rollup/plugin-commonjs": "^25.0.5",
+    "@rollup/plugin-node-resolve": "^15.2.2",
     "bianco.attr": "^1.1.1",
     "bianco.query": "^1.1.4",
-    "chai": "^4.3.8",
+    "chai": "^4.3.10",
     "cumpa": "^2.0.1",
     "curri": "^2.0.3",
-    "eslint": "^8.48.0",
+    "eslint": "^8.51.0",
     "eslint-config-riot": "^4.1.1",
     "eslint-plugin-import": "^2.28.1",
     "jsdom": "22.1.0",
@@ -83,13 +86,13 @@
     "karma-rollup-preprocessor": "^7.0.8",
     "karma-sauce-launcher": "^4.3.6",
     "mocha": "^10.2.0",
-    "prettier": "^3.0.2",
-    "rollup": "^3.28.1",
+    "prettier": "^3.0.3",
+    "rollup": "^3.29.4",
     "rollup-plugin-istanbul": "^4.0.0",
-    "rollup-plugin-riot": "^9.0.1",
-    "sinon": "^15.2.0",
+    "rollup-plugin-riot": "^9.0.2",
+    "sinon": "^16.1.0",
     "sinon-chai": "^3.7.0",
-    "terser": "^5.19.2",
+    "terser": "^5.21.0",
     "typescript": "^5.2.2"
   }
 }
