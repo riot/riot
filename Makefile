@@ -68,7 +68,7 @@ raw:
 	@ HAS_VISUALIZER=1 $(ROLLUP) src/riot+compiler.js --format umd --config rollup.config.cjs --file $(DIST)riot+compiler.js
 	@ $(ROLLUP) src/riot.js $(ROLLUP_ESM_OPTIONS)
 	@ $(ROLLUP) src/riot+compiler.js $(ROLLUP_ESM_OPTIONS)
-    # alias the common js files renaming the umd js -> cjs
+	# alias the common js files renaming the umd js -> cjs
 	@ mkdir -p $(DIST)/cjs
 	@ cp $(DIST)/riot.js $(DIST)/cjs/riot.cjs
 	@ cp $(DIST)/riot+compiler.js  $(DIST)/cjs/riot+compiler.cjs
