@@ -126,23 +126,27 @@ export interface RiotComponentFactoryFunction<Component> {
 }
 
 // Riot public API
-export function register<Props, State>(
+export declare function register<Props, State>(
   componentName: string,
   wrapper: RiotComponentWrapper<RiotComponent<Props, State>>,
 ): RegisteredComponentsMap
-export function unregister(componentName: string): RegisteredComponentsMap
-export function mount<Props, State>(
+export declare function unregister(
+  componentName: string,
+): RegisteredComponentsMap
+export declare function mount<Props, State>(
   selector: string | HTMLElement,
   initialProps?: Props,
   componentName?: string,
 ): RiotComponent<Props, State>[]
-export function unmount(
+export declare function unmount(
   selector: string | HTMLElement,
   keepRootElement?: boolean,
 ): HTMLElement[]
-export function install(plugin: ComponentEnhancer): InstalledPluginsSet
-export function uninstall(plugin: ComponentEnhancer): InstalledPluginsSet
-export function component<
+export declare function install(plugin: ComponentEnhancer): InstalledPluginsSet
+export declare function uninstall(
+  plugin: ComponentEnhancer,
+): InstalledPluginsSet
+export declare function component<
   Props,
   State,
   Component = RiotComponent<Props, State>,
@@ -158,22 +162,22 @@ export function component<
   },
 ) => Component
 
-export function pure<
+export declare function pure<
   InitialProps = any,
   Context = any,
   FactoryFunction = PureComponentFactoryFunction<InitialProps, Context>,
 >(func: FactoryFunction): FactoryFunction
 
-export const version: string
+export declare const version: string
 
 // typescript specific methods
-export function withTypes<
+export declare function withTypes<
   Component extends RiotComponent,
   ComponentFactory = RiotComponentFactoryFunction<
     AutobindObjectMethods<RiotComponentWithoutInternals<Component>, Component>
   >,
 >(fn: ComponentFactory): () => Component
-export function withTypes<
+export declare function withTypes<
   Component extends RiotComponent,
   ComponentFactory = RiotComponentFactoryFunction<
     AutobindObjectMethods<
@@ -182,13 +186,13 @@ export function withTypes<
     >
   >,
 >(fn: ComponentFactory): () => Component
-export function withTypes<
+export declare function withTypes<
   Component extends RiotComponent,
   ComponentObjectWithInitialState = RiotComponentWithoutInternals<Component>,
 >(
   component: AutobindObjectMethods<ComponentObjectWithInitialState, Component>,
 ): Component
-export function withTypes<
+export declare function withTypes<
   Component extends RiotComponent,
   ComponentObjectWithoutInitialState = RiotComponentWithoutInternalsAndInitialState<Component>,
 >(
