@@ -37,14 +37,14 @@
     ".": {
       "types": "./riot.d.ts",
       "import": "./esm/riot.js",
-      "browser": "./riot.js",
-      "require": "./cjs/riot.cjs"
+      "require": "./cjs/riot.cjs",
+      "browser": "./riot.js"
     },
     "./riot+compiler": {
       "types": "./riot.d.ts",
       "import": "./esm/riot_compiler.js",
-      "browser": "./riot+compiler.js",
-      "require": "./cjs/riot+compiler.cjs"
+      "require": "./cjs/riot+compiler.cjs",
+      "browser": "./riot+compiler.js"
     }
   },
   "files": [
