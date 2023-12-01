@@ -62,9 +62,11 @@
   "jsnext:main": "esm/riot.js",
   "sideEffects": false,
   "types": "./riot.d.ts",
+  "dependencies": {
+    "@riotjs/dom-bindings": "^9.0.3"
+  },
   "devDependencies": {
     "@riotjs/compiler": "^9.0.6",
-    "@riotjs/dom-bindings": "^9.0.3",
     "@riotjs/prettier-config": "^1.1.0",
     "@riotjs/util": "^2.2.4",
     "@rollup/plugin-commonjs": "^25.0.7",
