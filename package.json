@@ -76,9 +76,9 @@
     "chai": "^4.3.10",
     "cumpa": "^2.0.1",
     "curri": "^2.0.3",
-    "eslint": "^8.54.0",
+    "eslint": "^8.55.0",
     "eslint-config-riot": "^4.1.1",
-    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-import": "^2.29.1",
     "jsdom": "23.0.1",
     "jsdom-global": "3.0.2",
     "karma": "^6.4.2",
@@ -88,13 +88,13 @@
     "karma-rollup-preprocessor": "^7.0.8",
     "karma-sauce-launcher": "^4.3.6",
     "mocha": "^10.2.0",
-    "prettier": "^3.1.0",
-    "rollup": "^4.6.1",
+    "prettier": "^3.1.1",
+    "rollup": "^4.9.0",
     "rollup-plugin-istanbul": "^5.0.0",
     "rollup-plugin-riot": "^9.0.2",
     "sinon": "^17.0.1",
     "sinon-chai": "^3.7.0",
-    "terser": "^5.24.0",
-    "typescript": "^5.3.2"
+    "terser": "^5.26.0",
+    "typescript": "^5.3.3"
   }
 }
