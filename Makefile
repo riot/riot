@@ -9,7 +9,10 @@ VERSION := $(v)
 MINOR_VERSION = `echo $(VERSION) | sed 's/\.[^.]*$$//'`
 
 # Command line paths
-KARMA = ./node_modules/karma/bin/karma
+C8 = ./node_modules/c8/bin/c8.js
+WDIO = ./node_modules/.bin/wdio
+SERVE = ./node_modules/.bin/serve
+START_SERVER_AND_TEST = ./node_modules/.bin/start-server-and-test
 ESLINT = ./node_modules/eslint/bin/eslint.js
 MOCHA = ./node_modules/mocha/bin/_mocha
 ROLLUP = ./node_modules/.bin/rollup
@@ -30,7 +33,7 @@ ROLLUP_ESM_OPTIONS = --format esm \
 					 --output.preserveModules \
 					 --amd.forceJsExtensionForImports \
 					 --preserveModulesRoot src \
-					 --config rollup.config.cjs \
+					 --config rollup.config.js \
 					 --dir $(DIST)esm
 # Options we will pass to the minifier
 MINIFY_OPTIONS = --comments false \
@@ -38,23 +41,22 @@ MINIFY_OPTIONS = --comments false \
 				 --compress pure_funcs=['panic'],unsafe=true,unsafe_symbols=true,passes=5 \
 				 --mangle \
 
-test: lint test-karma test-typing
 
-test-karma:
-	@ $(KARMA) start test/karma.conf.cjs
+test: lint unit-test test-typing
+
+unit-test:
+	@ $(START_SERVER_AND_TEST) $(SERVE) 3000  "$(C8) $(MOCHA) -r test/setup.js test/**/*.spec.js"
+
+e2e-test:
+	# build the e2e bundle
+	@ $(ROLLUP) -c test/e2e/rollup.config.js
+	@ $(START_SERVER_AND_TEST) $(SERVE) 3000  "$(WDIO) run ./wdio.conf.js"
 
 lint:
     # check if the code looks pretty
 	@ $(PRETTIER) --check ./
 	# check code style
 	@ $(ESLINT) src test
-
-test-debug:
-	@ ${KARMA} start test/karma.conf.js --browsers=Chrome --no-single-run --auto-watch
-
-test-sauce:
-	# run the riot tests on saucelabs
-	@ SAUCELABS=1 make test-karma
 
 test-typing:
 	# silent compile typescript
@@ -64,8 +66,8 @@ raw:
 	# build riot
 	@ mkdir -p $(DIST)
 	# Default builds UMD
-	@ $(ROLLUP) src/riot.js --format umd --config rollup.config.cjs --file $(DIST)riot.js
-	@ HAS_VISUALIZER=1 $(ROLLUP) src/riot+compiler.js --format umd --config rollup.config.cjs --file $(DIST)riot+compiler.js
+	@ $(ROLLUP) src/riot.js --format umd --config rollup.config.js --file $(DIST)riot.js
+	@ HAS_VISUALIZER=1 $(ROLLUP) src/riot+compiler.js --format umd --config rollup.config.js --file $(DIST)riot+compiler.js
 	@ $(ROLLUP) src/riot.js $(ROLLUP_ESM_OPTIONS)
 	@ $(ROLLUP) src/riot+compiler.js $(ROLLUP_ESM_OPTIONS)
 	# alias the common js files renaming the umd js -> cjs
@@ -143,4 +145,4 @@ publish:
 	@ git push origin main
 	@ git push origin main --tags
 
-.PHONY: test min lint test-sauce raw riot build bump bump-undo version version-undo release-undo publish
+.PHONY: test unit-test e2e-test min lint raw riot build bump bump-undo version version-undo release-undo publish

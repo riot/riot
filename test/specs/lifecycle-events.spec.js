@@ -1,4 +1,4 @@
-import * as riot from '../../src/riot'
+import * as riot from '../../src/riot.js'
 import { bindingTypes, expressionTypes, template } from '@riotjs/dom-bindings'
 import CommentsAndExpressions from '../components/comments-and-expressions.riot'
 import ConditionalSelectOption from '../components/conditional-select-option.riot'

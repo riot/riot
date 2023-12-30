@@ -1,9 +1,10 @@
-import * as riot from '../../src/riot+compiler'
-import { GLOBAL_REGISTRY } from '../../src/compiler/global-registry'
+import * as riot from '../../src/riot+compiler.js'
+import { GLOBAL_REGISTRY } from '../../src/compiler/global-registry.js'
 import RuntimeSlotComponent from '../components/runtime-slot.riot'
 import RuntimeSlotWithChildrenComponent from '../components/runtime-slot-with-children.riot'
 import TitlePropComponent from '../components/title-prop.riot'
 import { expect } from 'chai'
+import { getBaseUrl } from '../utils.js'
 
 describe('Riot compiler api', () => {
   it('riot compiler exports properly its public api', () => {
@@ -30,7 +31,9 @@ describe('Riot compiler api', () => {
   })
 
   it('compiler can load asynchronously tags via url', async function () {
-    const { code } = await riot.compileFromUrl('/components/simple.riot')
+    const { code } = await riot.compileFromUrl(
+      `${getBaseUrl()}/test/components/simple.riot`,
+    )
 
     expect(code).to.match(/scope\.props\.message/)
   })
@@ -38,7 +41,10 @@ describe('Riot compiler api', () => {
   it('compiler can load asynchronously script tags', async function () {
     const script = document.createElement('script')
     script.setAttribute('type', 'riot')
-    script.setAttribute('data-src', 'components/simple.riot')
+    script.setAttribute(
+      'data-src',
+      `${getBaseUrl()}/test/components/simple.riot`,
+    )
     document.body.appendChild(script)
     await riot.compile()
 

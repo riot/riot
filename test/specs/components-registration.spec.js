@@ -1,6 +1,5 @@
-import * as riot from '../../src/riot'
-import { fireEvent, normalizeInnerHTML } from '../utils.cjs'
-
+import * as riot from '../../src/riot.js'
+import { fireEvent, normalizeInnerHTML } from '../utils.js'
 import GlobalComponents from '../components/global-components.riot'
 import NestedAliasedImportsComponent from '../components/nested-aliased-imports.riot'
 import OldSyntaxComponent from '../components/old-syntax.riot'
@@ -204,7 +203,7 @@ describe('components registration', () => {
     components.forEach((c) => c.unmount())
   })
 
-  it('old Riot.js syntax is supported', () => {
+  it('old Riot.js syntax is supported', async () => {
     const element = document.createElement('old-syntax')
     const component = riot.component(OldSyntaxComponent)(element)
 

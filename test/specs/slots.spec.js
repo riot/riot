@@ -1,5 +1,5 @@
-import * as riot from '../../src/riot'
-import { fireEvent, normalizeInnerHTML } from '../utils.cjs'
+import * as riot from '../../src/riot.js'
+import { fireEvent, normalizeInnerHTML } from '../utils.js'
 
 import ConditionalSlotParent from '../components/conditional-slot-parent.riot'
 import LoopWithSlots from '../components/loop-with-slots.riot'
