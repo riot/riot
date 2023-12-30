@@ -1,4 +1,4 @@
-import * as riot from '../../src/riot'
+import * as riot from '../../src/riot.js'
 import { expect } from 'chai'
 
 describe('plugins API', () => {

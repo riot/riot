@@ -1,4 +1,4 @@
-import * as riot from '../../src/riot'
+import * as riot from '../../src/riot.js'
 
 import ComponentWithGetters from '../components/component-with-getters.riot'
 import DashedAttributeParent from '../components/dashed-attribute-parent.riot'

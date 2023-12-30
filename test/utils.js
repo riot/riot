@@ -7,3 +7,5 @@ export function fireEvent(el, name) {
 export function normalizeInnerHTML(string) {
   return string.replace(/\n/g, '').trim()
 }
+
+export const getBaseUrl = () => 'http://localhost:3000'

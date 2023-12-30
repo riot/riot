@@ -1,4 +1,4 @@
-import * as riot from '../../src/riot'
+import * as riot from '../../src/riot.js'
 
 import Issue2895Parent from '../components/issue-2895-parent.riot'
 import MergeAttributes from '../components/merge-attributes.riot'

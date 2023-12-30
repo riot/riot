@@ -62,3 +62,4 @@ esm
 
 !.gitmodules
 !.travis.yml
+/test/e2e/test.bundle.js
