@@ -81,7 +81,7 @@ export const config = {
         ...capabilities,
         'sauce:options': {
           build: `GITHUB_RUN_NUMBER #${process.env.GITHUB_RUN_NUMBER} (${process.env.GITHUB_RUN_NUMBER})`,
-          name: 'riot',
+          name: `${capabilities.browserName} ${capabilities['appium:deviceName'] || ''}`,
         },
       }))
     : [
