@@ -14,7 +14,8 @@ export const config = {
       {
         sauceConnect: true,
         sauceConnectOpts: {
-          // ...
+          build: `GITHUB_RUN_NUMBER #${process.env.GITHUB_RUN_NUMBER} (${process.env.GITHUB_RUN_NUMBER})`,
+          name: 'riot',
         },
       },
     ],
