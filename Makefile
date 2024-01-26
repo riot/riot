@@ -45,7 +45,7 @@ MINIFY_OPTIONS = --comments false \
 test: lint unit-test test-typing
 
 unit-test:
-	@ $(START_SERVER_AND_TEST) $(SERVE) 3000  "$(C8) $(MOCHA) -r test/setup.js test/**/*.spec.js"
+	@ $(START_SERVER_AND_TEST) $(SERVE) 3000  "$(C8) -r lcov -r text $(MOCHA) -r test/setup.js test/**/*.spec.js"
 
 e2e-test:
 	# build the e2e bundle
