@@ -41,5 +41,5 @@ jobs:
         if: ${{ success() && github.event_name != 'pull_request' && matrix.node-version == '20.x' }}
         uses: coverallsapp/github-action@master
         with:
-          path-to-lcov: ./coverage/report-lcov/lcov.info
+          path-to-lcov: ./coverage/lcov.info
           github-token: ${{ secrets.GITHUB_TOKEN }}
