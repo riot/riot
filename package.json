@@ -57,8 +57,7 @@
     "riot+compiler.min.js"
   ],
   "scripts": {
-    "test": "make unit-test",
-    "wdio": "wdio run ./wdio.conf.js"
+    "test": "make unit-test"
   },
   "jsnext:main": "esm/riot.js",
   "sideEffects": false,
