@@ -5,6 +5,20 @@ export const config = {
   // ====================
   // WebdriverIO supports running e2e tests as well as unit and component tests.
   runner: 'local',
+  user: process.env.SAUCE_USERNAME,
+  key: process.env.SAUCE_ACCESS_KEY,
+  region: 'us', // or 'eu' or 'apac'
+  services: [
+    [
+      'sauce',
+      {
+        sauceConnect: true,
+        sauceConnectOpts: {
+          // ...
+        },
+      },
+    ],
+  ],
   //
   // ==================
   // Specify Test Files
@@ -47,12 +61,31 @@ export const config = {
   // Sauce Labs platform configurator - a great tool to configure your capabilities:
   // https://saucelabs.com/platform/platform-configurator
   //
-  capabilities: [
-    {
-      // capabilities for local browser web tests
-      browserName: 'chrome', // or "firefox", "microsoftedge", "safari"
-    },
-  ],
+  capabilities: process.env.SAUCELABS
+    ? [
+        {
+          // capabilities for local browser web tests
+          browserName: 'chrome', // or "firefox", "microsoftedge", "safari"
+        },
+        {
+          browserName: 'firefox',
+        },
+        {
+          platformName: 'iOS',
+          browserName: 'Safari',
+          'appium:deviceName': 'iPhone Simulator',
+          'appium:platformVersion': '15.0',
+          'appium:automationName': 'XCUITest',
+        },
+        {
+          browserName: 'MicrosoftEdge',
+        },
+      ]
+    : [
+        {
+          browserName: 'chrome',
+        },
+      ],
 
   //
   // ===================
@@ -96,12 +129,6 @@ export const config = {
   //
   // Default request retries count
   connectionRetryCount: 3,
-  //
-  // Test runner services
-  // Services take over a specific job you don't want to take care of. They enhance
-  // your test setup with almost no effort. Unlike plugins, they don't add new
-  // commands. Instead, they hook themselves up into the test process.
-  // services: [],
   //
   // Framework you want to run your specs with.
   // The following are supported: Mocha, Jasmine, and Cucumber
