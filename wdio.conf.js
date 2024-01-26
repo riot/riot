@@ -13,10 +13,6 @@ export const config = {
       'sauce',
       {
         sauceConnect: true,
-        sauceConnectOpts: {
-          build: `GITHUB_RUN_NUMBER #${process.env.GITHUB_RUN_NUMBER} (${process.env.GITHUB_RUN_NUMBER})`,
-          name: 'riot',
-        },
       },
     ],
   ],
@@ -62,7 +58,7 @@ export const config = {
   // Sauce Labs platform configurator - a great tool to configure your capabilities:
   // https://saucelabs.com/platform/platform-configurator
   //
-  capabilities: process.env.SAUCELABS
+  capabilities: process.env.GITHUB_RUN_NUMBER
     ? [
         {
           // capabilities for local browser web tests
@@ -81,7 +77,13 @@ export const config = {
         {
           browserName: 'MicrosoftEdge',
         },
-      ]
+      ].map((capabilities) => ({
+        ...capabilities,
+        'sauce:options': {
+          build: `GITHUB_RUN_NUMBER #${process.env.GITHUB_RUN_NUMBER} (${process.env.GITHUB_RUN_NUMBER})`,
+          name: 'riot',
+        },
+      }))
     : [
         {
           browserName: 'chrome',
