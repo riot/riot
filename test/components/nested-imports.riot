@@ -1,13 +1,13 @@
 <nested-imports>
-  <simple message="{state.message" || props.message}></simple>
+  <simple message={state.message || props.message}></simple>
 
   <script>
     import Simple from './simple.riot'
 
     export default {
       components: {
-        Simple,
-      },
+        Simple
+      }
     }
   </script>
 </nested-imports>

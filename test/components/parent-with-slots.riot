@@ -1,13 +1,15 @@
 <parent-with-slots>
-  <simple-slot> {props.message} </simple-slot>
+  <simple-slot>
+    {props.message}
+  </simple-slot>
 
   <script>
     import SimpleSlot from './simple-slot.riot'
 
     export default {
       components: {
-        SimpleSlot,
-      },
+        SimpleSlot
+      }
     }
   </script>
 </parent-with-slots>

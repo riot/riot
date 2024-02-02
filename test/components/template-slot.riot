@@ -1,14 +1,16 @@
 <template-slot>
   <simple-slot>
-    <template slot="default"> { props.message } </template>
+    <template slot="default">
+      { props.message }
+    </template>
   </simple-slot>
   <script>
     import SimpleSlot from './simple-slot.riot'
 
     export default {
       components: {
-        SimpleSlot,
-      },
+        SimpleSlot
+      }
     }
   </script>
 </template-slot>

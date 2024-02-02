@@ -1,10 +1,14 @@
 <named-slots-parent>
   <named-slots>
-    <span slot="header"> { state.header } </span>
+    <span slot='header'>
+      { state.header }
+    </span>
 
     {state.main}
 
-    <span slot="footer"> { state.footer } </span>
+    <span slot='footer'>
+      { state.footer }
+    </span>
   </named-slots>
 
   <script>
@@ -14,11 +18,11 @@
       state: {
         header: 'i am the header',
         footer: 'i am the footer',
-        main: 'i am the main',
+        main: 'i am the main'
       },
       components: {
-        NamedSlots,
-      },
+        NamedSlots
+      }
     }
   </script>
 </named-slots-parent>

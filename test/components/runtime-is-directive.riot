@@ -1,5 +1,5 @@
 <runtime-is-directive>
-  <div class="child" is="{state.child}" message="{state.message}"></div>
+  <div class="child" is={state.child} message={state.message}></div>
 
   <script>
     import Child from './child.riot'
@@ -8,12 +8,12 @@
     export default {
       components: {
         Child,
-        Simple,
+        Simple
       },
 
       state: {
-        child: 'child',
-      },
+        child: 'child'
+      }
     }
   </script>
 </runtime-is-directive>

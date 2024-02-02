@@ -1,6 +1,6 @@
 <old-syntax>
   <p>{ state.message }</p>
-  <button onclick="{onClick}">Click Me</button>
+  <button onclick={onClick}>Click Me</button>
 
   <script>
     this.onBeforeMount = () => {
@@ -9,7 +9,7 @@
 
     this.onClick = () => {
       this.update({
-        message: 'Goodbye',
+        message: 'Goodbye'
       })
     }
   </script>

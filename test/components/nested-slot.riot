@@ -1,5 +1,7 @@
 <nested-slot>
-  <sub-nested-slot> { state.message } </sub-nested-slot>
+  <sub-nested-slot>
+    { state.message }
+  </sub-nested-slot>
 
   <script>
     import SubNestedSlot from './sub-nested-slot.riot'
@@ -10,7 +12,7 @@
       },
       onBeforeMount({ message }) {
         this.state.message = message
-      },
+      }
     }
   </script>
 </nested-slot>

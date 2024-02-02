@@ -1,5 +1,5 @@
 <each-custom-children-componentsœ>
-  <child each="{item" in state.items} onclick="{props.onClick()}"></child>
+  <child each={item in state.items} onclick={props.onClick()}></child>
 
   <script>
     import Child from './child.riot'
@@ -10,9 +10,9 @@
       },
       onBeforeMount(props) {
         this.state = {
-          items: props.items,
+          items: props.items
         }
-      },
+      }
     }
   </script>
 </each-custom-children-componentsœ>

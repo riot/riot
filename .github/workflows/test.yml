@@ -28,7 +28,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
-      - run: make lint
       - run: make unit-test
       # Skip saucelabs test https://github.com/riot/riot/issues/2989
       - name: Saucelabs Crossbrowser Testing

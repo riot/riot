@@ -1,10 +1,10 @@
 <parent-context-child>
   <script>
-    import { PARENT_KEY_SYMBOL } from '@riotjs/util/constants'
+    import {PARENT_KEY_SYMBOL} from '@riotjs/util/constants'
 
     export default {
       callParent(from) {
-        this[PARENT_KEY_SYMBOL].test.add(from)
+        this[PARENT_KEY_SYMBOL].test.add(from);
       },
 
       onBeforeMount() {
@@ -29,7 +29,7 @@
 
       onUnmounted() {
         this.callParent('onUnmounted')
-      },
+      }
     }
   </script>
 </parent-context-child>
