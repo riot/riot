@@ -1,5 +1,5 @@
 <simple>
-  <p onclick={onClick}>{state.message || props.message}</p>
+  <p onclick="{onClick}">{state.message || props.message}</p>
 
   <style>
     :host {
@@ -10,9 +10,9 @@
     export default {
       onClick() {
         this.update({
-          message: 'clicked'
+          message: 'clicked',
         })
-      }
+      },
     }
   </script>
 </simple>

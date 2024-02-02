@@ -1,6 +1,6 @@
 <virtual-each>
   <dl>
-    <template each={item in state.items}>
+    <template each="{item" in state.items}>
       <dt>{item.title}</dt>
       <dd>{item.description}</dd>
     </template>
@@ -9,9 +9,9 @@
     export default {
       onBeforeMount(props) {
         this.state = {
-          items: props.items
+          items: props.items,
         }
-      }
+      },
     }
   </script>
 </virtual-each>

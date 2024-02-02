@@ -1,6 +1,6 @@
 <issue-2895-parent>
-  <child if={state.scope} {...state}/>
-  <p if={state.isMounted}>{state.message}</p>
+  <child if="{state.scope}" {...state} />
+  <p if="{state.isMounted}">{state.message}</p>
 
   <script>
     import Child from './issue-2895-child.riot'
@@ -10,14 +10,14 @@
       state: {
         message: '',
         scope: null,
-        isMounted: false
+        isMounted: false,
       },
       onMounted() {
         this.update({
           scope: this,
-          isMounted: true
+          isMounted: true,
         })
-      }
+      },
     }
   </script>
 </issue-2895-parent>
