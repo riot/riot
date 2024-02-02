@@ -1,5 +1,7 @@
+/* eslint-disable */
 import commonjs from '@rollup/plugin-commonjs'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
+/* eslint-enable */
 import riot from 'rollup-plugin-riot'
 
 export default {
