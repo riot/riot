@@ -1,4 +1,4 @@
-/* Riot v9.1.2, @license MIT */
+/* Riot v9.1.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2061,6 +2061,21 @@
   }
 
   /**
+   * Get the computed attribute names from the template instance
+   * Since these attributes will not change we memoize the result of this computation
+   * @param {TemplateChunk} template - template instance
+   * @return {[]} list of attribute names that will be computed by the template expressions
+   */
+  const getRootComputedAttributeNames = memoize(
+    (template) =>
+      template?.bindingsData?.[0].expressions?.reduce(
+        (acc, { name, type }) =>
+          type === expressionTypes.ATTRIBUTE ? [...acc, name] : acc,
+        [],
+      ) ?? [],
+  );
+
+  /**
    * Component creation factory function that will enhance the user provided API
    * @param   {Object} component - a component implementation previously defined
    * @param   {Array} options.slots - component slots generated via riot compiler
@@ -2123,11 +2138,24 @@
                 this[ATTRIBUTES_KEY_SYMBOL].update(parentScope);
               }
 
+              // get the attribute names that don't belong to the the props object
+              // this will avoid recursive props rendering https://github.com/riot/riot/issues/2994
+              const computedAttributeNames = getRootComputedAttributeNames(
+                this[TEMPLATE_KEY_SYMBOL],
+              );
+              // filter out the computed attributes from the root node
+              const staticRootAttributes = Array.from(
+                this[ROOT_KEY].attributes,
+              ).filter(({ name }) => !computedAttributeNames.includes(name));
+              // evaluate the
+              const domNodeAttributes = DOMattributesToObject({
+                attributes: staticRootAttributes,
+              });
+
               // Avoid adding the riot "is" directives to the component props
               // eslint-disable-next-line no-unused-vars
               const { [IS_DIRECTIVE]: _, ...newProps } = {
-                // make sure that the root node attributes will be always parsed
-                ...DOMattributesToObject(this[ROOT_KEY]),
+                ...domNodeAttributes,
                 ...evaluateAttributeExpressions(
                   this[ATTRIBUTES_KEY_SYMBOL].expressions,
                 ),
@@ -2477,7 +2505,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.1.2';
+  const version = 'v9.1.3';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
