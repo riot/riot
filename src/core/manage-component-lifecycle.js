@@ -23,6 +23,7 @@ import {
   isObject,
   DOMattributesToObject,
 } from '@riotjs/util'
+
 import { addCssHook } from './add-css-hook.js'
 import { bindDOMNodeToComponentInstance } from './bind-dom-node-to-component-instance.js'
 import { computeComponentState } from './compute-component-state.js'
@@ -30,6 +31,7 @@ import { computeInitialProps } from './compute-initial-props.js'
 import { createAttributeBindings } from './create-attribute-bindings.js'
 import { runPlugins } from './run-plugins.js'
 import { IS_DIRECTIVE } from '@riotjs/util/constants'
+import { getRootComputedAttributeNames } from '../utils/get-root-computed-attribute-names.js'
 
 /**
  * Component creation factory function that will enhance the user provided API
@@ -94,11 +96,24 @@ export function manageComponentLifecycle(
               this[ATTRIBUTES_KEY_SYMBOL].update(parentScope)
             }
 
+            // get the attribute names that don't belong to the the props object
+            // this will avoid recursive props rendering https://github.com/riot/riot/issues/2994
+            const computedAttributeNames = getRootComputedAttributeNames(
+              this[TEMPLATE_KEY_SYMBOL],
+            )
+            // filter out the computed attributes from the root node
+            const staticRootAttributes = Array.from(
+              this[ROOT_KEY].attributes,
+            ).filter(({ name }) => !computedAttributeNames.includes(name))
+            // evaluate the
+            const domNodeAttributes = DOMattributesToObject({
+              attributes: staticRootAttributes,
+            })
+
             // Avoid adding the riot "is" directives to the component props
             // eslint-disable-next-line no-unused-vars
             const { [IS_DIRECTIVE]: _, ...newProps } = {
-              // make sure that the root node attributes will be always parsed
-              ...DOMattributesToObject(this[ROOT_KEY]),
+              ...domNodeAttributes,
               ...evaluateAttributeExpressions(
                 this[ATTRIBUTES_KEY_SYMBOL].expressions,
               ),

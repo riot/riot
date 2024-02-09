@@ -1,6 +1,7 @@
 import * as riot from '../../src/riot.js'
 
 import Issue2895Parent from '../components/issue-2895-parent.riot'
+import Issue2994ClassDuplication from '../components/issue-2994-class-duplication.riot'
 import MergeAttributes from '../components/merge-attributes.riot'
 import VirtualEach from '../components/virtual-each.riot'
 
@@ -50,5 +51,20 @@ describe('components rendering', () => {
     expect(component.$('h1').innerHTML).to.be.equal('hello')
 
     component.unmount()
+  })
+
+  it('the class attributes should be not be recursively applied', () => {
+    const element = document.createElement('issue-2994-class-duplication')
+    const component = riot.component(Issue2994ClassDuplication)(element, {
+      dropdown: false,
+    })
+
+    expect(element.getAttribute('class').trim()).to.be.equal('btn')
+
+    component.update({
+      dropdown: true,
+    })
+
+    expect(element.getAttribute('class').trim()).to.be.equal('btn  dropdown')
   })
 })

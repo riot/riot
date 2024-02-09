@@ -1,6 +1,6 @@
 extends:
-  - eslint-config-riot
   - plugin:import/recommended
+  - eslint-config-riot
 
 settings:
   import/ignore:
