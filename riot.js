@@ -1,4 +1,4 @@
-/* Riot v9.1.3, @license MIT */
+/* Riot v9.1.4, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -844,6 +844,7 @@
     }
   }
 
+  /* c8 ignore next */
   const ElementProto = typeof Element === 'undefined' ? {} : Element.prototype;
   const isNativeHtmlProperty = memoize(
     (name) => ElementProto.hasOwnProperty(name), // eslint-disable-line
@@ -856,8 +857,8 @@
    * @returns {undefined} sorry it's a void function :(
    */
   function setAllAttributes(node, attributes) {
-    Object.entries(attributes).forEach(([name, value]) =>
-      attributeExpression(node, { name }, value),
+    Object.keys(attributes).forEach((name) =>
+      attributeExpression(node, { name }, attributes[name]),
     );
   }
 
@@ -1019,16 +1020,7 @@
    * @returns {Text} the text node to update
    */
   const getTextNode = (node, childNodeIndex) => {
-    const target = node.childNodes[childNodeIndex];
-
-    if (target.nodeType === Node.COMMENT_NODE) {
-      const textNode = document.createTextNode('');
-      node.replaceChild(textNode, target);
-
-      return textNode
-    }
-
-    return target
+    return node.childNodes[childNodeIndex]
   };
 
   /**
@@ -1152,12 +1144,10 @@
   }
 
   function create$3(node, { expressions }) {
-    return {
-      ...flattenCollectionMethods(
-        expressions.map((expression) => create$4(node, expression)),
-        ['mount', 'update', 'unmount'],
-      ),
-    }
+    return flattenCollectionMethods(
+      expressions.map((expression) => create$4(node, expression)),
+      ['mount', 'update', 'unmount'],
+    )
   }
 
   function extendParentScope(attributes, scope, parentScope) {
@@ -2505,7 +2495,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.1.3';
+  const version = 'v9.1.4';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
