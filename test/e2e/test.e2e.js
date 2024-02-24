@@ -9,6 +9,5 @@ describe('Run the mocha tests', function () {
     const testFailures = await browser.execute(() => window.testFailures)
 
     expect(testFailures).toBe(0)
-    expect(true).toBe(true)
   })
 })
