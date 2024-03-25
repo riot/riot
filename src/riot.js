@@ -1,3 +1,4 @@
+export * from './api/get.js'
 export * from './api/register.js'
 export * from './api/unregister.js'
 export * from './api/mount.js'

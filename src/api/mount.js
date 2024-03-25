@@ -6,10 +6,11 @@ import { mountComponent } from '../core/mount-component.js'
  * @param   {string|HTMLElement} selector - query for the selection or a DOM element
  * @param   {Object} initialProps - the initial component properties
  * @param   {string} name - optional component name
+ * @param   {Array} slots - optional component slots
  * @returns {Array} list of riot components
  */
-export function mount(selector, initialProps, name) {
+export function mount(selector, initialProps, name, slots) {
   return $(selector).map((element) =>
-    mountComponent(element, initialProps, name),
+    mountComponent(element, initialProps, name, slots),
   )
 }
