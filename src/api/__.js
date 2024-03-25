@@ -1,7 +1,13 @@
 import {
+  ATTRIBUTES_KEY_SYMBOL,
+  COMPONENTS_IMPLEMENTATION_MAP,
   DOM_COMPONENT_INSTANCE_PROPERTY,
+  IS_COMPONENT_UPDATING,
   PARENT_KEY_SYMBOL,
-} from '@riotjs/util'
+  PLUGINS_SET,
+  PROPS_KEY,
+  STATE_KEY,
+} from '@riotjs/util';
 import {
   bindingTypes,
   createBinding,
@@ -22,6 +28,12 @@ export const __ = {
     expressionTypes,
   },
   globals: {
+    PROPS_KEY,
+    STATE_KEY,
+    IS_COMPONENT_UPDATING,
+    ATTRIBUTES_KEY_SYMBOL,
+    COMPONENTS_IMPLEMENTATION_MAP,
+    PLUGINS_SET,
     DOM_COMPONENT_INSTANCE_PROPERTY,
     PARENT_KEY_SYMBOL,
   },
