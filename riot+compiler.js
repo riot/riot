@@ -1,4 +1,4 @@
-/* Riot v9.1.4, @license MIT */
+/* Riot v9.1.5, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2473,7 +2473,7 @@
 
   var require$$0 = /*@__PURE__*/getAugmentedNamespace(tslib_es6$1);
 
-  var require$$1$1 = undefined;
+  var require$$1 = undefined;
 
   var main = {};
 
@@ -7485,18 +7485,25 @@
 
   var parser = {};
 
-  const assert = {
-    ok: () => true,
-    strictEqual: () => true,
-    deepEqual: () => true,
-  };
+  var tinyInvariant_cjs;
+  var hasRequiredTinyInvariant_cjs;
 
-  var assertMockApi = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    default: assert
-  });
+  function requireTinyInvariant_cjs () {
+  	if (hasRequiredTinyInvariant_cjs) return tinyInvariant_cjs;
+  	hasRequiredTinyInvariant_cjs = 1;
+  	var prefix = 'Invariant failed';
+  	function invariant(condition, message) {
+  	    if (condition) {
+  	        return;
+  	    }
+  	    {
+  	        throw new Error(prefix);
+  	    }
+  	}
 
-  var require$$1 = /*@__PURE__*/getAugmentedNamespace(assertMockApi);
+  	tinyInvariant_cjs = invariant;
+  	return tinyInvariant_cjs;
+  }
 
   var options = {};
 
@@ -7544,7 +7551,7 @@
   Object.defineProperty(util, "__esModule", { value: true });
   util.isTrailingCommaEnabled = util.getParentExportDeclaration = util.isExportDeclaration = util.fixFaultyLocations = util.getTrueLoc = composeSourceMaps_1 = util.composeSourceMaps = util.copyPos = util.comparePos = util.getUnionOfKeys = util.getOption = util.isBrowser = util.getLineTerminator = void 0;
   var tslib_1 = require$$0;
-  var assert_1 = tslib_1.__importDefault(require$$1);
+  var tiny_invariant_1 = tslib_1.__importDefault(requireTinyInvariant_cjs());
   var types$1 = tslib_1.__importStar(requireMain());
   var n = types$1.namedTypes;
   var source_map_1 = tslib_1.__importDefault(require$$2);
@@ -7795,8 +7802,8 @@
           // First we need to exclude the opening ` from the .loc of the first
           // quasi element, in case the parser accidentally decided to include it.
           var afterLeftBackTickPos = copyPos(node.loc.start);
-          assert_1.default.strictEqual(lines.charAt(afterLeftBackTickPos), "`");
-          assert_1.default.ok(lines.nextPos(afterLeftBackTickPos));
+          (0, tiny_invariant_1.default)(lines.charAt(afterLeftBackTickPos) === "`");
+          (0, tiny_invariant_1.default)(lines.nextPos(afterLeftBackTickPos));
           var firstQuasi = node.quasis[0];
           if (comparePos(firstQuasi.loc.start, afterLeftBackTickPos) < 0) {
               firstQuasi.loc.start = afterLeftBackTickPos;
@@ -7804,8 +7811,8 @@
           // Next we need to exclude the closing ` from the .loc of the last quasi
           // element, in case the parser accidentally decided to include it.
           var rightBackTickPos = copyPos(node.loc.end);
-          assert_1.default.ok(lines.prevPos(rightBackTickPos));
-          assert_1.default.strictEqual(lines.charAt(rightBackTickPos), "`");
+          (0, tiny_invariant_1.default)(lines.prevPos(rightBackTickPos));
+          (0, tiny_invariant_1.default)(lines.charAt(rightBackTickPos) === "`");
           var lastQuasi = node.quasis[node.quasis.length - 1];
           if (comparePos(rightBackTickPos, lastQuasi.loc.end) < 0) {
               lastQuasi.loc.end = rightBackTickPos;
@@ -7832,7 +7839,7 @@
           // the expression in the .loc of the following quasi element.
           var rightCurlyPos = lines.skipSpaces(expr.loc.end, false, false);
           if (lines.charAt(rightCurlyPos) === "}") {
-              assert_1.default.ok(lines.nextPos(rightCurlyPos));
+              (0, tiny_invariant_1.default)(lines.nextPos(rightCurlyPos));
               // Now rightCurlyPos is technically the position just after the }.
               var quasiAfter = node.quasis[i + 1];
               if (comparePos(quasiAfter.loc.start, rightCurlyPos) < 0) {
@@ -7986,7 +7993,7 @@
   	hasRequiredMapping = 1;
   	Object.defineProperty(mapping, "__esModule", { value: true });
   	var tslib_1 = require$$0;
-  	var assert_1 = tslib_1.__importDefault(require$$1);
+  	var tiny_invariant_1 = tslib_1.__importDefault(requireTinyInvariant_cjs());
   	var util_1 = util;
   	var Mapping = /** @class */ (function () {
   	    function Mapping(sourceLines, sourceLoc, targetLoc) {
@@ -8008,7 +8015,7 @@
   	                targetToPos = end;
   	            }
   	            else {
-  	                assert_1.default.strictEqual(name, "start");
+  	                (0, tiny_invariant_1.default)(name === "start");
   	            }
   	            return skipChars(sourceLines, sourceFromPos, lines, targetFromPos, targetToPos);
   	        }
@@ -8146,12 +8153,12 @@
   	            targetCursor.column = 0;
   	        }
   	        else {
-  	            assert_1.default.strictEqual(lineDiff, 0);
+  	            (0, tiny_invariant_1.default)(lineDiff === 0);
   	        }
   	        while ((0, util_1.comparePos)(targetCursor, targetToPos) < 0 &&
   	            targetLines.nextPos(targetCursor, true)) {
-  	            assert_1.default.ok(sourceLines.nextPos(sourceCursor, true));
-  	            assert_1.default.strictEqual(sourceLines.charAt(sourceCursor), targetLines.charAt(targetCursor));
+  	            (0, tiny_invariant_1.default)(sourceLines.nextPos(sourceCursor, true));
+  	            (0, tiny_invariant_1.default)(sourceLines.charAt(sourceCursor) === targetLines.charAt(targetCursor));
   	        }
   	    }
   	    else {
@@ -8170,12 +8177,12 @@
   	            targetCursor.column = targetLines.getLineLength(targetCursor.line);
   	        }
   	        else {
-  	            assert_1.default.strictEqual(lineDiff, 0);
+  	            (0, tiny_invariant_1.default)(lineDiff === 0);
   	        }
   	        while ((0, util_1.comparePos)(targetToPos, targetCursor) < 0 &&
   	            targetLines.prevPos(targetCursor, true)) {
-  	            assert_1.default.ok(sourceLines.prevPos(sourceCursor, true));
-  	            assert_1.default.strictEqual(sourceLines.charAt(sourceCursor), targetLines.charAt(targetCursor));
+  	            (0, tiny_invariant_1.default)(sourceLines.prevPos(sourceCursor, true));
+  	            (0, tiny_invariant_1.default)(sourceLines.charAt(sourceCursor) === targetLines.charAt(targetCursor));
   	        }
   	    }
   	    return sourceCursor;
@@ -8191,7 +8198,7 @@
   	Object.defineProperty(lines, "__esModule", { value: true });
   	lines.concat = lines.fromString = lines.countSpaces = lines.Lines = void 0;
   	var tslib_1 = require$$0;
-  	var assert_1 = tslib_1.__importDefault(require$$1);
+  	var tiny_invariant_1 = tslib_1.__importDefault(requireTinyInvariant_cjs());
   	var source_map_1 = tslib_1.__importDefault(require$$2);
   	var options_1 = requireOptions();
   	var util_1 = util;
@@ -8203,7 +8210,7 @@
   	        this.mappings = [];
   	        this.cachedSourceMap = null;
   	        this.cachedTabWidth = void 0;
-  	        assert_1.default.ok(infos.length > 0);
+  	        (0, tiny_invariant_1.default)(infos.length > 0);
   	        this.length = infos.length;
   	        this.name = sourceFileName || null;
   	        if (this.name) {
@@ -8250,7 +8257,7 @@
   	                (0, util_1.comparePos)(targetCursor, mapping.targetLoc.end) < 0) {
   	                var sourceChar = mapping.sourceLines.charAt(sourceCursor);
   	                var targetChar = targetLines.charAt(targetCursor);
-  	                assert_1.default.strictEqual(sourceChar, targetChar);
+  	                (0, tiny_invariant_1.default)(sourceChar === targetChar);
   	                var sourceName = mapping.sourceLines.name;
   	                // Add mappings one character at a time for maximum resolution.
   	                smg.addMapping({
@@ -8271,9 +8278,9 @@
   	        return smg.toJSON();
   	    };
   	    Lines.prototype.bootstrapCharAt = function (pos) {
-  	        assert_1.default.strictEqual(typeof pos, "object");
-  	        assert_1.default.strictEqual(typeof pos.line, "number");
-  	        assert_1.default.strictEqual(typeof pos.column, "number");
+  	        (0, tiny_invariant_1.default)(typeof pos === "object");
+  	        (0, tiny_invariant_1.default)(typeof pos.line === "number");
+  	        (0, tiny_invariant_1.default)(typeof pos.column === "number");
   	        var line = pos.line, column = pos.column, strings = this.toString().split(lineTerminatorSeqExp), string = strings[line - 1];
   	        if (typeof string === "undefined")
   	            return "";
@@ -8284,9 +8291,9 @@
   	        return string.charAt(column);
   	    };
   	    Lines.prototype.charAt = function (pos) {
-  	        assert_1.default.strictEqual(typeof pos, "object");
-  	        assert_1.default.strictEqual(typeof pos.line, "number");
-  	        assert_1.default.strictEqual(typeof pos.column, "number");
+  	        (0, tiny_invariant_1.default)(typeof pos === "object");
+  	        (0, tiny_invariant_1.default)(typeof pos.line === "number");
+  	        (0, tiny_invariant_1.default)(typeof pos.column === "number");
   	        var line = pos.line, column = pos.column, secret = this, infos = secret.infos, info = infos[line - 1], c = column;
   	        if (typeof info === "undefined" || c < 0)
   	            return "";
@@ -8303,7 +8310,7 @@
   	    Lines.prototype.stripMargin = function (width, skipFirstLine) {
   	        if (width === 0)
   	            return this;
-  	        assert_1.default.ok(width > 0, "negative margin: " + width);
+  	        (0, tiny_invariant_1.default)(width > 0, "negative margin: " + width);
   	        if (skipFirstLine && this.length === 1)
   	            return this;
   	        var lines = new Lines(this.infos.map(function (info, i) {
@@ -8314,7 +8321,7 @@
   	        }));
   	        if (this.mappings.length > 0) {
   	            var newMappings_1 = lines.mappings;
-  	            assert_1.default.strictEqual(newMappings_1.length, 0);
+  	            (0, tiny_invariant_1.default)(newMappings_1.length === 0);
   	            this.mappings.forEach(function (mapping) {
   	                newMappings_1.push(mapping.indent(width, skipFirstLine, true));
   	            });
@@ -8333,7 +8340,7 @@
   	        }));
   	        if (this.mappings.length > 0) {
   	            var newMappings_2 = lines.mappings;
-  	            assert_1.default.strictEqual(newMappings_2.length, 0);
+  	            (0, tiny_invariant_1.default)(newMappings_2.length === 0);
   	            this.mappings.forEach(function (mapping) {
   	                newMappings_2.push(mapping.indent(by));
   	            });
@@ -8355,7 +8362,7 @@
   	        }));
   	        if (this.mappings.length > 0) {
   	            var newMappings_3 = lines.mappings;
-  	            assert_1.default.strictEqual(newMappings_3.length, 0);
+  	            (0, tiny_invariant_1.default)(newMappings_3.length === 0);
   	            this.mappings.forEach(function (mapping) {
   	                newMappings_3.push(mapping.indent(by, true));
   	            });
@@ -8369,7 +8376,7 @@
   	        return new Lines(this.infos.map(function (info, i) { return (tslib_1.__assign(tslib_1.__assign({}, info), { locked: i > 0 })); }));
   	    };
   	    Lines.prototype.getIndentAt = function (line) {
-  	        assert_1.default.ok(line >= 1, "no line " + line + " (line numbers start from 1)");
+  	        (0, tiny_invariant_1.default)(line >= 1, "no line " + line + " (line numbers start from 1)");
   	        return Math.max(this.infos[line - 1].indent, 0);
   	    };
   	    Lines.prototype.guessTabWidth = function () {
@@ -8569,14 +8576,14 @@
   	            sliced[0] = sliceInfo(sliced[0], start.column, end.column);
   	        }
   	        else {
-  	            assert_1.default.ok(start.line < end.line);
+  	            (0, tiny_invariant_1.default)(start.line < end.line);
   	            sliced[0] = sliceInfo(sliced[0], start.column);
   	            sliced.push(sliceInfo(sliced.pop(), 0, end.column));
   	        }
   	        var lines = new Lines(sliced);
   	        if (this.mappings.length > 0) {
   	            var newMappings_4 = lines.mappings;
-  	            assert_1.default.strictEqual(newMappings_4.length, 0);
+  	            (0, tiny_invariant_1.default)(newMappings_4.length === 0);
   	            this.mappings.forEach(function (mapping) {
   	                var sliced = mapping.slice(this, start, end);
   	                if (sliced) {
@@ -8710,7 +8717,7 @@
   	        }
   	        var list = [this];
   	        list.push.apply(list, args);
-  	        assert_1.default.strictEqual(list.length, args.length + 1);
+  	        (0, tiny_invariant_1.default)(list.length === args.length + 1);
   	        return emptyLines.join(list);
   	    };
   	    return Lines;
@@ -8726,8 +8733,8 @@
   	        switch (spaces.charCodeAt(i)) {
   	            case 9: {
   	                // '\t'
-  	                assert_1.default.strictEqual(typeof tabWidth, "number");
-  	                assert_1.default.ok(tabWidth > 0);
+  	                (0, tiny_invariant_1.default)(typeof tabWidth === "number");
+  	                (0, tiny_invariant_1.default)(tabWidth > 0);
   	                var next = Math.ceil(count / tabWidth) * tabWidth;
   	                if (next === count) {
   	                    count += tabWidth;
@@ -8766,7 +8773,7 @@
   	    var tabWidth = options && options.tabWidth;
   	    var tabless = string.indexOf("\t") < 0;
   	    var cacheable = !options && tabless && string.length <= maxCacheKeyLen;
-  	    assert_1.default.ok(tabWidth || tabless, "No tab width specified but encountered tabs in string\n" + string);
+  	    (0, tiny_invariant_1.default)(tabWidth || tabless, "No tab width specified but encountered tabs in string\n" + string);
   	    if (cacheable && hasOwn.call(fromStringCache, string))
   	        return fromStringCache[string];
   	    var lines = new Lines(string.split(lineTerminatorSeqExp).map(function (line) {
@@ -8817,9 +8824,9 @@
   	        indent = 0;
   	        sliceStart += startCol;
   	    }
-  	    assert_1.default.ok(indent >= 0);
-  	    assert_1.default.ok(sliceStart <= sliceEnd);
-  	    assert_1.default.strictEqual(lineLength, indent + sliceEnd - sliceStart);
+  	    (0, tiny_invariant_1.default)(indent >= 0);
+  	    (0, tiny_invariant_1.default)(sliceStart <= sliceEnd);
+  	    (0, tiny_invariant_1.default)(lineLength === indent + sliceEnd - sliceStart);
   	    if (info.indent === indent &&
   	        info.sliceStart === sliceStart &&
   	        info.sliceEnd === sliceEnd) {
@@ -8854,7 +8861,7 @@
   	Object.defineProperty(comments, "__esModule", { value: true });
   	comments.printComments = comments.attach = void 0;
   	var tslib_1 = require$$0;
-  	var assert_1 = tslib_1.__importDefault(require$$1);
+  	var tiny_invariant_1 = tslib_1.__importDefault(requireTinyInvariant_cjs());
   	var types = tslib_1.__importStar(requireMain());
   	var n = types.namedTypes;
   	var isArray = types.builtInTypes.array;
@@ -8976,7 +8983,8 @@
   	            var tieCount = tiesToBreak.length;
   	            if (tieCount > 0) {
   	                var lastTie = tiesToBreak[tieCount - 1];
-  	                assert_1.default.strictEqual(lastTie.precedingNode === comment.precedingNode, lastTie.followingNode === comment.followingNode);
+  	                (0, tiny_invariant_1.default)((lastTie.precedingNode === comment.precedingNode) ===
+  	                    (lastTie.followingNode === comment.followingNode));
   	                if (lastTie.followingNode !== comment.followingNode) {
   	                    breakTies(tiesToBreak, lines);
   	                }
@@ -9030,8 +9038,8 @@
   	    var comment;
   	    for (; indexOfFirstLeadingComment > 0; --indexOfFirstLeadingComment) {
   	        comment = tiesToBreak[indexOfFirstLeadingComment - 1];
-  	        assert_1.default.strictEqual(comment.precedingNode, pn);
-  	        assert_1.default.strictEqual(comment.followingNode, fn);
+  	        (0, tiny_invariant_1.default)(comment.precedingNode === pn);
+  	        (0, tiny_invariant_1.default)(comment.followingNode === fn);
   	        var gap = lines.sliceString(comment.loc.end, gapEndPos);
   	        if (/\S/.test(gap)) {
   	            // The gap string contained something other than whitespace.
@@ -9173,7 +9181,7 @@
   	Object.defineProperty(parser, "__esModule", { value: true });
   	parser.parse = void 0;
   	var tslib_1 = require$$0;
-  	var assert_1 = tslib_1.__importDefault(require$$1);
+  	var tiny_invariant_1 = tslib_1.__importDefault(requireTinyInvariant_cjs());
   	var types = tslib_1.__importStar(requireMain());
   	var b = types.builders;
   	var isObject = types.builtInTypes.object;
@@ -9282,7 +9290,7 @@
   	}
   	parser.parse = parse;
   	var TreeCopier = function TreeCopier(lines, tokens) {
-  	    assert_1.default.ok(this instanceof TreeCopier);
+  	    (0, tiny_invariant_1.default)(this instanceof TreeCopier);
   	    this.lines = lines;
   	    this.tokens = tokens;
   	    this.startTokenIndex = 0;
@@ -9433,7 +9441,7 @@
   	hasRequiredFastPath = 1;
   	Object.defineProperty(fastPath, "__esModule", { value: true });
   	var tslib_1 = require$$0;
-  	var assert_1 = tslib_1.__importDefault(require$$1);
+  	var tiny_invariant_1 = tslib_1.__importDefault(requireTinyInvariant_cjs());
   	var types = tslib_1.__importStar(requireMain());
   	var util$1 = tslib_1.__importStar(util);
   	var n = types.namedTypes;
@@ -9459,7 +9467,7 @@
   	    });
   	});
   	var FastPath = function FastPath(value) {
-  	    assert_1.default.ok(this instanceof FastPath);
+  	    (0, tiny_invariant_1.default)(this instanceof FastPath);
   	    this.stack = [value];
   	};
   	var FPp = FastPath.prototype;
@@ -9753,7 +9761,7 @@
   	                        return true;
   	                    }
   	                    if (pp === np && name === "right") {
-  	                        assert_1.default.strictEqual(parent.right, node);
+  	                        (0, tiny_invariant_1.default)(parent.right === node);
   	                        return true;
   	                    }
   	                    break;
@@ -9913,19 +9921,19 @@
   	        if (n.BlockStatement.check(parent) &&
   	            parentName === "body" &&
   	            childName === 0) {
-  	            assert_1.default.strictEqual(parent.body[0], child);
+  	            (0, tiny_invariant_1.default)(parent.body[0] === child);
   	            return true;
   	        }
   	        if (n.ExpressionStatement.check(parent) && childName === "expression") {
-  	            assert_1.default.strictEqual(parent.expression, child);
+  	            (0, tiny_invariant_1.default)(parent.expression === child);
   	            return true;
   	        }
   	        if (n.AssignmentExpression.check(parent) && childName === "left") {
-  	            assert_1.default.strictEqual(parent.left, child);
+  	            (0, tiny_invariant_1.default)(parent.left === child);
   	            return true;
   	        }
   	        if (n.ArrowFunctionExpression.check(parent) && childName === "body") {
-  	            assert_1.default.strictEqual(parent.body, child);
+  	            (0, tiny_invariant_1.default)(parent.body === child);
   	            return true;
   	        }
   	        // s[i + 1] and s[i + 2] represent the array between the parent
@@ -9933,29 +9941,29 @@
   	        if (n.SequenceExpression.check(parent) &&
   	            s[i + 1] === "expressions" &&
   	            childName === 0) {
-  	            assert_1.default.strictEqual(parent.expressions[0], child);
+  	            (0, tiny_invariant_1.default)(parent.expressions[0] === child);
   	            continue;
   	        }
   	        if (n.CallExpression.check(parent) && childName === "callee") {
-  	            assert_1.default.strictEqual(parent.callee, child);
+  	            (0, tiny_invariant_1.default)(parent.callee === child);
   	            continue;
   	        }
   	        if (n.MemberExpression.check(parent) && childName === "object") {
-  	            assert_1.default.strictEqual(parent.object, child);
+  	            (0, tiny_invariant_1.default)(parent.object === child);
   	            continue;
   	        }
   	        if (n.ConditionalExpression.check(parent) && childName === "test") {
-  	            assert_1.default.strictEqual(parent.test, child);
+  	            (0, tiny_invariant_1.default)(parent.test === child);
   	            continue;
   	        }
   	        if (isBinary(parent) && childName === "left") {
-  	            assert_1.default.strictEqual(parent.left, child);
+  	            (0, tiny_invariant_1.default)(parent.left === child);
   	            continue;
   	        }
   	        if (n.UnaryExpression.check(parent) &&
   	            !parent.prefix &&
   	            childName === "argument") {
-  	            assert_1.default.strictEqual(parent.argument, child);
+  	            (0, tiny_invariant_1.default)(parent.argument === child);
   	            continue;
   	        }
   	        return false;
@@ -9976,7 +9984,7 @@
   	Object.defineProperty(patcher, "__esModule", { value: true });
   	patcher.getReprinter = patcher.Patcher = void 0;
   	var tslib_1 = require$$0;
-  	var assert_1 = tslib_1.__importDefault(require$$1);
+  	var tiny_invariant_1 = tslib_1.__importDefault(requireTinyInvariant_cjs());
   	var linesModule = tslib_1.__importStar(requireLines());
   	var types = tslib_1.__importStar(requireMain());
   	var Printable = types.namedTypes.Printable;
@@ -9990,8 +9998,8 @@
   	var isString = types.builtInTypes.string;
   	var riskyAdjoiningCharExp = /[0-9a-z_$]/i;
   	var Patcher = function Patcher(lines) {
-  	    assert_1.default.ok(this instanceof Patcher);
-  	    assert_1.default.ok(lines instanceof linesModule.Lines);
+  	    (0, tiny_invariant_1.default)(this instanceof Patcher);
+  	    (0, tiny_invariant_1.default)(lines instanceof linesModule.Lines);
   	    var self = this, replacements = [];
   	    self.replace = function (loc, lines) {
   	        if (isString.check(lines))
@@ -10010,7 +10018,7 @@
   	        };
   	        var sliceFrom = loc.start, toConcat = [];
   	        function pushSlice(from, to) {
-  	            assert_1.default.ok((0, util_1.comparePos)(from, to) <= 0);
+  	            (0, tiny_invariant_1.default)((0, util_1.comparePos)(from, to) <= 0);
   	            toConcat.push(lines.slice(from, to));
   	        }
   	        replacements
@@ -10046,7 +10054,7 @@
   	    if (ableToReprintComments && reprints.length > 0) {
   	        reprints.forEach(function (reprint) {
   	            var oldComment = reprint.oldPath.getValue();
-  	            assert_1.default.ok(oldComment.leading || oldComment.trailing);
+  	            (0, tiny_invariant_1.default)(oldComment.leading || oldComment.trailing);
   	            patcher.replace(oldComment.loc, 
   	            // Comments can't have .comments, so it doesn't matter whether we
   	            // print with comments or without.
@@ -10094,7 +10102,7 @@
   	    });
   	};
   	function getReprinter(path) {
-  	    assert_1.default.ok(path instanceof fast_path_1.default);
+  	    (0, tiny_invariant_1.default)(path instanceof fast_path_1.default);
   	    // Make sure that this path refers specifically to a Node, rather than
   	    // some non-Node subproperty of a Node.
   	    var node = path.getValue();
@@ -10188,7 +10196,7 @@
   	    Printable.assert(newNode);
   	    var oldNode = newNode.original;
   	    Printable.assert(oldNode);
-  	    assert_1.default.deepEqual(reprints, []);
+  	    (0, tiny_invariant_1.default)(reprints.length === 0);
   	    if (newNode.type !== oldNode.type) {
   	        return false;
   	    }
@@ -10367,7 +10375,7 @@
   	Object.defineProperty(printer, "__esModule", { value: true });
   	printer.Printer = void 0;
   	var tslib_1 = require$$0;
-  	var assert_1 = tslib_1.__importDefault(require$$1);
+  	var tiny_invariant_1 = tslib_1.__importDefault(requireTinyInvariant_cjs());
   	var types = tslib_1.__importStar(requireMain());
   	var comments_1 = requireComments();
   	var fast_path_1 = tslib_1.__importDefault(requireFastPath());
@@ -10379,7 +10387,7 @@
   	var isString = types.builtInTypes.string;
   	var isObject = types.builtInTypes.object;
   	var PrintResult = function PrintResult(code, sourceMap) {
-  	    assert_1.default.ok(this instanceof PrintResult);
+  	    (0, tiny_invariant_1.default)(this instanceof PrintResult);
   	    isString.assert(code);
   	    this.code = code;
   	    if (sourceMap) {
@@ -10400,7 +10408,7 @@
   	};
   	var emptyPrintResult = new PrintResult("");
   	var Printer = function Printer(config) {
-  	    assert_1.default.ok(this instanceof Printer);
+  	    (0, tiny_invariant_1.default)(this instanceof Printer);
   	    var explicitTabWidth = config && config.tabWidth;
   	    config = (0, options_1.normalize)(config);
   	    // It's common for client code to pass the same options into both
@@ -10414,7 +10422,7 @@
   	        return function (path) { return print(path, options); };
   	    }
   	    function print(path, options) {
-  	        assert_1.default.ok(path instanceof fast_path_1.default);
+  	        (0, tiny_invariant_1.default)(path instanceof fast_path_1.default);
   	        options = options || {};
   	        if (options.includeComments) {
   	            return (0, comments_1.printComments)(path, makePrintFunctionWith(options, {
@@ -10482,7 +10490,7 @@
   	};
   	printer.Printer = Printer;
   	function genericPrint(path, config, options, printPath) {
-  	    assert_1.default.ok(path instanceof fast_path_1.default);
+  	    (0, tiny_invariant_1.default)(path instanceof fast_path_1.default);
   	    var node = path.getValue();
   	    var parts = [];
   	    var linesWithoutParens = genericPrintNoParens(path, config, printPath);
@@ -10679,7 +10687,7 @@
   	        case "ModuleDeclaration":
   	            parts.push("module", path.call(print, "id"));
   	            if (n.source) {
-  	                assert_1.default.ok(!n.body);
+  	                (0, tiny_invariant_1.default)(!n.body);
   	                parts.push("from", path.call(print, "source"));
   	            }
   	            else {
@@ -11337,7 +11345,7 @@
   	            var closingPropName = "closing" + (n.type === "JSXElement" ? "Element" : "Fragment");
   	            var openingLines = path.call(print, openingPropName);
   	            if (n[openingPropName].selfClosing) {
-  	                assert_1.default.ok(!n[closingPropName], "unexpected " +
+  	                (0, tiny_invariant_1.default)(!n[closingPropName], "unexpected " +
   	                    closingPropName +
   	                    " element in self-closing " +
   	                    n.type);
@@ -11370,7 +11378,7 @@
   	            if (needLineWrap) {
   	                attrParts_1.forEach(function (part, i) {
   	                    if (part === " ") {
-  	                        assert_1.default.strictEqual(i % 2, 0);
+  	                        (0, tiny_invariant_1.default)(i % 2 === 0);
   	                        attrParts_1[i] = "\n";
   	                    }
   	                });
@@ -11644,7 +11652,7 @@
   	        case "BooleanTypeAnnotation":
   	            return (0, lines_1.fromString)("boolean", options);
   	        case "BooleanLiteralTypeAnnotation":
-  	            assert_1.default.strictEqual(typeof n.value, "boolean");
+  	            (0, tiny_invariant_1.default)(typeof n.value === "boolean");
   	            return (0, lines_1.fromString)("" + n.value, options);
   	        case "InterfaceTypeAnnotation":
   	            parts.push("interface");
@@ -11824,7 +11832,7 @@
   	            return (0, lines_1.fromString)(nodeStr(n.value, options), options);
   	        case "NumberLiteralTypeAnnotation":
   	        case "NumericLiteralTypeAnnotation":
-  	            assert_1.default.strictEqual(typeof n.value, "number");
+  	            (0, tiny_invariant_1.default)(typeof n.value === "number");
   	            return (0, lines_1.fromString)(JSON.stringify(n.value), options);
   	        case "BigIntLiteralTypeAnnotation":
   	            return (0, lines_1.fromString)(n.raw, options);
@@ -12058,12 +12066,11 @@
   	        case "TSQualifiedName":
   	            return (0, lines_1.concat)([path.call(print, "left"), ".", path.call(print, "right")]);
   	        case "TSAsExpression":
-  	        case "TSSatisfiesExpression":
-  	            {
-  	                var expression = path.call(print, "expression");
-  	                parts.push(expression, n.type === "TSSatisfiesExpression" ? " satisfies " : " as ", path.call(print, "typeAnnotation"));
-  	                return (0, lines_1.concat)(parts);
-  	            }
+  	        case "TSSatisfiesExpression": {
+  	            var expression = path.call(print, "expression");
+  	            parts.push(expression, n.type === "TSSatisfiesExpression" ? " satisfies " : " as ", path.call(print, "typeAnnotation"));
+  	            return (0, lines_1.concat)(parts);
+  	        }
   	        case "TSTypeCastExpression":
   	            return (0, lines_1.concat)([
   	                path.call(print, "expression"),
@@ -12369,7 +12376,7 @@
   	        });
   	    });
   	    if (sawComment) {
-  	        assert_1.default.strictEqual(sawStatement, false, "Comments may appear as statements in otherwise empty statement " +
+  	        (0, tiny_invariant_1.default)(sawStatement === false, "Comments may appear as statements in otherwise empty statement " +
   	            "lists, but may not coexist with non-Comment nodes.");
   	    }
   	    var prevTrailingSpace = null;
@@ -12602,12 +12609,14 @@
   	        else if (decl.specifiers.length === 0) {
   	            parts.push("{}");
   	        }
-  	        else if (decl.specifiers[0].type === "ExportDefaultSpecifier") {
+  	        else if (decl.specifiers[0].type === "ExportDefaultSpecifier" ||
+  	            decl.specifiers[0].type === "ExportNamespaceSpecifier") {
   	            var unbracedSpecifiers_2 = [];
   	            var bracedSpecifiers_2 = [];
   	            path.each(function (specifierPath) {
   	                var spec = specifierPath.getValue();
-  	                if (spec.type === "ExportDefaultSpecifier") {
+  	                if (spec.type === "ExportDefaultSpecifier" ||
+  	                    spec.type === "ExportNamespaceSpecifier") {
   	                    unbracedSpecifiers_2.push(print(specifierPath));
   	                }
   	                else {
@@ -12664,7 +12673,7 @@
   	function printFlowDeclaration(path, parts) {
   	    var parentExportDecl = util$1.getParentExportDeclaration(path);
   	    if (parentExportDecl) {
-  	        assert_1.default.strictEqual(parentExportDecl.type, "DeclareExportDeclaration");
+  	        (0, tiny_invariant_1.default)(parentExportDecl.type === "DeclareExportDeclaration");
   	    }
   	    else {
   	        // If the parent node has type DeclareExportDeclaration, then it
@@ -12754,7 +12763,7 @@
   	Object.defineProperty(exports, "__esModule", { value: true });
   	exports.run = exports.prettyPrint = exports.print = exports.visit = exports.types = exports.parse = void 0;
   	var tslib_1 = require$$0;
-  	var fs_1 = tslib_1.__importDefault(require$$1$1);
+  	var fs_1 = tslib_1.__importDefault(require$$1);
   	var types = tslib_1.__importStar(requireMain());
   	exports.types = types;
   	var parser_1 = requireParser();
@@ -12830,7 +12839,6 @@
   	BigInt64Array: false,
   	BigUint64Array: false,
   	"Boolean": false,
-  	constructor: false,
   	"DataView": false,
   	"Date": false,
   	"decodeURI": false,
@@ -12846,14 +12854,13 @@
   	"Float64Array": false,
   	"Function": false,
   	globalThis: false,
-  	hasOwnProperty: false,
   	"Infinity": false,
   	"Int16Array": false,
   	"Int32Array": false,
   	"Int8Array": false,
+  	"Intl": false,
   	"isFinite": false,
   	"isNaN": false,
-  	isPrototypeOf: false,
   	"JSON": false,
   	"Map": false,
   	"Math": false,
@@ -12863,7 +12870,6 @@
   	"parseFloat": false,
   	"parseInt": false,
   	"Promise": false,
-  	propertyIsEnumerable: false,
   	"Proxy": false,
   	"RangeError": false,
   	"ReferenceError": false,
@@ -12874,8 +12880,6 @@
   	"String": false,
   	"Symbol": false,
   	"SyntaxError": false,
-  	toLocaleString: false,
-  	toString: false,
   	"TypeError": false,
   	"Uint16Array": false,
   	"Uint32Array": false,
@@ -12884,7 +12888,6 @@
   	"undefined": false,
   	"unescape": false,
   	"URIError": false,
-  	valueOf: false,
   	"WeakMap": false,
   	WeakRef: false,
   	"WeakSet": false
@@ -12892,7 +12895,6 @@
   const es5 = {
   	"Array": false,
   	"Boolean": false,
-  	constructor: false,
   	"Date": false,
   	"decodeURI": false,
   	"decodeURIComponent": false,
@@ -12903,11 +12905,9 @@
   	"eval": false,
   	"EvalError": false,
   	"Function": false,
-  	hasOwnProperty: false,
   	"Infinity": false,
   	"isFinite": false,
   	"isNaN": false,
-  	isPrototypeOf: false,
   	"JSON": false,
   	"Math": false,
   	"NaN": false,
@@ -12915,25 +12915,20 @@
   	"Object": false,
   	"parseFloat": false,
   	"parseInt": false,
-  	propertyIsEnumerable: false,
   	"RangeError": false,
   	"ReferenceError": false,
   	"RegExp": false,
   	"String": false,
   	"SyntaxError": false,
-  	toLocaleString: false,
-  	toString: false,
   	"TypeError": false,
   	"undefined": false,
   	"unescape": false,
-  	"URIError": false,
-  	valueOf: false
+  	"URIError": false
   };
   const es2015 = {
   	"Array": false,
   	"ArrayBuffer": false,
   	"Boolean": false,
-  	constructor: false,
   	"DataView": false,
   	"Date": false,
   	"decodeURI": false,
@@ -12947,14 +12942,13 @@
   	"Float32Array": false,
   	"Float64Array": false,
   	"Function": false,
-  	hasOwnProperty: false,
   	"Infinity": false,
   	"Int16Array": false,
   	"Int32Array": false,
   	"Int8Array": false,
+  	"Intl": false,
   	"isFinite": false,
   	"isNaN": false,
-  	isPrototypeOf: false,
   	"JSON": false,
   	"Map": false,
   	"Math": false,
@@ -12964,7 +12958,6 @@
   	"parseFloat": false,
   	"parseInt": false,
   	"Promise": false,
-  	propertyIsEnumerable: false,
   	"Proxy": false,
   	"RangeError": false,
   	"ReferenceError": false,
@@ -12974,8 +12967,6 @@
   	"String": false,
   	"Symbol": false,
   	"SyntaxError": false,
-  	toLocaleString: false,
-  	toString: false,
   	"TypeError": false,
   	"Uint16Array": false,
   	"Uint32Array": false,
@@ -12984,7 +12975,6 @@
   	"undefined": false,
   	"unescape": false,
   	"URIError": false,
-  	valueOf: false,
   	"WeakMap": false,
   	"WeakSet": false
   };
@@ -12993,7 +12983,6 @@
   	"ArrayBuffer": false,
   	Atomics: false,
   	"Boolean": false,
-  	constructor: false,
   	"DataView": false,
   	"Date": false,
   	"decodeURI": false,
@@ -13007,14 +12996,13 @@
   	"Float32Array": false,
   	"Float64Array": false,
   	"Function": false,
-  	hasOwnProperty: false,
   	"Infinity": false,
   	"Int16Array": false,
   	"Int32Array": false,
   	"Int8Array": false,
+  	"Intl": false,
   	"isFinite": false,
   	"isNaN": false,
-  	isPrototypeOf: false,
   	"JSON": false,
   	"Map": false,
   	"Math": false,
@@ -13024,7 +13012,6 @@
   	"parseFloat": false,
   	"parseInt": false,
   	"Promise": false,
-  	propertyIsEnumerable: false,
   	"Proxy": false,
   	"RangeError": false,
   	"ReferenceError": false,
@@ -13035,8 +13022,6 @@
   	"String": false,
   	"Symbol": false,
   	"SyntaxError": false,
-  	toLocaleString: false,
-  	toString: false,
   	"TypeError": false,
   	"Uint16Array": false,
   	"Uint32Array": false,
@@ -13045,7 +13030,6 @@
   	"undefined": false,
   	"unescape": false,
   	"URIError": false,
-  	valueOf: false,
   	"WeakMap": false,
   	"WeakSet": false
   };
@@ -13057,7 +13041,6 @@
   	BigInt64Array: false,
   	BigUint64Array: false,
   	"Boolean": false,
-  	constructor: false,
   	"DataView": false,
   	"Date": false,
   	"decodeURI": false,
@@ -13072,14 +13055,13 @@
   	"Float64Array": false,
   	"Function": false,
   	globalThis: false,
-  	hasOwnProperty: false,
   	"Infinity": false,
   	"Int16Array": false,
   	"Int32Array": false,
   	"Int8Array": false,
+  	"Intl": false,
   	"isFinite": false,
   	"isNaN": false,
-  	isPrototypeOf: false,
   	"JSON": false,
   	"Map": false,
   	"Math": false,
@@ -13089,7 +13071,6 @@
   	"parseFloat": false,
   	"parseInt": false,
   	"Promise": false,
-  	propertyIsEnumerable: false,
   	"Proxy": false,
   	"RangeError": false,
   	"ReferenceError": false,
@@ -13100,8 +13081,6 @@
   	"String": false,
   	"Symbol": false,
   	"SyntaxError": false,
-  	toLocaleString: false,
-  	toString: false,
   	"TypeError": false,
   	"Uint16Array": false,
   	"Uint32Array": false,
@@ -13110,7 +13089,6 @@
   	"undefined": false,
   	"unescape": false,
   	"URIError": false,
-  	valueOf: false,
   	"WeakMap": false,
   	"WeakSet": false
   };
@@ -13123,7 +13101,6 @@
   	BigInt64Array: false,
   	BigUint64Array: false,
   	"Boolean": false,
-  	constructor: false,
   	"DataView": false,
   	"Date": false,
   	"decodeURI": false,
@@ -13139,14 +13116,13 @@
   	"Float64Array": false,
   	"Function": false,
   	globalThis: false,
-  	hasOwnProperty: false,
   	"Infinity": false,
   	"Int16Array": false,
   	"Int32Array": false,
   	"Int8Array": false,
+  	"Intl": false,
   	"isFinite": false,
   	"isNaN": false,
-  	isPrototypeOf: false,
   	"JSON": false,
   	"Map": false,
   	"Math": false,
@@ -13156,7 +13132,6 @@
   	"parseFloat": false,
   	"parseInt": false,
   	"Promise": false,
-  	propertyIsEnumerable: false,
   	"Proxy": false,
   	"RangeError": false,
   	"ReferenceError": false,
@@ -13167,8 +13142,6 @@
   	"String": false,
   	"Symbol": false,
   	"SyntaxError": false,
-  	toLocaleString: false,
-  	toString: false,
   	"TypeError": false,
   	"Uint16Array": false,
   	"Uint32Array": false,
@@ -13177,7 +13150,6 @@
   	"undefined": false,
   	"unescape": false,
   	"URIError": false,
-  	valueOf: false,
   	"WeakMap": false,
   	WeakRef: false,
   	"WeakSet": false
@@ -13185,34 +13157,42 @@
   const browser = {
   	AbortController: false,
   	AbortSignal: false,
+  	AbsoluteOrientationSensor: false,
+  	AbstractRange: false,
+  	Accelerometer: false,
   	addEventListener: false,
   	alert: false,
   	AnalyserNode: false,
   	Animation: false,
-  	AnimationEffectReadOnly: false,
-  	AnimationEffectTiming: false,
-  	AnimationEffectTimingReadOnly: false,
+  	AnimationEffect: false,
   	AnimationEvent: false,
   	AnimationPlaybackEvent: false,
   	AnimationTimeline: false,
-  	applicationCache: false,
-  	ApplicationCache: false,
-  	ApplicationCacheErrorEvent: false,
   	atob: false,
   	Attr: false,
   	Audio: false,
   	AudioBuffer: false,
   	AudioBufferSourceNode: false,
   	AudioContext: false,
+  	AudioData: false,
+  	AudioDecoder: false,
   	AudioDestinationNode: false,
+  	AudioEncoder: false,
   	AudioListener: false,
   	AudioNode: false,
   	AudioParam: false,
+  	AudioParamMap: false,
   	AudioProcessingEvent: false,
   	AudioScheduledSourceNode: false,
-  	AudioWorkletGlobalScope: false,
+  	AudioSinkInfo: false,
+  	AudioWorklet: false,
   	AudioWorkletNode: false,
-  	AudioWorkletProcessor: false,
+  	AuthenticatorAssertionResponse: false,
+  	AuthenticatorAttestationResponse: false,
+  	AuthenticatorResponse: false,
+  	BackgroundFetchManager: false,
+  	BackgroundFetchRecord: false,
+  	BackgroundFetchRegistration: false,
   	BarProp: false,
   	BaseAudioContext: false,
   	BatteryManager: false,
@@ -13220,26 +13200,40 @@
   	BiquadFilterNode: false,
   	Blob: false,
   	BlobEvent: false,
+  	Bluetooth: false,
+  	BluetoothCharacteristicProperties: false,
+  	BluetoothDevice: false,
+  	BluetoothRemoteGATTCharacteristic: false,
+  	BluetoothRemoteGATTDescriptor: false,
+  	BluetoothRemoteGATTServer: false,
+  	BluetoothRemoteGATTService: false,
+  	BluetoothUUID: false,
   	blur: false,
   	BroadcastChannel: false,
+  	BrowserCaptureMediaStreamTrack: false,
   	btoa: false,
-  	BudgetService: false,
   	ByteLengthQueuingStrategy: false,
   	Cache: false,
   	caches: false,
   	CacheStorage: false,
   	cancelAnimationFrame: false,
   	cancelIdleCallback: false,
+  	CanvasCaptureMediaStream: false,
   	CanvasCaptureMediaStreamTrack: false,
   	CanvasGradient: false,
   	CanvasPattern: false,
   	CanvasRenderingContext2D: false,
+  	CaptureController: false,
+  	CaretPosition: false,
+  	CDATASection: false,
   	ChannelMergerNode: false,
   	ChannelSplitterNode: false,
+  	CharacterBoundsUpdateEvent: false,
   	CharacterData: false,
   	clearInterval: false,
   	clearTimeout: false,
   	clientInformation: false,
+  	Clipboard: false,
   	ClipboardEvent: false,
   	ClipboardItem: false,
   	close: false,
@@ -13251,56 +13245,99 @@
   	confirm: false,
   	console: false,
   	ConstantSourceNode: false,
+  	ContentVisibilityAutoStateChangeEvent: false,
   	ConvolverNode: false,
+  	CookieChangeEvent: false,
+  	cookieStore: false,
+  	CookieStore: false,
+  	CookieStoreManager: false,
   	CountQueuingStrategy: false,
   	createImageBitmap: false,
   	Credential: false,
+  	credentialless: false,
   	CredentialsContainer: false,
+  	CropTarget: false,
+  	crossOriginIsolated: false,
   	crypto: false,
   	Crypto: false,
   	CryptoKey: false,
   	CSS: false,
+  	CSSAnimation: false,
   	CSSConditionRule: false,
+  	CSSContainerRule: false,
+  	CSSCounterStyleRule: false,
   	CSSFontFaceRule: false,
+  	CSSFontFeatureValuesRule: false,
+  	CSSFontPaletteValuesRule: false,
   	CSSGroupingRule: false,
+  	CSSImageValue: false,
   	CSSImportRule: false,
   	CSSKeyframeRule: false,
   	CSSKeyframesRule: false,
+  	CSSKeywordValue: false,
+  	CSSLayerBlockRule: false,
+  	CSSLayerStatementRule: false,
+  	CSSMathClamp: false,
+  	CSSMathInvert: false,
+  	CSSMathMax: false,
+  	CSSMathMin: false,
+  	CSSMathNegate: false,
+  	CSSMathProduct: false,
+  	CSSMathSum: false,
+  	CSSMathValue: false,
   	CSSMatrixComponent: false,
   	CSSMediaRule: false,
   	CSSNamespaceRule: false,
+  	CSSNumericArray: false,
+  	CSSNumericValue: false,
   	CSSPageRule: false,
   	CSSPerspective: false,
+  	CSSPositionValue: false,
+  	CSSPropertyRule: false,
   	CSSRotate: false,
   	CSSRule: false,
   	CSSRuleList: false,
   	CSSScale: false,
+  	CSSScopeRule: false,
   	CSSSkew: false,
   	CSSSkewX: false,
   	CSSSkewY: false,
+  	CSSStartingStyleRule: false,
   	CSSStyleDeclaration: false,
   	CSSStyleRule: false,
   	CSSStyleSheet: false,
+  	CSSStyleValue: false,
   	CSSSupportsRule: false,
+  	CSSTransformComponent: false,
   	CSSTransformValue: false,
+  	CSSTransition: false,
   	CSSTranslate: false,
+  	CSSUnitValue: false,
+  	CSSUnparsedValue: false,
+  	CSSVariableReferenceValue: false,
   	CustomElementRegistry: false,
   	customElements: false,
   	CustomEvent: false,
+  	CustomStateSet: false,
   	DataTransfer: false,
   	DataTransferItem: false,
   	DataTransferItemList: false,
   	DecompressionStream: false,
-  	defaultstatus: false,
-  	defaultStatus: false,
   	DelayNode: false,
+  	DelegatedInkTrailPresenter: false,
   	DeviceMotionEvent: false,
+  	DeviceMotionEventAcceleration: false,
+  	DeviceMotionEventRotationRate: false,
   	DeviceOrientationEvent: false,
   	devicePixelRatio: false,
   	dispatchEvent: false,
   	document: false,
   	Document: false,
   	DocumentFragment: false,
+  	documentPictureInPicture: false,
+  	DocumentPictureInPicture: false,
+  	DocumentPictureInPictureEvent: false,
+  	DocumentTimeline: false,
   	DocumentType: false,
   	DOMError: false,
   	DOMException: false,
@@ -13319,34 +13356,112 @@
   	DOMTokenList: false,
   	DragEvent: false,
   	DynamicsCompressorNode: false,
+  	EditContext: false,
   	Element: false,
+  	ElementInternals: false,
+  	EncodedAudioChunk: false,
+  	EncodedVideoChunk: false,
   	ErrorEvent: false,
   	event: false,
   	Event: false,
+  	EventCounts: false,
   	EventSource: false,
   	EventTarget: false,
   	external: false,
+  	External: false,
+  	EyeDropper: false,
+  	FeaturePolicy: false,
+  	FederatedCredential: false,
   	fetch: false,
   	File: false,
   	FileList: false,
   	FileReader: false,
+  	FileSystem: false,
+  	FileSystemDirectoryEntry: false,
+  	FileSystemDirectoryHandle: false,
+  	FileSystemDirectoryReader: false,
+  	FileSystemEntry: false,
+  	FileSystemFileEntry: false,
+  	FileSystemFileHandle: false,
+  	FileSystemHandle: false,
+  	FileSystemWritableFileStream: false,
   	find: false,
   	focus: false,
   	FocusEvent: false,
+  	FontData: false,
   	FontFace: false,
+  	FontFaceSet: false,
   	FontFaceSetLoadEvent: false,
   	FormData: false,
   	FormDataEvent: false,
+  	FragmentDirective: false,
   	frameElement: false,
   	frames: false,
   	GainNode: false,
   	Gamepad: false,
+  	GamepadAxisMoveEvent: false,
   	GamepadButton: false,
+  	GamepadButtonEvent: false,
   	GamepadEvent: false,
+  	GamepadHapticActuator: false,
+  	GamepadPose: false,
+  	Geolocation: false,
+  	GeolocationCoordinates: false,
+  	GeolocationPosition: false,
+  	GeolocationPositionError: false,
   	getComputedStyle: false,
+  	getScreenDetails: false,
   	getSelection: false,
+  	GPU: false,
+  	GPUAdapter: false,
+  	GPUAdapterInfo: false,
+  	GPUBindGroup: false,
+  	GPUBindGroupLayout: false,
+  	GPUBuffer: false,
+  	GPUBufferUsage: false,
+  	GPUCanvasContext: false,
+  	GPUColorWrite: false,
+  	GPUCommandBuffer: false,
+  	GPUCommandEncoder: false,
+  	GPUCompilationInfo: false,
+  	GPUCompilationMessage: false,
+  	GPUComputePassEncoder: false,
+  	GPUComputePipeline: false,
+  	GPUDevice: false,
+  	GPUDeviceLostInfo: false,
+  	GPUError: false,
+  	GPUExternalTexture: false,
+  	GPUInternalError: false,
+  	GPUMapMode: false,
+  	GPUOutOfMemoryError: false,
+  	GPUPipelineError: false,
+  	GPUPipelineLayout: false,
+  	GPUQuerySet: false,
+  	GPUQueue: false,
+  	GPURenderBundle: false,
+  	GPURenderBundleEncoder: false,
+  	GPURenderPassEncoder: false,
+  	GPURenderPipeline: false,
+  	GPUSampler: false,
+  	GPUShaderModule: false,
+  	GPUShaderStage: false,
+  	GPUSupportedFeatures: false,
+  	GPUSupportedLimits: false,
+  	GPUTexture: false,
+  	GPUTextureUsage: false,
+  	GPUTextureView: false,
+  	GPUUncapturedErrorEvent: false,
+  	GPUValidationError: false,
+  	GravitySensor: false,
+  	Gyroscope: false,
   	HashChangeEvent: false,
   	Headers: false,
+  	HID: false,
+  	HIDConnectionEvent: false,
+  	HIDDevice: false,
+  	HIDInputReportEvent: false,
+  	Highlight: false,
+  	HighlightRegistry: false,
   	history: false,
   	History: false,
   	HTMLAllCollection: false,
@@ -13359,7 +13474,6 @@
   	HTMLButtonElement: false,
   	HTMLCanvasElement: false,
   	HTMLCollection: false,
-  	HTMLContentElement: false,
   	HTMLDataElement: false,
   	HTMLDataListElement: false,
   	HTMLDetailsElement: false,
@@ -13408,7 +13522,6 @@
   	HTMLQuoteElement: false,
   	HTMLScriptElement: false,
   	HTMLSelectElement: false,
-  	HTMLShadowElement: false,
   	HTMLSlotElement: false,
   	HTMLSourceElement: false,
   	HTMLSpanElement: false,
@@ -13438,36 +13551,61 @@
   	IDBRequest: false,
   	IDBTransaction: false,
   	IDBVersionChangeEvent: false,
+  	IdentityCredential: false,
+  	IdentityCredentialError: false,
+  	IdentityProvider: false,
   	IdleDeadline: false,
+  	IdleDetector: false,
   	IIRFilterNode: false,
   	Image: false,
   	ImageBitmap: false,
   	ImageBitmapRenderingContext: false,
   	ImageCapture: false,
   	ImageData: false,
+  	ImageDecoder: false,
+  	ImageTrack: false,
+  	ImageTrackList: false,
   	indexedDB: false,
+  	Ink: false,
   	innerHeight: false,
   	innerWidth: false,
+  	InputDeviceCapabilities: false,
+  	InputDeviceInfo: false,
   	InputEvent: false,
   	IntersectionObserver: false,
   	IntersectionObserverEntry: false,
-  	"Intl": false,
   	isSecureContext: false,
+  	Iterator: false,
+  	Keyboard: false,
   	KeyboardEvent: false,
+  	KeyboardLayoutMap: false,
   	KeyframeEffect: false,
-  	KeyframeEffectReadOnly: false,
+  	LargestContentfulPaint: false,
+  	LaunchParams: false,
+  	launchQueue: false,
+  	LaunchQueue: false,
+  	LayoutShift: false,
+  	LayoutShiftAttribution: false,
   	length: false,
+  	LinearAccelerationSensor: false,
   	localStorage: false,
   	location: true,
   	Location: false,
   	locationbar: false,
+  	Lock: false,
+  	LockManager: false,
   	matchMedia: false,
+  	MathMLElement: false,
+  	MediaCapabilities: false,
+  	MediaCapabilitiesInfo: false,
   	MediaDeviceInfo: false,
   	MediaDevices: false,
   	MediaElementAudioSourceNode: false,
   	MediaEncryptedEvent: false,
   	MediaError: false,
+  	MediaKeyError: false,
   	MediaKeyMessageEvent: false,
+  	MediaKeys: false,
   	MediaKeySession: false,
   	MediaKeyStatusMap: false,
   	MediaKeySystemAccess: false,
@@ -13476,15 +13614,20 @@
   	MediaQueryList: false,
   	MediaQueryListEvent: false,
   	MediaRecorder: false,
-  	MediaSettingsRange: false,
+  	MediaRecorderErrorEvent: false,
+  	MediaSession: false,
   	MediaSource: false,
+  	MediaSourceHandle: false,
   	MediaStream: false,
   	MediaStreamAudioDestinationNode: false,
   	MediaStreamAudioSourceNode: false,
-  	MediaStreamConstraints: false,
   	MediaStreamEvent: false,
   	MediaStreamTrack: false,
+  	MediaStreamTrackAudioSourceNode: false,
   	MediaStreamTrackEvent: false,
+  	MediaStreamTrackGenerator: false,
+  	MediaStreamTrackProcessor: false,
+  	MediaStreamTrackVideoStats: false,
   	menubar: false,
   	MessageChannel: false,
   	MessageEvent: false,
@@ -13507,9 +13650,19 @@
   	MutationRecord: false,
   	name: false,
   	NamedNodeMap: false,
+  	NavigateEvent: false,
+  	navigation: false,
+  	Navigation: false,
+  	NavigationActivation: false,
+  	NavigationCurrentEntryChangeEvent: false,
+  	NavigationDestination: false,
+  	NavigationHistoryEntry: false,
   	NavigationPreloadManager: false,
+  	NavigationTransition: false,
   	navigator: false,
   	Navigator: false,
+  	NavigatorLogin: false,
+  	NavigatorManagedData: false,
   	NavigatorUAData: false,
   	NetworkInformation: false,
   	Node: false,
@@ -13517,21 +13670,27 @@
   	NodeIterator: false,
   	NodeList: false,
   	Notification: false,
+  	NotifyPaintEvent: false,
   	OfflineAudioCompletionEvent: false,
   	OfflineAudioContext: false,
   	offscreenBuffering: false,
-  	OffscreenCanvas: true,
+  	OffscreenCanvas: false,
   	OffscreenCanvasRenderingContext2D: false,
   	onabort: true,
   	onafterprint: true,
+  	onanimationcancel: true,
   	onanimationend: true,
   	onanimationiteration: true,
   	onanimationstart: true,
   	onappinstalled: true,
   	onauxclick: true,
+  	onbeforeinput: true,
   	onbeforeinstallprompt: true,
+  	onbeforematch: true,
   	onbeforeprint: true,
+  	onbeforetoggle: true,
   	onbeforeunload: true,
+  	onbeforexrselect: true,
   	onblur: true,
   	oncancel: true,
   	oncanplay: true,
@@ -13539,8 +13698,13 @@
   	onchange: true,
   	onclick: true,
   	onclose: true,
+  	oncontentvisibilityautostatechange: true,
+  	oncontextlost: true,
   	oncontextmenu: true,
+  	oncontextrestored: true,
+  	oncopy: true,
   	oncuechange: true,
+  	oncut: true,
   	ondblclick: true,
   	ondevicemotion: true,
   	ondeviceorientation: true,
@@ -13557,6 +13721,9 @@
   	onended: true,
   	onerror: true,
   	onfocus: true,
+  	onformdata: true,
+  	ongamepadconnected: true,
+  	ongamepaddisconnected: true,
   	ongotpointercapture: true,
   	onhashchange: true,
   	oninput: true,
@@ -13583,7 +13750,9 @@
   	onoffline: true,
   	ononline: true,
   	onpagehide: true,
+  	onpagereveal: true,
   	onpageshow: true,
+  	onpaste: true,
   	onpause: true,
   	onplay: true,
   	onplaying: true,
@@ -13594,6 +13763,7 @@
   	onpointermove: true,
   	onpointerout: true,
   	onpointerover: true,
+  	onpointerrawupdate: true,
   	onpointerup: true,
   	onpopstate: true,
   	onprogress: true,
@@ -13602,44 +13772,61 @@
   	onreset: true,
   	onresize: true,
   	onscroll: true,
+  	onscrollend: true,
   	onsearch: true,
+  	onsecuritypolicyviolation: true,
   	onseeked: true,
   	onseeking: true,
   	onselect: true,
+  	onselectionchange: true,
+  	onselectstart: true,
+  	onslotchange: true,
   	onstalled: true,
   	onstorage: true,
   	onsubmit: true,
   	onsuspend: true,
   	ontimeupdate: true,
   	ontoggle: true,
+  	ontransitioncancel: true,
   	ontransitionend: true,
+  	ontransitionrun: true,
+  	ontransitionstart: true,
   	onunhandledrejection: true,
   	onunload: true,
   	onvolumechange: true,
   	onwaiting: true,
   	onwheel: true,
   	open: false,
-  	openDatabase: false,
   	opener: false,
   	Option: false,
+  	OrientationSensor: false,
   	origin: false,
+  	originAgentCluster: false,
   	OscillatorNode: false,
+  	OTPCredential: false,
   	outerHeight: false,
   	outerWidth: false,
   	OverconstrainedError: false,
+  	PageRevealEvent: false,
   	PageTransitionEvent: false,
   	pageXOffset: false,
   	pageYOffset: false,
   	PannerNode: false,
   	parent: false,
+  	PasswordCredential: false,
   	Path2D: false,
   	PaymentAddress: false,
+  	PaymentManager: false,
+  	PaymentMethodChangeEvent: false,
   	PaymentRequest: false,
   	PaymentRequestUpdateEvent: false,
   	PaymentResponse: false,
   	performance: false,
   	Performance: false,
+  	PerformanceElementTiming: false,
   	PerformanceEntry: false,
+  	PerformanceEventTiming: false,
+  	PerformanceLongAnimationFrameTiming: false,
   	PerformanceLongTaskTiming: false,
   	PerformanceMark: false,
   	PerformanceMeasure: false,
@@ -13649,12 +13836,17 @@
   	PerformanceObserverEntryList: false,
   	PerformancePaintTiming: false,
   	PerformanceResourceTiming: false,
+  	PerformanceScriptTiming: false,
+  	PerformanceServerTiming: false,
   	PerformanceTiming: false,
+  	PeriodicSyncManager: false,
   	PeriodicWave: false,
   	Permissions: false,
   	PermissionStatus: false,
+  	PERSISTENT: false,
   	personalbar: false,
-  	PhotoCapabilities: false,
+  	PictureInPictureEvent: false,
+  	PictureInPictureWindow: false,
   	Plugin: false,
   	PluginArray: false,
   	PointerEvent: false,
@@ -13670,12 +13862,15 @@
   	PresentationRequest: false,
   	print: false,
   	ProcessingInstruction: false,
+  	Profiler: false,
   	ProgressEvent: false,
   	PromiseRejectionEvent: false,
   	prompt: false,
+  	PublicKeyCredential: false,
   	PushManager: false,
   	PushSubscription: false,
   	PushSubscriptionOptions: false,
+  	queryLocalFonts: false,
   	queueMicrotask: false,
   	RadioNodeList: false,
   	Range: false,
@@ -13685,36 +13880,50 @@
   	ReadableStreamBYOBRequest: false,
   	ReadableStreamDefaultController: false,
   	ReadableStreamDefaultReader: false,
-  	registerProcessor: false,
+  	RelativeOrientationSensor: false,
   	RemotePlayback: false,
   	removeEventListener: false,
   	reportError: false,
+  	ReportingObserver: false,
   	Request: false,
   	requestAnimationFrame: false,
   	requestIdleCallback: false,
   	resizeBy: false,
   	ResizeObserver: false,
   	ResizeObserverEntry: false,
+  	ResizeObserverSize: false,
   	resizeTo: false,
   	Response: false,
   	RTCCertificate: false,
   	RTCDataChannel: false,
   	RTCDataChannelEvent: false,
   	RTCDtlsTransport: false,
+  	RTCDTMFSender: false,
+  	RTCDTMFToneChangeEvent: false,
+  	RTCEncodedAudioFrame: false,
+  	RTCEncodedVideoFrame: false,
+  	RTCError: false,
+  	RTCErrorEvent: false,
   	RTCIceCandidate: false,
-  	RTCIceGatherer: false,
   	RTCIceTransport: false,
   	RTCPeerConnection: false,
+  	RTCPeerConnectionIceErrorEvent: false,
   	RTCPeerConnectionIceEvent: false,
-  	RTCRtpContributingSource: false,
   	RTCRtpReceiver: false,
+  	RTCRtpScriptTransform: false,
   	RTCRtpSender: false,
+  	RTCRtpTransceiver: false,
   	RTCSctpTransport: false,
   	RTCSessionDescription: false,
   	RTCStatsReport: false,
   	RTCTrackEvent: false,
+  	scheduler: false,
+  	Scheduler: false,
+  	Scheduling: false,
   	screen: false,
   	Screen: false,
+  	ScreenDetailed: false,
+  	ScreenDetails: false,
   	screenLeft: false,
   	ScreenOrientation: false,
   	screenTop: false,
@@ -13724,12 +13933,17 @@
   	scroll: false,
   	scrollbars: false,
   	scrollBy: false,
+  	ScrollTimeline: false,
   	scrollTo: false,
   	scrollX: false,
   	scrollY: false,
   	SecurityPolicyViolationEvent: false,
   	Selection: false,
   	self: false,
+  	Sensor: false,
+  	SensorErrorEvent: false,
+  	Serial: false,
+  	SerialPort: false,
   	ServiceWorker: false,
   	ServiceWorkerContainer: false,
   	ServiceWorkerRegistration: false,
@@ -13738,21 +13952,31 @@
   	setTimeout: false,
   	ShadowRoot: false,
   	SharedWorker: false,
+  	showDirectoryPicker: false,
+  	showOpenFilePicker: false,
+  	showSaveFilePicker: false,
   	SourceBuffer: false,
   	SourceBufferList: false,
   	speechSynthesis: false,
+  	SpeechSynthesis: false,
+  	SpeechSynthesisErrorEvent: false,
   	SpeechSynthesisEvent: false,
   	SpeechSynthesisUtterance: false,
+  	SpeechSynthesisVoice: false,
   	StaticRange: false,
   	status: false,
   	statusbar: false,
   	StereoPannerNode: false,
   	stop: false,
   	Storage: false,
+  	StorageBucket: false,
+  	StorageBucketManager: false,
   	StorageEvent: false,
   	StorageManager: false,
   	structuredClone: false,
   	styleMedia: false,
+  	StylePropertyMap: false,
+  	StylePropertyMapReadOnly: false,
   	StyleSheet: false,
   	StyleSheetList: false,
   	SubmitEvent: false,
@@ -13780,7 +14004,6 @@
   	SVGComponentTransferFunctionElement: false,
   	SVGDefsElement: false,
   	SVGDescElement: false,
-  	SVGDiscardElement: false,
   	SVGElement: false,
   	SVGEllipseElement: false,
   	SVGFEBlendElement: false,
@@ -13855,18 +14078,27 @@
   	SVGUnitTypes: false,
   	SVGUseElement: false,
   	SVGViewElement: false,
+  	SyncManager: false,
   	TaskAttributionTiming: false,
+  	TaskController: false,
+  	TaskPriorityChangeEvent: false,
+  	TaskSignal: false,
+  	TEMPORARY: false,
   	Text: false,
   	TextDecoder: false,
   	TextDecoderStream: false,
   	TextEncoder: false,
   	TextEncoderStream: false,
   	TextEvent: false,
+  	TextFormat: false,
+  	TextFormatUpdateEvent: false,
   	TextMetrics: false,
   	TextTrack: false,
   	TextTrackCue: false,
   	TextTrackCueList: false,
   	TextTrackList: false,
+  	TextUpdateEvent: false,
+  	TimeEvent: false,
   	TimeRanges: false,
   	ToggleEvent: false,
   	toolbar: false,
@@ -13879,13 +14111,47 @@
   	TransformStreamDefaultController: false,
   	TransitionEvent: false,
   	TreeWalker: false,
+  	TrustedHTML: false,
+  	TrustedScript: false,
+  	TrustedScriptURL: false,
+  	TrustedTypePolicy: false,
+  	TrustedTypePolicyFactory: false,
+  	trustedTypes: false,
   	UIEvent: false,
   	URL: false,
+  	URLPattern: false,
   	URLSearchParams: false,
+  	USB: false,
+  	USBAlternateInterface: false,
+  	USBConfiguration: false,
+  	USBConnectionEvent: false,
+  	USBDevice: false,
+  	USBEndpoint: false,
+  	USBInterface: false,
+  	USBInTransferResult: false,
+  	USBIsochronousInTransferPacket: false,
+  	USBIsochronousInTransferResult: false,
+  	USBIsochronousOutTransferPacket: false,
+  	USBIsochronousOutTransferResult: false,
+  	USBOutTransferResult: false,
+  	UserActivation: false,
   	ValidityState: false,
+  	VideoColorSpace: false,
+  	VideoDecoder: false,
+  	VideoEncoder: false,
+  	VideoFrame: false,
+  	VideoPlaybackQuality: false,
+  	ViewTimeline: false,
+  	ViewTransition: false,
+  	VirtualKeyboard: false,
+  	VirtualKeyboardGeometryChangeEvent: false,
+  	VisibilityStateEntry: false,
   	visualViewport: false,
   	VisualViewport: false,
   	VTTCue: false,
+  	VTTRegion: false,
+  	WakeLock: false,
+  	WakeLockSentinel: false,
   	WaveShaperNode: false,
   	WebAssembly: false,
   	WebGL2RenderingContext: false,
@@ -13906,10 +14172,20 @@
   	WebGLUniformLocation: false,
   	WebGLVertexArrayObject: false,
   	WebSocket: false,
+  	WebTransport: false,
+  	WebTransportBidirectionalStream: false,
+  	WebTransportDatagramDuplexStream: false,
+  	WebTransportError: false,
+  	WebTransportReceiveStream: false,
+  	WebTransportSendStream: false,
+  	WGSLLanguageFeatures: false,
   	WheelEvent: false,
   	window: false,
   	Window: false,
+  	WindowControlsOverlay: false,
+  	WindowControlsOverlayGeometryChangeEvent: false,
   	Worker: false,
+  	Worklet: false,
   	WritableStream: false,
   	WritableStreamDefaultController: false,
   	WritableStreamDefaultWriter: false,
@@ -13922,15 +14198,24 @@
   	XPathExpression: false,
   	XPathResult: false,
   	XRAnchor: false,
+  	XRAnchorSet: false,
   	XRBoundedReferenceSpace: false,
+  	XRCamera: false,
   	XRCPUDepthInformation: false,
   	XRDepthInformation: false,
+  	XRDOMOverlayState: false,
   	XRFrame: false,
+  	XRHitTestResult: false,
+  	XRHitTestSource: false,
   	XRInputSource: false,
   	XRInputSourceArray: false,
   	XRInputSourceEvent: false,
   	XRInputSourcesChangeEvent: false,
+  	XRLayer: false,
+  	XRLightEstimate: false,
+  	XRLightProbe: false,
   	XRPose: false,
+  	XRRay: false,
   	XRReferenceSpace: false,
   	XRReferenceSpaceEvent: false,
   	XRRenderState: false,
@@ -13939,6 +14224,8 @@
   	XRSessionEvent: false,
   	XRSpace: false,
   	XRSystem: false,
+  	XRTransientInputHitTestResult: false,
+  	XRTransientInputHitTestSource: false,
   	XRView: false,
   	XRViewerPose: false,
   	XRViewport: false,
@@ -13948,32 +14235,113 @@
   	XSLTProcessor: false
   };
   const worker = {
+  	AbortController: false,
+  	AbortSignal: false,
   	addEventListener: false,
-  	applicationCache: false,
   	atob: false,
+  	AudioData: false,
+  	AudioDecoder: false,
+  	AudioEncoder: false,
+  	BackgroundFetchManager: false,
+  	BackgroundFetchRecord: false,
+  	BackgroundFetchRegistration: false,
   	Blob: false,
   	BroadcastChannel: false,
   	btoa: false,
   	ByteLengthQueuingStrategy: false,
   	Cache: false,
   	caches: false,
+  	CacheStorage: false,
+  	cancelAnimationFrame: false,
+  	CanvasGradient: false,
+  	CanvasPattern: false,
   	clearInterval: false,
   	clearTimeout: false,
-  	close: true,
+  	close: false,
+  	CloseEvent: false,
   	CompressionStream: false,
   	console: false,
   	CountQueuingStrategy: false,
+  	createImageBitmap: false,
+  	CropTarget: false,
+  	crossOriginIsolated: false,
   	crypto: false,
   	Crypto: false,
   	CryptoKey: false,
+  	CSSSkewX: false,
+  	CSSSkewY: false,
   	CustomEvent: false,
   	DecompressionStream: false,
+  	DedicatedWorkerGlobalScope: false,
+  	dispatchEvent: false,
+  	DOMException: false,
+  	DOMMatrix: false,
+  	DOMMatrixReadOnly: false,
+  	DOMPoint: false,
+  	DOMPointReadOnly: false,
+  	DOMQuad: false,
+  	DOMRect: false,
+  	DOMRectReadOnly: false,
+  	DOMStringList: false,
+  	EncodedAudioChunk: false,
+  	EncodedVideoChunk: false,
   	ErrorEvent: false,
   	Event: false,
+  	EventSource: false,
+  	EventTarget: false,
   	fetch: false,
   	File: false,
+  	FileList: false,
+  	FileReader: false,
   	FileReaderSync: false,
+  	FileSystemDirectoryHandle: false,
+  	FileSystemFileHandle: false,
+  	FileSystemHandle: false,
+  	FileSystemSyncAccessHandle: false,
+  	FileSystemWritableFileStream: false,
+  	FontFace: false,
+  	fonts: false,
   	FormData: false,
+  	GPU: false,
+  	GPUAdapter: false,
+  	GPUAdapterInfo: false,
+  	GPUBindGroup: false,
+  	GPUBindGroupLayout: false,
+  	GPUBuffer: false,
+  	GPUBufferUsage: false,
+  	GPUCanvasContext: false,
+  	GPUColorWrite: false,
+  	GPUCommandBuffer: false,
+  	GPUCommandEncoder: false,
+  	GPUCompilationInfo: false,
+  	GPUCompilationMessage: false,
+  	GPUComputePassEncoder: false,
+  	GPUComputePipeline: false,
+  	GPUDevice: false,
+  	GPUDeviceLostInfo: false,
+  	GPUError: false,
+  	GPUExternalTexture: false,
+  	GPUInternalError: false,
+  	GPUMapMode: false,
+  	GPUOutOfMemoryError: false,
+  	GPUPipelineError: false,
+  	GPUPipelineLayout: false,
+  	GPUQuerySet: false,
+  	GPUQueue: false,
+  	GPURenderBundle: false,
+  	GPURenderBundleEncoder: false,
+  	GPURenderPassEncoder: false,
+  	GPURenderPipeline: false,
+  	GPUSampler: false,
+  	GPUShaderModule: false,
+  	GPUShaderStage: false,
+  	GPUSupportedFeatures: false,
+  	GPUSupportedLimits: false,
+  	GPUTexture: false,
+  	GPUTextureUsage: false,
+  	GPUTextureView: false,
+  	GPUUncapturedErrorEvent: false,
+  	GPUValidationError: false,
   	Headers: false,
   	IDBCursor: false,
   	IDBCursorWithValue: false,
@@ -13986,37 +14354,61 @@
   	IDBRequest: false,
   	IDBTransaction: false,
   	IDBVersionChangeEvent: false,
+  	IdleDetector: false,
+  	ImageBitmap: false,
+  	ImageBitmapRenderingContext: false,
   	ImageData: false,
-  	importScripts: true,
+  	ImageDecoder: false,
+  	ImageTrack: false,
+  	ImageTrackList: false,
+  	importScripts: false,
   	indexedDB: false,
+  	isSecureContext: false,
+  	Iterator: false,
   	location: false,
+  	Lock: false,
+  	LockManager: false,
+  	MediaCapabilities: false,
+  	MediaSource: false,
+  	MediaSourceHandle: false,
   	MessageChannel: false,
   	MessageEvent: false,
   	MessagePort: false,
   	name: false,
+  	NavigationPreloadManager: false,
   	navigator: false,
+  	NavigatorUAData: false,
+  	NetworkInformation: false,
   	Notification: false,
-  	onclose: true,
-  	onconnect: true,
+  	OffscreenCanvas: false,
+  	OffscreenCanvasRenderingContext2D: false,
   	onerror: true,
   	onlanguagechange: true,
   	onmessage: true,
-  	onoffline: true,
-  	ononline: true,
+  	onmessageerror: true,
   	onrejectionhandled: true,
   	onunhandledrejection: true,
+  	origin: false,
+  	Path2D: false,
   	performance: false,
   	Performance: false,
   	PerformanceEntry: false,
   	PerformanceMark: false,
   	PerformanceMeasure: false,
-  	PerformanceNavigation: false,
   	PerformanceObserver: false,
   	PerformanceObserverEntryList: false,
   	PerformanceResourceTiming: false,
-  	PerformanceTiming: false,
-  	postMessage: true,
-  	"Promise": false,
+  	PerformanceServerTiming: false,
+  	PeriodicSyncManager: false,
+  	Permissions: false,
+  	PermissionStatus: false,
+  	PERSISTENT: false,
+  	postMessage: false,
+  	ProgressEvent: false,
+  	PromiseRejectionEvent: false,
+  	PushManager: false,
+  	PushSubscription: false,
+  	PushSubscriptionOptions: false,
   	queueMicrotask: false,
   	ReadableByteStreamController: false,
   	ReadableStream: false,
@@ -14026,29 +14418,105 @@
   	ReadableStreamDefaultReader: false,
   	removeEventListener: false,
   	reportError: false,
+  	ReportingObserver: false,
   	Request: false,
+  	requestAnimationFrame: false,
   	Response: false,
-  	self: true,
+  	RTCEncodedAudioFrame: false,
+  	RTCEncodedVideoFrame: false,
+  	scheduler: false,
+  	Scheduler: false,
+  	SecurityPolicyViolationEvent: false,
+  	self: false,
+  	Serial: false,
+  	SerialPort: false,
   	ServiceWorkerRegistration: false,
   	setInterval: false,
   	setTimeout: false,
+  	SourceBuffer: false,
+  	SourceBufferList: false,
+  	StorageBucket: false,
+  	StorageBucketManager: false,
+  	StorageManager: false,
+  	structuredClone: false,
   	SubtleCrypto: false,
+  	SyncManager: false,
+  	TaskController: false,
+  	TaskPriorityChangeEvent: false,
+  	TaskSignal: false,
+  	TEMPORARY: false,
   	TextDecoder: false,
   	TextDecoderStream: false,
   	TextEncoder: false,
   	TextEncoderStream: false,
+  	TextMetrics: false,
   	TransformStream: false,
   	TransformStreamDefaultController: false,
+  	TrustedHTML: false,
+  	TrustedScript: false,
+  	TrustedScriptURL: false,
+  	TrustedTypePolicy: false,
+  	TrustedTypePolicyFactory: false,
+  	trustedTypes: false,
   	URL: false,
+  	URLPattern: false,
   	URLSearchParams: false,
+  	USB: false,
+  	USBAlternateInterface: false,
+  	USBConfiguration: false,
+  	USBConnectionEvent: false,
+  	USBDevice: false,
+  	USBEndpoint: false,
+  	USBInterface: false,
+  	USBInTransferResult: false,
+  	USBIsochronousInTransferPacket: false,
+  	USBIsochronousInTransferResult: false,
+  	USBIsochronousOutTransferPacket: false,
+  	USBIsochronousOutTransferResult: false,
+  	USBOutTransferResult: false,
+  	UserActivation: false,
+  	VideoColorSpace: false,
+  	VideoDecoder: false,
+  	VideoEncoder: false,
+  	VideoFrame: false,
   	WebAssembly: false,
+  	WebGL2RenderingContext: false,
+  	WebGLActiveInfo: false,
+  	WebGLBuffer: false,
+  	WebGLContextEvent: false,
+  	WebGLFramebuffer: false,
+  	WebGLProgram: false,
+  	WebGLQuery: false,
+  	WebGLRenderbuffer: false,
+  	WebGLRenderingContext: false,
+  	WebGLSampler: false,
+  	WebGLShader: false,
+  	WebGLShaderPrecisionFormat: false,
+  	WebGLSync: false,
+  	WebGLTexture: false,
+  	WebGLTransformFeedback: false,
+  	WebGLUniformLocation: false,
+  	WebGLVertexArrayObject: false,
+  	webkitRequestFileSystem: false,
+  	webkitRequestFileSystemSync: false,
+  	webkitResolveLocalFileSystemSyncURL: false,
+  	webkitResolveLocalFileSystemURL: false,
   	WebSocket: false,
+  	WebTransport: false,
+  	WebTransportBidirectionalStream: false,
+  	WebTransportDatagramDuplexStream: false,
+  	WebTransportError: false,
+  	WGSLLanguageFeatures: false,
   	Worker: false,
   	WorkerGlobalScope: false,
+  	WorkerLocation: false,
+  	WorkerNavigator: false,
   	WritableStream: false,
   	WritableStreamDefaultController: false,
   	WritableStreamDefaultWriter: false,
-  	XMLHttpRequest: false
+  	XMLHttpRequest: false,
+  	XMLHttpRequestEventTarget: false,
+  	XMLHttpRequestUpload: false
   };
   const node = {
   	__dirname: false,
@@ -14081,12 +14549,14 @@
   	FormData: false,
   	global: false,
   	Headers: false,
-  	"Intl": false,
   	MessageChannel: false,
   	MessageEvent: false,
   	MessagePort: false,
   	module: false,
+  	navigator: false,
+  	Navigator: false,
   	performance: false,
+  	Performance: false,
   	PerformanceEntry: false,
   	PerformanceMark: false,
   	PerformanceMeasure: false,
@@ -14150,11 +14620,13 @@
   	FormData: false,
   	global: false,
   	Headers: false,
-  	"Intl": false,
   	MessageChannel: false,
   	MessageEvent: false,
   	MessagePort: false,
+  	navigator: false,
+  	Navigator: false,
   	performance: false,
+  	Performance: false,
   	PerformanceEntry: false,
   	PerformanceMark: false,
   	PerformanceMeasure: false,
@@ -14251,12 +14723,9 @@
   	beforeEach: false,
   	describe: false,
   	expect: false,
-  	fdescribe: false,
   	fit: false,
   	it: false,
   	jest: false,
-  	pit: false,
-  	require: false,
   	test: false,
   	xdescribe: false,
   	xit: false,
@@ -14385,6 +14854,7 @@
   	exit: false,
   	find: false,
   	grep: false,
+  	head: false,
   	ln: false,
   	ls: false,
   	mkdir: false,
@@ -14395,10 +14865,13 @@
   	rm: false,
   	sed: false,
   	set: false,
-  	target: false,
+  	ShellString: false,
+  	sort: false,
+  	tail: false,
   	tempdir: false,
   	test: false,
   	touch: false,
+  	uniq: false,
   	which: false
   };
   const prototypejs = {
@@ -14614,7 +15087,6 @@
   	PerformanceResourceTiming: false,
   	PerformanceTiming: false,
   	postMessage: true,
-  	"Promise": false,
   	queueMicrotask: false,
   	ReadableByteStreamController: false,
   	ReadableStream: false,
@@ -14813,11 +15285,13 @@
   	File: false,
   	FormData: false,
   	Headers: false,
-  	"Intl": false,
   	MessageChannel: false,
   	MessageEvent: false,
   	MessagePort: false,
+  	navigator: false,
+  	Navigator: false,
   	performance: false,
+  	Performance: false,
   	PerformanceEntry: false,
   	PerformanceMark: false,
   	PerformanceMeasure: false,
@@ -15026,12 +15500,21 @@
   }
 
   /**
-   * True if the node parsed is the root one
+   * True if the node parsed any of the root nodes (each, tag bindings create root nodes as well...)
    * @param   {RiotParser.Node} node - riot parser node
    * @returns {boolean} true only for the root nodes
    */
   function isRootNode(node) {
     return node.isRoot
+  }
+
+  /**
+   * True if the node parsed is the absolute root node (nested root nodes are not considered)
+   * @param   {RiotParser.Node} node - riot parser node
+   * @returns {boolean} true only for the root nodes
+   */
+  function isAbsoluteRootNode(node) {
+    return node.isRoot && !node.isNestedRoot
   }
 
   /**
@@ -15256,7 +15739,7 @@
             // Custom nodes can't handle boolean attrs
             // Riot.js will handle the bool attrs logic only on native html tags
             (!parentNode[IS_CUSTOM_NODE] &&
-              !isRootNode(parentNode) &&
+              !isAbsoluteRootNode(parentNode) &&
               !isSpread &&
               !!sourceNode[IS_BOOLEAN_ATTRIBUTE]),
         ),
@@ -19364,12 +19847,14 @@
   		    // Consume `import` as an identifier for `import.meta`.
   		    // Because `this.parseIdent(true)` doesn't check escape sequences, it needs the check of `this.containsEsc`.
   		    if (this.containsEsc) { this.raiseRecoverable(this.start, "Escape sequence in keyword import"); }
-  		    var meta = this.parseIdent(true);
+  		    this.next();
 
   		    if (this.type === types$1.parenL && !forNew) {
   		      return this.parseDynamicImport(node)
   		    } else if (this.type === types$1.dot) {
-  		      node.meta = meta;
+  		      var meta = this.startNodeAt(node.start, node.loc && node.loc.start);
+  		      meta.name = "import";
+  		      node.meta = this.finishNode(meta, "Identifier");
   		      return this.parseImportMeta(node)
   		    } else {
   		      this.unexpected();
@@ -19519,7 +20004,7 @@
   		    var node = this.startNode();
   		    this.next();
   		    if (this.options.ecmaVersion >= 6 && this.type === types$1.dot) {
-  		      var meta = this.startNodeAt(node.start, node.startLoc);
+  		      var meta = this.startNodeAt(node.start, node.loc && node.loc.start);
   		      meta.name = "new";
   		      node.meta = this.finishNode(meta, "Identifier");
   		      this.next();
@@ -22347,7 +22832,7 @@
   		  // [walk]: util/walk.js
 
 
-  		  var version = "8.11.2";
+  		  var version = "8.11.3";
 
   		  Parser.acorn = {
   		    Parser: Parser,
@@ -22372,11 +22857,10 @@
   		  };
 
   		  // The main exported interface (under `self.acorn` when in the
-  		  // browser) is a `parse` function that takes a code string and
-  		  // returns an abstract syntax tree as specified by [Mozilla parser
-  		  // API][api].
+  		  // browser) is a `parse` function that takes a code string and returns
+  		  // an abstract syntax tree as specified by the [ESTree spec][estree].
   		  //
-  		  // [api]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Parser_API
+  		  // [estree]: https://github.com/estree/estree
 
   		  function parse(input, options) {
   		    return Parser.parse(input, options)
@@ -22872,6 +23356,7 @@
   function createNestedRootNode(node) {
     return {
       ...rootNodeFactory(node),
+      isNestedRoot: true,
       attributes: cleanAttributes(node),
     }
   }
@@ -27082,7 +27567,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.1.4';
+  const version = 'v9.1.5';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
