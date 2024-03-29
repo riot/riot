@@ -66,17 +66,17 @@
     "@riotjs/dom-bindings": "^9.0.4"
   },
   "devDependencies": {
-    "@riotjs/compiler": "^9.0.7",
+    "@riotjs/compiler": "^9.0.8",
     "@riotjs/prettier-config": "^1.1.0",
     "@riotjs/register": "^9.0.0",
     "@riotjs/util": "^2.2.4",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@testing-library/user-event": "^14.5.2",
-    "@wdio/cli": "^8.34.0",
-    "@wdio/local-runner": "^8.34.0",
-    "@wdio/mocha-framework": "^8.33.1",
-    "@wdio/sauce-service": "^8.34.0",
+    "@wdio/cli": "^8.35.1",
+    "@wdio/local-runner": "^8.35.1",
+    "@wdio/mocha-framework": "^8.35.0",
+    "@wdio/sauce-service": "^8.35.1",
     "@wdio/spec-reporter": "^8.32.4",
     "bianco.attr": "^1.1.1",
     "bianco.query": "^1.1.4",
@@ -89,15 +89,15 @@
     "eslint-plugin-import": "^2.29.1",
     "jsdom": "^24.0.0",
     "jsdom-global": "^3.0.2",
-    "mocha": "^10.3.0",
+    "mocha": "^10.4.0",
     "prettier": "^3.2.5",
-    "rollup": "^4.13.0",
+    "rollup": "^4.13.2",
     "rollup-plugin-riot": "^9.0.2",
     "serve": "^14.2.1",
     "sinon": "^17.0.1",
     "sinon-chai": "^3.7.0",
     "start-server-and-test": "^2.0.3",
-    "terser": "^5.29.2",
-    "typescript": "^5.4.2"
+    "terser": "^5.30.0",
+    "typescript": "^5.4.3"
   }
 }

@@ -1,3 +1,1 @@
-test/vendor
-test/performance/db-monster
-test/performance/riot.*.js
+/test/e2e/test.bundle.js
