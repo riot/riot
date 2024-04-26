@@ -5,6 +5,11 @@ import {
   AttributeExpressionData,
   ExpressionType,
   BindingType,
+  template,
+  createBinding,
+  createExpression,
+  bindingTypes,
+  expressionTypes,
 } from '@riotjs/dom-bindings'
 
 // Internal Types and shortcuts
@@ -201,3 +206,38 @@ export declare function withTypes<
     Component
   >,
 ): Component
+
+/**
+ * Internal stuff exposed for advanced use cases
+ * IMPORTANT:
+ * The things exposed under __ are not part of the official API and might break at any time
+ * Use it at your own risk!
+ */
+
+export interface CSSManager {
+  CSS_BY_NAME: Map<string, string>
+  add: (name: string, css: string) => CSSManager
+  inject: () => CSSManager
+  remove: (name: string) => CSSManager
+}
+
+export declare const __: {
+  cssManager: CSSManager
+  DOMBindings: {
+    template
+    createBinding
+    createExpression
+    bindingTypes
+    expressionTypes
+  }
+  globals: {
+    PROPS_KEY: string
+    STATE_KEY: string
+    IS_COMPONENT_UPDATING: Symbol
+    ATTRIBUTES_KEY_SYMBOL: Symbol
+    PARENT_KEY_SYMBOL: Symbol
+    DOM_COMPONENT_INSTANCE_PROPERTY: Symbol
+    COMPONENTS_IMPLEMENTATION_MAP: RegisteredComponentsMap
+    PLUGINS_SET: InstalledPluginsSet
+  }
+}
