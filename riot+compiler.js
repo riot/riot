@@ -1,4 +1,4 @@
-/* Riot v9.1.5, @license MIT */
+/* Riot v9.1.6, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -24587,7 +24587,8 @@
    * @const {RegExp}
    */
 
-  const CSS_SELECTOR_LIST = /([^,]+)(?::\w+(?:[\s|\S]*?\))?(?:[^,:]*)?)+|([^,]+)/g;
+  const CSS_SELECTOR_LIST =
+    /([^,]+)(?::(?!host)\w+(?:[\s|\S]*?\))?(?:[^,:]*)?)+|([^,]+)/g;
 
   /**
    * Scope the css selectors prefixing them with the tag name
@@ -27197,7 +27198,7 @@
    */
   const getRootComputedAttributeNames = memoize$1(
     (template) =>
-      template?.bindingsData?.[0].expressions?.reduce(
+      template?.bindingsData?.[0]?.expressions?.reduce(
         (acc, { name, type }) =>
           type === expressionTypes.ATTRIBUTE ? [...acc, name] : acc,
         [],
@@ -27567,7 +27568,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.1.5';
+  const version = 'v9.1.6';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
@@ -27580,6 +27581,12 @@
       expressionTypes,
     },
     globals: {
+      PROPS_KEY,
+      STATE_KEY,
+      IS_COMPONENT_UPDATING,
+      ATTRIBUTES_KEY_SYMBOL,
+      COMPONENTS_IMPLEMENTATION_MAP,
+      PLUGINS_SET,
       DOM_COMPONENT_INSTANCE_PROPERTY,
       PARENT_KEY_SYMBOL,
     },
