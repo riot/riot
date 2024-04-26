@@ -2,6 +2,7 @@ import * as riot from '../../src/riot.js'
 
 import Issue2895Parent from '../components/issue-2895-parent.riot'
 import Issue2994ClassDuplication from '../components/issue-2994-class-duplication.riot'
+import Issue3003Parent from '../components/issue-3003-parent.riot'
 import MergeAttributes from '../components/merge-attributes.riot'
 import VirtualEach from '../components/virtual-each.riot'
 
@@ -66,5 +67,16 @@ describe('components rendering', () => {
     })
 
     expect(element.getAttribute('class').trim()).to.be.equal('btn  dropdown')
+
+    component.unmount()
+  })
+
+  it('nested static components can be rendered without errors', () => {
+    const element = document.createElement('issue-3003-parent')
+    const component = riot.component(Issue3003Parent)(element)
+
+    expect(() => component.update()).to.not.throw()
+
+    component.unmount()
   })
 })

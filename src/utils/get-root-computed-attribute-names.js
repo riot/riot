@@ -9,7 +9,7 @@ import { memoize } from '@riotjs/util'
  */
 export const getRootComputedAttributeNames = memoize(
   (template) =>
-    template?.bindingsData?.[0].expressions?.reduce(
+    template?.bindingsData?.[0]?.expressions?.reduce(
       (acc, { name, type }) =>
         type === expressionTypes.ATTRIBUTE ? [...acc, name] : acc,
       [],
