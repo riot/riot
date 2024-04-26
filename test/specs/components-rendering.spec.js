@@ -2,6 +2,7 @@ import * as riot from '../../src/riot.js'
 
 import Issue2895Parent from '../components/issue-2895-parent.riot'
 import Issue2994ClassDuplication from '../components/issue-2994-class-duplication.riot'
+import Issue2994ClassDuplicationNestedExpression from '../components/issue-2994-class-duplication-nested-expression.riot'
 import Issue3003Parent from '../components/issue-3003-parent.riot'
 import MergeAttributes from '../components/merge-attributes.riot'
 import VirtualEach from '../components/virtual-each.riot'
@@ -67,6 +68,26 @@ describe('components rendering', () => {
     })
 
     expect(element.getAttribute('class').trim()).to.be.equal('btn  dropdown')
+
+    component.unmount()
+  })
+
+  it('the class attribute should be available as component prop (https://github.com/riot/riot/issues/3003#issuecomment-2080160160)', () => {
+    const element = document.createElement(
+      'issue-2994-class-duplication-nested-expression',
+    )
+    element.classList.add('btn')
+
+    const component = riot.component(Issue2994ClassDuplicationNestedExpression)(
+      element,
+    )
+
+    expect(component.props.class).to.be.equal('btn')
+
+    element.classList.add('dropdown')
+    component.update()
+
+    expect(component.props.class).to.be.equal('btn dropdown')
 
     component.unmount()
   })

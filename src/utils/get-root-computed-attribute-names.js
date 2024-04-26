@@ -7,11 +7,17 @@ import { memoize } from '@riotjs/util'
  * @param {TemplateChunk} template - template instance
  * @return {[]} list of attribute names that will be computed by the template expressions
  */
-export const getRootComputedAttributeNames = memoize(
-  (template) =>
-    template?.bindingsData?.[0]?.expressions?.reduce(
+export const getRootComputedAttributeNames = memoize((template) => {
+  const firstBinding = template?.bindingsData?.[0]
+
+  // if the first binding has the selector attribute it means that it doesn't belong to the root node
+  if (firstBinding?.selector) return []
+
+  return (
+    firstBinding?.expressions?.reduce(
       (acc, { name, type }) =>
         type === expressionTypes.ATTRIBUTE ? [...acc, name] : acc,
       [],
-    ) ?? [],
-)
+    ) ?? []
+  )
+})
