@@ -224,11 +224,11 @@ export interface CSSManager {
 export declare const __: {
   cssManager: CSSManager
   DOMBindings: {
-    template
-    createBinding
-    createExpression
-    bindingTypes
-    expressionTypes
+    template: typeof template
+    createBinding: typeof createBinding
+    createExpression: typeof createBinding
+    bindingTypes: typeof bindingTypes
+    expressionTypes: typeof expressionTypes
   }
   globals: {
     PROPS_KEY: string
