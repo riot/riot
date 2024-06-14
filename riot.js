@@ -1,4 +1,4 @@
-/* Riot v9.1.6, @license MIT */
+/* Riot v9.1.7, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -351,6 +351,20 @@
     });
 
     return source
+  }
+
+  /**
+   * Like Array.prototype.filter but for objects
+   * @param {Object} source - target object
+   * @param {Funciton} filter - filter function
+   * @return {Object} filtered source or the original source received
+   */
+  function filter(source, filter) {
+    return isObject(source)
+      ? Object.fromEntries(
+          Object.entries(source).filter(([key, value]) => filter(key, value)),
+        )
+      : source
   }
 
   // Components without template use a mocked template interface with some basic functionalities to
@@ -2056,14 +2070,20 @@
    * @param {TemplateChunk} template - template instance
    * @return {[]} list of attribute names that will be computed by the template expressions
    */
-  const getRootComputedAttributeNames = memoize(
-    (template) =>
-      template?.bindingsData?.[0]?.expressions?.reduce(
+  const getRootComputedAttributeNames = memoize((template) => {
+    const firstBinding = template?.bindingsData?.[0];
+
+    // if the first binding has the selector attribute it means that it doesn't belong to the root node
+    if (firstBinding?.selector) return []
+
+    return (
+      firstBinding?.expressions?.reduce(
         (acc, { name, type }) =>
           type === expressionTypes.ATTRIBUTE ? [...acc, name] : acc,
         [],
-      ) ?? [],
-  );
+      ) ?? []
+    )
+  });
 
   /**
    * Component creation factory function that will enhance the user provided API
@@ -2137,7 +2157,8 @@
               const staticRootAttributes = Array.from(
                 this[ROOT_KEY].attributes,
               ).filter(({ name }) => !computedAttributeNames.includes(name));
-              // evaluate the
+
+              // evaluate the value of the static dom attributes
               const domNodeAttributes = DOMattributesToObject({
                 attributes: staticRootAttributes,
               });
@@ -2150,7 +2171,6 @@
                   this[ATTRIBUTES_KEY_SYMBOL].expressions,
                 ),
               };
-
               if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false)
                 return
 
@@ -2160,7 +2180,11 @@
                 Object.freeze({
                   // only root components will merge their initial props with the new ones
                   // children components will just get them overridden see also https://github.com/riot/riot/issues/2978
-                  ...(parentScope ? null : this[PROPS_KEY]),
+                  ...(parentScope
+                    ? filter(this[PROPS_KEY], (key) =>
+                        computedAttributeNames.includes(key),
+                      )
+                    : this[PROPS_KEY]),
                   ...newProps,
                 }),
               );
@@ -2495,7 +2519,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.1.6';
+  const version = 'v9.1.7';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
