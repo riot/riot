@@ -21,6 +21,7 @@ import {
   evaluateAttributeExpressions,
   isFunction,
   isObject,
+  filter,
   DOMattributesToObject,
 } from '@riotjs/util'
 
@@ -105,7 +106,8 @@ export function manageComponentLifecycle(
             const staticRootAttributes = Array.from(
               this[ROOT_KEY].attributes,
             ).filter(({ name }) => !computedAttributeNames.includes(name))
-            // evaluate the
+
+            // evaluate the value of the static dom attributes
             const domNodeAttributes = DOMattributesToObject({
               attributes: staticRootAttributes,
             })
@@ -118,7 +120,6 @@ export function manageComponentLifecycle(
                 this[ATTRIBUTES_KEY_SYMBOL].expressions,
               ),
             }
-
             if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false)
               return
 
@@ -128,7 +129,11 @@ export function manageComponentLifecycle(
               Object.freeze({
                 // only root components will merge their initial props with the new ones
                 // children components will just get them overridden see also https://github.com/riot/riot/issues/2978
-                ...(parentScope ? null : this[PROPS_KEY]),
+                ...(parentScope
+                  ? filter(this[PROPS_KEY], (key) =>
+                      computedAttributeNames.includes(key),
+                    )
+                  : this[PROPS_KEY]),
                 ...newProps,
               }),
             )
