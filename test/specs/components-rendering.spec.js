@@ -2,6 +2,7 @@ import * as riot from '../../src/riot.js'
 
 import Issue2895Parent from '../components/issue-2895-parent.riot'
 import Issue2994ClassDuplication from '../components/issue-2994-class-duplication.riot'
+import Issue3011MissingCssClass from '../components/issue-3011-missing-css-class.riot'
 import Issue2994ClassDuplicationNestedExpression from '../components/issue-2994-class-duplication-nested-expression.riot'
 import Issue3003Parent from '../components/issue-3003-parent.riot'
 import MergeAttributes from '../components/merge-attributes.riot'
@@ -59,15 +60,37 @@ describe('components rendering', () => {
     const element = document.createElement('issue-2994-class-duplication')
     const component = riot.component(Issue2994ClassDuplication)(element, {
       dropdown: false,
+      class: 'custom',
     })
 
-    expect(element.getAttribute('class').trim()).to.be.equal('btn')
+    expect(element.getAttribute('class').trim()).to.be.equal('btn custom')
 
     component.update({
       dropdown: true,
+      class: 'custom',
     })
 
-    expect(element.getAttribute('class').trim()).to.be.equal('btn  dropdown')
+    expect(element.getAttribute('class').trim()).to.be.equal(
+      'btn custom dropdown',
+    )
+
+    component.unmount()
+  })
+
+  it('the class attribute should persist in nested tags https://github.com/riot/riot/issues/3011', () => {
+    const element = document.createElement('issue-3011-missing-css-class')
+    const component = riot.component(Issue3011MissingCssClass)(element)
+    const nestedComponent = component.$('class-duplication')
+
+    expect(nestedComponent.getAttribute('class').trim()).to.be.equal(
+      'btn custom',
+    )
+
+    component.update()
+
+    expect(nestedComponent.getAttribute('class').trim()).to.be.equal(
+      'btn custom',
+    )
 
     component.unmount()
   })
