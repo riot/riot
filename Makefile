@@ -53,7 +53,7 @@ e2e-test:
 	@ $(START_SERVER_AND_TEST) $(SERVE) 3000  "$(WDIO) run ./wdio.conf.js"
 
 lint:
-    # check if the code looks pretty
+	# check if the code looks pretty
 	@ $(PRETTIER) --check ./
 	# check code style
 	@ $(ESLINT) src test
