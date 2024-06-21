@@ -1,4 +1,4 @@
-/* Riot v9.1.7, @license MIT */
+/* Riot v9.1.8, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -354,16 +354,14 @@
   }
 
   /**
-   * Like Array.prototype.filter but for objects
+   * Generate a new object picking only the properties from a given array
    * @param {Object} source - target object
-   * @param {Funciton} filter - filter function
-   * @return {Object} filtered source or the original source received
+   * @param {Array} keys - list of keys that we want to copy over to the new object
+   * @return {Object} a new object conaining only the keys that we have picked from the keys array list
    */
-  function filter(source, filter) {
+  function pick(source, keys) {
     return isObject(source)
-      ? Object.fromEntries(
-          Object.entries(source).filter(([key, value]) => filter(key, value)),
-        )
+      ? Object.fromEntries(keys.map((key) => [key, source[key]]))
       : source
   }
 
@@ -2079,7 +2077,7 @@
     return (
       firstBinding?.expressions?.reduce(
         (acc, { name, type }) =>
-          type === expressionTypes.ATTRIBUTE ? [...acc, name] : acc,
+          type === expressionTypes.ATTRIBUTE ? acc.concat([name]) : acc,
         [],
       ) ?? []
     )
@@ -2181,9 +2179,7 @@
                   // only root components will merge their initial props with the new ones
                   // children components will just get them overridden see also https://github.com/riot/riot/issues/2978
                   ...(parentScope
-                    ? filter(this[PROPS_KEY], (key) =>
-                        computedAttributeNames.includes(key),
-                      )
+                    ? pick(this[PROPS_KEY], computedAttributeNames)
                     : this[PROPS_KEY]),
                   ...newProps,
                 }),
@@ -2519,7 +2515,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.1.7';
+  const version = 'v9.1.8';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
