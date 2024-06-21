@@ -16,7 +16,7 @@ export const getRootComputedAttributeNames = memoize((template) => {
   return (
     firstBinding?.expressions?.reduce(
       (acc, { name, type }) =>
-        type === expressionTypes.ATTRIBUTE ? [...acc, name] : acc,
+        type === expressionTypes.ATTRIBUTE ? acc.concat([name]) : acc,
       [],
     ) ?? []
   )

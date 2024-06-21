@@ -21,7 +21,7 @@ import {
   evaluateAttributeExpressions,
   isFunction,
   isObject,
-  filter,
+  pick,
   DOMattributesToObject,
 } from '@riotjs/util'
 
@@ -130,9 +130,7 @@ export function manageComponentLifecycle(
                 // only root components will merge their initial props with the new ones
                 // children components will just get them overridden see also https://github.com/riot/riot/issues/2978
                 ...(parentScope
-                  ? filter(this[PROPS_KEY], (key) =>
-                      computedAttributeNames.includes(key),
-                    )
+                  ? pick(this[PROPS_KEY], computedAttributeNames)
                   : this[PROPS_KEY]),
                 ...newProps,
               }),

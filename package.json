@@ -69,15 +69,15 @@
     "@riotjs/compiler": "^9.0.9",
     "@riotjs/prettier-config": "^1.1.0",
     "@riotjs/register": "^9.1.0",
-    "@riotjs/util": "^2.3.0",
+    "@riotjs/util": "^2.4.0",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@testing-library/user-event": "^14.5.2",
-    "@wdio/cli": "^8.38.2",
-    "@wdio/local-runner": "^8.38.2",
-    "@wdio/mocha-framework": "^8.38.2",
-    "@wdio/sauce-service": "^8.38.2",
-    "@wdio/spec-reporter": "^8.38.2",
+    "@wdio/cli": "^8.39.0",
+    "@wdio/local-runner": "^8.39.0",
+    "@wdio/mocha-framework": "^8.39.0",
+    "@wdio/sauce-service": "^8.39.0",
+    "@wdio/spec-reporter": "^8.39.0",
     "bianco.attr": "^1.1.1",
     "bianco.query": "^1.1.4",
     "c8": "^10.1.2",
@@ -98,6 +98,6 @@
     "sinon-chai": "^3.7.0",
     "start-server-and-test": "^2.0.4",
     "terser": "^5.31.1",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.2"
   }
 }
