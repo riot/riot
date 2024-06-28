@@ -1,4 +1,3 @@
-
 # if no "v" var given, default to package version
 v ?= $(shell node -pe "require('./package.json').version")
 
@@ -53,7 +52,8 @@ e2e-test:
 	@ $(START_SERVER_AND_TEST) $(SERVE) 3000  "$(WDIO) run ./wdio.conf.js"
 
 lint:
-    # check if the code looks pretty
+	@ test -n "$$SAUCE_USERNAME" || (echo "not set"; exit 1)
+	# check if the code looks pretty
 	@ $(PRETTIER) --check ./
 	# check code style
 	@ $(ESLINT) src test
