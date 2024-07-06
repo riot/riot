@@ -66,7 +66,7 @@
     "@riotjs/dom-bindings": "^9.0.4"
   },
   "devDependencies": {
-    "@riotjs/compiler": "^9.1.1",
+    "@riotjs/compiler": "^9.1.2",
     "@riotjs/prettier-config": "^1.1.0",
     "@riotjs/register": "^9.1.0",
     "@riotjs/util": "^2.4.0",
