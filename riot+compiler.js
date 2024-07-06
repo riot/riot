@@ -1,4 +1,4 @@
-/* Riot v9.2.0, @license MIT */
+/* Riot v9.2.1, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -25385,11 +25385,11 @@
 
     traverse(ast, (node) => {
       if (!node.selector.trim().startsWith('@')) {
+        // the css parser doesn't detect the comments so we manually remove them
+        const selector = node.selector.replace(R_MLCOMMS, '');
+
         // replace the selector and override the original css
-        css = css.replace(
-          node.selector.trim(),
-          addScopeToSelectorList(tag, node.selector),
-        );
+        css = css.replace(node.selector, addScopeToSelectorList(tag, selector));
         // stop the recurstion
         return false
       }
@@ -28337,7 +28337,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.2.0';
+  const version = 'v9.2.1';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
