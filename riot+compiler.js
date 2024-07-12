@@ -1,4 +1,4 @@
-/* Riot v9.2.1, @license MIT */
+/* Riot v9.2.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -25300,6 +25300,23 @@
       : { code }
   }
 
+  /**
+   * Replace a text chunk in a range
+   * @param {string} originalString - the text we need to patch
+   * @param {number} start - the start offset where the string should be replaced
+   * @param {number} end - the end where the string replacement should finish
+   * @param {string} replacement - the string we need to insert
+   * @return {string} the original text patched with the replacement string
+   */
+  function replaceInRange(
+    originalString,
+    start,
+    end,
+    replacement,
+  ) {
+    return `${originalString.substring(0, start)}${replacement}${originalString.substring(end)}`
+  }
+
   const HOST = ':host';
   const DISABLED_SELECTORS = ['from', 'to'];
 
@@ -25313,9 +25330,10 @@
   /**
    * Matches the list of css selectors excluding the pseudo selectors
    * @const {RegExp}
+   * @static
    */
 
-  const CSS_SELECTOR_LIST =
+  const R_CSS_SELECTOR_LIST =
     /([^,]+)(?::(?!host)\w+(?:[\s|\S]*?\))?(?:[^,:]*)?)+|([^,]+)/g;
 
   /**
@@ -25325,7 +25343,7 @@
    * @returns {string} scoped selectors
    */
   function addScopeToSelectorList(tag, selectorList) {
-    return selectorList.replace(CSS_SELECTOR_LIST, (match, selector) => {
+    return selectorList.replace(R_CSS_SELECTOR_LIST, (match, selector) => {
       const trimmedMatch = match.trim();
       const trimmedSelector = selector ? selector.trim() : trimmedMatch;
       // skip selectors already using the tag name
@@ -25365,7 +25383,7 @@
     const { children } = ast;
 
     children.forEach((child) => {
-      // if fn returns false we stop the recurstion
+      // if fn returns false we stop the recursion
       if (fn(child) !== false) traverse(child, fn);
     });
 
@@ -25382,15 +25400,25 @@
    */
   function generateScopedCss(tag, css) {
     const ast = Parser.parse(css);
+    const originalCssLength = css.length;
 
     traverse(ast, (node) => {
+      // calculate the selector offset from the original css length
+      const newSelectorOffset = css.length - originalCssLength;
+
       if (!node.selector.trim().startsWith('@')) {
         // the css parser doesn't detect the comments so we manually remove them
         const selector = node.selector.replace(R_MLCOMMS, '');
 
         // replace the selector and override the original css
-        css = css.replace(node.selector, addScopeToSelectorList(tag, selector));
-        // stop the recurstion
+        css = replaceInRange(
+          css,
+          node.selectorIndex + newSelectorOffset,
+          node.selectorIndexEnd + newSelectorOffset,
+          addScopeToSelectorList(tag, selector),
+        );
+
+        // stop the recursion
         return false
       }
     });
@@ -28337,7 +28365,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.2.1';
+  const version = 'v9.2.2';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
