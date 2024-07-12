@@ -129,19 +129,19 @@ Following the steps below you should be able to properly submit your patch to th
 #### 1) Clone the repo and browse to the riot folder
 
 ```shell
-$ git clone git@github.com:riot/riot.git && cd riot
+git clone git@github.com:riot/riot.git && cd riot
 ```
 
 #### 2) Set up your git branch
 
 ```shell
-$ git checkout -b feature/my-awesome-patch
+git checkout -b feature/my-awesome-patch
 ```
 
 #### 3) Install the npm dependencies
 
 ```shell
-$ npm i
+npm i
 ```
 
 #### 4) Build and test riot using the Makefile
@@ -178,7 +178,7 @@ Many thanks to all smart people from all over the world who helped improving it.
 
 ## Official Website
 
-https://riot.js.org
+<https://riot.js.org>
 
 ## Backers
 
@@ -194,15 +194,10 @@ Become a sponsor to get your logo on our README. [Become a sponsor][support-url]
 
 ## Thanks
 
-Special thanks to Browserstack and JetBrains for their support
+Special thanks to Browserstack for their support
 
 <table cellpadding="8">
     <tr>
-        <td>
-          <a href='https://www.jetbrains.com/?from=riotjs'>
-            <img width='70px' src="https://cdn.worldvectorlogo.com/logos/jetbrains-1.svg" alt="jetbrains">
-          </a>
-        </td>
         <td>
           <a href='https://www.browserstack.com/?from=riotjs'>
             <img width='70px' src="https://cdn.worldvectorlogo.com/logos/browserstack.svg" alt="browser stack">
@@ -228,8 +223,6 @@ Special thanks to Browserstack and JetBrains for their support
 [slack-ja-url]: https://riot-jp-slackin.herokuapp.com/
 [codeclimate-image]: https://api.codeclimate.com/v1/badges/b81ddf3c77e8189876da/maintainability
 [codeclimate-url]: https://codeclimate.com/github/riot/riot
-[donations-campaign-url]: https://pledgie.com/campaigns/31139
-[donations-campaign-image]: https://pledgie.com/campaigns/31139.png?skin_name=chrome
 [jsdelivr-image]: https://data.jsdelivr.com/v1/package/npm/riot/badge
 [jsdelivr-url]: https://www.jsdelivr.com/package/npm/riot
 [backer-url]: #backers
