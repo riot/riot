@@ -66,7 +66,7 @@
     "@riotjs/dom-bindings": "^9.0.4"
   },
   "devDependencies": {
-    "@riotjs/compiler": "^9.1.2",
+    "@riotjs/compiler": "^9.1.3",
     "@riotjs/prettier-config": "^1.1.0",
     "@riotjs/register": "^9.1.0",
     "@riotjs/util": "^2.4.0",
@@ -91,13 +91,13 @@
     "jsdom-global": "^3.0.2",
     "mocha": "^10.6.0",
     "prettier": "^3.3.2",
-    "rollup": "^4.18.0",
+    "rollup": "^4.18.1",
     "rollup-plugin-riot": "^9.0.2",
     "serve": "^14.2.3",
     "sinon": "^18.0.0",
     "sinon-chai": "^3.7.0",
     "start-server-and-test": "^2.0.4",
-    "terser": "^5.31.1",
+    "terser": "^5.31.2",
     "typescript": "^5.5.3"
   }
 }
