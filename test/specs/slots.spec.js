@@ -10,6 +10,7 @@ import NestedSlot from '../components/nested-slot.riot'
 import ParentWithSlotsComponent from '../components/parent-with-slots.riot'
 import SimpleSlot from '../components/simple-slot.riot'
 import TemplateSlot from '../components/template-slot.riot'
+import Issue3014SlotFallback from '../components/issue-3014.riot'
 
 import { expect } from 'chai'
 
@@ -184,6 +185,17 @@ describe('slots', () => {
       normalizeInnerHTML(component.$('simple-slot').innerHTML),
     ).to.be.equal('hello')
     expect(component.$('template')).to.be.not.ok
+
+    component.unmount()
+  })
+
+  it('slots fallback expressions can be properly rendered (https://github.com/riot/riot/issues/3014)', () => {
+    const element = document.createElement('issue-3014')
+    const component = riot.component(Issue3014SlotFallback)(element)
+
+    expect(normalizeInnerHTML(component.root.innerHTML)).to.be.equal(
+      'Default content',
+    )
 
     component.unmount()
   })
