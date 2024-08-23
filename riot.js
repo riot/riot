@@ -1,4 +1,4 @@
-/* Riot v9.2.2, @license MIT */
+/* Riot v9.3.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1200,9 +1200,14 @@
       const { parentNode } = this.node;
       const realParent = getRealParent(scope, parentScope);
 
+      // override the template property if the slot needs to be replaced
       this.template =
-        templateData &&
-        create(templateData.html, templateData.bindings).createDOM(parentNode);
+        (templateData &&
+          create(templateData.html, templateData.bindings).createDOM(
+            parentNode,
+          )) ||
+        // otherwise use the optional template fallback if provided by the compiler see also https://github.com/riot/riot/issues/3014
+        this.template;
 
       if (this.template) {
         cleanNode(this.node);
@@ -1261,10 +1266,11 @@
    * @param   {AttributeExpressionData[]} attributes - slot attributes
    * @returns {Object} Slot binding object
    */
-  function createSlot(node, { name, attributes }) {
+  function createSlot(node, { name, attributes, template }) {
     return {
       ...SlotBinding,
       attributes,
+      template,
       node,
       name,
     }
@@ -2515,7 +2521,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.2.2';
+  const version = 'v9.3.0';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
