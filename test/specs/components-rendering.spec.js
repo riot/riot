@@ -79,7 +79,7 @@ describe('components rendering', () => {
     component.unmount()
   })
 
-  it('the class attribute should persist in nested tags ', () => {
+  it('the class attribute should persist in nested tags https://github.com/riot/riot/issues/3011', () => {
     const element = document.createElement('issue-3011-missing-css-class')
     const component = riot.component(Issue3011MissingCssClass)(element)
     const nestedComponent = component.$('class-duplication')
