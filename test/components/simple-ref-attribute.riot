@@ -1,0 +1,13 @@
+<simple-ref-attribute>
+  <p ref={ref}>Ref paragraph</p>
+
+
+  <script>
+    export default {
+      ref(element) {
+        // we are going to spy on this method in our unit test
+        console.log({ element })
+      }
+    }
+  </script>
+</simple-ref-attribute>

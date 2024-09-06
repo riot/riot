@@ -7,8 +7,10 @@ import Issue2994ClassDuplicationNestedExpression from '../components/issue-2994-
 import Issue3003Parent from '../components/issue-3003-parent.riot'
 import MergeAttributes from '../components/merge-attributes.riot'
 import VirtualEach from '../components/virtual-each.riot'
+import SimpleRefAttribute from '../components/simple-ref-attribute.riot'
 
 import { expect } from 'chai'
+import { spy } from 'sinon'
 
 describe('components rendering', () => {
   it('multiple expression on the same attribute will be merged', () => {
@@ -77,7 +79,7 @@ describe('components rendering', () => {
     component.unmount()
   })
 
-  it('the class attribute should persist in nested tags https://github.com/riot/riot/issues/3011', () => {
+  it('the class attribute should persist in nested tags ', () => {
     const element = document.createElement('issue-3011-missing-css-class')
     const component = riot.component(Issue3011MissingCssClass)(element)
     const nestedComponent = component.$('class-duplication')
@@ -122,5 +124,23 @@ describe('components rendering', () => {
     expect(() => component.update()).to.not.throw()
 
     component.unmount()
+  })
+
+  it('ref attributes are properly registered/unregistered', () => {
+    const element = document.createElement('simple-ref-attribute')
+    const ref = spy()
+    // Override the original ref method
+    SimpleRefAttribute.exports.ref = ref
+    const component = riot.component(SimpleRefAttribute)(element)
+
+    expect(ref).to.have.been.calledWith(component.$('p'))
+
+    component.update()
+
+    expect(ref).to.have.been.calledOnce
+
+    component.unmount()
+
+    expect(ref).to.have.been.calledWith(null)
   })
 })
