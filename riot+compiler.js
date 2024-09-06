@@ -1,4 +1,4 @@
-/* Riot v9.3.0, @license MIT */
+/* Riot v9.4.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -26316,6 +26316,7 @@
 
   const HEAD_SYMBOL = Symbol();
   const TAIL_SYMBOL = Symbol();
+  const REF_ATTRIBUTE = 'ref';
 
   /**
    * Create the <template> fragments text nodes
@@ -26876,6 +26877,13 @@
       return
     }
 
+    // ref attributes are treated differently so we early return in this case
+    if (name === REF_ATTRIBUTE) {
+      node && node.removeAttribute(node, name);
+      value(node);
+      return
+    }
+
     // store the attribute on the node to make it compatible with native custom elements
     if (
       !isNativeHtmlProperty(name) &&
@@ -27042,6 +27050,9 @@
     unmount() {
       // unmount only the event handling expressions
       if (this.type === EVENT) apply(this, null);
+      // ref attributes need to be unmounted as well
+      if (this.name === REF_ATTRIBUTE)
+        expressions[ATTRIBUTE](null, this, this.value);
 
       return this
     },
@@ -28388,7 +28399,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.3.0';
+  const version = 'v9.4.0';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
