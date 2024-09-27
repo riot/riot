@@ -12,7 +12,7 @@ export default {
   output: {
     globals: { chai: 'chai', sinon: 'sinon' },
     file: './test/e2e/test.bundle.js',
-    format: 'iife',
+    format: 'es',
     sourcemap: 'inline',
   },
 }

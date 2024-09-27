@@ -9,18 +9,29 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>E2E Tests</title>
     <link rel="stylesheet" href="../../node_modules/mocha/mocha.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "chai": "../../node_modules/chai/chai.js",
+          "sinon": "../../node_modules/sinon/pkg/sinon-esm.js",
+          "sinon-chai": "../../node_modules/sinon-chai/lib/sinon-chai.js"
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="mocha"></div>
     <script src="../../node_modules/mocha/mocha.js"></script>
-    <script src="../../node_modules/chai/chai.js"></script>
-    <script src="../../node_modules/sinon/pkg/sinon.js"></script>
-    <script src="../../node_modules/sinon-chai/lib/sinon-chai.js"></script>
     <script>
       mocha.setup('bdd')
     </script>
-    <script src="./test.bundle.js"></script>
-    <script>
+    <script type="module">
+      import './test.bundle.js'
+      import { use } from 'chai'
+      import sinonChai from 'sinon-chai'
+
+      use(sinonChai)
+
       mocha.run((failures) => {
         // store the failure amount into this global variable that can be accessed from our e2e environment
         window.testFailures = failures
