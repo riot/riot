@@ -8,6 +8,7 @@ import Issue3003Parent from '../components/issue-3003-parent.riot'
 import MergeAttributes from '../components/merge-attributes.riot'
 import VirtualEach from '../components/virtual-each.riot'
 import SimpleRefAttribute from '../components/simple-ref-attribute.riot'
+import Issue3023SpreadAttribute from '../components/issue-3023-spread-attribute.riot'
 
 import { expect } from 'chai'
 import { spy } from 'sinon'
@@ -113,6 +114,23 @@ describe('components rendering', () => {
     component.update()
 
     expect(component.props.class).to.be.equal('btn dropdown')
+
+    component.unmount()
+  })
+
+  it('the spreaded attributes are properly rendered on the root tag (https://github.com/riot/riot/issues/3023)', () => {
+    const element = document.createElement('issue-3023-spread-attribute')
+    element.classList.add('btn')
+
+    const component = riot.component(Issue3023SpreadAttribute)(element)
+
+    const p = component.$('p')
+
+    expect(p.getAttribute('class').trim()).to.be.equal('btn foo')
+
+    component.update()
+
+    expect(p.getAttribute('class').trim()).to.be.equal('btn foo')
 
     component.unmount()
   })

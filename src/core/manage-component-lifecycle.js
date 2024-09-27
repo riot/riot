@@ -97,7 +97,7 @@ export function manageComponentLifecycle(
               this[ATTRIBUTES_KEY_SYMBOL].update(parentScope)
             }
 
-            // get the attribute names that don't belong to the the props object
+            // get the attribute names that don't belong to the props object
             // this will avoid recursive props rendering https://github.com/riot/riot/issues/2994
             const computedAttributeNames = getRootComputedAttributeNames(
               this[TEMPLATE_KEY_SYMBOL],

@@ -1,0 +1,16 @@
+<issue-3023-spread-attribute>
+  <p is='class-duplication' {...rest}>Hello</p>
+
+  <script>
+    import ClassDuplication from './issue-2994-class-duplication.riot'
+
+    export default {
+      components: { ClassDuplication },
+      get rest() {
+        return {
+          class: 'foo'
+        }
+      }
+    }
+  </script>
+</issue-3023-spread-attribute>
