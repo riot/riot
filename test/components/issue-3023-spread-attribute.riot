@@ -1,11 +1,19 @@
 <issue-3023-spread-attribute>
   <p is='class-duplication' {...rest}>Hello</p>
+  <p is='class-duplication' {...staticProps}>Hello</p>
+  <p is='class-duplication' class={state.class}>Hello</p>
 
   <script>
     import ClassDuplication from './issue-2994-class-duplication.riot'
 
     export default {
       components: { ClassDuplication },
+      state: {
+        foo: 'foo'
+      },
+      staticProps: {
+        class: 'foo'
+      },
       get rest() {
         return {
           class: 'foo'

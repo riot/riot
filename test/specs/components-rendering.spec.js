@@ -70,7 +70,6 @@ describe('components rendering', () => {
 
     component.update({
       dropdown: true,
-      class: 'custom',
     })
 
     expect(element.getAttribute('class').trim()).to.be.equal(
@@ -120,17 +119,32 @@ describe('components rendering', () => {
 
   it('the spreaded attributes are properly rendered on the root tag (https://github.com/riot/riot/issues/3023)', () => {
     const element = document.createElement('issue-3023-spread-attribute')
-    element.classList.add('btn')
-
     const component = riot.component(Issue3023SpreadAttribute)(element)
 
-    const p = component.$('p')
+    const [dynamicSpreadTarget, staticSpreadTarget, stateClassTarget] =
+      component.$$('p')
 
-    expect(p.getAttribute('class').trim()).to.be.equal('btn foo')
+    expect(dynamicSpreadTarget.getAttribute('class').trim()).to.be.equal(
+      'btn foo',
+    )
+    expect(staticSpreadTarget.getAttribute('class').trim()).to.be.equal(
+      'btn foo',
+    )
 
-    component.update()
+    expect(stateClassTarget.getAttribute('class').trim()).to.be.equal('btn foo')
 
-    expect(p.getAttribute('class').trim()).to.be.equal('btn foo')
+    component.update({
+      class: 'bar',
+    })
+
+    expect(dynamicSpreadTarget.getAttribute('class').trim()).to.be.equal(
+      'btn foo',
+    )
+    expect(staticSpreadTarget.getAttribute('class').trim()).to.be.equal(
+      'btn foo',
+    )
+
+    expect(stateClassTarget.getAttribute('class').trim()).to.be.equal('btn bar')
 
     component.unmount()
   })
