@@ -47,6 +47,11 @@ test: lint unit-test test-typing
 unit-test:
 	@ $(START_SERVER_AND_TEST) $(SERVE) 3000  "$(C8) -r lcov -r text $(MOCHA) -r test/setup.js test/**/*.spec.js"
 
+debug:
+	# build the e2e bundle
+	@ $(ROLLUP) -c test/e2e/rollup.config.js
+	@ $(SERVE)
+
 e2e-test:
 	# build the e2e bundle
 	@ $(ROLLUP) -c test/e2e/rollup.config.js
@@ -145,4 +150,4 @@ publish:
 	@ git push origin main
 	@ git push origin main --tags
 
-.PHONY: test unit-test e2e-test min lint raw riot build bump bump-undo version version-undo release-undo publish
+.PHONY: test unit-test e2e-test debug min lint raw riot build bump bump-undo version version-undo release-undo publish

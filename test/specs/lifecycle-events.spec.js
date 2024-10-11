@@ -63,6 +63,37 @@ describe('lifecycle events', () => {
     expect(element.parentNode).to.be.not.ok
   })
 
+  it('unmounting multiple tags without template works properly (https://github.com/riot/riot/issues/3025)', () => {
+    const component = riot.component(RawComponent)
+
+    const wrapper = document.createElement('div')
+    const element1 = document.createElement('div')
+    const element2 = document.createElement('div')
+
+    document.body.appendChild(wrapper)
+
+    wrapper.appendChild(element1)
+    wrapper.appendChild(element2)
+
+    const tag1 = component(element1, { html: '<p>hello</p>' })
+    const tag2 = component(element2, { html: '<p>there</p>' })
+
+    expect(element1.parentNode).to.be.ok
+    expect(element2.parentNode).to.be.ok
+
+    tag1.unmount()
+
+    expect(element1.parentNode).to.be.not.ok
+    expect(element2.parentNode).to.be.ok
+
+    tag2.unmount()
+
+    expect(element1.parentNode).to.be.not.ok
+    expect(element2.parentNode).to.be.not.ok
+
+    document.body.removeChild(wrapper)
+  })
+
   it('unmounting components can preserve the root tag', () => {
     const component = riot.component(SimpleComponent)
     const element = document.createElement('div')
