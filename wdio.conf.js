@@ -1,3 +1,5 @@
+const isCI = process.env.GITHUB_RUN_NUMBER
+
 export const config = {
   //
   // ====================
@@ -5,17 +7,19 @@ export const config = {
   // ====================
   // WebdriverIO supports running e2e tests as well as unit and component tests.
   runner: 'local',
-  user: process.env.SAUCE_USERNAME,
-  key: process.env.SAUCE_ACCESS_KEY,
+  user: isCI ? process.env.SAUCE_USERNAME : undefined,
+  key: isCI ? process.env.SAUCE_ACCESS_KEY : undefined,
   region: 'us', // or 'eu' or 'apac'
-  services: [
-    [
-      'sauce',
-      {
-        sauceConnect: true,
-      },
-    ],
-  ],
+  services: isCI
+    ? [
+        [
+          'sauce',
+          {
+            sauceConnect: true,
+          },
+        ],
+      ]
+    : [],
   //
   // ==================
   // Specify Test Files
@@ -58,7 +62,7 @@ export const config = {
   // Sauce Labs platform configurator - a great tool to configure your capabilities:
   // https://saucelabs.com/platform/platform-configurator
   //
-  capabilities: process.env.GITHUB_RUN_NUMBER
+  capabilities: isCI
     ? [
         {
           // capabilities for local browser web tests
