@@ -1,0 +1,18 @@
+<nested-raw-components>
+  <raw html={'hello'} if={state.show}/>
+  <raw html={'world'}/>
+  <raw html={'!'}/>
+
+  <script>
+    import Raw from './raw-component.riot';
+
+    export default {
+      components: {
+        Raw
+      },
+      state: {
+        show: true
+      }
+    }
+  </script>
+</nested-raw-components>

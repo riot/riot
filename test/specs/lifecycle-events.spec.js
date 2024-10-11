@@ -5,6 +5,7 @@ import ConditionalSelectOption from '../components/conditional-select-option.rio
 import EachCustomChildrenComponents from '../components/each-custom-children-components.riot'
 import ExpressionParts from '../components/expression-parts.riot'
 import RawComponent from '../components/raw-component.riot'
+import NestedRawComponents from '../components/nested-raw-components.riot'
 import InvalidPureCssComponent from '../components/invalid-pure-css-component.riot'
 import InvalidPureHtmlComponent from '../components/invalid-pure-html-component.riot'
 import NativeAttributes from '../components/native-attributes.riot'
@@ -92,6 +93,23 @@ describe('lifecycle events', () => {
     expect(element2.parentNode).to.be.not.ok
 
     document.body.removeChild(wrapper)
+  })
+
+  it('unmounting multiple nested tags without template works properly (https://github.com/riot/riot/issues/3025)', () => {
+    const component = riot.component(NestedRawComponents)
+    const element = document.createElement('div')
+
+    document.body.appendChild(element)
+
+    const tag = component(element)
+
+    expect(tag.$$('raw')).to.have.length(3)
+
+    tag.update({ show: false })
+
+    expect(tag.$$('raw')).to.have.length(2)
+
+    tag.unmount()
   })
 
   it('unmounting components can preserve the root tag', () => {
