@@ -18,6 +18,8 @@ export const MOCKED_TEMPLATE_INTERFACE = {
     if (mustRemoveRoot) removeChild(this.el)
     else if (!mustRemoveRoot) cleanNode(this.el)
   },
-  clone: noop,
+  clone() {
+    return { ...this }
+  },
   createDOM: noop,
 }
