@@ -67,7 +67,7 @@ export function createComponentFromWrapper(componentWrapper) {
         componentWrapper,
         createChildComponentGetter(componentWrapper),
       )
-    : { ...MOCKED_TEMPLATE_INTERFACE }
+    : MOCKED_TEMPLATE_INTERFACE
 
   return ({ slots, attributes, props }) => {
     // pure components rendering will be managed by the end user
