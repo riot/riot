@@ -18,6 +18,7 @@ import SimpleComponent from '../components/simple.riot'
 
 import { expect } from 'chai'
 import { spy } from 'sinon'
+import { DOM_COMPONENT_INSTANCE_PROPERTY, TEMPLATE_KEY_SYMBOL } from '@riotjs/util';
 
 describe('lifecycle events', () => {
   it('riot.component can mount anonymous components', () => {
@@ -108,6 +109,17 @@ describe('lifecycle events', () => {
     tag.update({ show: false })
 
     expect(tag.$$('raw')).to.have.length(2)
+
+    tag.unmount()
+  })
+
+  it('template el reference for tags without template must be equal to component root', () => {
+    const tag = riot.component(NestedRawComponents)(document.createElement('div'))
+    const raws = [...tag.$$('raw')].map(el => el[DOM_COMPONENT_INSTANCE_PROPERTY]);
+
+    raws.forEach((raw) => {
+        expect(raw[TEMPLATE_KEY_SYMBOL].el).to.be.equal(raw.root)
+    });
 
     tag.unmount()
   })
