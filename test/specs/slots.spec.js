@@ -10,7 +10,7 @@ import NestedSlot from '../components/nested-slot.riot'
 import ParentWithSlotsComponent from '../components/parent-with-slots.riot'
 import SimpleSlot from '../components/simple-slot.riot'
 import TemplateSlot from '../components/template-slot.riot'
-import Issue3014SlotFallback from '../components/issue-3014.riot'
+import DefaultContentSlot from '../components/default-content-slot.riot'
 
 import { expect } from 'chai'
 
@@ -189,12 +189,18 @@ describe('slots', () => {
     component.unmount()
   })
 
-  it('slots fallback expressions can be properly rendered (https://github.com/riot/riot/issues/3014)', () => {
-    const element = document.createElement('issue-3014')
-    const component = riot.component(Issue3014SlotFallback)(element)
+  it('slots fallback expressions can be properly rendered and have access to own component context (https://github.com/riot/riot/issues/3014, https://github.com/riot/riot/issues/3024)', () => {
+    const element = document.createElement('default-content-slot')
+    const component = riot.component(DefaultContentSlot)(element)
 
-    expect(normalizeInnerHTML(component.root.innerHTML)).to.be.equal(
-      'Default content',
+    expect(component.root.textContent.replace(/\s+/g, '')).to.be.equal(
+        'One.Two.Three.Four.',
+    )
+
+    component.update()
+
+    expect(component.root.textContent.replace(/\s+/g, '')).to.be.equal(
+        'One.Two.Three.Four.',
     )
 
     component.unmount()

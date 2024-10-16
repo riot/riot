@@ -1,0 +1,16 @@
+<default-content-slot>
+  <slot text={'Four.'}>
+    One.
+    <span>{state.text}</span>
+    <template if={true}>Three.</template>
+    { text }
+  </slot>
+
+  <script>
+    export default {
+      state: {
+        text: 'Two.'
+      }
+    }
+  </script>
+</default-content-slot>
