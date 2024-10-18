@@ -1,4 +1,4 @@
-/* Riot v9.4.2, @license MIT */
+/* Riot v9.4.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -27159,7 +27159,7 @@
             parentNode,
           )) ||
         // otherwise use the optional template fallback if provided by the compiler see also https://github.com/riot/riot/issues/3014
-        this.template;
+        this.template?.clone();
 
       if (this.template) {
         cleanNode(this.node);
@@ -28409,7 +28409,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.4.2';
+  const version = 'v9.4.3';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
