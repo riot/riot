@@ -194,13 +194,13 @@ describe('slots', () => {
     const component = riot.component(DefaultContentSlot)(element)
 
     expect(component.root.textContent.replace(/\s+/g, '')).to.be.equal(
-        'One.Two.Three.Four.',
+      'One.Two.Three.Four.',
     )
 
     component.update()
 
     expect(component.root.textContent.replace(/\s+/g, '')).to.be.equal(
-        'One.Two.Three.Four.',
+      'One.Two.Three.Four.',
     )
 
     component.unmount()
