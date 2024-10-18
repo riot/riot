@@ -75,7 +75,7 @@ export const config = {
           platformName: 'iOS',
           browserName: 'Safari',
           'appium:deviceName': 'iPhone Simulator',
-          'appium:platformVersion': '15.0',
+          'appium:platformVersion': '17.0',
           'appium:automationName': 'XCUITest',
         },
         {
