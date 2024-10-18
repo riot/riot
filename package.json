@@ -63,7 +63,7 @@
   "sideEffects": false,
   "types": "./riot.d.ts",
   "dependencies": {
-    "@riotjs/dom-bindings": "^9.2.1"
+    "@riotjs/dom-bindings": "^9.2.2"
   },
   "devDependencies": {
     "@riotjs/compiler": "^9.2.0",
