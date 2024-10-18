@@ -194,7 +194,7 @@ Become a sponsor to get your logo on our README. [Become a sponsor][support-url]
 
 ## Thanks
 
-Special thanks to Browserstack and for their support
+Special thanks to Browserstack for their support
 
 <table cellpadding="8">
     <tr>
