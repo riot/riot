@@ -1,4 +1,4 @@
-/* Riot v9.4.1, @license MIT */
+/* Riot v9.4.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -26310,7 +26310,9 @@
       if (mustRemoveRoot) removeChild(this.el);
       else if (!mustRemoveRoot) cleanNode(this.el);
     },
-    clone: noop,
+    clone() {
+      return { ...this }
+    },
     createDOM: noop,
   };
 
@@ -27131,6 +27133,7 @@
     // node: null,
     // name: null,
     attributes: [],
+    // templateData: null,
     // template: null,
 
     getTemplateScope(scope, parentScope) {
@@ -27143,7 +27146,11 @@
         ? scope.slots.find(({ id }) => id === this.name)
         : false;
       const { parentNode } = this.node;
-      const realParent = getRealParent(scope, parentScope);
+
+      // if the slot did not pass any content, we will use the self slot for optional fallback content (https://github.com/riot/riot/issues/3024)
+      const realParent = templateData ? getRealParent(scope, parentScope) : scope;
+
+      this.templateData = templateData;
 
       // override the template property if the slot needs to be replaced
       this.template =
@@ -27171,7 +27178,10 @@
     },
     update(scope, parentScope) {
       if (this.template) {
-        const realParent = getRealParent(scope, parentScope);
+        const realParent = this.templateData
+          ? getRealParent(scope, parentScope)
+          : scope;
+
         this.template.update(this.getTemplateScope(scope, realParent), realParent);
       }
 
@@ -28263,7 +28273,7 @@
           componentWrapper,
           createChildComponentGetter(componentWrapper),
         )
-      : { ...MOCKED_TEMPLATE_INTERFACE };
+      : MOCKED_TEMPLATE_INTERFACE;
 
     return ({ slots, attributes, props }) => {
       // pure components rendering will be managed by the end user
@@ -28399,7 +28409,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.4.1';
+  const version = 'v9.4.2';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
