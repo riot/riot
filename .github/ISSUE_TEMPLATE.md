@@ -1,4 +1,4 @@
-## Help us to manage our issues by answering the following:
+## Help us to manage our issues by answering the following
 
 1. Describe your issue:
 

@@ -1,5 +1,3 @@
-## **IMPORTANT: for all the pull requests use the `dev` branch**
-
 ### Answer the following depending on the type of change you want to merge
 
 #### Code

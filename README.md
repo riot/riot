@@ -154,7 +154,7 @@ $ make riot
 $ make raw
 ```
 
-#### 5) Pull request only against the `dev` branch making sure you have read [our pull request template](.github/PULL_REQUEST_TEMPLATE.md)
+#### 5) Pull request only against the `main` branch making sure you have read [our pull request template](.github/PULL_REQUEST_TEMPLATE.md)
 
 #### 6) Be patient
 
@@ -194,7 +194,7 @@ Become a sponsor to get your logo on our README. [Become a sponsor][support-url]
 
 ## Thanks
 
-Special thanks to Browserstack for their support
+Special thanks to Browserstack and for their support
 
 <table cellpadding="8">
     <tr>
@@ -213,8 +213,8 @@ Special thanks to Browserstack for their support
 [npm-version-image]: https://img.shields.io/npm/v/riot.svg?style=flat-square
 [npm-downloads-image]: https://img.shields.io/npm/dm/riot.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/riot
-[coverage-image]: https://img.shields.io/coveralls/riot/riot/dev.svg?style=flat-square
-[coverage-url]: https://coveralls.io/r/riot/riot?branch=dev
+[coverage-image]: https://img.shields.io/coveralls/riot/riot/main.svg?style=flat-square
+[coverage-url]: https://coveralls.io/r/riot/riot?branch=main
 [saucelabs-image]: https://saucelabs.com/browser-matrix/testsriotjs.svg?1
 [saucelabs-url]: https://saucelabs.com/u/testsriotjs
 [discord-url]: https://discord.gg/PagXe5Y

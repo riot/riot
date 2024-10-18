@@ -5,7 +5,8 @@ Please make sure to [search the issue tracker](https://github.com/riot/riot/issu
 
 ### Development Process
 
-`main` is considered safe and should be identical to the last release tag. When submitting pull requests please use the `dev` branch.
+When submitting pull requests please use the `main` branch. We use only this branch for the development of Riot.js.
+Releases will be tagged from the `main` branch.
 
 ### Create a test
 
@@ -16,7 +17,7 @@ Create a test for your specific contribution and submit it with your pull reques
 Before any pull request please run the following command from your terminal to be sure your changes will not break Riotjs:
 
 ```shell
-$ make riot
+make riot
 ```
 
 ### Reporting New Issues
@@ -34,7 +35,7 @@ Please just add a link to the bottom of the README.md file
 
 Please go to the [website repository](https://github.com/riot/riot.github.io).
 
-#### We are happy to accept PRs so thank you in advance!
+#### We are happy to accept PRs so thank you in advance
 
 #### Copyright
 
