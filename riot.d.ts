@@ -13,14 +13,24 @@ import {
 } from '@riotjs/dom-bindings'
 
 // Internal Types and shortcuts
-export type RegisteredComponentsMap = Map<string, () => RiotComponent>
+export type SlotBinding = {
+  id: string | null;
+  html: string;
+  bindings: SlotBindingData[];
+}
+
+export type RegisteredComponentsMap = Map<string, ({ slots, attributes, props }: { slots?: SlotBinding[], attributes?: AttributeExpressionData[], props?: any }) => RiotComponent>
+
 export type ComponentEnhancer = <Props = any, State = any>(
   component: RiotComponent<Props, State>,
 ) => RiotComponent<Props, State>
+
 export type InstalledPluginsSet = Set<ComponentEnhancer>
+
 export type RiotComponentsMap = {
   [key: string]: RiotComponentWrapper
 }
+
 export type AutobindObjectMethods<Object, This> = {
   [K in keyof Object]: Object[K] extends (...args: any) => any
     ? (this: This, ...args: Parameters<Object[K]>) => ReturnType<Object[K]>
@@ -32,7 +42,7 @@ export interface RiotComponent<Props = any, State = any> {
   readonly props: Props
   readonly root: HTMLElement
   readonly name?: string
-  readonly slots: SlotBindingData[]
+  readonly slots: SlotBinding[]
 
   // mutable state property
   state: State
@@ -101,7 +111,7 @@ export interface PureComponentFactoryFunction<
     attributes,
     props,
   }: {
-    slots?: SlotBindingData<Context>[]
+    slots?: SlotBinding[]
     attributes?: AttributeExpressionData<Context>[]
     props?: InitialProps
   }): RiotPureComponent<Context>
@@ -161,9 +171,9 @@ export declare function component<
   el: HTMLElement,
   initialProps?: Props,
   meta?: {
-    slots: SlotBindingData[]
-    attributes: AttributeExpressionData[]
-    parentScope: any
+    slots?: SlotBinding[]
+    attributes?: AttributeExpressionData[]
+    parentScope?: any
   },
 ) => Component
 
@@ -226,7 +236,7 @@ export declare const __: {
   DOMBindings: {
     template: typeof template
     createBinding: typeof createBinding
-    createExpression: typeof createBinding
+    createExpression: typeof createExpression
     bindingTypes: typeof bindingTypes
     expressionTypes: typeof expressionTypes
   }
