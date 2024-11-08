@@ -33,9 +33,12 @@ export type InstalledPluginsSet = Set<ComponentEnhancer>
 export type RiotComponentsMap = {
   [key: string]: RiotComponentWrapper
 }
-export type AutobindObjectMethods<Object, This> = {
+export type AutobindObjectMethods<Object, Component extends RiotComponent> = {
   [K in keyof Object]: Object[K] extends (...args: any) => any
-    ? (this: This, ...args: Parameters<Object[K]>) => ReturnType<Object[K]>
+    ? (
+        this: Component & Object,
+        ...args: Parameters<Object[K]>
+      ) => ReturnType<Object[K]>
     : Object[K]
 }
 
