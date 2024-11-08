@@ -226,7 +226,7 @@ export declare const __: {
   DOMBindings: {
     template: typeof template
     createBinding: typeof createBinding
-    createExpression: typeof createBinding
+    createExpression: typeof createExpression
     bindingTypes: typeof bindingTypes
     expressionTypes: typeof expressionTypes
   }
