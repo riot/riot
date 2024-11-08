@@ -10,10 +10,22 @@ import {
   createExpression,
   bindingTypes,
   expressionTypes,
+  TagSlotData,
 } from '@riotjs/dom-bindings'
 
 // Internal Types and shortcuts
-export type RegisteredComponentsMap = Map<string, () => RiotComponent>
+export type RegisteredComponentsMap = Map<
+  string,
+  ({
+    slots,
+    attributes,
+    props,
+  }: {
+    slots?: TagSlotData[]
+    attributes?: AttributeExpressionData[]
+    props?: any
+  }) => RiotComponent
+>
 export type ComponentEnhancer = <Props = any, State = any>(
   component: RiotComponent<Props, State>,
 ) => RiotComponent<Props, State>
@@ -32,7 +44,7 @@ export interface RiotComponent<Props = any, State = any> {
   readonly props: Props
   readonly root: HTMLElement
   readonly name?: string
-  readonly slots: SlotBindingData[]
+  readonly slots: TagSlotData[]
 
   // mutable state property
   state: State
@@ -101,7 +113,7 @@ export interface PureComponentFactoryFunction<
     attributes,
     props,
   }: {
-    slots?: SlotBindingData<Context>[]
+    slots?: TagSlotData<Context>[]
     attributes?: AttributeExpressionData<Context>[]
     props?: InitialProps
   }): RiotPureComponent<Context>
@@ -161,7 +173,7 @@ export declare function component<
   el: HTMLElement,
   initialProps?: Props,
   meta?: {
-    slots: SlotBindingData[]
+    slots: TagSlotData[]
     attributes: AttributeExpressionData[]
     parentScope: any
   },
