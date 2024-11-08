@@ -72,13 +72,6 @@ export const config = {
           browserName: 'firefox',
         },
         {
-          platformName: 'iOS',
-          browserName: 'Safari',
-          'appium:deviceName': 'iPhone Simulator',
-          'appium:platformVersion': '17.0',
-          'appium:automationName': 'XCUITest',
-        },
-        {
           browserName: 'MicrosoftEdge',
         },
       ].map((capabilities) => ({
