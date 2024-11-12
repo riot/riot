@@ -42,7 +42,13 @@ export type AutobindObjectMethods<Object, Component extends RiotComponent> = {
     : Object[K]
 }
 
-export interface RiotComponent<Props = any, State = any> {
+export type DefaultProps = Record<string, any>;
+export type DefaultState = Record<PropertyKey, any>;
+
+export interface RiotComponent<
+  Props extends DefaultProps = DefaultProps,
+  State extends DefaultState = DefaultState
+> {
   // automatically generated on any component instance
   readonly props: Props
   readonly root: HTMLElement
