@@ -14,6 +14,9 @@ import {
 } from '@riotjs/dom-bindings'
 
 // Internal Types and shortcuts
+export type DefaultProps = Record<PropertyKey, any>;
+export type DefaultState = Record<PropertyKey, any>;
+
 export type RegisteredComponentsMap = Map<
   string,
   ({
@@ -23,10 +26,13 @@ export type RegisteredComponentsMap = Map<
   }: {
     slots?: TagSlotData[]
     attributes?: AttributeExpressionData[]
-    props?: any
+    props?: DefaultProps
   }) => RiotComponent
 >
-export type ComponentEnhancer = <Props = any, State = any>(
+export type ComponentEnhancer = <
+  Props extends DefaultProps = DefaultProps,
+  State extends DefaultState = DefaultState
+>(
   component: RiotComponent<Props, State>,
 ) => RiotComponent<Props, State>
 export type InstalledPluginsSet = Set<ComponentEnhancer>
@@ -41,9 +47,6 @@ export type AutobindObjectMethods<Object, Component extends RiotComponent> = {
       ) => ReturnType<Object[K]>
     : Object[K]
 }
-
-export type DefaultProps = Record<PropertyKey, any>;
-export type DefaultState = Record<PropertyKey, any>;
 
 export interface RiotComponent<
   Props extends DefaultProps = DefaultProps,
@@ -114,7 +117,7 @@ export interface RiotPureComponent<Context = object> {
 }
 
 export interface PureComponentFactoryFunction<
-  InitialProps = any,
+  InitialProps extends DefaultProps = DefaultProps,
   Context = any,
 > {
   ({
@@ -152,14 +155,20 @@ export interface RiotComponentFactoryFunction<Component> {
 }
 
 // Riot public API
-export declare function register<Props, State>(
+export declare function register<
+  Props extends DefaultProps,
+  State extends DefaultState
+>(
   componentName: string,
   wrapper: RiotComponentWrapper<RiotComponent<Props, State>>,
 ): RegisteredComponentsMap
 export declare function unregister(
   componentName: string,
 ): RegisteredComponentsMap
-export declare function mount<Props, State>(
+export declare function mount<
+  Props extends DefaultProps,
+  State extends DefaultState
+>(
   selector: string | HTMLElement,
   initialProps?: Props,
   componentName?: string,
@@ -173,8 +182,8 @@ export declare function uninstall(
   plugin: ComponentEnhancer,
 ): InstalledPluginsSet
 export declare function component<
-  Props,
-  State,
+  Props extends DefaultProps,
+  State extends DefaultState,
   Component = RiotComponent<Props, State>,
 >(
   wrapper: RiotComponentWrapper<Component>,
@@ -189,7 +198,7 @@ export declare function component<
 ) => Component
 
 export declare function pure<
-  InitialProps = any,
+  InitialProps extends DefaultProps = DefaultProps,
   Context = any,
   FactoryFunction = PureComponentFactoryFunction<InitialProps, Context>,
 >(func: FactoryFunction): FactoryFunction
