@@ -9,3 +9,13 @@ export const Component = withTypes({
     this.onClick()
   },
 })
+
+export const Component2 = withTypes({
+  onClick() {
+    this.update({ clicked: true })
+  },
+  onMounted() {
+    this.state = 2
+    this.onClick()
+  },
+})
