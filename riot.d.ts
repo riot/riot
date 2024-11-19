@@ -42,7 +42,7 @@ export type AutobindObjectMethods<Object, Component extends RiotComponent> = {
     : Object[K]
 }
 
-export type DefaultProps = Record<string, any>;
+export type DefaultProps = Record<PropertyKey, any>;
 export type DefaultState = Record<PropertyKey, any>;
 
 export interface RiotComponent<
