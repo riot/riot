@@ -14,8 +14,8 @@ import {
 } from '@riotjs/dom-bindings'
 
 // Internal Types and shortcuts
-export type DefaultProps = Record<PropertyKey, any>;
-export type DefaultState = Record<PropertyKey, any>;
+export type DefaultProps = Record<PropertyKey, any>
+export type DefaultState = Record<PropertyKey, any>
 
 export type RegisteredComponentsMap = Map<
   string,
@@ -31,7 +31,7 @@ export type RegisteredComponentsMap = Map<
 >
 export type ComponentEnhancer = <
   Props extends DefaultProps = DefaultProps,
-  State extends DefaultState = DefaultState
+  State extends DefaultState = DefaultState,
 >(
   component: RiotComponent<Props, State>,
 ) => RiotComponent<Props, State>
@@ -41,16 +41,13 @@ export type RiotComponentsMap = {
 }
 export type AutobindObjectMethods<Object, Component extends RiotComponent> = {
   [K in keyof Object]: Object[K] extends (...args: infer Args) => infer Return
-    ? (
-        this: Component & Object,
-        ...args: Args
-      ) => Return
+    ? (this: Component & Object, ...args: Args) => Return
     : Object[K]
 }
 
 export interface RiotComponent<
   Props extends DefaultProps = DefaultProps,
-  State extends DefaultState = DefaultState
+  State extends DefaultState = DefaultState,
 > {
   // automatically generated on any component instance
   readonly props: Props
@@ -144,7 +141,9 @@ export interface RiotComponentWrapper<Component = RiotComponent> {
     ) => TemplateChunk<Component>,
     expressionTypes: Record<keyof typeof ExpressionType, number>,
     bindingTypes: Record<keyof typeof BindingType, number>,
-    getComponent: (componentName: string) => RiotComponentWrapper<RiotComponent> | undefined,
+    getComponent: (
+      componentName: string,
+    ) => RiotComponentWrapper<RiotComponent> | undefined,
   ): TemplateChunk<Component> | null
 }
 
@@ -157,7 +156,7 @@ export interface RiotComponentFactoryFunction<Component> {
 // Riot public API
 export declare function register<
   Props extends DefaultProps,
-  State extends DefaultState
+  State extends DefaultState,
 >(
   componentName: string,
   wrapper: RiotComponentWrapper<RiotComponent<Props, State>>,
@@ -167,7 +166,7 @@ export declare function unregister(
 ): RegisteredComponentsMap
 export declare function mount<
   Props extends DefaultProps,
-  State extends DefaultState
+  State extends DefaultState,
 >(
   selector: string | HTMLElement,
   initialProps?: Props,
