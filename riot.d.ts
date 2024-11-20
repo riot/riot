@@ -144,7 +144,7 @@ export interface RiotComponentWrapper<Component = RiotComponent> {
     ) => TemplateChunk<Component>,
     expressionTypes: Record<keyof typeof ExpressionType, number>,
     bindingTypes: Record<keyof typeof BindingType, number>,
-    getComponent: (componentName: string) => any,
+    getComponent: (componentName: string) => RiotComponentWrapper<RiotComponent> | undefined,
   ): TemplateChunk<Component> | null
 }
 
