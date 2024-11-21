@@ -15,6 +15,7 @@ export const Component2 = withTypes({
     this.update({ clicked: true })
   },
   onMounted() {
+    //@ts-expect-error
     this.state = 2
     this.onClick()
   },

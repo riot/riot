@@ -26,6 +26,7 @@ export const object2: BoundObject = {
    * The following implementation will throw
    * an error because of the wrong arg type
    */
+  //@ts-expect-error
   method(example: string) {
     return example != ''
   },
