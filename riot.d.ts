@@ -141,9 +141,9 @@ export interface RiotComponentWrapper<Component = RiotComponent> {
     ) => TemplateChunk<Component>,
     expressionTypes: Record<keyof typeof ExpressionType, number>,
     bindingTypes: Record<keyof typeof BindingType, number>,
-    getComponent: (
-      componentName: string,
-    ) => RiotComponentWrapper<RiotComponent> | undefined,
+    getComponent: (name: string) => (
+      { slots, attributes }: { slot: TagSlotData[], attributes: AttributeExpressionData[] }
+    ) => Pick<TemplateChunk, 'mount' | 'update' | 'unmount'>
   ): TemplateChunk<Component> | null
 }
 
