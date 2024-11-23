@@ -63,10 +63,10 @@
   "sideEffects": false,
   "types": "./riot.d.ts",
   "dependencies": {
-    "@riotjs/dom-bindings": "^9.2.3"
+    "@riotjs/dom-bindings": "^9.2.5"
   },
   "devDependencies": {
-    "@riotjs/compiler": "^9.2.0",
+    "@riotjs/compiler": "^9.3.0",
     "@riotjs/prettier-config": "^1.1.0",
     "@riotjs/register": "^9.1.0",
     "@riotjs/util": "^2.4.0",
