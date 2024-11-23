@@ -11,6 +11,7 @@ import {
   bindingTypes,
   expressionTypes,
   TagSlotData,
+  TagBindingData,
 } from '@riotjs/dom-bindings'
 
 // Internal Types and shortcuts
@@ -141,15 +142,7 @@ export interface RiotComponentWrapper<Component = RiotComponent> {
     ) => TemplateChunk<Component>,
     expressionTypes: Record<keyof typeof ExpressionType, number>,
     bindingTypes: Record<keyof typeof BindingType, number>,
-    getComponent: (
-      name: string,
-    ) => ({
-      slots,
-      attributes,
-    }: {
-      slot: TagSlotData[]
-      attributes: AttributeExpressionData[]
-    }) => Pick<TemplateChunk, 'mount' | 'update' | 'unmount'>,
+    getComponent: TagBindingData['getComponent'],
   ): TemplateChunk<Component> | null
 }
 
