@@ -24,6 +24,6 @@ export const Component2 = withTypes({
 export const Component3 = withTypes({
   onMounted() {
     //@ts-expect-error
-    this.onClick();
+    this.onClick()
   },
 })

@@ -90,7 +90,7 @@ export interface RiotComponent<
 
 // The Riot component object without the internals
 // The internal attributes will be handled by the framework
-export type RiotInternals = (
+export type RiotInternals =
   | 'props'
   | 'root'
   | 'name'
@@ -100,7 +100,6 @@ export type RiotInternals = (
   | 'unmount'
   | '$'
   | '$$'
-)
 
 export type RiotComponentWithoutInternals<Component extends RiotComponent> =
   Omit<Component, RiotInternals>
@@ -205,91 +204,103 @@ export declare function pure<
 export declare const version: string
 
 // typescript specific methods
-export type NeverOfKeys<T extends PropertyKey> = { [K in T]?: never };
-export type NeverOf<T> = NeverOfKeys<keyof T>;
+export type NeverOfKeys<T extends PropertyKey> = { [K in T]?: never }
+export type NeverOf<T> = NeverOfKeys<keyof T>
 
 export type WithTypes<
   Props = DefaultProps,
   DefinedE = {},
   PublicE = {},
-  PrivateE = {}
+  PrivateE = {},
 > = {
   <C extends object>(
-    component: (
-      C &
+    component: C &
       Partial<
         RiotComponentWithoutInternals<RiotComponent<Props, DefaultState>> &
-        PublicE & PrivateE
+          PublicE &
+          PrivateE
       > &
       NeverOf<DefinedE> &
       NeverOfKeys<RiotInternals> &
       ThisType<
         C & DefinedE & PublicE & PrivateE & RiotComponent<Props, DefaultState>
-      >
-    )
-  ): Omit<C, keyof PrivateE> & PublicE & DefinedE & RiotComponent<Props, DefaultState>
+      >,
+  ): Omit<C, keyof PrivateE> &
+    PublicE &
+    DefinedE &
+    RiotComponent<Props, DefaultState>
 }
 
 export type ExtractPropsFromWithTypesList<
-    WithTypesList extends Array<WithTypes>, Res = {}
-> = WithTypesList extends [
-    infer First, ...infer Rem extends Array<WithTypes>
-] ? First extends WithTypes<infer FirstProps> ? FirstProps & ExtractPropsFromWithTypesList<Rem, Res> : never : Res;
+  WithTypesList extends Array<WithTypes>,
+  Res = {},
+> = WithTypesList extends [infer First, ...infer Rem extends Array<WithTypes>]
+  ? First extends WithTypes<infer FirstProps>
+    ? FirstProps & ExtractPropsFromWithTypesList<Rem, Res>
+    : never
+  : Res
 export type ExtractDefinedFromWithTypesList<
-    WithTypesList extends Array<WithTypes>, Res = {}
-> = WithTypesList extends [
-    infer First, ...infer Rem extends Array<WithTypes>
-] ? First extends WithTypes<any, infer FirstDefined> ? FirstDefined & ExtractDefinedFromWithTypesList<Rem, Res> : never : Res;
+  WithTypesList extends Array<WithTypes>,
+  Res = {},
+> = WithTypesList extends [infer First, ...infer Rem extends Array<WithTypes>]
+  ? First extends WithTypes<any, infer FirstDefined>
+    ? FirstDefined & ExtractDefinedFromWithTypesList<Rem, Res>
+    : never
+  : Res
 export type ExtractPublicFromWithTypesList<
-    WithTypesList extends Array<WithTypes>, Res = {}
-> = WithTypesList extends [
-    infer First, ...infer Rem extends Array<WithTypes>
-] ? First extends WithTypes<any, any, infer FirstPublic> ? FirstPublic & ExtractPublicFromWithTypesList<Rem, Res> : never : Res;
+  WithTypesList extends Array<WithTypes>,
+  Res = {},
+> = WithTypesList extends [infer First, ...infer Rem extends Array<WithTypes>]
+  ? First extends WithTypes<any, any, infer FirstPublic>
+    ? FirstPublic & ExtractPublicFromWithTypesList<Rem, Res>
+    : never
+  : Res
 export type ExtractPrivateFromWithTypesList<
-    WithTypesList extends Array<WithTypes>, Res = {}
-> = WithTypesList extends [
-    infer First, ...infer Rem extends Array<WithTypes>
-] ? First extends WithTypes<any, any, any, infer FirstPrivate> ? FirstPrivate & ExtractPrivateFromWithTypesList<Rem, Res> : never : Res;
+  WithTypesList extends Array<WithTypes>,
+  Res = {},
+> = WithTypesList extends [infer First, ...infer Rem extends Array<WithTypes>]
+  ? First extends WithTypes<any, any, any, infer FirstPrivate>
+    ? FirstPrivate & ExtractPrivateFromWithTypesList<Rem, Res>
+    : never
+  : Res
 
 export const composeTypes: {
-  <
-    WithTypesList extends Array<WithTypes> = Array<WithTypes>
-  >(...withTypes: WithTypesList): (
-        <C extends object>(
-            component: (
-                C &
-                Partial<
-                    RiotComponentWithoutInternals<RiotComponent<
-                        ExtractPropsFromWithTypesList<WithTypesList>,
-                        DefaultState
-                    >> &
-                    ExtractPrivateFromWithTypesList<WithTypesList> &
-                    ExtractPublicFromWithTypesList<WithTypesList>
-                > &
-                NeverOf<ExtractDefinedFromWithTypesList<WithTypesList>> &
-                NeverOfKeys<RiotInternals> &
-                ThisType<
-                    C & RiotComponent<
-                        ExtractPropsFromWithTypesList<WithTypesList>,
-                        DefaultState
-                    > &
-                    ExtractDefinedFromWithTypesList<WithTypesList> &
-                    ExtractPublicFromWithTypesList<WithTypesList> &
-                    ExtractPrivateFromWithTypesList<WithTypesList>
-                >
-            )
-        ) => (
-                Omit<C, keyof ExtractPrivateFromWithTypesList<WithTypesList>> &
-                RiotComponent<
-                    ExtractPropsFromWithTypesList<WithTypesList>
-                > &
-                ExtractPublicFromWithTypesList<WithTypesList> &
-                ExtractDefinedFromWithTypesList<WithTypesList>
-            )
-    )
-} = (...withTypes) => component => withTypes.reduce((c, fn) => fn(c as any) as any, component) as any;
+  <WithTypesList extends Array<WithTypes> = Array<WithTypes>>(
+    ...withTypes: WithTypesList
+  ): <C extends object>(
+    component: C &
+      Partial<
+        RiotComponentWithoutInternals<
+          RiotComponent<
+            ExtractPropsFromWithTypesList<WithTypesList>,
+            DefaultState
+          >
+        > &
+          ExtractPrivateFromWithTypesList<WithTypesList> &
+          ExtractPublicFromWithTypesList<WithTypesList>
+      > &
+      NeverOf<ExtractDefinedFromWithTypesList<WithTypesList>> &
+      NeverOfKeys<RiotInternals> &
+      ThisType<
+        C &
+          RiotComponent<
+            ExtractPropsFromWithTypesList<WithTypesList>,
+            DefaultState
+          > &
+          ExtractDefinedFromWithTypesList<WithTypesList> &
+          ExtractPublicFromWithTypesList<WithTypesList> &
+          ExtractPrivateFromWithTypesList<WithTypesList>
+      >,
+  ) => Omit<C, keyof ExtractPrivateFromWithTypesList<WithTypesList>> &
+    RiotComponent<ExtractPropsFromWithTypesList<WithTypesList>> &
+    ExtractPublicFromWithTypesList<WithTypesList> &
+    ExtractDefinedFromWithTypesList<WithTypesList>
+} =
+  (...withTypes) =>
+  (component) =>
+    withTypes.reduce((c, fn) => fn(c as any) as any, component) as any
 
-export const withTypes: WithTypes = component => component as any;
+export const withTypes: WithTypes = (component) => component as any
 
 /**
  * Internal stuff exposed for advanced use cases

@@ -4,4 +4,7 @@
  * @returns {Function} returns a function that takes the component to apply the wrappers to
  */
 /* istanbul ignore next */
-export const composeTypes = (...withTypesList) => component => withTypesList.reduce((c, fn) => fn(c), component)
+export const composeTypes =
+  (...withTypesList) =>
+  (component) =>
+    withTypesList.reduce((c, fn) => fn(c), component)
