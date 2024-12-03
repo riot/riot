@@ -208,7 +208,7 @@ export type NeverOfKeys<T extends PropertyKey> = { [K in T]?: never }
 export type NeverOf<T> = NeverOfKeys<keyof T>
 
 export type WithTypes<
-  Props = DefaultProps,
+  Props extends DefaultProps = DefaultProps,
   DefinedE = {},
   PublicE = {},
   PrivateE = {},
@@ -264,7 +264,7 @@ export type ExtractPrivateFromWithTypesList<
     : never
   : Res
 
-export const composeTypes: {
+export declare const composeTypes: {
   <WithTypesList extends Array<WithTypes> = Array<WithTypes>>(
     ...withTypes: WithTypesList
   ): <C extends object>(
@@ -295,12 +295,9 @@ export const composeTypes: {
     RiotComponent<ExtractPropsFromWithTypesList<WithTypesList>> &
     ExtractPublicFromWithTypesList<WithTypesList> &
     ExtractDefinedFromWithTypesList<WithTypesList>
-} =
-  (...withTypes) =>
-  (component) =>
-    withTypes.reduce((c, fn) => fn(c as any) as any, component) as any
+}
 
-export const withTypes: WithTypes = (component) => component as any
+export declare const withTypes: WithTypes
 
 /**
  * Internal stuff exposed for advanced use cases
