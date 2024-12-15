@@ -90,19 +90,19 @@ export interface RiotComponent<
 
 // The Riot component object without the internals
 // The internal attributes will be handled by the framework
+export type RiotInternals =
+  | 'props'
+  | 'root'
+  | 'name'
+  | 'slots'
+  | 'mount'
+  | 'update'
+  | 'unmount'
+  | '$'
+  | '$$'
+
 export type RiotComponentWithoutInternals<Component extends RiotComponent> =
-  Omit<
-    Component,
-    | 'props'
-    | 'root'
-    | 'name'
-    | 'slots'
-    | 'mount'
-    | 'update'
-    | 'unmount'
-    | '$'
-    | '$$'
-  >
+  Omit<Component, RiotInternals>
 export type RiotComponentWithoutInternalsAndInitialState<
   Component extends RiotComponent,
 > = Omit<RiotComponentWithoutInternals<Component>, 'state'>
@@ -204,36 +204,34 @@ export declare function pure<
 export declare const version: string
 
 // typescript specific methods
-export declare function withTypes<
-  Component extends RiotComponent,
-  ComponentFactory = RiotComponentFactoryFunction<
-    AutobindObjectMethods<RiotComponentWithoutInternals<Component>, Component>
-  >,
->(fn: ComponentFactory): () => Component
-export declare function withTypes<
-  Component extends RiotComponent,
-  ComponentFactory = RiotComponentFactoryFunction<
-    AutobindObjectMethods<
-      RiotComponentWithoutInternalsAndInitialState<Component>,
-      Component
-    >
-  >,
->(fn: ComponentFactory): () => Component
-export declare function withTypes<
-  Component extends RiotComponent,
-  ComponentObjectWithInitialState = RiotComponentWithoutInternals<Component>,
->(
-  component: AutobindObjectMethods<ComponentObjectWithInitialState, Component>,
-): Component
-export declare function withTypes<
-  Component extends RiotComponent,
-  ComponentObjectWithoutInitialState = RiotComponentWithoutInternalsAndInitialState<Component>,
->(
-  component: AutobindObjectMethods<
-    ComponentObjectWithoutInitialState,
-    Component
-  >,
-): Component
+export type NeverOfKeys<T extends PropertyKey> = { [K in T]?: never }
+export type NeverOf<T> = NeverOfKeys<keyof T>
+
+export type WithTypes<
+  Props extends DefaultProps = DefaultProps,
+  DefinedE = {},
+  PublicE = {},
+  PrivateE = {},
+> = {
+  <C extends object>(
+    component: C &
+      Partial<
+        RiotComponentWithoutInternals<RiotComponent<Props, DefaultState>> &
+          PublicE &
+          PrivateE
+      > &
+      NeverOf<DefinedE> &
+      NeverOfKeys<RiotInternals> &
+      ThisType<
+        C & DefinedE & PublicE & PrivateE & RiotComponent<Props, DefaultState>
+      >,
+  ): Omit<C, keyof PrivateE> &
+    PublicE &
+    DefinedE &
+    RiotComponent<Props, DefaultState>
+}
+
+export declare const withTypes: WithTypes
 
 /**
  * Internal stuff exposed for advanced use cases
