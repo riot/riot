@@ -1,4 +1,4 @@
-import { RiotComponentWrapper, RiotComponent, withTypes } from '../../riot'
+import { RiotComponentWrapper, withTypes, WithTypes } from '../../riot'
 
 export interface RandomComponentState {
   number: number | null
@@ -9,22 +9,13 @@ export interface RandomComponentProps {
   title: string
 }
 
-export interface RandomComponent
-  extends RiotComponent<RandomComponentProps, RandomComponentState> {
-  generate(event: MouseEvent): void
-
-  clearLogs(): void
-
-  state: RandomComponentState
-}
-
-const Random = withTypes<RandomComponent>({
+export const RandomComponent = (withTypes as WithTypes<RandomComponentProps>)({
   state: {
     number: null,
     logs: [],
-  },
+  } as RandomComponentState,
 
-  generate(event) {
+  generate(event: MouseEvent) {
     this.update({
       number: Math.floor(Math.random() * 10000),
       logs: this.state.logs.concat({
@@ -42,7 +33,7 @@ const Random = withTypes<RandomComponent>({
 
 export default {
   css: undefined,
-  exports: Random,
+  exports: RandomComponent,
   template: function (template, expressionTypes, bindingTypes, getComponent) {
     return template(
       '<h3 expr1="expr1"> </h3><button expr2="expr2">\n    Generate\n  </button><h1 expr3="expr3"> </h1><logs expr4="expr4"></logs>',
@@ -129,4 +120,4 @@ export default {
   },
 
   name: 'random',
-} as RiotComponentWrapper<RandomComponent>
+} as RiotComponentWrapper<typeof RandomComponent>

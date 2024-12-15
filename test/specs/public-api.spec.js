@@ -15,7 +15,6 @@ describe('Riot public api', () => {
       'component',
       'pure',
       'withTypes',
-      'composeTypes',
       'version',
       '__',
     ])

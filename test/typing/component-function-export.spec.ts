@@ -1,5 +1,5 @@
-import { RiotComponentWrapper } from '../../riot'
-import { RiotComponent, withTypes } from '../../riot'
+import { RiotComponentWrapper, WithTypes } from '../../riot'
+import { withTypes } from '../../riot'
 import ConditionalSlot from './conditional-slot.riot'
 
 export type ConditionalSlotProps = {}
@@ -8,23 +8,20 @@ export type ConditionalSlotState = {
   mustShowSlot: boolean
 }
 
-export type ConditionalSlotComponent = RiotComponent<
-  ConditionalSlotProps,
-  ConditionalSlotState
->
+const exports = () => (withTypes as WithTypes<ConditionalSlotProps>)({
+  state: {
+    mustShowSlot: false,
+  } as ConditionalSlotState,
+
+  components: {
+    ConditionalSlot,
+  },
+});
 
 export default {
   css: null,
 
-  exports: withTypes<ConditionalSlotComponent>(() => ({
-    state: {
-      mustShowSlot: false,
-    },
-
-    components: {
-      ConditionalSlot,
-    },
-  })),
+  exports,
   template: function (template, expressionTypes, bindingTypes, getComponent) {
     return template('<conditional-slot expr1="expr1"></conditional-slot>', [
       {
@@ -75,4 +72,4 @@ export default {
   },
 
   name: 'conditional-slot-parent',
-} as RiotComponentWrapper<ConditionalSlotComponent>
+} as RiotComponentWrapper<ReturnType<typeof exports>>
