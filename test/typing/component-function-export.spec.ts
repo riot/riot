@@ -8,15 +8,16 @@ export type ConditionalSlotState = {
   mustShowSlot: boolean
 }
 
-const exports = () => (withTypes as WithTypes<ConditionalSlotProps>)({
-  state: {
-    mustShowSlot: false,
-  } as ConditionalSlotState,
+const exports = () =>
+  (withTypes as WithTypes<ConditionalSlotProps>)({
+    state: {
+      mustShowSlot: false,
+    } as ConditionalSlotState,
 
-  components: {
-    ConditionalSlot,
-  },
-});
+    components: {
+      ConditionalSlot,
+    },
+  })
 
 export default {
   css: null,
