@@ -90,22 +90,28 @@ export interface RiotComponent<
 
 // The Riot component object without the internals
 // The internal attributes will be handled by the framework
-export type RiotComponentWithoutInternals<Component extends RiotComponent> =
-  Omit<
-    Component,
-    | 'props'
-    | 'root'
-    | 'name'
-    | 'slots'
-    | 'mount'
-    | 'update'
-    | 'unmount'
-    | '$'
-    | '$$'
-  >
-export type RiotComponentWithoutInternalsAndInitialState<
-  Component extends RiotComponent,
-> = Omit<RiotComponentWithoutInternals<Component>, 'state'>
+export type RiotComponentWithoutBaseInternals<Component> = Omit<
+  Component,
+  | 'props'
+  | 'root'
+  | 'name'
+  | 'slots'
+  | 'mount'
+  | 'update'
+  | 'unmount'
+  | '$'
+  | '$$'
+>
+// the state property is optional and we need to handle it separately
+export type RiotComponentWithoutInternalsAndInitialState<Component> = Omit<
+  RiotComponentWithoutBaseInternals<Component>,
+  'state'
+>
+
+export type RiotComponentWithoutInternals<Component> =
+  Component['state'] extends DefaultState
+    ? RiotComponentWithoutBaseInternals<Component>
+    : RiotComponentWithoutInternalsAndInitialState<Component>
 
 // Riot Pure Component interface that should be used together with riot.pure
 export interface RiotPureComponent<Context = object> {
@@ -204,35 +210,39 @@ export declare function pure<
 export declare const version: string
 
 // typescript specific methods
+// Component using a factory function
 export declare function withTypes<
   Component extends RiotComponent,
   ComponentFactory = RiotComponentFactoryFunction<
     AutobindObjectMethods<RiotComponentWithoutInternals<Component>, Component>
   >,
 >(fn: ComponentFactory): () => Component
+
+// Component using a factory function without generics
 export declare function withTypes<
-  Component extends RiotComponent,
+  Component,
   ComponentFactory = RiotComponentFactoryFunction<
     AutobindObjectMethods<
-      RiotComponentWithoutInternalsAndInitialState<Component>,
-      Component
+      RiotComponentWithoutInternals<Component>,
+      RiotComponent
     >
   >,
 >(fn: ComponentFactory): () => Component
-export declare function withTypes<
-  Component extends RiotComponent,
-  ComponentObjectWithInitialState = RiotComponentWithoutInternals<Component>,
->(
-  component: AutobindObjectMethods<ComponentObjectWithInitialState, Component>,
-): Component
-export declare function withTypes<
-  Component extends RiotComponent,
-  ComponentObjectWithoutInitialState = RiotComponentWithoutInternalsAndInitialState<Component>,
->(
+
+// Components defined a plain object
+export declare function withTypes<Component extends RiotComponent>(
   component: AutobindObjectMethods<
-    ComponentObjectWithoutInitialState,
+    RiotComponentWithoutInternals<Component>,
     Component
   >,
+): Component
+
+// Component defined without generics
+export declare function withTypes<
+  Component,
+  ComponentWithoutInternals = RiotComponentWithoutInternals<Component>,
+>(
+  component: AutobindObjectMethods<ComponentWithoutInternals, RiotComponent>,
 ): Component
 
 /**
