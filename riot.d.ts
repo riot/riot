@@ -40,7 +40,10 @@ export type InstalledPluginsSet = Set<ComponentEnhancer>
 export type RiotComponentsMap = {
   [key: string]: RiotComponentWrapper
 }
-export type AutobindObjectMethods<Object, Component extends RiotComponent> = {
+export type AutobindObjectMethods<
+  Object,
+  Component extends RiotComponent | RiotComponentWithoutState,
+> = {
   [K in keyof Object]: Object[K] extends (...args: infer Args) => infer Return
     ? (this: Component & Object, ...args: Args) => Return
     : Object[K]
@@ -88,9 +91,14 @@ export interface RiotComponent<
   onUnmounted?(props: Props, state: State): void
 }
 
+// Type needed to identify components without the initial state
+export type RiotComponentWithoutState<
+  Props extends DefaultProps = DefaultProps,
+> = Omit<RiotComponent<Props>, 'state'>
+
 // The Riot component object without the internals
 // The internal attributes will be handled by the framework
-export type RiotComponentWithoutBaseInternals<Component> = Omit<
+export type RiotComponentWithoutInternals<Component> = Omit<
   Component,
   | 'props'
   | 'root'
@@ -102,16 +110,6 @@ export type RiotComponentWithoutBaseInternals<Component> = Omit<
   | '$'
   | '$$'
 >
-// the state property is optional and we need to handle it separately
-export type RiotComponentWithoutInternalsAndInitialState<Component> = Omit<
-  RiotComponentWithoutBaseInternals<Component>,
-  'state'
->
-
-export type RiotComponentWithoutInternals<Component> =
-  Component['state'] extends DefaultState
-    ? RiotComponentWithoutBaseInternals<Component>
-    : RiotComponentWithoutInternalsAndInitialState<Component>
 
 // Riot Pure Component interface that should be used together with riot.pure
 export interface RiotPureComponent<Context = object> {
@@ -154,7 +152,7 @@ export interface RiotComponentWrapper<Component = RiotComponent> {
 
 // Interface for components factory functions
 export interface RiotComponentFactoryFunction<Component> {
-  (): Component
+  (...args: any): Component
   components?: RiotComponentsMap
 }
 
@@ -210,32 +208,6 @@ export declare function pure<
 export declare const version: string
 
 // typescript specific methods
-// Component using a factory function
-export declare function withTypes<
-  Component extends RiotComponent,
-  ComponentFactory = RiotComponentFactoryFunction<
-    AutobindObjectMethods<RiotComponentWithoutInternals<Component>, Component>
-  >,
->(fn: ComponentFactory): () => Component
-
-// Component using a factory function without generics
-export declare function withTypes<
-  Component,
-  ComponentFactory = RiotComponentFactoryFunction<
-    AutobindObjectMethods<
-      RiotComponentWithoutInternals<Component>,
-      RiotComponent
-    >
-  >,
->(fn: ComponentFactory): () => Component
-
-// Components defined a plain object
-export declare function withTypes<Component extends RiotComponent>(
-  component: AutobindObjectMethods<
-    RiotComponentWithoutInternals<Component>,
-    Component
-  >,
-): Component
 
 // Component defined without generics
 export declare function withTypes<
@@ -243,7 +215,17 @@ export declare function withTypes<
   ComponentWithoutInternals = RiotComponentWithoutInternals<Component>,
 >(
   component: AutobindObjectMethods<ComponentWithoutInternals, RiotComponent>,
-): Component
+): typeof component
+
+// Components defined a plain object without generics
+export declare function withTypes<
+  Component extends RiotComponent | RiotComponentWithoutState,
+>(
+  component: AutobindObjectMethods<
+    RiotComponentWithoutInternals<Component>,
+    Component
+  >,
+): typeof component
 
 /**
  * Internal stuff exposed for advanced use cases

@@ -1,4 +1,4 @@
-import { RiotComponent, withTypes } from '../../riot'
+import { RiotComponent, RiotComponentWithoutState, withTypes } from '../../riot'
 
 /**
  * test: component can assign state to object
@@ -8,6 +8,12 @@ export const Component1 = withTypes({
     this.state = { clicked: false }
   },
 })
+
+export const Component1Fn = withTypes(() => ({
+  onMounted() {
+    this.state = { clicked: false }
+  },
+}))
 
 /**
  * test: component can't assign state to non Record object
@@ -91,7 +97,11 @@ export const Component7 = withTypes({
 /**
  * test: with types can inject props type
  */
-export const Component8 = withTypes({
+export const Component8 = withTypes<
+  RiotComponentWithoutState<{
+    customProp: string
+  }>
+>({
   onBeforeMount(props) {
     props.customProp
   },
@@ -100,7 +110,7 @@ export const Component8 = withTypes({
 /**
  * test: injected props type won't allow undefined property access
  */
-export const Component9 = withTypes({
+export const Component9 = withTypes<RiotComponentWithoutState<{}>>({
   onBeforeMount(props) {
     //@ts-expect-error
     props.undefinedProp
@@ -110,7 +120,7 @@ export const Component9 = withTypes({
 /**
  * test: with types can inject state type both into this and return value
  */
-export const Component10 = withTypes({
+export const Component10 = withTypes<RiotComponent<{}, { hidden: boolean }>>({
   state: {
     hidden: false,
   },
