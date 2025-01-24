@@ -134,7 +134,9 @@ export interface PureComponentFactoryFunction<
 }
 
 // This object interface is created anytime a riot file will be compiled into javascript
-export interface RiotComponentWrapper<Component = RiotComponent> {
+export interface RiotComponentWrapper<
+  Component extends RiotComponent | RiotComponentWithoutState = RiotComponent,
+> {
   readonly css?: string | null
   readonly exports?: RiotComponentFactoryFunction<Component> | Component | null
   readonly name?: string | null
@@ -152,7 +154,7 @@ export interface RiotComponentWrapper<Component = RiotComponent> {
 
 // Interface for components factory functions
 export interface RiotComponentFactoryFunction<Component> {
-  (...args: any): Component
+  (...args: any[]): Component
   components?: RiotComponentsMap
 }
 
@@ -186,7 +188,10 @@ export declare function uninstall(
 export declare function component<
   Props extends DefaultProps,
   State extends DefaultState,
-  Component = RiotComponent<Props, State>,
+  Component extends RiotComponent | RiotComponentWithoutState = RiotComponent<
+    Props,
+    State
+  >,
 >(
   wrapper: RiotComponentWrapper<Component>,
 ): (
@@ -209,22 +214,35 @@ export declare const version: string
 
 // typescript specific methods
 
+// Component with factory function
+export declare function withTypes<
+  Factory extends RiotComponentFactoryFunction<
+    RiotComponent | RiotComponentWithoutState
+  >,
+>(factory: Factory): ReturnType<Factory>
+
+// Component undefined factory function
+export declare function withTypes<Factory extends (...args: any[]) => any>(
+  factory: Factory,
+): ReturnType<Factory>
+
 // Component defined without generics
 export declare function withTypes<
-  Component,
+  Component extends {},
   ComponentWithoutInternals = RiotComponentWithoutInternals<Component>,
 >(
-  component: AutobindObjectMethods<ComponentWithoutInternals, RiotComponent>,
+  component:
+    | AutobindObjectMethods<ComponentWithoutInternals, RiotComponent>
+    | RiotComponentFactoryFunction<RiotComponent>,
 ): typeof component
 
-// Components defined a plain object without generics
+// // Components defined a plain object without generics
 export declare function withTypes<
   Component extends RiotComponent | RiotComponentWithoutState,
 >(
-  component: AutobindObjectMethods<
-    RiotComponentWithoutInternals<Component>,
-    Component
-  >,
+  component:
+    | AutobindObjectMethods<RiotComponentWithoutInternals<Component>, Component>
+    | RiotComponentFactoryFunction<Parial<Component>>,
 ): typeof component
 
 /**
