@@ -21,6 +21,10 @@ export default {
       mustShowSlot: false,
     },
 
+    onClick() {
+      this.update({ mustShowSlot: !this.state.mustShowSlot })
+    },
+
     components: {
       ConditionalSlot,
     },

@@ -9,7 +9,7 @@ export const Component1 = withTypes({
   },
 })
 
-export const Component1Fn = withTypes(() => ({
+export const Component1Fn = withTypes<{}>(() => ({
   onMounted() {
     this.state = { clicked: false }
   },
@@ -27,6 +27,18 @@ export const Component2 = withTypes({
     this.state = 2
   },
 })
+
+// TODO: improve factory function types
+// export const Component2Fn = withTypes(() => ({
+//   onClick() {
+//     this.update({ clicked: true })
+//   },
+//   onMounted() {
+//     //@ts-expect-error
+//     this.state = 2
+//   },
+// }))
+//
 
 /**
  * test: component does infer this and its methods and properties
