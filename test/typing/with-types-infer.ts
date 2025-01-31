@@ -1,4 +1,4 @@
-import { withTypes } from '../../riot'
+import { RiotComponent, withTypes } from '../../riot'
 
 /**
  * test: component can assign state to object
