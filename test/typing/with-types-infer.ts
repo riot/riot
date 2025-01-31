@@ -1,4 +1,4 @@
-import { RiotComponent, RiotComponentWithoutState, withTypes } from '../../riot'
+import { withTypes } from '../../riot'
 
 /**
  * test: component can assign state to object
@@ -9,7 +9,7 @@ export const Component1 = withTypes({
   },
 })
 
-export const Component1Fn = withTypes<{}>(() => ({
+export const Component1Fn = withTypes(() => ({
   onMounted() {
     this.state = { clicked: false }
   },
@@ -28,17 +28,15 @@ export const Component2 = withTypes({
   },
 })
 
-// TODO: improve factory function types
-// export const Component2Fn = withTypes(() => ({
-//   onClick() {
-//     this.update({ clicked: true })
-//   },
-//   onMounted() {
-//     //@ts-expect-error
-//     this.state = 2
-//   },
-// }))
-//
+export const Component2Fn = withTypes(() => ({
+  onClick() {
+    this.update({ clicked: true })
+  },
+  onMounted() {
+    //@ts-expect-error
+    this.state = 2
+  },
+}))
 
 /**
  * test: component does infer this and its methods and properties
@@ -54,6 +52,18 @@ export const Component3 = withTypes({
   },
 })
 
+export const Component3Fn = withTypes(() => ({
+  someProp: 'random',
+  onClick() {
+    console.log('click', this.someProp)
+  },
+  onMounted() {
+    this.onClick()
+    this.update()
+    console.log(this.someProp)
+  },
+}))
+
 /**
  * test: component does infer this erroring on undefined methods
  */
@@ -63,6 +73,13 @@ export const Component4 = withTypes({
     this.undefinedMethod()
   },
 })
+
+export const Component4Fn = withTypes(() => ({
+  onMounted() {
+    //@ts-expect-error
+    this.undefinedMethod()
+  },
+}))
 
 /**
  * test: component does infer this erroring on undefined properties
@@ -89,6 +106,12 @@ export const Component6 = withTypes({
   },
 })
 
+export const Component6Fn = withTypes(() => ({
+  onload() {
+    this.update()
+  },
+}))
+
 /**
  * test: component can specify any property or method
  *       alongisde with other riot lifecycle callbacks
@@ -103,44 +126,91 @@ export const Component7 = withTypes({
   onload() {},
   onBeforeMount() {
     this.onload()
+
+    this.update()
   },
 })
+
+export const Component7Fn = withTypes(() => ({
+  state: {},
+  onload() {},
+  onBeforeMount() {
+    this.onload()
+
+    this.update()
+  },
+}))
 
 /**
  * test: with types can inject props type
  */
-export const Component8 = withTypes<
-  RiotComponentWithoutState<{
-    customProp: string
-  }>
->({
+export const Component8 = withTypes({
+  onClick() {},
   onBeforeMount(props) {
     props.customProp
+
+    this.onClick()
+    this.update()
   },
 })
+
+export const Component8Fn = withTypes(() => ({
+  onClick() {},
+  onBeforeMount(props) {
+    props.customProp
+
+    this.onClick()
+    this.update()
+  },
+}))
 
 /**
  * test: injected props type won't allow undefined property access
  */
-export const Component9 = withTypes<RiotComponentWithoutState<{}>>({
+export const Component9 = withTypes({
   onBeforeMount(props) {
     //@ts-expect-error
     props.undefinedProp
+
+    this.update()
   },
 })
+
+export const Component9Fn = withTypes(() => ({
+  onBeforeMount(props) {
+    //@ts-expect-error
+    props.undefinedProp
+
+    this.update()
+  },
+}))
 
 /**
  * test: with types can inject state type both into this and return value
  */
-export const Component10 = withTypes<RiotComponent<{}, { hidden: boolean }>>({
+export const Component10 = withTypes({
   state: {
     hidden: false,
   },
   onBeforeMount() {
     //@ts-expect-error
     this.state.hidden = "won't work"
+
+    this.update()
   },
 })
+
+export const Component10Fn = withTypes(() => ({
+  state: {
+    hidden: false,
+  },
+  onBeforeMount() {
+    //@ts-expect-error
+    this.state.hidden = "won't work"
+
+    this.update()
+  },
+}))
 
 //@ts-expect-error
 Component10.state.hidden = "won't work either"
