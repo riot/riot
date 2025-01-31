@@ -1,5 +1,4 @@
 import {
-  SlotBindingData,
   TemplateChunk,
   BindingData,
   AttributeExpressionData,
@@ -40,10 +39,8 @@ export type InstalledPluginsSet = Set<ComponentEnhancer>
 export type RiotComponentsMap = {
   [key: string]: RiotComponentWrapper
 }
-export type AutobindObjectMethods<
-  Object,
-  Component extends RiotComponent | RiotComponentWithoutState,
-> = {
+
+export type AutobindObjectMethods<Object, Component extends RiotComponent> = {
   [K in keyof Object]: Object[K] extends (...args: infer Args) => infer Return
     ? (this: Component & Object, ...args: Args) => Return
     : Object[K]
@@ -91,27 +88,7 @@ export interface RiotComponent<
   onUnmounted?(props: Props, state: State): void
 }
 
-// Type needed to identify components without the initial state
-export type RiotComponentWithoutState<
-  Props extends DefaultProps = DefaultProps,
-> = Omit<RiotComponent<Props>, 'state'>
-
-// The Riot component object without the internals
-// The internal attributes will be handled by the framework
-export type RiotComponentWithoutInternals<Component> = Omit<
-  Component,
-  | 'props'
-  | 'root'
-  | 'name'
-  | 'slots'
-  | 'mount'
-  | 'update'
-  | 'unmount'
-  | '$'
-  | '$$'
->
-
-// Riot Pure Component interface that should be used together with riot.pure
+// The Riot // Riot Pure Component interface that should be used together with riot.pure
 export interface RiotPureComponent<Context = object> {
   mount(element: HTMLElement, context?: Context): RiotPureComponent<Context>
   update(context?: Context): RiotPureComponent<Context>
@@ -133,10 +110,8 @@ export interface PureComponentFactoryFunction<
   }): RiotPureComponent<Context>
 }
 
-// This object interface is created anytime a riot file will be compiled into javascript
-export interface RiotComponentWrapper<
-  Component extends RiotComponent | RiotComponentWithoutState = RiotComponent,
-> {
+// This object represents the Output of the Riot compiler
+export interface RiotComponentWrapper<Component> {
   readonly css?: string | null
   readonly exports?: RiotComponentFactoryFunction<Component> | Component | null
   readonly name?: string | null
@@ -188,10 +163,7 @@ export declare function uninstall(
 export declare function component<
   Props extends DefaultProps,
   State extends DefaultState,
-  Component extends RiotComponent | RiotComponentWithoutState = RiotComponent<
-    Props,
-    State
-  >,
+  Component extends RiotComponent = RiotComponent<Props, State>,
 >(
   wrapper: RiotComponentWrapper<Component>,
 ): (
@@ -214,38 +186,42 @@ export declare const version: string
 
 // typescript specific methods
 
-// Component with factory function
+// Helper to infer the component object
+type InferComponent<T> = T extends (...args: any[]) => infer C ? C : T
+
+// Static component objects
 export declare function withTypes<
-  Factory extends RiotComponentFactoryFunction<
-    RiotComponent | RiotComponentWithoutState
+  Component extends RiotComponent = RiotComponent,
+  ComponentInstance extends RiotComponent = RiotComponent,
+  ComponentWithoutInternals = RiotComponentWithoutInternals<
+    InferComponent<Component>
   >,
->(factory: Factory): ReturnType<Factory>
-
-// Component undefined factory function
-export declare function withTypes<Factory extends (...args: any[]) => any>(
-  factory: Factory,
-): ReturnType<Factory>
-
-// Component defined without generics
-export declare function withTypes<
-  Component extends {},
-  ComponentWithoutInternals = RiotComponentWithoutInternals<Component>,
 >(
-  component:
-    | AutobindObjectMethods<ComponentWithoutInternals, RiotComponent>
-    | RiotComponentFactoryFunction<RiotComponent>,
-): typeof component
+  // try to infer the functions instantiating components
+  component: Component extends (...args: any[]) => any
+    ? RiotComponentFactoryFunction<
+        AutobindObjectMethods<ComponentWithoutInternals, ComponentInstance>
+      >
+    : AutobindObjectMethods<ComponentWithoutInternals, ComponentInstance>,
+): typeof component extends (...args: any[]) => any
+  ? ReturnType<typeof component>
+  : typeof component
 
-// // Components defined a plain object without generics
+// Functional Components instances
 export declare function withTypes<
-  Component extends RiotComponent | RiotComponentWithoutState,
+  Factory extends (...args: any[]) => any = (...args: any[]) => any,
+  ComponentInstance extends RiotComponent = RiotComponent,
+  ComponentWithoutInternals = RiotComponentWithoutInternals<
+    InferComponent<Factory>
+  >,
 >(
-  component:
-    | AutobindObjectMethods<RiotComponentWithoutInternals<Component>, Component>
-    | RiotComponentFactoryFunction<Parial<Component>>,
-): typeof component
+  factory: RiotComponentFactoryFunction<
+    AutobindObjectMethods<ComponentWithoutInternals, ComponentInstance>
+  >,
+): ReturnType<typeof factory>
 
 /**
+
  * Internal stuff exposed for advanced use cases
  * IMPORTANT:
  * The things exposed under __ are not part of the official API and might break at any time
