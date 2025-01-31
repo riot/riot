@@ -37,7 +37,7 @@ export type ComponentEnhancer = <
 ) => RiotComponent<Props, State>
 export type InstalledPluginsSet = Set<ComponentEnhancer>
 export type RiotComponentsMap = {
-  [key: string]: RiotComponentWrapper
+  [key: string]: RiotComponentWrapper<RiotComponent>
 }
 
 export type AutobindObjectMethods<Object, Component extends RiotComponent> = {
@@ -61,16 +61,12 @@ export interface RiotComponent<
   // optional alias to map the children component names
   components?: RiotComponentsMap
 
-  mount(
-    element: HTMLElement,
-    initialState?: State,
-    parentScope?: object,
-  ): RiotComponent<Props, State>
+  mount(element: HTMLElement, initialState?: State, parentScope?: object): void
   update(
     newState?: Partial<State>,
     parentScope?: object,
   ): RiotComponent<Props, State>
-  unmount(keepRootElement?: boolean): RiotComponent<Props, State>
+  unmount(keepRootElement?: boolean): void
 
   // Helpers
   $(selector: string): Element | null
@@ -186,38 +182,20 @@ export declare const version: string
 
 // typescript specific methods
 
-// Helper to infer the component object
-type InferComponent<T> = T extends (...args: any[]) => infer C ? C : T
-
-// Static component objects
-export declare function withTypes<
-  Component extends RiotComponent = RiotComponent,
-  ComponentInstance extends RiotComponent = RiotComponent,
-  ComponentWithoutInternals = RiotComponentWithoutInternals<
-    InferComponent<Component>
-  >,
->(
+//Static component objects
+export declare function withTypes<Component>(
   // try to infer the functions instantiating components
-  component: Component extends (...args: any[]) => any
-    ? RiotComponentFactoryFunction<
-        AutobindObjectMethods<ComponentWithoutInternals, ComponentInstance>
-      >
-    : AutobindObjectMethods<ComponentWithoutInternals, ComponentInstance>,
-): typeof component extends (...args: any[]) => any
-  ? ReturnType<typeof component>
-  : typeof component
+  component: AutobindObjectMethods<Component, RiotComponent>,
+): typeof component
 
-// Functional Components instances
-export declare function withTypes<
-  Factory extends (...args: any[]) => any = (...args: any[]) => any,
-  ComponentInstance extends RiotComponent = RiotComponent,
-  ComponentWithoutInternals = RiotComponentWithoutInternals<
-    InferComponent<Factory>
-  >,
->(
-  factory: RiotComponentFactoryFunction<
-    AutobindObjectMethods<ComponentWithoutInternals, ComponentInstance>
-  >,
+// Functional component instantiation
+export declare function withTypes<Factory extends (...args: any[]) => any>(
+  // try to infer the functions instantiating components
+  factory: Factory extends (...args: any[]) => infer ReturnedComponent
+    ? RiotComponentFactoryFunction<
+        AutobindObjectMethods<ReturnedComponent, RiotComponent>
+      >
+    : never,
 ): ReturnType<typeof factory>
 
 /**
