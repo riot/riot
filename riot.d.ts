@@ -86,9 +86,9 @@ export interface RiotComponent<
 
 // The Riot // Riot Pure Component interface that should be used together with riot.pure
 export interface RiotPureComponent<Context = object> {
-  mount(element: HTMLElement, context?: Context): RiotPureComponent<Context>
-  update(context?: Context): RiotPureComponent<Context>
-  unmount(keepRootElement: boolean): RiotPureComponent<Context>
+  mount(element: HTMLElement, context?: Context): void
+  update(context?: Context): void
+  unmount(keepRootElement: boolean): void
 }
 
 export interface PureComponentFactoryFunction<
@@ -182,21 +182,26 @@ export declare const version: string
 
 // typescript specific methods
 
-//Static component objects
-export declare function withTypes<Component>(
-  // try to infer the functions instantiating components
-  component: AutobindObjectMethods<Component, RiotComponent>,
-): typeof component
+// Helper to infer the component object
+type InferComponent<T> = T extends (...args: any[]) => infer C ? C : never
 
 // Functional component instantiation
-export declare function withTypes<Factory extends (...args: any[]) => any>(
+export declare function withTypes<
+  Factory extends (...args: any[]) => any,
+  Component = InferComponent<Factory>,
+>(
   // try to infer the functions instantiating components
-  factory: Factory extends (...args: any[]) => infer ReturnedComponent
-    ? RiotComponentFactoryFunction<
-        AutobindObjectMethods<ReturnedComponent, RiotComponent>
-      >
-    : never,
+  factory: RiotComponentFactoryFunction<
+    AutobindObjectMethods<Component, RiotComponent>
+  >,
 ): ReturnType<typeof factory>
+//Static component objects
+export declare function withTypes<Component>(
+  component: AutobindObjectMethods<Component, RiotComponent> & {
+    // Prevent functions from matching,
+    prototype?: never
+  },
+): typeof component
 
 /**
 
