@@ -61,12 +61,16 @@ export interface RiotComponent<
   // optional alias to map the children component names
   components?: RiotComponentsMap
 
-  mount(element: HTMLElement, initialState?: State, parentScope?: object): void
+  mount(
+    element: HTMLElement,
+    initialState?: State,
+    parentScope?: object,
+  ): RiotComponent<Props, State>
   update(
     newState?: Partial<State>,
     parentScope?: object,
   ): RiotComponent<Props, State>
-  unmount(keepRootElement?: boolean): void
+  unmount(keepRootElement?: boolean): RiotComponent<Props, State>
 
   // Helpers
   $(selector: string): Element | null
@@ -83,6 +87,21 @@ export interface RiotComponent<
   onBeforeUnmount?(props: Props, state: State): void
   onUnmounted?(props: Props, state: State): void
 }
+
+// The Riot component object without the internals
+// The internal attributes will be handled by the framework
+export type RiotComponentWithoutInternals<Component> = Omit<
+  Component,
+  | 'props'
+  | 'root'
+  | 'name'
+  | 'slots'
+  | 'mount'
+  | 'update'
+  | 'unmount'
+  | '$'
+  | '$$'
+>
 
 // The Riot // Riot Pure Component interface that should be used together with riot.pure
 export interface RiotPureComponent<Context = object> {
@@ -187,17 +206,21 @@ type InferComponent<T> = T extends (...args: any[]) => infer C ? C : never
 
 // Functional component instantiation
 export declare function withTypes<
-  Factory extends (...args: any[]) => any,
+  Factory extends (...args: any[], Component = InferComponent<Factory>) => any,
   Component = InferComponent<Factory>,
+  ComponentWithoutInternals = RiotComponentWithoutInternals<Component>,
 >(
-  // try to infer the functions instantiating components
   factory: RiotComponentFactoryFunction<
-    AutobindObjectMethods<Component, RiotComponent>
+    AutobindObjectMethods<ComponentWithoutInternals, RiotComponent>
   >,
 ): ReturnType<typeof factory>
+
 //Static component objects
-export declare function withTypes<Component>(
-  component: AutobindObjectMethods<Component, RiotComponent> & {
+export declare function withTypes<
+  Component,
+  ComponentWithoutInternals = RiotComponentWithoutInternals<Component>,
+>(
+  component: AutobindObjectMethods<ComponentWithoutInternals, RiotComponent> & {
     // Prevent functions from matching,
     prototype?: never
   },

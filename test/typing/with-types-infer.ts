@@ -144,9 +144,11 @@ export const Component7Fn = withTypes(() => ({
 /**
  * test: with types can inject props type
  */
+type Component8Props = { customProp: string }
+
 export const Component8 = withTypes({
   onClick() {},
-  onBeforeMount(props) {
+  onBeforeMount(props: Component8Props) {
     props.customProp
 
     this.onClick()
@@ -156,7 +158,7 @@ export const Component8 = withTypes({
 
 export const Component8Fn = withTypes(() => ({
   onClick() {},
-  onBeforeMount(props) {
+  onBeforeMount(props: Component8Props) {
     props.customProp
 
     this.onClick()
@@ -167,8 +169,10 @@ export const Component8Fn = withTypes(() => ({
 /**
  * test: injected props type won't allow undefined property access
  */
+type Component9Props = { customProp: string }
+
 export const Component9 = withTypes({
-  onBeforeMount(props) {
+  onBeforeMount(props: Component9Props) {
     //@ts-expect-error
     props.undefinedProp
 
@@ -177,7 +181,7 @@ export const Component9 = withTypes({
 })
 
 export const Component9Fn = withTypes(() => ({
-  onBeforeMount(props) {
+  onBeforeMount(props: Component9Props) {
     //@ts-expect-error
     props.undefinedProp
 
