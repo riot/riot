@@ -90,20 +90,21 @@ export interface RiotComponent<
 
 // The Riot component object without the internals
 // The internal attributes will be handled by the framework
-export type RiotComponentWithoutInternals<Component> = Omit<
-  Component,
-  | 'props'
-  | 'root'
-  | 'name'
-  | 'slots'
-  | 'mount'
-  | 'update'
-  | 'unmount'
-  | '$'
-  | '$$'
->
+export type RiotComponentWithoutInternals<Component extends RiotComponent> =
+  Omit<
+    Component,
+    | 'props'
+    | 'root'
+    | 'name'
+    | 'slots'
+    | 'mount'
+    | 'update'
+    | 'unmount'
+    | '$'
+    | '$$'
+  >
 
-// The Riot // Riot Pure Component interface that should be used together with riot.pure
+//  Riot Pure Component interface that should be used together with riot.pure
 export interface RiotPureComponent<Context = object> {
   mount(element: HTMLElement, context?: Context): void
   update(context?: Context): void
