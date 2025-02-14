@@ -1,4 +1,4 @@
-/* Riot v9.4.4, @license MIT */
+/* Riot v9.4.5, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -164,6 +164,215 @@
     }, {})
   }
 
+  const EACH = 0;
+  const IF = 1;
+  const SIMPLE = 2;
+  const TAG$1 = 3;
+  const SLOT = 4;
+
+  const bindingTypes = {
+    EACH,
+    IF,
+    SIMPLE,
+    TAG: TAG$1,
+    SLOT,
+  };
+
+  // Riot.js constants that can be used across more modules
+
+  const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
+    DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
+    PLUGINS_SET = new Set(),
+    IS_DIRECTIVE$1 = 'is',
+    MOUNT_METHOD_KEY = 'mount',
+    UPDATE_METHOD_KEY = 'update',
+    UNMOUNT_METHOD_KEY = 'unmount',
+    SHOULD_UPDATE_KEY = 'shouldUpdate',
+    ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
+    ON_MOUNTED_KEY = 'onMounted',
+    ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
+    ON_UPDATED_KEY = 'onUpdated',
+    ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
+    ON_UNMOUNTED_KEY = 'onUnmounted',
+    PROPS_KEY = 'props',
+    STATE_KEY = 'state',
+    SLOTS_KEY = 'slots',
+    ROOT_KEY = 'root',
+    IS_PURE_SYMBOL = Symbol('pure'),
+    IS_COMPONENT_UPDATING = Symbol('is_updating'),
+    PARENT_KEY_SYMBOL = Symbol('parent'),
+    ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
+    TEMPLATE_KEY_SYMBOL = Symbol('template');
+
+  /**
+   * Get all the element attributes as object
+   * @param   {HTMLElement} element - DOM node we want to parse
+   * @returns {Object} all the attributes found as a key value pairs
+   */
+  function DOMattributesToObject(element) {
+    return Array.from(element.attributes).reduce((acc, attribute) => {
+      acc[dashToCamelCase(attribute.name)] = attribute.value;
+      return acc
+    }, {})
+  }
+
+  /**
+   * Move all the child nodes from a source tag to another
+   * @param   {HTMLElement} source - source node
+   * @param   {HTMLElement} target - target node
+   * @returns {undefined} it's a void method ¯\_(ツ)_/¯
+   */
+
+  // Ignore this helper because it's needed only for svg tags
+  function moveChildren(source, target) {
+    // eslint-disable-next-line fp/no-loops
+    while (source.firstChild) target.appendChild(source.firstChild);
+  }
+
+  /**
+   * Remove the child nodes from any DOM node
+   * @param   {HTMLElement} node - target node
+   * @returns {undefined}
+   */
+  function cleanNode(node) {
+    // eslint-disable-next-line fp/no-loops
+    while (node.firstChild) node.removeChild(node.firstChild);
+  }
+
+  /**
+   * Clear multiple children in a node
+   * @param   {HTMLElement[]} children - direct children nodes
+   * @returns {undefined}
+   */
+  function clearChildren(children) {
+    // eslint-disable-next-line fp/no-loops,fp/no-let
+    for (let i = 0; i < children.length; i++) removeChild(children[i]);
+  }
+
+  /**
+   * Remove a node
+   * @param {HTMLElement}node - node to remove
+   * @returns {undefined}
+   */
+  const removeChild = (node) => node.remove();
+
+  /**
+   * Insert before a node
+   * @param {HTMLElement} newNode - node to insert
+   * @param {HTMLElement} refNode - ref child
+   * @returns {undefined}
+   */
+  const insertBefore = (newNode, refNode) =>
+    refNode &&
+    refNode.parentNode &&
+    refNode.parentNode.insertBefore(newNode, refNode);
+
+  /**
+   * Replace a node
+   * @param {HTMLElement} newNode - new node to add to the DOM
+   * @param {HTMLElement} replaced - node to replace
+   * @returns {undefined}
+   */
+  const replaceChild = (newNode, replaced) =>
+    replaced &&
+    replaced.parentNode &&
+    replaced.parentNode.replaceChild(newNode, replaced);
+
+  // does simply nothing
+  function noop$1() {
+    return this
+  }
+
+  /**
+   * Autobind the methods of a source object to itself
+   * @param   {Object} source - probably a riot tag instance
+   * @param   {Array<string>} methods - list of the methods to autobind
+   * @returns {Object} the original object received
+   */
+  function autobindMethods(source, methods) {
+    methods.forEach((method) => {
+      source[method] = source[method].bind(source);
+    });
+
+    return source
+  }
+
+  /**
+   * Call the first argument received only if it's a function otherwise return it as it is
+   * @param   {*} source - anything
+   * @returns {*} anything
+   */
+  function callOrAssign(source) {
+    return isFunction(source)
+      ? source.prototype && source.prototype.constructor
+        ? new source()
+        : source()
+      : source
+  }
+
+  /**
+   * Helper function to set an immutable property
+   * @param   {Object} source - object where the new property will be set
+   * @param   {string} key - object key where the new property will be stored
+   * @param   {*} value - value of the new property
+   * @param   {Object} options - set the property overriding the default options
+   * @returns {Object} - the original object modified
+   */
+  function defineProperty(source, key, value, options = {}) {
+    /* eslint-disable fp/no-mutating-methods */
+    Object.defineProperty(source, key, {
+      value,
+      enumerable: false,
+      writable: false,
+      configurable: true,
+      ...options,
+    });
+    /* eslint-enable fp/no-mutating-methods */
+
+    return source
+  }
+
+  /**
+   * Define multiple properties on a target object
+   * @param   {Object} source - object where the new properties will be set
+   * @param   {Object} properties - object containing as key pair the key + value properties
+   * @param   {Object} options - set the property overriding the default options
+   * @returns {Object} the original object modified
+   */
+  function defineProperties(source, properties, options) {
+    Object.entries(properties).forEach(([key, value]) => {
+      defineProperty(source, key, value, options);
+    });
+
+    return source
+  }
+
+  /**
+   * Define default properties if they don't exist on the source object
+   * @param   {Object} source - object that will receive the default properties
+   * @param   {Object} defaults - object containing additional optional keys
+   * @returns {Object} the original object received enhanced
+   */
+  function defineDefaults(source, defaults) {
+    Object.entries(defaults).forEach(([key, value]) => {
+      if (!source[key]) source[key] = value;
+    });
+
+    return source
+  }
+
+  /**
+   * Generate a new object picking only the properties from a given array
+   * @param {Object} source - target object
+   * @param {Array} keys - list of keys that we want to copy over to the new object
+   * @return {Object} a new object conaining only the keys that we have picked from the keys array list
+   */
+  function pick(source, keys) {
+    return isObject(source)
+      ? Object.fromEntries(keys.map((key) => [key, source[key]]))
+      : source
+  }
+
   /* Riot Compiler, @license MIT */
 
   const TAG_LOGIC_PROPERTY = 'exports';
@@ -213,7 +422,7 @@
    * @enum {number}
    * @readonly
    */
-  const TAG$1 = 1; /* TAG */
+  const TAG = 1; /* TAG */
   const ATTR = 2; /* ATTR */
   const TEXT = 3; /* TEXT */
   const CDATA = 4; /* CDATA */
@@ -222,7 +431,7 @@
   const DOCTYPE = 10; /* DOCTYPE */
   const DOCUMENT_FRAGMENT = 11; /* DOCUMENT_FRAGMENT */
 
-  var types$3 = /*#__PURE__*/Object.freeze({
+  var types$2 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     ATTR: ATTR,
     CDATA: CDATA,
@@ -230,7 +439,7 @@
     DOCTYPE: DOCTYPE,
     DOCUMENT: DOCUMENT,
     DOCUMENT_FRAGMENT: DOCUMENT_FRAGMENT,
-    TAG: TAG$1,
+    TAG: TAG,
     TEXT: TEXT
   });
 
@@ -1480,7 +1689,7 @@
    */
   function pushTag(state, name, start, end) {
     const root = state.root;
-    const last = { type: TAG$1, name, start, end };
+    const last = { type: TAG, name, start, end };
 
     if (isCustom(name)) {
       last[IS_CUSTOM] = true;
@@ -1575,9 +1784,16 @@
         const start = match.index;
         const end = re.lastIndex;
         state.scryle = null; // reset the script/style flag now
-        // write the tag content, if any
+        // write the tag content
         if (start > pos) {
           parseSpecialTagsContent(state, name, match);
+        } else if (name !== TEXTAREA_TAG) {
+          state.last.text = {
+            type: TEXT,
+            text: '',
+            start: pos,
+            end: pos,
+          };
         }
         // now the closing tag, either </script> or </style>
         pushTag(state, `/${name}`, start, end);
@@ -1585,7 +1801,7 @@
       }
       case data[pos] === '<':
         state.pos++;
-        return TAG$1
+        return TAG
       default:
         expr(state, null, '<', pos);
     }
@@ -1689,7 +1905,7 @@
         case TEXT:
           this.pushText(store, node);
           break
-        case TAG$1: {
+        case TAG: {
           const name = node.name;
           const closingTagChar = '/';
           const [firstChar] = name;
@@ -1774,19 +1990,19 @@
     },
     pushText(store, node) {
       const text = node.text;
-      const empty = !/\S/.test(text);
       const scryle = store.scryle;
       if (!scryle) {
         // store.last always have a nodes property
         const parent = store.last;
 
         const pack = this.compact && !parent[IS_RAW];
+        const empty = !/\S/.test(text);
         if (pack && empty) {
           return
         }
         this.split(node, text, node.start, pack);
         parent.nodes.push(node);
-      } else if (!empty) {
+      } else {
         scryle.text = node;
       }
     },
@@ -1836,7 +2052,7 @@
 
   function createTreeBuilder(data, options) {
     const root = {
-      type: TAG$1,
+      type: TAG,
       name: '',
       start: 0,
       end: 0,
@@ -1868,7 +2084,7 @@
   function parser$1(options, customBuilder) {
     const state = curry$1(createParserState)(options, createTreeBuilder);
     return {
-      parse: (data) => parse$2(state(data)),
+      parse: (data) => parse$1(state(data)),
     }
   }
 
@@ -1911,7 +2127,7 @@
    * @param   {ParserState}  state - Current parser state
    * @returns {ParserResult} Result, contains data and output properties.
    */
-  function parse$2(state) {
+  function parse$1(state) {
     const { data } = state;
 
     walk(state);
@@ -1958,7 +2174,7 @@
    */
   function eat(state, type) {
     switch (type) {
-      case TAG$1:
+      case TAG:
         return tag(state)
       case ATTR:
         return attr(state)
@@ -1975,7 +2191,7 @@
   /**
    * The nodeTypes definition
    */
-  const nodeTypes = types$3;
+  const nodeTypes = types$2;
 
   const BINDING_TYPES = 'bindingTypes';
   const EACH_BINDING_TYPE = 'EACH';
@@ -2021,7 +2237,7 @@
   const KEY_ATTRIBUTE = 'key';
   const SLOT_ATTRIBUTE = 'slot';
   const NAME_ATTRIBUTE = 'name';
-  const IS_DIRECTIVE$1 = 'is';
+  const IS_DIRECTIVE = 'is';
 
   // Misc
   const DEFAULT_SLOT_NAME = 'default';
@@ -2135,7 +2351,7 @@
   }
 
   function __esDecorate(ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
-    function accept(f) { if (f !== void 0 && typeof f !== "function") throw new TypeError("Function expected"); return f; }
+    function accept(f) { if (f !== undefined && typeof f !== "function") throw new TypeError("Function expected"); return f; }
     var kind = contextIn.kind, key = kind === "getter" ? "get" : kind === "setter" ? "set" : "value";
     var target = !descriptorIn && ctor ? contextIn["static"] ? ctor : ctor.prototype : null;
     var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});
@@ -2147,7 +2363,7 @@
         context.addInitializer = function (f) { if (done) throw new TypeError("Cannot add initializers after decoration has completed"); extraInitializers.push(accept(f || null)); };
         var result = (0, decorators[i])(kind === "accessor" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);
         if (kind === "accessor") {
-            if (result === void 0) continue;
+            if (result === undefined) continue;
             if (result === null || typeof result !== "object") throw new TypeError("Object expected");
             if (_ = accept(result.get)) descriptor.get = _;
             if (_ = accept(result.set)) descriptor.set = _;
@@ -2166,7 +2382,7 @@
     for (var i = 0; i < initializers.length; i++) {
         value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);
     }
-    return useValue ? value : void 0;
+    return useValue ? value : undefined;
   }
   function __propKey(x) {
     return typeof x === "symbol" ? x : "".concat(x);
@@ -2213,7 +2429,7 @@
             }
             op = body.call(thisArg, _);
         } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : undefined, done: true };
     }
   }
 
@@ -2238,7 +2454,7 @@
     if (m) return m.call(o);
     if (o && typeof o.length === "number") return {
         next: function () {
-            if (o && i >= o.length) o = void 0;
+            if (o && i >= o.length) o = undefined;
             return { value: o && o[i++], done: !o };
         }
     };
@@ -2359,14 +2575,14 @@
   }
 
   function __addDisposableResource(env, value, async) {
-    if (value !== null && value !== void 0) {
+    if (value !== null && value !== undefined) {
       if (typeof value !== "object" && typeof value !== "function") throw new TypeError("Object expected.");
       var dispose;
       if (async) {
           if (!Symbol.asyncDispose) throw new TypeError("Symbol.asyncDispose is not defined.");
           dispose = value[Symbol.asyncDispose];
       }
-      if (dispose === void 0) {
+      if (dispose === undefined) {
           if (!Symbol.dispose) throw new TypeError("Symbol.dispose is not defined.");
           dispose = value[Symbol.dispose];
       }
@@ -2479,7 +2695,7 @@
 
   var fork = {exports: {}};
 
-  var types$2 = {exports: {}};
+  var types$1 = {exports: {}};
 
   var shared = {};
 
@@ -2489,7 +2705,7 @@
   	if (hasRequiredShared) return shared;
   	hasRequiredShared = 1;
   	Object.defineProperty(shared, "__esModule", { value: true });
-  	shared.maybeSetModuleExports = void 0;
+  	shared.maybeSetModuleExports = undefined;
   	var tslib_1 = require$$0;
   	var types_1 = tslib_1.__importDefault(requireTypes());
   	function default_1(fork) {
@@ -2579,16 +2795,16 @@
   	return shared;
   }
 
-  types$2.exports;
+  types$1.exports;
 
   var hasRequiredTypes;
 
   function requireTypes () {
-  	if (hasRequiredTypes) return types$2.exports;
+  	if (hasRequiredTypes) return types$1.exports;
   	hasRequiredTypes = 1;
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
-  		exports.Def = void 0;
+  		exports.Def = undefined;
   		var tslib_1 = require$$0;
   		var shared_1 = requireShared();
   		var Op = Object.prototype;
@@ -3376,8 +3592,8 @@
   		exports.default = typesPlugin;
   		(0, shared_1.maybeSetModuleExports)(function () { return module; });
   		
-  	} (types$2, types$2.exports));
-  	return types$2.exports;
+  	} (types$1, types$1.exports));
+  	return types$1.exports;
   }
 
   var pathVisitor = {exports: {}};
@@ -5452,14 +5668,14 @@
   		        // Esprima doesn't bother with this field, presumably because it's
   		        // always true for unary operators.
   		        .field("prefix", Boolean, defaults["true"]);
-  		    var BinaryOperator = or.apply(void 0, BinaryOperators);
+  		    var BinaryOperator = or.apply(undefined, BinaryOperators);
   		    def("BinaryExpression")
   		        .bases("Expression")
   		        .build("operator", "left", "right")
   		        .field("operator", BinaryOperator)
   		        .field("left", def("Expression"))
   		        .field("right", def("Expression"));
-  		    var AssignmentOperator = or.apply(void 0, AssignmentOperators);
+  		    var AssignmentOperator = or.apply(undefined, AssignmentOperators);
   		    def("AssignmentExpression")
   		        .bases("Expression")
   		        .build("operator", "left", "right")
@@ -5473,7 +5689,7 @@
   		        .field("operator", UpdateOperator)
   		        .field("argument", def("Expression"))
   		        .field("prefix", Boolean);
-  		    var LogicalOperator = or.apply(void 0, LogicalOperators);
+  		    var LogicalOperator = or.apply(undefined, LogicalOperators);
   		    def("LogicalExpression")
   		        .bases("Expression")
   		        .build("operator", "left", "right")
@@ -5962,7 +6178,7 @@
   		        .bases("Declaration")
   		        .build("source", "exported")
   		        .field("source", def("Literal"))
-  		        .field("exported", or(def("Identifier"), null, void 0), defaults["null"]);
+  		        .field("exported", or(def("Identifier"), null, undefined), defaults["null"]);
   		    // Optional chaining
   		    def("ChainElement")
   		        .bases("Node")
@@ -6432,7 +6648,7 @@
   		    ])
   		        .field("indexers", [def("ObjectTypeIndexer")], defaults.emptyArray)
   		        .field("callProperties", [def("ObjectTypeCallProperty")], defaults.emptyArray)
-  		        .field("inexact", or(Boolean, void 0), defaults["undefined"])
+  		        .field("inexact", or(Boolean, undefined), defaults["undefined"])
   		        .field("exact", Boolean, defaults["false"])
   		        .field("internalSlots", [def("ObjectTypeInternalSlot")], defaults.emptyArray);
   		    def("Variance")
@@ -6819,7 +7035,7 @@
   		        .field("directives", [def("Directive")], defaults.emptyArray)
   		        .field("interpreter", or(def("InterpreterDirective"), null), defaults["null"]);
   		    function makeLiteralExtra(rawValueType, toRaw) {
-  		        if (rawValueType === void 0) { rawValueType = String; }
+  		        if (rawValueType === undefined) { rawValueType = String; }
   		        return [
   		            "extra",
   		            {
@@ -7084,7 +7300,7 @@
   		    // An abstract (non-buildable) base type that provide a commonly-needed
   		    // optional .typeParameters field.
   		    def("TSHasOptionalTypeParameters")
-  		        .field("typeParameters", or(def("TSTypeParameterDeclaration"), null, void 0), defaults["null"]);
+  		        .field("typeParameters", or(def("TSTypeParameterDeclaration"), null, undefined), defaults["null"]);
   		    // An abstract (non-buildable) base type that provide a commonly-needed
   		    // optional .typeAnnotation field.
   		    def("TSHasOptionalTypeAnnotation")
@@ -7199,7 +7415,7 @@
   		        .field("params", [def("Pattern")])
   		        // classMethodOrPropertyCommon
   		        .field("abstract", Boolean, defaults["false"])
-  		        .field("accessibility", or("public", "private", "protected", void 0), defaults["undefined"])
+  		        .field("accessibility", or("public", "private", "protected", undefined), defaults["undefined"])
   		        .field("static", Boolean, defaults["false"])
   		        .field("computed", Boolean, defaults["false"])
   		        .field("optional", Boolean, defaults["false"])
@@ -7209,7 +7425,7 @@
   		        // classMethodOrDeclareMethodCommon
   		        .field("kind", or("get", "set", "method", "constructor"), function getDefault() { return "method"; })
   		        .field("access", // Not "accessibility"?
-  		    or("public", "private", "protected", void 0), defaults["undefined"])
+  		    or("public", "private", "protected", undefined), defaults["undefined"])
   		        .field("decorators", or([def("Decorator")], null), defaults["null"])
   		        // tSFunctionTypeAnnotationCommon
   		        .field("returnType", or(def("TSTypeAnnotation"), def("Noop"), // Still used?
@@ -7306,8 +7522,8 @@
   		        .bases("Identifier")
   		        .build("name", "constraint", "default")
   		        .field("name", or(def("Identifier"), String))
-  		        .field("constraint", or(def("TSType"), void 0), defaults["undefined"])
-  		        .field("default", or(def("TSType"), void 0), defaults["undefined"]);
+  		        .field("constraint", or(def("TSType"), undefined), defaults["undefined"])
+  		        .field("default", or(def("TSType"), undefined), defaults["undefined"]);
   		    def("TSTypeAssertion")
   		        .bases("Expression", "Pattern")
   		        .build("typeAnnotation", "expression")
@@ -7355,7 +7571,7 @@
   		        .bases("TSType", "TSHasOptionalTypeParameterInstantiation")
   		        .build("argument", "qualifier", "typeParameters")
   		        .field("argument", StringLiteral)
-  		        .field("qualifier", or(TSEntityName, void 0), defaults["undefined"]);
+  		        .field("qualifier", or(TSEntityName, undefined), defaults["undefined"]);
   		    def("TSImportEqualsDeclaration")
   		        .bases("Declaration")
   		        .build("id", "moduleReference")
@@ -7392,12 +7608,12 @@
   		    def("TSParameterProperty")
   		        .bases("Pattern")
   		        .build("parameter")
-  		        .field("accessibility", or("public", "private", "protected", void 0), defaults["undefined"])
+  		        .field("accessibility", or("public", "private", "protected", undefined), defaults["undefined"])
   		        .field("readonly", Boolean, defaults["false"])
   		        .field("parameter", or(def("Identifier"), def("AssignmentPattern")));
   		    def("ClassProperty")
   		        .field("access", // Not "accessibility"?
-  		    or("public", "private", "protected", void 0), defaults["undefined"]);
+  		    or("public", "private", "protected", undefined), defaults["undefined"]);
   		    def("ClassAccessorProperty")
   		        .bases("Declaration", "TSHasOptionalTypeAnnotation");
   		    // Defined already in es6 and babel-core.
@@ -7422,7 +7638,7 @@
   	hasRequiredNamedTypes = 1;
   	(function (exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
-  		exports.namedTypes = void 0;
+  		exports.namedTypes = undefined;
   		(function (namedTypes) {
   		})(exports.namedTypes || (exports.namedTypes = {}));
   		
@@ -7430,14 +7646,14 @@
   	return namedTypes$1;
   }
 
-  var hasRequiredMain;
+  var hasRequiredMain$1;
 
-  function requireMain () {
-  	if (hasRequiredMain) return main;
-  	hasRequiredMain = 1;
+  function requireMain$1 () {
+  	if (hasRequiredMain$1) return main;
+  	hasRequiredMain$1 = 1;
   	(function (exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
-  		exports.visit = exports.use = exports.Type = exports.someField = exports.PathVisitor = exports.Path = exports.NodePath = exports.namedTypes = exports.getSupertypeNames = exports.getFieldValue = exports.getFieldNames = exports.getBuilderName = exports.finalize = exports.eachField = exports.defineMethod = exports.builtInTypes = exports.builders = exports.astNodesAreEquivalent = void 0;
+  		exports.visit = exports.use = exports.Type = exports.someField = exports.PathVisitor = exports.Path = exports.NodePath = exports.namedTypes = exports.getSupertypeNames = exports.getFieldValue = exports.getFieldNames = exports.getBuilderName = exports.finalize = exports.eachField = exports.defineMethod = exports.builtInTypes = exports.builders = exports.astNodesAreEquivalent = undefined;
   		var tslib_1 = require$$0;
   		var fork_1 = tslib_1.__importDefault(requireFork());
   		var es_proposals_1 = tslib_1.__importDefault(requireEsProposals());
@@ -7511,28 +7727,28 @@
 
   // mock the sourcemaps api for the browser bundle
   // we do not need sourcemaps with the in browser compilation
-  const noop$1 = function () {};
+  const noop = function () {};
 
-  const SourceMapGenerator$1 = function () {
+  const SourceMapGenerator = function () {
     return {
-      addMapping: noop$1,
-      setSourceContent: noop$1,
+      addMapping: noop,
+      setSourceContent: noop,
       toJSON: () => ({}),
     }
   };
-  const SourceMapConsumer$1 = function () {};
+  const SourceMapConsumer = function () {};
   const SourceNode = function () {};
 
   var sourcemapMockApi = {
     SourceNode,
-    SourceMapConsumer: SourceMapConsumer$1,
-    SourceMapGenerator: SourceMapGenerator$1,
+    SourceMapConsumer,
+    SourceMapGenerator,
   };
 
   var sourcemapMockApi$1 = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    SourceMapConsumer: SourceMapConsumer$1,
-    SourceMapGenerator: SourceMapGenerator$1,
+    SourceMapConsumer: SourceMapConsumer,
+    SourceMapGenerator: SourceMapGenerator,
     SourceNode: SourceNode,
     default: sourcemapMockApi
   });
@@ -7548,336 +7764,343 @@
 
   var require$$4 = /*@__PURE__*/getAugmentedNamespace(osMockApi);
 
-  Object.defineProperty(util, "__esModule", { value: true });
-  util.isTrailingCommaEnabled = util.getParentExportDeclaration = util.isExportDeclaration = util.fixFaultyLocations = util.getTrueLoc = composeSourceMaps_1 = util.composeSourceMaps = util.copyPos = util.comparePos = util.getUnionOfKeys = util.getOption = util.isBrowser = util.getLineTerminator = void 0;
-  var tslib_1 = require$$0;
-  var tiny_invariant_1 = tslib_1.__importDefault(requireTinyInvariant_cjs());
-  var types$1 = tslib_1.__importStar(requireMain());
-  var n = types$1.namedTypes;
-  var source_map_1 = tslib_1.__importDefault(require$$2);
-  var SourceMapConsumer = source_map_1.default.SourceMapConsumer;
-  var SourceMapGenerator = source_map_1.default.SourceMapGenerator;
-  var hasOwn = Object.prototype.hasOwnProperty;
-  function getLineTerminator() {
-      return isBrowser$1() ? "\n" : require$$4.EOL || "\n";
+  var hasRequiredUtil;
+
+  function requireUtil () {
+  	if (hasRequiredUtil) return util;
+  	hasRequiredUtil = 1;
+  	Object.defineProperty(util, "__esModule", { value: true });
+  	util.isTrailingCommaEnabled = util.getParentExportDeclaration = util.isExportDeclaration = util.fixFaultyLocations = util.getTrueLoc = util.composeSourceMaps = util.copyPos = util.comparePos = util.getUnionOfKeys = util.getOption = util.isBrowser = util.getLineTerminator = undefined;
+  	var tslib_1 = require$$0;
+  	var tiny_invariant_1 = tslib_1.__importDefault(/*@__PURE__*/ requireTinyInvariant_cjs());
+  	var types = tslib_1.__importStar(requireMain$1());
+  	var n = types.namedTypes;
+  	var source_map_1 = tslib_1.__importDefault(require$$2);
+  	var SourceMapConsumer = source_map_1.default.SourceMapConsumer;
+  	var SourceMapGenerator = source_map_1.default.SourceMapGenerator;
+  	var hasOwn = Object.prototype.hasOwnProperty;
+  	function getLineTerminator() {
+  	    return isBrowser() ? "\n" : require$$4.EOL || "\n";
+  	}
+  	util.getLineTerminator = getLineTerminator;
+  	function isBrowser() {
+  	    return (typeof window !== "undefined" && typeof window.document !== "undefined");
+  	}
+  	util.isBrowser = isBrowser;
+  	function getOption(options, key, defaultValue) {
+  	    if (options && hasOwn.call(options, key)) {
+  	        return options[key];
+  	    }
+  	    return defaultValue;
+  	}
+  	util.getOption = getOption;
+  	function getUnionOfKeys() {
+  	    var args = [];
+  	    for (var _i = 0; _i < arguments.length; _i++) {
+  	        args[_i] = arguments[_i];
+  	    }
+  	    var result = {};
+  	    var argc = args.length;
+  	    for (var i = 0; i < argc; ++i) {
+  	        var keys = Object.keys(args[i]);
+  	        var keyCount = keys.length;
+  	        for (var j = 0; j < keyCount; ++j) {
+  	            result[keys[j]] = true;
+  	        }
+  	    }
+  	    return result;
+  	}
+  	util.getUnionOfKeys = getUnionOfKeys;
+  	function comparePos(pos1, pos2) {
+  	    return pos1.line - pos2.line || pos1.column - pos2.column;
+  	}
+  	util.comparePos = comparePos;
+  	function copyPos(pos) {
+  	    return {
+  	        line: pos.line,
+  	        column: pos.column,
+  	    };
+  	}
+  	util.copyPos = copyPos;
+  	function composeSourceMaps(formerMap, latterMap) {
+  	    if (formerMap) {
+  	        if (!latterMap) {
+  	            return formerMap;
+  	        }
+  	    }
+  	    else {
+  	        return latterMap || null;
+  	    }
+  	    var smcFormer = new SourceMapConsumer(formerMap);
+  	    var smcLatter = new SourceMapConsumer(latterMap);
+  	    var smg = new SourceMapGenerator({
+  	        file: latterMap.file,
+  	        sourceRoot: latterMap.sourceRoot,
+  	    });
+  	    var sourcesToContents = {};
+  	    smcLatter.eachMapping(function (mapping) {
+  	        var origPos = smcFormer.originalPositionFor({
+  	            line: mapping.originalLine,
+  	            column: mapping.originalColumn,
+  	        });
+  	        var sourceName = origPos.source;
+  	        if (sourceName === null) {
+  	            return;
+  	        }
+  	        smg.addMapping({
+  	            source: sourceName,
+  	            original: copyPos(origPos),
+  	            generated: {
+  	                line: mapping.generatedLine,
+  	                column: mapping.generatedColumn,
+  	            },
+  	            name: mapping.name,
+  	        });
+  	        var sourceContent = smcFormer.sourceContentFor(sourceName);
+  	        if (sourceContent && !hasOwn.call(sourcesToContents, sourceName)) {
+  	            sourcesToContents[sourceName] = sourceContent;
+  	            smg.setSourceContent(sourceName, sourceContent);
+  	        }
+  	    });
+  	    return smg.toJSON();
+  	}
+  	util.composeSourceMaps = composeSourceMaps;
+  	function getTrueLoc(node, lines) {
+  	    // It's possible that node is newly-created (not parsed by Esprima),
+  	    // in which case it probably won't have a .loc property (or an
+  	    // .original property for that matter). That's fine; we'll just
+  	    // pretty-print it as usual.
+  	    if (!node.loc) {
+  	        return null;
+  	    }
+  	    var result = {
+  	        start: node.loc.start,
+  	        end: node.loc.end,
+  	    };
+  	    function include(node) {
+  	        expandLoc(result, node.loc);
+  	    }
+  	    // If the node is an export declaration and its .declaration has any
+  	    // decorators, their locations might contribute to the true start/end
+  	    // positions of the export declaration node.
+  	    if (node.declaration &&
+  	        node.declaration.decorators &&
+  	        isExportDeclaration(node)) {
+  	        node.declaration.decorators.forEach(include);
+  	    }
+  	    if (comparePos(result.start, result.end) < 0) {
+  	        // Trim leading whitespace.
+  	        result.start = copyPos(result.start);
+  	        lines.skipSpaces(result.start, false, true);
+  	        if (comparePos(result.start, result.end) < 0) {
+  	            // Trim trailing whitespace, if the end location is not already the
+  	            // same as the start location.
+  	            result.end = copyPos(result.end);
+  	            lines.skipSpaces(result.end, true, true);
+  	        }
+  	    }
+  	    // If the node has any comments, their locations might contribute to
+  	    // the true start/end positions of the node.
+  	    if (node.comments) {
+  	        node.comments.forEach(include);
+  	    }
+  	    return result;
+  	}
+  	util.getTrueLoc = getTrueLoc;
+  	function expandLoc(parentLoc, childLoc) {
+  	    if (parentLoc && childLoc) {
+  	        if (comparePos(childLoc.start, parentLoc.start) < 0) {
+  	            parentLoc.start = childLoc.start;
+  	        }
+  	        if (comparePos(parentLoc.end, childLoc.end) < 0) {
+  	            parentLoc.end = childLoc.end;
+  	        }
+  	    }
+  	}
+  	function fixFaultyLocations(node, lines) {
+  	    var loc = node.loc;
+  	    if (loc) {
+  	        if (loc.start.line < 1) {
+  	            loc.start.line = 1;
+  	        }
+  	        if (loc.end.line < 1) {
+  	            loc.end.line = 1;
+  	        }
+  	    }
+  	    if (node.type === "File") {
+  	        // Babylon returns File nodes whose .loc.{start,end} do not include
+  	        // leading or trailing whitespace.
+  	        loc.start = lines.firstPos();
+  	        loc.end = lines.lastPos();
+  	    }
+  	    fixForLoopHead(node, lines);
+  	    fixTemplateLiteral(node, lines);
+  	    if (loc && node.decorators) {
+  	        // Expand the .loc of the node responsible for printing the decorators
+  	        // (here, the decorated node) so that it includes node.decorators.
+  	        node.decorators.forEach(function (decorator) {
+  	            expandLoc(loc, decorator.loc);
+  	        });
+  	    }
+  	    else if (node.declaration && isExportDeclaration(node)) {
+  	        // Nullify .loc information for the child declaration so that we never
+  	        // try to reprint it without also reprinting the export declaration.
+  	        node.declaration.loc = null;
+  	        // Expand the .loc of the node responsible for printing the decorators
+  	        // (here, the export declaration) so that it includes node.decorators.
+  	        var decorators = node.declaration.decorators;
+  	        if (decorators) {
+  	            decorators.forEach(function (decorator) {
+  	                expandLoc(loc, decorator.loc);
+  	            });
+  	        }
+  	    }
+  	    else if ((n.MethodDefinition && n.MethodDefinition.check(node)) ||
+  	        (n.Property.check(node) && (node.method || node.shorthand))) {
+  	        // If the node is a MethodDefinition or a .method or .shorthand
+  	        // Property, then the location information stored in
+  	        // node.value.loc is very likely untrustworthy (just the {body}
+  	        // part of a method, or nothing in the case of shorthand
+  	        // properties), so we null out that information to prevent
+  	        // accidental reuse of bogus source code during reprinting.
+  	        node.value.loc = null;
+  	        if (n.FunctionExpression.check(node.value)) {
+  	            // FunctionExpression method values should be anonymous,
+  	            // because their .id fields are ignored anyway.
+  	            node.value.id = null;
+  	        }
+  	    }
+  	    else if (node.type === "ObjectTypeProperty") {
+  	        var loc_1 = node.loc;
+  	        var end = loc_1 && loc_1.end;
+  	        if (end) {
+  	            end = copyPos(end);
+  	            if (lines.prevPos(end) && lines.charAt(end) === ",") {
+  	                // Some parsers accidentally include trailing commas in the
+  	                // .loc.end information for ObjectTypeProperty nodes.
+  	                if ((end = lines.skipSpaces(end, true, true))) {
+  	                    loc_1.end = end;
+  	                }
+  	            }
+  	        }
+  	    }
+  	}
+  	util.fixFaultyLocations = fixFaultyLocations;
+  	function fixForLoopHead(node, lines) {
+  	    if (node.type !== "ForStatement") {
+  	        return;
+  	    }
+  	    function fix(child) {
+  	        var loc = child && child.loc;
+  	        var start = loc && loc.start;
+  	        var end = loc && copyPos(loc.end);
+  	        while (start && end && comparePos(start, end) < 0) {
+  	            lines.prevPos(end);
+  	            if (lines.charAt(end) === ";") {
+  	                // Update child.loc.end to *exclude* the ';' character.
+  	                loc.end.line = end.line;
+  	                loc.end.column = end.column;
+  	            }
+  	            else {
+  	                break;
+  	            }
+  	        }
+  	    }
+  	    fix(node.init);
+  	    fix(node.test);
+  	    fix(node.update);
+  	}
+  	function fixTemplateLiteral(node, lines) {
+  	    if (node.type !== "TemplateLiteral") {
+  	        return;
+  	    }
+  	    if (node.quasis.length === 0) {
+  	        // If there are no quasi elements, then there is nothing to fix.
+  	        return;
+  	    }
+  	    // node.loc is not present when using export default with a template literal
+  	    if (node.loc) {
+  	        // First we need to exclude the opening ` from the .loc of the first
+  	        // quasi element, in case the parser accidentally decided to include it.
+  	        var afterLeftBackTickPos = copyPos(node.loc.start);
+  	        (0, tiny_invariant_1.default)(lines.charAt(afterLeftBackTickPos) === "`");
+  	        (0, tiny_invariant_1.default)(lines.nextPos(afterLeftBackTickPos));
+  	        var firstQuasi = node.quasis[0];
+  	        if (comparePos(firstQuasi.loc.start, afterLeftBackTickPos) < 0) {
+  	            firstQuasi.loc.start = afterLeftBackTickPos;
+  	        }
+  	        // Next we need to exclude the closing ` from the .loc of the last quasi
+  	        // element, in case the parser accidentally decided to include it.
+  	        var rightBackTickPos = copyPos(node.loc.end);
+  	        (0, tiny_invariant_1.default)(lines.prevPos(rightBackTickPos));
+  	        (0, tiny_invariant_1.default)(lines.charAt(rightBackTickPos) === "`");
+  	        var lastQuasi = node.quasis[node.quasis.length - 1];
+  	        if (comparePos(rightBackTickPos, lastQuasi.loc.end) < 0) {
+  	            lastQuasi.loc.end = rightBackTickPos;
+  	        }
+  	    }
+  	    // Now we need to exclude ${ and } characters from the .loc's of all
+  	    // quasi elements, since some parsers accidentally include them.
+  	    node.expressions.forEach(function (expr, i) {
+  	        // Rewind from expr.loc.start over any whitespace and the ${ that
+  	        // precedes the expression. The position of the $ should be the same
+  	        // as the .loc.end of the preceding quasi element, but some parsers
+  	        // accidentally include the ${ in the .loc of the quasi element.
+  	        var dollarCurlyPos = lines.skipSpaces(expr.loc.start, true, false);
+  	        if (lines.prevPos(dollarCurlyPos) &&
+  	            lines.charAt(dollarCurlyPos) === "{" &&
+  	            lines.prevPos(dollarCurlyPos) &&
+  	            lines.charAt(dollarCurlyPos) === "$") {
+  	            var quasiBefore = node.quasis[i];
+  	            if (comparePos(dollarCurlyPos, quasiBefore.loc.end) < 0) {
+  	                quasiBefore.loc.end = dollarCurlyPos;
+  	            }
+  	        }
+  	        // Likewise, some parsers accidentally include the } that follows
+  	        // the expression in the .loc of the following quasi element.
+  	        var rightCurlyPos = lines.skipSpaces(expr.loc.end, false, false);
+  	        if (lines.charAt(rightCurlyPos) === "}") {
+  	            (0, tiny_invariant_1.default)(lines.nextPos(rightCurlyPos));
+  	            // Now rightCurlyPos is technically the position just after the }.
+  	            var quasiAfter = node.quasis[i + 1];
+  	            if (comparePos(quasiAfter.loc.start, rightCurlyPos) < 0) {
+  	                quasiAfter.loc.start = rightCurlyPos;
+  	            }
+  	        }
+  	    });
+  	}
+  	function isExportDeclaration(node) {
+  	    if (node)
+  	        switch (node.type) {
+  	            case "ExportDeclaration":
+  	            case "ExportDefaultDeclaration":
+  	            case "ExportDefaultSpecifier":
+  	            case "DeclareExportDeclaration":
+  	            case "ExportNamedDeclaration":
+  	            case "ExportAllDeclaration":
+  	                return true;
+  	        }
+  	    return false;
+  	}
+  	util.isExportDeclaration = isExportDeclaration;
+  	function getParentExportDeclaration(path) {
+  	    var parentNode = path.getParentNode();
+  	    if (path.getName() === "declaration" && isExportDeclaration(parentNode)) {
+  	        return parentNode;
+  	    }
+  	    return null;
+  	}
+  	util.getParentExportDeclaration = getParentExportDeclaration;
+  	function isTrailingCommaEnabled(options, context) {
+  	    var trailingComma = options.trailingComma;
+  	    if (typeof trailingComma === "object") {
+  	        return !!trailingComma[context];
+  	    }
+  	    return !!trailingComma;
+  	}
+  	util.isTrailingCommaEnabled = isTrailingCommaEnabled;
+  	return util;
   }
-  util.getLineTerminator = getLineTerminator;
-  function isBrowser$1() {
-      return (typeof window !== "undefined" && typeof window.document !== "undefined");
-  }
-  util.isBrowser = isBrowser$1;
-  function getOption(options, key, defaultValue) {
-      if (options && hasOwn.call(options, key)) {
-          return options[key];
-      }
-      return defaultValue;
-  }
-  util.getOption = getOption;
-  function getUnionOfKeys() {
-      var args = [];
-      for (var _i = 0; _i < arguments.length; _i++) {
-          args[_i] = arguments[_i];
-      }
-      var result = {};
-      var argc = args.length;
-      for (var i = 0; i < argc; ++i) {
-          var keys = Object.keys(args[i]);
-          var keyCount = keys.length;
-          for (var j = 0; j < keyCount; ++j) {
-              result[keys[j]] = true;
-          }
-      }
-      return result;
-  }
-  util.getUnionOfKeys = getUnionOfKeys;
-  function comparePos(pos1, pos2) {
-      return pos1.line - pos2.line || pos1.column - pos2.column;
-  }
-  util.comparePos = comparePos;
-  function copyPos(pos) {
-      return {
-          line: pos.line,
-          column: pos.column,
-      };
-  }
-  util.copyPos = copyPos;
-  function composeSourceMaps(formerMap, latterMap) {
-      if (formerMap) {
-          if (!latterMap) {
-              return formerMap;
-          }
-      }
-      else {
-          return latterMap || null;
-      }
-      var smcFormer = new SourceMapConsumer(formerMap);
-      var smcLatter = new SourceMapConsumer(latterMap);
-      var smg = new SourceMapGenerator({
-          file: latterMap.file,
-          sourceRoot: latterMap.sourceRoot,
-      });
-      var sourcesToContents = {};
-      smcLatter.eachMapping(function (mapping) {
-          var origPos = smcFormer.originalPositionFor({
-              line: mapping.originalLine,
-              column: mapping.originalColumn,
-          });
-          var sourceName = origPos.source;
-          if (sourceName === null) {
-              return;
-          }
-          smg.addMapping({
-              source: sourceName,
-              original: copyPos(origPos),
-              generated: {
-                  line: mapping.generatedLine,
-                  column: mapping.generatedColumn,
-              },
-              name: mapping.name,
-          });
-          var sourceContent = smcFormer.sourceContentFor(sourceName);
-          if (sourceContent && !hasOwn.call(sourcesToContents, sourceName)) {
-              sourcesToContents[sourceName] = sourceContent;
-              smg.setSourceContent(sourceName, sourceContent);
-          }
-      });
-      return smg.toJSON();
-  }
-  var composeSourceMaps_1 = util.composeSourceMaps = composeSourceMaps;
-  function getTrueLoc(node, lines) {
-      // It's possible that node is newly-created (not parsed by Esprima),
-      // in which case it probably won't have a .loc property (or an
-      // .original property for that matter). That's fine; we'll just
-      // pretty-print it as usual.
-      if (!node.loc) {
-          return null;
-      }
-      var result = {
-          start: node.loc.start,
-          end: node.loc.end,
-      };
-      function include(node) {
-          expandLoc(result, node.loc);
-      }
-      // If the node is an export declaration and its .declaration has any
-      // decorators, their locations might contribute to the true start/end
-      // positions of the export declaration node.
-      if (node.declaration &&
-          node.declaration.decorators &&
-          isExportDeclaration(node)) {
-          node.declaration.decorators.forEach(include);
-      }
-      if (comparePos(result.start, result.end) < 0) {
-          // Trim leading whitespace.
-          result.start = copyPos(result.start);
-          lines.skipSpaces(result.start, false, true);
-          if (comparePos(result.start, result.end) < 0) {
-              // Trim trailing whitespace, if the end location is not already the
-              // same as the start location.
-              result.end = copyPos(result.end);
-              lines.skipSpaces(result.end, true, true);
-          }
-      }
-      // If the node has any comments, their locations might contribute to
-      // the true start/end positions of the node.
-      if (node.comments) {
-          node.comments.forEach(include);
-      }
-      return result;
-  }
-  util.getTrueLoc = getTrueLoc;
-  function expandLoc(parentLoc, childLoc) {
-      if (parentLoc && childLoc) {
-          if (comparePos(childLoc.start, parentLoc.start) < 0) {
-              parentLoc.start = childLoc.start;
-          }
-          if (comparePos(parentLoc.end, childLoc.end) < 0) {
-              parentLoc.end = childLoc.end;
-          }
-      }
-  }
-  function fixFaultyLocations(node, lines) {
-      var loc = node.loc;
-      if (loc) {
-          if (loc.start.line < 1) {
-              loc.start.line = 1;
-          }
-          if (loc.end.line < 1) {
-              loc.end.line = 1;
-          }
-      }
-      if (node.type === "File") {
-          // Babylon returns File nodes whose .loc.{start,end} do not include
-          // leading or trailing whitespace.
-          loc.start = lines.firstPos();
-          loc.end = lines.lastPos();
-      }
-      fixForLoopHead(node, lines);
-      fixTemplateLiteral(node, lines);
-      if (loc && node.decorators) {
-          // Expand the .loc of the node responsible for printing the decorators
-          // (here, the decorated node) so that it includes node.decorators.
-          node.decorators.forEach(function (decorator) {
-              expandLoc(loc, decorator.loc);
-          });
-      }
-      else if (node.declaration && isExportDeclaration(node)) {
-          // Nullify .loc information for the child declaration so that we never
-          // try to reprint it without also reprinting the export declaration.
-          node.declaration.loc = null;
-          // Expand the .loc of the node responsible for printing the decorators
-          // (here, the export declaration) so that it includes node.decorators.
-          var decorators = node.declaration.decorators;
-          if (decorators) {
-              decorators.forEach(function (decorator) {
-                  expandLoc(loc, decorator.loc);
-              });
-          }
-      }
-      else if ((n.MethodDefinition && n.MethodDefinition.check(node)) ||
-          (n.Property.check(node) && (node.method || node.shorthand))) {
-          // If the node is a MethodDefinition or a .method or .shorthand
-          // Property, then the location information stored in
-          // node.value.loc is very likely untrustworthy (just the {body}
-          // part of a method, or nothing in the case of shorthand
-          // properties), so we null out that information to prevent
-          // accidental reuse of bogus source code during reprinting.
-          node.value.loc = null;
-          if (n.FunctionExpression.check(node.value)) {
-              // FunctionExpression method values should be anonymous,
-              // because their .id fields are ignored anyway.
-              node.value.id = null;
-          }
-      }
-      else if (node.type === "ObjectTypeProperty") {
-          var loc_1 = node.loc;
-          var end = loc_1 && loc_1.end;
-          if (end) {
-              end = copyPos(end);
-              if (lines.prevPos(end) && lines.charAt(end) === ",") {
-                  // Some parsers accidentally include trailing commas in the
-                  // .loc.end information for ObjectTypeProperty nodes.
-                  if ((end = lines.skipSpaces(end, true, true))) {
-                      loc_1.end = end;
-                  }
-              }
-          }
-      }
-  }
-  util.fixFaultyLocations = fixFaultyLocations;
-  function fixForLoopHead(node, lines) {
-      if (node.type !== "ForStatement") {
-          return;
-      }
-      function fix(child) {
-          var loc = child && child.loc;
-          var start = loc && loc.start;
-          var end = loc && copyPos(loc.end);
-          while (start && end && comparePos(start, end) < 0) {
-              lines.prevPos(end);
-              if (lines.charAt(end) === ";") {
-                  // Update child.loc.end to *exclude* the ';' character.
-                  loc.end.line = end.line;
-                  loc.end.column = end.column;
-              }
-              else {
-                  break;
-              }
-          }
-      }
-      fix(node.init);
-      fix(node.test);
-      fix(node.update);
-  }
-  function fixTemplateLiteral(node, lines) {
-      if (node.type !== "TemplateLiteral") {
-          return;
-      }
-      if (node.quasis.length === 0) {
-          // If there are no quasi elements, then there is nothing to fix.
-          return;
-      }
-      // node.loc is not present when using export default with a template literal
-      if (node.loc) {
-          // First we need to exclude the opening ` from the .loc of the first
-          // quasi element, in case the parser accidentally decided to include it.
-          var afterLeftBackTickPos = copyPos(node.loc.start);
-          (0, tiny_invariant_1.default)(lines.charAt(afterLeftBackTickPos) === "`");
-          (0, tiny_invariant_1.default)(lines.nextPos(afterLeftBackTickPos));
-          var firstQuasi = node.quasis[0];
-          if (comparePos(firstQuasi.loc.start, afterLeftBackTickPos) < 0) {
-              firstQuasi.loc.start = afterLeftBackTickPos;
-          }
-          // Next we need to exclude the closing ` from the .loc of the last quasi
-          // element, in case the parser accidentally decided to include it.
-          var rightBackTickPos = copyPos(node.loc.end);
-          (0, tiny_invariant_1.default)(lines.prevPos(rightBackTickPos));
-          (0, tiny_invariant_1.default)(lines.charAt(rightBackTickPos) === "`");
-          var lastQuasi = node.quasis[node.quasis.length - 1];
-          if (comparePos(rightBackTickPos, lastQuasi.loc.end) < 0) {
-              lastQuasi.loc.end = rightBackTickPos;
-          }
-      }
-      // Now we need to exclude ${ and } characters from the .loc's of all
-      // quasi elements, since some parsers accidentally include them.
-      node.expressions.forEach(function (expr, i) {
-          // Rewind from expr.loc.start over any whitespace and the ${ that
-          // precedes the expression. The position of the $ should be the same
-          // as the .loc.end of the preceding quasi element, but some parsers
-          // accidentally include the ${ in the .loc of the quasi element.
-          var dollarCurlyPos = lines.skipSpaces(expr.loc.start, true, false);
-          if (lines.prevPos(dollarCurlyPos) &&
-              lines.charAt(dollarCurlyPos) === "{" &&
-              lines.prevPos(dollarCurlyPos) &&
-              lines.charAt(dollarCurlyPos) === "$") {
-              var quasiBefore = node.quasis[i];
-              if (comparePos(dollarCurlyPos, quasiBefore.loc.end) < 0) {
-                  quasiBefore.loc.end = dollarCurlyPos;
-              }
-          }
-          // Likewise, some parsers accidentally include the } that follows
-          // the expression in the .loc of the following quasi element.
-          var rightCurlyPos = lines.skipSpaces(expr.loc.end, false, false);
-          if (lines.charAt(rightCurlyPos) === "}") {
-              (0, tiny_invariant_1.default)(lines.nextPos(rightCurlyPos));
-              // Now rightCurlyPos is technically the position just after the }.
-              var quasiAfter = node.quasis[i + 1];
-              if (comparePos(quasiAfter.loc.start, rightCurlyPos) < 0) {
-                  quasiAfter.loc.start = rightCurlyPos;
-              }
-          }
-      });
-  }
-  function isExportDeclaration(node) {
-      if (node)
-          switch (node.type) {
-              case "ExportDeclaration":
-              case "ExportDefaultDeclaration":
-              case "ExportDefaultSpecifier":
-              case "DeclareExportDeclaration":
-              case "ExportNamedDeclaration":
-              case "ExportAllDeclaration":
-                  return true;
-          }
-      return false;
-  }
-  util.isExportDeclaration = isExportDeclaration;
-  function getParentExportDeclaration(path) {
-      var parentNode = path.getParentNode();
-      if (path.getName() === "declaration" && isExportDeclaration(parentNode)) {
-          return parentNode;
-      }
-      return null;
-  }
-  util.getParentExportDeclaration = getParentExportDeclaration;
-  function isTrailingCommaEnabled(options, context) {
-      var trailingComma = options.trailingComma;
-      if (typeof trailingComma === "object") {
-          return !!trailingComma[context];
-      }
-      return !!trailingComma;
-  }
-  util.isTrailingCommaEnabled = isTrailingCommaEnabled;
 
   var esprima = {};
 
@@ -7889,7 +8112,7 @@
   	if (hasRequiredEsprima) return esprima;
   	hasRequiredEsprima = 1;
   	Object.defineProperty(esprima, "__esModule", { value: true });
-  	esprima.parse = void 0;
+  	esprima.parse = undefined;
   	// This module is suitable for passing as options.parser when calling
   	// recast.parse to process ECMAScript code with Esprima:
   	//
@@ -7897,7 +8120,7 @@
   	//     parser: require("recast/parsers/esprima")
   	//   });
   	//
-  	var util_1 = util;
+  	var util_1 = requireUtil();
   	function parse(source, options) {
   	    var comments = [];
   	    var ast = require$$7.parse(source, {
@@ -7926,8 +8149,8 @@
   	if (hasRequiredOptions) return options;
   	hasRequiredOptions = 1;
   	Object.defineProperty(options, "__esModule", { value: true });
-  	options.normalize = void 0;
-  	var util_1 = util;
+  	options.normalize = undefined;
+  	var util_1 = requireUtil();
   	var defaults = {
   	    parser: requireEsprima(),
   	    tabWidth: 4,
@@ -7993,17 +8216,17 @@
   	hasRequiredMapping = 1;
   	Object.defineProperty(mapping, "__esModule", { value: true });
   	var tslib_1 = require$$0;
-  	var tiny_invariant_1 = tslib_1.__importDefault(requireTinyInvariant_cjs());
-  	var util_1 = util;
+  	var tiny_invariant_1 = tslib_1.__importDefault(/*@__PURE__*/ requireTinyInvariant_cjs());
+  	var util_1 = requireUtil();
   	var Mapping = /** @class */ (function () {
   	    function Mapping(sourceLines, sourceLoc, targetLoc) {
-  	        if (targetLoc === void 0) { targetLoc = sourceLoc; }
+  	        if (targetLoc === undefined) { targetLoc = sourceLoc; }
   	        this.sourceLines = sourceLines;
   	        this.sourceLoc = sourceLoc;
   	        this.targetLoc = targetLoc;
   	    }
   	    Mapping.prototype.slice = function (lines, start, end) {
-  	        if (end === void 0) { end = lines.lastPos(); }
+  	        if (end === undefined) { end = lines.lastPos(); }
   	        var sourceLines = this.sourceLines;
   	        var sourceLoc = this.sourceLoc;
   	        var targetLoc = this.targetLoc;
@@ -8084,8 +8307,8 @@
   	        });
   	    };
   	    Mapping.prototype.indent = function (by, skipFirstLine, noNegativeColumns) {
-  	        if (skipFirstLine === void 0) { skipFirstLine = false; }
-  	        if (noNegativeColumns === void 0) { noNegativeColumns = false; }
+  	        if (skipFirstLine === undefined) { skipFirstLine = false; }
+  	        if (noNegativeColumns === undefined) { noNegativeColumns = false; }
   	        if (by === 0) {
   	            return this;
   	        }
@@ -8196,20 +8419,20 @@
   	if (hasRequiredLines) return lines;
   	hasRequiredLines = 1;
   	Object.defineProperty(lines, "__esModule", { value: true });
-  	lines.concat = lines.fromString = lines.countSpaces = lines.Lines = void 0;
+  	lines.concat = lines.fromString = lines.countSpaces = lines.Lines = undefined;
   	var tslib_1 = require$$0;
-  	var tiny_invariant_1 = tslib_1.__importDefault(requireTinyInvariant_cjs());
+  	var tiny_invariant_1 = tslib_1.__importDefault(/*@__PURE__*/ requireTinyInvariant_cjs());
   	var source_map_1 = tslib_1.__importDefault(require$$2);
   	var options_1 = requireOptions();
-  	var util_1 = util;
+  	var util_1 = requireUtil();
   	var mapping_1 = tslib_1.__importDefault(requireMapping());
   	var Lines = /** @class */ (function () {
   	    function Lines(infos, sourceFileName) {
-  	        if (sourceFileName === void 0) { sourceFileName = null; }
+  	        if (sourceFileName === undefined) { sourceFileName = null; }
   	        this.infos = infos;
   	        this.mappings = [];
   	        this.cachedSourceMap = null;
-  	        this.cachedTabWidth = void 0;
+  	        this.cachedTabWidth = undefined;
   	        (0, tiny_invariant_1.default)(infos.length > 0);
   	        this.length = infos.length;
   	        this.name = sourceFileName || null;
@@ -8441,7 +8664,7 @@
   	        return this.getIndentAt(line) + info.sliceEnd - info.sliceStart;
   	    };
   	    Lines.prototype.nextPos = function (pos, skipSpaces) {
-  	        if (skipSpaces === void 0) { skipSpaces = false; }
+  	        if (skipSpaces === undefined) { skipSpaces = false; }
   	        var l = Math.max(pos.line, 0), c = Math.max(pos.column, 0);
   	        if (c < this.getLineLength(l)) {
   	            pos.column += 1;
@@ -8455,7 +8678,7 @@
   	        return false;
   	    };
   	    Lines.prototype.prevPos = function (pos, skipSpaces) {
-  	        if (skipSpaces === void 0) { skipSpaces = false; }
+  	        if (skipSpaces === undefined) { skipSpaces = false; }
   	        var l = pos.line, c = pos.column;
   	        if (c < 1) {
   	            l -= 1;
@@ -8481,8 +8704,8 @@
   	        };
   	    };
   	    Lines.prototype.skipSpaces = function (pos, backward, modifyInPlace) {
-  	        if (backward === void 0) { backward = false; }
-  	        if (modifyInPlace === void 0) { modifyInPlace = false; }
+  	        if (backward === undefined) { backward = false; }
+  	        if (modifyInPlace === undefined) { modifyInPlace = false; }
   	        if (pos) {
   	            pos = modifyInPlace
   	                ? pos
@@ -8534,8 +8757,8 @@
   	        return this.slice(start, end);
   	    };
   	    Lines.prototype.eachPos = function (callback, startPos, skipSpaces) {
-  	        if (startPos === void 0) { startPos = this.firstPos(); }
-  	        if (skipSpaces === void 0) { skipSpaces = false; }
+  	        if (startPos === undefined) { startPos = this.firstPos(); }
+  	        if (skipSpaces === undefined) { skipSpaces = false; }
   	        var pos = this.firstPos();
   	        if (startPos) {
   	            (pos.line = startPos.line), (pos.column = startPos.column);
@@ -8597,8 +8820,8 @@
   	        return this.slice(start, end).toString(options);
   	    };
   	    Lines.prototype.sliceString = function (start, end, options) {
-  	        if (start === void 0) { start = this.firstPos(); }
-  	        if (end === void 0) { end = this.lastPos(); }
+  	        if (start === undefined) { start = this.firstPos(); }
+  	        if (end === undefined) { end = this.lastPos(); }
   	        var _a = (0, options_1.normalize)(options), tabWidth = _a.tabWidth, useTabs = _a.useTabs, reuseWhitespace = _a.reuseWhitespace, lineTerminator = _a.lineTerminator;
   	        var parts = [];
   	        for (var line = start.line; line <= end.line; ++line) {
@@ -8859,15 +9082,15 @@
   	if (hasRequiredComments) return comments;
   	hasRequiredComments = 1;
   	Object.defineProperty(comments, "__esModule", { value: true });
-  	comments.printComments = comments.attach = void 0;
+  	comments.printComments = comments.attach = undefined;
   	var tslib_1 = require$$0;
-  	var tiny_invariant_1 = tslib_1.__importDefault(requireTinyInvariant_cjs());
-  	var types = tslib_1.__importStar(requireMain());
+  	var tiny_invariant_1 = tslib_1.__importDefault(/*@__PURE__*/ requireTinyInvariant_cjs());
+  	var types = tslib_1.__importStar(requireMain$1());
   	var n = types.namedTypes;
   	var isArray = types.builtInTypes.array;
   	var isObject = types.builtInTypes.object;
   	var lines_1 = requireLines();
-  	var util_1 = util;
+  	var util_1 = requireUtil();
   	var childNodesCache = new WeakMap();
   	// TODO Move a non-caching implementation of this function into ast-types,
   	// and implement a caching wrapper function here.
@@ -9057,7 +9280,7 @@
   	    }
   	    if (indexOfFirstLeadingComment) {
   	        var enclosingNode = tiesToBreak[indexOfFirstLeadingComment - 1].enclosingNode;
-  	        if ((enclosingNode === null || enclosingNode === void 0 ? void 0 : enclosingNode.type) === "CallExpression") {
+  	        if ((enclosingNode === null || enclosingNode === undefined ? undefined : enclosingNode.type) === "CallExpression") {
   	            --indexOfFirstLeadingComment;
   	        }
   	    }
@@ -9179,17 +9402,17 @@
   	if (hasRequiredParser) return parser;
   	hasRequiredParser = 1;
   	Object.defineProperty(parser, "__esModule", { value: true });
-  	parser.parse = void 0;
+  	parser.parse = undefined;
   	var tslib_1 = require$$0;
-  	var tiny_invariant_1 = tslib_1.__importDefault(requireTinyInvariant_cjs());
-  	var types = tslib_1.__importStar(requireMain());
+  	var tiny_invariant_1 = tslib_1.__importDefault(/*@__PURE__*/ requireTinyInvariant_cjs());
+  	var types = tslib_1.__importStar(requireMain$1());
   	var b = types.builders;
   	var isObject = types.builtInTypes.object;
   	var isArray = types.builtInTypes.array;
   	var options_1 = requireOptions();
   	var lines_1 = requireLines();
   	var comments_1 = requireComments();
-  	var util$1 = tslib_1.__importStar(util);
+  	var util = tslib_1.__importStar(requireUtil());
   	function parse(source, options) {
   	    options = (0, options_1.normalize)(options);
   	    var lines = (0, lines_1.fromString)(source, options);
@@ -9206,9 +9429,9 @@
   	        range: options.range,
   	        comment: true,
   	        onComment: comments,
-  	        tolerant: util$1.getOption(options, "tolerant", true),
+  	        tolerant: util.getOption(options, "tolerant", true),
   	        ecmaVersion: 6,
-  	        sourceType: util$1.getOption(options, "sourceType", "module"),
+  	        sourceType: util.getOption(options, "sourceType", "module"),
   	    });
   	    // Use ast.tokens if possible, and otherwise fall back to the Esprima
   	    // tokenizer. All the preconfigured ../parsers/* expose ast.tokens
@@ -9234,7 +9457,7 @@
   	    if (ast.loc) {
   	        // If the source was empty, some parsers give loc.{start,end}.line
   	        // values of 0, instead of the minimum of 1.
-  	        util$1.fixFaultyLocations(ast, lines);
+  	        util.fixFaultyLocations(ast, lines);
   	    }
   	    else {
   	        ast.loc = {
@@ -9273,7 +9496,7 @@
   	    // well), since sometimes program.loc.{start,end} will coincide with the
   	    // .loc.{start,end} of the first and last *statements*, mistakenly
   	    // excluding comments that fall outside that region.
-  	    var trueProgramLoc = util$1.getTrueLoc({
+  	    var trueProgramLoc = util.getTrueLoc({
   	        type: program.type,
   	        loc: program.loc,
   	        body: [],
@@ -9314,7 +9537,7 @@
   	    if (!isObject.check(node)) {
   	        return node;
   	    }
-  	    util$1.fixFaultyLocations(node, this.lines);
+  	    util.fixFaultyLocations(node, this.lines);
   	    var copy = Object.create(Object.getPrototypeOf(node), {
   	        original: {
   	            // Provide a link from the copy to the original.
@@ -9384,7 +9607,7 @@
   	    // *after* loc.start, we need to rewind this.startTokenIndex first.
   	    while (this.startTokenIndex > 0) {
   	        var token = loc.tokens[this.startTokenIndex];
-  	        if (util$1.comparePos(loc.start, token.loc.start) < 0) {
+  	        if (util.comparePos(loc.start, token.loc.start) < 0) {
   	            --this.startTokenIndex;
   	        }
   	        else
@@ -9394,7 +9617,7 @@
   	    // *before* loc.end, we need to fast-forward this.endTokenIndex first.
   	    while (this.endTokenIndex < loc.tokens.length) {
   	        var token = loc.tokens[this.endTokenIndex];
-  	        if (util$1.comparePos(token.loc.end, loc.end) < 0) {
+  	        if (util.comparePos(token.loc.end, loc.end) < 0) {
   	            ++this.endTokenIndex;
   	        }
   	        else
@@ -9404,7 +9627,7 @@
   	    // contained by this node.
   	    while (this.startTokenIndex < this.endTokenIndex) {
   	        var token = loc.tokens[this.startTokenIndex];
-  	        if (util$1.comparePos(token.loc.start, loc.start) < 0) {
+  	        if (util.comparePos(token.loc.start, loc.start) < 0) {
   	            ++this.startTokenIndex;
   	        }
   	        else
@@ -9416,7 +9639,7 @@
   	    // this node (not contained by the node).
   	    while (this.endTokenIndex > this.startTokenIndex) {
   	        var token = loc.tokens[this.endTokenIndex - 1];
-  	        if (util$1.comparePos(loc.end, token.loc.end) < 0) {
+  	        if (util.comparePos(loc.end, token.loc.end) < 0) {
   	            --this.endTokenIndex;
   	        }
   	        else
@@ -9441,9 +9664,9 @@
   	hasRequiredFastPath = 1;
   	Object.defineProperty(fastPath, "__esModule", { value: true });
   	var tslib_1 = require$$0;
-  	var tiny_invariant_1 = tslib_1.__importDefault(requireTinyInvariant_cjs());
-  	var types = tslib_1.__importStar(requireMain());
-  	var util$1 = tslib_1.__importStar(util);
+  	var tiny_invariant_1 = tslib_1.__importDefault(/*@__PURE__*/ requireTinyInvariant_cjs());
+  	var types = tslib_1.__importStar(requireMain$1());
+  	var util = tslib_1.__importStar(requireUtil());
   	var n = types.namedTypes;
   	var isArray = types.builtInTypes.array;
   	var isNumber = types.builtInTypes.number;
@@ -9482,7 +9705,7 @@
   	        // lightweight FastPath [..., name, value] stacks.
   	        var copy = Object.create(FastPath.prototype);
   	        var stack = [obj.value];
-  	        for (var pp = void 0; (pp = obj.parentPath); obj = pp)
+  	        for (var pp = undefined; (pp = obj.parentPath); obj = pp)
   	            stack.push(obj.name, pp.value);
   	        copy.stack = stack.reverse();
   	        return copy;
@@ -9529,11 +9752,11 @@
   	    return null;
   	}
   	FPp.getNode = function getNode(count) {
-  	    if (count === void 0) { count = 0; }
+  	    if (count === undefined) { count = 0; }
   	    return getNodeHelper(this, ~~count);
   	};
   	FPp.getParentNode = function getParentNode(count) {
-  	    if (count === void 0) { count = 0; }
+  	    if (count === undefined) { count = 0; }
   	    return getNodeHelper(this, ~~count + 1);
   	};
   	// The length of the stack can be either even or odd, depending on whether
@@ -9667,7 +9890,7 @@
   	        if (token) {
   	            // Do not return tokens that fall outside the root subtree.
   	            var rootLoc = this.getRootValue().loc;
-  	            if (util$1.comparePos(rootLoc.start, token.loc.start) <= 0) {
+  	            if (util.comparePos(rootLoc.start, token.loc.start) <= 0) {
   	                return token;
   	            }
   	        }
@@ -9683,7 +9906,7 @@
   	        if (token) {
   	            // Do not return tokens that fall outside the root subtree.
   	            var rootLoc = this.getRootValue().loc;
-  	            if (util$1.comparePos(token.loc.end, rootLoc.end) <= 0) {
+  	            if (util.comparePos(token.loc.end, rootLoc.end) <= 0) {
   	                return token;
   	            }
   	        }
@@ -9982,16 +10205,16 @@
   	if (hasRequiredPatcher) return patcher;
   	hasRequiredPatcher = 1;
   	Object.defineProperty(patcher, "__esModule", { value: true });
-  	patcher.getReprinter = patcher.Patcher = void 0;
+  	patcher.getReprinter = patcher.Patcher = undefined;
   	var tslib_1 = require$$0;
-  	var tiny_invariant_1 = tslib_1.__importDefault(requireTinyInvariant_cjs());
+  	var tiny_invariant_1 = tslib_1.__importDefault(/*@__PURE__*/ requireTinyInvariant_cjs());
   	var linesModule = tslib_1.__importStar(requireLines());
-  	var types = tslib_1.__importStar(requireMain());
+  	var types = tslib_1.__importStar(requireMain$1());
   	var Printable = types.namedTypes.Printable;
   	var Expression = types.namedTypes.Expression;
   	var ReturnStatement = types.namedTypes.ReturnStatement;
   	var SourceLocation = types.namedTypes.SourceLocation;
-  	var util_1 = util;
+  	var util_1 = requireUtil();
   	var fast_path_1 = tslib_1.__importDefault(requireFastPath());
   	var isObject = types.builtInTypes.object;
   	var isArray = types.builtInTypes.array;
@@ -10373,16 +10596,16 @@
   	if (hasRequiredPrinter) return printer;
   	hasRequiredPrinter = 1;
   	Object.defineProperty(printer, "__esModule", { value: true });
-  	printer.Printer = void 0;
+  	printer.Printer = undefined;
   	var tslib_1 = require$$0;
-  	var tiny_invariant_1 = tslib_1.__importDefault(requireTinyInvariant_cjs());
-  	var types = tslib_1.__importStar(requireMain());
+  	var tiny_invariant_1 = tslib_1.__importDefault(/*@__PURE__*/ requireTinyInvariant_cjs());
+  	var types = tslib_1.__importStar(requireMain$1());
   	var comments_1 = requireComments();
   	var fast_path_1 = tslib_1.__importDefault(requireFastPath());
   	var lines_1 = requireLines();
   	var options_1 = requireOptions();
   	var patcher_1 = requirePatcher();
-  	var util$1 = tslib_1.__importStar(util);
+  	var util = tslib_1.__importStar(requireUtil());
   	var namedTypes = types.namedTypes;
   	var isString = types.builtInTypes.string;
   	var isObject = types.builtInTypes.object;
@@ -10462,7 +10685,7 @@
   	            includeComments: true,
   	            avoidRootParens: false,
   	        });
-  	        return new PrintResult(lines.toString(config), util$1.composeSourceMaps(config.inputSourceMap, lines.getSourceMap(config.sourceMapName, config.sourceRoot)));
+  	        return new PrintResult(lines.toString(config), util.composeSourceMaps(config.inputSourceMap, lines.getSourceMap(config.sourceMapName, config.sourceRoot)));
   	    };
   	    this.printGenerically = function (ast) {
   	        if (!ast) {
@@ -10933,7 +11156,7 @@
   	                        parts.push(separator_1);
   	                    }
   	                    else if (!oneLine_1 &&
-  	                        util$1.isTrailingCommaEnabled(options, "objects") &&
+  	                        util.isTrailingCommaEnabled(options, "objects") &&
   	                        childPath.getValue().type !== "RestElement") {
   	                        parts.push(separator_1);
   	                    }
@@ -11042,7 +11265,7 @@
   	                    }
   	                    parts.push(lines);
   	                    if (i < len_2 - 1 ||
-  	                        (!oneLine_2 && util$1.isTrailingCommaEnabled(options, "arrays")))
+  	                        (!oneLine_2 && util.isTrailingCommaEnabled(options, "arrays")))
   	                        parts.push(",");
   	                    if (!oneLine_2)
   	                        parts.push("\n");
@@ -11638,7 +11861,7 @@
   	                    }
   	                    parts.push(lines);
   	                    if (i < n.types.length - 1 ||
-  	                        (!oneLine_3 && util$1.isTrailingCommaEnabled(options, "arrays")))
+  	                        (!oneLine_3 && util.isTrailingCommaEnabled(options, "arrays")))
   	                        parts.push(",");
   	                    if (!oneLine_3)
   	                        parts.push("\n");
@@ -12327,12 +12550,12 @@
   	        node.decorators.length > 0 &&
   	        // If the parent node is an export declaration, it will be
   	        // responsible for printing node.decorators.
-  	        !util$1.getParentExportDeclaration(path)) {
+  	        !util.getParentExportDeclaration(path)) {
   	        path.each(function (decoratorPath) {
   	            parts.push(printPath(decoratorPath), "\n");
   	        }, "decorators");
   	    }
-  	    else if (util$1.isExportDeclaration(node) &&
+  	    else if (util.isExportDeclaration(node) &&
   	        node.declaration &&
   	        node.declaration.decorators) {
   	        // Export declarations are responsible for printing any decorators
@@ -12400,7 +12623,7 @@
   	        var leadingSpace;
   	        var trailingSpace;
   	        var lines = stmt && stmt.loc && stmt.loc.lines;
-  	        var trueLoc = lines && options.reuseWhitespace && util$1.getTrueLoc(stmt, lines);
+  	        var trueLoc = lines && options.reuseWhitespace && util.getTrueLoc(stmt, lines);
   	        if (notFirst) {
   	            if (trueLoc) {
   	                var beforeStart = lines.skipSpaces(trueLoc.start, true);
@@ -12527,7 +12750,7 @@
   	}
   	function printArgumentsList(path, options, print) {
   	    var printed = path.map(print, "arguments");
-  	    var trailingComma = util$1.isTrailingCommaEnabled(options, "parameters");
+  	    var trailingComma = util.isTrailingCommaEnabled(options, "parameters");
   	    var joined = (0, lines_1.fromString)(", ").join(printed);
   	    if (joined.getLineLength(1) > options.wrapColumn) {
   	        joined = (0, lines_1.fromString)(",\n").join(printed);
@@ -12566,7 +12789,7 @@
   	    var joined = (0, lines_1.fromString)(", ").join(printed);
   	    if (joined.length > 1 || joined.getLineLength(1) > options.wrapColumn) {
   	        joined = (0, lines_1.fromString)(",\n").join(printed);
-  	        if (util$1.isTrailingCommaEnabled(options, "parameters") &&
+  	        if (util.isTrailingCommaEnabled(options, "parameters") &&
   	            !fun.rest &&
   	            params[params.length - 1].type !== "RestElement") {
   	            joined = (0, lines_1.concat)([joined, ",\n"]);
@@ -12680,7 +12903,7 @@
   	    return lines;
   	}
   	function printFlowDeclaration(path, parts) {
-  	    var parentExportDecl = util$1.getParentExportDeclaration(path);
+  	    var parentExportDecl = util.getParentExportDeclaration(path);
   	    if (parentExportDecl) {
   	        (0, tiny_invariant_1.default)(parentExportDecl.type === "DeclareExportDeclaration");
   	    }
@@ -12768,76 +12991,85 @@
   	return printer;
   }
 
-  (function (exports) {
-  	Object.defineProperty(exports, "__esModule", { value: true });
-  	exports.run = exports.prettyPrint = exports.print = exports.visit = exports.types = exports.parse = void 0;
-  	var tslib_1 = require$$0;
-  	var fs_1 = tslib_1.__importDefault(require$$1);
-  	var types = tslib_1.__importStar(requireMain());
-  	exports.types = types;
-  	var parser_1 = requireParser();
-  	Object.defineProperty(exports, "parse", { enumerable: true, get: function () { return parser_1.parse; } });
-  	var printer_1 = requirePrinter();
-  	/**
-  	 * Traverse and potentially modify an abstract syntax tree using a
-  	 * convenient visitor syntax:
-  	 *
-  	 *   recast.visit(ast, {
-  	 *     names: [],
-  	 *     visitIdentifier: function(path) {
-  	 *       var node = path.value;
-  	 *       this.visitor.names.push(node.name);
-  	 *       this.traverse(path);
-  	 *     }
-  	 *   });
-  	 */
-  	var ast_types_1 = requireMain();
-  	Object.defineProperty(exports, "visit", { enumerable: true, get: function () { return ast_types_1.visit; } });
-  	/**
-  	 * Reprint a modified syntax tree using as much of the original source
-  	 * code as possible.
-  	 */
-  	function print(node, options) {
-  	    return new printer_1.Printer(options).print(node);
-  	}
-  	exports.print = print;
-  	/**
-  	 * Print without attempting to reuse any original source code.
-  	 */
-  	function prettyPrint(node, options) {
-  	    return new printer_1.Printer(options).printGenerically(node);
-  	}
-  	exports.prettyPrint = prettyPrint;
-  	/**
-  	 * Convenient command-line interface (see e.g. example/add-braces).
-  	 */
-  	function run(transformer, options) {
-  	    return runFile(process.argv[2], transformer, options);
-  	}
-  	exports.run = run;
-  	function runFile(path, transformer, options) {
-  	    fs_1.default.readFile(path, "utf-8", function (err, code) {
-  	        if (err) {
-  	            console.error(err);
-  	            return;
-  	        }
-  	        runString(code, transformer, options);
-  	    });
-  	}
-  	function defaultWriteback(output) {
-  	    process.stdout.write(output);
-  	}
-  	function runString(code, transformer, options) {
-  	    var writeback = (options && options.writeback) || defaultWriteback;
-  	    transformer((0, parser_1.parse)(code, options), function (node) {
-  	        writeback(print(node, options).code);
-  	    });
-  	} 
-  } (main$1));
+  var hasRequiredMain;
 
-  const types = main$1.types;
-  const builders = main$1.types.builders;
-  const namedTypes = main$1.types.namedTypes;
+  function requireMain () {
+  	if (hasRequiredMain) return main$1;
+  	hasRequiredMain = 1;
+  	(function (exports) {
+  		Object.defineProperty(exports, "__esModule", { value: true });
+  		exports.run = exports.prettyPrint = exports.print = exports.visit = exports.types = exports.parse = undefined;
+  		var tslib_1 = require$$0;
+  		var fs_1 = tslib_1.__importDefault(require$$1);
+  		var types = tslib_1.__importStar(requireMain$1());
+  		exports.types = types;
+  		var parser_1 = requireParser();
+  		Object.defineProperty(exports, "parse", { enumerable: true, get: function () { return parser_1.parse; } });
+  		var printer_1 = requirePrinter();
+  		/**
+  		 * Traverse and potentially modify an abstract syntax tree using a
+  		 * convenient visitor syntax:
+  		 *
+  		 *   recast.visit(ast, {
+  		 *     names: [],
+  		 *     visitIdentifier: function(path) {
+  		 *       var node = path.value;
+  		 *       this.visitor.names.push(node.name);
+  		 *       this.traverse(path);
+  		 *     }
+  		 *   });
+  		 */
+  		var ast_types_1 = requireMain$1();
+  		Object.defineProperty(exports, "visit", { enumerable: true, get: function () { return ast_types_1.visit; } });
+  		/**
+  		 * Reprint a modified syntax tree using as much of the original source
+  		 * code as possible.
+  		 */
+  		function print(node, options) {
+  		    return new printer_1.Printer(options).print(node);
+  		}
+  		exports.print = print;
+  		/**
+  		 * Print without attempting to reuse any original source code.
+  		 */
+  		function prettyPrint(node, options) {
+  		    return new printer_1.Printer(options).printGenerically(node);
+  		}
+  		exports.prettyPrint = prettyPrint;
+  		/**
+  		 * Convenient command-line interface (see e.g. example/add-braces).
+  		 */
+  		function run(transformer, options) {
+  		    return runFile(process.argv[2], transformer, options);
+  		}
+  		exports.run = run;
+  		function runFile(path, transformer, options) {
+  		    fs_1.default.readFile(path, "utf-8", function (err, code) {
+  		        if (err) {
+  		            console.error(err);
+  		            return;
+  		        }
+  		        runString(code, transformer, options);
+  		    });
+  		}
+  		function defaultWriteback(output) {
+  		    process.stdout.write(output);
+  		}
+  		function runString(code, transformer, options) {
+  		    var writeback = (options && options.writeback) || defaultWriteback;
+  		    transformer((0, parser_1.parse)(code, options), function (node) {
+  		        writeback(print(node, options).code);
+  		    });
+  		} 
+  	} (main$1));
+  	return main$1;
+  }
+
+  var mainExports = requireMain();
+
+  const types = mainExports.types;
+  const builders = mainExports.types.builders;
+  const namedTypes = mainExports.types.namedTypes;
 
   const amd = {
   	define: false,
@@ -12910,6 +13142,7 @@
   	BackgroundFetchManager: false,
   	BackgroundFetchRecord: false,
   	BackgroundFetchRegistration: false,
+  	BarcodeDetector: false,
   	BarProp: false,
   	BaseAudioContext: false,
   	BatteryManager: false,
@@ -13008,6 +13241,7 @@
   	CSSMatrixComponent: false,
   	CSSMediaRule: false,
   	CSSNamespaceRule: false,
+  	CSSNestedDeclarations: false,
   	CSSNumericArray: false,
   	CSSNumericValue: false,
   	CSSPageDescriptors: false,
@@ -13308,7 +13542,6 @@
   	IntersectionObserver: false,
   	IntersectionObserverEntry: false,
   	isSecureContext: false,
-  	Iterator: false,
   	Keyboard: false,
   	KeyboardEvent: false,
   	KeyboardLayoutMap: false,
@@ -13513,6 +13746,8 @@
   	onresize: true,
   	onscroll: true,
   	onscrollend: true,
+  	onscrollsnapchange: true,
+  	onscrollsnapchanging: true,
   	onsearch: true,
   	onsecuritypolicyviolation: true,
   	onseeked: true,
@@ -13704,6 +13939,7 @@
   	showDirectoryPicker: false,
   	showOpenFilePicker: false,
   	showSaveFilePicker: false,
+  	SnapEvent: false,
   	SourceBuffer: false,
   	SourceBufferList: false,
   	speechSynthesis: false,
@@ -14019,6 +14255,7 @@
   	"Intl": false,
   	"isFinite": false,
   	"isNaN": false,
+  	Iterator: false,
   	"JSON": false,
   	"Map": false,
   	"Math": false,
@@ -14730,6 +14967,7 @@
   	"Intl": false,
   	"isFinite": false,
   	"isNaN": false,
+  	Iterator: false,
   	"JSON": false,
   	"Map": false,
   	"Math": false,
@@ -14760,6 +14998,38 @@
   	"WeakMap": false,
   	WeakRef: false,
   	"WeakSet": false
+  };
+  const es3 = {
+  	"Array": false,
+  	"Boolean": false,
+  	"Date": false,
+  	"decodeURI": false,
+  	"decodeURIComponent": false,
+  	"encodeURI": false,
+  	"encodeURIComponent": false,
+  	"Error": false,
+  	"escape": false,
+  	"eval": false,
+  	"EvalError": false,
+  	"Function": false,
+  	"Infinity": false,
+  	"isFinite": false,
+  	"isNaN": false,
+  	"Math": false,
+  	"NaN": false,
+  	"Number": false,
+  	"Object": false,
+  	"parseFloat": false,
+  	"parseInt": false,
+  	"RangeError": false,
+  	"ReferenceError": false,
+  	"RegExp": false,
+  	"String": false,
+  	"SyntaxError": false,
+  	"TypeError": false,
+  	"undefined": false,
+  	"unescape": false,
+  	"URIError": false
   };
   const es5 = {
   	"Array": false,
@@ -14997,6 +15267,7 @@
   	clearImmediate: false,
   	clearInterval: false,
   	clearTimeout: false,
+  	CloseEvent: false,
   	CompressionStream: false,
   	console: false,
   	CountQueuingStrategy: false,
@@ -15014,7 +15285,6 @@
   	FormData: false,
   	global: false,
   	Headers: false,
-  	Iterator: false,
   	MessageChannel: false,
   	MessageEvent: false,
   	MessagePort: false,
@@ -15071,6 +15341,7 @@
   	clearImmediate: false,
   	clearInterval: false,
   	clearTimeout: false,
+  	CloseEvent: false,
   	CompressionStream: false,
   	console: false,
   	CountQueuingStrategy: false,
@@ -15087,7 +15358,6 @@
   	FormData: false,
   	global: false,
   	Headers: false,
-  	Iterator: false,
   	MessageChannel: false,
   	MessageEvent: false,
   	MessagePort: false,
@@ -15405,6 +15675,7 @@
   	BackgroundFetchManager: false,
   	BackgroundFetchRecord: false,
   	BackgroundFetchRegistration: false,
+  	BarcodeDetector: false,
   	Blob: false,
   	BroadcastChannel: false,
   	btoa: false,
@@ -15524,7 +15795,6 @@
   	importScripts: false,
   	indexedDB: false,
   	isSecureContext: false,
-  	Iterator: false,
   	location: false,
   	Lock: false,
   	LockManager: false,
@@ -15584,6 +15854,7 @@
   	Request: false,
   	requestAnimationFrame: false,
   	Response: false,
+  	RTCDataChannel: false,
   	RTCEncodedAudioFrame: false,
   	RTCEncodedVideoFrame: false,
   	scheduler: false,
@@ -15726,6 +15997,7 @@
   	es2023: es2023,
   	es2024: es2024,
   	es2025: es2025,
+  	es3: es3,
   	es5: es5,
   	greasemonkey: greasemonkey,
   	jasmine: jasmine,
@@ -15753,6 +16025,7 @@
   	ByteLengthQueuingStrategy: false,
   	clearInterval: false,
   	clearTimeout: false,
+  	CloseEvent: false,
   	CompressionStream: false,
   	console: false,
   	CountQueuingStrategy: false,
@@ -15768,7 +16041,6 @@
   	File: false,
   	FormData: false,
   	Headers: false,
-  	Iterator: false,
   	MessageChannel: false,
   	MessageEvent: false,
   	MessagePort: false,
@@ -16116,7 +16388,7 @@
   }
 
   function findIsAttribute(node) {
-    return findAttribute(IS_DIRECTIVE$1, node)
+    return findAttribute(IS_DIRECTIVE, node)
   }
 
   /**
@@ -17387,26 +17659,26 @@
 
   var acorn = {exports: {}};
 
-  var hasRequiredAcorn;
+  var hasRequiredAcorn$1;
 
-  function requireAcorn () {
-  	if (hasRequiredAcorn) return acorn.exports;
-  	hasRequiredAcorn = 1;
+  function requireAcorn$1 () {
+  	if (hasRequiredAcorn$1) return acorn.exports;
+  	hasRequiredAcorn$1 = 1;
   	(function (module, exports) {
   		(function (global, factory) {
   		  factory(exports) ;
   		})(this, (function (exports) {
   		  // This file was generated. Do not modify manually!
-  		  var astralIdentifierCodes = [509, 0, 227, 0, 150, 4, 294, 9, 1368, 2, 2, 1, 6, 3, 41, 2, 5, 0, 166, 1, 574, 3, 9, 9, 370, 1, 81, 2, 71, 10, 50, 3, 123, 2, 54, 14, 32, 10, 3, 1, 11, 3, 46, 10, 8, 0, 46, 9, 7, 2, 37, 13, 2, 9, 6, 1, 45, 0, 13, 2, 49, 13, 9, 3, 2, 11, 83, 11, 7, 0, 3, 0, 158, 11, 6, 9, 7, 3, 56, 1, 2, 6, 3, 1, 3, 2, 10, 0, 11, 1, 3, 6, 4, 4, 193, 17, 10, 9, 5, 0, 82, 19, 13, 9, 214, 6, 3, 8, 28, 1, 83, 16, 16, 9, 82, 12, 9, 9, 84, 14, 5, 9, 243, 14, 166, 9, 71, 5, 2, 1, 3, 3, 2, 0, 2, 1, 13, 9, 120, 6, 3, 6, 4, 0, 29, 9, 41, 6, 2, 3, 9, 0, 10, 10, 47, 15, 406, 7, 2, 7, 17, 9, 57, 21, 2, 13, 123, 5, 4, 0, 2, 1, 2, 6, 2, 0, 9, 9, 49, 4, 2, 1, 2, 4, 9, 9, 330, 3, 10, 1, 2, 0, 49, 6, 4, 4, 14, 9, 5351, 0, 7, 14, 13835, 9, 87, 9, 39, 4, 60, 6, 26, 9, 1014, 0, 2, 54, 8, 3, 82, 0, 12, 1, 19628, 1, 4706, 45, 3, 22, 543, 4, 4, 5, 9, 7, 3, 6, 31, 3, 149, 2, 1418, 49, 513, 54, 5, 49, 9, 0, 15, 0, 23, 4, 2, 14, 1361, 6, 2, 16, 3, 6, 2, 1, 2, 4, 101, 0, 161, 6, 10, 9, 357, 0, 62, 13, 499, 13, 983, 6, 110, 6, 6, 9, 4759, 9, 787719, 239];
+  		  var astralIdentifierCodes = [509, 0, 227, 0, 150, 4, 294, 9, 1368, 2, 2, 1, 6, 3, 41, 2, 5, 0, 166, 1, 574, 3, 9, 9, 7, 9, 32, 4, 318, 1, 80, 3, 71, 10, 50, 3, 123, 2, 54, 14, 32, 10, 3, 1, 11, 3, 46, 10, 8, 0, 46, 9, 7, 2, 37, 13, 2, 9, 6, 1, 45, 0, 13, 2, 49, 13, 9, 3, 2, 11, 83, 11, 7, 0, 3, 0, 158, 11, 6, 9, 7, 3, 56, 1, 2, 6, 3, 1, 3, 2, 10, 0, 11, 1, 3, 6, 4, 4, 68, 8, 2, 0, 3, 0, 2, 3, 2, 4, 2, 0, 15, 1, 83, 17, 10, 9, 5, 0, 82, 19, 13, 9, 214, 6, 3, 8, 28, 1, 83, 16, 16, 9, 82, 12, 9, 9, 7, 19, 58, 14, 5, 9, 243, 14, 166, 9, 71, 5, 2, 1, 3, 3, 2, 0, 2, 1, 13, 9, 120, 6, 3, 6, 4, 0, 29, 9, 41, 6, 2, 3, 9, 0, 10, 10, 47, 15, 343, 9, 54, 7, 2, 7, 17, 9, 57, 21, 2, 13, 123, 5, 4, 0, 2, 1, 2, 6, 2, 0, 9, 9, 49, 4, 2, 1, 2, 4, 9, 9, 330, 3, 10, 1, 2, 0, 49, 6, 4, 4, 14, 10, 5350, 0, 7, 14, 11465, 27, 2343, 9, 87, 9, 39, 4, 60, 6, 26, 9, 535, 9, 470, 0, 2, 54, 8, 3, 82, 0, 12, 1, 19628, 1, 4178, 9, 519, 45, 3, 22, 543, 4, 4, 5, 9, 7, 3, 6, 31, 3, 149, 2, 1418, 49, 513, 54, 5, 49, 9, 0, 15, 0, 23, 4, 2, 14, 1361, 6, 2, 16, 3, 6, 2, 1, 2, 4, 101, 0, 161, 6, 10, 9, 357, 0, 62, 13, 499, 13, 245, 1, 2, 9, 726, 6, 110, 6, 6, 9, 4759, 9, 787719, 239];
 
   		  // This file was generated. Do not modify manually!
-  		  var astralIdentifierStartCodes = [0, 11, 2, 25, 2, 18, 2, 1, 2, 14, 3, 13, 35, 122, 70, 52, 268, 28, 4, 48, 48, 31, 14, 29, 6, 37, 11, 29, 3, 35, 5, 7, 2, 4, 43, 157, 19, 35, 5, 35, 5, 39, 9, 51, 13, 10, 2, 14, 2, 6, 2, 1, 2, 10, 2, 14, 2, 6, 2, 1, 68, 310, 10, 21, 11, 7, 25, 5, 2, 41, 2, 8, 70, 5, 3, 0, 2, 43, 2, 1, 4, 0, 3, 22, 11, 22, 10, 30, 66, 18, 2, 1, 11, 21, 11, 25, 71, 55, 7, 1, 65, 0, 16, 3, 2, 2, 2, 28, 43, 28, 4, 28, 36, 7, 2, 27, 28, 53, 11, 21, 11, 18, 14, 17, 111, 72, 56, 50, 14, 50, 14, 35, 349, 41, 7, 1, 79, 28, 11, 0, 9, 21, 43, 17, 47, 20, 28, 22, 13, 52, 58, 1, 3, 0, 14, 44, 33, 24, 27, 35, 30, 0, 3, 0, 9, 34, 4, 0, 13, 47, 15, 3, 22, 0, 2, 0, 36, 17, 2, 24, 20, 1, 64, 6, 2, 0, 2, 3, 2, 14, 2, 9, 8, 46, 39, 7, 3, 1, 3, 21, 2, 6, 2, 1, 2, 4, 4, 0, 19, 0, 13, 4, 159, 52, 19, 3, 21, 2, 31, 47, 21, 1, 2, 0, 185, 46, 42, 3, 37, 47, 21, 0, 60, 42, 14, 0, 72, 26, 38, 6, 186, 43, 117, 63, 32, 7, 3, 0, 3, 7, 2, 1, 2, 23, 16, 0, 2, 0, 95, 7, 3, 38, 17, 0, 2, 0, 29, 0, 11, 39, 8, 0, 22, 0, 12, 45, 20, 0, 19, 72, 264, 8, 2, 36, 18, 0, 50, 29, 113, 6, 2, 1, 2, 37, 22, 0, 26, 5, 2, 1, 2, 31, 15, 0, 328, 18, 16, 0, 2, 12, 2, 33, 125, 0, 80, 921, 103, 110, 18, 195, 2637, 96, 16, 1071, 18, 5, 4026, 582, 8634, 568, 8, 30, 18, 78, 18, 29, 19, 47, 17, 3, 32, 20, 6, 18, 689, 63, 129, 74, 6, 0, 67, 12, 65, 1, 2, 0, 29, 6135, 9, 1237, 43, 8, 8936, 3, 2, 6, 2, 1, 2, 290, 16, 0, 30, 2, 3, 0, 15, 3, 9, 395, 2309, 106, 6, 12, 4, 8, 8, 9, 5991, 84, 2, 70, 2, 1, 3, 0, 3, 1, 3, 3, 2, 11, 2, 0, 2, 6, 2, 64, 2, 3, 3, 7, 2, 6, 2, 27, 2, 3, 2, 4, 2, 0, 4, 6, 2, 339, 3, 24, 2, 24, 2, 30, 2, 24, 2, 30, 2, 24, 2, 30, 2, 24, 2, 30, 2, 24, 2, 7, 1845, 30, 7, 5, 262, 61, 147, 44, 11, 6, 17, 0, 322, 29, 19, 43, 485, 27, 757, 6, 2, 3, 2, 1, 2, 14, 2, 196, 60, 67, 8, 0, 1205, 3, 2, 26, 2, 1, 2, 0, 3, 0, 2, 9, 2, 3, 2, 0, 2, 0, 7, 0, 5, 0, 2, 0, 2, 0, 2, 2, 2, 1, 2, 0, 3, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 1, 2, 0, 3, 3, 2, 6, 2, 3, 2, 3, 2, 0, 2, 9, 2, 16, 6, 2, 2, 4, 2, 16, 4421, 42719, 33, 4153, 7, 221, 3, 5761, 15, 7472, 16, 621, 2467, 541, 1507, 4938, 6, 4191];
+  		  var astralIdentifierStartCodes = [0, 11, 2, 25, 2, 18, 2, 1, 2, 14, 3, 13, 35, 122, 70, 52, 268, 28, 4, 48, 48, 31, 14, 29, 6, 37, 11, 29, 3, 35, 5, 7, 2, 4, 43, 157, 19, 35, 5, 35, 5, 39, 9, 51, 13, 10, 2, 14, 2, 6, 2, 1, 2, 10, 2, 14, 2, 6, 2, 1, 4, 51, 13, 310, 10, 21, 11, 7, 25, 5, 2, 41, 2, 8, 70, 5, 3, 0, 2, 43, 2, 1, 4, 0, 3, 22, 11, 22, 10, 30, 66, 18, 2, 1, 11, 21, 11, 25, 71, 55, 7, 1, 65, 0, 16, 3, 2, 2, 2, 28, 43, 28, 4, 28, 36, 7, 2, 27, 28, 53, 11, 21, 11, 18, 14, 17, 111, 72, 56, 50, 14, 50, 14, 35, 39, 27, 10, 22, 251, 41, 7, 1, 17, 2, 60, 28, 11, 0, 9, 21, 43, 17, 47, 20, 28, 22, 13, 52, 58, 1, 3, 0, 14, 44, 33, 24, 27, 35, 30, 0, 3, 0, 9, 34, 4, 0, 13, 47, 15, 3, 22, 0, 2, 0, 36, 17, 2, 24, 20, 1, 64, 6, 2, 0, 2, 3, 2, 14, 2, 9, 8, 46, 39, 7, 3, 1, 3, 21, 2, 6, 2, 1, 2, 4, 4, 0, 19, 0, 13, 4, 31, 9, 2, 0, 3, 0, 2, 37, 2, 0, 26, 0, 2, 0, 45, 52, 19, 3, 21, 2, 31, 47, 21, 1, 2, 0, 185, 46, 42, 3, 37, 47, 21, 0, 60, 42, 14, 0, 72, 26, 38, 6, 186, 43, 117, 63, 32, 7, 3, 0, 3, 7, 2, 1, 2, 23, 16, 0, 2, 0, 95, 7, 3, 38, 17, 0, 2, 0, 29, 0, 11, 39, 8, 0, 22, 0, 12, 45, 20, 0, 19, 72, 200, 32, 32, 8, 2, 36, 18, 0, 50, 29, 113, 6, 2, 1, 2, 37, 22, 0, 26, 5, 2, 1, 2, 31, 15, 0, 328, 18, 16, 0, 2, 12, 2, 33, 125, 0, 80, 921, 103, 110, 18, 195, 2637, 96, 16, 1071, 18, 5, 26, 3994, 6, 582, 6842, 29, 1763, 568, 8, 30, 18, 78, 18, 29, 19, 47, 17, 3, 32, 20, 6, 18, 433, 44, 212, 63, 129, 74, 6, 0, 67, 12, 65, 1, 2, 0, 29, 6135, 9, 1237, 42, 9, 8936, 3, 2, 6, 2, 1, 2, 290, 16, 0, 30, 2, 3, 0, 15, 3, 9, 395, 2309, 106, 6, 12, 4, 8, 8, 9, 5991, 84, 2, 70, 2, 1, 3, 0, 3, 1, 3, 3, 2, 11, 2, 0, 2, 6, 2, 64, 2, 3, 3, 7, 2, 6, 2, 27, 2, 3, 2, 4, 2, 0, 4, 6, 2, 339, 3, 24, 2, 24, 2, 30, 2, 24, 2, 30, 2, 24, 2, 30, 2, 24, 2, 30, 2, 24, 2, 7, 1845, 30, 7, 5, 262, 61, 147, 44, 11, 6, 17, 0, 322, 29, 19, 43, 485, 27, 229, 29, 3, 0, 496, 6, 2, 3, 2, 1, 2, 14, 2, 196, 60, 67, 8, 0, 1205, 3, 2, 26, 2, 1, 2, 0, 3, 0, 2, 9, 2, 3, 2, 0, 2, 0, 7, 0, 5, 0, 2, 0, 2, 0, 2, 2, 2, 1, 2, 0, 3, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 1, 2, 0, 3, 3, 2, 6, 2, 3, 2, 3, 2, 0, 2, 9, 2, 16, 6, 2, 2, 4, 2, 16, 4421, 42719, 33, 4153, 7, 221, 3, 5761, 15, 7472, 16, 621, 2467, 541, 1507, 4938, 6, 4191];
 
   		  // This file was generated. Do not modify manually!
-  		  var nonASCIIidentifierChars = "\u200c\u200d\xb7\u0300-\u036f\u0387\u0483-\u0487\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7\u0610-\u061a\u064b-\u0669\u0670\u06d6-\u06dc\u06df-\u06e4\u06e7\u06e8\u06ea-\u06ed\u06f0-\u06f9\u0711\u0730-\u074a\u07a6-\u07b0\u07c0-\u07c9\u07eb-\u07f3\u07fd\u0816-\u0819\u081b-\u0823\u0825-\u0827\u0829-\u082d\u0859-\u085b\u0898-\u089f\u08ca-\u08e1\u08e3-\u0903\u093a-\u093c\u093e-\u094f\u0951-\u0957\u0962\u0963\u0966-\u096f\u0981-\u0983\u09bc\u09be-\u09c4\u09c7\u09c8\u09cb-\u09cd\u09d7\u09e2\u09e3\u09e6-\u09ef\u09fe\u0a01-\u0a03\u0a3c\u0a3e-\u0a42\u0a47\u0a48\u0a4b-\u0a4d\u0a51\u0a66-\u0a71\u0a75\u0a81-\u0a83\u0abc\u0abe-\u0ac5\u0ac7-\u0ac9\u0acb-\u0acd\u0ae2\u0ae3\u0ae6-\u0aef\u0afa-\u0aff\u0b01-\u0b03\u0b3c\u0b3e-\u0b44\u0b47\u0b48\u0b4b-\u0b4d\u0b55-\u0b57\u0b62\u0b63\u0b66-\u0b6f\u0b82\u0bbe-\u0bc2\u0bc6-\u0bc8\u0bca-\u0bcd\u0bd7\u0be6-\u0bef\u0c00-\u0c04\u0c3c\u0c3e-\u0c44\u0c46-\u0c48\u0c4a-\u0c4d\u0c55\u0c56\u0c62\u0c63\u0c66-\u0c6f\u0c81-\u0c83\u0cbc\u0cbe-\u0cc4\u0cc6-\u0cc8\u0cca-\u0ccd\u0cd5\u0cd6\u0ce2\u0ce3\u0ce6-\u0cef\u0cf3\u0d00-\u0d03\u0d3b\u0d3c\u0d3e-\u0d44\u0d46-\u0d48\u0d4a-\u0d4d\u0d57\u0d62\u0d63\u0d66-\u0d6f\u0d81-\u0d83\u0dca\u0dcf-\u0dd4\u0dd6\u0dd8-\u0ddf\u0de6-\u0def\u0df2\u0df3\u0e31\u0e34-\u0e3a\u0e47-\u0e4e\u0e50-\u0e59\u0eb1\u0eb4-\u0ebc\u0ec8-\u0ece\u0ed0-\u0ed9\u0f18\u0f19\u0f20-\u0f29\u0f35\u0f37\u0f39\u0f3e\u0f3f\u0f71-\u0f84\u0f86\u0f87\u0f8d-\u0f97\u0f99-\u0fbc\u0fc6\u102b-\u103e\u1040-\u1049\u1056-\u1059\u105e-\u1060\u1062-\u1064\u1067-\u106d\u1071-\u1074\u1082-\u108d\u108f-\u109d\u135d-\u135f\u1369-\u1371\u1712-\u1715\u1732-\u1734\u1752\u1753\u1772\u1773\u17b4-\u17d3\u17dd\u17e0-\u17e9\u180b-\u180d\u180f-\u1819\u18a9\u1920-\u192b\u1930-\u193b\u1946-\u194f\u19d0-\u19da\u1a17-\u1a1b\u1a55-\u1a5e\u1a60-\u1a7c\u1a7f-\u1a89\u1a90-\u1a99\u1ab0-\u1abd\u1abf-\u1ace\u1b00-\u1b04\u1b34-\u1b44\u1b50-\u1b59\u1b6b-\u1b73\u1b80-\u1b82\u1ba1-\u1bad\u1bb0-\u1bb9\u1be6-\u1bf3\u1c24-\u1c37\u1c40-\u1c49\u1c50-\u1c59\u1cd0-\u1cd2\u1cd4-\u1ce8\u1ced\u1cf4\u1cf7-\u1cf9\u1dc0-\u1dff\u200c\u200d\u203f\u2040\u2054\u20d0-\u20dc\u20e1\u20e5-\u20f0\u2cef-\u2cf1\u2d7f\u2de0-\u2dff\u302a-\u302f\u3099\u309a\u30fb\ua620-\ua629\ua66f\ua674-\ua67d\ua69e\ua69f\ua6f0\ua6f1\ua802\ua806\ua80b\ua823-\ua827\ua82c\ua880\ua881\ua8b4-\ua8c5\ua8d0-\ua8d9\ua8e0-\ua8f1\ua8ff-\ua909\ua926-\ua92d\ua947-\ua953\ua980-\ua983\ua9b3-\ua9c0\ua9d0-\ua9d9\ua9e5\ua9f0-\ua9f9\uaa29-\uaa36\uaa43\uaa4c\uaa4d\uaa50-\uaa59\uaa7b-\uaa7d\uaab0\uaab2-\uaab4\uaab7\uaab8\uaabe\uaabf\uaac1\uaaeb-\uaaef\uaaf5\uaaf6\uabe3-\uabea\uabec\uabed\uabf0-\uabf9\ufb1e\ufe00-\ufe0f\ufe20-\ufe2f\ufe33\ufe34\ufe4d-\ufe4f\uff10-\uff19\uff3f\uff65";
+  		  var nonASCIIidentifierChars = "\u200c\u200d\xb7\u0300-\u036f\u0387\u0483-\u0487\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7\u0610-\u061a\u064b-\u0669\u0670\u06d6-\u06dc\u06df-\u06e4\u06e7\u06e8\u06ea-\u06ed\u06f0-\u06f9\u0711\u0730-\u074a\u07a6-\u07b0\u07c0-\u07c9\u07eb-\u07f3\u07fd\u0816-\u0819\u081b-\u0823\u0825-\u0827\u0829-\u082d\u0859-\u085b\u0897-\u089f\u08ca-\u08e1\u08e3-\u0903\u093a-\u093c\u093e-\u094f\u0951-\u0957\u0962\u0963\u0966-\u096f\u0981-\u0983\u09bc\u09be-\u09c4\u09c7\u09c8\u09cb-\u09cd\u09d7\u09e2\u09e3\u09e6-\u09ef\u09fe\u0a01-\u0a03\u0a3c\u0a3e-\u0a42\u0a47\u0a48\u0a4b-\u0a4d\u0a51\u0a66-\u0a71\u0a75\u0a81-\u0a83\u0abc\u0abe-\u0ac5\u0ac7-\u0ac9\u0acb-\u0acd\u0ae2\u0ae3\u0ae6-\u0aef\u0afa-\u0aff\u0b01-\u0b03\u0b3c\u0b3e-\u0b44\u0b47\u0b48\u0b4b-\u0b4d\u0b55-\u0b57\u0b62\u0b63\u0b66-\u0b6f\u0b82\u0bbe-\u0bc2\u0bc6-\u0bc8\u0bca-\u0bcd\u0bd7\u0be6-\u0bef\u0c00-\u0c04\u0c3c\u0c3e-\u0c44\u0c46-\u0c48\u0c4a-\u0c4d\u0c55\u0c56\u0c62\u0c63\u0c66-\u0c6f\u0c81-\u0c83\u0cbc\u0cbe-\u0cc4\u0cc6-\u0cc8\u0cca-\u0ccd\u0cd5\u0cd6\u0ce2\u0ce3\u0ce6-\u0cef\u0cf3\u0d00-\u0d03\u0d3b\u0d3c\u0d3e-\u0d44\u0d46-\u0d48\u0d4a-\u0d4d\u0d57\u0d62\u0d63\u0d66-\u0d6f\u0d81-\u0d83\u0dca\u0dcf-\u0dd4\u0dd6\u0dd8-\u0ddf\u0de6-\u0def\u0df2\u0df3\u0e31\u0e34-\u0e3a\u0e47-\u0e4e\u0e50-\u0e59\u0eb1\u0eb4-\u0ebc\u0ec8-\u0ece\u0ed0-\u0ed9\u0f18\u0f19\u0f20-\u0f29\u0f35\u0f37\u0f39\u0f3e\u0f3f\u0f71-\u0f84\u0f86\u0f87\u0f8d-\u0f97\u0f99-\u0fbc\u0fc6\u102b-\u103e\u1040-\u1049\u1056-\u1059\u105e-\u1060\u1062-\u1064\u1067-\u106d\u1071-\u1074\u1082-\u108d\u108f-\u109d\u135d-\u135f\u1369-\u1371\u1712-\u1715\u1732-\u1734\u1752\u1753\u1772\u1773\u17b4-\u17d3\u17dd\u17e0-\u17e9\u180b-\u180d\u180f-\u1819\u18a9\u1920-\u192b\u1930-\u193b\u1946-\u194f\u19d0-\u19da\u1a17-\u1a1b\u1a55-\u1a5e\u1a60-\u1a7c\u1a7f-\u1a89\u1a90-\u1a99\u1ab0-\u1abd\u1abf-\u1ace\u1b00-\u1b04\u1b34-\u1b44\u1b50-\u1b59\u1b6b-\u1b73\u1b80-\u1b82\u1ba1-\u1bad\u1bb0-\u1bb9\u1be6-\u1bf3\u1c24-\u1c37\u1c40-\u1c49\u1c50-\u1c59\u1cd0-\u1cd2\u1cd4-\u1ce8\u1ced\u1cf4\u1cf7-\u1cf9\u1dc0-\u1dff\u200c\u200d\u203f\u2040\u2054\u20d0-\u20dc\u20e1\u20e5-\u20f0\u2cef-\u2cf1\u2d7f\u2de0-\u2dff\u302a-\u302f\u3099\u309a\u30fb\ua620-\ua629\ua66f\ua674-\ua67d\ua69e\ua69f\ua6f0\ua6f1\ua802\ua806\ua80b\ua823-\ua827\ua82c\ua880\ua881\ua8b4-\ua8c5\ua8d0-\ua8d9\ua8e0-\ua8f1\ua8ff-\ua909\ua926-\ua92d\ua947-\ua953\ua980-\ua983\ua9b3-\ua9c0\ua9d0-\ua9d9\ua9e5\ua9f0-\ua9f9\uaa29-\uaa36\uaa43\uaa4c\uaa4d\uaa50-\uaa59\uaa7b-\uaa7d\uaab0\uaab2-\uaab4\uaab7\uaab8\uaabe\uaabf\uaac1\uaaeb-\uaaef\uaaf5\uaaf6\uabe3-\uabea\uabec\uabed\uabf0-\uabf9\ufb1e\ufe00-\ufe0f\ufe20-\ufe2f\ufe33\ufe34\ufe4d-\ufe4f\uff10-\uff19\uff3f\uff65";
 
   		  // This file was generated. Do not modify manually!
-  		  var nonASCIIidentifierStartChars = "\xaa\xb5\xba\xc0-\xd6\xd8-\xf6\xf8-\u02c1\u02c6-\u02d1\u02e0-\u02e4\u02ec\u02ee\u0370-\u0374\u0376\u0377\u037a-\u037d\u037f\u0386\u0388-\u038a\u038c\u038e-\u03a1\u03a3-\u03f5\u03f7-\u0481\u048a-\u052f\u0531-\u0556\u0559\u0560-\u0588\u05d0-\u05ea\u05ef-\u05f2\u0620-\u064a\u066e\u066f\u0671-\u06d3\u06d5\u06e5\u06e6\u06ee\u06ef\u06fa-\u06fc\u06ff\u0710\u0712-\u072f\u074d-\u07a5\u07b1\u07ca-\u07ea\u07f4\u07f5\u07fa\u0800-\u0815\u081a\u0824\u0828\u0840-\u0858\u0860-\u086a\u0870-\u0887\u0889-\u088e\u08a0-\u08c9\u0904-\u0939\u093d\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098c\u098f\u0990\u0993-\u09a8\u09aa-\u09b0\u09b2\u09b6-\u09b9\u09bd\u09ce\u09dc\u09dd\u09df-\u09e1\u09f0\u09f1\u09fc\u0a05-\u0a0a\u0a0f\u0a10\u0a13-\u0a28\u0a2a-\u0a30\u0a32\u0a33\u0a35\u0a36\u0a38\u0a39\u0a59-\u0a5c\u0a5e\u0a72-\u0a74\u0a85-\u0a8d\u0a8f-\u0a91\u0a93-\u0aa8\u0aaa-\u0ab0\u0ab2\u0ab3\u0ab5-\u0ab9\u0abd\u0ad0\u0ae0\u0ae1\u0af9\u0b05-\u0b0c\u0b0f\u0b10\u0b13-\u0b28\u0b2a-\u0b30\u0b32\u0b33\u0b35-\u0b39\u0b3d\u0b5c\u0b5d\u0b5f-\u0b61\u0b71\u0b83\u0b85-\u0b8a\u0b8e-\u0b90\u0b92-\u0b95\u0b99\u0b9a\u0b9c\u0b9e\u0b9f\u0ba3\u0ba4\u0ba8-\u0baa\u0bae-\u0bb9\u0bd0\u0c05-\u0c0c\u0c0e-\u0c10\u0c12-\u0c28\u0c2a-\u0c39\u0c3d\u0c58-\u0c5a\u0c5d\u0c60\u0c61\u0c80\u0c85-\u0c8c\u0c8e-\u0c90\u0c92-\u0ca8\u0caa-\u0cb3\u0cb5-\u0cb9\u0cbd\u0cdd\u0cde\u0ce0\u0ce1\u0cf1\u0cf2\u0d04-\u0d0c\u0d0e-\u0d10\u0d12-\u0d3a\u0d3d\u0d4e\u0d54-\u0d56\u0d5f-\u0d61\u0d7a-\u0d7f\u0d85-\u0d96\u0d9a-\u0db1\u0db3-\u0dbb\u0dbd\u0dc0-\u0dc6\u0e01-\u0e30\u0e32\u0e33\u0e40-\u0e46\u0e81\u0e82\u0e84\u0e86-\u0e8a\u0e8c-\u0ea3\u0ea5\u0ea7-\u0eb0\u0eb2\u0eb3\u0ebd\u0ec0-\u0ec4\u0ec6\u0edc-\u0edf\u0f00\u0f40-\u0f47\u0f49-\u0f6c\u0f88-\u0f8c\u1000-\u102a\u103f\u1050-\u1055\u105a-\u105d\u1061\u1065\u1066\u106e-\u1070\u1075-\u1081\u108e\u10a0-\u10c5\u10c7\u10cd\u10d0-\u10fa\u10fc-\u1248\u124a-\u124d\u1250-\u1256\u1258\u125a-\u125d\u1260-\u1288\u128a-\u128d\u1290-\u12b0\u12b2-\u12b5\u12b8-\u12be\u12c0\u12c2-\u12c5\u12c8-\u12d6\u12d8-\u1310\u1312-\u1315\u1318-\u135a\u1380-\u138f\u13a0-\u13f5\u13f8-\u13fd\u1401-\u166c\u166f-\u167f\u1681-\u169a\u16a0-\u16ea\u16ee-\u16f8\u1700-\u1711\u171f-\u1731\u1740-\u1751\u1760-\u176c\u176e-\u1770\u1780-\u17b3\u17d7\u17dc\u1820-\u1878\u1880-\u18a8\u18aa\u18b0-\u18f5\u1900-\u191e\u1950-\u196d\u1970-\u1974\u1980-\u19ab\u19b0-\u19c9\u1a00-\u1a16\u1a20-\u1a54\u1aa7\u1b05-\u1b33\u1b45-\u1b4c\u1b83-\u1ba0\u1bae\u1baf\u1bba-\u1be5\u1c00-\u1c23\u1c4d-\u1c4f\u1c5a-\u1c7d\u1c80-\u1c88\u1c90-\u1cba\u1cbd-\u1cbf\u1ce9-\u1cec\u1cee-\u1cf3\u1cf5\u1cf6\u1cfa\u1d00-\u1dbf\u1e00-\u1f15\u1f18-\u1f1d\u1f20-\u1f45\u1f48-\u1f4d\u1f50-\u1f57\u1f59\u1f5b\u1f5d\u1f5f-\u1f7d\u1f80-\u1fb4\u1fb6-\u1fbc\u1fbe\u1fc2-\u1fc4\u1fc6-\u1fcc\u1fd0-\u1fd3\u1fd6-\u1fdb\u1fe0-\u1fec\u1ff2-\u1ff4\u1ff6-\u1ffc\u2071\u207f\u2090-\u209c\u2102\u2107\u210a-\u2113\u2115\u2118-\u211d\u2124\u2126\u2128\u212a-\u2139\u213c-\u213f\u2145-\u2149\u214e\u2160-\u2188\u2c00-\u2ce4\u2ceb-\u2cee\u2cf2\u2cf3\u2d00-\u2d25\u2d27\u2d2d\u2d30-\u2d67\u2d6f\u2d80-\u2d96\u2da0-\u2da6\u2da8-\u2dae\u2db0-\u2db6\u2db8-\u2dbe\u2dc0-\u2dc6\u2dc8-\u2dce\u2dd0-\u2dd6\u2dd8-\u2dde\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303c\u3041-\u3096\u309b-\u309f\u30a1-\u30fa\u30fc-\u30ff\u3105-\u312f\u3131-\u318e\u31a0-\u31bf\u31f0-\u31ff\u3400-\u4dbf\u4e00-\ua48c\ua4d0-\ua4fd\ua500-\ua60c\ua610-\ua61f\ua62a\ua62b\ua640-\ua66e\ua67f-\ua69d\ua6a0-\ua6ef\ua717-\ua71f\ua722-\ua788\ua78b-\ua7ca\ua7d0\ua7d1\ua7d3\ua7d5-\ua7d9\ua7f2-\ua801\ua803-\ua805\ua807-\ua80a\ua80c-\ua822\ua840-\ua873\ua882-\ua8b3\ua8f2-\ua8f7\ua8fb\ua8fd\ua8fe\ua90a-\ua925\ua930-\ua946\ua960-\ua97c\ua984-\ua9b2\ua9cf\ua9e0-\ua9e4\ua9e6-\ua9ef\ua9fa-\ua9fe\uaa00-\uaa28\uaa40-\uaa42\uaa44-\uaa4b\uaa60-\uaa76\uaa7a\uaa7e-\uaaaf\uaab1\uaab5\uaab6\uaab9-\uaabd\uaac0\uaac2\uaadb-\uaadd\uaae0-\uaaea\uaaf2-\uaaf4\uab01-\uab06\uab09-\uab0e\uab11-\uab16\uab20-\uab26\uab28-\uab2e\uab30-\uab5a\uab5c-\uab69\uab70-\uabe2\uac00-\ud7a3\ud7b0-\ud7c6\ud7cb-\ud7fb\uf900-\ufa6d\ufa70-\ufad9\ufb00-\ufb06\ufb13-\ufb17\ufb1d\ufb1f-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb3e\ufb40\ufb41\ufb43\ufb44\ufb46-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\uff21-\uff3a\uff41-\uff5a\uff66-\uffbe\uffc2-\uffc7\uffca-\uffcf\uffd2-\uffd7\uffda-\uffdc";
+  		  var nonASCIIidentifierStartChars = "\xaa\xb5\xba\xc0-\xd6\xd8-\xf6\xf8-\u02c1\u02c6-\u02d1\u02e0-\u02e4\u02ec\u02ee\u0370-\u0374\u0376\u0377\u037a-\u037d\u037f\u0386\u0388-\u038a\u038c\u038e-\u03a1\u03a3-\u03f5\u03f7-\u0481\u048a-\u052f\u0531-\u0556\u0559\u0560-\u0588\u05d0-\u05ea\u05ef-\u05f2\u0620-\u064a\u066e\u066f\u0671-\u06d3\u06d5\u06e5\u06e6\u06ee\u06ef\u06fa-\u06fc\u06ff\u0710\u0712-\u072f\u074d-\u07a5\u07b1\u07ca-\u07ea\u07f4\u07f5\u07fa\u0800-\u0815\u081a\u0824\u0828\u0840-\u0858\u0860-\u086a\u0870-\u0887\u0889-\u088e\u08a0-\u08c9\u0904-\u0939\u093d\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098c\u098f\u0990\u0993-\u09a8\u09aa-\u09b0\u09b2\u09b6-\u09b9\u09bd\u09ce\u09dc\u09dd\u09df-\u09e1\u09f0\u09f1\u09fc\u0a05-\u0a0a\u0a0f\u0a10\u0a13-\u0a28\u0a2a-\u0a30\u0a32\u0a33\u0a35\u0a36\u0a38\u0a39\u0a59-\u0a5c\u0a5e\u0a72-\u0a74\u0a85-\u0a8d\u0a8f-\u0a91\u0a93-\u0aa8\u0aaa-\u0ab0\u0ab2\u0ab3\u0ab5-\u0ab9\u0abd\u0ad0\u0ae0\u0ae1\u0af9\u0b05-\u0b0c\u0b0f\u0b10\u0b13-\u0b28\u0b2a-\u0b30\u0b32\u0b33\u0b35-\u0b39\u0b3d\u0b5c\u0b5d\u0b5f-\u0b61\u0b71\u0b83\u0b85-\u0b8a\u0b8e-\u0b90\u0b92-\u0b95\u0b99\u0b9a\u0b9c\u0b9e\u0b9f\u0ba3\u0ba4\u0ba8-\u0baa\u0bae-\u0bb9\u0bd0\u0c05-\u0c0c\u0c0e-\u0c10\u0c12-\u0c28\u0c2a-\u0c39\u0c3d\u0c58-\u0c5a\u0c5d\u0c60\u0c61\u0c80\u0c85-\u0c8c\u0c8e-\u0c90\u0c92-\u0ca8\u0caa-\u0cb3\u0cb5-\u0cb9\u0cbd\u0cdd\u0cde\u0ce0\u0ce1\u0cf1\u0cf2\u0d04-\u0d0c\u0d0e-\u0d10\u0d12-\u0d3a\u0d3d\u0d4e\u0d54-\u0d56\u0d5f-\u0d61\u0d7a-\u0d7f\u0d85-\u0d96\u0d9a-\u0db1\u0db3-\u0dbb\u0dbd\u0dc0-\u0dc6\u0e01-\u0e30\u0e32\u0e33\u0e40-\u0e46\u0e81\u0e82\u0e84\u0e86-\u0e8a\u0e8c-\u0ea3\u0ea5\u0ea7-\u0eb0\u0eb2\u0eb3\u0ebd\u0ec0-\u0ec4\u0ec6\u0edc-\u0edf\u0f00\u0f40-\u0f47\u0f49-\u0f6c\u0f88-\u0f8c\u1000-\u102a\u103f\u1050-\u1055\u105a-\u105d\u1061\u1065\u1066\u106e-\u1070\u1075-\u1081\u108e\u10a0-\u10c5\u10c7\u10cd\u10d0-\u10fa\u10fc-\u1248\u124a-\u124d\u1250-\u1256\u1258\u125a-\u125d\u1260-\u1288\u128a-\u128d\u1290-\u12b0\u12b2-\u12b5\u12b8-\u12be\u12c0\u12c2-\u12c5\u12c8-\u12d6\u12d8-\u1310\u1312-\u1315\u1318-\u135a\u1380-\u138f\u13a0-\u13f5\u13f8-\u13fd\u1401-\u166c\u166f-\u167f\u1681-\u169a\u16a0-\u16ea\u16ee-\u16f8\u1700-\u1711\u171f-\u1731\u1740-\u1751\u1760-\u176c\u176e-\u1770\u1780-\u17b3\u17d7\u17dc\u1820-\u1878\u1880-\u18a8\u18aa\u18b0-\u18f5\u1900-\u191e\u1950-\u196d\u1970-\u1974\u1980-\u19ab\u19b0-\u19c9\u1a00-\u1a16\u1a20-\u1a54\u1aa7\u1b05-\u1b33\u1b45-\u1b4c\u1b83-\u1ba0\u1bae\u1baf\u1bba-\u1be5\u1c00-\u1c23\u1c4d-\u1c4f\u1c5a-\u1c7d\u1c80-\u1c8a\u1c90-\u1cba\u1cbd-\u1cbf\u1ce9-\u1cec\u1cee-\u1cf3\u1cf5\u1cf6\u1cfa\u1d00-\u1dbf\u1e00-\u1f15\u1f18-\u1f1d\u1f20-\u1f45\u1f48-\u1f4d\u1f50-\u1f57\u1f59\u1f5b\u1f5d\u1f5f-\u1f7d\u1f80-\u1fb4\u1fb6-\u1fbc\u1fbe\u1fc2-\u1fc4\u1fc6-\u1fcc\u1fd0-\u1fd3\u1fd6-\u1fdb\u1fe0-\u1fec\u1ff2-\u1ff4\u1ff6-\u1ffc\u2071\u207f\u2090-\u209c\u2102\u2107\u210a-\u2113\u2115\u2118-\u211d\u2124\u2126\u2128\u212a-\u2139\u213c-\u213f\u2145-\u2149\u214e\u2160-\u2188\u2c00-\u2ce4\u2ceb-\u2cee\u2cf2\u2cf3\u2d00-\u2d25\u2d27\u2d2d\u2d30-\u2d67\u2d6f\u2d80-\u2d96\u2da0-\u2da6\u2da8-\u2dae\u2db0-\u2db6\u2db8-\u2dbe\u2dc0-\u2dc6\u2dc8-\u2dce\u2dd0-\u2dd6\u2dd8-\u2dde\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303c\u3041-\u3096\u309b-\u309f\u30a1-\u30fa\u30fc-\u30ff\u3105-\u312f\u3131-\u318e\u31a0-\u31bf\u31f0-\u31ff\u3400-\u4dbf\u4e00-\ua48c\ua4d0-\ua4fd\ua500-\ua60c\ua610-\ua61f\ua62a\ua62b\ua640-\ua66e\ua67f-\ua69d\ua6a0-\ua6ef\ua717-\ua71f\ua722-\ua788\ua78b-\ua7cd\ua7d0\ua7d1\ua7d3\ua7d5-\ua7dc\ua7f2-\ua801\ua803-\ua805\ua807-\ua80a\ua80c-\ua822\ua840-\ua873\ua882-\ua8b3\ua8f2-\ua8f7\ua8fb\ua8fd\ua8fe\ua90a-\ua925\ua930-\ua946\ua960-\ua97c\ua984-\ua9b2\ua9cf\ua9e0-\ua9e4\ua9e6-\ua9ef\ua9fa-\ua9fe\uaa00-\uaa28\uaa40-\uaa42\uaa44-\uaa4b\uaa60-\uaa76\uaa7a\uaa7e-\uaaaf\uaab1\uaab5\uaab6\uaab9-\uaabd\uaac0\uaac2\uaadb-\uaadd\uaae0-\uaaea\uaaf2-\uaaf4\uab01-\uab06\uab09-\uab0e\uab11-\uab16\uab20-\uab26\uab28-\uab2e\uab30-\uab5a\uab5c-\uab69\uab70-\uabe2\uac00-\ud7a3\ud7b0-\ud7c6\ud7cb-\ud7fb\uf900-\ufa6d\ufa70-\ufad9\ufb00-\ufb06\ufb13-\ufb17\ufb1d\ufb1f-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb3e\ufb40\ufb41\ufb43\ufb44\ufb46-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\uff21-\uff3a\uff41-\uff5a\uff66-\uffbe\uffc2-\uffc7\uffca-\uffcf\uffd2-\uffd7\uffda-\uffdc";
 
   		  // These are a run-length and offset encoded representation of the
   		  // >0xffff code points that are a valid part of identifiers. The
@@ -17504,7 +17776,7 @@
   		  // continue jumps to that label.
 
   		  var TokenType = function TokenType(label, conf) {
-  		    if ( conf === void 0 ) conf = {};
+  		    if ( conf === undefined ) conf = {};
 
   		    this.label = label;
   		    this.keyword = conf.keyword;
@@ -17529,7 +17801,7 @@
 
   		  // Succinct definitions of keyword token types
   		  function kw(name, options) {
-  		    if ( options === void 0 ) options = {};
+  		    if ( options === undefined ) options = {};
 
   		    options.keyword = name;
   		    return keywords[name] = new TokenType(name, options)
@@ -17645,7 +17917,7 @@
   		  }
 
   		  function nextLineBreak(code, from, end) {
-  		    if ( end === void 0 ) end = code.length;
+  		    if ( end === undefined ) end = code.length;
 
   		    for (var i = from; i < end; i++) {
   		      var next = code.charCodeAt(i);
@@ -18642,8 +18914,8 @@
   		  // function bodies).
 
   		  pp$8.parseBlock = function(createNewLexicalScope, node, exitStrict) {
-  		    if ( createNewLexicalScope === void 0 ) createNewLexicalScope = true;
-  		    if ( node === void 0 ) node = this.startNode();
+  		    if ( createNewLexicalScope === undefined ) createNewLexicalScope = true;
+  		    if ( node === undefined ) node = this.startNode();
 
   		    node.body = [];
   		    this.expect(types$1.braceL);
@@ -19070,6 +19342,8 @@
   		    this.expectContextual("from");
   		    if (this.type !== types$1.string) { this.unexpected(); }
   		    node.source = this.parseExprAtom();
+  		    if (this.options.ecmaVersion >= 16)
+  		      { node.attributes = this.parseWithClause(); }
   		    this.semicolon();
   		    return this.finishNode(node, "ExportAllDeclaration")
   		  };
@@ -19100,6 +19374,8 @@
   		      if (this.eatContextual("from")) {
   		        if (this.type !== types$1.string) { this.unexpected(); }
   		        node.source = this.parseExprAtom();
+  		        if (this.options.ecmaVersion >= 16)
+  		          { node.attributes = this.parseWithClause(); }
   		      } else {
   		        for (var i = 0, list = node.specifiers; i < list.length; i += 1) {
   		          // check for keywords used as local names
@@ -19240,6 +19516,8 @@
   		      this.expectContextual("from");
   		      node.source = this.type === types$1.string ? this.parseExprAtom() : this.unexpected();
   		    }
+  		    if (this.options.ecmaVersion >= 16)
+  		      { node.attributes = this.parseWithClause(); }
   		    this.semicolon();
   		    return this.finishNode(node, "ImportDeclaration")
   		  };
@@ -19298,6 +19576,41 @@
   		      nodes.push(this.parseImportSpecifier());
   		    }
   		    return nodes
+  		  };
+
+  		  pp$8.parseWithClause = function() {
+  		    var nodes = [];
+  		    if (!this.eat(types$1._with)) {
+  		      return nodes
+  		    }
+  		    this.expect(types$1.braceL);
+  		    var attributeKeys = {};
+  		    var first = true;
+  		    while (!this.eat(types$1.braceR)) {
+  		      if (!first) {
+  		        this.expect(types$1.comma);
+  		        if (this.afterTrailingComma(types$1.braceR)) { break }
+  		      } else { first = false; }
+
+  		      var attr = this.parseImportAttribute();
+  		      var keyName = attr.key.type === "Identifier" ? attr.key.name : attr.key.value;
+  		      if (hasOwn(attributeKeys, keyName))
+  		        { this.raiseRecoverable(attr.key.start, "Duplicate attribute key '" + keyName + "'"); }
+  		      attributeKeys[keyName] = true;
+  		      nodes.push(attr);
+  		    }
+  		    return nodes
+  		  };
+
+  		  pp$8.parseImportAttribute = function() {
+  		    var node = this.startNode();
+  		    node.key = this.type === types$1.string ? this.parseExprAtom() : this.parseIdent(this.options.allowReserved !== "never");
+  		    this.expect(types$1.colon);
+  		    if (this.type !== types$1.string) {
+  		      this.unexpected();
+  		    }
+  		    node.value = this.parseExprAtom();
+  		    return this.finishNode(node, "ImportAttribute")
   		  };
 
   		  pp$8.parseModuleExportName = function() {
@@ -19577,7 +19890,7 @@
   		  // is an assignment (i.e., bindingType is BIND_NONE).
 
   		  pp$7.checkLValSimple = function(expr, bindingType, checkClashes) {
-  		    if ( bindingType === void 0 ) bindingType = BIND_NONE;
+  		    if ( bindingType === undefined ) bindingType = BIND_NONE;
 
   		    var isBind = bindingType !== BIND_NONE;
 
@@ -19615,7 +19928,7 @@
   		  };
 
   		  pp$7.checkLValPattern = function(expr, bindingType, checkClashes) {
-  		    if ( bindingType === void 0 ) bindingType = BIND_NONE;
+  		    if ( bindingType === undefined ) bindingType = BIND_NONE;
 
   		    switch (expr.type) {
   		    case "ObjectPattern":
@@ -19640,7 +19953,7 @@
   		  };
 
   		  pp$7.checkLValInnerPattern = function(expr, bindingType, checkClashes) {
-  		    if ( bindingType === void 0 ) bindingType = BIND_NONE;
+  		    if ( bindingType === undefined ) bindingType = BIND_NONE;
 
   		    switch (expr.type) {
   		    case "Property":
@@ -20367,13 +20680,32 @@
   		    // Parse node.source.
   		    node.source = this.parseMaybeAssign();
 
-  		    // Verify ending.
-  		    if (!this.eat(types$1.parenR)) {
-  		      var errorPos = this.start;
-  		      if (this.eat(types$1.comma) && this.eat(types$1.parenR)) {
-  		        this.raiseRecoverable(errorPos, "Trailing comma is not allowed in import()");
+  		    if (this.options.ecmaVersion >= 16) {
+  		      if (!this.eat(types$1.parenR)) {
+  		        this.expect(types$1.comma);
+  		        if (!this.afterTrailingComma(types$1.parenR)) {
+  		          node.options = this.parseMaybeAssign();
+  		          if (!this.eat(types$1.parenR)) {
+  		            this.expect(types$1.comma);
+  		            if (!this.afterTrailingComma(types$1.parenR)) {
+  		              this.unexpected();
+  		            }
+  		          }
+  		        } else {
+  		          node.options = null;
+  		        }
   		      } else {
-  		        this.unexpected(errorPos);
+  		        node.options = null;
+  		      }
+  		    } else {
+  		      // Verify ending.
+  		      if (!this.eat(types$1.parenR)) {
+  		        var errorPos = this.start;
+  		        if (this.eat(types$1.comma) && this.eat(types$1.parenR)) {
+  		          this.raiseRecoverable(errorPos, "Trailing comma is not allowed in import()");
+  		        } else {
+  		          this.unexpected(errorPos);
+  		        }
   		      }
   		    }
 
@@ -20551,8 +20883,8 @@
   		  };
 
   		  pp$5.parseTemplate = function(ref) {
-  		    if ( ref === void 0 ) ref = {};
-  		    var isTagged = ref.isTagged; if ( isTagged === void 0 ) isTagged = false;
+  		    if ( ref === undefined ) ref = {};
+  		    var isTagged = ref.isTagged; if ( isTagged === undefined ) isTagged = false;
 
   		    var node = this.startNode();
   		    this.next();
@@ -20838,7 +21170,7 @@
   		        if (allowTrailingComma && this.afterTrailingComma(close)) { break }
   		      } else { first = false; }
 
-  		      var elt = (void 0);
+  		      var elt = (undefined);
   		      if (allowEmpty && this.type === types$1.comma)
   		        { elt = null; }
   		      else if (this.type === types$1.ellipsis) {
@@ -21133,6 +21465,9 @@
   		    return newNode
   		  };
 
+  		  // This file was generated by "bin/generate-unicode-script-values.js". Do not modify manually!
+  		  var scriptValuesAddedInUnicode = "Gara Garay Gukh Gurung_Khema Hrkt Katakana_Or_Hiragana Kawi Kirat_Rai Krai Nag_Mundari Nagm Ol_Onal Onao Sunu Sunuwar Todhri Todr Tulu_Tigalari Tutg Unknown Zzzz";
+
   		  // This file contains Unicode properties extracted from the ECMAScript specification.
   		  // The lists are extracted like so:
   		  // $$('#table-binary-unicode-properties > figure > table > tbody > tr > td:nth-child(1) code').map(el => el.innerText)
@@ -21175,7 +21510,7 @@
   		  var ecma11ScriptValues = ecma10ScriptValues + " Elymaic Elym Nandinagari Nand Nyiakeng_Puachue_Hmong Hmnp Wancho Wcho";
   		  var ecma12ScriptValues = ecma11ScriptValues + " Chorasmian Chrs Diak Dives_Akuru Khitan_Small_Script Kits Yezi Yezidi";
   		  var ecma13ScriptValues = ecma12ScriptValues + " Cypro_Minoan Cpmn Old_Uyghur Ougr Tangsa Tnsa Toto Vithkuqi Vith";
-  		  var ecma14ScriptValues = ecma13ScriptValues + " Hrkt Katakana_Or_Hiragana Kawi Nag_Mundari Nagm Unknown Zzzz";
+  		  var ecma14ScriptValues = ecma13ScriptValues + " " + scriptValuesAddedInUnicode;
 
   		  var unicodeScriptValues = {
   		    9: ecma9ScriptValues,
@@ -21280,7 +21615,7 @@
   		  // If u flag is given, this returns the code point at the index (it combines a surrogate pair).
   		  // Otherwise, this returns the code unit of the index (can be a part of a surrogate pair).
   		  RegExpValidationState.prototype.at = function at (i, forceU) {
-  		      if ( forceU === void 0 ) forceU = false;
+  		      if ( forceU === undefined ) forceU = false;
 
   		    var s = this.source;
   		    var l = s.length;
@@ -21296,7 +21631,7 @@
   		  };
 
   		  RegExpValidationState.prototype.nextIndex = function nextIndex (i, forceU) {
-  		      if ( forceU === void 0 ) forceU = false;
+  		      if ( forceU === undefined ) forceU = false;
 
   		    var s = this.source;
   		    var l = s.length;
@@ -21312,25 +21647,25 @@
   		  };
 
   		  RegExpValidationState.prototype.current = function current (forceU) {
-  		      if ( forceU === void 0 ) forceU = false;
+  		      if ( forceU === undefined ) forceU = false;
 
   		    return this.at(this.pos, forceU)
   		  };
 
   		  RegExpValidationState.prototype.lookahead = function lookahead (forceU) {
-  		      if ( forceU === void 0 ) forceU = false;
+  		      if ( forceU === undefined ) forceU = false;
 
   		    return this.at(this.nextIndex(this.pos, forceU), forceU)
   		  };
 
   		  RegExpValidationState.prototype.advance = function advance (forceU) {
-  		      if ( forceU === void 0 ) forceU = false;
+  		      if ( forceU === undefined ) forceU = false;
 
   		    this.pos = this.nextIndex(this.pos, forceU);
   		  };
 
   		  RegExpValidationState.prototype.eat = function eat (ch, forceU) {
-  		      if ( forceU === void 0 ) forceU = false;
+  		      if ( forceU === undefined ) forceU = false;
 
   		    if (this.current(forceU) === ch) {
   		      this.advance(forceU);
@@ -21340,7 +21675,7 @@
   		  };
 
   		  RegExpValidationState.prototype.eatChars = function eatChars (chs, forceU) {
-  		      if ( forceU === void 0 ) forceU = false;
+  		      if ( forceU === undefined ) forceU = false;
 
   		    var pos = this.pos;
   		    for (var i = 0, list = chs; i < list.length; i += 1) {
@@ -21533,7 +21868,7 @@
 
   		  // https://www.ecma-international.org/ecma-262/8.0/#prod-Quantifier
   		  pp$1.regexp_eatQuantifier = function(state, noError) {
-  		    if ( noError === void 0 ) noError = false;
+  		    if ( noError === undefined ) noError = false;
 
   		    if (this.regexp_eatQuantifierPrefix(state, noError)) {
   		      state.eat(0x3F /* ? */);
@@ -21600,12 +21935,41 @@
   		  pp$1.regexp_eatUncapturingGroup = function(state) {
   		    var start = state.pos;
   		    if (state.eat(0x28 /* ( */)) {
-  		      if (state.eat(0x3F /* ? */) && state.eat(0x3A /* : */)) {
-  		        this.regexp_disjunction(state);
-  		        if (state.eat(0x29 /* ) */)) {
-  		          return true
+  		      if (state.eat(0x3F /* ? */)) {
+  		        if (this.options.ecmaVersion >= 16) {
+  		          var addModifiers = this.regexp_eatModifiers(state);
+  		          var hasHyphen = state.eat(0x2D /* - */);
+  		          if (addModifiers || hasHyphen) {
+  		            for (var i = 0; i < addModifiers.length; i++) {
+  		              var modifier = addModifiers.charAt(i);
+  		              if (addModifiers.indexOf(modifier, i + 1) > -1) {
+  		                state.raise("Duplicate regular expression modifiers");
+  		              }
+  		            }
+  		            if (hasHyphen) {
+  		              var removeModifiers = this.regexp_eatModifiers(state);
+  		              if (!addModifiers && !removeModifiers && state.current() === 0x3A /* : */) {
+  		                state.raise("Invalid regular expression modifiers");
+  		              }
+  		              for (var i$1 = 0; i$1 < removeModifiers.length; i$1++) {
+  		                var modifier$1 = removeModifiers.charAt(i$1);
+  		                if (
+  		                  removeModifiers.indexOf(modifier$1, i$1 + 1) > -1 ||
+  		                  addModifiers.indexOf(modifier$1) > -1
+  		                ) {
+  		                  state.raise("Duplicate regular expression modifiers");
+  		                }
+  		              }
+  		            }
+  		          }
   		        }
-  		        state.raise("Unterminated group");
+  		        if (state.eat(0x3A /* : */)) {
+  		          this.regexp_disjunction(state);
+  		          if (state.eat(0x29 /* ) */)) {
+  		            return true
+  		          }
+  		          state.raise("Unterminated group");
+  		        }
   		      }
   		      state.pos = start;
   		    }
@@ -21627,6 +21991,23 @@
   		    }
   		    return false
   		  };
+  		  // RegularExpressionModifiers ::
+  		  //   [empty]
+  		  //   RegularExpressionModifiers RegularExpressionModifier
+  		  pp$1.regexp_eatModifiers = function(state) {
+  		    var modifiers = "";
+  		    var ch = 0;
+  		    while ((ch = state.current()) !== -1 && isRegularExpressionModifier(ch)) {
+  		      modifiers += codePointToString(ch);
+  		      state.advance();
+  		    }
+  		    return modifiers
+  		  };
+  		  // RegularExpressionModifier :: one of
+  		  //   `i` `m` `s`
+  		  function isRegularExpressionModifier(ch) {
+  		    return ch === 0x69 /* i */ || ch === 0x6d /* m */ || ch === 0x73 /* s */
+  		  }
 
   		  // https://www.ecma-international.org/ecma-262/8.0/#prod-annexB-ExtendedAtom
   		  pp$1.regexp_eatExtendedAtom = function(state) {
@@ -21941,7 +22322,7 @@
 
   		  // https://www.ecma-international.org/ecma-262/8.0/#prod-RegExpUnicodeEscapeSequence
   		  pp$1.regexp_eatRegExpUnicodeEscapeSequence = function(state, forceU) {
-  		    if ( forceU === void 0 ) forceU = false;
+  		    if ( forceU === undefined ) forceU = false;
 
   		    var start = state.pos;
   		    var switchU = forceU || state.switchU;
@@ -22659,7 +23040,7 @@
   		    if (end === -1) { this.raise(this.pos - 2, "Unterminated comment"); }
   		    this.pos = end + 2;
   		    if (this.options.locations) {
-  		      for (var nextBreak = (void 0), pos = start; (nextBreak = nextLineBreak(this.input, pos, this.pos)) > -1;) {
+  		      for (var nextBreak = (undefined), pos = start; (nextBreak = nextLineBreak(this.input, pos, this.pos)) > -1;) {
   		        ++this.curLine;
   		        pos = this.lineStart = nextBreak;
   		      }
@@ -23018,7 +23399,7 @@
 
   		    var start = this.pos, total = 0, lastCode = 0;
   		    for (var i = 0, e = len == null ? Infinity : len; i < e; ++i, ++this.pos) {
-  		      var code = this.input.charCodeAt(this.pos), val = (void 0);
+  		      var code = this.input.charCodeAt(this.pos), val = (undefined);
 
   		      if (allowSeparators && code === 95) {
   		        if (isLegacyOctalNumericLiteral) { this.raiseRecoverable(this.pos, "Numeric separator is not allowed in legacy octal numeric literals"); }
@@ -23382,7 +23763,7 @@
   		  // [walk]: util/walk.js
 
 
-  		  var version = "8.12.1";
+  		  var version = "8.14.0";
 
   		  Parser.acorn = {
   		    Parser: Parser,
@@ -23459,38 +23840,47 @@
   	return acorn.exports;
   }
 
-  Object.defineProperty(acorn$1, "__esModule", { value: true });
-  var parse_1 = acorn$1.parse = void 0;
-  // This module is suitable for passing as options.parser when calling
-  // recast.parse to process JavaScript code with Acorn:
-  //
-  //   const ast = recast.parse(source, {
-  //     parser: require("recast/parsers/acorn")
-  //   });
-  //
-  var util_1 = util;
-  function parse$1(source, options) {
-      var comments = [];
-      var tokens = [];
-      var ast = requireAcorn().parse(source, {
-          allowHashBang: true,
-          allowImportExportEverywhere: true,
-          allowReturnOutsideFunction: true,
-          ecmaVersion: (0, util_1.getOption)(options, "ecmaVersion", 8),
-          sourceType: (0, util_1.getOption)(options, "sourceType", "module"),
-          locations: true,
-          onComment: comments,
-          onToken: tokens,
-      });
-      if (!ast.comments) {
-          ast.comments = comments;
-      }
-      if (!ast.tokens) {
-          ast.tokens = tokens;
-      }
-      return ast;
+  var hasRequiredAcorn;
+
+  function requireAcorn () {
+  	if (hasRequiredAcorn) return acorn$1;
+  	hasRequiredAcorn = 1;
+  	Object.defineProperty(acorn$1, "__esModule", { value: true });
+  	acorn$1.parse = undefined;
+  	// This module is suitable for passing as options.parser when calling
+  	// recast.parse to process JavaScript code with Acorn:
+  	//
+  	//   const ast = recast.parse(source, {
+  	//     parser: require("recast/parsers/acorn")
+  	//   });
+  	//
+  	var util_1 = requireUtil();
+  	function parse(source, options) {
+  	    var comments = [];
+  	    var tokens = [];
+  	    var ast = requireAcorn$1().parse(source, {
+  	        allowHashBang: true,
+  	        allowImportExportEverywhere: true,
+  	        allowReturnOutsideFunction: true,
+  	        ecmaVersion: (0, util_1.getOption)(options, "ecmaVersion", 8),
+  	        sourceType: (0, util_1.getOption)(options, "sourceType", "module"),
+  	        locations: true,
+  	        onComment: comments,
+  	        onToken: tokens,
+  	    });
+  	    if (!ast.comments) {
+  	        ast.comments = comments;
+  	    }
+  	    if (!ast.tokens) {
+  	        ast.tokens = tokens;
+  	    }
+  	    return ast;
+  	}
+  	acorn$1.parse = parse;
+  	return acorn$1;
   }
-  parse_1 = acorn$1.parse = parse$1;
+
+  var acornExports = requireAcorn();
 
   /**
    * Parse a js source to generate the AST
@@ -23499,10 +23889,10 @@
    * @returns {AST} AST tree
    */
   function generateAST(source, options) {
-    return main$1.parse(source, {
+    return mainExports.parse(source, {
       parser: {
         parse: (source, opts) =>
-          parse_1(source, {
+          acornExports.parse(source, {
             ...opts,
             ecmaVersion: 'latest',
           }),
@@ -23596,6 +23986,8 @@
   function visitThisExpression(path) {
     path.replace(scope);
     this.traverse(path);
+
+    return false
   }
 
   /**
@@ -23864,7 +24256,7 @@
           EACH_DIRECTIVE,
           KEY_ATTRIBUTE,
           SLOT_ATTRIBUTE,
-          IS_DIRECTIVE$1,
+          IS_DIRECTIVE,
         ].includes(attribute.name),
     )
   }
@@ -24167,6 +24559,8 @@
     return map
   }
 
+  var utilExports = requireUtil();
+
   /**
    * Compose two sourcemaps
    * @param   { SourceMapGenerator } formerMap - original sourcemap
@@ -24175,7 +24569,7 @@
    */
   function composeSourcemaps(formerMap, latterMap) {
     if (isNode() && formerMap && latterMap && latterMap.mappings) {
-      return composeSourceMaps_1(sourcemapAsJSON(formerMap), sourcemapAsJSON(latterMap))
+      return utilExports.composeSourceMaps(sourcemapAsJSON(formerMap), sourcemapAsJSON(latterMap))
     } else if (isNode() && formerMap) {
       return sourcemapAsJSON(formerMap)
     }
@@ -24189,7 +24583,7 @@
    * @returns { SourceMapGenerator } SourceMapGenerator instance
    */
   function createSourcemap(options) {
-    return new SourceMapGenerator$1()
+    return new SourceMapGenerator()
   }
 
   const Output = Object.freeze({
@@ -24356,11 +24750,11 @@
    * @returns {Object} code + map
    */
   function generateJavascript(ast, options) {
-    return main$1.print(ast, {
+    return mainExports.print(ast, {
       ...options,
       parser: {
         parse: (source, opts) =>
-          parse_1(source, {
+          acornExports.parse(source, {
             ...opts,
             ecmaVersion: 'latest',
           }),
@@ -24634,14 +25028,17 @@
         ),
       ),
       simplePropertyNode(BINDING_NAME_KEY, builders.literal(slotName)),
-      createTemplateProperty(
-        createNestedBindings(
-          sourceNode,
-          sourceFile,
-          sourceCode,
-          selectorAttribute,
-        ),
-      ),
+      getChildrenNodes(sourceNode).length
+        ? createTemplateProperty(
+            createNestedBindings(
+              // the root attributes should be removed
+              { ...sourceNode, attributes: [] },
+              sourceFile,
+              sourceCode,
+              selectorAttribute,
+            ),
+          )
+        : simplePropertyNode(BINDING_TEMPLATE_KEY, builders.nullLiteral()),
       ...createSelectorProperties(selectorAttribute),
     ])
   }
@@ -24959,114 +25356,124 @@
 
   /*! https://mths.be/cssesc v3.0.0 by @mathias */
 
-  var object = {};
-  var hasOwnProperty = object.hasOwnProperty;
-  var merge = function merge(options, defaults) {
-  	if (!options) {
-  		return defaults;
-  	}
-  	var result = {};
-  	for (var key in defaults) {
-  		// `if (defaults.hasOwnProperty(key) { … }` is not needed here, since
-  		// only recognized option names are used.
-  		result[key] = hasOwnProperty.call(options, key) ? options[key] : defaults[key];
-  	}
-  	return result;
-  };
+  var cssesc_1;
+  var hasRequiredCssesc;
 
-  var regexAnySingleEscape = /[ -,\.\/:-@\[-\^`\{-~]/;
-  var regexSingleEscape = /[ -,\.\/:-@\[\]\^`\{-~]/;
-  var regexExcessiveSpaces = /(^|\\+)?(\\[A-F0-9]{1,6})\x20(?![a-fA-F0-9\x20])/g;
+  function requireCssesc () {
+  	if (hasRequiredCssesc) return cssesc_1;
+  	hasRequiredCssesc = 1;
 
-  // https://mathiasbynens.be/notes/css-escapes#css
-  var cssesc = function cssesc(string, options) {
-  	options = merge(options, cssesc.options);
-  	if (options.quotes != 'single' && options.quotes != 'double') {
-  		options.quotes = 'single';
-  	}
-  	var quote = options.quotes == 'double' ? '"' : '\'';
-  	var isIdentifier = options.isIdentifier;
+  	var object = {};
+  	var hasOwnProperty = object.hasOwnProperty;
+  	var merge = function merge(options, defaults) {
+  		if (!options) {
+  			return defaults;
+  		}
+  		var result = {};
+  		for (var key in defaults) {
+  			// `if (defaults.hasOwnProperty(key) { … }` is not needed here, since
+  			// only recognized option names are used.
+  			result[key] = hasOwnProperty.call(options, key) ? options[key] : defaults[key];
+  		}
+  		return result;
+  	};
 
-  	var firstChar = string.charAt(0);
-  	var output = '';
-  	var counter = 0;
-  	var length = string.length;
-  	while (counter < length) {
-  		var character = string.charAt(counter++);
-  		var codePoint = character.charCodeAt();
-  		var value = void 0;
-  		// If it’s not a printable ASCII character…
-  		if (codePoint < 0x20 || codePoint > 0x7E) {
-  			if (codePoint >= 0xD800 && codePoint <= 0xDBFF && counter < length) {
-  				// It’s a high surrogate, and there is a next character.
-  				var extra = string.charCodeAt(counter++);
-  				if ((extra & 0xFC00) == 0xDC00) {
-  					// next character is low surrogate
-  					codePoint = ((codePoint & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000;
-  				} else {
-  					// It’s an unmatched surrogate; only append this code unit, in case
-  					// the next code unit is the high surrogate of a surrogate pair.
-  					counter--;
+  	var regexAnySingleEscape = /[ -,\.\/:-@\[-\^`\{-~]/;
+  	var regexSingleEscape = /[ -,\.\/:-@\[\]\^`\{-~]/;
+  	var regexExcessiveSpaces = /(^|\\+)?(\\[A-F0-9]{1,6})\x20(?![a-fA-F0-9\x20])/g;
+
+  	// https://mathiasbynens.be/notes/css-escapes#css
+  	var cssesc = function cssesc(string, options) {
+  		options = merge(options, cssesc.options);
+  		if (options.quotes != 'single' && options.quotes != 'double') {
+  			options.quotes = 'single';
+  		}
+  		var quote = options.quotes == 'double' ? '"' : '\'';
+  		var isIdentifier = options.isIdentifier;
+
+  		var firstChar = string.charAt(0);
+  		var output = '';
+  		var counter = 0;
+  		var length = string.length;
+  		while (counter < length) {
+  			var character = string.charAt(counter++);
+  			var codePoint = character.charCodeAt();
+  			var value = undefined;
+  			// If it’s not a printable ASCII character…
+  			if (codePoint < 0x20 || codePoint > 0x7E) {
+  				if (codePoint >= 0xD800 && codePoint <= 0xDBFF && counter < length) {
+  					// It’s a high surrogate, and there is a next character.
+  					var extra = string.charCodeAt(counter++);
+  					if ((extra & 0xFC00) == 0xDC00) {
+  						// next character is low surrogate
+  						codePoint = ((codePoint & 0x3FF) << 10) + (extra & 0x3FF) + 0x10000;
+  					} else {
+  						// It’s an unmatched surrogate; only append this code unit, in case
+  						// the next code unit is the high surrogate of a surrogate pair.
+  						counter--;
+  					}
   				}
-  			}
-  			value = '\\' + codePoint.toString(16).toUpperCase() + ' ';
-  		} else {
-  			if (options.escapeEverything) {
-  				if (regexAnySingleEscape.test(character)) {
+  				value = '\\' + codePoint.toString(16).toUpperCase() + ' ';
+  			} else {
+  				if (options.escapeEverything) {
+  					if (regexAnySingleEscape.test(character)) {
+  						value = '\\' + character;
+  					} else {
+  						value = '\\' + codePoint.toString(16).toUpperCase() + ' ';
+  					}
+  				} else if (/[\t\n\f\r\x0B]/.test(character)) {
+  					value = '\\' + codePoint.toString(16).toUpperCase() + ' ';
+  				} else if (character == '\\' || !isIdentifier && (character == '"' && quote == character || character == '\'' && quote == character) || isIdentifier && regexSingleEscape.test(character)) {
   					value = '\\' + character;
   				} else {
-  					value = '\\' + codePoint.toString(16).toUpperCase() + ' ';
+  					value = character;
   				}
-  			} else if (/[\t\n\f\r\x0B]/.test(character)) {
-  				value = '\\' + codePoint.toString(16).toUpperCase() + ' ';
-  			} else if (character == '\\' || !isIdentifier && (character == '"' && quote == character || character == '\'' && quote == character) || isIdentifier && regexSingleEscape.test(character)) {
-  				value = '\\' + character;
-  			} else {
-  				value = character;
+  			}
+  			output += value;
+  		}
+
+  		if (isIdentifier) {
+  			if (/^-[-\d]/.test(output)) {
+  				output = '\\-' + output.slice(1);
+  			} else if (/\d/.test(firstChar)) {
+  				output = '\\3' + firstChar + ' ' + output.slice(1);
   			}
   		}
-  		output += value;
-  	}
 
-  	if (isIdentifier) {
-  		if (/^-[-\d]/.test(output)) {
-  			output = '\\-' + output.slice(1);
-  		} else if (/\d/.test(firstChar)) {
-  			output = '\\3' + firstChar + ' ' + output.slice(1);
+  		// Remove spaces after `\HEX` escapes that are not followed by a hex digit,
+  		// since they’re redundant. Note that this is only possible if the escape
+  		// sequence isn’t preceded by an odd number of backslashes.
+  		output = output.replace(regexExcessiveSpaces, function ($0, $1, $2) {
+  			if ($1 && $1.length % 2) {
+  				// It’s not safe to remove the space, so don’t.
+  				return $0;
+  			}
+  			// Strip the space.
+  			return ($1 || '') + $2;
+  		});
+
+  		if (!isIdentifier && options.wrap) {
+  			return quote + output + quote;
   		}
-  	}
+  		return output;
+  	};
 
-  	// Remove spaces after `\HEX` escapes that are not followed by a hex digit,
-  	// since they’re redundant. Note that this is only possible if the escape
-  	// sequence isn’t preceded by an odd number of backslashes.
-  	output = output.replace(regexExcessiveSpaces, function ($0, $1, $2) {
-  		if ($1 && $1.length % 2) {
-  			// It’s not safe to remove the space, so don’t.
-  			return $0;
-  		}
-  		// Strip the space.
-  		return ($1 || '') + $2;
-  	});
+  	// Expose default options (so they can be overridden globally).
+  	cssesc.options = {
+  		'escapeEverything': false,
+  		'isIdentifier': false,
+  		'quotes': 'single',
+  		'wrap': false
+  	};
 
-  	if (!isIdentifier && options.wrap) {
-  		return quote + output + quote;
-  	}
-  	return output;
-  };
+  	cssesc.version = '3.0.0';
 
-  // Expose default options (so they can be overridden globally).
-  cssesc.options = {
-  	'escapeEverything': false,
-  	'isIdentifier': false,
-  	'quotes': 'single',
-  	'wrap': false
-  };
+  	cssesc_1 = cssesc;
+  	return cssesc_1;
+  }
 
-  cssesc.version = '3.0.0';
-
-  var cssesc_1 = cssesc;
-
-  var cssEscape = /*@__PURE__*/getDefaultExportFromCjs(cssesc_1);
+  var cssescExports = requireCssesc();
+  var cssEscape = /*@__PURE__*/getDefaultExportFromCjs(cssescExports);
 
   /* MAIN */
   const TOKEN_TYPE = {
@@ -25525,40 +25932,6 @@
   }
 
   /**
-   * Find whether there is html code outside of the root node
-   * @param   {RiotParser.Node} root - node generated by the riot compiler
-   * @param   {string}  code - riot tag source code
-   * @param   {Function} parse - riot parser function
-   * @returns {boolean} true if extra markup is detected
-   */
-  function hasHTMLOutsideRootNode(root, code, parse) {
-    const additionalCode = root
-      ? [
-          // head
-          code.substr(0, root.start),
-          // tail
-          code.substr(root.end, code.length),
-        ]
-          .join('')
-          .trim()
-      : '';
-
-    if (additionalCode) {
-      // if there are parsing errors we assume that there are no html
-      // tags outside of the root node
-      try {
-        const { template, javascript, css } = parse(additionalCode).output;
-
-        return [template, javascript, css].some(isObject)
-      } catch (error) {
-        return false
-      }
-    }
-
-    return false
-  }
-
-  /**
    * Ckeck if an Array-like object has empty length
    * @param {Array} target - Array-like object
    * @returns {boolean} target is empty or null
@@ -25880,6 +26253,73 @@
     return extendTemplateProperty(ast, options.file, source, sourceNode)
   }
 
+  /**
+   * Find whether there is html code outside of the root node
+   * @param   {RiotParser.Node} root - node generated by the riot compiler
+   * @param   {string}  code - riot tag source code
+   * @param   {Function} parse - riot parser function
+   * @returns {boolean} true if extra markup is detected
+   */
+  function hasHTMLOutsideRootNode(root, code, parse) {
+    const additionalCode = root
+      ? [
+          // head
+          code.substr(0, root.start),
+          // tail
+          code.substr(root.end, code.length),
+        ]
+          .join('')
+          .trim()
+      : '';
+
+    if (additionalCode) {
+      // if there are parsing errors we assume that there are no html
+      // tags outside of the root node
+      try {
+        const { template, javascript, css } = parse(additionalCode).output;
+
+        return [template, javascript, css].some(isObject)
+      } catch (error) {
+        return false
+      }
+    }
+
+    return false
+  }
+
+  /**
+   * Get an object containing the template, css and javascript ast. The origianl source code and the sourcemap are also included
+   *
+   * @param { string | ParserResult } source - source code of the tag we will need to compile or a parsed Component AST
+   * @param { Object } meta - compiler meta object that will be used to store the meta information of the input across the whole compilation
+   * @returns { Object } object that will be used to generate the output code
+   */
+  function preProcessSource(source, meta) {
+    // if the source is a parser output we can return it directly
+    // @link https://github.com/riot/compiler/issues/178
+    if (isObject(source))
+      return { ...source.output, code: source.data, map: null }
+
+    const { options } = meta;
+
+    const { code, map } = execute(
+      'template',
+      options.template,
+      meta,
+      source,
+    );
+
+    const parse = parser$1(options).parse;
+    const { template, css, javascript } = parse(code).output;
+
+    // see also https://github.com/riot/compiler/issues/130
+    if (hasHTMLOutsideRootNode(template || css || javascript, source, parse)) {
+      throw new Error('Multiple HTML root nodes are not supported')
+    }
+
+    return { template, css, javascript, map, code }
+  }
+
   const DEFAULT_OPTIONS = {
     template: 'default',
     file: '[unknown-source-file]',
@@ -26004,26 +26444,17 @@
 
   /**
    * Generate the output code source together with the sourcemap
-   * @param { string } source - source code of the tag we will need to compile
+   * @param { string | ParserResult } source - source code of the tag we will need to compile or a parsed Component AST
    * @param { Object } opts - compiling options
    * @returns { Output } object containing output code and source map
    */
   function compile$1(source, opts = {}) {
     const meta = createMeta(source, opts);
     const { options } = meta;
-    const { code, map } = execute(
-      'template',
-      options.template,
-      meta,
+    const { template: template$1, css: css$1, javascript: javascript$1, map, code } = preProcessSource(
       source,
+      meta,
     );
-    const { parse } = parser$1(options);
-    const { template: template$1, css: css$1, javascript: javascript$1 } = parse(code).output;
-
-    // see also https://github.com/riot/compiler/issues/130
-    if (hasHTMLOutsideRootNode(template$1 || css$1 || javascript$1, code, parse)) {
-      throw new Error('Multiple HTML root nodes are not supported')
-    }
 
     // extend the meta object with the result of the parsing
     Object.assign(meta, {
@@ -26090,222 +26521,13 @@
     registerPreprocessor: registerPreprocessor
   });
 
-  const EACH = 0;
-  const IF = 1;
-  const SIMPLE = 2;
-  const TAG = 3;
-  const SLOT = 4;
-
-  const bindingTypes = {
-    EACH,
-    IF,
-    SIMPLE,
-    TAG,
-    SLOT,
-  };
-
-  // Riot.js constants that can be used across more modules
-
-  const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
-    DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
-    PLUGINS_SET = new Set(),
-    IS_DIRECTIVE = 'is',
-    MOUNT_METHOD_KEY = 'mount',
-    UPDATE_METHOD_KEY = 'update',
-    UNMOUNT_METHOD_KEY = 'unmount',
-    SHOULD_UPDATE_KEY = 'shouldUpdate',
-    ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
-    ON_MOUNTED_KEY = 'onMounted',
-    ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
-    ON_UPDATED_KEY = 'onUpdated',
-    ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
-    ON_UNMOUNTED_KEY = 'onUnmounted',
-    PROPS_KEY = 'props',
-    STATE_KEY = 'state',
-    SLOTS_KEY = 'slots',
-    ROOT_KEY = 'root',
-    IS_PURE_SYMBOL = Symbol('pure'),
-    IS_COMPONENT_UPDATING = Symbol('is_updating'),
-    PARENT_KEY_SYMBOL = Symbol('parent'),
-    ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
-    TEMPLATE_KEY_SYMBOL = Symbol('template');
-
-  /**
-   * Get all the element attributes as object
-   * @param   {HTMLElement} element - DOM node we want to parse
-   * @returns {Object} all the attributes found as a key value pairs
-   */
-  function DOMattributesToObject(element) {
-    return Array.from(element.attributes).reduce((acc, attribute) => {
-      acc[dashToCamelCase(attribute.name)] = attribute.value;
-      return acc
-    }, {})
-  }
-
-  /**
-   * Move all the child nodes from a source tag to another
-   * @param   {HTMLElement} source - source node
-   * @param   {HTMLElement} target - target node
-   * @returns {undefined} it's a void method ¯\_(ツ)_/¯
-   */
-
-  // Ignore this helper because it's needed only for svg tags
-  function moveChildren(source, target) {
-    // eslint-disable-next-line fp/no-loops
-    while (source.firstChild) target.appendChild(source.firstChild);
-  }
-
-  /**
-   * Remove the child nodes from any DOM node
-   * @param   {HTMLElement} node - target node
-   * @returns {undefined}
-   */
-  function cleanNode(node) {
-    // eslint-disable-next-line fp/no-loops
-    while (node.firstChild) node.removeChild(node.firstChild);
-  }
-
-  /**
-   * Clear multiple children in a node
-   * @param   {HTMLElement[]} children - direct children nodes
-   * @returns {undefined}
-   */
-  function clearChildren(children) {
-    // eslint-disable-next-line fp/no-loops,fp/no-let
-    for (let i = 0; i < children.length; i++) removeChild(children[i]);
-  }
-
-  /**
-   * Remove a node
-   * @param {HTMLElement}node - node to remove
-   * @returns {undefined}
-   */
-  const removeChild = (node) => node.remove();
-
-  /**
-   * Insert before a node
-   * @param {HTMLElement} newNode - node to insert
-   * @param {HTMLElement} refNode - ref child
-   * @returns {undefined}
-   */
-  const insertBefore = (newNode, refNode) =>
-    refNode &&
-    refNode.parentNode &&
-    refNode.parentNode.insertBefore(newNode, refNode);
-
-  /**
-   * Replace a node
-   * @param {HTMLElement} newNode - new node to add to the DOM
-   * @param {HTMLElement} replaced - node to replace
-   * @returns {undefined}
-   */
-  const replaceChild = (newNode, replaced) =>
-    replaced &&
-    replaced.parentNode &&
-    replaced.parentNode.replaceChild(newNode, replaced);
-
-  // does simply nothing
-  function noop() {
-    return this
-  }
-
-  /**
-   * Autobind the methods of a source object to itself
-   * @param   {Object} source - probably a riot tag instance
-   * @param   {Array<string>} methods - list of the methods to autobind
-   * @returns {Object} the original object received
-   */
-  function autobindMethods(source, methods) {
-    methods.forEach((method) => {
-      source[method] = source[method].bind(source);
-    });
-
-    return source
-  }
-
-  /**
-   * Call the first argument received only if it's a function otherwise return it as it is
-   * @param   {*} source - anything
-   * @returns {*} anything
-   */
-  function callOrAssign(source) {
-    return isFunction(source)
-      ? source.prototype && source.prototype.constructor
-        ? new source()
-        : source()
-      : source
-  }
-
-  /**
-   * Helper function to set an immutable property
-   * @param   {Object} source - object where the new property will be set
-   * @param   {string} key - object key where the new property will be stored
-   * @param   {*} value - value of the new property
-   * @param   {Object} options - set the property overriding the default options
-   * @returns {Object} - the original object modified
-   */
-  function defineProperty(source, key, value, options = {}) {
-    /* eslint-disable fp/no-mutating-methods */
-    Object.defineProperty(source, key, {
-      value,
-      enumerable: false,
-      writable: false,
-      configurable: true,
-      ...options,
-    });
-    /* eslint-enable fp/no-mutating-methods */
-
-    return source
-  }
-
-  /**
-   * Define multiple properties on a target object
-   * @param   {Object} source - object where the new properties will be set
-   * @param   {Object} properties - object containing as key pair the key + value properties
-   * @param   {Object} options - set the property overriding the default options
-   * @returns {Object} the original object modified
-   */
-  function defineProperties(source, properties, options) {
-    Object.entries(properties).forEach(([key, value]) => {
-      defineProperty(source, key, value, options);
-    });
-
-    return source
-  }
-
-  /**
-   * Define default properties if they don't exist on the source object
-   * @param   {Object} source - object that will receive the default properties
-   * @param   {Object} defaults - object containing additional optional keys
-   * @returns {Object} the original object received enhanced
-   */
-  function defineDefaults(source, defaults) {
-    Object.entries(defaults).forEach(([key, value]) => {
-      if (!source[key]) source[key] = value;
-    });
-
-    return source
-  }
-
-  /**
-   * Generate a new object picking only the properties from a given array
-   * @param {Object} source - target object
-   * @param {Array} keys - list of keys that we want to copy over to the new object
-   * @return {Object} a new object conaining only the keys that we have picked from the keys array list
-   */
-  function pick(source, keys) {
-    return isObject(source)
-      ? Object.fromEntries(keys.map((key) => [key, source[key]]))
-      : source
-  }
-
   // Components without template use a mocked template interface with some basic functionalities to
   // guarantee consistent rendering behaviour see https://github.com/riot/riot/issues/2984
   const MOCKED_TEMPLATE_INTERFACE = {
     [MOUNT_METHOD_KEY](el) {
       this.el = el;
     },
-    [UPDATE_METHOD_KEY]: noop,
+    [UPDATE_METHOD_KEY]: noop$1,
     [UNMOUNT_METHOD_KEY](_, __, mustRemoveRoot = false) {
       if (mustRemoveRoot) removeChild(this.el);
       else if (!mustRemoveRoot) cleanNode(this.el);
@@ -26313,7 +26535,7 @@
     clone() {
       return { ...this }
     },
-    createDOM: noop,
+    createDOM: noop$1,
   };
 
   const HEAD_SYMBOL = Symbol();
@@ -27340,7 +27562,7 @@
     [IF]: create$5,
     [SIMPLE]: create$3,
     [EACH]: create$6,
-    [TAG]: create$2,
+    [TAG$1]: create$2,
     [SLOT]: createSlot,
   };
 
@@ -27657,9 +27879,9 @@
   }
 
   const PURE_COMPONENT_API = Object.freeze({
-    [MOUNT_METHOD_KEY]: noop,
-    [UPDATE_METHOD_KEY]: noop,
-    [UNMOUNT_METHOD_KEY]: noop,
+    [MOUNT_METHOD_KEY]: noop$1,
+    [UPDATE_METHOD_KEY]: noop$1,
+    [UNMOUNT_METHOD_KEY]: noop$1,
   });
 
   /**
@@ -27773,13 +27995,13 @@
   });
 
   const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
-    [SHOULD_UPDATE_KEY]: noop,
-    [ON_BEFORE_MOUNT_KEY]: noop,
-    [ON_MOUNTED_KEY]: noop,
-    [ON_BEFORE_UPDATE_KEY]: noop,
-    [ON_UPDATED_KEY]: noop,
-    [ON_BEFORE_UNMOUNT_KEY]: noop,
-    [ON_UNMOUNTED_KEY]: noop,
+    [SHOULD_UPDATE_KEY]: noop$1,
+    [ON_BEFORE_MOUNT_KEY]: noop$1,
+    [ON_MOUNTED_KEY]: noop$1,
+    [ON_BEFORE_UPDATE_KEY]: noop$1,
+    [ON_UPDATED_KEY]: noop$1,
+    [ON_BEFORE_UNMOUNT_KEY]: noop$1,
+    [ON_UNMOUNTED_KEY]: noop$1,
   });
 
   /**
@@ -27952,7 +28174,7 @@
    * @returns {string} name to identify this dom node in riot
    */
   function getName(element) {
-    return get(element, IS_DIRECTIVE) || element.tagName.toLowerCase()
+    return get(element, IS_DIRECTIVE$1) || element.tagName.toLowerCase()
   }
 
   /**
@@ -27964,7 +28186,7 @@
 
   function addCssHook(element, name) {
     if (getName(element) !== name) {
-      set(element, IS_DIRECTIVE, name);
+      set(element, IS_DIRECTIVE$1, name);
     }
   }
 
@@ -28124,7 +28346,7 @@
 
               // Avoid adding the riot "is" directives to the component props
               // eslint-disable-next-line no-unused-vars
-              const { [IS_DIRECTIVE]: _, ...newProps } = {
+              const { [IS_DIRECTIVE$1]: _, ...newProps } = {
                 ...domNodeAttributes,
                 ...evaluateAttributeExpressions(
                   this[ATTRIBUTES_KEY_SYMBOL].expressions,
@@ -28409,7 +28631,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.4.4';
+  const version = 'v9.4.5';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
