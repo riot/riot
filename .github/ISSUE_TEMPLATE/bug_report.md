@@ -4,7 +4,6 @@ about: Create a report to help us improve
 title: ''
 labels: bug, to verify
 assignees: GianlucaGuarini
-
 ---
 
 ## Help us to manage our issues by answering the following
