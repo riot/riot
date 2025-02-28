@@ -1,4 +1,4 @@
-/* Riot v9.4.5, @license MIT */
+/* Riot v9.4.6, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -83,12 +83,14 @@
   const EVENT = 1;
   const TEXT$1 = 2;
   const VALUE = 3;
+  const REF = 4;
 
   const expressionTypes = {
     ATTRIBUTE,
     EVENT,
     TEXT: TEXT$1,
     VALUE,
+    REF,
   };
 
   /**
@@ -2202,6 +2204,7 @@
   const EXPRESSION_TYPES = 'expressionTypes';
   const ATTRIBUTE_EXPRESSION_TYPE = 'ATTRIBUTE';
   const VALUE_EXPRESSION_TYPE = 'VALUE';
+  const REF_EXPRESSION_TYPE = 'REF';
   const TEXT_EXPRESSION_TYPE = 'TEXT';
   const EVENT_EXPRESSION_TYPE = 'EVENT';
 
@@ -2236,6 +2239,8 @@
   const EACH_DIRECTIVE = 'each';
   const KEY_ATTRIBUTE = 'key';
   const SLOT_ATTRIBUTE = 'slot';
+  const VALUE_ATTRIBUTE = 'value';
+  const REF_ATTRIBUTE = 'ref';
   const NAME_ATTRIBUTE = 'name';
   const IS_DIRECTIVE = 'is';
 
@@ -2351,7 +2356,7 @@
   }
 
   function __esDecorate(ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
-    function accept(f) { if (f !== undefined && typeof f !== "function") throw new TypeError("Function expected"); return f; }
+    function accept(f) { if (f !== void 0 && typeof f !== "function") throw new TypeError("Function expected"); return f; }
     var kind = contextIn.kind, key = kind === "getter" ? "get" : kind === "setter" ? "set" : "value";
     var target = !descriptorIn && ctor ? contextIn["static"] ? ctor : ctor.prototype : null;
     var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});
@@ -2363,7 +2368,7 @@
         context.addInitializer = function (f) { if (done) throw new TypeError("Cannot add initializers after decoration has completed"); extraInitializers.push(accept(f || null)); };
         var result = (0, decorators[i])(kind === "accessor" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);
         if (kind === "accessor") {
-            if (result === undefined) continue;
+            if (result === void 0) continue;
             if (result === null || typeof result !== "object") throw new TypeError("Object expected");
             if (_ = accept(result.get)) descriptor.get = _;
             if (_ = accept(result.set)) descriptor.set = _;
@@ -2382,7 +2387,7 @@
     for (var i = 0; i < initializers.length; i++) {
         value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);
     }
-    return useValue ? value : undefined;
+    return useValue ? value : void 0;
   }
   function __propKey(x) {
     return typeof x === "symbol" ? x : "".concat(x);
@@ -2429,7 +2434,7 @@
             }
             op = body.call(thisArg, _);
         } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : undefined, done: true };
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
   }
 
@@ -2454,7 +2459,7 @@
     if (m) return m.call(o);
     if (o && typeof o.length === "number") return {
         next: function () {
-            if (o && i >= o.length) o = undefined;
+            if (o && i >= o.length) o = void 0;
             return { value: o && o[i++], done: !o };
         }
     };
@@ -2575,14 +2580,14 @@
   }
 
   function __addDisposableResource(env, value, async) {
-    if (value !== null && value !== undefined) {
+    if (value !== null && value !== void 0) {
       if (typeof value !== "object" && typeof value !== "function") throw new TypeError("Object expected.");
       var dispose;
       if (async) {
           if (!Symbol.asyncDispose) throw new TypeError("Symbol.asyncDispose is not defined.");
           dispose = value[Symbol.asyncDispose];
       }
-      if (dispose === undefined) {
+      if (dispose === void 0) {
           if (!Symbol.dispose) throw new TypeError("Symbol.dispose is not defined.");
           dispose = value[Symbol.dispose];
       }
@@ -2705,7 +2710,7 @@
   	if (hasRequiredShared) return shared;
   	hasRequiredShared = 1;
   	Object.defineProperty(shared, "__esModule", { value: true });
-  	shared.maybeSetModuleExports = undefined;
+  	shared.maybeSetModuleExports = void 0;
   	var tslib_1 = require$$0;
   	var types_1 = tslib_1.__importDefault(requireTypes());
   	function default_1(fork) {
@@ -2804,7 +2809,7 @@
   	hasRequiredTypes = 1;
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
-  		exports.Def = undefined;
+  		exports.Def = void 0;
   		var tslib_1 = require$$0;
   		var shared_1 = requireShared();
   		var Op = Object.prototype;
@@ -5318,15 +5323,15 @@
 
   var esProposals = {exports: {}};
 
-  var es2022$1 = {exports: {}};
-
-  var es2021$2 = {exports: {}};
+  var es2022 = {exports: {}};
 
   var es2021$1 = {exports: {}};
 
-  var es2020$2 = {exports: {}};
+  var es2021 = {exports: {}};
 
-  var es2016$2 = {exports: {}};
+  var es2020$1 = {exports: {}};
+
+  var es2016$1 = {exports: {}};
 
   var core$1 = {exports: {}};
 
@@ -5368,12 +5373,12 @@
   	return core$1.exports;
   }
 
-  es2016$2.exports;
+  es2016$1.exports;
 
   var hasRequiredEs2016$1;
 
   function requireEs2016$1 () {
-  	if (hasRequiredEs2016$1) return es2016$2.exports;
+  	if (hasRequiredEs2016$1) return es2016$1.exports;
   	hasRequiredEs2016$1 = 1;
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
@@ -5396,16 +5401,16 @@
   		exports.default = default_1;
   		(0, shared_1.maybeSetModuleExports)(function () { return module; });
   		
-  	} (es2016$2, es2016$2.exports));
-  	return es2016$2.exports;
+  	} (es2016$1, es2016$1.exports));
+  	return es2016$1.exports;
   }
 
-  es2020$2.exports;
+  es2020$1.exports;
 
   var hasRequiredEs2020$1;
 
   function requireEs2020$1 () {
-  	if (hasRequiredEs2020$1) return es2020$2.exports;
+  	if (hasRequiredEs2020$1) return es2020$1.exports;
   	hasRequiredEs2020$1 = 1;
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
@@ -5424,16 +5429,16 @@
   		exports.default = default_1;
   		(0, shared_1.maybeSetModuleExports)(function () { return module; });
   		
-  	} (es2020$2, es2020$2.exports));
-  	return es2020$2.exports;
+  	} (es2020$1, es2020$1.exports));
+  	return es2020$1.exports;
   }
 
-  es2021$1.exports;
+  es2021.exports;
 
   var hasRequiredEs2021$1;
 
   function requireEs2021$1 () {
-  	if (hasRequiredEs2021$1) return es2021$1.exports;
+  	if (hasRequiredEs2021$1) return es2021.exports;
   	hasRequiredEs2021$1 = 1;
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
@@ -5455,19 +5460,19 @@
   		exports.default = default_1;
   		(0, shared_1.maybeSetModuleExports)(function () { return module; });
   		
-  	} (es2021$1, es2021$1.exports));
-  	return es2021$1.exports;
+  	} (es2021, es2021.exports));
+  	return es2021.exports;
   }
 
-  var es2020$1 = {exports: {}};
+  var es2020 = {exports: {}};
 
-  var es2019$1 = {exports: {}};
+  var es2019 = {exports: {}};
 
-  var es2018$1 = {exports: {}};
+  var es2018 = {exports: {}};
 
-  var es2017$1 = {exports: {}};
+  var es2017 = {exports: {}};
 
-  var es2016$1 = {exports: {}};
+  var es2016 = {exports: {}};
 
   var es6 = {exports: {}};
 
@@ -5668,14 +5673,14 @@
   		        // Esprima doesn't bother with this field, presumably because it's
   		        // always true for unary operators.
   		        .field("prefix", Boolean, defaults["true"]);
-  		    var BinaryOperator = or.apply(undefined, BinaryOperators);
+  		    var BinaryOperator = or.apply(void 0, BinaryOperators);
   		    def("BinaryExpression")
   		        .bases("Expression")
   		        .build("operator", "left", "right")
   		        .field("operator", BinaryOperator)
   		        .field("left", def("Expression"))
   		        .field("right", def("Expression"));
-  		    var AssignmentOperator = or.apply(undefined, AssignmentOperators);
+  		    var AssignmentOperator = or.apply(void 0, AssignmentOperators);
   		    def("AssignmentExpression")
   		        .bases("Expression")
   		        .build("operator", "left", "right")
@@ -5689,7 +5694,7 @@
   		        .field("operator", UpdateOperator)
   		        .field("argument", def("Expression"))
   		        .field("prefix", Boolean);
-  		    var LogicalOperator = or.apply(undefined, LogicalOperators);
+  		    var LogicalOperator = or.apply(void 0, LogicalOperators);
   		    def("LogicalExpression")
   		        .bases("Expression")
   		        .build("operator", "left", "right")
@@ -6012,12 +6017,12 @@
   	return es6.exports;
   }
 
-  es2016$1.exports;
+  es2016.exports;
 
   var hasRequiredEs2016;
 
   function requireEs2016 () {
-  	if (hasRequiredEs2016) return es2016$1.exports;
+  	if (hasRequiredEs2016) return es2016.exports;
   	hasRequiredEs2016 = 1;
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
@@ -6035,16 +6040,16 @@
   		exports.default = default_1;
   		(0, shared_1.maybeSetModuleExports)(function () { return module; });
   		
-  	} (es2016$1, es2016$1.exports));
-  	return es2016$1.exports;
+  	} (es2016, es2016.exports));
+  	return es2016.exports;
   }
 
-  es2017$1.exports;
+  es2017.exports;
 
   var hasRequiredEs2017;
 
   function requireEs2017 () {
-  	if (hasRequiredEs2017) return es2017$1.exports;
+  	if (hasRequiredEs2017) return es2017.exports;
   	hasRequiredEs2017 = 1;
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
@@ -6067,16 +6072,16 @@
   		exports.default = default_1;
   		(0, shared_1.maybeSetModuleExports)(function () { return module; });
   		
-  	} (es2017$1, es2017$1.exports));
-  	return es2017$1.exports;
+  	} (es2017, es2017.exports));
+  	return es2017.exports;
   }
 
-  es2018$1.exports;
+  es2018.exports;
 
   var hasRequiredEs2018;
 
   function requireEs2018 () {
-  	if (hasRequiredEs2018) return es2018$1.exports;
+  	if (hasRequiredEs2018) return es2018.exports;
   	hasRequiredEs2018 = 1;
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
@@ -6113,16 +6118,16 @@
   		exports.default = default_1;
   		(0, shared_1.maybeSetModuleExports)(function () { return module; });
   		
-  	} (es2018$1, es2018$1.exports));
-  	return es2018$1.exports;
+  	} (es2018, es2018.exports));
+  	return es2018.exports;
   }
 
-  es2019$1.exports;
+  es2019.exports;
 
   var hasRequiredEs2019;
 
   function requireEs2019 () {
-  	if (hasRequiredEs2019) return es2019$1.exports;
+  	if (hasRequiredEs2019) return es2019.exports;
   	hasRequiredEs2019 = 1;
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
@@ -6142,16 +6147,16 @@
   		exports.default = default_1;
   		(0, shared_1.maybeSetModuleExports)(function () { return module; });
   		
-  	} (es2019$1, es2019$1.exports));
-  	return es2019$1.exports;
+  	} (es2019, es2019.exports));
+  	return es2019.exports;
   }
 
-  es2020$1.exports;
+  es2020.exports;
 
   var hasRequiredEs2020;
 
   function requireEs2020 () {
-  	if (hasRequiredEs2020) return es2020$1.exports;
+  	if (hasRequiredEs2020) return es2020.exports;
   	hasRequiredEs2020 = 1;
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
@@ -6178,7 +6183,7 @@
   		        .bases("Declaration")
   		        .build("source", "exported")
   		        .field("source", def("Literal"))
-  		        .field("exported", or(def("Identifier"), null, undefined), defaults["null"]);
+  		        .field("exported", or(def("Identifier"), null, void 0), defaults["null"]);
   		    // Optional chaining
   		    def("ChainElement")
   		        .bases("Node")
@@ -6204,16 +6209,16 @@
   		exports.default = default_1;
   		(0, shared_1.maybeSetModuleExports)(function () { return module; });
   		
-  	} (es2020$1, es2020$1.exports));
-  	return es2020$1.exports;
+  	} (es2020, es2020.exports));
+  	return es2020.exports;
   }
 
-  es2021$2.exports;
+  es2021$1.exports;
 
   var hasRequiredEs2021;
 
   function requireEs2021 () {
-  	if (hasRequiredEs2021) return es2021$2.exports;
+  	if (hasRequiredEs2021) return es2021$1.exports;
   	hasRequiredEs2021 = 1;
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
@@ -6230,16 +6235,16 @@
   		exports.default = default_1;
   		(0, shared_1.maybeSetModuleExports)(function () { return module; });
   		
-  	} (es2021$2, es2021$2.exports));
-  	return es2021$2.exports;
+  	} (es2021$1, es2021$1.exports));
+  	return es2021$1.exports;
   }
 
-  es2022$1.exports;
+  es2022.exports;
 
   var hasRequiredEs2022;
 
   function requireEs2022 () {
-  	if (hasRequiredEs2022) return es2022$1.exports;
+  	if (hasRequiredEs2022) return es2022.exports;
   	hasRequiredEs2022 = 1;
   	(function (module, exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
@@ -6259,8 +6264,8 @@
   		exports.default = default_1;
   		(0, shared_1.maybeSetModuleExports)(function () { return module; });
   		
-  	} (es2022$1, es2022$1.exports));
-  	return es2022$1.exports;
+  	} (es2022, es2022.exports));
+  	return es2022.exports;
   }
 
   esProposals.exports;
@@ -6648,7 +6653,7 @@
   		    ])
   		        .field("indexers", [def("ObjectTypeIndexer")], defaults.emptyArray)
   		        .field("callProperties", [def("ObjectTypeCallProperty")], defaults.emptyArray)
-  		        .field("inexact", or(Boolean, undefined), defaults["undefined"])
+  		        .field("inexact", or(Boolean, void 0), defaults["undefined"])
   		        .field("exact", Boolean, defaults["false"])
   		        .field("internalSlots", [def("ObjectTypeInternalSlot")], defaults.emptyArray);
   		    def("Variance")
@@ -7035,7 +7040,7 @@
   		        .field("directives", [def("Directive")], defaults.emptyArray)
   		        .field("interpreter", or(def("InterpreterDirective"), null), defaults["null"]);
   		    function makeLiteralExtra(rawValueType, toRaw) {
-  		        if (rawValueType === undefined) { rawValueType = String; }
+  		        if (rawValueType === void 0) { rawValueType = String; }
   		        return [
   		            "extra",
   		            {
@@ -7300,7 +7305,7 @@
   		    // An abstract (non-buildable) base type that provide a commonly-needed
   		    // optional .typeParameters field.
   		    def("TSHasOptionalTypeParameters")
-  		        .field("typeParameters", or(def("TSTypeParameterDeclaration"), null, undefined), defaults["null"]);
+  		        .field("typeParameters", or(def("TSTypeParameterDeclaration"), null, void 0), defaults["null"]);
   		    // An abstract (non-buildable) base type that provide a commonly-needed
   		    // optional .typeAnnotation field.
   		    def("TSHasOptionalTypeAnnotation")
@@ -7415,7 +7420,7 @@
   		        .field("params", [def("Pattern")])
   		        // classMethodOrPropertyCommon
   		        .field("abstract", Boolean, defaults["false"])
-  		        .field("accessibility", or("public", "private", "protected", undefined), defaults["undefined"])
+  		        .field("accessibility", or("public", "private", "protected", void 0), defaults["undefined"])
   		        .field("static", Boolean, defaults["false"])
   		        .field("computed", Boolean, defaults["false"])
   		        .field("optional", Boolean, defaults["false"])
@@ -7425,7 +7430,7 @@
   		        // classMethodOrDeclareMethodCommon
   		        .field("kind", or("get", "set", "method", "constructor"), function getDefault() { return "method"; })
   		        .field("access", // Not "accessibility"?
-  		    or("public", "private", "protected", undefined), defaults["undefined"])
+  		    or("public", "private", "protected", void 0), defaults["undefined"])
   		        .field("decorators", or([def("Decorator")], null), defaults["null"])
   		        // tSFunctionTypeAnnotationCommon
   		        .field("returnType", or(def("TSTypeAnnotation"), def("Noop"), // Still used?
@@ -7522,8 +7527,8 @@
   		        .bases("Identifier")
   		        .build("name", "constraint", "default")
   		        .field("name", or(def("Identifier"), String))
-  		        .field("constraint", or(def("TSType"), undefined), defaults["undefined"])
-  		        .field("default", or(def("TSType"), undefined), defaults["undefined"]);
+  		        .field("constraint", or(def("TSType"), void 0), defaults["undefined"])
+  		        .field("default", or(def("TSType"), void 0), defaults["undefined"]);
   		    def("TSTypeAssertion")
   		        .bases("Expression", "Pattern")
   		        .build("typeAnnotation", "expression")
@@ -7571,7 +7576,7 @@
   		        .bases("TSType", "TSHasOptionalTypeParameterInstantiation")
   		        .build("argument", "qualifier", "typeParameters")
   		        .field("argument", StringLiteral)
-  		        .field("qualifier", or(TSEntityName, undefined), defaults["undefined"]);
+  		        .field("qualifier", or(TSEntityName, void 0), defaults["undefined"]);
   		    def("TSImportEqualsDeclaration")
   		        .bases("Declaration")
   		        .build("id", "moduleReference")
@@ -7608,12 +7613,12 @@
   		    def("TSParameterProperty")
   		        .bases("Pattern")
   		        .build("parameter")
-  		        .field("accessibility", or("public", "private", "protected", undefined), defaults["undefined"])
+  		        .field("accessibility", or("public", "private", "protected", void 0), defaults["undefined"])
   		        .field("readonly", Boolean, defaults["false"])
   		        .field("parameter", or(def("Identifier"), def("AssignmentPattern")));
   		    def("ClassProperty")
   		        .field("access", // Not "accessibility"?
-  		    or("public", "private", "protected", undefined), defaults["undefined"]);
+  		    or("public", "private", "protected", void 0), defaults["undefined"]);
   		    def("ClassAccessorProperty")
   		        .bases("Declaration", "TSHasOptionalTypeAnnotation");
   		    // Defined already in es6 and babel-core.
@@ -7638,7 +7643,7 @@
   	hasRequiredNamedTypes = 1;
   	(function (exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
-  		exports.namedTypes = undefined;
+  		exports.namedTypes = void 0;
   		(function (namedTypes) {
   		})(exports.namedTypes || (exports.namedTypes = {}));
   		
@@ -7653,7 +7658,7 @@
   	hasRequiredMain$1 = 1;
   	(function (exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
-  		exports.visit = exports.use = exports.Type = exports.someField = exports.PathVisitor = exports.Path = exports.NodePath = exports.namedTypes = exports.getSupertypeNames = exports.getFieldValue = exports.getFieldNames = exports.getBuilderName = exports.finalize = exports.eachField = exports.defineMethod = exports.builtInTypes = exports.builders = exports.astNodesAreEquivalent = undefined;
+  		exports.visit = exports.use = exports.Type = exports.someField = exports.PathVisitor = exports.Path = exports.NodePath = exports.namedTypes = exports.getSupertypeNames = exports.getFieldValue = exports.getFieldNames = exports.getBuilderName = exports.finalize = exports.eachField = exports.defineMethod = exports.builtInTypes = exports.builders = exports.astNodesAreEquivalent = void 0;
   		var tslib_1 = require$$0;
   		var fork_1 = tslib_1.__importDefault(requireFork());
   		var es_proposals_1 = tslib_1.__importDefault(requireEsProposals());
@@ -7770,7 +7775,7 @@
   	if (hasRequiredUtil) return util;
   	hasRequiredUtil = 1;
   	Object.defineProperty(util, "__esModule", { value: true });
-  	util.isTrailingCommaEnabled = util.getParentExportDeclaration = util.isExportDeclaration = util.fixFaultyLocations = util.getTrueLoc = util.composeSourceMaps = util.copyPos = util.comparePos = util.getUnionOfKeys = util.getOption = util.isBrowser = util.getLineTerminator = undefined;
+  	util.isTrailingCommaEnabled = util.getParentExportDeclaration = util.isExportDeclaration = util.fixFaultyLocations = util.getTrueLoc = util.composeSourceMaps = util.copyPos = util.comparePos = util.getUnionOfKeys = util.getOption = util.isBrowser = util.getLineTerminator = void 0;
   	var tslib_1 = require$$0;
   	var tiny_invariant_1 = tslib_1.__importDefault(/*@__PURE__*/ requireTinyInvariant_cjs());
   	var types = tslib_1.__importStar(requireMain$1());
@@ -8112,7 +8117,7 @@
   	if (hasRequiredEsprima) return esprima;
   	hasRequiredEsprima = 1;
   	Object.defineProperty(esprima, "__esModule", { value: true });
-  	esprima.parse = undefined;
+  	esprima.parse = void 0;
   	// This module is suitable for passing as options.parser when calling
   	// recast.parse to process ECMAScript code with Esprima:
   	//
@@ -8149,7 +8154,7 @@
   	if (hasRequiredOptions) return options;
   	hasRequiredOptions = 1;
   	Object.defineProperty(options, "__esModule", { value: true });
-  	options.normalize = undefined;
+  	options.normalize = void 0;
   	var util_1 = requireUtil();
   	var defaults = {
   	    parser: requireEsprima(),
@@ -8220,13 +8225,13 @@
   	var util_1 = requireUtil();
   	var Mapping = /** @class */ (function () {
   	    function Mapping(sourceLines, sourceLoc, targetLoc) {
-  	        if (targetLoc === undefined) { targetLoc = sourceLoc; }
+  	        if (targetLoc === void 0) { targetLoc = sourceLoc; }
   	        this.sourceLines = sourceLines;
   	        this.sourceLoc = sourceLoc;
   	        this.targetLoc = targetLoc;
   	    }
   	    Mapping.prototype.slice = function (lines, start, end) {
-  	        if (end === undefined) { end = lines.lastPos(); }
+  	        if (end === void 0) { end = lines.lastPos(); }
   	        var sourceLines = this.sourceLines;
   	        var sourceLoc = this.sourceLoc;
   	        var targetLoc = this.targetLoc;
@@ -8307,8 +8312,8 @@
   	        });
   	    };
   	    Mapping.prototype.indent = function (by, skipFirstLine, noNegativeColumns) {
-  	        if (skipFirstLine === undefined) { skipFirstLine = false; }
-  	        if (noNegativeColumns === undefined) { noNegativeColumns = false; }
+  	        if (skipFirstLine === void 0) { skipFirstLine = false; }
+  	        if (noNegativeColumns === void 0) { noNegativeColumns = false; }
   	        if (by === 0) {
   	            return this;
   	        }
@@ -8419,7 +8424,7 @@
   	if (hasRequiredLines) return lines;
   	hasRequiredLines = 1;
   	Object.defineProperty(lines, "__esModule", { value: true });
-  	lines.concat = lines.fromString = lines.countSpaces = lines.Lines = undefined;
+  	lines.concat = lines.fromString = lines.countSpaces = lines.Lines = void 0;
   	var tslib_1 = require$$0;
   	var tiny_invariant_1 = tslib_1.__importDefault(/*@__PURE__*/ requireTinyInvariant_cjs());
   	var source_map_1 = tslib_1.__importDefault(require$$2);
@@ -8428,11 +8433,11 @@
   	var mapping_1 = tslib_1.__importDefault(requireMapping());
   	var Lines = /** @class */ (function () {
   	    function Lines(infos, sourceFileName) {
-  	        if (sourceFileName === undefined) { sourceFileName = null; }
+  	        if (sourceFileName === void 0) { sourceFileName = null; }
   	        this.infos = infos;
   	        this.mappings = [];
   	        this.cachedSourceMap = null;
-  	        this.cachedTabWidth = undefined;
+  	        this.cachedTabWidth = void 0;
   	        (0, tiny_invariant_1.default)(infos.length > 0);
   	        this.length = infos.length;
   	        this.name = sourceFileName || null;
@@ -8664,7 +8669,7 @@
   	        return this.getIndentAt(line) + info.sliceEnd - info.sliceStart;
   	    };
   	    Lines.prototype.nextPos = function (pos, skipSpaces) {
-  	        if (skipSpaces === undefined) { skipSpaces = false; }
+  	        if (skipSpaces === void 0) { skipSpaces = false; }
   	        var l = Math.max(pos.line, 0), c = Math.max(pos.column, 0);
   	        if (c < this.getLineLength(l)) {
   	            pos.column += 1;
@@ -8678,7 +8683,7 @@
   	        return false;
   	    };
   	    Lines.prototype.prevPos = function (pos, skipSpaces) {
-  	        if (skipSpaces === undefined) { skipSpaces = false; }
+  	        if (skipSpaces === void 0) { skipSpaces = false; }
   	        var l = pos.line, c = pos.column;
   	        if (c < 1) {
   	            l -= 1;
@@ -8704,8 +8709,8 @@
   	        };
   	    };
   	    Lines.prototype.skipSpaces = function (pos, backward, modifyInPlace) {
-  	        if (backward === undefined) { backward = false; }
-  	        if (modifyInPlace === undefined) { modifyInPlace = false; }
+  	        if (backward === void 0) { backward = false; }
+  	        if (modifyInPlace === void 0) { modifyInPlace = false; }
   	        if (pos) {
   	            pos = modifyInPlace
   	                ? pos
@@ -8757,8 +8762,8 @@
   	        return this.slice(start, end);
   	    };
   	    Lines.prototype.eachPos = function (callback, startPos, skipSpaces) {
-  	        if (startPos === undefined) { startPos = this.firstPos(); }
-  	        if (skipSpaces === undefined) { skipSpaces = false; }
+  	        if (startPos === void 0) { startPos = this.firstPos(); }
+  	        if (skipSpaces === void 0) { skipSpaces = false; }
   	        var pos = this.firstPos();
   	        if (startPos) {
   	            (pos.line = startPos.line), (pos.column = startPos.column);
@@ -8820,8 +8825,8 @@
   	        return this.slice(start, end).toString(options);
   	    };
   	    Lines.prototype.sliceString = function (start, end, options) {
-  	        if (start === undefined) { start = this.firstPos(); }
-  	        if (end === undefined) { end = this.lastPos(); }
+  	        if (start === void 0) { start = this.firstPos(); }
+  	        if (end === void 0) { end = this.lastPos(); }
   	        var _a = (0, options_1.normalize)(options), tabWidth = _a.tabWidth, useTabs = _a.useTabs, reuseWhitespace = _a.reuseWhitespace, lineTerminator = _a.lineTerminator;
   	        var parts = [];
   	        for (var line = start.line; line <= end.line; ++line) {
@@ -9082,7 +9087,7 @@
   	if (hasRequiredComments) return comments;
   	hasRequiredComments = 1;
   	Object.defineProperty(comments, "__esModule", { value: true });
-  	comments.printComments = comments.attach = undefined;
+  	comments.printComments = comments.attach = void 0;
   	var tslib_1 = require$$0;
   	var tiny_invariant_1 = tslib_1.__importDefault(/*@__PURE__*/ requireTinyInvariant_cjs());
   	var types = tslib_1.__importStar(requireMain$1());
@@ -9280,7 +9285,7 @@
   	    }
   	    if (indexOfFirstLeadingComment) {
   	        var enclosingNode = tiesToBreak[indexOfFirstLeadingComment - 1].enclosingNode;
-  	        if ((enclosingNode === null || enclosingNode === undefined ? undefined : enclosingNode.type) === "CallExpression") {
+  	        if ((enclosingNode === null || enclosingNode === void 0 ? void 0 : enclosingNode.type) === "CallExpression") {
   	            --indexOfFirstLeadingComment;
   	        }
   	    }
@@ -9402,7 +9407,7 @@
   	if (hasRequiredParser) return parser;
   	hasRequiredParser = 1;
   	Object.defineProperty(parser, "__esModule", { value: true });
-  	parser.parse = undefined;
+  	parser.parse = void 0;
   	var tslib_1 = require$$0;
   	var tiny_invariant_1 = tslib_1.__importDefault(/*@__PURE__*/ requireTinyInvariant_cjs());
   	var types = tslib_1.__importStar(requireMain$1());
@@ -9705,7 +9710,7 @@
   	        // lightweight FastPath [..., name, value] stacks.
   	        var copy = Object.create(FastPath.prototype);
   	        var stack = [obj.value];
-  	        for (var pp = undefined; (pp = obj.parentPath); obj = pp)
+  	        for (var pp = void 0; (pp = obj.parentPath); obj = pp)
   	            stack.push(obj.name, pp.value);
   	        copy.stack = stack.reverse();
   	        return copy;
@@ -9752,11 +9757,11 @@
   	    return null;
   	}
   	FPp.getNode = function getNode(count) {
-  	    if (count === undefined) { count = 0; }
+  	    if (count === void 0) { count = 0; }
   	    return getNodeHelper(this, ~~count);
   	};
   	FPp.getParentNode = function getParentNode(count) {
-  	    if (count === undefined) { count = 0; }
+  	    if (count === void 0) { count = 0; }
   	    return getNodeHelper(this, ~~count + 1);
   	};
   	// The length of the stack can be either even or odd, depending on whether
@@ -10205,7 +10210,7 @@
   	if (hasRequiredPatcher) return patcher;
   	hasRequiredPatcher = 1;
   	Object.defineProperty(patcher, "__esModule", { value: true });
-  	patcher.getReprinter = patcher.Patcher = undefined;
+  	patcher.getReprinter = patcher.Patcher = void 0;
   	var tslib_1 = require$$0;
   	var tiny_invariant_1 = tslib_1.__importDefault(/*@__PURE__*/ requireTinyInvariant_cjs());
   	var linesModule = tslib_1.__importStar(requireLines());
@@ -10596,7 +10601,7 @@
   	if (hasRequiredPrinter) return printer;
   	hasRequiredPrinter = 1;
   	Object.defineProperty(printer, "__esModule", { value: true });
-  	printer.Printer = undefined;
+  	printer.Printer = void 0;
   	var tslib_1 = require$$0;
   	var tiny_invariant_1 = tslib_1.__importDefault(/*@__PURE__*/ requireTinyInvariant_cjs());
   	var types = tslib_1.__importStar(requireMain$1());
@@ -10695,7 +10700,6 @@
   	        function printGenerically(path) {
   	            return (0, comments_1.printComments)(path, function (path) {
   	                return genericPrint(path, config, {
-  	                    includeComments: true,
   	                    avoidRootParens: false,
   	                }, printGenerically);
   	            });
@@ -10746,6 +10750,7 @@
   	// configuration object originally passed into the Printer constructor).
   	// Its properties are documented in lib/options.js.
   	function genericPrintNoParens(path, options, print) {
+  	    var _a, _b, _c;
   	    var n = path.getValue();
   	    if (!n) {
   	        return (0, lines_1.fromString)("");
@@ -11072,12 +11077,18 @@
   	        case "ReturnStatement": {
   	            parts.push("return");
   	            if (n.argument) {
+  	                var argIsJsxElement = ((_a = namedTypes.JSXElement) === null || _a === void 0 ? void 0 : _a.check(n.argument)) ||
+  	                    ((_b = namedTypes.JSXFragment) === null || _b === void 0 ? void 0 : _b.check(n.argument));
   	                var argLines = path.call(print, "argument");
   	                if (argLines.startsWithComment() ||
-  	                    (argLines.length > 1 &&
-  	                        namedTypes.JSXElement &&
-  	                        namedTypes.JSXElement.check(n.argument))) {
-  	                    parts.push(" (\n", argLines.indent(options.tabWidth), "\n)");
+  	                    (argLines.length > 1 && argIsJsxElement)) {
+  	                    // Babel: regenerate parenthesized jsxElements so we don't double parentheses
+  	                    if (argIsJsxElement && ((_c = n.argument.extra) === null || _c === void 0 ? void 0 : _c.parenthesized)) {
+  	                        n.argument.extra.parenthesized = false;
+  	                        argLines = path.call(print, "argument");
+  	                        n.argument.extra.parenthesized = true;
+  	                    }
+  	                    parts.push(" ", (0, lines_1.concat)(["(\n", argLines]).indentTail(options.tabWidth), "\n)");
   	                }
   	                else {
   	                    parts.push(" ", argLines);
@@ -12998,7 +13009,7 @@
   	hasRequiredMain = 1;
   	(function (exports) {
   		Object.defineProperty(exports, "__esModule", { value: true });
-  		exports.run = exports.prettyPrint = exports.print = exports.visit = exports.types = exports.parse = undefined;
+  		exports.run = exports.prettyPrint = exports.print = exports.visit = exports.types = exports.parse = void 0;
   		var tslib_1 = require$$0;
   		var fs_1 = tslib_1.__importDefault(require$$1);
   		var types = tslib_1.__importStar(requireMain$1());
@@ -13071,1159 +13082,6 @@
   const builders = mainExports.types.builders;
   const namedTypes = mainExports.types.namedTypes;
 
-  const amd = {
-  	define: false,
-  	require: false
-  };
-  const applescript = {
-  	$: false,
-  	Application: false,
-  	Automation: false,
-  	console: false,
-  	delay: false,
-  	Library: false,
-  	ObjC: false,
-  	ObjectSpecifier: false,
-  	Path: false,
-  	Progress: false,
-  	Ref: false
-  };
-  const atomtest = {
-  	advanceClock: false,
-  	atom: false,
-  	fakeClearInterval: false,
-  	fakeClearTimeout: false,
-  	fakeSetInterval: false,
-  	fakeSetTimeout: false,
-  	resetTimeouts: false,
-  	waitsForPromise: false
-  };
-  const browser = {
-  	AbortController: false,
-  	AbortSignal: false,
-  	AbsoluteOrientationSensor: false,
-  	AbstractRange: false,
-  	Accelerometer: false,
-  	addEventListener: false,
-  	ai: false,
-  	AI: false,
-  	AITextSession: false,
-  	alert: false,
-  	AnalyserNode: false,
-  	Animation: false,
-  	AnimationEffect: false,
-  	AnimationEvent: false,
-  	AnimationPlaybackEvent: false,
-  	AnimationTimeline: false,
-  	atob: false,
-  	Attr: false,
-  	Audio: false,
-  	AudioBuffer: false,
-  	AudioBufferSourceNode: false,
-  	AudioContext: false,
-  	AudioData: false,
-  	AudioDecoder: false,
-  	AudioDestinationNode: false,
-  	AudioEncoder: false,
-  	AudioListener: false,
-  	AudioNode: false,
-  	AudioParam: false,
-  	AudioParamMap: false,
-  	AudioProcessingEvent: false,
-  	AudioScheduledSourceNode: false,
-  	AudioSinkInfo: false,
-  	AudioWorklet: false,
-  	AudioWorkletGlobalScope: false,
-  	AudioWorkletNode: false,
-  	AudioWorkletProcessor: false,
-  	AuthenticatorAssertionResponse: false,
-  	AuthenticatorAttestationResponse: false,
-  	AuthenticatorResponse: false,
-  	BackgroundFetchManager: false,
-  	BackgroundFetchRecord: false,
-  	BackgroundFetchRegistration: false,
-  	BarcodeDetector: false,
-  	BarProp: false,
-  	BaseAudioContext: false,
-  	BatteryManager: false,
-  	BeforeUnloadEvent: false,
-  	BiquadFilterNode: false,
-  	Blob: false,
-  	BlobEvent: false,
-  	Bluetooth: false,
-  	BluetoothCharacteristicProperties: false,
-  	BluetoothDevice: false,
-  	BluetoothRemoteGATTCharacteristic: false,
-  	BluetoothRemoteGATTDescriptor: false,
-  	BluetoothRemoteGATTServer: false,
-  	BluetoothRemoteGATTService: false,
-  	BluetoothUUID: false,
-  	blur: false,
-  	BroadcastChannel: false,
-  	BrowserCaptureMediaStreamTrack: false,
-  	btoa: false,
-  	ByteLengthQueuingStrategy: false,
-  	Cache: false,
-  	caches: false,
-  	CacheStorage: false,
-  	cancelAnimationFrame: false,
-  	cancelIdleCallback: false,
-  	CanvasCaptureMediaStream: false,
-  	CanvasCaptureMediaStreamTrack: false,
-  	CanvasGradient: false,
-  	CanvasPattern: false,
-  	CanvasRenderingContext2D: false,
-  	CaptureController: false,
-  	CaretPosition: false,
-  	CDATASection: false,
-  	ChannelMergerNode: false,
-  	ChannelSplitterNode: false,
-  	ChapterInformation: false,
-  	CharacterBoundsUpdateEvent: false,
-  	CharacterData: false,
-  	clearInterval: false,
-  	clearTimeout: false,
-  	clientInformation: false,
-  	Clipboard: false,
-  	ClipboardEvent: false,
-  	ClipboardItem: false,
-  	close: false,
-  	closed: false,
-  	CloseEvent: false,
-  	CloseWatcher: false,
-  	Comment: false,
-  	CompositionEvent: false,
-  	CompressionStream: false,
-  	confirm: false,
-  	console: false,
-  	ConstantSourceNode: false,
-  	ContentVisibilityAutoStateChangeEvent: false,
-  	ConvolverNode: false,
-  	CookieChangeEvent: false,
-  	CookieDeprecationLabel: false,
-  	cookieStore: false,
-  	CookieStore: false,
-  	CookieStoreManager: false,
-  	CountQueuingStrategy: false,
-  	createImageBitmap: false,
-  	Credential: false,
-  	credentialless: false,
-  	CredentialsContainer: false,
-  	CropTarget: false,
-  	crossOriginIsolated: false,
-  	crypto: false,
-  	Crypto: false,
-  	CryptoKey: false,
-  	CSS: false,
-  	CSSAnimation: false,
-  	CSSConditionRule: false,
-  	CSSContainerRule: false,
-  	CSSCounterStyleRule: false,
-  	CSSFontFaceRule: false,
-  	CSSFontFeatureValuesRule: false,
-  	CSSFontPaletteValuesRule: false,
-  	CSSGroupingRule: false,
-  	CSSImageValue: false,
-  	CSSImportRule: false,
-  	CSSKeyframeRule: false,
-  	CSSKeyframesRule: false,
-  	CSSKeywordValue: false,
-  	CSSLayerBlockRule: false,
-  	CSSLayerStatementRule: false,
-  	CSSMathClamp: false,
-  	CSSMathInvert: false,
-  	CSSMathMax: false,
-  	CSSMathMin: false,
-  	CSSMathNegate: false,
-  	CSSMathProduct: false,
-  	CSSMathSum: false,
-  	CSSMathValue: false,
-  	CSSMatrixComponent: false,
-  	CSSMediaRule: false,
-  	CSSNamespaceRule: false,
-  	CSSNestedDeclarations: false,
-  	CSSNumericArray: false,
-  	CSSNumericValue: false,
-  	CSSPageDescriptors: false,
-  	CSSPageRule: false,
-  	CSSPerspective: false,
-  	CSSPositionTryDescriptors: false,
-  	CSSPositionTryRule: false,
-  	CSSPositionValue: false,
-  	CSSPropertyRule: false,
-  	CSSRotate: false,
-  	CSSRule: false,
-  	CSSRuleList: false,
-  	CSSScale: false,
-  	CSSScopeRule: false,
-  	CSSSkew: false,
-  	CSSSkewX: false,
-  	CSSSkewY: false,
-  	CSSStartingStyleRule: false,
-  	CSSStyleDeclaration: false,
-  	CSSStyleRule: false,
-  	CSSStyleSheet: false,
-  	CSSStyleValue: false,
-  	CSSSupportsRule: false,
-  	CSSTransformComponent: false,
-  	CSSTransformValue: false,
-  	CSSTransition: false,
-  	CSSTranslate: false,
-  	CSSUnitValue: false,
-  	CSSUnparsedValue: false,
-  	CSSVariableReferenceValue: false,
-  	CSSViewTransitionRule: false,
-  	currentFrame: false,
-  	currentTime: false,
-  	CustomElementRegistry: false,
-  	customElements: false,
-  	CustomEvent: false,
-  	CustomStateSet: false,
-  	DataTransfer: false,
-  	DataTransferItem: false,
-  	DataTransferItemList: false,
-  	DecompressionStream: false,
-  	DelayNode: false,
-  	DelegatedInkTrailPresenter: false,
-  	DeviceMotionEvent: false,
-  	DeviceMotionEventAcceleration: false,
-  	DeviceMotionEventRotationRate: false,
-  	DeviceOrientationEvent: false,
-  	devicePixelRatio: false,
-  	dispatchEvent: false,
-  	document: false,
-  	Document: false,
-  	DocumentFragment: false,
-  	documentPictureInPicture: false,
-  	DocumentPictureInPicture: false,
-  	DocumentPictureInPictureEvent: false,
-  	DocumentTimeline: false,
-  	DocumentType: false,
-  	DOMError: false,
-  	DOMException: false,
-  	DOMImplementation: false,
-  	DOMMatrix: false,
-  	DOMMatrixReadOnly: false,
-  	DOMParser: false,
-  	DOMPoint: false,
-  	DOMPointReadOnly: false,
-  	DOMQuad: false,
-  	DOMRect: false,
-  	DOMRectList: false,
-  	DOMRectReadOnly: false,
-  	DOMStringList: false,
-  	DOMStringMap: false,
-  	DOMTokenList: false,
-  	DragEvent: false,
-  	DynamicsCompressorNode: false,
-  	EditContext: false,
-  	Element: false,
-  	ElementInternals: false,
-  	EncodedAudioChunk: false,
-  	EncodedVideoChunk: false,
-  	ErrorEvent: false,
-  	event: false,
-  	Event: false,
-  	EventCounts: false,
-  	EventSource: false,
-  	EventTarget: false,
-  	external: false,
-  	External: false,
-  	EyeDropper: false,
-  	FeaturePolicy: false,
-  	FederatedCredential: false,
-  	fence: false,
-  	Fence: false,
-  	FencedFrameConfig: false,
-  	fetch: false,
-  	fetchLater: false,
-  	FetchLaterResult: false,
-  	File: false,
-  	FileList: false,
-  	FileReader: false,
-  	FileSystem: false,
-  	FileSystemDirectoryEntry: false,
-  	FileSystemDirectoryHandle: false,
-  	FileSystemDirectoryReader: false,
-  	FileSystemEntry: false,
-  	FileSystemFileEntry: false,
-  	FileSystemFileHandle: false,
-  	FileSystemHandle: false,
-  	FileSystemWritableFileStream: false,
-  	find: false,
-  	Float16Array: false,
-  	focus: false,
-  	FocusEvent: false,
-  	FontData: false,
-  	FontFace: false,
-  	FontFaceSet: false,
-  	FontFaceSetLoadEvent: false,
-  	FormData: false,
-  	FormDataEvent: false,
-  	FragmentDirective: false,
-  	frameElement: false,
-  	frames: false,
-  	GainNode: false,
-  	Gamepad: false,
-  	GamepadAxisMoveEvent: false,
-  	GamepadButton: false,
-  	GamepadButtonEvent: false,
-  	GamepadEvent: false,
-  	GamepadHapticActuator: false,
-  	GamepadPose: false,
-  	Geolocation: false,
-  	GeolocationCoordinates: false,
-  	GeolocationPosition: false,
-  	GeolocationPositionError: false,
-  	getComputedStyle: false,
-  	getScreenDetails: false,
-  	getSelection: false,
-  	GPU: false,
-  	GPUAdapter: false,
-  	GPUAdapterInfo: false,
-  	GPUBindGroup: false,
-  	GPUBindGroupLayout: false,
-  	GPUBuffer: false,
-  	GPUBufferUsage: false,
-  	GPUCanvasContext: false,
-  	GPUColorWrite: false,
-  	GPUCommandBuffer: false,
-  	GPUCommandEncoder: false,
-  	GPUCompilationInfo: false,
-  	GPUCompilationMessage: false,
-  	GPUComputePassEncoder: false,
-  	GPUComputePipeline: false,
-  	GPUDevice: false,
-  	GPUDeviceLostInfo: false,
-  	GPUError: false,
-  	GPUExternalTexture: false,
-  	GPUInternalError: false,
-  	GPUMapMode: false,
-  	GPUOutOfMemoryError: false,
-  	GPUPipelineError: false,
-  	GPUPipelineLayout: false,
-  	GPUQuerySet: false,
-  	GPUQueue: false,
-  	GPURenderBundle: false,
-  	GPURenderBundleEncoder: false,
-  	GPURenderPassEncoder: false,
-  	GPURenderPipeline: false,
-  	GPUSampler: false,
-  	GPUShaderModule: false,
-  	GPUShaderStage: false,
-  	GPUSupportedFeatures: false,
-  	GPUSupportedLimits: false,
-  	GPUTexture: false,
-  	GPUTextureUsage: false,
-  	GPUTextureView: false,
-  	GPUUncapturedErrorEvent: false,
-  	GPUValidationError: false,
-  	GravitySensor: false,
-  	Gyroscope: false,
-  	HashChangeEvent: false,
-  	Headers: false,
-  	HID: false,
-  	HIDConnectionEvent: false,
-  	HIDDevice: false,
-  	HIDInputReportEvent: false,
-  	Highlight: false,
-  	HighlightRegistry: false,
-  	history: false,
-  	History: false,
-  	HTMLAllCollection: false,
-  	HTMLAnchorElement: false,
-  	HTMLAreaElement: false,
-  	HTMLAudioElement: false,
-  	HTMLBaseElement: false,
-  	HTMLBodyElement: false,
-  	HTMLBRElement: false,
-  	HTMLButtonElement: false,
-  	HTMLCanvasElement: false,
-  	HTMLCollection: false,
-  	HTMLDataElement: false,
-  	HTMLDataListElement: false,
-  	HTMLDetailsElement: false,
-  	HTMLDialogElement: false,
-  	HTMLDirectoryElement: false,
-  	HTMLDivElement: false,
-  	HTMLDListElement: false,
-  	HTMLDocument: false,
-  	HTMLElement: false,
-  	HTMLEmbedElement: false,
-  	HTMLFencedFrameElement: false,
-  	HTMLFieldSetElement: false,
-  	HTMLFontElement: false,
-  	HTMLFormControlsCollection: false,
-  	HTMLFormElement: false,
-  	HTMLFrameElement: false,
-  	HTMLFrameSetElement: false,
-  	HTMLHeadElement: false,
-  	HTMLHeadingElement: false,
-  	HTMLHRElement: false,
-  	HTMLHtmlElement: false,
-  	HTMLIFrameElement: false,
-  	HTMLImageElement: false,
-  	HTMLInputElement: false,
-  	HTMLLabelElement: false,
-  	HTMLLegendElement: false,
-  	HTMLLIElement: false,
-  	HTMLLinkElement: false,
-  	HTMLMapElement: false,
-  	HTMLMarqueeElement: false,
-  	HTMLMediaElement: false,
-  	HTMLMenuElement: false,
-  	HTMLMetaElement: false,
-  	HTMLMeterElement: false,
-  	HTMLModElement: false,
-  	HTMLObjectElement: false,
-  	HTMLOListElement: false,
-  	HTMLOptGroupElement: false,
-  	HTMLOptionElement: false,
-  	HTMLOptionsCollection: false,
-  	HTMLOutputElement: false,
-  	HTMLParagraphElement: false,
-  	HTMLParamElement: false,
-  	HTMLPictureElement: false,
-  	HTMLPreElement: false,
-  	HTMLProgressElement: false,
-  	HTMLQuoteElement: false,
-  	HTMLScriptElement: false,
-  	HTMLSelectElement: false,
-  	HTMLSlotElement: false,
-  	HTMLSourceElement: false,
-  	HTMLSpanElement: false,
-  	HTMLStyleElement: false,
-  	HTMLTableCaptionElement: false,
-  	HTMLTableCellElement: false,
-  	HTMLTableColElement: false,
-  	HTMLTableElement: false,
-  	HTMLTableRowElement: false,
-  	HTMLTableSectionElement: false,
-  	HTMLTemplateElement: false,
-  	HTMLTextAreaElement: false,
-  	HTMLTimeElement: false,
-  	HTMLTitleElement: false,
-  	HTMLTrackElement: false,
-  	HTMLUListElement: false,
-  	HTMLUnknownElement: false,
-  	HTMLVideoElement: false,
-  	IDBCursor: false,
-  	IDBCursorWithValue: false,
-  	IDBDatabase: false,
-  	IDBFactory: false,
-  	IDBIndex: false,
-  	IDBKeyRange: false,
-  	IDBObjectStore: false,
-  	IDBOpenDBRequest: false,
-  	IDBRequest: false,
-  	IDBTransaction: false,
-  	IDBVersionChangeEvent: false,
-  	IdentityCredential: false,
-  	IdentityCredentialError: false,
-  	IdentityProvider: false,
-  	IdleDeadline: false,
-  	IdleDetector: false,
-  	IIRFilterNode: false,
-  	Image: false,
-  	ImageBitmap: false,
-  	ImageBitmapRenderingContext: false,
-  	ImageCapture: false,
-  	ImageData: false,
-  	ImageDecoder: false,
-  	ImageTrack: false,
-  	ImageTrackList: false,
-  	indexedDB: false,
-  	Ink: false,
-  	innerHeight: false,
-  	innerWidth: false,
-  	InputDeviceCapabilities: false,
-  	InputDeviceInfo: false,
-  	InputEvent: false,
-  	IntersectionObserver: false,
-  	IntersectionObserverEntry: false,
-  	isSecureContext: false,
-  	Keyboard: false,
-  	KeyboardEvent: false,
-  	KeyboardLayoutMap: false,
-  	KeyframeEffect: false,
-  	LargestContentfulPaint: false,
-  	LaunchParams: false,
-  	launchQueue: false,
-  	LaunchQueue: false,
-  	LayoutShift: false,
-  	LayoutShiftAttribution: false,
-  	length: false,
-  	LinearAccelerationSensor: false,
-  	localStorage: false,
-  	location: true,
-  	Location: false,
-  	locationbar: false,
-  	Lock: false,
-  	LockManager: false,
-  	matchMedia: false,
-  	MathMLElement: false,
-  	MediaCapabilities: false,
-  	MediaCapabilitiesInfo: false,
-  	MediaDeviceInfo: false,
-  	MediaDevices: false,
-  	MediaElementAudioSourceNode: false,
-  	MediaEncryptedEvent: false,
-  	MediaError: false,
-  	MediaKeyError: false,
-  	MediaKeyMessageEvent: false,
-  	MediaKeys: false,
-  	MediaKeySession: false,
-  	MediaKeyStatusMap: false,
-  	MediaKeySystemAccess: false,
-  	MediaList: false,
-  	MediaMetadata: false,
-  	MediaQueryList: false,
-  	MediaQueryListEvent: false,
-  	MediaRecorder: false,
-  	MediaRecorderErrorEvent: false,
-  	MediaSession: false,
-  	MediaSource: false,
-  	MediaSourceHandle: false,
-  	MediaStream: false,
-  	MediaStreamAudioDestinationNode: false,
-  	MediaStreamAudioSourceNode: false,
-  	MediaStreamEvent: false,
-  	MediaStreamTrack: false,
-  	MediaStreamTrackAudioSourceNode: false,
-  	MediaStreamTrackAudioStats: false,
-  	MediaStreamTrackEvent: false,
-  	MediaStreamTrackGenerator: false,
-  	MediaStreamTrackProcessor: false,
-  	MediaStreamTrackVideoStats: false,
-  	menubar: false,
-  	MessageChannel: false,
-  	MessageEvent: false,
-  	MessagePort: false,
-  	MIDIAccess: false,
-  	MIDIConnectionEvent: false,
-  	MIDIInput: false,
-  	MIDIInputMap: false,
-  	MIDIMessageEvent: false,
-  	MIDIOutput: false,
-  	MIDIOutputMap: false,
-  	MIDIPort: false,
-  	MimeType: false,
-  	MimeTypeArray: false,
-  	model: false,
-  	ModelGenericSession: false,
-  	ModelManager: false,
-  	MouseEvent: false,
-  	moveBy: false,
-  	moveTo: false,
-  	MutationEvent: false,
-  	MutationObserver: false,
-  	MutationRecord: false,
-  	name: false,
-  	NamedNodeMap: false,
-  	NavigateEvent: false,
-  	navigation: false,
-  	Navigation: false,
-  	NavigationActivation: false,
-  	NavigationCurrentEntryChangeEvent: false,
-  	NavigationDestination: false,
-  	NavigationHistoryEntry: false,
-  	NavigationPreloadManager: false,
-  	NavigationTransition: false,
-  	navigator: false,
-  	Navigator: false,
-  	NavigatorLogin: false,
-  	NavigatorManagedData: false,
-  	NavigatorUAData: false,
-  	NetworkInformation: false,
-  	Node: false,
-  	NodeFilter: false,
-  	NodeIterator: false,
-  	NodeList: false,
-  	Notification: false,
-  	NotifyPaintEvent: false,
-  	NotRestoredReasonDetails: false,
-  	NotRestoredReasons: false,
-  	OfflineAudioCompletionEvent: false,
-  	OfflineAudioContext: false,
-  	offscreenBuffering: false,
-  	OffscreenCanvas: false,
-  	OffscreenCanvasRenderingContext2D: false,
-  	onabort: true,
-  	onafterprint: true,
-  	onanimationcancel: true,
-  	onanimationend: true,
-  	onanimationiteration: true,
-  	onanimationstart: true,
-  	onappinstalled: true,
-  	onauxclick: true,
-  	onbeforeinput: true,
-  	onbeforeinstallprompt: true,
-  	onbeforematch: true,
-  	onbeforeprint: true,
-  	onbeforetoggle: true,
-  	onbeforeunload: true,
-  	onbeforexrselect: true,
-  	onblur: true,
-  	oncancel: true,
-  	oncanplay: true,
-  	oncanplaythrough: true,
-  	onchange: true,
-  	onclick: true,
-  	onclose: true,
-  	oncontentvisibilityautostatechange: true,
-  	oncontextlost: true,
-  	oncontextmenu: true,
-  	oncontextrestored: true,
-  	oncopy: true,
-  	oncuechange: true,
-  	oncut: true,
-  	ondblclick: true,
-  	ondevicemotion: true,
-  	ondeviceorientation: true,
-  	ondeviceorientationabsolute: true,
-  	ondrag: true,
-  	ondragend: true,
-  	ondragenter: true,
-  	ondragleave: true,
-  	ondragover: true,
-  	ondragstart: true,
-  	ondrop: true,
-  	ondurationchange: true,
-  	onemptied: true,
-  	onended: true,
-  	onerror: true,
-  	onfocus: true,
-  	onformdata: true,
-  	ongamepadconnected: true,
-  	ongamepaddisconnected: true,
-  	ongotpointercapture: true,
-  	onhashchange: true,
-  	oninput: true,
-  	oninvalid: true,
-  	onkeydown: true,
-  	onkeypress: true,
-  	onkeyup: true,
-  	onlanguagechange: true,
-  	onload: true,
-  	onloadeddata: true,
-  	onloadedmetadata: true,
-  	onloadstart: true,
-  	onlostpointercapture: true,
-  	onmessage: true,
-  	onmessageerror: true,
-  	onmousedown: true,
-  	onmouseenter: true,
-  	onmouseleave: true,
-  	onmousemove: true,
-  	onmouseout: true,
-  	onmouseover: true,
-  	onmouseup: true,
-  	onmousewheel: true,
-  	onoffline: true,
-  	ononline: true,
-  	onpagehide: true,
-  	onpagereveal: true,
-  	onpageshow: true,
-  	onpageswap: true,
-  	onpaste: true,
-  	onpause: true,
-  	onplay: true,
-  	onplaying: true,
-  	onpointercancel: true,
-  	onpointerdown: true,
-  	onpointerenter: true,
-  	onpointerleave: true,
-  	onpointermove: true,
-  	onpointerout: true,
-  	onpointerover: true,
-  	onpointerrawupdate: true,
-  	onpointerup: true,
-  	onpopstate: true,
-  	onprogress: true,
-  	onratechange: true,
-  	onrejectionhandled: true,
-  	onreset: true,
-  	onresize: true,
-  	onscroll: true,
-  	onscrollend: true,
-  	onscrollsnapchange: true,
-  	onscrollsnapchanging: true,
-  	onsearch: true,
-  	onsecuritypolicyviolation: true,
-  	onseeked: true,
-  	onseeking: true,
-  	onselect: true,
-  	onselectionchange: true,
-  	onselectstart: true,
-  	onslotchange: true,
-  	onstalled: true,
-  	onstorage: true,
-  	onsubmit: true,
-  	onsuspend: true,
-  	ontimeupdate: true,
-  	ontoggle: true,
-  	ontransitioncancel: true,
-  	ontransitionend: true,
-  	ontransitionrun: true,
-  	ontransitionstart: true,
-  	onunhandledrejection: true,
-  	onunload: true,
-  	onvolumechange: true,
-  	onwaiting: true,
-  	onwheel: true,
-  	open: false,
-  	opener: false,
-  	Option: false,
-  	OrientationSensor: false,
-  	origin: false,
-  	originAgentCluster: false,
-  	OscillatorNode: false,
-  	OTPCredential: false,
-  	outerHeight: false,
-  	outerWidth: false,
-  	OverconstrainedError: false,
-  	PageRevealEvent: false,
-  	PageSwapEvent: false,
-  	PageTransitionEvent: false,
-  	pageXOffset: false,
-  	pageYOffset: false,
-  	PannerNode: false,
-  	parent: false,
-  	PasswordCredential: false,
-  	Path2D: false,
-  	PaymentAddress: false,
-  	PaymentManager: false,
-  	PaymentMethodChangeEvent: false,
-  	PaymentRequest: false,
-  	PaymentRequestUpdateEvent: false,
-  	PaymentResponse: false,
-  	performance: false,
-  	Performance: false,
-  	PerformanceElementTiming: false,
-  	PerformanceEntry: false,
-  	PerformanceEventTiming: false,
-  	PerformanceLongAnimationFrameTiming: false,
-  	PerformanceLongTaskTiming: false,
-  	PerformanceMark: false,
-  	PerformanceMeasure: false,
-  	PerformanceNavigation: false,
-  	PerformanceNavigationTiming: false,
-  	PerformanceObserver: false,
-  	PerformanceObserverEntryList: false,
-  	PerformancePaintTiming: false,
-  	PerformanceResourceTiming: false,
-  	PerformanceScriptTiming: false,
-  	PerformanceServerTiming: false,
-  	PerformanceTiming: false,
-  	PeriodicSyncManager: false,
-  	PeriodicWave: false,
-  	Permissions: false,
-  	PermissionStatus: false,
-  	PERSISTENT: false,
-  	personalbar: false,
-  	PictureInPictureEvent: false,
-  	PictureInPictureWindow: false,
-  	Plugin: false,
-  	PluginArray: false,
-  	PointerEvent: false,
-  	PopStateEvent: false,
-  	postMessage: false,
-  	Presentation: false,
-  	PresentationAvailability: false,
-  	PresentationConnection: false,
-  	PresentationConnectionAvailableEvent: false,
-  	PresentationConnectionCloseEvent: false,
-  	PresentationConnectionList: false,
-  	PresentationReceiver: false,
-  	PresentationRequest: false,
-  	PressureObserver: false,
-  	PressureRecord: false,
-  	print: false,
-  	ProcessingInstruction: false,
-  	Profiler: false,
-  	ProgressEvent: false,
-  	PromiseRejectionEvent: false,
-  	prompt: false,
-  	ProtectedAudience: false,
-  	PublicKeyCredential: false,
-  	PushManager: false,
-  	PushSubscription: false,
-  	PushSubscriptionOptions: false,
-  	queryLocalFonts: false,
-  	queueMicrotask: false,
-  	RadioNodeList: false,
-  	Range: false,
-  	ReadableByteStreamController: false,
-  	ReadableStream: false,
-  	ReadableStreamBYOBReader: false,
-  	ReadableStreamBYOBRequest: false,
-  	ReadableStreamDefaultController: false,
-  	ReadableStreamDefaultReader: false,
-  	registerProcessor: false,
-  	RelativeOrientationSensor: false,
-  	RemotePlayback: false,
-  	removeEventListener: false,
-  	reportError: false,
-  	ReportingObserver: false,
-  	Request: false,
-  	requestAnimationFrame: false,
-  	requestIdleCallback: false,
-  	resizeBy: false,
-  	ResizeObserver: false,
-  	ResizeObserverEntry: false,
-  	ResizeObserverSize: false,
-  	resizeTo: false,
-  	Response: false,
-  	RTCCertificate: false,
-  	RTCDataChannel: false,
-  	RTCDataChannelEvent: false,
-  	RTCDtlsTransport: false,
-  	RTCDTMFSender: false,
-  	RTCDTMFToneChangeEvent: false,
-  	RTCEncodedAudioFrame: false,
-  	RTCEncodedVideoFrame: false,
-  	RTCError: false,
-  	RTCErrorEvent: false,
-  	RTCIceCandidate: false,
-  	RTCIceTransport: false,
-  	RTCPeerConnection: false,
-  	RTCPeerConnectionIceErrorEvent: false,
-  	RTCPeerConnectionIceEvent: false,
-  	RTCRtpReceiver: false,
-  	RTCRtpScriptTransform: false,
-  	RTCRtpSender: false,
-  	RTCRtpTransceiver: false,
-  	RTCSctpTransport: false,
-  	RTCSessionDescription: false,
-  	RTCStatsReport: false,
-  	RTCTrackEvent: false,
-  	sampleRate: false,
-  	scheduler: false,
-  	Scheduler: false,
-  	Scheduling: false,
-  	screen: false,
-  	Screen: false,
-  	ScreenDetailed: false,
-  	ScreenDetails: false,
-  	screenLeft: false,
-  	ScreenOrientation: false,
-  	screenTop: false,
-  	screenX: false,
-  	screenY: false,
-  	ScriptProcessorNode: false,
-  	scroll: false,
-  	scrollbars: false,
-  	scrollBy: false,
-  	ScrollTimeline: false,
-  	scrollTo: false,
-  	scrollX: false,
-  	scrollY: false,
-  	SecurityPolicyViolationEvent: false,
-  	Selection: false,
-  	self: false,
-  	Sensor: false,
-  	SensorErrorEvent: false,
-  	Serial: false,
-  	SerialPort: false,
-  	ServiceWorker: false,
-  	ServiceWorkerContainer: false,
-  	ServiceWorkerRegistration: false,
-  	sessionStorage: false,
-  	setInterval: false,
-  	setTimeout: false,
-  	ShadowRoot: false,
-  	sharedStorage: false,
-  	SharedStorage: false,
-  	SharedStorageWorklet: false,
-  	SharedWorker: false,
-  	showDirectoryPicker: false,
-  	showOpenFilePicker: false,
-  	showSaveFilePicker: false,
-  	SnapEvent: false,
-  	SourceBuffer: false,
-  	SourceBufferList: false,
-  	speechSynthesis: false,
-  	SpeechSynthesis: false,
-  	SpeechSynthesisErrorEvent: false,
-  	SpeechSynthesisEvent: false,
-  	SpeechSynthesisUtterance: false,
-  	SpeechSynthesisVoice: false,
-  	StaticRange: false,
-  	status: false,
-  	statusbar: false,
-  	StereoPannerNode: false,
-  	stop: false,
-  	Storage: false,
-  	StorageBucket: false,
-  	StorageBucketManager: false,
-  	StorageEvent: false,
-  	StorageManager: false,
-  	structuredClone: false,
-  	styleMedia: false,
-  	StylePropertyMap: false,
-  	StylePropertyMapReadOnly: false,
-  	StyleSheet: false,
-  	StyleSheetList: false,
-  	SubmitEvent: false,
-  	SubtleCrypto: false,
-  	SVGAElement: false,
-  	SVGAngle: false,
-  	SVGAnimatedAngle: false,
-  	SVGAnimatedBoolean: false,
-  	SVGAnimatedEnumeration: false,
-  	SVGAnimatedInteger: false,
-  	SVGAnimatedLength: false,
-  	SVGAnimatedLengthList: false,
-  	SVGAnimatedNumber: false,
-  	SVGAnimatedNumberList: false,
-  	SVGAnimatedPreserveAspectRatio: false,
-  	SVGAnimatedRect: false,
-  	SVGAnimatedString: false,
-  	SVGAnimatedTransformList: false,
-  	SVGAnimateElement: false,
-  	SVGAnimateMotionElement: false,
-  	SVGAnimateTransformElement: false,
-  	SVGAnimationElement: false,
-  	SVGCircleElement: false,
-  	SVGClipPathElement: false,
-  	SVGComponentTransferFunctionElement: false,
-  	SVGDefsElement: false,
-  	SVGDescElement: false,
-  	SVGElement: false,
-  	SVGEllipseElement: false,
-  	SVGFEBlendElement: false,
-  	SVGFEColorMatrixElement: false,
-  	SVGFEComponentTransferElement: false,
-  	SVGFECompositeElement: false,
-  	SVGFEConvolveMatrixElement: false,
-  	SVGFEDiffuseLightingElement: false,
-  	SVGFEDisplacementMapElement: false,
-  	SVGFEDistantLightElement: false,
-  	SVGFEDropShadowElement: false,
-  	SVGFEFloodElement: false,
-  	SVGFEFuncAElement: false,
-  	SVGFEFuncBElement: false,
-  	SVGFEFuncGElement: false,
-  	SVGFEFuncRElement: false,
-  	SVGFEGaussianBlurElement: false,
-  	SVGFEImageElement: false,
-  	SVGFEMergeElement: false,
-  	SVGFEMergeNodeElement: false,
-  	SVGFEMorphologyElement: false,
-  	SVGFEOffsetElement: false,
-  	SVGFEPointLightElement: false,
-  	SVGFESpecularLightingElement: false,
-  	SVGFESpotLightElement: false,
-  	SVGFETileElement: false,
-  	SVGFETurbulenceElement: false,
-  	SVGFilterElement: false,
-  	SVGForeignObjectElement: false,
-  	SVGGElement: false,
-  	SVGGeometryElement: false,
-  	SVGGradientElement: false,
-  	SVGGraphicsElement: false,
-  	SVGImageElement: false,
-  	SVGLength: false,
-  	SVGLengthList: false,
-  	SVGLinearGradientElement: false,
-  	SVGLineElement: false,
-  	SVGMarkerElement: false,
-  	SVGMaskElement: false,
-  	SVGMatrix: false,
-  	SVGMetadataElement: false,
-  	SVGMPathElement: false,
-  	SVGNumber: false,
-  	SVGNumberList: false,
-  	SVGPathElement: false,
-  	SVGPatternElement: false,
-  	SVGPoint: false,
-  	SVGPointList: false,
-  	SVGPolygonElement: false,
-  	SVGPolylineElement: false,
-  	SVGPreserveAspectRatio: false,
-  	SVGRadialGradientElement: false,
-  	SVGRect: false,
-  	SVGRectElement: false,
-  	SVGScriptElement: false,
-  	SVGSetElement: false,
-  	SVGStopElement: false,
-  	SVGStringList: false,
-  	SVGStyleElement: false,
-  	SVGSVGElement: false,
-  	SVGSwitchElement: false,
-  	SVGSymbolElement: false,
-  	SVGTextContentElement: false,
-  	SVGTextElement: false,
-  	SVGTextPathElement: false,
-  	SVGTextPositioningElement: false,
-  	SVGTitleElement: false,
-  	SVGTransform: false,
-  	SVGTransformList: false,
-  	SVGTSpanElement: false,
-  	SVGUnitTypes: false,
-  	SVGUseElement: false,
-  	SVGViewElement: false,
-  	SyncManager: false,
-  	TaskAttributionTiming: false,
-  	TaskController: false,
-  	TaskPriorityChangeEvent: false,
-  	TaskSignal: false,
-  	TEMPORARY: false,
-  	Text: false,
-  	TextDecoder: false,
-  	TextDecoderStream: false,
-  	TextEncoder: false,
-  	TextEncoderStream: false,
-  	TextEvent: false,
-  	TextFormat: false,
-  	TextFormatUpdateEvent: false,
-  	TextMetrics: false,
-  	TextTrack: false,
-  	TextTrackCue: false,
-  	TextTrackCueList: false,
-  	TextTrackList: false,
-  	TextUpdateEvent: false,
-  	TimeEvent: false,
-  	TimeRanges: false,
-  	ToggleEvent: false,
-  	toolbar: false,
-  	top: false,
-  	Touch: false,
-  	TouchEvent: false,
-  	TouchList: false,
-  	TrackEvent: false,
-  	TransformStream: false,
-  	TransformStreamDefaultController: false,
-  	TransitionEvent: false,
-  	TreeWalker: false,
-  	TrustedHTML: false,
-  	TrustedScript: false,
-  	TrustedScriptURL: false,
-  	TrustedTypePolicy: false,
-  	TrustedTypePolicyFactory: false,
-  	trustedTypes: false,
-  	UIEvent: false,
-  	URL: false,
-  	URLPattern: false,
-  	URLSearchParams: false,
-  	USB: false,
-  	USBAlternateInterface: false,
-  	USBConfiguration: false,
-  	USBConnectionEvent: false,
-  	USBDevice: false,
-  	USBEndpoint: false,
-  	USBInterface: false,
-  	USBInTransferResult: false,
-  	USBIsochronousInTransferPacket: false,
-  	USBIsochronousInTransferResult: false,
-  	USBIsochronousOutTransferPacket: false,
-  	USBIsochronousOutTransferResult: false,
-  	USBOutTransferResult: false,
-  	UserActivation: false,
-  	ValidityState: false,
-  	VideoColorSpace: false,
-  	VideoDecoder: false,
-  	VideoEncoder: false,
-  	VideoFrame: false,
-  	VideoPlaybackQuality: false,
-  	ViewTimeline: false,
-  	ViewTransition: false,
-  	ViewTransitionTypeSet: false,
-  	VirtualKeyboard: false,
-  	VirtualKeyboardGeometryChangeEvent: false,
-  	VisibilityStateEntry: false,
-  	visualViewport: false,
-  	VisualViewport: false,
-  	VTTCue: false,
-  	VTTRegion: false,
-  	WakeLock: false,
-  	WakeLockSentinel: false,
-  	WaveShaperNode: false,
-  	WebAssembly: false,
-  	WebGL2RenderingContext: false,
-  	WebGLActiveInfo: false,
-  	WebGLBuffer: false,
-  	WebGLContextEvent: false,
-  	WebGLFramebuffer: false,
-  	WebGLObject: false,
-  	WebGLProgram: false,
-  	WebGLQuery: false,
-  	WebGLRenderbuffer: false,
-  	WebGLRenderingContext: false,
-  	WebGLSampler: false,
-  	WebGLShader: false,
-  	WebGLShaderPrecisionFormat: false,
-  	WebGLSync: false,
-  	WebGLTexture: false,
-  	WebGLTransformFeedback: false,
-  	WebGLUniformLocation: false,
-  	WebGLVertexArrayObject: false,
-  	WebSocket: false,
-  	WebSocketError: false,
-  	WebSocketStream: false,
-  	WebTransport: false,
-  	WebTransportBidirectionalStream: false,
-  	WebTransportDatagramDuplexStream: false,
-  	WebTransportError: false,
-  	WebTransportReceiveStream: false,
-  	WebTransportSendStream: false,
-  	WGSLLanguageFeatures: false,
-  	WheelEvent: false,
-  	window: false,
-  	Window: false,
-  	WindowControlsOverlay: false,
-  	WindowControlsOverlayGeometryChangeEvent: false,
-  	Worker: false,
-  	Worklet: false,
-  	WorkletGlobalScope: false,
-  	WritableStream: false,
-  	WritableStreamDefaultController: false,
-  	WritableStreamDefaultWriter: false,
-  	XMLDocument: false,
-  	XMLHttpRequest: false,
-  	XMLHttpRequestEventTarget: false,
-  	XMLHttpRequestUpload: false,
-  	XMLSerializer: false,
-  	XPathEvaluator: false,
-  	XPathExpression: false,
-  	XPathResult: false,
-  	XRAnchor: false,
-  	XRAnchorSet: false,
-  	XRBoundedReferenceSpace: false,
-  	XRCamera: false,
-  	XRCPUDepthInformation: false,
-  	XRDepthInformation: false,
-  	XRDOMOverlayState: false,
-  	XRFrame: false,
-  	XRHitTestResult: false,
-  	XRHitTestSource: false,
-  	XRInputSource: false,
-  	XRInputSourceArray: false,
-  	XRInputSourceEvent: false,
-  	XRInputSourcesChangeEvent: false,
-  	XRLayer: false,
-  	XRLightEstimate: false,
-  	XRLightProbe: false,
-  	XRPose: false,
-  	XRRay: false,
-  	XRReferenceSpace: false,
-  	XRReferenceSpaceEvent: false,
-  	XRRenderState: false,
-  	XRRigidTransform: false,
-  	XRSession: false,
-  	XRSessionEvent: false,
-  	XRSpace: false,
-  	XRSystem: false,
-  	XRTransientInputHitTestResult: false,
-  	XRTransientInputHitTestSource: false,
-  	XRView: false,
-  	XRViewerPose: false,
-  	XRViewport: false,
-  	XRWebGLBinding: false,
-  	XRWebGLDepthInformation: false,
-  	XRWebGLLayer: false,
-  	XSLTProcessor: false
-  };
   const builtin = {
   	AggregateError: false,
   	"Array": false,
@@ -14287,1806 +13145,8 @@
   	WeakRef: false,
   	"WeakSet": false
   };
-  const chai = {
-  	assert: true,
-  	expect: true,
-  	should: true
-  };
-  const commonjs = {
-  	exports: true,
-  	global: false,
-  	module: false,
-  	require: false
-  };
-  const couch = {
-  	emit: false,
-  	exports: false,
-  	getRow: false,
-  	log: false,
-  	module: false,
-  	provides: false,
-  	require: false,
-  	respond: false,
-  	send: false,
-  	start: false,
-  	sum: false
-  };
-  const devtools = {
-  	$: false,
-  	$_: false,
-  	$$: false,
-  	$0: false,
-  	$1: false,
-  	$2: false,
-  	$3: false,
-  	$4: false,
-  	$x: false,
-  	chrome: false,
-  	clear: false,
-  	copy: false,
-  	debug: false,
-  	dir: false,
-  	dirxml: false,
-  	getEventListeners: false,
-  	inspect: false,
-  	keys: false,
-  	monitor: false,
-  	monitorEvents: false,
-  	profile: false,
-  	profileEnd: false,
-  	queryObjects: false,
-  	table: false,
-  	undebug: false,
-  	unmonitor: false,
-  	unmonitorEvents: false,
-  	values: false
-  };
-  const embertest = {
-  	andThen: false,
-  	click: false,
-  	currentPath: false,
-  	currentRouteName: false,
-  	currentURL: false,
-  	fillIn: false,
-  	find: false,
-  	findAll: false,
-  	findWithAssert: false,
-  	keyEvent: false,
-  	pauseTest: false,
-  	resumeTest: false,
-  	triggerEvent: false,
-  	visit: false,
-  	wait: false
-  };
-  const es2015 = {
-  	"Array": false,
-  	"ArrayBuffer": false,
-  	"Boolean": false,
-  	"DataView": false,
-  	"Date": false,
-  	"decodeURI": false,
-  	"decodeURIComponent": false,
-  	"encodeURI": false,
-  	"encodeURIComponent": false,
-  	"Error": false,
-  	"escape": false,
-  	"eval": false,
-  	"EvalError": false,
-  	"Float32Array": false,
-  	"Float64Array": false,
-  	"Function": false,
-  	"Infinity": false,
-  	"Int16Array": false,
-  	"Int32Array": false,
-  	"Int8Array": false,
-  	"Intl": false,
-  	"isFinite": false,
-  	"isNaN": false,
-  	"JSON": false,
-  	"Map": false,
-  	"Math": false,
-  	"NaN": false,
-  	"Number": false,
-  	"Object": false,
-  	"parseFloat": false,
-  	"parseInt": false,
-  	"Promise": false,
-  	"Proxy": false,
-  	"RangeError": false,
-  	"ReferenceError": false,
-  	"Reflect": false,
-  	"RegExp": false,
-  	"Set": false,
-  	"String": false,
-  	"Symbol": false,
-  	"SyntaxError": false,
-  	"TypeError": false,
-  	"Uint16Array": false,
-  	"Uint32Array": false,
-  	"Uint8Array": false,
-  	"Uint8ClampedArray": false,
-  	"undefined": false,
-  	"unescape": false,
-  	"URIError": false,
-  	"WeakMap": false,
-  	"WeakSet": false
-  };
-  const es2016 = {
-  	"Array": false,
-  	"ArrayBuffer": false,
-  	"Boolean": false,
-  	"DataView": false,
-  	"Date": false,
-  	"decodeURI": false,
-  	"decodeURIComponent": false,
-  	"encodeURI": false,
-  	"encodeURIComponent": false,
-  	"Error": false,
-  	"escape": false,
-  	"eval": false,
-  	"EvalError": false,
-  	"Float32Array": false,
-  	"Float64Array": false,
-  	"Function": false,
-  	"Infinity": false,
-  	"Int16Array": false,
-  	"Int32Array": false,
-  	"Int8Array": false,
-  	"Intl": false,
-  	"isFinite": false,
-  	"isNaN": false,
-  	"JSON": false,
-  	"Map": false,
-  	"Math": false,
-  	"NaN": false,
-  	"Number": false,
-  	"Object": false,
-  	"parseFloat": false,
-  	"parseInt": false,
-  	"Promise": false,
-  	"Proxy": false,
-  	"RangeError": false,
-  	"ReferenceError": false,
-  	"Reflect": false,
-  	"RegExp": false,
-  	"Set": false,
-  	"String": false,
-  	"Symbol": false,
-  	"SyntaxError": false,
-  	"TypeError": false,
-  	"Uint16Array": false,
-  	"Uint32Array": false,
-  	"Uint8Array": false,
-  	"Uint8ClampedArray": false,
-  	"undefined": false,
-  	"unescape": false,
-  	"URIError": false,
-  	"WeakMap": false,
-  	"WeakSet": false
-  };
-  const es2017 = {
-  	"Array": false,
-  	"ArrayBuffer": false,
-  	Atomics: false,
-  	"Boolean": false,
-  	"DataView": false,
-  	"Date": false,
-  	"decodeURI": false,
-  	"decodeURIComponent": false,
-  	"encodeURI": false,
-  	"encodeURIComponent": false,
-  	"Error": false,
-  	"escape": false,
-  	"eval": false,
-  	"EvalError": false,
-  	"Float32Array": false,
-  	"Float64Array": false,
-  	"Function": false,
-  	"Infinity": false,
-  	"Int16Array": false,
-  	"Int32Array": false,
-  	"Int8Array": false,
-  	"Intl": false,
-  	"isFinite": false,
-  	"isNaN": false,
-  	"JSON": false,
-  	"Map": false,
-  	"Math": false,
-  	"NaN": false,
-  	"Number": false,
-  	"Object": false,
-  	"parseFloat": false,
-  	"parseInt": false,
-  	"Promise": false,
-  	"Proxy": false,
-  	"RangeError": false,
-  	"ReferenceError": false,
-  	"Reflect": false,
-  	"RegExp": false,
-  	"Set": false,
-  	SharedArrayBuffer: false,
-  	"String": false,
-  	"Symbol": false,
-  	"SyntaxError": false,
-  	"TypeError": false,
-  	"Uint16Array": false,
-  	"Uint32Array": false,
-  	"Uint8Array": false,
-  	"Uint8ClampedArray": false,
-  	"undefined": false,
-  	"unescape": false,
-  	"URIError": false,
-  	"WeakMap": false,
-  	"WeakSet": false
-  };
-  const es2018 = {
-  	"Array": false,
-  	"ArrayBuffer": false,
-  	Atomics: false,
-  	"Boolean": false,
-  	"DataView": false,
-  	"Date": false,
-  	"decodeURI": false,
-  	"decodeURIComponent": false,
-  	"encodeURI": false,
-  	"encodeURIComponent": false,
-  	"Error": false,
-  	"escape": false,
-  	"eval": false,
-  	"EvalError": false,
-  	"Float32Array": false,
-  	"Float64Array": false,
-  	"Function": false,
-  	"Infinity": false,
-  	"Int16Array": false,
-  	"Int32Array": false,
-  	"Int8Array": false,
-  	"Intl": false,
-  	"isFinite": false,
-  	"isNaN": false,
-  	"JSON": false,
-  	"Map": false,
-  	"Math": false,
-  	"NaN": false,
-  	"Number": false,
-  	"Object": false,
-  	"parseFloat": false,
-  	"parseInt": false,
-  	"Promise": false,
-  	"Proxy": false,
-  	"RangeError": false,
-  	"ReferenceError": false,
-  	"Reflect": false,
-  	"RegExp": false,
-  	"Set": false,
-  	SharedArrayBuffer: false,
-  	"String": false,
-  	"Symbol": false,
-  	"SyntaxError": false,
-  	"TypeError": false,
-  	"Uint16Array": false,
-  	"Uint32Array": false,
-  	"Uint8Array": false,
-  	"Uint8ClampedArray": false,
-  	"undefined": false,
-  	"unescape": false,
-  	"URIError": false,
-  	"WeakMap": false,
-  	"WeakSet": false
-  };
-  const es2019 = {
-  	"Array": false,
-  	"ArrayBuffer": false,
-  	Atomics: false,
-  	"Boolean": false,
-  	"DataView": false,
-  	"Date": false,
-  	"decodeURI": false,
-  	"decodeURIComponent": false,
-  	"encodeURI": false,
-  	"encodeURIComponent": false,
-  	"Error": false,
-  	"escape": false,
-  	"eval": false,
-  	"EvalError": false,
-  	"Float32Array": false,
-  	"Float64Array": false,
-  	"Function": false,
-  	"Infinity": false,
-  	"Int16Array": false,
-  	"Int32Array": false,
-  	"Int8Array": false,
-  	"Intl": false,
-  	"isFinite": false,
-  	"isNaN": false,
-  	"JSON": false,
-  	"Map": false,
-  	"Math": false,
-  	"NaN": false,
-  	"Number": false,
-  	"Object": false,
-  	"parseFloat": false,
-  	"parseInt": false,
-  	"Promise": false,
-  	"Proxy": false,
-  	"RangeError": false,
-  	"ReferenceError": false,
-  	"Reflect": false,
-  	"RegExp": false,
-  	"Set": false,
-  	SharedArrayBuffer: false,
-  	"String": false,
-  	"Symbol": false,
-  	"SyntaxError": false,
-  	"TypeError": false,
-  	"Uint16Array": false,
-  	"Uint32Array": false,
-  	"Uint8Array": false,
-  	"Uint8ClampedArray": false,
-  	"undefined": false,
-  	"unescape": false,
-  	"URIError": false,
-  	"WeakMap": false,
-  	"WeakSet": false
-  };
-  const es2020 = {
-  	"Array": false,
-  	"ArrayBuffer": false,
-  	Atomics: false,
-  	BigInt: false,
-  	BigInt64Array: false,
-  	BigUint64Array: false,
-  	"Boolean": false,
-  	"DataView": false,
-  	"Date": false,
-  	"decodeURI": false,
-  	"decodeURIComponent": false,
-  	"encodeURI": false,
-  	"encodeURIComponent": false,
-  	"Error": false,
-  	"escape": false,
-  	"eval": false,
-  	"EvalError": false,
-  	"Float32Array": false,
-  	"Float64Array": false,
-  	"Function": false,
-  	globalThis: false,
-  	"Infinity": false,
-  	"Int16Array": false,
-  	"Int32Array": false,
-  	"Int8Array": false,
-  	"Intl": false,
-  	"isFinite": false,
-  	"isNaN": false,
-  	"JSON": false,
-  	"Map": false,
-  	"Math": false,
-  	"NaN": false,
-  	"Number": false,
-  	"Object": false,
-  	"parseFloat": false,
-  	"parseInt": false,
-  	"Promise": false,
-  	"Proxy": false,
-  	"RangeError": false,
-  	"ReferenceError": false,
-  	"Reflect": false,
-  	"RegExp": false,
-  	"Set": false,
-  	SharedArrayBuffer: false,
-  	"String": false,
-  	"Symbol": false,
-  	"SyntaxError": false,
-  	"TypeError": false,
-  	"Uint16Array": false,
-  	"Uint32Array": false,
-  	"Uint8Array": false,
-  	"Uint8ClampedArray": false,
-  	"undefined": false,
-  	"unescape": false,
-  	"URIError": false,
-  	"WeakMap": false,
-  	"WeakSet": false
-  };
-  const es2021 = {
-  	AggregateError: false,
-  	"Array": false,
-  	"ArrayBuffer": false,
-  	Atomics: false,
-  	BigInt: false,
-  	BigInt64Array: false,
-  	BigUint64Array: false,
-  	"Boolean": false,
-  	"DataView": false,
-  	"Date": false,
-  	"decodeURI": false,
-  	"decodeURIComponent": false,
-  	"encodeURI": false,
-  	"encodeURIComponent": false,
-  	"Error": false,
-  	"escape": false,
-  	"eval": false,
-  	"EvalError": false,
-  	FinalizationRegistry: false,
-  	"Float32Array": false,
-  	"Float64Array": false,
-  	"Function": false,
-  	globalThis: false,
-  	"Infinity": false,
-  	"Int16Array": false,
-  	"Int32Array": false,
-  	"Int8Array": false,
-  	"Intl": false,
-  	"isFinite": false,
-  	"isNaN": false,
-  	"JSON": false,
-  	"Map": false,
-  	"Math": false,
-  	"NaN": false,
-  	"Number": false,
-  	"Object": false,
-  	"parseFloat": false,
-  	"parseInt": false,
-  	"Promise": false,
-  	"Proxy": false,
-  	"RangeError": false,
-  	"ReferenceError": false,
-  	"Reflect": false,
-  	"RegExp": false,
-  	"Set": false,
-  	SharedArrayBuffer: false,
-  	"String": false,
-  	"Symbol": false,
-  	"SyntaxError": false,
-  	"TypeError": false,
-  	"Uint16Array": false,
-  	"Uint32Array": false,
-  	"Uint8Array": false,
-  	"Uint8ClampedArray": false,
-  	"undefined": false,
-  	"unescape": false,
-  	"URIError": false,
-  	"WeakMap": false,
-  	WeakRef: false,
-  	"WeakSet": false
-  };
-  const es2022 = {
-  	AggregateError: false,
-  	"Array": false,
-  	"ArrayBuffer": false,
-  	Atomics: false,
-  	BigInt: false,
-  	BigInt64Array: false,
-  	BigUint64Array: false,
-  	"Boolean": false,
-  	"DataView": false,
-  	"Date": false,
-  	"decodeURI": false,
-  	"decodeURIComponent": false,
-  	"encodeURI": false,
-  	"encodeURIComponent": false,
-  	"Error": false,
-  	"escape": false,
-  	"eval": false,
-  	"EvalError": false,
-  	FinalizationRegistry: false,
-  	"Float32Array": false,
-  	"Float64Array": false,
-  	"Function": false,
-  	globalThis: false,
-  	"Infinity": false,
-  	"Int16Array": false,
-  	"Int32Array": false,
-  	"Int8Array": false,
-  	"Intl": false,
-  	"isFinite": false,
-  	"isNaN": false,
-  	"JSON": false,
-  	"Map": false,
-  	"Math": false,
-  	"NaN": false,
-  	"Number": false,
-  	"Object": false,
-  	"parseFloat": false,
-  	"parseInt": false,
-  	"Promise": false,
-  	"Proxy": false,
-  	"RangeError": false,
-  	"ReferenceError": false,
-  	"Reflect": false,
-  	"RegExp": false,
-  	"Set": false,
-  	SharedArrayBuffer: false,
-  	"String": false,
-  	"Symbol": false,
-  	"SyntaxError": false,
-  	"TypeError": false,
-  	"Uint16Array": false,
-  	"Uint32Array": false,
-  	"Uint8Array": false,
-  	"Uint8ClampedArray": false,
-  	"undefined": false,
-  	"unescape": false,
-  	"URIError": false,
-  	"WeakMap": false,
-  	WeakRef: false,
-  	"WeakSet": false
-  };
-  const es2023 = {
-  	AggregateError: false,
-  	"Array": false,
-  	"ArrayBuffer": false,
-  	Atomics: false,
-  	BigInt: false,
-  	BigInt64Array: false,
-  	BigUint64Array: false,
-  	"Boolean": false,
-  	"DataView": false,
-  	"Date": false,
-  	"decodeURI": false,
-  	"decodeURIComponent": false,
-  	"encodeURI": false,
-  	"encodeURIComponent": false,
-  	"Error": false,
-  	"escape": false,
-  	"eval": false,
-  	"EvalError": false,
-  	FinalizationRegistry: false,
-  	"Float32Array": false,
-  	"Float64Array": false,
-  	"Function": false,
-  	globalThis: false,
-  	"Infinity": false,
-  	"Int16Array": false,
-  	"Int32Array": false,
-  	"Int8Array": false,
-  	"Intl": false,
-  	"isFinite": false,
-  	"isNaN": false,
-  	"JSON": false,
-  	"Map": false,
-  	"Math": false,
-  	"NaN": false,
-  	"Number": false,
-  	"Object": false,
-  	"parseFloat": false,
-  	"parseInt": false,
-  	"Promise": false,
-  	"Proxy": false,
-  	"RangeError": false,
-  	"ReferenceError": false,
-  	"Reflect": false,
-  	"RegExp": false,
-  	"Set": false,
-  	SharedArrayBuffer: false,
-  	"String": false,
-  	"Symbol": false,
-  	"SyntaxError": false,
-  	"TypeError": false,
-  	"Uint16Array": false,
-  	"Uint32Array": false,
-  	"Uint8Array": false,
-  	"Uint8ClampedArray": false,
-  	"undefined": false,
-  	"unescape": false,
-  	"URIError": false,
-  	"WeakMap": false,
-  	WeakRef: false,
-  	"WeakSet": false
-  };
-  const es2024 = {
-  	AggregateError: false,
-  	"Array": false,
-  	"ArrayBuffer": false,
-  	Atomics: false,
-  	BigInt: false,
-  	BigInt64Array: false,
-  	BigUint64Array: false,
-  	"Boolean": false,
-  	"DataView": false,
-  	"Date": false,
-  	"decodeURI": false,
-  	"decodeURIComponent": false,
-  	"encodeURI": false,
-  	"encodeURIComponent": false,
-  	"Error": false,
-  	"escape": false,
-  	"eval": false,
-  	"EvalError": false,
-  	FinalizationRegistry: false,
-  	"Float32Array": false,
-  	"Float64Array": false,
-  	"Function": false,
-  	globalThis: false,
-  	"Infinity": false,
-  	"Int16Array": false,
-  	"Int32Array": false,
-  	"Int8Array": false,
-  	"Intl": false,
-  	"isFinite": false,
-  	"isNaN": false,
-  	"JSON": false,
-  	"Map": false,
-  	"Math": false,
-  	"NaN": false,
-  	"Number": false,
-  	"Object": false,
-  	"parseFloat": false,
-  	"parseInt": false,
-  	"Promise": false,
-  	"Proxy": false,
-  	"RangeError": false,
-  	"ReferenceError": false,
-  	"Reflect": false,
-  	"RegExp": false,
-  	"Set": false,
-  	SharedArrayBuffer: false,
-  	"String": false,
-  	"Symbol": false,
-  	"SyntaxError": false,
-  	"TypeError": false,
-  	"Uint16Array": false,
-  	"Uint32Array": false,
-  	"Uint8Array": false,
-  	"Uint8ClampedArray": false,
-  	"undefined": false,
-  	"unescape": false,
-  	"URIError": false,
-  	"WeakMap": false,
-  	WeakRef: false,
-  	"WeakSet": false
-  };
-  const es2025 = {
-  	AggregateError: false,
-  	"Array": false,
-  	"ArrayBuffer": false,
-  	Atomics: false,
-  	BigInt: false,
-  	BigInt64Array: false,
-  	BigUint64Array: false,
-  	"Boolean": false,
-  	"DataView": false,
-  	"Date": false,
-  	"decodeURI": false,
-  	"decodeURIComponent": false,
-  	"encodeURI": false,
-  	"encodeURIComponent": false,
-  	"Error": false,
-  	"escape": false,
-  	"eval": false,
-  	"EvalError": false,
-  	FinalizationRegistry: false,
-  	"Float32Array": false,
-  	"Float64Array": false,
-  	"Function": false,
-  	globalThis: false,
-  	"Infinity": false,
-  	"Int16Array": false,
-  	"Int32Array": false,
-  	"Int8Array": false,
-  	"Intl": false,
-  	"isFinite": false,
-  	"isNaN": false,
-  	Iterator: false,
-  	"JSON": false,
-  	"Map": false,
-  	"Math": false,
-  	"NaN": false,
-  	"Number": false,
-  	"Object": false,
-  	"parseFloat": false,
-  	"parseInt": false,
-  	"Promise": false,
-  	"Proxy": false,
-  	"RangeError": false,
-  	"ReferenceError": false,
-  	"Reflect": false,
-  	"RegExp": false,
-  	"Set": false,
-  	SharedArrayBuffer: false,
-  	"String": false,
-  	"Symbol": false,
-  	"SyntaxError": false,
-  	"TypeError": false,
-  	"Uint16Array": false,
-  	"Uint32Array": false,
-  	"Uint8Array": false,
-  	"Uint8ClampedArray": false,
-  	"undefined": false,
-  	"unescape": false,
-  	"URIError": false,
-  	"WeakMap": false,
-  	WeakRef: false,
-  	"WeakSet": false
-  };
-  const es3 = {
-  	"Array": false,
-  	"Boolean": false,
-  	"Date": false,
-  	"decodeURI": false,
-  	"decodeURIComponent": false,
-  	"encodeURI": false,
-  	"encodeURIComponent": false,
-  	"Error": false,
-  	"escape": false,
-  	"eval": false,
-  	"EvalError": false,
-  	"Function": false,
-  	"Infinity": false,
-  	"isFinite": false,
-  	"isNaN": false,
-  	"Math": false,
-  	"NaN": false,
-  	"Number": false,
-  	"Object": false,
-  	"parseFloat": false,
-  	"parseInt": false,
-  	"RangeError": false,
-  	"ReferenceError": false,
-  	"RegExp": false,
-  	"String": false,
-  	"SyntaxError": false,
-  	"TypeError": false,
-  	"undefined": false,
-  	"unescape": false,
-  	"URIError": false
-  };
-  const es5 = {
-  	"Array": false,
-  	"Boolean": false,
-  	"Date": false,
-  	"decodeURI": false,
-  	"decodeURIComponent": false,
-  	"encodeURI": false,
-  	"encodeURIComponent": false,
-  	"Error": false,
-  	"escape": false,
-  	"eval": false,
-  	"EvalError": false,
-  	"Function": false,
-  	"Infinity": false,
-  	"isFinite": false,
-  	"isNaN": false,
-  	"JSON": false,
-  	"Math": false,
-  	"NaN": false,
-  	"Number": false,
-  	"Object": false,
-  	"parseFloat": false,
-  	"parseInt": false,
-  	"RangeError": false,
-  	"ReferenceError": false,
-  	"RegExp": false,
-  	"String": false,
-  	"SyntaxError": false,
-  	"TypeError": false,
-  	"undefined": false,
-  	"unescape": false,
-  	"URIError": false
-  };
-  const greasemonkey = {
-  	cloneInto: false,
-  	createObjectIn: false,
-  	exportFunction: false,
-  	GM: false,
-  	GM_addElement: false,
-  	GM_addStyle: false,
-  	GM_addValueChangeListener: false,
-  	GM_deleteValue: false,
-  	GM_download: false,
-  	GM_getResourceText: false,
-  	GM_getResourceURL: false,
-  	GM_getTab: false,
-  	GM_getTabs: false,
-  	GM_getValue: false,
-  	GM_info: false,
-  	GM_listValues: false,
-  	GM_log: false,
-  	GM_notification: false,
-  	GM_openInTab: false,
-  	GM_registerMenuCommand: false,
-  	GM_removeValueChangeListener: false,
-  	GM_saveTab: false,
-  	GM_setClipboard: false,
-  	GM_setValue: false,
-  	GM_unregisterMenuCommand: false,
-  	GM_xmlhttpRequest: false,
-  	unsafeWindow: false
-  };
-  const jasmine = {
-  	afterAll: false,
-  	afterEach: false,
-  	beforeAll: false,
-  	beforeEach: false,
-  	describe: false,
-  	expect: false,
-  	expectAsync: false,
-  	fail: false,
-  	fdescribe: false,
-  	fit: false,
-  	it: false,
-  	jasmine: false,
-  	pending: false,
-  	runs: false,
-  	spyOn: false,
-  	spyOnAllFunctions: false,
-  	spyOnProperty: false,
-  	waits: false,
-  	waitsFor: false,
-  	xdescribe: false,
-  	xit: false
-  };
-  const jest = {
-  	afterAll: false,
-  	afterEach: false,
-  	beforeAll: false,
-  	beforeEach: false,
-  	describe: false,
-  	expect: false,
-  	fit: false,
-  	it: false,
-  	jest: false,
-  	test: false,
-  	xdescribe: false,
-  	xit: false,
-  	xtest: false
-  };
-  const jquery = {
-  	$: false,
-  	jQuery: false
-  };
-  const meteor = {
-  	$: false,
-  	Accounts: false,
-  	AccountsClient: false,
-  	AccountsCommon: false,
-  	AccountsServer: false,
-  	App: false,
-  	Assets: false,
-  	Blaze: false,
-  	check: false,
-  	Cordova: false,
-  	DDP: false,
-  	DDPRateLimiter: false,
-  	DDPServer: false,
-  	Deps: false,
-  	EJSON: false,
-  	Email: false,
-  	HTTP: false,
-  	Log: false,
-  	Match: false,
-  	Meteor: false,
-  	Mongo: false,
-  	MongoInternals: false,
-  	Npm: false,
-  	Package: false,
-  	Plugin: false,
-  	process: false,
-  	Random: false,
-  	ReactiveDict: false,
-  	ReactiveVar: false,
-  	Router: false,
-  	ServiceConfiguration: false,
-  	Session: false,
-  	share: false,
-  	Spacebars: false,
-  	Template: false,
-  	Tinytest: false,
-  	Tracker: false,
-  	UI: false,
-  	Utils: false,
-  	WebApp: false,
-  	WebAppInternals: false
-  };
-  const mocha = {
-  	after: false,
-  	afterEach: false,
-  	before: false,
-  	beforeEach: false,
-  	context: false,
-  	describe: false,
-  	it: false,
-  	mocha: false,
-  	run: false,
-  	setup: false,
-  	specify: false,
-  	suite: false,
-  	suiteSetup: false,
-  	suiteTeardown: false,
-  	teardown: false,
-  	test: false,
-  	xcontext: false,
-  	xdescribe: false,
-  	xit: false,
-  	xspecify: false
-  };
-  const mongo = {
-  	_isWindows: false,
-  	_rand: false,
-  	BulkWriteResult: false,
-  	cat: false,
-  	cd: false,
-  	connect: false,
-  	db: false,
-  	getHostName: false,
-  	getMemInfo: false,
-  	hostname: false,
-  	ISODate: false,
-  	listFiles: false,
-  	load: false,
-  	ls: false,
-  	md5sumFile: false,
-  	mkdir: false,
-  	Mongo: false,
-  	NumberInt: false,
-  	NumberLong: false,
-  	ObjectId: false,
-  	PlanCache: false,
-  	print: false,
-  	printjson: false,
-  	pwd: false,
-  	quit: false,
-  	removeFile: false,
-  	rs: false,
-  	sh: false,
-  	UUID: false,
-  	version: false,
-  	WriteResult: false
-  };
-  const nashorn = {
-  	__DIR__: false,
-  	__FILE__: false,
-  	__LINE__: false,
-  	com: false,
-  	edu: false,
-  	exit: false,
-  	java: false,
-  	Java: false,
-  	javafx: false,
-  	JavaImporter: false,
-  	javax: false,
-  	JSAdapter: false,
-  	load: false,
-  	loadWithNewGlobal: false,
-  	org: false,
-  	Packages: false,
-  	print: false,
-  	quit: false
-  };
-  const node = {
-  	__dirname: false,
-  	__filename: false,
-  	AbortController: false,
-  	AbortSignal: false,
-  	atob: false,
-  	Blob: false,
-  	BroadcastChannel: false,
-  	btoa: false,
-  	Buffer: false,
-  	ByteLengthQueuingStrategy: false,
-  	clearImmediate: false,
-  	clearInterval: false,
-  	clearTimeout: false,
-  	CloseEvent: false,
-  	CompressionStream: false,
-  	console: false,
-  	CountQueuingStrategy: false,
-  	crypto: false,
-  	Crypto: false,
-  	CryptoKey: false,
-  	CustomEvent: false,
-  	DecompressionStream: false,
-  	DOMException: false,
-  	Event: false,
-  	EventTarget: false,
-  	exports: true,
-  	fetch: false,
-  	File: false,
-  	FormData: false,
-  	global: false,
-  	Headers: false,
-  	MessageChannel: false,
-  	MessageEvent: false,
-  	MessagePort: false,
-  	module: false,
-  	navigator: false,
-  	Navigator: false,
-  	performance: false,
-  	Performance: false,
-  	PerformanceEntry: false,
-  	PerformanceMark: false,
-  	PerformanceMeasure: false,
-  	PerformanceObserver: false,
-  	PerformanceObserverEntryList: false,
-  	PerformanceResourceTiming: false,
-  	process: false,
-  	queueMicrotask: false,
-  	ReadableByteStreamController: false,
-  	ReadableStream: false,
-  	ReadableStreamBYOBReader: false,
-  	ReadableStreamBYOBRequest: false,
-  	ReadableStreamDefaultController: false,
-  	ReadableStreamDefaultReader: false,
-  	Request: false,
-  	require: false,
-  	Response: false,
-  	setImmediate: false,
-  	setInterval: false,
-  	setTimeout: false,
-  	structuredClone: false,
-  	SubtleCrypto: false,
-  	TextDecoder: false,
-  	TextDecoderStream: false,
-  	TextEncoder: false,
-  	TextEncoderStream: false,
-  	TransformStream: false,
-  	TransformStreamDefaultController: false,
-  	URL: false,
-  	URLSearchParams: false,
-  	WebAssembly: false,
-  	WebSocket: false,
-  	WritableStream: false,
-  	WritableStreamDefaultController: false,
-  	WritableStreamDefaultWriter: false
-  };
-  const nodeBuiltin = {
-  	AbortController: false,
-  	AbortSignal: false,
-  	atob: false,
-  	Blob: false,
-  	BroadcastChannel: false,
-  	btoa: false,
-  	Buffer: false,
-  	ByteLengthQueuingStrategy: false,
-  	clearImmediate: false,
-  	clearInterval: false,
-  	clearTimeout: false,
-  	CloseEvent: false,
-  	CompressionStream: false,
-  	console: false,
-  	CountQueuingStrategy: false,
-  	crypto: false,
-  	Crypto: false,
-  	CryptoKey: false,
-  	CustomEvent: false,
-  	DecompressionStream: false,
-  	DOMException: false,
-  	Event: false,
-  	EventTarget: false,
-  	fetch: false,
-  	File: false,
-  	FormData: false,
-  	global: false,
-  	Headers: false,
-  	MessageChannel: false,
-  	MessageEvent: false,
-  	MessagePort: false,
-  	navigator: false,
-  	Navigator: false,
-  	performance: false,
-  	Performance: false,
-  	PerformanceEntry: false,
-  	PerformanceMark: false,
-  	PerformanceMeasure: false,
-  	PerformanceObserver: false,
-  	PerformanceObserverEntryList: false,
-  	PerformanceResourceTiming: false,
-  	process: false,
-  	queueMicrotask: false,
-  	ReadableByteStreamController: false,
-  	ReadableStream: false,
-  	ReadableStreamBYOBReader: false,
-  	ReadableStreamBYOBRequest: false,
-  	ReadableStreamDefaultController: false,
-  	ReadableStreamDefaultReader: false,
-  	Request: false,
-  	Response: false,
-  	setImmediate: false,
-  	setInterval: false,
-  	setTimeout: false,
-  	structuredClone: false,
-  	SubtleCrypto: false,
-  	TextDecoder: false,
-  	TextDecoderStream: false,
-  	TextEncoder: false,
-  	TextEncoderStream: false,
-  	TransformStream: false,
-  	TransformStreamDefaultController: false,
-  	URL: false,
-  	URLSearchParams: false,
-  	WebAssembly: false,
-  	WebSocket: false,
-  	WritableStream: false,
-  	WritableStreamDefaultController: false,
-  	WritableStreamDefaultWriter: false
-  };
-  const phantomjs = {
-  	console: true,
-  	exports: true,
-  	phantom: true,
-  	require: true,
-  	WebPage: true
-  };
-  const prototypejs = {
-  	$: false,
-  	$$: false,
-  	$A: false,
-  	$break: false,
-  	$continue: false,
-  	$F: false,
-  	$H: false,
-  	$R: false,
-  	$w: false,
-  	Abstract: false,
-  	Ajax: false,
-  	Autocompleter: false,
-  	Builder: false,
-  	Class: false,
-  	Control: false,
-  	Draggable: false,
-  	Draggables: false,
-  	Droppables: false,
-  	Effect: false,
-  	Element: false,
-  	Enumerable: false,
-  	Event: false,
-  	Field: false,
-  	Form: false,
-  	Hash: false,
-  	Insertion: false,
-  	ObjectRange: false,
-  	PeriodicalExecuter: false,
-  	Position: false,
-  	Prototype: false,
-  	Scriptaculous: false,
-  	Selector: false,
-  	Sortable: false,
-  	SortableObserver: false,
-  	Sound: false,
-  	Template: false,
-  	Toggle: false,
-  	Try: false
-  };
-  const protractor = {
-  	$: false,
-  	$$: false,
-  	browser: false,
-  	by: false,
-  	By: false,
-  	DartObject: false,
-  	element: false,
-  	protractor: false
-  };
-  const qunit = {
-  	asyncTest: false,
-  	deepEqual: false,
-  	equal: false,
-  	expect: false,
-  	module: false,
-  	notDeepEqual: false,
-  	notEqual: false,
-  	notOk: false,
-  	notPropEqual: false,
-  	notStrictEqual: false,
-  	ok: false,
-  	propEqual: false,
-  	QUnit: false,
-  	raises: false,
-  	start: false,
-  	stop: false,
-  	strictEqual: false,
-  	test: false,
-  	throws: false
-  };
-  const rhino = {
-  	defineClass: false,
-  	deserialize: false,
-  	gc: false,
-  	help: false,
-  	importClass: false,
-  	importPackage: false,
-  	java: false,
-  	load: false,
-  	loadClass: false,
-  	Packages: false,
-  	print: false,
-  	quit: false,
-  	readFile: false,
-  	readUrl: false,
-  	runCommand: false,
-  	seal: false,
-  	serialize: false,
-  	spawn: false,
-  	sync: false,
-  	toint32: false,
-  	version: false
-  };
-  const serviceworker = {
-  	addEventListener: false,
-  	applicationCache: false,
-  	atob: false,
-  	Blob: false,
-  	BroadcastChannel: false,
-  	btoa: false,
-  	ByteLengthQueuingStrategy: false,
-  	Cache: false,
-  	caches: false,
-  	CacheStorage: false,
-  	clearInterval: false,
-  	clearTimeout: false,
-  	Client: false,
-  	clients: false,
-  	Clients: false,
-  	close: true,
-  	CompressionStream: false,
-  	console: false,
-  	CountQueuingStrategy: false,
-  	crypto: false,
-  	Crypto: false,
-  	CryptoKey: false,
-  	CustomEvent: false,
-  	DecompressionStream: false,
-  	ErrorEvent: false,
-  	Event: false,
-  	ExtendableEvent: false,
-  	ExtendableMessageEvent: false,
-  	fetch: false,
-  	FetchEvent: false,
-  	File: false,
-  	FileReaderSync: false,
-  	FormData: false,
-  	Headers: false,
-  	IDBCursor: false,
-  	IDBCursorWithValue: false,
-  	IDBDatabase: false,
-  	IDBFactory: false,
-  	IDBIndex: false,
-  	IDBKeyRange: false,
-  	IDBObjectStore: false,
-  	IDBOpenDBRequest: false,
-  	IDBRequest: false,
-  	IDBTransaction: false,
-  	IDBVersionChangeEvent: false,
-  	ImageData: false,
-  	importScripts: false,
-  	indexedDB: false,
-  	location: false,
-  	MessageChannel: false,
-  	MessageEvent: false,
-  	MessagePort: false,
-  	name: false,
-  	navigator: false,
-  	Notification: false,
-  	onclose: true,
-  	onconnect: true,
-  	onerror: true,
-  	onfetch: true,
-  	oninstall: true,
-  	onlanguagechange: true,
-  	onmessage: true,
-  	onmessageerror: true,
-  	onnotificationclick: true,
-  	onnotificationclose: true,
-  	onoffline: true,
-  	ononline: true,
-  	onpush: true,
-  	onpushsubscriptionchange: true,
-  	onrejectionhandled: true,
-  	onsync: true,
-  	onunhandledrejection: true,
-  	performance: false,
-  	Performance: false,
-  	PerformanceEntry: false,
-  	PerformanceMark: false,
-  	PerformanceMeasure: false,
-  	PerformanceNavigation: false,
-  	PerformanceObserver: false,
-  	PerformanceObserverEntryList: false,
-  	PerformanceResourceTiming: false,
-  	PerformanceTiming: false,
-  	postMessage: true,
-  	queueMicrotask: false,
-  	ReadableByteStreamController: false,
-  	ReadableStream: false,
-  	ReadableStreamBYOBReader: false,
-  	ReadableStreamBYOBRequest: false,
-  	ReadableStreamDefaultController: false,
-  	ReadableStreamDefaultReader: false,
-  	registration: false,
-  	removeEventListener: false,
-  	Request: false,
-  	Response: false,
-  	self: false,
-  	ServiceWorker: false,
-  	ServiceWorkerContainer: false,
-  	ServiceWorkerGlobalScope: false,
-  	ServiceWorkerMessageEvent: false,
-  	ServiceWorkerRegistration: false,
-  	setInterval: false,
-  	setTimeout: false,
-  	skipWaiting: false,
-  	SubtleCrypto: false,
-  	TextDecoder: false,
-  	TextDecoderStream: false,
-  	TextEncoder: false,
-  	TextEncoderStream: false,
-  	TransformStream: false,
-  	TransformStreamDefaultController: false,
-  	URL: false,
-  	URLSearchParams: false,
-  	WebAssembly: false,
-  	WebSocket: false,
-  	WindowClient: false,
-  	Worker: false,
-  	WorkerGlobalScope: false,
-  	WritableStream: false,
-  	WritableStreamDefaultController: false,
-  	WritableStreamDefaultWriter: false,
-  	XMLHttpRequest: false
-  };
-  const shelljs = {
-  	cat: false,
-  	cd: false,
-  	chmod: false,
-  	config: false,
-  	cp: false,
-  	dirs: false,
-  	echo: false,
-  	env: false,
-  	error: false,
-  	exec: false,
-  	exit: false,
-  	find: false,
-  	grep: false,
-  	head: false,
-  	ln: false,
-  	ls: false,
-  	mkdir: false,
-  	mv: false,
-  	popd: false,
-  	pushd: false,
-  	pwd: false,
-  	rm: false,
-  	sed: false,
-  	set: false,
-  	ShellString: false,
-  	sort: false,
-  	tail: false,
-  	tempdir: false,
-  	test: false,
-  	touch: false,
-  	uniq: false,
-  	which: false
-  };
-  const webextensions = {
-  	browser: false,
-  	chrome: false,
-  	opr: false
-  };
-  const worker = {
-  	AbortController: false,
-  	AbortSignal: false,
-  	addEventListener: false,
-  	ai: false,
-  	atob: false,
-  	AudioData: false,
-  	AudioDecoder: false,
-  	AudioEncoder: false,
-  	BackgroundFetchManager: false,
-  	BackgroundFetchRecord: false,
-  	BackgroundFetchRegistration: false,
-  	BarcodeDetector: false,
-  	Blob: false,
-  	BroadcastChannel: false,
-  	btoa: false,
-  	ByteLengthQueuingStrategy: false,
-  	Cache: false,
-  	caches: false,
-  	CacheStorage: false,
-  	cancelAnimationFrame: false,
-  	CanvasGradient: false,
-  	CanvasPattern: false,
-  	clearInterval: false,
-  	clearTimeout: false,
-  	close: false,
-  	CloseEvent: false,
-  	CompressionStream: false,
-  	console: false,
-  	CountQueuingStrategy: false,
-  	createImageBitmap: false,
-  	CropTarget: false,
-  	crossOriginIsolated: false,
-  	crypto: false,
-  	Crypto: false,
-  	CryptoKey: false,
-  	CSSSkewX: false,
-  	CSSSkewY: false,
-  	CustomEvent: false,
-  	DecompressionStream: false,
-  	DedicatedWorkerGlobalScope: false,
-  	dispatchEvent: false,
-  	DOMException: false,
-  	DOMMatrix: false,
-  	DOMMatrixReadOnly: false,
-  	DOMPoint: false,
-  	DOMPointReadOnly: false,
-  	DOMQuad: false,
-  	DOMRect: false,
-  	DOMRectReadOnly: false,
-  	DOMStringList: false,
-  	EncodedAudioChunk: false,
-  	EncodedVideoChunk: false,
-  	ErrorEvent: false,
-  	Event: false,
-  	EventSource: false,
-  	EventTarget: false,
-  	fetch: false,
-  	File: false,
-  	FileList: false,
-  	FileReader: false,
-  	FileReaderSync: false,
-  	FileSystemDirectoryHandle: false,
-  	FileSystemFileHandle: false,
-  	FileSystemHandle: false,
-  	FileSystemSyncAccessHandle: false,
-  	FileSystemWritableFileStream: false,
-  	FontFace: false,
-  	fonts: false,
-  	FormData: false,
-  	GPU: false,
-  	GPUAdapter: false,
-  	GPUAdapterInfo: false,
-  	GPUBindGroup: false,
-  	GPUBindGroupLayout: false,
-  	GPUBuffer: false,
-  	GPUBufferUsage: false,
-  	GPUCanvasContext: false,
-  	GPUColorWrite: false,
-  	GPUCommandBuffer: false,
-  	GPUCommandEncoder: false,
-  	GPUCompilationInfo: false,
-  	GPUCompilationMessage: false,
-  	GPUComputePassEncoder: false,
-  	GPUComputePipeline: false,
-  	GPUDevice: false,
-  	GPUDeviceLostInfo: false,
-  	GPUError: false,
-  	GPUExternalTexture: false,
-  	GPUInternalError: false,
-  	GPUMapMode: false,
-  	GPUOutOfMemoryError: false,
-  	GPUPipelineError: false,
-  	GPUPipelineLayout: false,
-  	GPUQuerySet: false,
-  	GPUQueue: false,
-  	GPURenderBundle: false,
-  	GPURenderBundleEncoder: false,
-  	GPURenderPassEncoder: false,
-  	GPURenderPipeline: false,
-  	GPUSampler: false,
-  	GPUShaderModule: false,
-  	GPUShaderStage: false,
-  	GPUSupportedFeatures: false,
-  	GPUSupportedLimits: false,
-  	GPUTexture: false,
-  	GPUTextureUsage: false,
-  	GPUTextureView: false,
-  	GPUUncapturedErrorEvent: false,
-  	GPUValidationError: false,
-  	Headers: false,
-  	IDBCursor: false,
-  	IDBCursorWithValue: false,
-  	IDBDatabase: false,
-  	IDBFactory: false,
-  	IDBIndex: false,
-  	IDBKeyRange: false,
-  	IDBObjectStore: false,
-  	IDBOpenDBRequest: false,
-  	IDBRequest: false,
-  	IDBTransaction: false,
-  	IDBVersionChangeEvent: false,
-  	IdleDetector: false,
-  	ImageBitmap: false,
-  	ImageBitmapRenderingContext: false,
-  	ImageData: false,
-  	ImageDecoder: false,
-  	ImageTrack: false,
-  	ImageTrackList: false,
-  	importScripts: false,
-  	indexedDB: false,
-  	isSecureContext: false,
-  	location: false,
-  	Lock: false,
-  	LockManager: false,
-  	MediaCapabilities: false,
-  	MediaSource: false,
-  	MediaSourceHandle: false,
-  	MessageChannel: false,
-  	MessageEvent: false,
-  	MessagePort: false,
-  	name: false,
-  	NavigationPreloadManager: false,
-  	navigator: false,
-  	NavigatorUAData: false,
-  	NetworkInformation: false,
-  	Notification: false,
-  	OffscreenCanvas: false,
-  	OffscreenCanvasRenderingContext2D: false,
-  	onerror: true,
-  	onlanguagechange: true,
-  	onmessage: true,
-  	onmessageerror: true,
-  	onrejectionhandled: true,
-  	onunhandledrejection: true,
-  	origin: false,
-  	Path2D: false,
-  	performance: false,
-  	Performance: false,
-  	PerformanceEntry: false,
-  	PerformanceMark: false,
-  	PerformanceMeasure: false,
-  	PerformanceObserver: false,
-  	PerformanceObserverEntryList: false,
-  	PerformanceResourceTiming: false,
-  	PerformanceServerTiming: false,
-  	PeriodicSyncManager: false,
-  	Permissions: false,
-  	PermissionStatus: false,
-  	PERSISTENT: false,
-  	postMessage: false,
-  	PressureObserver: false,
-  	PressureRecord: false,
-  	ProgressEvent: false,
-  	PromiseRejectionEvent: false,
-  	PushManager: false,
-  	PushSubscription: false,
-  	PushSubscriptionOptions: false,
-  	queueMicrotask: false,
-  	ReadableByteStreamController: false,
-  	ReadableStream: false,
-  	ReadableStreamBYOBReader: false,
-  	ReadableStreamBYOBRequest: false,
-  	ReadableStreamDefaultController: false,
-  	ReadableStreamDefaultReader: false,
-  	removeEventListener: false,
-  	reportError: false,
-  	ReportingObserver: false,
-  	Request: false,
-  	requestAnimationFrame: false,
-  	Response: false,
-  	RTCDataChannel: false,
-  	RTCEncodedAudioFrame: false,
-  	RTCEncodedVideoFrame: false,
-  	scheduler: false,
-  	Scheduler: false,
-  	SecurityPolicyViolationEvent: false,
-  	self: false,
-  	Serial: false,
-  	SerialPort: false,
-  	ServiceWorkerRegistration: false,
-  	setInterval: false,
-  	setTimeout: false,
-  	SourceBuffer: false,
-  	SourceBufferList: false,
-  	StorageBucket: false,
-  	StorageBucketManager: false,
-  	StorageManager: false,
-  	structuredClone: false,
-  	SubtleCrypto: false,
-  	SyncManager: false,
-  	TaskController: false,
-  	TaskPriorityChangeEvent: false,
-  	TaskSignal: false,
-  	TEMPORARY: false,
-  	TextDecoder: false,
-  	TextDecoderStream: false,
-  	TextEncoder: false,
-  	TextEncoderStream: false,
-  	TextMetrics: false,
-  	TransformStream: false,
-  	TransformStreamDefaultController: false,
-  	TrustedHTML: false,
-  	TrustedScript: false,
-  	TrustedScriptURL: false,
-  	TrustedTypePolicy: false,
-  	TrustedTypePolicyFactory: false,
-  	trustedTypes: false,
-  	URL: false,
-  	URLPattern: false,
-  	URLSearchParams: false,
-  	USB: false,
-  	USBAlternateInterface: false,
-  	USBConfiguration: false,
-  	USBConnectionEvent: false,
-  	USBDevice: false,
-  	USBEndpoint: false,
-  	USBInterface: false,
-  	USBInTransferResult: false,
-  	USBIsochronousInTransferPacket: false,
-  	USBIsochronousInTransferResult: false,
-  	USBIsochronousOutTransferPacket: false,
-  	USBIsochronousOutTransferResult: false,
-  	USBOutTransferResult: false,
-  	UserActivation: false,
-  	VideoColorSpace: false,
-  	VideoDecoder: false,
-  	VideoEncoder: false,
-  	VideoFrame: false,
-  	WebAssembly: false,
-  	WebGL2RenderingContext: false,
-  	WebGLActiveInfo: false,
-  	WebGLBuffer: false,
-  	WebGLContextEvent: false,
-  	WebGLFramebuffer: false,
-  	WebGLObject: false,
-  	WebGLProgram: false,
-  	WebGLQuery: false,
-  	WebGLRenderbuffer: false,
-  	WebGLRenderingContext: false,
-  	WebGLSampler: false,
-  	WebGLShader: false,
-  	WebGLShaderPrecisionFormat: false,
-  	WebGLSync: false,
-  	WebGLTexture: false,
-  	WebGLTransformFeedback: false,
-  	WebGLUniformLocation: false,
-  	WebGLVertexArrayObject: false,
-  	webkitRequestFileSystem: false,
-  	webkitRequestFileSystemSync: false,
-  	webkitResolveLocalFileSystemSyncURL: false,
-  	webkitResolveLocalFileSystemURL: false,
-  	WebSocket: false,
-  	WebSocketError: false,
-  	WebSocketStream: false,
-  	WebTransport: false,
-  	WebTransportBidirectionalStream: false,
-  	WebTransportDatagramDuplexStream: false,
-  	WebTransportError: false,
-  	WGSLLanguageFeatures: false,
-  	Worker: false,
-  	WorkerGlobalScope: false,
-  	WorkerLocation: false,
-  	WorkerNavigator: false,
-  	WritableStream: false,
-  	WritableStreamDefaultController: false,
-  	WritableStreamDefaultWriter: false,
-  	XMLHttpRequest: false,
-  	XMLHttpRequestEventTarget: false,
-  	XMLHttpRequestUpload: false
-  };
-  const wsh = {
-  	ActiveXObject: false,
-  	CollectGarbage: false,
-  	Debug: false,
-  	Enumerator: false,
-  	GetObject: false,
-  	RuntimeObject: false,
-  	ScriptEngine: false,
-  	ScriptEngineBuildVersion: false,
-  	ScriptEngineMajorVersion: false,
-  	ScriptEngineMinorVersion: false,
-  	VBArray: false,
-  	WScript: false,
-  	WSH: false
-  };
-  const yui = {
-  	YAHOO: false,
-  	YAHOO_config: false,
-  	YUI: false,
-  	YUI_config: false
-  };
   var globals = {
-  	amd: amd,
-  	applescript: applescript,
-  	atomtest: atomtest,
-  	browser: browser,
-  	builtin: builtin,
-  	chai: chai,
-  	commonjs: commonjs,
-  	couch: couch,
-  	devtools: devtools,
-  	embertest: embertest,
-  	es2015: es2015,
-  	es2016: es2016,
-  	es2017: es2017,
-  	es2018: es2018,
-  	es2019: es2019,
-  	es2020: es2020,
-  	es2021: es2021,
-  	es2022: es2022,
-  	es2023: es2023,
-  	es2024: es2024,
-  	es2025: es2025,
-  	es3: es3,
-  	es5: es5,
-  	greasemonkey: greasemonkey,
-  	jasmine: jasmine,
-  	jest: jest,
-  	jquery: jquery,
-  	meteor: meteor,
-  	mocha: mocha,
-  	mongo: mongo,
-  	nashorn: nashorn,
-  	node: node,
-  	nodeBuiltin: nodeBuiltin,
-  	phantomjs: phantomjs,
-  	prototypejs: prototypejs,
-  	protractor: protractor,
-  	qunit: qunit,
-  	rhino: rhino,
-  	serviceworker: serviceworker,
-  	"shared-node-browser": {
-  	AbortController: false,
-  	AbortSignal: false,
-  	atob: false,
-  	Blob: false,
-  	BroadcastChannel: false,
-  	btoa: false,
-  	ByteLengthQueuingStrategy: false,
-  	clearInterval: false,
-  	clearTimeout: false,
-  	CloseEvent: false,
-  	CompressionStream: false,
-  	console: false,
-  	CountQueuingStrategy: false,
-  	crypto: false,
-  	Crypto: false,
-  	CryptoKey: false,
-  	CustomEvent: false,
-  	DecompressionStream: false,
-  	DOMException: false,
-  	Event: false,
-  	EventTarget: false,
-  	fetch: false,
-  	File: false,
-  	FormData: false,
-  	Headers: false,
-  	MessageChannel: false,
-  	MessageEvent: false,
-  	MessagePort: false,
-  	navigator: false,
-  	Navigator: false,
-  	performance: false,
-  	Performance: false,
-  	PerformanceEntry: false,
-  	PerformanceMark: false,
-  	PerformanceMeasure: false,
-  	PerformanceObserver: false,
-  	PerformanceObserverEntryList: false,
-  	PerformanceResourceTiming: false,
-  	queueMicrotask: false,
-  	ReadableByteStreamController: false,
-  	ReadableStream: false,
-  	ReadableStreamBYOBReader: false,
-  	ReadableStreamBYOBRequest: false,
-  	ReadableStreamDefaultController: false,
-  	ReadableStreamDefaultReader: false,
-  	Request: false,
-  	Response: false,
-  	setInterval: false,
-  	setTimeout: false,
-  	structuredClone: false,
-  	SubtleCrypto: false,
-  	TextDecoder: false,
-  	TextDecoderStream: false,
-  	TextEncoder: false,
-  	TextEncoderStream: false,
-  	TransformStream: false,
-  	TransformStreamDefaultController: false,
-  	URL: false,
-  	URLSearchParams: false,
-  	WebAssembly: false,
-  	WebSocket: false,
-  	WritableStream: false,
-  	WritableStreamDefaultController: false,
-  	WritableStreamDefaultWriter: false
-  },
-  	shelljs: shelljs,
-  	webextensions: webextensions,
-  	worker: worker,
-  	wsh: wsh,
-  	yui: yui
-  };
+  	builtin: builtin};
 
   const browserAPIs = ['window', 'document', 'console'];
   const builtinAPIs = Object.keys(globals.builtin);
@@ -16291,7 +13351,16 @@
    * @returns {boolean} true only for value attribute nodes
    */
   function isValueAttribute(node) {
-    return node.name === 'value'
+    return node.name === VALUE_ATTRIBUTE
+  }
+
+  /**
+   * True if the node is an attribute and its name is "ref"
+   * @param   {RiotParser.Node} node - riot parser node
+   * @returns {boolean} true only for ref attribute nodes
+   */
+  function isRefAttribute(node) {
+    return node.name === REF_ATTRIBUTE
   }
 
   /**
@@ -17619,6 +14688,27 @@
     ])
   }
 
+  function createRefExpression(
+    sourceNode,
+    sourceFile,
+    sourceCode,
+  ) {
+    return builders.objectExpression([
+      simplePropertyNode(
+        BINDING_TYPE_KEY,
+        builders.memberExpression(
+          builders.identifier(EXPRESSION_TYPES),
+          builders.identifier(REF_EXPRESSION_TYPE),
+          false,
+        ),
+      ),
+      simplePropertyNode(
+        BINDING_EVALUATE_KEY,
+        createAttributeEvaluationFunction(sourceNode, sourceFile, sourceCode),
+      ),
+    ])
+  }
+
   function createExpression(
     sourceNode,
     sourceFile,
@@ -17635,6 +14725,8 @@
         hasValueAttribute(parentNode.name) &&
         !isProgressNode(parentNode):
         return createValueExpression(sourceNode, sourceFile, sourceCode)
+      case isRefAttribute(sourceNode):
+        return createRefExpression(sourceNode, sourceFile, sourceCode)
       case isEventAttribute(sourceNode):
         return createEventExpression(sourceNode, sourceFile, sourceCode)
       default:
@@ -17776,7 +14868,7 @@
   		  // continue jumps to that label.
 
   		  var TokenType = function TokenType(label, conf) {
-  		    if ( conf === undefined ) conf = {};
+  		    if ( conf === void 0 ) conf = {};
 
   		    this.label = label;
   		    this.keyword = conf.keyword;
@@ -17801,7 +14893,7 @@
 
   		  // Succinct definitions of keyword token types
   		  function kw(name, options) {
-  		    if ( options === undefined ) options = {};
+  		    if ( options === void 0 ) options = {};
 
   		    options.keyword = name;
   		    return keywords[name] = new TokenType(name, options)
@@ -17917,7 +15009,7 @@
   		  }
 
   		  function nextLineBreak(code, from, end) {
-  		    if ( end === undefined ) end = code.length;
+  		    if ( end === void 0 ) end = code.length;
 
   		    for (var i = from; i < end; i++) {
   		      var next = code.charCodeAt(i);
@@ -18914,8 +16006,8 @@
   		  // function bodies).
 
   		  pp$8.parseBlock = function(createNewLexicalScope, node, exitStrict) {
-  		    if ( createNewLexicalScope === undefined ) createNewLexicalScope = true;
-  		    if ( node === undefined ) node = this.startNode();
+  		    if ( createNewLexicalScope === void 0 ) createNewLexicalScope = true;
+  		    if ( node === void 0 ) node = this.startNode();
 
   		    node.body = [];
   		    this.expect(types$1.braceL);
@@ -19890,7 +16982,7 @@
   		  // is an assignment (i.e., bindingType is BIND_NONE).
 
   		  pp$7.checkLValSimple = function(expr, bindingType, checkClashes) {
-  		    if ( bindingType === undefined ) bindingType = BIND_NONE;
+  		    if ( bindingType === void 0 ) bindingType = BIND_NONE;
 
   		    var isBind = bindingType !== BIND_NONE;
 
@@ -19928,7 +17020,7 @@
   		  };
 
   		  pp$7.checkLValPattern = function(expr, bindingType, checkClashes) {
-  		    if ( bindingType === undefined ) bindingType = BIND_NONE;
+  		    if ( bindingType === void 0 ) bindingType = BIND_NONE;
 
   		    switch (expr.type) {
   		    case "ObjectPattern":
@@ -19953,7 +17045,7 @@
   		  };
 
   		  pp$7.checkLValInnerPattern = function(expr, bindingType, checkClashes) {
-  		    if ( bindingType === undefined ) bindingType = BIND_NONE;
+  		    if ( bindingType === void 0 ) bindingType = BIND_NONE;
 
   		    switch (expr.type) {
   		    case "Property":
@@ -20883,8 +17975,8 @@
   		  };
 
   		  pp$5.parseTemplate = function(ref) {
-  		    if ( ref === undefined ) ref = {};
-  		    var isTagged = ref.isTagged; if ( isTagged === undefined ) isTagged = false;
+  		    if ( ref === void 0 ) ref = {};
+  		    var isTagged = ref.isTagged; if ( isTagged === void 0 ) isTagged = false;
 
   		    var node = this.startNode();
   		    this.next();
@@ -21170,7 +18262,7 @@
   		        if (allowTrailingComma && this.afterTrailingComma(close)) { break }
   		      } else { first = false; }
 
-  		      var elt = (undefined);
+  		      var elt = (void 0);
   		      if (allowEmpty && this.type === types$1.comma)
   		        { elt = null; }
   		      else if (this.type === types$1.ellipsis) {
@@ -21615,7 +18707,7 @@
   		  // If u flag is given, this returns the code point at the index (it combines a surrogate pair).
   		  // Otherwise, this returns the code unit of the index (can be a part of a surrogate pair).
   		  RegExpValidationState.prototype.at = function at (i, forceU) {
-  		      if ( forceU === undefined ) forceU = false;
+  		      if ( forceU === void 0 ) forceU = false;
 
   		    var s = this.source;
   		    var l = s.length;
@@ -21631,7 +18723,7 @@
   		  };
 
   		  RegExpValidationState.prototype.nextIndex = function nextIndex (i, forceU) {
-  		      if ( forceU === undefined ) forceU = false;
+  		      if ( forceU === void 0 ) forceU = false;
 
   		    var s = this.source;
   		    var l = s.length;
@@ -21647,25 +18739,25 @@
   		  };
 
   		  RegExpValidationState.prototype.current = function current (forceU) {
-  		      if ( forceU === undefined ) forceU = false;
+  		      if ( forceU === void 0 ) forceU = false;
 
   		    return this.at(this.pos, forceU)
   		  };
 
   		  RegExpValidationState.prototype.lookahead = function lookahead (forceU) {
-  		      if ( forceU === undefined ) forceU = false;
+  		      if ( forceU === void 0 ) forceU = false;
 
   		    return this.at(this.nextIndex(this.pos, forceU), forceU)
   		  };
 
   		  RegExpValidationState.prototype.advance = function advance (forceU) {
-  		      if ( forceU === undefined ) forceU = false;
+  		      if ( forceU === void 0 ) forceU = false;
 
   		    this.pos = this.nextIndex(this.pos, forceU);
   		  };
 
   		  RegExpValidationState.prototype.eat = function eat (ch, forceU) {
-  		      if ( forceU === undefined ) forceU = false;
+  		      if ( forceU === void 0 ) forceU = false;
 
   		    if (this.current(forceU) === ch) {
   		      this.advance(forceU);
@@ -21675,7 +18767,7 @@
   		  };
 
   		  RegExpValidationState.prototype.eatChars = function eatChars (chs, forceU) {
-  		      if ( forceU === undefined ) forceU = false;
+  		      if ( forceU === void 0 ) forceU = false;
 
   		    var pos = this.pos;
   		    for (var i = 0, list = chs; i < list.length; i += 1) {
@@ -21868,7 +18960,7 @@
 
   		  // https://www.ecma-international.org/ecma-262/8.0/#prod-Quantifier
   		  pp$1.regexp_eatQuantifier = function(state, noError) {
-  		    if ( noError === undefined ) noError = false;
+  		    if ( noError === void 0 ) noError = false;
 
   		    if (this.regexp_eatQuantifierPrefix(state, noError)) {
   		      state.eat(0x3F /* ? */);
@@ -22322,7 +19414,7 @@
 
   		  // https://www.ecma-international.org/ecma-262/8.0/#prod-RegExpUnicodeEscapeSequence
   		  pp$1.regexp_eatRegExpUnicodeEscapeSequence = function(state, forceU) {
-  		    if ( forceU === undefined ) forceU = false;
+  		    if ( forceU === void 0 ) forceU = false;
 
   		    var start = state.pos;
   		    var switchU = forceU || state.switchU;
@@ -23040,7 +20132,7 @@
   		    if (end === -1) { this.raise(this.pos - 2, "Unterminated comment"); }
   		    this.pos = end + 2;
   		    if (this.options.locations) {
-  		      for (var nextBreak = (undefined), pos = start; (nextBreak = nextLineBreak(this.input, pos, this.pos)) > -1;) {
+  		      for (var nextBreak = (void 0), pos = start; (nextBreak = nextLineBreak(this.input, pos, this.pos)) > -1;) {
   		        ++this.curLine;
   		        pos = this.lineStart = nextBreak;
   		      }
@@ -23399,7 +20491,7 @@
 
   		    var start = this.pos, total = 0, lastCode = 0;
   		    for (var i = 0, e = len == null ? Infinity : len; i < e; ++i, ++this.pos) {
-  		      var code = this.input.charCodeAt(this.pos), val = (undefined);
+  		      var code = this.input.charCodeAt(this.pos), val = (void 0);
 
   		      if (allowSeparators && code === 95) {
   		        if (isLegacyOctalNumericLiteral) { this.raiseRecoverable(this.pos, "Numeric separator is not allowed in legacy octal numeric literals"); }
@@ -23846,7 +20938,7 @@
   	if (hasRequiredAcorn) return acorn$1;
   	hasRequiredAcorn = 1;
   	Object.defineProperty(acorn$1, "__esModule", { value: true });
-  	acorn$1.parse = undefined;
+  	acorn$1.parse = void 0;
   	// This module is suitable for passing as options.parser when calling
   	// recast.parse to process JavaScript code with Acorn:
   	//
@@ -25398,7 +22490,7 @@
   		while (counter < length) {
   			var character = string.charAt(counter++);
   			var codePoint = character.charCodeAt();
-  			var value = undefined;
+  			var value = void 0;
   			// If it’s not a printable ASCII character…
   			if (codePoint < 0x20 || codePoint > 0x7E) {
   				if (codePoint >= 0xD800 && codePoint <= 0xDBFF && counter < length) {
@@ -25483,7 +22575,7 @@
   };
 
   /* MAIN */
-  const indexes = (str, substr) => {
+  const getIndexes = (str, substr) => {
       const indexes = [];
       const substrLength = substr.length;
       let indexFrom = 0;
@@ -25534,8 +22626,8 @@
   /* MAIN */
   const tokenizer = (css) => {
       /* VARIABLES */
-      const startIndexes = indexes(css, '{');
-      const endIndexes = indexes(css, '}');
+      const startIndexes = getIndexes(css, '{');
+      const endIndexes = getIndexes(css, '}');
       const selectorTokens = new Array(startIndexes.length);
       const startTokens = new Array(startIndexes.length);
       const endTokens = new Array(endIndexes.length);
@@ -26540,7 +23632,6 @@
 
   const HEAD_SYMBOL = Symbol();
   const TAIL_SYMBOL = Symbol();
-  const REF_ATTRIBUTE = 'ref';
 
   /**
    * Create the <template> fragments text nodes
@@ -27029,7 +24120,7 @@
    */
   function setAllAttributes(node, attributes) {
     Object.keys(attributes).forEach((name) =>
-      attributeExpression(node, { name }, attributes[name]),
+      attributeExpression({ node, name }, attributes[name]),
     );
   }
 
@@ -27072,19 +24163,16 @@
 
   /**
    * This methods handles the DOM attributes updates
-   * @param   {HTMLElement} node - target node
-   * @param   {Object} expression - expression object
+   * @param   {HTMLElement} expression.node - target node
    * @param   {string} expression.name - attribute name
    * @param   {boolean} expression.isBoolean - flag to handle boolean attributes
+   * @param   {*} expression.value - the old expression cached value
    * @param   {*} value - new expression value
-   * @param   {*} oldValue - the old expression cached value
    * @returns {undefined}
    */
   function attributeExpression(
-    node,
-    { name, isBoolean: isBoolean$1 },
+    { node, name, isBoolean: isBoolean$1, value: oldValue },
     value,
-    oldValue,
   ) {
     // is it a spread operator? {...attributes}
     if (!name) {
@@ -27098,13 +24186,6 @@
         setAllAttributes(node, value);
       }
 
-      return
-    }
-
-    // ref attributes are treated differently so we early return in this case
-    if (name === REF_ATTRIBUTE) {
-      node && node.removeAttribute(node, name);
-      value(node);
       return
     }
 
@@ -27157,13 +24238,12 @@
 
   /**
    * Set a new event listener
-   * @param   {HTMLElement} node - target node
-   * @param   {Object} expression - expression object
+   * @param   {HTMLElement} expression.node - target node
    * @param   {string} expression.name - event name
    * @param   {*} value - new expression value
    * @returns {value} the callback just received
    */
-  function eventExpression(node, { name }, value) {
+  function eventExpression({ node, name }, value) {
     const normalizedEventName = name.replace(RE_EVENTS_PREFIX, '');
     const eventListener = ListenersWeakMap.get(node) || createListener(node);
     const [callback, options] = getCallbackAndOptions(value);
@@ -27203,24 +24283,37 @@
 
   /**
    * This methods handles a simple text expression update
-   * @param   {HTMLElement} node - target node
-   * @param   {Object} data - expression object
+   * @param   {HTMLElement} expression.node - target node
    * @param   {*} value - new expression value
    * @returns {undefined}
    */
-  function textExpression(node, data, value) {
+  function textExpression({ node }, value) {
     node.data = normalizeStringValue(value);
   }
 
   /**
    * This methods handles the input fields value updates
-   * @param   {HTMLElement} node - target node
-   * @param   {Object} expression - expression object
+   * @param   {HTMLElement} expression.node - target node
    * @param   {*} value - new expression value
    * @returns {undefined}
    */
-  function valueExpression(node, expression, value) {
+  function valueExpression({ node }, value) {
     node.value = normalizeStringValue(value);
+  }
+
+  /**
+     This method handles the REF attribute expressions 
+   * @param   {HTMLElement} expression.node - target node
+   * @param   {*} expression.value - the old expression cached value
+   * @param   {*} value - new expression value
+   * @returns {undefined}
+   */
+  function refExpression({ node, value: oldValue }, value) {
+    // called on mount and update
+    if (value) value(node);
+    // called on unmount
+    // in this case the node value is null
+    else oldValue(null);
   }
 
   const expressions = {
@@ -27228,6 +24321,7 @@
     [EVENT]: eventExpression,
     [TEXT$1]: textExpression,
     [VALUE]: valueExpression,
+    [REF]: refExpression,
   };
 
   const Expression = {
@@ -27246,7 +24340,7 @@
       this.value = this.evaluate(scope);
 
       // IO() DOM updates
-      apply(this, this.value);
+      expressions[this.type](this, this.value);
 
       return this
     },
@@ -27261,7 +24355,7 @@
 
       if (this.value !== value) {
         // IO() DOM updates
-        apply(this, value);
+        expressions[this.type](this, value);
         this.value = value;
       }
 
@@ -27272,30 +24366,12 @@
      * @returns {Expression} self
      */
     unmount() {
-      // unmount only the event handling expressions
-      if (this.type === EVENT) apply(this, null);
-      // ref attributes need to be unmounted as well
-      if (this.name === REF_ATTRIBUTE)
-        expressions[ATTRIBUTE](null, this, this.value);
+      // unmount event and ref expressions
+      if ([EVENT, REF].includes(this.type)) expressions[this.type](this, null);
 
       return this
     },
   };
-
-  /**
-   * IO() function to handle the DOM updates
-   * @param {Expression} expression - expression object
-   * @param {*} value - current expression value
-   * @returns {undefined}
-   */
-  function apply(expression, value) {
-    return expressions[expression.type](
-      expression.node,
-      expression,
-      value,
-      expression.value,
-    )
-  }
 
   function create$4(node, data) {
     return {
@@ -28631,7 +25707,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.4.5';
+  const version = 'v9.4.6';
 
   // expose some internal stuff that might be used from external tools
   const __ = {

@@ -1,4 +1,4 @@
-/* Riot v9.4.5, @license MIT */
+/* Riot v9.4.6, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -207,12 +207,14 @@
   const EVENT = 1;
   const TEXT = 2;
   const VALUE = 3;
+  const REF = 4;
 
   const expressionTypes = {
     ATTRIBUTE,
     EVENT,
     TEXT,
     VALUE,
+    REF,
   };
 
   // does simply nothing
@@ -384,7 +386,6 @@
 
   const HEAD_SYMBOL = Symbol();
   const TAIL_SYMBOL = Symbol();
-  const REF_ATTRIBUTE = 'ref';
 
   /**
    * Create the <template> fragments text nodes
@@ -873,7 +874,7 @@
    */
   function setAllAttributes(node, attributes) {
     Object.keys(attributes).forEach((name) =>
-      attributeExpression(node, { name }, attributes[name]),
+      attributeExpression({ node, name }, attributes[name]),
     );
   }
 
@@ -916,19 +917,16 @@
 
   /**
    * This methods handles the DOM attributes updates
-   * @param   {HTMLElement} node - target node
-   * @param   {Object} expression - expression object
+   * @param   {HTMLElement} expression.node - target node
    * @param   {string} expression.name - attribute name
    * @param   {boolean} expression.isBoolean - flag to handle boolean attributes
+   * @param   {*} expression.value - the old expression cached value
    * @param   {*} value - new expression value
-   * @param   {*} oldValue - the old expression cached value
    * @returns {undefined}
    */
   function attributeExpression(
-    node,
-    { name, isBoolean: isBoolean$1 },
+    { node, name, isBoolean: isBoolean$1, value: oldValue },
     value,
-    oldValue,
   ) {
     // is it a spread operator? {...attributes}
     if (!name) {
@@ -942,13 +940,6 @@
         setAllAttributes(node, value);
       }
 
-      return
-    }
-
-    // ref attributes are treated differently so we early return in this case
-    if (name === REF_ATTRIBUTE) {
-      node && node.removeAttribute(node, name);
-      value(node);
       return
     }
 
@@ -1001,13 +992,12 @@
 
   /**
    * Set a new event listener
-   * @param   {HTMLElement} node - target node
-   * @param   {Object} expression - expression object
+   * @param   {HTMLElement} expression.node - target node
    * @param   {string} expression.name - event name
    * @param   {*} value - new expression value
    * @returns {value} the callback just received
    */
-  function eventExpression(node, { name }, value) {
+  function eventExpression({ node, name }, value) {
     const normalizedEventName = name.replace(RE_EVENTS_PREFIX, '');
     const eventListener = ListenersWeakMap.get(node) || createListener(node);
     const [callback, options] = getCallbackAndOptions(value);
@@ -1047,24 +1037,37 @@
 
   /**
    * This methods handles a simple text expression update
-   * @param   {HTMLElement} node - target node
-   * @param   {Object} data - expression object
+   * @param   {HTMLElement} expression.node - target node
    * @param   {*} value - new expression value
    * @returns {undefined}
    */
-  function textExpression(node, data, value) {
+  function textExpression({ node }, value) {
     node.data = normalizeStringValue(value);
   }
 
   /**
    * This methods handles the input fields value updates
-   * @param   {HTMLElement} node - target node
-   * @param   {Object} expression - expression object
+   * @param   {HTMLElement} expression.node - target node
    * @param   {*} value - new expression value
    * @returns {undefined}
    */
-  function valueExpression(node, expression, value) {
+  function valueExpression({ node }, value) {
     node.value = normalizeStringValue(value);
+  }
+
+  /**
+     This method handles the REF attribute expressions 
+   * @param   {HTMLElement} expression.node - target node
+   * @param   {*} expression.value - the old expression cached value
+   * @param   {*} value - new expression value
+   * @returns {undefined}
+   */
+  function refExpression({ node, value: oldValue }, value) {
+    // called on mount and update
+    if (value) value(node);
+    // called on unmount
+    // in this case the node value is null
+    else oldValue(null);
   }
 
   const expressions = {
@@ -1072,6 +1075,7 @@
     [EVENT]: eventExpression,
     [TEXT]: textExpression,
     [VALUE]: valueExpression,
+    [REF]: refExpression,
   };
 
   const Expression = {
@@ -1090,7 +1094,7 @@
       this.value = this.evaluate(scope);
 
       // IO() DOM updates
-      apply(this, this.value);
+      expressions[this.type](this, this.value);
 
       return this
     },
@@ -1105,7 +1109,7 @@
 
       if (this.value !== value) {
         // IO() DOM updates
-        apply(this, value);
+        expressions[this.type](this, value);
         this.value = value;
       }
 
@@ -1116,30 +1120,12 @@
      * @returns {Expression} self
      */
     unmount() {
-      // unmount only the event handling expressions
-      if (this.type === EVENT) apply(this, null);
-      // ref attributes need to be unmounted as well
-      if (this.name === REF_ATTRIBUTE)
-        expressions[ATTRIBUTE](null, this, this.value);
+      // unmount event and ref expressions
+      if ([EVENT, REF].includes(this.type)) expressions[this.type](this, null);
 
       return this
     },
   };
-
-  /**
-   * IO() function to handle the DOM updates
-   * @param {Expression} expression - expression object
-   * @param {*} value - current expression value
-   * @returns {undefined}
-   */
-  function apply(expression, value) {
-    return expressions[expression.type](
-      expression.node,
-      expression,
-      value,
-      expression.value,
-    )
-  }
 
   function create$4(node, data) {
     return {
@@ -2542,7 +2528,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.4.5';
+  const version = 'v9.4.6';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
