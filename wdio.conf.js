@@ -17,7 +17,7 @@ export const config = {
           {
             sauceConnect: true,
             sauceConnectOpts: {
-              directDomains: 'localhost,127.0.0.1', // Allow localhost traffic
+              directDomains: '127.0.0.1', // Allow localhost traffic
             },
           },
         ],
@@ -121,7 +121,7 @@ export const config = {
   // with `/`, the base url gets prepended, not including the path portion of your baseUrl.
   // If your `url` parameter starts without a scheme or `/` (like `some/path`), the base url
   // gets prepended directly.
-  baseUrl: 'http://localhost',
+  baseUrl: 'http://127.0.0.1',
   //
   // Default timeout for all waitFor* commands.
   waitforTimeout: 10000,
