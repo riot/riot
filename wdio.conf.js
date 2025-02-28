@@ -16,6 +16,9 @@ export const config = {
           'sauce',
           {
             sauceConnect: true,
+            sauceConnectOpts: {
+              directDomains: 'localhost,127.0.0.1', // Allow localhost traffic
+            },
           },
         ],
       ]
