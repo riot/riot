@@ -31,13 +31,13 @@ jobs:
       - run: make lint
       - run: make unit-test
       # Skip saucelabs test https://github.com/riot/riot/issues/2989
-      - name: Saucelabs Crossbrowser Testing
-        if: ${{ success() && github.event_name != 'pull_request' && matrix.node-version == '20.x' }}
-        env:
-          SAUCELABS: 1
-          SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
-        run: make e2e-test
+      # - name: Saucelabs Crossbrowser Testing
+      #   if: ${{ success() && github.event_name != 'pull_request' && matrix.node-version == '20.x' }}
+      #   env:
+      #     SAUCELABS: 1
+      #     SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
+      #     SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
+      #   run: make e2e-test
       - name: Coveralls
         if: ${{ success() && github.event_name != 'pull_request' && matrix.node-version == '20.x' }}
         uses: coverallsapp/github-action@master
