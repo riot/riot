@@ -213,6 +213,8 @@ Special thanks to Browserstack for their support
 [npm-version-image]: https://img.shields.io/npm/v/riot.svg?style=flat-square
 [npm-downloads-image]: https://img.shields.io/npm/dm/riot.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/riot
+[saucelabs-image]: https://saucelabs.com/browser-matrix/testsriotjs.svg?1
+[saucelabs-url]: https://saucelabs.com/u/testsriotjs
 [coverage-image]: https://img.shields.io/coveralls/riot/riot/main.svg?style=flat-square
 [coverage-url]: https://coveralls.io/r/riot/riot?branch=main
 [discord-url]: https://discord.gg/PagXe5Y
