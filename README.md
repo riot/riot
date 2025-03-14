@@ -15,7 +15,7 @@
 ![Riot Size][lib-size]
 [![Code Quality][codeclimate-image]][codeclimate-url]
 
-<!--[![Sauce Test Status][saucelabs-image]][saucelabs-url]-->
+[![Sauce Test Status][saucelabs-image]][saucelabs-url]
 
 ### Custom components • Concise syntax • Simple API • Tiny Size
 
