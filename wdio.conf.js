@@ -15,6 +15,7 @@ export const config = {
         [
           'sauce',
           {
+            proxyLocalhost: 'allows',
             sauceConnect: true,
           },
         ],
