@@ -1,4 +1,4 @@
-/* Riot v9.4.6, @license MIT */
+/* Riot v9.4.7, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -1161,7 +1161,7 @@
     )
   }
 
-  function extendParentScope(attributes, scope, parentScope) {
+  const extendParentScope = (attributes, scope, parentScope) => {
     if (!attributes || !attributes.length) return parentScope
 
     const expressions = attributes.map((attr) => ({
@@ -1173,7 +1173,9 @@
       Object.create(parentScope || null),
       evaluateAttributeExpressions(expressions),
     )
-  }
+  };
+
+  const findSlotById = (id, slots) => slots?.find((slot) => slot.id === id);
 
   // this function is only meant to fix an edge case
   // https://github.com/riot/riot/issues/2842
@@ -1195,19 +1197,22 @@
     // API methods
     mount(scope, parentScope) {
       const templateData = scope.slots
-        ? scope.slots.find(({ id }) => id === this.name)
+        ? findSlotById(this.name, scope.slots)
         : false;
       const { parentNode } = this.node;
 
       // if the slot did not pass any content, we will use the self slot for optional fallback content (https://github.com/riot/riot/issues/3024)
       const realParent = templateData ? getRealParent(scope, parentScope) : scope;
 
-      this.templateData = templateData;
+      // if there is no html for the current slot detected we rely on the parent slots (https://github.com/riot/riot/issues/3055)
+      this.templateData = templateData?.html
+        ? templateData
+        : findSlotById(this.name, realParent.slots);
 
       // override the template property if the slot needs to be replaced
       this.template =
-        (templateData &&
-          create(templateData.html, templateData.bindings).createDOM(
+        (this.templateData &&
+          create(this.templateData.html, this.templateData.bindings).createDOM(
             parentNode,
           )) ||
         // otherwise use the optional template fallback if provided by the compiler see also https://github.com/riot/riot/issues/3014
@@ -2528,7 +2533,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v9.4.6';
+  const version = 'v9.4.7';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
