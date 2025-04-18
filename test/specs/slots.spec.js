@@ -11,6 +11,8 @@ import ParentWithSlotsComponent from '../components/parent-with-slots.riot'
 import SimpleSlot from '../components/simple-slot.riot'
 import TemplateSlot from '../components/template-slot.riot'
 import DefaultContentSlot from '../components/default-content-slot.riot'
+import Issue3055Parent from '../components/issue-3055-parent.riot'
+import Issue3055Combined from '../components/issue-3055-combined.riot'
 
 import { expect } from 'chai'
 
@@ -202,6 +204,31 @@ describe('slots', () => {
     expect(component.root.textContent.replace(/\s+/g, '')).to.be.equal(
       'One.Two.Three.Four.',
     )
+
+    component.unmount()
+  })
+
+  it('slots can be forwarded (https://github.com/riot/riot/issues/3055)', () => {
+    const element = document.createElement('issue-3055-parent')
+    const component = riot.component(Issue3055Parent)(element)
+
+    expect(component.root.querySelector('my-button').textContent).to.be.equal(
+      'Default Text',
+    )
+
+    component.unmount()
+  })
+
+  it('slots can be forwarded and overwritten (https://github.com/riot/riot/issues/3055)', () => {
+    const element = document.createElement('issue-3055-combined')
+    const component = riot.component(Issue3055Combined)(element)
+
+    const buttons = component.root.querySelectorAll('my-button')
+
+    expect(buttons[0].textContent).to.be.equal('Default Text')
+    expect(buttons[1].textContent).to.be.equal('Hello there')
+    expect(buttons[2].textContent).to.be.equal('foo')
+    expect(buttons[3].textContent).to.be.equal('bar')
 
     component.unmount()
   })

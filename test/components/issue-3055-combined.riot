@@ -1,0 +1,15 @@
+<issue-3055-conbined>
+  <simple-button></simple-button>
+  <overwrite-button></overwrite-button>
+  <simple-button>foo</simple-button>
+  <overwrite-button>bar</overwrite-button>
+
+  <script>
+    import SimpleButton from './issue-3055-parent.riot'
+    import OverwriteButton from './issue-3055-overwrite.riot'
+
+    export default {
+      components: { SimpleButton, OverwriteButton }
+    }
+  </script>
+</issue-3055-conbined>

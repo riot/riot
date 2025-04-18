@@ -1,0 +1,13 @@
+<issue-3055-overwrite>
+  <my-button style="display: inline-block; border: 5px solid orange">
+    <slot name="default" slot="default">Hello there</slot>
+  </my-button>
+
+  <script>
+    import MyButton from './issue-3055-child.riot'
+
+    export default {
+      components: { MyButton }
+    }
+  </script>
+</issue-3055-overwrite>
