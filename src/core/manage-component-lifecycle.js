@@ -1,5 +1,4 @@
 import {
-  ATTRIBUTES_KEY_SYMBOL,
   IS_COMPONENT_UPDATING,
   IS_PURE_SYMBOL,
   ON_BEFORE_MOUNT_KEY,
@@ -18,7 +17,7 @@ import {
   autobindMethods,
   defineProperties,
   defineProperty,
-  evaluateAttributeExpressions,
+  generatePropsFromAttributes,
   isFunction,
   isObject,
   pick,
@@ -29,7 +28,6 @@ import { addCssHook } from './add-css-hook.js'
 import { bindDOMNodeToComponentInstance } from './bind-dom-node-to-component-instance.js'
 import { computeComponentState } from './compute-component-state.js'
 import { computeInitialProps } from './compute-initial-props.js'
-import { createAttributeBindings } from './create-attribute-bindings.js'
 import { runPlugins } from './run-plugins.js'
 import { IS_DIRECTIVE } from '@riotjs/util/constants'
 import { getRootComputedAttributeNames } from '../utils/get-root-computed-attribute-names.js'
@@ -43,7 +41,7 @@ import { getRootComputedAttributeNames } from '../utils/get-root-computed-attrib
  */
 export function manageComponentLifecycle(
   component,
-  { slots, attributes, props },
+  { slots, attributes = [], props },
 ) {
   return autobindMethods(
     runPlugins(
@@ -54,19 +52,13 @@ export function manageComponentLifecycle(
             // any element mounted passing through this function can't be a pure component
             defineProperty(element, IS_PURE_SYMBOL, false)
             this[PARENT_KEY_SYMBOL] = parentScope
-            this[ATTRIBUTES_KEY_SYMBOL] = createAttributeBindings(
-              element,
-              attributes,
-            ).mount(parentScope)
 
             defineProperty(
               this,
               PROPS_KEY,
               Object.freeze({
                 ...computeInitialProps(element, props),
-                ...evaluateAttributeExpressions(
-                  this[ATTRIBUTES_KEY_SYMBOL].expressions,
-                ),
+                ...generatePropsFromAttributes(attributes, parentScope),
               }),
             )
 
@@ -94,7 +86,6 @@ export function manageComponentLifecycle(
           update(state = {}, parentScope) {
             if (parentScope) {
               this[PARENT_KEY_SYMBOL] = parentScope
-              this[ATTRIBUTES_KEY_SYMBOL].update(parentScope)
             }
 
             // get the attribute names that don't belong to the the props object
@@ -116,9 +107,7 @@ export function manageComponentLifecycle(
             // eslint-disable-next-line no-unused-vars
             const { [IS_DIRECTIVE]: _, ...newProps } = {
               ...domNodeAttributes,
-              ...evaluateAttributeExpressions(
-                this[ATTRIBUTES_KEY_SYMBOL].expressions,
-              ),
+              ...generatePropsFromAttributes(attributes, parentScope),
             }
             if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false)
               return
@@ -154,7 +143,6 @@ export function manageComponentLifecycle(
           },
           unmount(preserveRoot) {
             this[ON_BEFORE_UNMOUNT_KEY](this[PROPS_KEY], this[STATE_KEY])
-            this[ATTRIBUTES_KEY_SYMBOL].unmount()
             // if the preserveRoot is null the template html will be left untouched
             // in that case the DOM cleanup will happen differently from a parent node
             this[TEMPLATE_KEY_SYMBOL].unmount(
