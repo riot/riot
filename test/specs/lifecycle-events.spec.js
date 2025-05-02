@@ -273,6 +273,15 @@ describe('lifecycle events', () => {
       template: () =>
         template('<slot/>', [
           {
+            expressions: [
+              {
+                type: expressionTypes.ATTRIBUTE,
+                name: 'class',
+                evaluate: (scope) => scope.props.class,
+              },
+            ],
+          },
+          {
             type: bindingTypes.SLOT,
             selector: 'slot',
             name: 'default',
