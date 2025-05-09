@@ -107,6 +107,7 @@ export function manageComponentLifecycle(
             // eslint-disable-next-line no-unused-vars
             const { [IS_DIRECTIVE]: _, ...newProps } = {
               ...domNodeAttributes,
+              // TODO: figure out why the unit test fail without this condition
               ...(parentScope
                 ? generatePropsFromAttributes(attributes, parentScope)
                 : null),
