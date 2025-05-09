@@ -107,7 +107,9 @@ export function manageComponentLifecycle(
             // eslint-disable-next-line no-unused-vars
             const { [IS_DIRECTIVE]: _, ...newProps } = {
               ...domNodeAttributes,
-              ...generatePropsFromAttributes(attributes, parentScope),
+              ...(parentScope
+                ? generatePropsFromAttributes(attributes, parentScope)
+                : null),
             }
             if (this[SHOULD_UPDATE_KEY](newProps, this[PROPS_KEY]) === false)
               return
