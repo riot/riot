@@ -69,7 +69,7 @@
     "@riotjs/compiler": "^10.0.0-alpha.1",
     "@riotjs/prettier-config": "^1.1.0",
     "@riotjs/register": "^9.1.0",
-    "@riotjs/util": "^10.0.0-alpha.0",
+    "@riotjs/util": "^10.0.0-alpha.1",
     "@rollup/plugin-commonjs": "^28.0.3",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@testing-library/user-event": "^14.6.1",

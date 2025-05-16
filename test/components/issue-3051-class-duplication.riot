@@ -1,0 +1,16 @@
+<my-tag>
+  <div is={ state.view } class={state.view === 'view-one' ? 'view-one' : null}></div>
+
+  <script>
+    import ViewOne from './view-one.riot'
+    import ViewTwo from './view-two.riot'
+
+    export default {
+      components: { ViewOne, ViewTwo },
+      state: {
+        view: 'view-one'
+      }
+    }
+  </script>
+</my-tag>
+
