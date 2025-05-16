@@ -146,6 +146,10 @@ export function manageComponentLifecycle(
           },
           unmount(preserveRoot) {
             this[ON_BEFORE_UNMOUNT_KEY](this[PROPS_KEY], this[STATE_KEY])
+            if (preserveRoot)
+              this[ROOT_ATTRIBUTES_KEY_SYMBOL].forEach((attribute) =>
+                this[ROOT_KEY].removeAttribute(attribute),
+              )
             // if the preserveRoot is null the template html will be left untouched
             // in that case the DOM cleanup will happen differently from a parent node
             this[TEMPLATE_KEY_SYMBOL].unmount(
