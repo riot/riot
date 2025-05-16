@@ -1,6 +1,6 @@
 {
   "name": "riot",
-  "version": "9.4.7",
+  "version": "10.0.0-alpha.1",
   "description": "Simple and elegant component-based UI library",
   "license": "MIT",
   "engines": {
