@@ -1,4 +1,4 @@
-/* Riot v10.0.0-alpha.1, @license MIT */
+/* Riot v10.0.0-alpha.2, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2181,6 +2181,13 @@
             },
             unmount(preserveRoot) {
               this[ON_BEFORE_UNMOUNT_KEY](this[PROPS_KEY], this[STATE_KEY]);
+
+              // make sure that computed root attributes get removed if the root is preserved
+              // https://github.com/riot/riot/issues/3051
+              if (preserveRoot)
+                this[ROOT_ATTRIBUTES_KEY_SYMBOL].forEach((attribute) =>
+                  this[ROOT_KEY].removeAttribute(attribute),
+                );
               // if the preserveRoot is null the template html will be left untouched
               // in that case the DOM cleanup will happen differently from a parent node
               this[TEMPLATE_KEY_SYMBOL].unmount(
@@ -2492,7 +2499,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v10.0.0-alpha.1';
+  const version = 'v10.0.0-alpha.2';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
