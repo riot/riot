@@ -20,17 +20,18 @@ import {
   generatePropsFromAttributes,
   isFunction,
   isObject,
-  pick,
   DOMattributesToObject,
 } from '@riotjs/util'
-
+import { getRootComputedAttributeNames } from '../utils/get-root-computed-attribute-names.js'
 import { addCssHook } from './add-css-hook.js'
 import { bindDOMNodeToComponentInstance } from './bind-dom-node-to-component-instance.js'
 import { computeComponentState } from './compute-component-state.js'
 import { computeInitialProps } from './compute-initial-props.js'
 import { runPlugins } from './run-plugins.js'
-import { IS_DIRECTIVE } from '@riotjs/util/constants'
-import { getRootComputedAttributeNames } from '../utils/get-root-computed-attribute-names.js'
+import {
+  IS_DIRECTIVE,
+  ROOT_ATTRIBUTES_KEY_SYMBOL,
+} from '@riotjs/util/constants'
 
 /**
  * Component creation factory function that will enhance the user provided API
@@ -64,6 +65,11 @@ export function manageComponentLifecycle(
 
             this[STATE_KEY] = computeComponentState(this[STATE_KEY], state)
             this[TEMPLATE_KEY_SYMBOL] = this.template.createDOM(element).clone()
+            // get the attribute names that don't belong to the props object
+            // this will avoid recursive props rendering https://github.com/riot/riot/issues/2994
+            this[ROOT_ATTRIBUTES_KEY_SYMBOL] = getRootComputedAttributeNames(
+              this[TEMPLATE_KEY_SYMBOL],
+            )
 
             // link this object to the DOM node
             bindDOMNodeToComponentInstance(element, this)
@@ -88,15 +94,12 @@ export function manageComponentLifecycle(
               this[PARENT_KEY_SYMBOL] = parentScope
             }
 
-            // get the attribute names that don't belong to the the props object
-            // this will avoid recursive props rendering https://github.com/riot/riot/issues/2994
-            const computedAttributeNames = getRootComputedAttributeNames(
-              this[TEMPLATE_KEY_SYMBOL],
-            )
             // filter out the computed attributes from the root node
             const staticRootAttributes = Array.from(
               this[ROOT_KEY].attributes,
-            ).filter(({ name }) => !computedAttributeNames.includes(name))
+            ).filter(
+              ({ name }) => !this[ROOT_ATTRIBUTES_KEY_SYMBOL].includes(name),
+            )
 
             // evaluate the value of the static dom attributes
             const domNodeAttributes = DOMattributesToObject({
@@ -121,15 +124,12 @@ export function manageComponentLifecycle(
               Object.freeze({
                 // only root components will merge their initial props with the new ones
                 // children components will just get them overridden see also https://github.com/riot/riot/issues/2978
-                ...(parentScope
-                  ? pick(this[PROPS_KEY], computedAttributeNames)
-                  : this[PROPS_KEY]),
+                ...(parentScope ? null : this[PROPS_KEY]),
                 ...newProps,
               }),
             )
 
             this[STATE_KEY] = computeComponentState(this[STATE_KEY], state)
-
             this[ON_BEFORE_UPDATE_KEY](this[PROPS_KEY], this[STATE_KEY])
 
             // avoiding recursive updates
