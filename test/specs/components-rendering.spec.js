@@ -9,6 +9,7 @@ import MergeAttributes from '../components/merge-attributes.riot'
 import VirtualEach from '../components/virtual-each.riot'
 import SimpleRefAttribute from '../components/simple-ref-attribute.riot'
 import CustomTagRefAttribute from '../components/custom-tag-ref-attribute.riot'
+import Issue3051ClassDuplication from '../components/issue-3051-class-duplication.riot'
 
 import { expect } from 'chai'
 import { spy } from 'sinon'
@@ -76,6 +77,22 @@ describe('components rendering', () => {
     expect(element.getAttribute('class').trim()).to.be.equal(
       'btn custom dropdown',
     )
+
+    component.unmount()
+  })
+
+  it('the class attributes should be not be recursively applied in dynamic tags', () => {
+    const element = document.createElement('issue-3051-class-duplication')
+    const component = riot.component(Issue3051ClassDuplication)(element)
+    const view = element.querySelector('div')
+
+    expect(view.getAttribute('class').trim()).to.be.equal('view-one')
+
+    component.update({
+      view: 'view-two',
+    })
+
+    expect(view.getAttribute('class').trim()).to.be.equal('view-two')
 
     component.unmount()
   })
