@@ -146,6 +146,9 @@ export function manageComponentLifecycle(
           },
           unmount(preserveRoot) {
             this[ON_BEFORE_UNMOUNT_KEY](this[PROPS_KEY], this[STATE_KEY])
+
+            // make sure that computed root attributes get removed if the root is preserved
+            // https://github.com/riot/riot/issues/3051
             if (preserveRoot)
               this[ROOT_ATTRIBUTES_KEY_SYMBOL].forEach((attribute) =>
                 this[ROOT_KEY].removeAttribute(attribute),
