@@ -11,6 +11,7 @@ import SpreadAttribute from '../components/spread-attribute.riot'
 import StaticAttribute from '../components/static-attribute.riot'
 import TitleProps from '../components/title-prop.riot'
 import Issue2978Parent from '../components/issue-2978-parent.riot'
+import Issue3021BooleanAttribute from '../components/issue-3021-boolean-attribute.riot'
 
 import { expect } from 'chai'
 import { spy } from 'sinon'
@@ -120,6 +121,32 @@ describe('components state and props', () => {
 
     expect(a.getAttribute('href')).to.be.equal(component.href)
     expect(a.getAttribute('target')).to.be.equal(component.target)
+    component.unmount()
+  })
+
+  it('true boolean attributes on the root node get properly evaluated', () => {
+    const element = document.createElement('input')
+
+    const component = riot.component(Issue3021BooleanAttribute)(element, {
+      checked: 1,
+    })
+
+    expect(element.checked).to.be.equal(true)
+    expect(element.getAttribute('checked')).to.be.equal('checked')
+
+    component.unmount()
+  })
+
+  it('falsy boolean attributes on the root node get properly evaluated', () => {
+    const element = document.createElement('input')
+
+    const component = riot.component(Issue3021BooleanAttribute)(element, {
+      checked: undefined,
+    })
+
+    expect(element.checked).to.be.equal(false)
+    expect(element.getAttribute('checked')).to.be.equal(null)
+
     component.unmount()
   })
 
