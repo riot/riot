@@ -1,4 +1,4 @@
-/* Riot v10.0.0-alpha.2, @license MIT */
+/* Riot v10.0.0-alpha.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -13325,15 +13325,6 @@
   }
 
   /**
-   * True if the node parsed is the absolute root node (nested root nodes are not considered)
-   * @param   {RiotParser.Node} node - riot parser node
-   * @returns {boolean} true only for the root nodes
-   */
-  function isAbsoluteRootNode(node) {
-    return node.isRoot && !node.isNestedRoot
-  }
-
-  /**
    * True if the attribute parsed is of type spread one
    * @param   {RiotParser.Node} node - riot parser node
    * @returns {boolean} true if the attribute node is of type spread
@@ -13535,14 +13526,12 @@
   /**
    * Create a simple attribute expression
    * @param   {RiotParser.Node.Attr} sourceNode - the custom tag
-   * @param   {RiotParser.Node} parentNode - the html node that has received the attribute expression
    * @param   {string} sourceFile - source file path
    * @param   {string} sourceCode - original source
    * @returns {AST.Node} object containing the expression binding keys
    */
   function createAttributeExpression(
     sourceNode,
-    parentNode,
     sourceFile,
     sourceCode,
   ) {
@@ -13559,16 +13548,7 @@
       ),
       simplePropertyNode(
         BINDING_IS_BOOLEAN_ATTRIBUTE,
-        builders.literal(
-          // the hidden attribute is always a boolean and can be applied to any DOM node
-          sourceNode.name === 'hidden' ||
-            // Custom nodes can't handle boolean attrs
-            // Riot.js will handle the bool attrs logic only on native html tags
-            (!parentNode[IS_CUSTOM_NODE] &&
-              !isAbsoluteRootNode(parentNode) &&
-              !isSpread &&
-              !!sourceNode[IS_BOOLEAN_ATTRIBUTE]),
-        ),
+        builders.literal(!isSpread && !!sourceNode[IS_BOOLEAN_ATTRIBUTE]),
       ),
       simplePropertyNode(
         BINDING_NAME_KEY,
@@ -14728,7 +14708,7 @@
       case isEventAttribute(sourceNode):
         return createEventExpression(sourceNode, sourceFile, sourceCode)
       default:
-        return createAttributeExpression(sourceNode, parentNode, sourceFile, sourceCode)
+        return createAttributeExpression(sourceNode, sourceFile, sourceCode)
     }
   }
 
@@ -24199,13 +24179,14 @@
    * Check whether the attribute should be removed
    * @param {*} value - expression value
    * @param   {boolean} isBoolean - flag to handle boolean attributes
-   * @returns {boolean} boolean - true if the attribute can be removed}
+   * @returns {boolean} boolean - true if the attribute can be removed
    */
   function shouldRemoveAttribute(value, isBoolean) {
     // boolean attributes should be removed if the value is falsy
-    if (isBoolean) return !value && value !== 0
-    // otherwise we can try to render it
-    return typeof value === 'undefined' || value === null
+    if (isBoolean) return !value
+
+    // null and undefined values will remove the attribute as well
+    return isNil(value)
   }
 
   /**
@@ -24261,7 +24242,7 @@
   function normalizeValue(name, value, isBoolean) {
     // be sure that expressions like selected={ true } will always be rendered as selected='selected'
     // fix https://github.com/riot/riot/issues/2975
-    return value === true && isBoolean ? name : value
+    return !!value && isBoolean ? name : value
   }
 
   const RE_EVENTS_PREFIX = /^on/;
@@ -25733,7 +25714,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v10.0.0-alpha.2';
+  const version = 'v10.0.0-alpha.3';
 
   // expose some internal stuff that might be used from external tools
   const __ = {

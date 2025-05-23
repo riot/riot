@@ -1,4 +1,4 @@
-/* Riot v10.0.0-alpha.2, @license MIT */
+/* Riot v10.0.0-alpha.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -895,13 +895,14 @@
    * Check whether the attribute should be removed
    * @param {*} value - expression value
    * @param   {boolean} isBoolean - flag to handle boolean attributes
-   * @returns {boolean} boolean - true if the attribute can be removed}
+   * @returns {boolean} boolean - true if the attribute can be removed
    */
   function shouldRemoveAttribute(value, isBoolean) {
     // boolean attributes should be removed if the value is falsy
-    if (isBoolean) return !value && value !== 0
-    // otherwise we can try to render it
-    return typeof value === 'undefined' || value === null
+    if (isBoolean) return !value
+
+    // null and undefined values will remove the attribute as well
+    return isNil(value)
   }
 
   /**
@@ -957,7 +958,7 @@
   function normalizeValue(name, value, isBoolean) {
     // be sure that expressions like selected={ true } will always be rendered as selected='selected'
     // fix https://github.com/riot/riot/issues/2975
-    return value === true && isBoolean ? name : value
+    return !!value && isBoolean ? name : value
   }
 
   const RE_EVENTS_PREFIX = /^on/;
@@ -2496,7 +2497,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v10.0.0-alpha.2';
+  const version = 'v10.0.0-alpha.3';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
