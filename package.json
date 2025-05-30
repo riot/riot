@@ -66,10 +66,10 @@
     "@riotjs/dom-bindings": "^9.2.8"
   },
   "devDependencies": {
-    "@riotjs/compiler": "^9.4.8",
+    "@riotjs/compiler": "^9.4.9",
     "@riotjs/prettier-config": "^1.1.0",
     "@riotjs/register": "^9.1.0",
-    "@riotjs/util": "^2.5.0",
+    "@riotjs/util": "^2.5.1",
     "@rollup/plugin-commonjs": "^28.0.3",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@testing-library/user-event": "^14.6.1",

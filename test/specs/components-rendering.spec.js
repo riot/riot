@@ -8,6 +8,7 @@ import Issue3003Parent from '../components/issue-3003-parent.riot'
 import MergeAttributes from '../components/merge-attributes.riot'
 import VirtualEach from '../components/virtual-each.riot'
 import SimpleRefAttribute from '../components/simple-ref-attribute.riot'
+import CustomTagRefAttribute from '../components/custom-tag-ref-attribute.riot'
 
 import { expect } from 'chai'
 import { spy } from 'sinon'
@@ -134,6 +135,24 @@ describe('components rendering', () => {
     const component = riot.component(SimpleRefAttribute)(element)
 
     expect(ref).to.have.been.calledWith(component.$('p'))
+
+    component.update()
+
+    expect(ref).to.have.been.calledOnce
+
+    component.unmount()
+
+    expect(ref).to.have.been.calledWith(null)
+  })
+
+  it('ref attributes on child components properly handled (https://github.com/riot/riot/issues/3060)', () => {
+    const element = document.createElement('custom-tag-ref-attribute')
+    const ref = spy()
+    // Override the original ref method
+    CustomTagRefAttribute.exports.ref = ref
+    const component = riot.component(CustomTagRefAttribute)(element)
+
+    expect(ref).to.have.been.calledWith(component.$('child'))
 
     component.update()
 
