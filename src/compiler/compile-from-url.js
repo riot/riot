@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved
 import * as compiler from '@riotjs/compiler/essential'
 
 export async function compileFromUrl(url, options) {

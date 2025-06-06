@@ -35,9 +35,11 @@ import {
 
 /**
  * Component creation factory function that will enhance the user provided API
- * @param   {Object} component - a component implementation previously defined
+ * @param   {object} component - a component implementation previously defined
+ * @param   {object} options - component options
  * @param   {Array} options.slots - component slots generated via riot compiler
  * @param   {Array} options.attributes - attribute expressions generated via riot compiler
+ * @param   {object} options.props - component initial props
  * @returns {Riot.Component} a riot component instance
  */
 export function manageComponentLifecycle(

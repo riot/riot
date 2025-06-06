@@ -1,5 +1,6 @@
 import { bindingTypes, expressionTypes, template } from '@riotjs/dom-bindings'
 import { COMPONENTS_IMPLEMENTATION_MAP } from '@riotjs/util'
+// eslint-disable-next-line import/no-unresolved
 import { generateSlotsFromString } from '@riotjs/compiler/essential'
 
 /**

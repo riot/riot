@@ -33,7 +33,7 @@ export default {
    * Save a tag style to be later injected into DOM
    * @param { string } name - if it's passed we will map the css to a tagname
    * @param { string } css - css string
-   * @returns {Object} self
+   * @returns {object} self
    */
   add(name, css) {
     if (!CSS_BY_NAME.has(name)) {
@@ -46,7 +46,7 @@ export default {
   /**
    * Inject all previously saved tag styles into DOM
    * innerHTML seems slow: http://jsperf.com/riot-insert-style
-   * @returns {Object} self
+   * @returns {object} self
    */
   inject() {
     getStyleNode().innerHTML = [...CSS_BY_NAME.values()].join('\n')
@@ -56,7 +56,7 @@ export default {
   /**
    * Remove a tag style from the DOM
    * @param {string} name a registered tagname
-   * @returns {Object} self
+   * @returns {object} self
    */
   remove(name) {
     if (CSS_BY_NAME.has(name)) {

@@ -12,12 +12,13 @@ import { createCoreAPIMethods } from './create-core-api-methods.js'
 /**
  * Create a pure component
  * @param   {Function} pureFactoryFunction - pure component factory function
+ * @param   {object} options - pure component options
+ * @param   {string} options.css - pure component can't have css
  * @param   {Array} options.slots - component slots
  * @param   {Array} options.attributes - component attributes
  * @param   {Array} options.template - template factory function
- * @param   {Array} options.template - template factory function
  * @param   {any} options.props - initial component properties
- * @returns {Object} pure component object
+ * @returns {object} pure component object
  */
 export function createPureComponent(
   pureFactoryFunction,
