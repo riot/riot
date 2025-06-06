@@ -5,7 +5,7 @@ import { mountComponent } from '../core/mount-component.js'
 /**
  * Mounting function that will work only for the components that were globally registered
  * @param   {string|HTMLElement} selector - query for the selection or a DOM element
- * @param   {Object} initialProps - the initial component properties
+ * @param   {object} initialProps - the initial component properties
  * @param   {string} name - optional component name
  * @returns {Array} list of riot components
  */
