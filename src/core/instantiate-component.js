@@ -14,9 +14,12 @@ import { manageComponentLifecycle } from './manage-component-lifecycle.js'
 
 /**
  * Component definition function
- * @param   {Object} implementation - the component implementation will be generated via compiler
- * @param   {Object} component - the component initial properties
- * @returns {Object} a new component implementation object
+ * @param  {object} component - the component initial properties
+ * @param  {string}  component.css - component css string
+ * @param  {TemplateChunk} component.template - component template rendering
+ * @param  {object} component.componentAPI - component export default value
+ * @param  {string} component.name - component name
+ * @returns {object} a new component implementation object
  */
 export function instantiateComponent({ css, template, componentAPI, name }) {
   // add the component css into the DOM

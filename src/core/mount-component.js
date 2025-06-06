@@ -4,10 +4,10 @@ import { getName } from '../utils/dom.js'
 /**
  * Component initialization function starting from a DOM node
  * @param   {HTMLElement} element - element to upgrade
- * @param   {Object} initialProps - initial component properties
+ * @param   {object} initialProps - initial component properties
  * @param   {string} componentName - component id
  * @param   {Array} slots - component slots
- * @returns {Object} a new component instance bound to a DOM node
+ * @returns {object} a new component instance bound to a DOM node
  */
 export function mountComponent(element, initialProps, componentName, slots) {
   const name = componentName || getName(element)

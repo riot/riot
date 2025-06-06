@@ -11,8 +11,8 @@ import { createPureComponent } from './create-pure-component.js'
 import { instantiateComponent } from './instantiate-component.js'
 /**
  * Create the subcomponents that can be included inside a tag in runtime
- * @param   {Object} components - components imported in runtime
- * @returns {Object} all the components transformed into Riot.Component factory functions
+ * @param   {object} components - components imported in runtime
+ * @returns {object} all the components transformed into Riot.Component factory functions
  */
 function createChildrenComponentsObject(components = {}) {
   return Object.entries(callOrAssign(components)).reduce(
@@ -46,7 +46,7 @@ const createChildComponentGetter = (componentWrapper) => {
 /**
  * Performance optimization for the recursive components
  * @param  {RiotComponentWrapper} componentWrapper - riot compiler generated object
- * @returns {Object} component like interface
+ * @returns {object} component like interface
  */
 const memoizedCreateComponentFromWrapper = memoize(createComponentFromWrapper)
 
@@ -55,9 +55,9 @@ const memoizedCreateComponentFromWrapper = memoize(createComponentFromWrapper)
  * @param   {RiotComponentWrapper} componentWrapper - riot compiler generated object
  * @param   {string} componentWrapper.css - component css
  * @param   {Function} componentWrapper.template - function that will return the dom-bindings template function
- * @param   {Object} componentWrapper.exports - component interface
+ * @param   {object} componentWrapper.exports - component interface
  * @param   {string} componentWrapper.name - component name
- * @returns {Object} component like interface
+ * @returns {object} component like interface
  */
 export function createComponentFromWrapper(componentWrapper) {
   const { css, template, exports, name } = componentWrapper
