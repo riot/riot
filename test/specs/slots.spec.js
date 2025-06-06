@@ -165,7 +165,7 @@ describe('slots', () => {
       expect(node.innerHTML).to.be.equal(String(index))
     })
 
-    component.state.people.reverse() // eslint-disable-line
+    component.state.people.reverse()
     component.update()
 
     const bTagsAfter = component.$$('b')
