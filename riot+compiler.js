@@ -1,9 +1,38 @@
-/* Riot v10.0.0-beta.1, @license MIT */
+/* Riot v10.0.0-rc.1, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.riot = {}));
 })(this, (function (exports) { 'use strict';
+
+  // Riot.js constants that can be used across more modules
+
+  const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
+    DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
+    PLUGINS_SET = new Set(),
+    IS_DIRECTIVE = 'is',
+    VALUE_ATTRIBUTE = 'value',
+    REF_ATTRIBUTE = 'ref',
+    EVENT_ATTRIBUTE_RE = /^on/,
+    MOUNT_METHOD_KEY = 'mount',
+    UPDATE_METHOD_KEY = 'update',
+    UNMOUNT_METHOD_KEY = 'unmount',
+    SHOULD_UPDATE_KEY = 'shouldUpdate',
+    ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
+    ON_MOUNTED_KEY = 'onMounted',
+    ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
+    ON_UPDATED_KEY = 'onUpdated',
+    ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
+    ON_UNMOUNTED_KEY = 'onUnmounted',
+    PROPS_KEY = 'props',
+    STATE_KEY = 'state',
+    SLOTS_KEY = 'slots',
+    ROOT_KEY = 'root',
+    IS_PURE_SYMBOL = Symbol('pure'),
+    IS_COMPONENT_UPDATING = Symbol('is_updating'),
+    PARENT_KEY_SYMBOL = Symbol('parent'),
+    TEMPLATE_KEY_SYMBOL = Symbol('template'),
+    ROOT_ATTRIBUTES_KEY_SYMBOL = Symbol('root-attributes');
 
   /**
    * Quick type checking
@@ -11,14 +40,55 @@
    * @param   {string} type - type definition
    * @returns {boolean} true if the type corresponds
    */
+  function checkType(element, type) {
+    return typeof element === type
+  }
+
+  /**
+   * Check if an element is part of an svg
+   * @param   {HTMLElement}  el - element to check
+   * @returns {boolean} true if we are in an svg context
+   */
+  function isSvg(el) {
+    const owner = el.ownerSVGElement;
+
+    return !!owner || owner === null
+  }
+
+  /**
+   * Check if an element is a template tag
+   * @param   {HTMLElement}  el - element to check
+   * @returns {boolean} true if it's a <template>
+   */
+  function isTemplate(el) {
+    return el.tagName.toLowerCase() === 'template'
+  }
+
+  /**
+   * Check that will be passed if its argument is a function
+   * @param   {*} value - value to check
+   * @returns {boolean} - true if the value is a function
+   */
+  function isFunction(value) {
+    return checkType(value, 'function')
+  }
+
+  /**
+   * Check if a value is a Boolean
+   * @param   {*}  value - anything
+   * @returns {boolean} true only for the value is a boolean
+   */
+  function isBoolean(value) {
+    return checkType(value, 'boolean')
+  }
 
   /**
    * Check if a value is an Object
    * @param   {*}  value - anything
    * @returns {boolean} true only for the value is an object
    */
-  function isObject$1(value) {
-    return !isNil$1(value) && value.constructor === Object
+  function isObject(value) {
+    return !isNil(value) && value.constructor === Object
   }
 
   /**
@@ -26,7 +96,7 @@
    * @param   {*}  value - anything
    * @returns {boolean} true only for the 'undefined' and 'null' types
    */
-  function isNil$1(value) {
+  function isNil(value) {
     return value === null || value === undefined
   }
 
@@ -39,12 +109,53 @@
   }
 
   /**
+   * Check if an attribute is a DOM handler
+   * @param   {string} attribute - attribute string
+   * @returns {boolean} true only for dom listener attribute nodes
+   */
+  function isEventAttribute$1(attribute) {
+    return EVENT_ATTRIBUTE_RE.test(attribute)
+  }
+
+  const ATTRIBUTE = 0;
+  const EVENT = 1;
+  const TEXT$1 = 2;
+  const VALUE = 3;
+  const REF = 4;
+
+  const expressionTypes = {
+    ATTRIBUTE,
+    EVENT,
+    TEXT: TEXT$1,
+    VALUE,
+    REF,
+  };
+
+  /**
+   * Convert a string from camel case to dash-case
+   * @param   {string} string - probably a component tag name
+   * @returns {string} component name normalized
+   */
+  function camelToDashCase(string) {
+    return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
+  }
+
+  /**
+   * Convert a string containing dashes to camel case
+   * @param   {string} string - input string
+   * @returns {string} my-string -> myString
+   */
+  function dashToCamelCase(string) {
+    return string.replace(/-(\w)/g, (_, c) => c.toUpperCase())
+  }
+
+  /**
    * Throw an error with a descriptive message
    * @param   { string } message - error message
    * @param   { string } cause - optional error cause object
    * @returns { undefined } hoppla... at this point the program should stop working
    */
-  function panic$2(message, cause) {
+  function panic$1(message, cause) {
     throw new Error(message, { cause })
   }
   /**
@@ -71,32 +182,31 @@
    * @returns {Object} key value pairs with the result of the computation
    */
   function generatePropsFromAttributes(attributes, scope) {
-    return (
-      attributes
-        // filter out the ref attributes
-        .filter(({ type }) => type !== REF)
-        .reduce((acc, { type, name, evaluate }) => {
-          const value = evaluate(scope);
+    return attributes.reduce((acc, { type, name, evaluate }) => {
+      const value = evaluate(scope);
 
-          switch (true) {
-            // spread attribute
-            case !name && type === ATTRIBUTE:
-              return {
-                ...acc,
-                ...value,
-              }
-            // value attribute
-            case type === VALUE:
-              acc.value = value;
-              break
-            // normal attributes
-            default:
-              acc[dashToCamelCase(name)] = value;
+      switch (true) {
+        // spread attribute
+        case !name && type === ATTRIBUTE:
+          return {
+            ...acc,
+            ...value,
           }
+        // ref attribute
+        case type === REF:
+          acc.ref = value;
+          break
+        // value attribute
+        case type === VALUE:
+          acc.value = value;
+          break
+        // normal attributes
+        default:
+          acc[dashToCamelCase(name)] = value;
+      }
 
-          return acc
-        }, {})
-    )
+      return acc
+    }, {})
   }
 
   const EACH = 0;
@@ -112,32 +222,6 @@
     TAG: TAG$1,
     SLOT,
   };
-
-  // Riot.js constants that can be used across more modules
-
-  const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
-    DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
-    PLUGINS_SET = new Set(),
-    IS_DIRECTIVE$1 = 'is',
-    MOUNT_METHOD_KEY = 'mount',
-    UPDATE_METHOD_KEY = 'update',
-    UNMOUNT_METHOD_KEY = 'unmount',
-    SHOULD_UPDATE_KEY = 'shouldUpdate',
-    ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
-    ON_MOUNTED_KEY = 'onMounted',
-    ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
-    ON_UPDATED_KEY = 'onUpdated',
-    ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
-    ON_UNMOUNTED_KEY = 'onUnmounted',
-    PROPS_KEY = 'props',
-    STATE_KEY = 'state',
-    SLOTS_KEY = 'slots',
-    ROOT_KEY = 'root',
-    IS_PURE_SYMBOL = Symbol('pure'),
-    IS_COMPONENT_UPDATING = Symbol('is_updating'),
-    PARENT_KEY_SYMBOL = Symbol('parent'),
-    TEMPLATE_KEY_SYMBOL = Symbol('template'),
-    ROOT_ATTRIBUTES_KEY_SYMBOL = Symbol('root-attributes');
 
   /**
    * Get all the element attributes as object
@@ -345,9 +429,9 @@
    * @enum {number}
    * @readonly
    */
-  const TAG$1 = 1; /* TAG */
+  const TAG = 1; /* TAG */
   const ATTR = 2; /* ATTR */
-  const TEXT$1 = 3; /* TEXT */
+  const TEXT = 3; /* TEXT */
   const CDATA = 4; /* CDATA */
   const COMMENT = 8; /* COMMENT */
   const DOCUMENT = 9; /* DOCUMENT */
@@ -362,8 +446,8 @@
     DOCTYPE: DOCTYPE,
     DOCUMENT: DOCUMENT,
     DOCUMENT_FRAGMENT: DOCUMENT_FRAGMENT,
-    TAG: TAG$1,
-    TEXT: TEXT$1
+    TAG: TAG,
+    TEXT: TEXT
   });
 
   const rootTagNotFound = 'Root tag not found.';
@@ -504,7 +588,7 @@
    * @param {number} pos - Position of the error
    * @returns {undefined} throw an exception error
    */
-  function panic$1(data, msg, pos) {
+  function panic(data, msg, pos) {
     const message = formatError(data, msg, pos);
     throw new Error(message)
   }
@@ -697,7 +781,7 @@
       case ']':
       case '}':
         if (char !== stack.pop()) {
-          panic$1(code, unexpectedCharInExpression.replace('%1', char), index);
+          panic(code, unexpectedCharInExpression.replace('%1', char), index);
         }
 
         if (char === '}' && stack[stack.length - 1] === $_ES6_BQ) {
@@ -758,7 +842,7 @@
     }
 
     if (stack.length) {
-      panic$1(code, unclosedExpression, end);
+      panic(code, unclosedExpression, end);
     }
   }
 
@@ -809,12 +893,12 @@
     let q = state.last;
     state.pos = end;
 
-    if (q && q.type === TEXT$1) {
+    if (q && q.type === TEXT) {
       q.text += text;
       q.end = end;
     } else {
       flush(state);
-      state.last = q = { type: TEXT$1, text, start, end };
+      state.last = q = { type: TEXT, text, start, end };
     }
 
     if (expressions && expressions.length) {
@@ -825,7 +909,7 @@
       q.unescape = unescape;
     }
 
-    return TEXT$1
+    return TEXT
   }
 
   /**
@@ -890,7 +974,7 @@
 
     // Even for text, the parser needs match a closing char
     if (!match) {
-      panic$1(data, unexpectedEndOfFile, pos);
+      panic(data, unexpectedEndOfFile, pos);
     }
 
     return {
@@ -1332,7 +1416,7 @@
    * @param   {Function} fn - function to memoize
    * @returns {*} return of the function to memoize
    */
-  function memoize$1(fn) {
+  function memoize(fn) {
     const cache = new WeakMap();
 
     return (...args) => {
@@ -1346,7 +1430,7 @@
     }
   }
 
-  const expressionsContentRe = memoize$1((brackets) =>
+  const expressionsContentRe = memoize((brackets) =>
     RegExp(`(${brackets[0]}[^${brackets[1]}]*?${brackets[1]})`, 'g'),
   );
   const isSpreadAttribute$1 = (name) => SPREAD_OPERATOR.test(name);
@@ -1383,7 +1467,7 @@
             state.count--; // "pop" root tag
           }
         }
-        return TEXT$1
+        return TEXT
       case ch[0] === '/':
         state.pos = _CH.lastIndex; // maybe. delegate the validation
         tag[IS_SELF_CLOSING] = true; // the next loop
@@ -1563,7 +1647,7 @@
     const end = data.indexOf(str, pos);
 
     if (end < 0) {
-      panic$1(data, unclosedComment, start);
+      panic(data, unclosedComment, start);
     }
 
     pushComment(
@@ -1573,7 +1657,7 @@
       data.substring(start, end + str.length),
     );
 
-    return TEXT$1
+    return TEXT
   }
 
   /**
@@ -1612,7 +1696,7 @@
    */
   function pushTag(state, name, start, end) {
     const root = state.root;
-    const last = { type: TAG$1, name, start, end };
+    const last = { type: TAG, name, start, end };
 
     if (isCustom(name)) {
       last[IS_CUSTOM] = true;
@@ -1680,7 +1764,7 @@
       return ATTR
     }
 
-    return TEXT$1
+    return TEXT
   }
 
   /**
@@ -1701,7 +1785,7 @@
         const match = execFromPos(re, pos, data);
 
         if (!match) {
-          panic$1(data, unclosedNamedBlock.replace('%1', name), pos - 1);
+          panic(data, unclosedNamedBlock.replace('%1', name), pos - 1);
         }
 
         const start = match.index;
@@ -1712,7 +1796,7 @@
           parseSpecialTagsContent(state, name, match);
         } else if (name !== TEXTAREA_TAG) {
           state.last.text = {
-            type: TEXT$1,
+            type: TEXT,
             text: '',
             start: pos,
             end: pos,
@@ -1724,12 +1808,12 @@
       }
       case data[pos] === '<':
         state.pos++;
-        return TAG$1
+        return TAG
       default:
         expr(state, null, '<', pos);
     }
 
-    return TEXT$1
+    return TEXT
   }
 
   /**
@@ -1825,10 +1909,10 @@
         case COMMENT:
           this.pushComment(store, node);
           break
-        case TEXT$1:
+        case TEXT:
           this.pushText(store, node);
           break
-        case TAG$1: {
+        case TAG: {
           const name = node.name;
           const closingTagChar = '/';
           const [firstChar] = name;
@@ -1871,7 +1955,7 @@
       if (isCoreTag) {
         // Only accept one of each
         if (store[name]) {
-          panic$1(
+          panic(
             this.store.data,
             duplicatedNamedTag.replace('%1', name),
             node.start,
@@ -1975,7 +2059,7 @@
 
   function createTreeBuilder(data, options) {
     const root = {
-      type: TAG$1,
+      type: TAG,
       name: '',
       start: 0,
       end: 0,
@@ -2059,7 +2143,7 @@
     flush(state);
 
     if (state.count) {
-      panic$1(
+      panic(
         data,
         state.count > 0 ? unexpectedEndOfFile : rootTagNotFound,
         state.pos,
@@ -2099,7 +2183,7 @@
    */
   function eat(state, type) {
     switch (type) {
-      case TAG$1:
+      case TAG:
         return tag(state)
       case ATTR:
         return attr(state)
@@ -2162,10 +2246,7 @@
   const EACH_DIRECTIVE = 'each';
   const KEY_ATTRIBUTE = 'key';
   const SLOT_ATTRIBUTE = 'slot';
-  const VALUE_ATTRIBUTE = 'value';
-  const REF_ATTRIBUTE = 'ref';
   const NAME_ATTRIBUTE = 'name';
-  const IS_DIRECTIVE$1 = 'is';
 
   // Misc
   const DEFAULT_SLOT_NAME = 'default';
@@ -2191,7 +2272,11 @@
     var f = n.default;
   	if (typeof f == "function") {
   		var a = function a () {
-  			if (this instanceof a) {
+  			var isInstance = false;
+        try {
+          isInstance = this instanceof a;
+        } catch {}
+  			if (isInstance) {
           return Reflect.construct(f, arguments, this.constructor);
   			}
   			return f.apply(this, arguments);
@@ -7655,12 +7740,12 @@
 
   // mock the sourcemaps api for the browser bundle
   // we do not need sourcemaps with the in browser compilation
-  const noop$1 = function () {};
+  const noop = function () {};
 
   const SourceMapGenerator = function () {
     return {
-      addMapping: noop$1,
-      setSourceContent: noop$1,
+      addMapping: noop,
+      setSourceContent: noop,
       toJSON: () => ({}),
     }
   };
@@ -13152,7 +13237,7 @@
   function isRemovableNode(node) {
     return (
       isTemplateNode(node) &&
-      !isNil$1(findAttribute(SLOT_ATTRIBUTE, node)) &&
+      !isNil(findAttribute(SLOT_ATTRIBUTE, node)) &&
       !hasEachAttribute(node) &&
       !hasIfAttribute(node)
     )
@@ -13307,8 +13392,7 @@
    * @returns {boolean} true only for dom listener attribute nodes
    */
   const isEventAttribute = (() => {
-    const EVENT_ATTR_RE = /^on/;
-    return (node) => EVENT_ATTR_RE.test(node.name)
+    return (node) => isEventAttribute$1(node.name)
   })();
 
   /**
@@ -13378,7 +13462,7 @@
   }
 
   function findIsAttribute(node) {
-    return findAttribute(IS_DIRECTIVE$1, node)
+    return findAttribute(IS_DIRECTIVE, node)
   }
 
   /**
@@ -15553,6 +15637,49 @@
   		       !(isIdentifierChar(after = this.input.charCodeAt(next + 8)) || after > 0xd7ff && after < 0xdc00))
   		  };
 
+  		  pp$8.isUsingKeyword = function(isAwaitUsing, isFor) {
+  		    if (this.options.ecmaVersion < 17 || !this.isContextual(isAwaitUsing ? "await" : "using"))
+  		      { return false }
+
+  		    skipWhiteSpace.lastIndex = this.pos;
+  		    var skip = skipWhiteSpace.exec(this.input);
+  		    var next = this.pos + skip[0].length;
+
+  		    if (lineBreak.test(this.input.slice(this.pos, next))) { return false }
+
+  		    if (isAwaitUsing) {
+  		      var awaitEndPos = next + 5 /* await */, after;
+  		      if (this.input.slice(next, awaitEndPos) !== "using" ||
+  		        awaitEndPos === this.input.length ||
+  		        isIdentifierChar(after = this.input.charCodeAt(awaitEndPos)) ||
+  		        (after > 0xd7ff && after < 0xdc00)
+  		      ) { return false }
+
+  		      skipWhiteSpace.lastIndex = awaitEndPos;
+  		      var skipAfterUsing = skipWhiteSpace.exec(this.input);
+  		      if (skipAfterUsing && lineBreak.test(this.input.slice(awaitEndPos, awaitEndPos + skipAfterUsing[0].length))) { return false }
+  		    }
+
+  		    if (isFor) {
+  		      var ofEndPos = next + 2 /* of */, after$1;
+  		      if (this.input.slice(next, ofEndPos) === "of") {
+  		        if (ofEndPos === this.input.length ||
+  		          (!isIdentifierChar(after$1 = this.input.charCodeAt(ofEndPos)) && !(after$1 > 0xd7ff && after$1 < 0xdc00))) { return false }
+  		      }
+  		    }
+
+  		    var ch = this.input.charCodeAt(next);
+  		    return isIdentifierStart(ch, true) || ch === 92 // '\'
+  		  };
+
+  		  pp$8.isAwaitUsing = function(isFor) {
+  		    return this.isUsingKeyword(true, isFor)
+  		  };
+
+  		  pp$8.isUsing = function(isFor) {
+  		    return this.isUsingKeyword(false, isFor)
+  		  };
+
   		  // Parse a single statement.
   		  //
   		  // If expecting a statement and finding a slash operator, parse a
@@ -15627,6 +15754,23 @@
   		        if (context) { this.unexpected(); }
   		        this.next();
   		        return this.parseFunctionStatement(node, true, !context)
+  		      }
+
+  		      var usingKind = this.isAwaitUsing(false) ? "await using" : this.isUsing(false) ? "using" : null;
+  		      if (usingKind) {
+  		        if (topLevel && this.options.sourceType === "script") {
+  		          this.raise(this.start, "Using declaration cannot appear in the top level when source type is `script`");
+  		        }
+  		        if (usingKind === "await using") {
+  		          if (!this.canAwait) {
+  		            this.raise(this.start, "Await using cannot appear outside of async function");
+  		          }
+  		          this.next();
+  		        }
+  		        this.next();
+  		        this.parseVar(node, false, usingKind);
+  		        this.semicolon();
+  		        return this.finishNode(node, "VariableDeclaration")
   		      }
 
   		      var maybeName = this.value, expr = this.parseExpression();
@@ -15704,18 +15848,19 @@
   		      this.next();
   		      this.parseVar(init$1, true, kind);
   		      this.finishNode(init$1, "VariableDeclaration");
-  		      if ((this.type === types$1._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))) && init$1.declarations.length === 1) {
-  		        if (this.options.ecmaVersion >= 9) {
-  		          if (this.type === types$1._in) {
-  		            if (awaitAt > -1) { this.unexpected(awaitAt); }
-  		          } else { node.await = awaitAt > -1; }
-  		        }
-  		        return this.parseForIn(node, init$1)
-  		      }
-  		      if (awaitAt > -1) { this.unexpected(awaitAt); }
-  		      return this.parseFor(node, init$1)
+  		      return this.parseForAfterInit(node, init$1, awaitAt)
   		    }
   		    var startsWithLet = this.isContextual("let"), isForOf = false;
+
+  		    var usingKind = this.isUsing(true) ? "using" : this.isAwaitUsing(true) ? "await using" : null;
+  		    if (usingKind) {
+  		      var init$2 = this.startNode();
+  		      this.next();
+  		      if (usingKind === "await using") { this.next(); }
+  		      this.parseVar(init$2, true, usingKind);
+  		      this.finishNode(init$2, "VariableDeclaration");
+  		      return this.parseForAfterInit(node, init$2, awaitAt)
+  		    }
   		    var containsEsc = this.containsEsc;
   		    var refDestructuringErrors = new DestructuringErrors;
   		    var initPos = this.start;
@@ -15736,6 +15881,20 @@
   		      return this.parseForIn(node, init)
   		    } else {
   		      this.checkExpressionErrors(refDestructuringErrors, true);
+  		    }
+  		    if (awaitAt > -1) { this.unexpected(awaitAt); }
+  		    return this.parseFor(node, init)
+  		  };
+
+  		  // Helper method to parse for loop after variable initialization
+  		  pp$8.parseForAfterInit = function(node, init, awaitAt) {
+  		    if ((this.type === types$1._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))) && init.declarations.length === 1) {
+  		      if (this.options.ecmaVersion >= 9) {
+  		        if (this.type === types$1._in) {
+  		          if (awaitAt > -1) { this.unexpected(awaitAt); }
+  		        } else { node.await = awaitAt > -1; }
+  		      }
+  		      return this.parseForIn(node, init)
   		    }
   		    if (awaitAt > -1) { this.unexpected(awaitAt); }
   		    return this.parseFor(node, init)
@@ -15997,6 +16156,8 @@
   		        decl.init = this.parseMaybeAssign(isFor);
   		      } else if (!allowMissingInitializer && kind === "const" && !(this.type === types$1._in || (this.options.ecmaVersion >= 6 && this.isContextual("of")))) {
   		        this.unexpected();
+  		      } else if (!allowMissingInitializer && (kind === "using" || kind === "await using") && this.options.ecmaVersion >= 17 && this.type !== types$1._in && !this.isContextual("of")) {
+  		        this.raise(this.lastTokEnd, ("Missing initializer in " + kind + " declaration"));
   		      } else if (!allowMissingInitializer && decl.id.type !== "Identifier" && !(isFor && (this.type === types$1._in || this.isContextual("of")))) {
   		        this.raise(this.lastTokEnd, "Complex binding patterns require an initialization value");
   		      } else {
@@ -16009,7 +16170,10 @@
   		  };
 
   		  pp$8.parseVarId = function(decl, kind) {
-  		    decl.id = this.parseBindingAtom();
+  		    decl.id = kind === "using" || kind === "await using"
+  		      ? this.parseIdent()
+  		      : this.parseBindingAtom();
+
   		    this.checkLValPattern(decl.id, kind === "var" ? BIND_VAR : BIND_LEXICAL, false);
   		  };
 
@@ -17740,7 +17904,8 @@
   		    var node = this.startNode();
   		    node.value = value;
   		    node.raw = this.input.slice(this.start, this.end);
-  		    if (node.raw.charCodeAt(node.raw.length - 1) === 110) { node.bigint = node.raw.slice(0, -1).replace(/_/g, ""); }
+  		    if (node.raw.charCodeAt(node.raw.length - 1) === 110)
+  		      { node.bigint = node.value != null ? node.value.toString() : node.raw.slice(0, -1).replace(/_/g, ""); }
   		    this.next();
   		    return this.finishNode(node, "Literal")
   		  };
@@ -20770,11 +20935,9 @@
   		  // Please use the [github bug tracker][ghbt] to report issues.
   		  //
   		  // [ghbt]: https://github.com/acornjs/acorn/issues
-  		  //
-  		  // [walk]: util/walk.js
 
 
-  		  var version = "8.14.1";
+  		  var version = "8.15.0";
 
   		  Parser.acorn = {
   		    Parser: Parser,
@@ -21264,7 +21427,7 @@
           EACH_DIRECTIVE,
           KEY_ATTRIBUTE,
           SLOT_ATTRIBUTE,
-          IS_DIRECTIVE$1,
+          IS_DIRECTIVE,
         ].includes(attribute.name),
     )
   }
@@ -21676,7 +21839,7 @@
    */
   function register$1(postprocessor) {
     if (postprocessors.has(postprocessor)) {
-      panic$2(
+      panic$1(
         `This postprocessor "${
         postprocessor.name || postprocessor.toString()
       }" was already registered`,
@@ -21721,14 +21884,14 @@
 
   // throw a processor type error
   function preprocessorTypeError(type) {
-    panic$2(
+    panic$1(
       `No preprocessor of type "${type}" was found, please make sure to use one of these: 'javascript', 'css' or 'template'`,
     );
   }
 
   // throw an error if the preprocessor was not registered
   function preprocessorNameNotFoundError(name) {
-    panic$2(
+    panic$1(
       `No preprocessor named "${name}" was found, are you sure you have registered it?'`,
     );
   }
@@ -21742,14 +21905,14 @@
    */
   function register$2(type, name, preprocessor) {
     if (!type)
-      panic$2(
+      panic$1(
         "Please define the type of preprocessor you want to register 'javascript', 'css' or 'template'",
       );
-    if (!name) panic$2('Please define a name for your preprocessor');
-    if (!preprocessor) panic$2('Please provide a preprocessor function');
+    if (!name) panic$1('Please define a name for your preprocessor');
+    if (!preprocessor) panic$1('Please provide a preprocessor function');
     if (!preprocessors[type]) preprocessorTypeError(type);
     if (preprocessors[type].has(name))
-      panic$2(`The preprocessor ${name} was already registered before`);
+      panic$1(`The preprocessor ${name} was already registered before`);
 
     preprocessors[type].set(name, preprocessor);
 
@@ -21858,7 +22021,7 @@
     const firstNode = body[0];
 
     if (!isExpressionStatement(firstNode)) {
-      panic$2(
+      panic$1(
         `The each directives supported should be of type "ExpressionStatement",you have provided a "${firstNode.type}"`,
       );
     }
@@ -22366,7 +22529,7 @@
    */
   function build(sourceNode, sourceFile, sourceCode, state) {
     if (!sourceNode)
-      panic$2(
+      panic$1(
         "Something went wrong with your tag DOM parsing, your tag template can't be created",
       );
 
@@ -23209,7 +23372,7 @@
     });
     const generatedAstBody = getProgramBody(generatedAst);
     const exportDefaultNode = findExportDefaultStatement(generatedAstBody);
-    const isLegacyRiotSyntax = isNil$1(exportDefaultNode);
+    const isLegacyRiotSyntax = isNil(exportDefaultNode);
     const outputBody = getProgramBody(ast);
     const componentInterface = findComponentInterface(generatedAstBody);
 
@@ -23342,7 +23505,7 @@
   function preProcessSource(source, meta) {
     // if the source is a parser output we can return it directly
     // @link https://github.com/riot/compiler/issues/178
-    if (isObject$1(source))
+    if (isObject(source))
       return { ...source.output, code: source.data, map: null }
 
     const { options } = meta;
@@ -23565,378 +23728,13 @@
     registerPreprocessor: registerPreprocessor
   });
 
-  const EACH = 0;
-  const IF = 1;
-  const SIMPLE = 2;
-  const TAG = 3;
-  const SLOT = 4;
-
-  const bindingTypes = {
-    EACH,
-    IF,
-    SIMPLE,
-    TAG,
-    SLOT,
-  };
-
-  /**
-   * Quick type checking
-   * @param   {*} element - anything
-   * @param   {string} type - type definition
-   * @returns {boolean} true if the type corresponds
-   */
-  function checkType(element, type) {
-    return typeof element === type
-  }
-
-  /**
-   * Check if an element is part of an svg
-   * @param   {HTMLElement}  el - element to check
-   * @returns {boolean} true if we are in an svg context
-   */
-  function isSvg(el) {
-    const owner = el.ownerSVGElement;
-
-    return !!owner || owner === null
-  }
-
-  /**
-   * Check if an element is a template tag
-   * @param   {HTMLElement}  el - element to check
-   * @returns {boolean} true if it's a <template>
-   */
-  function isTemplate(el) {
-    return el.tagName.toLowerCase() === 'template'
-  }
-
-  /**
-   * Check that will be passed if its argument is a function
-   * @param   {*} value - value to check
-   * @returns {boolean} - true if the value is a function
-   */
-  function isFunction(value) {
-    return checkType(value, 'function')
-  }
-
-  /**
-   * Check if a value is a Boolean
-   * @param   {*}  value - anything
-   * @returns {boolean} true only for the value is a boolean
-   */
-  function isBoolean(value) {
-    return checkType(value, 'boolean')
-  }
-
-  /**
-   * Check if a value is an Object
-   * @param   {*}  value - anything
-   * @returns {boolean} true only for the value is an object
-   */
-  function isObject(value) {
-    return !isNil(value) && value.constructor === Object
-  }
-
-  /**
-   * Check if a value is null or undefined
-   * @param   {*}  value - anything
-   * @returns {boolean} true only for the 'undefined' and 'null' types
-   */
-  function isNil(value) {
-    return value === null || value === undefined
-  }
-
-  // Riot.js constants that can be used across more modules
-
-  const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
-    DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
-    PLUGINS_SET = new Set(),
-    IS_DIRECTIVE = 'is',
-    MOUNT_METHOD_KEY = 'mount',
-    UPDATE_METHOD_KEY = 'update',
-    UNMOUNT_METHOD_KEY = 'unmount',
-    SHOULD_UPDATE_KEY = 'shouldUpdate',
-    ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
-    ON_MOUNTED_KEY = 'onMounted',
-    ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
-    ON_UPDATED_KEY = 'onUpdated',
-    ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
-    ON_UNMOUNTED_KEY = 'onUnmounted',
-    PROPS_KEY = 'props',
-    STATE_KEY = 'state',
-    SLOTS_KEY = 'slots',
-    ROOT_KEY = 'root',
-    IS_PURE_SYMBOL = Symbol('pure'),
-    IS_COMPONENT_UPDATING = Symbol('is_updating'),
-    PARENT_KEY_SYMBOL = Symbol('parent'),
-    ATTRIBUTES_KEY_SYMBOL = Symbol('attributes'),
-    TEMPLATE_KEY_SYMBOL = Symbol('template');
-
-  /**
-   * Convert a string from camel case to dash-case
-   * @param   {string} string - probably a component tag name
-   * @returns {string} component name normalized
-   */
-  function camelToDashCase(string) {
-    return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
-  }
-
-  /**
-   * Convert a string containing dashes to camel case
-   * @param   {string} string - input string
-   * @returns {string} my-string -> myString
-   */
-  function dashToCamelCase(string) {
-    return string.replace(/-(\w)/g, (_, c) => c.toUpperCase())
-  }
-
-  /**
-   * Get all the element attributes as object
-   * @param   {HTMLElement} element - DOM node we want to parse
-   * @returns {Object} all the attributes found as a key value pairs
-   */
-  function DOMattributesToObject(element) {
-    return Array.from(element.attributes).reduce((acc, attribute) => {
-      acc[dashToCamelCase(attribute.name)] = attribute.value;
-      return acc
-    }, {})
-  }
-
-  /**
-   * Move all the child nodes from a source tag to another
-   * @param   {HTMLElement} source - source node
-   * @param   {HTMLElement} target - target node
-   * @returns {undefined} it's a void method ¯\_(ツ)_/¯
-   */
-
-  // Ignore this helper because it's needed only for svg tags
-  function moveChildren(source, target) {
-    // eslint-disable-next-line fp/no-loops
-    while (source.firstChild) target.appendChild(source.firstChild);
-  }
-
-  /**
-   * Remove the child nodes from any DOM node
-   * @param   {HTMLElement} node - target node
-   * @returns {undefined}
-   */
-  function cleanNode(node) {
-    // eslint-disable-next-line fp/no-loops
-    while (node.firstChild) node.removeChild(node.firstChild);
-  }
-
-  /**
-   * Clear multiple children in a node
-   * @param   {HTMLElement[]} children - direct children nodes
-   * @returns {undefined}
-   */
-  function clearChildren(children) {
-    // eslint-disable-next-line fp/no-loops,fp/no-let
-    for (let i = 0; i < children.length; i++) removeChild(children[i]);
-  }
-
-  /**
-   * Remove a node
-   * @param {HTMLElement}node - node to remove
-   * @returns {undefined}
-   */
-  const removeChild = (node) => node.remove();
-
-  /**
-   * Insert before a node
-   * @param {HTMLElement} newNode - node to insert
-   * @param {HTMLElement} refNode - ref child
-   * @returns {undefined}
-   */
-  const insertBefore = (newNode, refNode) =>
-    refNode &&
-    refNode.parentNode &&
-    refNode.parentNode.insertBefore(newNode, refNode);
-
-  /**
-   * Replace a node
-   * @param {HTMLElement} newNode - new node to add to the DOM
-   * @param {HTMLElement} replaced - node to replace
-   * @returns {undefined}
-   */
-  const replaceChild = (newNode, replaced) =>
-    replaced &&
-    replaced.parentNode &&
-    replaced.parentNode.replaceChild(newNode, replaced);
-
-  const ATTRIBUTE = 0;
-  const EVENT = 1;
-  const TEXT = 2;
-  const VALUE = 3;
-  const REF = 4;
-
-  const expressionTypes = {
-    ATTRIBUTE,
-    EVENT,
-    TEXT,
-    VALUE,
-    REF,
-  };
-
-  // does simply nothing
-  function noop() {
-    return this
-  }
-
-  /**
-   * Autobind the methods of a source object to itself
-   * @param   {Object} source - probably a riot tag instance
-   * @param   {Array<string>} methods - list of the methods to autobind
-   * @returns {Object} the original object received
-   */
-  function autobindMethods(source, methods) {
-    methods.forEach((method) => {
-      source[method] = source[method].bind(source);
-    });
-
-    return source
-  }
-
-  /**
-   * Call the first argument received only if it's a function otherwise return it as it is
-   * @param   {*} source - anything
-   * @returns {*} anything
-   */
-  function callOrAssign(source) {
-    return isFunction(source)
-      ? source.prototype && source.prototype.constructor
-        ? new source()
-        : source()
-      : source
-  }
-
-  /**
-   * Throw an error with a descriptive message
-   * @param   { string } message - error message
-   * @param   { string } cause - optional error cause object
-   * @returns { undefined } hoppla... at this point the program should stop working
-   */
-  function panic(message, cause) {
-    throw new Error(message, { cause })
-  }
-  /**
-   * Returns the memoized (cached) function.
-   * // borrowed from https://www.30secondsofcode.org/js/s/memoize
-   * @param {Function} fn - function to memoize
-   * @returns {Function} memoize function
-   */
-  function memoize(fn) {
-    const cache = new Map();
-    const cached = (val) => {
-      return cache.has(val)
-        ? cache.get(val)
-        : cache.set(val, fn.call(this, val)) && cache.get(val)
-    };
-    cached.cache = cache;
-    return cached
-  }
-
-  /**
-   * Evaluate a list of attribute expressions
-   * @param   {Array} attributes - attribute expressions generated by the riot compiler
-   * @returns {Object} key value pairs with the result of the computation
-   */
-  function evaluateAttributeExpressions(attributes) {
-    return attributes.reduce((acc, attribute) => {
-      const { value, type } = attribute;
-
-      switch (true) {
-        // ref attributes shouldn't be evaluated in the props
-        case attribute.type === REF:
-          break
-        // spread attribute
-        case !attribute.name && type === ATTRIBUTE:
-          return {
-            ...acc,
-            ...value,
-          }
-        // value attribute
-        case type === VALUE:
-          acc.value = attribute.value;
-          break
-        // normal attributes
-        default:
-          acc[dashToCamelCase(attribute.name)] = attribute.value;
-      }
-
-      return acc
-    }, {})
-  }
-
-  /**
-   * Helper function to set an immutable property
-   * @param   {Object} source - object where the new property will be set
-   * @param   {string} key - object key where the new property will be stored
-   * @param   {*} value - value of the new property
-   * @param   {Object} options - set the property overriding the default options
-   * @returns {Object} - the original object modified
-   */
-  function defineProperty(source, key, value, options = {}) {
-    /* eslint-disable fp/no-mutating-methods */
-    Object.defineProperty(source, key, {
-      value,
-      enumerable: false,
-      writable: false,
-      configurable: true,
-      ...options,
-    });
-    /* eslint-enable fp/no-mutating-methods */
-
-    return source
-  }
-
-  /**
-   * Define multiple properties on a target object
-   * @param   {Object} source - object where the new properties will be set
-   * @param   {Object} properties - object containing as key pair the key + value properties
-   * @param   {Object} options - set the property overriding the default options
-   * @returns {Object} the original object modified
-   */
-  function defineProperties(source, properties, options) {
-    Object.entries(properties).forEach(([key, value]) => {
-      defineProperty(source, key, value, options);
-    });
-
-    return source
-  }
-
-  /**
-   * Define default properties if they don't exist on the source object
-   * @param   {Object} source - object that will receive the default properties
-   * @param   {Object} defaults - object containing additional optional keys
-   * @returns {Object} the original object received enhanced
-   */
-  function defineDefaults(source, defaults) {
-    Object.entries(defaults).forEach(([key, value]) => {
-      if (!source[key]) source[key] = value;
-    });
-
-    return source
-  }
-
-  /**
-   * Generate a new object picking only the properties from a given array
-   * @param {Object} source - target object
-   * @param {Array} keys - list of keys that we want to copy over to the new object
-   * @return {Object} a new object conaining only the keys that we have picked from the keys array list
-   */
-  function pick(source, keys) {
-    return isObject(source)
-      ? Object.fromEntries(keys.map((key) => [key, source[key]]))
-      : source
-  }
-
   // Components without template use a mocked template interface with some basic functionalities to
   // guarantee consistent rendering behaviour see https://github.com/riot/riot/issues/2984
   const MOCKED_TEMPLATE_INTERFACE = {
     [MOUNT_METHOD_KEY](el) {
       this.el = el;
     },
-    [UPDATE_METHOD_KEY]: noop,
+    [UPDATE_METHOD_KEY]: noop$1,
     [UNMOUNT_METHOD_KEY](_, __, mustRemoveRoot = false) {
       if (mustRemoveRoot) removeChild(this.el);
       else if (!mustRemoveRoot) cleanNode(this.el);
@@ -23944,7 +23742,7 @@
     clone() {
       return { ...this }
     },
-    createDOM: noop,
+    createDOM: noop$1,
   };
 
   const HEAD_SYMBOL = Symbol();
@@ -24423,117 +24221,40 @@
     }
   }
 
-  /* c8 ignore next */
-  const ElementProto = typeof Element === 'undefined' ? {} : Element.prototype;
-  const isNativeHtmlProperty = memoize$1(
-    (name) => ElementProto.hasOwnProperty(name), // eslint-disable-line
-  );
-
   /**
-   * Add all the attributes provided
-   * @param   {HTMLElement} node - target node
-   * @param   {object} attributes - object containing the attributes names and values
-   * @returns {undefined} sorry it's a void function :(
-   */
-  function setAllAttributes(node, attributes) {
-    Object.keys(attributes).forEach((name) =>
-      attributeExpression({ node, name }, attributes[name]),
-    );
-  }
-
-  /**
-   * Remove all the attributes provided
-   * @param   {HTMLElement} node - target node
-   * @param   {object} newAttributes - object containing all the new attribute names
-   * @param   {object} oldAttributes - object containing all the old attribute names
-   * @returns {undefined} sorry it's a void function :(
-   */
-  function removeAllAttributes(node, newAttributes, oldAttributes) {
-    const newKeys = newAttributes ? Object.keys(newAttributes) : [];
-
-    Object.keys(oldAttributes)
-      .filter((name) => !newKeys.includes(name))
-      .forEach((attribute) => node.removeAttribute(attribute));
-  }
-
-  /**
-   * Check whether the attribute value can be rendered
-   * @param {*} value - expression value
-   * @returns {boolean} true if we can render this attribute value
-   */
-  function canRenderAttribute(value) {
-    return ['string', 'number', 'boolean'].includes(typeof value)
-  }
-
-  /**
-   * Check whether the attribute should be removed
-   * @param {*} value - expression value
-   * @param   {boolean} isBoolean - flag to handle boolean attributes
-   * @returns {boolean} boolean - true if the attribute can be removed
-   */
-  function shouldRemoveAttribute(value, isBoolean) {
-    // boolean attributes should be removed if the value is falsy
-    if (isBoolean) return !value
-
-    // null and undefined values will remove the attribute as well
-    return isNil(value)
-  }
-
-  /**
-   * This methods handles the DOM attributes updates
-   * @param   {object} expression - attribute expression data
+   * This method handles the REF attribute expressions
+   * @param   {object} expression - expression data
    * @param   {HTMLElement} expression.node - target node
-   * @param   {string} expression.name - attribute name
-   * @param   {boolean} expression.isBoolean - flag to handle boolean attributes
    * @param   {*} expression.value - the old expression cached value
    * @param   {*} value - new expression value
    * @returns {undefined}
    */
-  function attributeExpression(
-    { node, name, isBoolean: isBoolean$1, value: oldValue },
-    value,
-  ) {
-    // is it a spread operator? {...attributes}
-    if (!name) {
-      if (oldValue) {
-        // remove all the old attributes
-        removeAllAttributes(node, value, oldValue);
-      }
-
-      // is the value still truthy?
-      if (value) {
-        setAllAttributes(node, value);
-      }
-
-      return
-    }
-
-    // store the attribute on the node to make it compatible with native custom elements
-    if (
-      !isNativeHtmlProperty(name) &&
-      (isBoolean(value) || isObject(value) || isFunction(value))
-    ) {
-      node[name] = value;
-    }
-
-    if (shouldRemoveAttribute(value, isBoolean$1)) {
-      node.removeAttribute(name);
-    } else if (canRenderAttribute(value)) {
-      node.setAttribute(name, normalizeValue(name, value, isBoolean$1));
-    }
+  function refExpression({ node, value: oldValue }, value) {
+    // called on mount and update
+    if (value) value(node);
+    // called on unmount
+    // in this case the node value is null
+    else oldValue(null);
   }
 
   /**
-   * Get the value as string
-   * @param   {string} name - attribute name
+   * Normalize the user value in order to render a empty string in case of falsy values
    * @param   {*} value - user input value
-   * @param   {boolean} isBoolean - boolean attributes flag
-   * @returns {string} input value as string
+   * @returns {string} hopefully a string
    */
-  function normalizeValue(name, value, isBoolean) {
-    // be sure that expressions like selected={ true } will always be rendered as selected='selected'
-    // fix https://github.com/riot/riot/issues/2975
-    return !!value && isBoolean ? name : value
+  function normalizeStringValue(value) {
+    return isNil(value) ? '' : value
+  }
+
+  /**
+   * This methods handles the input fields value updates
+   * @param   {object} expression - expression data
+   * @param   {HTMLElement} expression.node - target node
+   * @param   {*} value - new expression value
+   * @returns {undefined}
+   */
+  function valueExpression({ node }, value) {
+    node.value = normalizeStringValue(value);
   }
 
   const RE_EVENTS_PREFIX = /^on/;
@@ -24582,13 +24303,143 @@
     eventListener[normalizedEventName] = callback;
   }
 
+  /* c8 ignore next */
+  const ElementProto = typeof Element === 'undefined' ? {} : Element.prototype;
+  const isNativeHtmlProperty = memoize$1(
+    (name) => ElementProto.hasOwnProperty(name), // eslint-disable-line
+  );
+
   /**
-   * Normalize the user value in order to render a empty string in case of falsy values
-   * @param   {*} value - user input value
-   * @returns {string} hopefully a string
+   * Add all the attributes provided
+   * @param   {HTMLElement} node - target node
+   * @param   {object} attributes - object containing the attributes names and values
+   * @param   {*} oldAttributes - the old expression cached value
+   * @returns {undefined} sorry it's a void function :(
    */
-  function normalizeStringValue(value) {
-    return isNil(value) ? '' : value
+  function setAllAttributes(node, attributes, oldAttributes) {
+    Object.entries(attributes)
+      // filter out the attributes that didn't change their value
+      .filter(([name, value]) => value !== oldAttributes?.[name])
+      .forEach(([name, value]) => {
+        switch (true) {
+          case name === REF_ATTRIBUTE:
+            return refExpression({ node }, value)
+          case name === VALUE_ATTRIBUTE:
+            return valueExpression({ node }, value)
+          case isEventAttribute$1(name):
+            return eventExpression({ node, name }, value)
+          default:
+            return attributeExpression({ node, name }, value)
+        }
+      });
+  }
+
+  /**
+   * Remove all the attributes provided
+   * @param   {HTMLElement} node - target node
+   * @param   {object} newAttributes - object containing all the new attribute names
+   * @param   {object} oldAttributes - object containing all the old attribute names
+   * @returns {undefined} sorry it's a void function :(
+   */
+  function removeAllAttributes(node, newAttributes, oldAttributes) {
+    const newKeys = newAttributes ? Object.keys(newAttributes) : [];
+
+    Object.entries(oldAttributes)
+      .filter(([name]) => !newKeys.includes(name))
+      .forEach(([name, value]) => {
+        switch (true) {
+          case name === REF_ATTRIBUTE:
+            return refExpression({ node, value })
+          case name === VALUE_ATTRIBUTE:
+            node.removeAttribute('value');
+            node.value = '';
+            return
+          case isEventAttribute$1(name):
+            return eventExpression({ node, name }, null)
+          default:
+            return node.removeAttribute(name)
+        }
+      });
+  }
+
+  /**
+   * Check whether the attribute value can be rendered
+   * @param {*} value - expression value
+   * @returns {boolean} true if we can render this attribute value
+   */
+  function canRenderAttribute(value) {
+    return ['string', 'number', 'boolean'].includes(typeof value)
+  }
+
+  /**
+   * Check whether the attribute should be removed
+   * @param {*} value - expression value
+   * @param   {boolean} isBoolean - flag to handle boolean attributes
+   * @returns {boolean} boolean - true if the attribute can be removed
+   */
+  function shouldRemoveAttribute(value, isBoolean) {
+    // boolean attributes should be removed if the value is falsy
+    if (isBoolean) return !value
+
+    // null and undefined values will remove the attribute as well
+    return isNil(value)
+  }
+
+  /**
+   * This methods handles the DOM attributes updates
+   * @param   {object} expression - attribute expression data
+   * @param   {HTMLElement} expression.node - target node
+   * @param   {string} expression.name - attribute name
+   * @param   {boolean} expression.isBoolean - flag to handle boolean attributes
+   * @param   {*} expression.value - the old expression cached value
+   * @param   {*} value - new expression value
+   * @returns {undefined}
+   */
+  function attributeExpression(
+    { node, name, isBoolean: isBoolean$1, value: oldValue },
+    value,
+  ) {
+    // is it a spread operator? {...attributes}
+    if (!name) {
+      if (oldValue) {
+        // remove all the old attributes
+        removeAllAttributes(node, value, oldValue);
+      }
+
+      // is the value still truthy?
+      if (value) {
+        setAllAttributes(node, value, oldValue);
+      }
+
+      return
+    }
+
+    // store the attribute on the node to make it compatible with native custom elements
+    if (
+      !isNativeHtmlProperty(name) &&
+      (isBoolean(value) || isObject(value) || isFunction(value))
+    ) {
+      node[name] = value;
+    }
+
+    if (shouldRemoveAttribute(value, isBoolean$1)) {
+      node.removeAttribute(name);
+    } else if (canRenderAttribute(value)) {
+      node.setAttribute(name, normalizeValue(name, value, isBoolean$1));
+    }
+  }
+
+  /**
+   * Get the value as string
+   * @param   {string} name - attribute name
+   * @param   {*} value - user input value
+   * @param   {boolean} isBoolean - boolean attributes flag
+   * @returns {string} input value as string
+   */
+  function normalizeValue(name, value, isBoolean) {
+    // be sure that expressions like selected={ true } will always be rendered as selected='selected'
+    // fix https://github.com/riot/riot/issues/2975
+    return !!value && isBoolean ? name : value
   }
 
   /**
@@ -24612,37 +24463,10 @@
     node.data = normalizeStringValue(value);
   }
 
-  /**
-   * This methods handles the input fields value updates
-   * @param   {object} expression - expression data
-   * @param   {HTMLElement} expression.node - target node
-   * @param   {*} value - new expression value
-   * @returns {undefined}
-   */
-  function valueExpression({ node }, value) {
-    node.value = normalizeStringValue(value);
-  }
-
-  /**
-   * This method handles the REF attribute expressions
-   * @param   {object} expression - expression data
-   * @param   {HTMLElement} expression.node - target node
-   * @param   {*} expression.value - the old expression cached value
-   * @param   {*} value - new expression value
-   * @returns {undefined}
-   */
-  function refExpression({ node, value: oldValue }, value) {
-    // called on mount and update
-    if (value) value(node);
-    // called on unmount
-    // in this case the node value is null
-    else oldValue(null);
-  }
-
   const expressions = {
     [ATTRIBUTE]: attributeExpression,
     [EVENT]: eventExpression,
-    [TEXT]: textExpression,
+    [TEXT$1]: textExpression,
     [VALUE]: valueExpression,
     [REF]: refExpression,
   };
@@ -24660,10 +24484,13 @@
      */
     mount(scope) {
       // hopefully a pure function
-      this.value = this.evaluate(scope);
+      const value = this.evaluate(scope);
 
       // IO() DOM updates
-      expressions[this.type](this, this.value);
+      expressions[this.type](this, value);
+
+      // store the computed value for the update calls
+      this.value = value;
 
       return this
     },
@@ -24690,7 +24517,12 @@
      */
     unmount() {
       // unmount event and ref expressions
-      if ([EVENT, REF].includes(this.type)) expressions[this.type](this, null);
+      if (
+        [EVENT, REF].includes(this.type) ||
+        // spread attributes might contain events or refs that must be unmounted
+        (this.type === ATTRIBUTE && !this.name)
+      )
+        expressions[this.type](this, null);
 
       return this
     },
@@ -24700,7 +24532,7 @@
     return {
       ...Expression,
       ...data,
-      node: data.type === TEXT ? getTextNode(node, data.childNodeIndex) : node,
+      node: data.type === TEXT$1 ? getTextNode(node, data.childNodeIndex) : node,
     }
   }
 
@@ -24963,7 +24795,7 @@
     [IF]: create$5,
     [SIMPLE]: create$3,
     [EACH]: create$6,
-    [TAG]: create$2,
+    [TAG$1]: create$2,
     [SLOT]: createSlot,
   };
 
@@ -24976,7 +24808,7 @@
    */
   function fixTextExpressionsOffset(expressions, textExpressionsOffset) {
     return expressions.map((e) =>
-      e.type === TEXT
+      e.type === TEXT$1
         ? {
             ...e,
             childNodeIndex: e.childNodeIndex + textExpressionsOffset,
@@ -25129,7 +24961,7 @@
      * @returns {TemplateChunk} self
      */
     mount(el, scope, parentScope, meta = {}) {
-      if (!el) panic('Please provide DOM node to mount properly your template');
+      if (!el) panic$1('Please provide DOM node to mount properly your template');
 
       if (this.el) this.unmount(scope);
 
@@ -25280,9 +25112,9 @@
   }
 
   const PURE_COMPONENT_API = Object.freeze({
-    [MOUNT_METHOD_KEY]: noop,
-    [UPDATE_METHOD_KEY]: noop,
-    [UNMOUNT_METHOD_KEY]: noop,
+    [MOUNT_METHOD_KEY]: noop$1,
+    [UPDATE_METHOD_KEY]: noop$1,
+    [UNMOUNT_METHOD_KEY]: noop$1,
   });
 
   /**
@@ -25325,8 +25157,8 @@
     pureFactoryFunction,
     { slots, attributes, props, css, template },
   ) {
-    if (template) panic('Pure components can not have html');
-    if (css) panic('Pure components do not have css');
+    if (template) panic$1('Pure components can not have html');
+    if (css) panic$1('Pure components do not have css');
 
     const component = defineDefaults(
       pureFactoryFunction({ slots, attributes, props }),
@@ -25397,13 +25229,13 @@
   });
 
   const COMPONENT_LIFECYCLE_METHODS = Object.freeze({
-    [SHOULD_UPDATE_KEY]: noop,
-    [ON_BEFORE_MOUNT_KEY]: noop,
-    [ON_MOUNTED_KEY]: noop,
-    [ON_BEFORE_UPDATE_KEY]: noop,
-    [ON_UPDATED_KEY]: noop,
-    [ON_BEFORE_UNMOUNT_KEY]: noop,
-    [ON_UNMOUNTED_KEY]: noop,
+    [SHOULD_UPDATE_KEY]: noop$1,
+    [ON_BEFORE_MOUNT_KEY]: noop$1,
+    [ON_MOUNTED_KEY]: noop$1,
+    [ON_BEFORE_UPDATE_KEY]: noop$1,
+    [ON_UPDATED_KEY]: noop$1,
+    [ON_BEFORE_UNMOUNT_KEY]: noop$1,
+    [ON_UNMOUNTED_KEY]: noop$1,
   });
 
   /**
@@ -25725,7 +25557,7 @@
 
               // Avoid adding the riot "is" directives to the component props
               // eslint-disable-next-line no-unused-vars
-              const { [IS_DIRECTIVE$1]: _, ...newProps } = {
+              const { [IS_DIRECTIVE]: _, ...newProps } = {
                 ...domNodeAttributes,
                 ...generatePropsFromAttributes(
                   attributes,
@@ -25862,7 +25694,7 @@
    * @param  {RiotComponentWrapper} componentWrapper - riot compiler generated object
    * @returns {object} component like interface
    */
-  const memoizedCreateComponentFromWrapper = memoize(createComponentFromWrapper);
+  const memoizedCreateComponentFromWrapper = memoize$1(createComponentFromWrapper);
 
   /**
    * Create the component interface needed for the @riotjs/dom-bindings tag bindings
@@ -25932,7 +25764,7 @@
    */
   function register(name, { css, template, exports }) {
     if (COMPONENTS_IMPLEMENTATION_MAP.has(name))
-      panic(`The component "${name}" was already registered`);
+      panic$1(`The component "${name}" was already registered`);
 
     COMPONENTS_IMPLEMENTATION_MAP.set(
       name,
@@ -25949,7 +25781,7 @@
    */
   function unregister(name) {
     if (!COMPONENTS_IMPLEMENTATION_MAP.has(name))
-      panic(`The component "${name}" was never registered`);
+      panic$1(`The component "${name}" was never registered`);
 
     COMPONENTS_IMPLEMENTATION_MAP.delete(name);
     cssManager.remove(name);
@@ -25978,8 +25810,8 @@
    * @returns {Set} the set containing all the plugins installed
    */
   function install(plugin) {
-    if (!isFunction(plugin)) panic('Plugins must be of type function');
-    if (PLUGINS_SET.has(plugin)) panic('This plugin was already installed');
+    if (!isFunction(plugin)) panic$1('Plugins must be of type function');
+    if (PLUGINS_SET.has(plugin)) panic$1('This plugin was already installed');
 
     PLUGINS_SET.add(plugin);
 
@@ -25992,7 +25824,7 @@
    * @returns {Set} the set containing all the plugins installed
    */
   function uninstall(plugin) {
-    if (!PLUGINS_SET.has(plugin)) panic('This plugin was never installed');
+    if (!PLUGINS_SET.has(plugin)) panic$1('This plugin was never installed');
 
     PLUGINS_SET.delete(plugin);
 
@@ -26006,7 +25838,7 @@
    */
   function pure(func) {
     if (!isFunction(func))
-      panic('riot.pure accepts only arguments of type "function"');
+      panic$1('riot.pure accepts only arguments of type "function"');
     func[IS_PURE_SYMBOL] = true;
     return func
   }
@@ -26020,7 +25852,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v10.0.0-beta.1';
+  const version = 'v10.0.0-rc.1';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
@@ -26096,7 +25928,7 @@
   function mountComponent(element, initialProps, componentName, slots) {
     const name = componentName || getName(element);
     if (!COMPONENTS_IMPLEMENTATION_MAP.has(name))
-      panic(`The component named "${name}" was never registered`);
+      panic$1(`The component named "${name}" was never registered`);
 
     const component = COMPONENTS_IMPLEMENTATION_MAP.get(name)({
       props: initialProps,
