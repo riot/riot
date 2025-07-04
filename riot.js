@@ -1,4 +1,4 @@
-/* Riot v10.0.0-beta.1, @license MIT */
+/* Riot v10.0.0-rc.1, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -18,6 +18,35 @@
     TAG,
     SLOT,
   };
+
+  // Riot.js constants that can be used across more modules
+
+  const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
+    DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
+    PLUGINS_SET = new Set(),
+    IS_DIRECTIVE = 'is',
+    VALUE_ATTRIBUTE = 'value',
+    REF_ATTRIBUTE = 'ref',
+    EVENT_ATTRIBUTE_RE = /^on/,
+    MOUNT_METHOD_KEY = 'mount',
+    UPDATE_METHOD_KEY = 'update',
+    UNMOUNT_METHOD_KEY = 'unmount',
+    SHOULD_UPDATE_KEY = 'shouldUpdate',
+    ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
+    ON_MOUNTED_KEY = 'onMounted',
+    ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
+    ON_UPDATED_KEY = 'onUpdated',
+    ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
+    ON_UNMOUNTED_KEY = 'onUnmounted',
+    PROPS_KEY = 'props',
+    STATE_KEY = 'state',
+    SLOTS_KEY = 'slots',
+    ROOT_KEY = 'root',
+    IS_PURE_SYMBOL = Symbol('pure'),
+    IS_COMPONENT_UPDATING = Symbol('is_updating'),
+    PARENT_KEY_SYMBOL = Symbol('parent'),
+    TEMPLATE_KEY_SYMBOL = Symbol('template'),
+    ROOT_ATTRIBUTES_KEY_SYMBOL = Symbol('root-attributes');
 
   /**
    * Quick type checking
@@ -85,31 +114,14 @@
     return value === null || value === undefined
   }
 
-  // Riot.js constants that can be used across more modules
-
-  const COMPONENTS_IMPLEMENTATION_MAP = new Map(),
-    DOM_COMPONENT_INSTANCE_PROPERTY = Symbol('riot-component'),
-    PLUGINS_SET = new Set(),
-    IS_DIRECTIVE = 'is',
-    MOUNT_METHOD_KEY = 'mount',
-    UPDATE_METHOD_KEY = 'update',
-    UNMOUNT_METHOD_KEY = 'unmount',
-    SHOULD_UPDATE_KEY = 'shouldUpdate',
-    ON_BEFORE_MOUNT_KEY = 'onBeforeMount',
-    ON_MOUNTED_KEY = 'onMounted',
-    ON_BEFORE_UPDATE_KEY = 'onBeforeUpdate',
-    ON_UPDATED_KEY = 'onUpdated',
-    ON_BEFORE_UNMOUNT_KEY = 'onBeforeUnmount',
-    ON_UNMOUNTED_KEY = 'onUnmounted',
-    PROPS_KEY = 'props',
-    STATE_KEY = 'state',
-    SLOTS_KEY = 'slots',
-    ROOT_KEY = 'root',
-    IS_PURE_SYMBOL = Symbol('pure'),
-    IS_COMPONENT_UPDATING = Symbol('is_updating'),
-    PARENT_KEY_SYMBOL = Symbol('parent'),
-    TEMPLATE_KEY_SYMBOL = Symbol('template'),
-    ROOT_ATTRIBUTES_KEY_SYMBOL = Symbol('root-attributes');
+  /**
+   * Check if an attribute is a DOM handler
+   * @param   {string} attribute - attribute string
+   * @returns {boolean} true only for dom listener attribute nodes
+   */
+  function isEventAttribute(attribute) {
+    return EVENT_ATTRIBUTE_RE.test(attribute)
+  }
 
   /**
    * Convert a string from camel case to dash-case
@@ -282,32 +294,31 @@
    * @returns {Object} key value pairs with the result of the computation
    */
   function generatePropsFromAttributes(attributes, scope) {
-    return (
-      attributes
-        // filter out the ref attributes
-        .filter(({ type }) => type !== REF)
-        .reduce((acc, { type, name, evaluate }) => {
-          const value = evaluate(scope);
+    return attributes.reduce((acc, { type, name, evaluate }) => {
+      const value = evaluate(scope);
 
-          switch (true) {
-            // spread attribute
-            case !name && type === ATTRIBUTE:
-              return {
-                ...acc,
-                ...value,
-              }
-            // value attribute
-            case type === VALUE:
-              acc.value = value;
-              break
-            // normal attributes
-            default:
-              acc[dashToCamelCase(name)] = value;
+      switch (true) {
+        // spread attribute
+        case !name && type === ATTRIBUTE:
+          return {
+            ...acc,
+            ...value,
           }
+        // ref attribute
+        case type === REF:
+          acc.ref = value;
+          break
+        // value attribute
+        case type === VALUE:
+          acc.value = value;
+          break
+        // normal attributes
+        default:
+          acc[dashToCamelCase(name)] = value;
+      }
 
-          return acc
-        }, {})
-    )
+      return acc
+    }, {})
   }
 
   /**
@@ -854,117 +865,40 @@
     }
   }
 
-  /* c8 ignore next */
-  const ElementProto = typeof Element === 'undefined' ? {} : Element.prototype;
-  const isNativeHtmlProperty = memoize(
-    (name) => ElementProto.hasOwnProperty(name), // eslint-disable-line
-  );
-
   /**
-   * Add all the attributes provided
-   * @param   {HTMLElement} node - target node
-   * @param   {object} attributes - object containing the attributes names and values
-   * @returns {undefined} sorry it's a void function :(
-   */
-  function setAllAttributes(node, attributes) {
-    Object.keys(attributes).forEach((name) =>
-      attributeExpression({ node, name }, attributes[name]),
-    );
-  }
-
-  /**
-   * Remove all the attributes provided
-   * @param   {HTMLElement} node - target node
-   * @param   {object} newAttributes - object containing all the new attribute names
-   * @param   {object} oldAttributes - object containing all the old attribute names
-   * @returns {undefined} sorry it's a void function :(
-   */
-  function removeAllAttributes(node, newAttributes, oldAttributes) {
-    const newKeys = newAttributes ? Object.keys(newAttributes) : [];
-
-    Object.keys(oldAttributes)
-      .filter((name) => !newKeys.includes(name))
-      .forEach((attribute) => node.removeAttribute(attribute));
-  }
-
-  /**
-   * Check whether the attribute value can be rendered
-   * @param {*} value - expression value
-   * @returns {boolean} true if we can render this attribute value
-   */
-  function canRenderAttribute(value) {
-    return ['string', 'number', 'boolean'].includes(typeof value)
-  }
-
-  /**
-   * Check whether the attribute should be removed
-   * @param {*} value - expression value
-   * @param   {boolean} isBoolean - flag to handle boolean attributes
-   * @returns {boolean} boolean - true if the attribute can be removed
-   */
-  function shouldRemoveAttribute(value, isBoolean) {
-    // boolean attributes should be removed if the value is falsy
-    if (isBoolean) return !value
-
-    // null and undefined values will remove the attribute as well
-    return isNil(value)
-  }
-
-  /**
-   * This methods handles the DOM attributes updates
-   * @param   {object} expression - attribute expression data
+   * This method handles the REF attribute expressions
+   * @param   {object} expression - expression data
    * @param   {HTMLElement} expression.node - target node
-   * @param   {string} expression.name - attribute name
-   * @param   {boolean} expression.isBoolean - flag to handle boolean attributes
    * @param   {*} expression.value - the old expression cached value
    * @param   {*} value - new expression value
    * @returns {undefined}
    */
-  function attributeExpression(
-    { node, name, isBoolean: isBoolean$1, value: oldValue },
-    value,
-  ) {
-    // is it a spread operator? {...attributes}
-    if (!name) {
-      if (oldValue) {
-        // remove all the old attributes
-        removeAllAttributes(node, value, oldValue);
-      }
-
-      // is the value still truthy?
-      if (value) {
-        setAllAttributes(node, value);
-      }
-
-      return
-    }
-
-    // store the attribute on the node to make it compatible with native custom elements
-    if (
-      !isNativeHtmlProperty(name) &&
-      (isBoolean(value) || isObject(value) || isFunction(value))
-    ) {
-      node[name] = value;
-    }
-
-    if (shouldRemoveAttribute(value, isBoolean$1)) {
-      node.removeAttribute(name);
-    } else if (canRenderAttribute(value)) {
-      node.setAttribute(name, normalizeValue(name, value, isBoolean$1));
-    }
+  function refExpression({ node, value: oldValue }, value) {
+    // called on mount and update
+    if (value) value(node);
+    // called on unmount
+    // in this case the node value is null
+    else oldValue(null);
   }
 
   /**
-   * Get the value as string
-   * @param   {string} name - attribute name
+   * Normalize the user value in order to render a empty string in case of falsy values
    * @param   {*} value - user input value
-   * @param   {boolean} isBoolean - boolean attributes flag
-   * @returns {string} input value as string
+   * @returns {string} hopefully a string
    */
-  function normalizeValue(name, value, isBoolean) {
-    // be sure that expressions like selected={ true } will always be rendered as selected='selected'
-    // fix https://github.com/riot/riot/issues/2975
-    return !!value && isBoolean ? name : value
+  function normalizeStringValue(value) {
+    return isNil(value) ? '' : value
+  }
+
+  /**
+   * This methods handles the input fields value updates
+   * @param   {object} expression - expression data
+   * @param   {HTMLElement} expression.node - target node
+   * @param   {*} value - new expression value
+   * @returns {undefined}
+   */
+  function valueExpression({ node }, value) {
+    node.value = normalizeStringValue(value);
   }
 
   const RE_EVENTS_PREFIX = /^on/;
@@ -1013,13 +947,143 @@
     eventListener[normalizedEventName] = callback;
   }
 
+  /* c8 ignore next */
+  const ElementProto = typeof Element === 'undefined' ? {} : Element.prototype;
+  const isNativeHtmlProperty = memoize(
+    (name) => ElementProto.hasOwnProperty(name), // eslint-disable-line
+  );
+
   /**
-   * Normalize the user value in order to render a empty string in case of falsy values
-   * @param   {*} value - user input value
-   * @returns {string} hopefully a string
+   * Add all the attributes provided
+   * @param   {HTMLElement} node - target node
+   * @param   {object} attributes - object containing the attributes names and values
+   * @param   {*} oldAttributes - the old expression cached value
+   * @returns {undefined} sorry it's a void function :(
    */
-  function normalizeStringValue(value) {
-    return isNil(value) ? '' : value
+  function setAllAttributes(node, attributes, oldAttributes) {
+    Object.entries(attributes)
+      // filter out the attributes that didn't change their value
+      .filter(([name, value]) => value !== oldAttributes?.[name])
+      .forEach(([name, value]) => {
+        switch (true) {
+          case name === REF_ATTRIBUTE:
+            return refExpression({ node }, value)
+          case name === VALUE_ATTRIBUTE:
+            return valueExpression({ node }, value)
+          case isEventAttribute(name):
+            return eventExpression({ node, name }, value)
+          default:
+            return attributeExpression({ node, name }, value)
+        }
+      });
+  }
+
+  /**
+   * Remove all the attributes provided
+   * @param   {HTMLElement} node - target node
+   * @param   {object} newAttributes - object containing all the new attribute names
+   * @param   {object} oldAttributes - object containing all the old attribute names
+   * @returns {undefined} sorry it's a void function :(
+   */
+  function removeAllAttributes(node, newAttributes, oldAttributes) {
+    const newKeys = newAttributes ? Object.keys(newAttributes) : [];
+
+    Object.entries(oldAttributes)
+      .filter(([name]) => !newKeys.includes(name))
+      .forEach(([name, value]) => {
+        switch (true) {
+          case name === REF_ATTRIBUTE:
+            return refExpression({ node, value })
+          case name === VALUE_ATTRIBUTE:
+            node.removeAttribute('value');
+            node.value = '';
+            return
+          case isEventAttribute(name):
+            return eventExpression({ node, name }, null)
+          default:
+            return node.removeAttribute(name)
+        }
+      });
+  }
+
+  /**
+   * Check whether the attribute value can be rendered
+   * @param {*} value - expression value
+   * @returns {boolean} true if we can render this attribute value
+   */
+  function canRenderAttribute(value) {
+    return ['string', 'number', 'boolean'].includes(typeof value)
+  }
+
+  /**
+   * Check whether the attribute should be removed
+   * @param {*} value - expression value
+   * @param   {boolean} isBoolean - flag to handle boolean attributes
+   * @returns {boolean} boolean - true if the attribute can be removed
+   */
+  function shouldRemoveAttribute(value, isBoolean) {
+    // boolean attributes should be removed if the value is falsy
+    if (isBoolean) return !value
+
+    // null and undefined values will remove the attribute as well
+    return isNil(value)
+  }
+
+  /**
+   * This methods handles the DOM attributes updates
+   * @param   {object} expression - attribute expression data
+   * @param   {HTMLElement} expression.node - target node
+   * @param   {string} expression.name - attribute name
+   * @param   {boolean} expression.isBoolean - flag to handle boolean attributes
+   * @param   {*} expression.value - the old expression cached value
+   * @param   {*} value - new expression value
+   * @returns {undefined}
+   */
+  function attributeExpression(
+    { node, name, isBoolean: isBoolean$1, value: oldValue },
+    value,
+  ) {
+    // is it a spread operator? {...attributes}
+    if (!name) {
+      if (oldValue) {
+        // remove all the old attributes
+        removeAllAttributes(node, value, oldValue);
+      }
+
+      // is the value still truthy?
+      if (value) {
+        setAllAttributes(node, value, oldValue);
+      }
+
+      return
+    }
+
+    // store the attribute on the node to make it compatible with native custom elements
+    if (
+      !isNativeHtmlProperty(name) &&
+      (isBoolean(value) || isObject(value) || isFunction(value))
+    ) {
+      node[name] = value;
+    }
+
+    if (shouldRemoveAttribute(value, isBoolean$1)) {
+      node.removeAttribute(name);
+    } else if (canRenderAttribute(value)) {
+      node.setAttribute(name, normalizeValue(name, value, isBoolean$1));
+    }
+  }
+
+  /**
+   * Get the value as string
+   * @param   {string} name - attribute name
+   * @param   {*} value - user input value
+   * @param   {boolean} isBoolean - boolean attributes flag
+   * @returns {string} input value as string
+   */
+  function normalizeValue(name, value, isBoolean) {
+    // be sure that expressions like selected={ true } will always be rendered as selected='selected'
+    // fix https://github.com/riot/riot/issues/2975
+    return !!value && isBoolean ? name : value
   }
 
   /**
@@ -1043,33 +1107,6 @@
     node.data = normalizeStringValue(value);
   }
 
-  /**
-   * This methods handles the input fields value updates
-   * @param   {object} expression - expression data
-   * @param   {HTMLElement} expression.node - target node
-   * @param   {*} value - new expression value
-   * @returns {undefined}
-   */
-  function valueExpression({ node }, value) {
-    node.value = normalizeStringValue(value);
-  }
-
-  /**
-   * This method handles the REF attribute expressions
-   * @param   {object} expression - expression data
-   * @param   {HTMLElement} expression.node - target node
-   * @param   {*} expression.value - the old expression cached value
-   * @param   {*} value - new expression value
-   * @returns {undefined}
-   */
-  function refExpression({ node, value: oldValue }, value) {
-    // called on mount and update
-    if (value) value(node);
-    // called on unmount
-    // in this case the node value is null
-    else oldValue(null);
-  }
-
   const expressions = {
     [ATTRIBUTE]: attributeExpression,
     [EVENT]: eventExpression,
@@ -1091,10 +1128,13 @@
      */
     mount(scope) {
       // hopefully a pure function
-      this.value = this.evaluate(scope);
+      const value = this.evaluate(scope);
 
       // IO() DOM updates
-      expressions[this.type](this, this.value);
+      expressions[this.type](this, value);
+
+      // store the computed value for the update calls
+      this.value = value;
 
       return this
     },
@@ -1121,7 +1161,12 @@
      */
     unmount() {
       // unmount event and ref expressions
-      if ([EVENT, REF].includes(this.type)) expressions[this.type](this, null);
+      if (
+        [EVENT, REF].includes(this.type) ||
+        // spread attributes might contain events or refs that must be unmounted
+        (this.type === ATTRIBUTE && !this.name)
+      )
+        expressions[this.type](this, null);
 
       return this
     },
@@ -2518,7 +2563,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v10.0.0-beta.1';
+  const version = 'v10.0.0-rc.1';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
