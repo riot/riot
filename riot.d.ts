@@ -254,10 +254,10 @@ export declare const __: {
   globals: {
     PROPS_KEY: string
     STATE_KEY: string
-    IS_COMPONENT_UPDATING: Symbol
-    ATTRIBUTES_KEY_SYMBOL: Symbol
-    PARENT_KEY_SYMBOL: Symbol
-    DOM_COMPONENT_INSTANCE_PROPERTY: Symbol
+    IS_COMPONENT_UPDATING: symbol
+    ATTRIBUTES_KEY_SYMBOL: symbol
+    PARENT_KEY_SYMBOL: symbol
+    DOM_COMPONENT_INSTANCE_PROPERTY: symbol
     COMPONENTS_IMPLEMENTATION_MAP: RegisteredComponentsMap
     PLUGINS_SET: InstalledPluginsSet
   }
