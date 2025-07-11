@@ -43,9 +43,3 @@ jobs:
         with:
           token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
           files: coverage/lcov.info
-      - name: Coveralls
-        if: ${{ success() && github.event_name != 'pull_request' && matrix.node-version == '22.x' }}
-        uses: coverallsapp/github-action@master
-        with:
-          path-to-lcov: ./coverage/lcov.info
-          github-token: ${{ secrets.GITHUB_TOKEN }}

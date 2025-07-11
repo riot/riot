@@ -215,8 +215,8 @@ Special thanks to Browserstack for their support
 [npm-url]: https://npmjs.org/package/riot
 [saucelabs-image]: https://saucelabs.com/browser-matrix/testsriotjs.svg?1
 [saucelabs-url]: https://saucelabs.com/u/testsriotjs
-[coverage-image]: https://img.shields.io/coveralls/riot/riot/main.svg?style=flat-square
-[coverage-url]: https://coveralls.io/r/riot/riot?branch=main
+[coverage-image]: https://qlty.sh/gh/riot/projects/riot/coverage.svg
+[coverage-url]: https://qlty.sh/gh/riot/projects/riot
 [discord-url]: https://discord.gg/PagXe5Y
 [discord-image]: https://img.shields.io/badge/DISCORD-JOIN_CHANNEL_%E2%86%92-7289da.svg?style=flat-square
 [slack-ja-image]: https://img.shields.io/badge/SLACK_(ja)-JOIN_CHAT_%E2%86%92-551a8b.svg?style=flat-square
