@@ -13,7 +13,7 @@
 [![jsDelivr Hits][jsdelivr-image]][jsdelivr-url]
 [![Coverage Status][coverage-image]][coverage-url]
 ![Riot Size][lib-size]
-[![Code Quality][codeclimate-image]][codeclimate-url]
+[![Code Quality][qlty-image]][qlty-url]
 
 [![Sauce Test Status][saucelabs-image]][saucelabs-url]
 
@@ -221,8 +221,8 @@ Special thanks to Browserstack for their support
 [discord-image]: https://img.shields.io/badge/DISCORD-JOIN_CHANNEL_%E2%86%92-7289da.svg?style=flat-square
 [slack-ja-image]: https://img.shields.io/badge/SLACK_(ja)-JOIN_CHAT_%E2%86%92-551a8b.svg?style=flat-square
 [slack-ja-url]: https://riot-jp-slackin.herokuapp.com/
-[codeclimate-image]: https://api.codeclimate.com/v1/badges/b81ddf3c77e8189876da/maintainability
-[codeclimate-url]: https://codeclimate.com/github/riot/riot
+[qlty-image]: https://qlty.sh/gh/riot/projects/riot/maintainability.svg
+[qlty-url]: https://qlty.sh/gh/riot/projects/riot
 [jsdelivr-image]: https://data.jsdelivr.com/v1/package/npm/riot/badge
 [jsdelivr-url]: https://www.jsdelivr.com/package/npm/riot
 [backer-url]: #backers
