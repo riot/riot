@@ -37,9 +37,11 @@ jobs:
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
           SAUCE_USERNAME: ${{ secrets.SAUCE_USERNAME }}
         run: make e2e-test
-      - uses: qltysh/qlty-action/coverage@v1
+      - name: Code Quality
+        if: ${{ success() && github.event_name != 'pull_request' && matrix.node-version == '22.x' }}
+        uses: qltysh/qlty-action/coverage@v1
         with:
-          token: { { secrets.QLTY_COVERAGE_TOKEN } }
+          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
           files: coverage/lcov.info
       - name: Coveralls
         if: ${{ success() && github.event_name != 'pull_request' && matrix.node-version == '22.x' }}
