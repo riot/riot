@@ -15,7 +15,7 @@
 ![Riot Size][lib-size]
 [![Code Quality][qlty-image]][qlty-url]
 
-[![Sauce Test Status][saucelabs-image]][saucelabs-url]
+<!-- [![Sauce Test Status][saucelabs-image]][saucelabs-url] -->
 
 ### Custom components • Concise syntax • Simple API • Tiny Size
 
@@ -213,8 +213,10 @@ Special thanks to Browserstack for their support
 [npm-version-image]: https://img.shields.io/npm/v/riot.svg?style=flat-square
 [npm-downloads-image]: https://img.shields.io/npm/dm/riot.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/riot
-[saucelabs-image]: https://saucelabs.com/browser-matrix/testsriotjs.svg?1
-[saucelabs-url]: https://saucelabs.com/u/testsriotjs
+
+<!-- [saucelabs-image]: https://saucelabs.com/browser-matrix/testsriotjs.svg?1 -->
+<!-- [saucelabs-url]: https://saucelabs.com/u/testsriotjs -->
+
 [coverage-image]: https://qlty.sh/gh/riot/projects/riot/coverage.svg
 [coverage-url]: https://qlty.sh/gh/riot/projects/riot
 [discord-url]: https://discord.gg/PagXe5Y
