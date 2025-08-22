@@ -31,9 +31,7 @@ jobs:
       - run: make lint
       - run: make unit-test
       - name: Saucelabs Crossbrowser Testing
-        # if: ${{ success() && github.event_name != 'pull_request' && matrix.node-version == '22.x' }}
-        # disable the saucelabs tests that seems to randomly fail
-        if: false
+        if: ${{ success() && github.event_name != 'pull_request' && matrix.node-version == '22.x' }}
         env:
           SAUCELABS: 1
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
