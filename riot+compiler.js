@@ -1,4 +1,4 @@
-/* Riot v10.0.0, @license MIT */
+/* Riot v10.0.1, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -21641,6 +21641,10 @@
    */
   function mergeAttributeExpressions(node, sourceFile, sourceCode) {
     switch (true) {
+      // If the node has no value we early return either an empty string or its name
+      // https://github.com/riot/riot/issues/3068
+      case node.value === '':
+        return builders.literal(node[IS_BOOLEAN_ATTRIBUTE] ? node.name : '')
       // static attributes don't need to be merged, nor expression transformations are needed
       case !hasExpressions(node) && node.parts.length === 1:
         return builders.literal(node.parts[0])
@@ -25827,7 +25831,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v10.0.0';
+  const version = 'v10.0.1';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
