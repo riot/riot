@@ -197,6 +197,12 @@ export declare function pure<
   FactoryFunction = PureComponentFactoryFunction<InitialProps, Context>,
 >(func: FactoryFunction): FactoryFunction
 
+export declare function createPureComponent<
+  InitialProps extends DefaultProps = DefaultProps,
+  Context = any,
+  FactoryFunction = PureComponentFactoryFunction<InitialProps, Context>,
+>(func: FactoryFunction): FactoryFunction
+
 export declare const version: string
 
 // typescript specific methods
