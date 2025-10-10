@@ -354,6 +354,29 @@ describe('lifecycle events', () => {
     expect(element.getAttribute('is-pure')).to.be.not.ok
   })
 
+  it('riot.createPureComponent components get properly rendered', () => {
+    const element = document.createElement('pure-component')
+    const component = riot
+      .createPureComponent(() => {
+        return {
+          mount(root) {
+            this.root = root
+            this.root.setAttribute('is-pure', 'is-pure')
+          },
+          unmount() {
+            this.root.removeAttribute('is-pure')
+          },
+        }
+      })({})
+      .mount(element)
+
+    expect(element.getAttribute('is-pure')).to.be.equal('is-pure')
+
+    component.unmount()
+
+    expect(element.getAttribute('is-pure')).to.be.not.ok
+  })
+
   it('html comments do not break the expressions rendering', () => {
     const element = document.createElement('comments-and-expressions')
     const component = riot.component(CommentsAndExpressions)(element)
