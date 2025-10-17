@@ -4,13 +4,18 @@ import { pure } from './pure.js'
 /**
  * Helper method to simplify the creation of pure components without the need to rely on a .riot file
  * @param {Function} func - RiotPureComponent factory function
- * @returns {PureComponentFactoryFunction} pure component object implementation
+ * @param {string} name - Optional parameter if you want to define the name of your component for debugging purposes
+ * @returns {import('../../riot.js').RiotComponentWrapper} pure component object implementation
  */
-export function createPureComponent(func) {
-  return ({ slots, attributes, props }) =>
-    create(pure(func), {
-      attributes,
-      slots,
-      props,
-    })
+export function createPureComponent(func, name) {
+  return {
+    name,
+    exports: pure(({ slots, attributes, props }) =>
+      create(func, {
+        attributes,
+        slots,
+        props,
+      }),
+    ),
+  }
 }
