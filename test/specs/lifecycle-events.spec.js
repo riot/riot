@@ -356,8 +356,8 @@ describe('lifecycle events', () => {
 
   it('riot.createPureComponent components get properly rendered', () => {
     const element = document.createElement('pure-component')
-    const component = riot
-      .createPureComponent(() => {
+    const component = riot.component(
+      riot.createPureComponent(() => {
         return {
           mount(root) {
             this.root = root
@@ -367,8 +367,8 @@ describe('lifecycle events', () => {
             this.root.removeAttribute('is-pure')
           },
         }
-      })({})
-      .mount(element)
+      }),
+    )(element)
 
     expect(element.getAttribute('is-pure')).to.be.equal('is-pure')
 
