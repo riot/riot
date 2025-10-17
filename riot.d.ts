@@ -201,7 +201,7 @@ export declare function createPureComponent<
   InitialProps extends DefaultProps = DefaultProps,
   Context = any,
   FactoryFunction = PureComponentFactoryFunction<InitialProps, Context>,
->(func: FactoryFunction): RiotComponentWrapper<RiotComponent>
+>(func: FactoryFunction, name?: string): RiotComponentWrapper<RiotComponent>
 
 export declare const version: string
 
