@@ -1,4 +1,4 @@
-/* Riot v10.0.1, @license MIT */
+/* Riot v10.1.0, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -25132,7 +25132,7 @@
    * @param   {any} options.props - initial component properties
    * @returns {object} pure component object
    */
-  function createPureComponent(
+  function createPureComponent$1(
     pureFactoryFunction,
     { slots, attributes, props, css, template },
   ) {
@@ -25697,7 +25697,7 @@
     return ({ slots, attributes, props }) => {
       // pure components rendering will be managed by the end user
       if (exports && exports[IS_PURE_SYMBOL])
-        return createPureComponent(exports, {
+        return createPureComponent$1(exports, {
           slots,
           attributes,
           props,
@@ -25823,6 +25823,25 @@
   }
 
   /**
+   * Helper method to simplify the creation of pure components without the need to rely on a .riot file
+   * @param {Function} func - RiotPureComponent factory function
+   * @param {string} name - Optional parameter if you want to define the name of your component for debugging purposes
+   * @returns {import('../../riot.js').RiotComponentWrapper} pure component object implementation
+   */
+  function createPureComponent(func, name) {
+    return {
+      name,
+      exports: pure(({ slots, attributes, props }) =>
+        createPureComponent$1(func, {
+          attributes,
+          slots,
+          props,
+        }),
+      ),
+    }
+  }
+
+  /**
    * no-op function needed to add the proper types to your component via typescript
    * @param {Function | object} component - component default export
    * @returns {Function | object} returns exactly what it has received
@@ -25831,7 +25850,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v10.0.1';
+  const version = 'v10.1.0';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
@@ -26040,6 +26059,7 @@
   exports.compileFromUrl = compileFromUrl;
   exports.compiler = compiler_essential;
   exports.component = component;
+  exports.createPureComponent = createPureComponent;
   exports.inject = inject;
   exports.install = install;
   exports.mount = mount;
