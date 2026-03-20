@@ -1,4 +1,4 @@
-/* Riot v10.1.2, @license MIT */
+/* Riot v10.1.3, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -23895,7 +23895,14 @@
             // will be processed at zero cost
             if (sequence > index - bStart) {
               const node = get(a[aStart], 0);
-              while (bStart < index) moveBefore(get(b[bStart++], 1), node);
+              while (bStart < index) {
+                // if the node is already in the DOM, move it
+                // to preserve its state (focus, animations, iframes, etc.)
+                // otherwise insert it as a new node
+                const newNode = get(b[bStart++], 1);
+                if (newNode.parentNode) moveBefore(newNode, node);
+                else insertBefore(newNode, node);
+              }
             }
             // if the effort wasn't good enough, fallback to a replace,
             // moving both source and target indexes forward, hoping that some
@@ -25859,7 +25866,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v10.1.2';
+  const version = 'v10.1.3';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
