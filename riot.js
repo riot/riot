@@ -1,4 +1,4 @@
-/* Riot v10.1.3, @license MIT */
+/* Riot v10.1.4, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2366,7 +2366,7 @@
    * @returns {object} component like interface
    */
   function createComponentFromWrapper(componentWrapper) {
-    const { css, template, exports: exports$1, name } = componentWrapper;
+    const { css, template, exports, name } = componentWrapper;
     const templateFn = template
       ? componentTemplateFactory(
           template,
@@ -2377,8 +2377,8 @@
 
     return ({ slots, attributes, props }) => {
       // pure components rendering will be managed by the end user
-      if (exports$1 && exports$1[IS_PURE_SYMBOL])
-        return createPureComponent$1(exports$1, {
+      if (exports && exports[IS_PURE_SYMBOL])
+        return createPureComponent$1(exports, {
           slots,
           attributes,
           props,
@@ -2386,7 +2386,7 @@
           template,
         })
 
-      const componentAPI = callOrAssign(exports$1) || {};
+      const componentAPI = callOrAssign(exports) || {};
 
       const component = instantiateComponent({
         css,
@@ -2422,13 +2422,13 @@
    * @param   {object} implementation.exports - component default export
    * @returns {Map} map containing all the components implementations
    */
-  function register(name, { css, template, exports: exports$1 }) {
+  function register(name, { css, template, exports }) {
     if (COMPONENTS_IMPLEMENTATION_MAP.has(name))
       panic(`The component "${name}" was already registered`);
 
     COMPONENTS_IMPLEMENTATION_MAP.set(
       name,
-      createComponentFromWrapper({ name, css, template, exports: exports$1 }),
+      createComponentFromWrapper({ name, css, template, exports }),
     );
 
     return COMPONENTS_IMPLEMENTATION_MAP
@@ -2598,7 +2598,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v10.1.3';
+  const version = 'v10.1.4';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
