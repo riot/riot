@@ -9,8 +9,10 @@ export interface RandomComponentProps {
   title: string
 }
 
-export interface RandomComponent
-  extends RiotComponent<RandomComponentProps, RandomComponentState> {
+export interface RandomComponent extends RiotComponent<
+  RandomComponentProps,
+  RandomComponentState
+> {
   generate(event: MouseEvent): void
 
   clearLogs(): void
