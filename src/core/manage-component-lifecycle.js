@@ -136,13 +136,14 @@ export function manageComponentLifecycle(
 
             // avoiding recursive updates
             // see also https://github.com/riot/riot/issues/2895
+            // only the call that acquired the guard should update the template,
+            // fire onUpdated, and release the guard — re-entrant calls skip all three
             if (!this[IS_COMPONENT_UPDATING]) {
               this[IS_COMPONENT_UPDATING] = true
               this[TEMPLATE_KEY_SYMBOL].update(this, this[PARENT_KEY_SYMBOL])
+              this[ON_UPDATED_KEY](this[PROPS_KEY], this[STATE_KEY])
+              this[IS_COMPONENT_UPDATING] = false
             }
-
-            this[ON_UPDATED_KEY](this[PROPS_KEY], this[STATE_KEY])
-            this[IS_COMPONENT_UPDATING] = false
 
             return this
           },

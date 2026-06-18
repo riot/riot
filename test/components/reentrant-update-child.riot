@@ -1,0 +1,12 @@
+<reentrant-update-child>
+  <script>
+    export default {
+      onMounted({ parent }) {
+        // trigger a re-entrant update on the parent while IS_COMPONENT_UPDATING
+        // is true for the parent (the parent's TEMPLATE_KEY_SYMBOL.update() is
+        // still executing on the call stack when this runs)
+        parent.update()
+      }
+    }
+  </script>
+</reentrant-update-child>

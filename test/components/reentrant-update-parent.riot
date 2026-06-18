@@ -1,0 +1,24 @@
+<reentrant-update-parent>
+  <reentrant-update-child parent={this} if={state.started}/>
+
+  <script>
+    import Child from './reentrant-update-child.riot'
+
+    export default {
+      components: { Child },
+      state: {
+        started: false,
+        updatedCount: 0
+      },
+      onMounted() {
+        // kick off an update — this sets IS_COMPONENT_UPDATING = true and calls
+        // TEMPLATE_KEY_SYMBOL.update(), during which the child will mount and
+        // call parent.update() again (the re-entrant case)
+        this.update({ started: true })
+      },
+      onUpdated() {
+        this.state.updatedCount++
+      }
+    }
+  </script>
+</reentrant-update-parent>

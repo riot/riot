@@ -1,5 +1,6 @@
 import * as riot from '../../src/riot.js'
 import { bindingTypes, expressionTypes, template } from '@riotjs/dom-bindings'
+import ReentrantUpdateParent from '../components/reentrant-update-parent.riot'
 import CommentsAndExpressions from '../components/comments-and-expressions.riot'
 import ConditionalSelectOption from '../components/conditional-select-option.riot'
 import EachCustomChildrenComponents from '../components/each-custom-children-components.riot'
@@ -402,5 +403,20 @@ describe('lifecycle events', () => {
       'onBeforeUnmount',
       'onUnmounted',
     ])
+  })
+
+  it('onUpdated does not fire for re-entrant update calls that skip the DOM update', () => {
+    // The parent's onMounted calls this.update(), setting IS_COMPONENT_UPDATING=true.
+    // During TEMPLATE_KEY_SYMBOL.update() the child mounts and calls parent.update()
+    // again (re-entrant). The re-entrant call must skip both the DOM update AND the
+    // onUpdated hook — only the outer call should fire onUpdated.
+    const element = document.createElement('reentrant-update-parent')
+    const component = riot.component(ReentrantUpdateParent)(element)
+
+    // onMounted triggers exactly one update(); the child's re-entrant update()
+    // must not produce an additional onUpdated invocation.
+    expect(component.state.updatedCount).to.be.equal(1)
+
+    component.unmount()
   })
 })
