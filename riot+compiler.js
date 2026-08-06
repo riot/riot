@@ -1,4 +1,4 @@
-/* Riot v10.1.5, @license MIT */
+/* Riot v10.1.6, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -2259,7 +2259,7 @@
   			var isInstance = false;
         try {
           isInstance = this instanceof a;
-        } catch {}
+        } catch (e) {}
   			if (isInstance) {
           return Reflect.construct(f, arguments, this.constructor);
   			}
@@ -2296,7 +2296,7 @@
   OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
   PERFORMANCE OF THIS SOFTWARE.
   ***************************************************************************** */
-  /* global Reflect, Promise, SuppressedError, Symbol */
+  /* global Reflect, Promise, SuppressedError, Symbol, Iterator */
 
   var extendStatics = function(d, b) {
     extendStatics = Object.setPrototypeOf ||
@@ -2403,8 +2403,8 @@
   }
 
   function __generator(thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
@@ -2508,8 +2508,9 @@
   function __asyncGenerator(thisArg, _arguments, generator) {
     if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
     var g = generator.apply(thisArg, _arguments || []), i, q = [];
-    return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i;
-    function verb(n) { if (g[n]) i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; }
+    return i = Object.create((typeof AsyncIterator === "function" ? AsyncIterator : Object).prototype), verb("next"), verb("throw"), verb("return", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;
+    function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }
+    function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }
     function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
     function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }
     function fulfill(value) { resume("next", value); }
@@ -2541,10 +2542,19 @@
     o["default"] = v;
   };
 
+  var ownKeys = function(o) {
+    ownKeys = Object.getOwnPropertyNames || function (o) {
+      var ar = [];
+      for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+      return ar;
+    };
+    return ownKeys(o);
+  };
+
   function __importStar(mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
     __setModuleDefault(result, mod);
     return result;
   }
@@ -2574,16 +2584,18 @@
   function __addDisposableResource(env, value, async) {
     if (value !== null && value !== void 0) {
       if (typeof value !== "object" && typeof value !== "function") throw new TypeError("Object expected.");
-      var dispose;
+      var dispose, inner;
       if (async) {
-          if (!Symbol.asyncDispose) throw new TypeError("Symbol.asyncDispose is not defined.");
-          dispose = value[Symbol.asyncDispose];
+        if (!Symbol.asyncDispose) throw new TypeError("Symbol.asyncDispose is not defined.");
+        dispose = value[Symbol.asyncDispose];
       }
       if (dispose === void 0) {
-          if (!Symbol.dispose) throw new TypeError("Symbol.dispose is not defined.");
-          dispose = value[Symbol.dispose];
+        if (!Symbol.dispose) throw new TypeError("Symbol.dispose is not defined.");
+        dispose = value[Symbol.dispose];
+        if (async) inner = dispose;
       }
       if (typeof dispose !== "function") throw new TypeError("Object not disposable.");
+      if (inner) dispose = function() { try { inner.call(this); } catch (e) { return Promise.reject(e); } };
       env.stack.push({ value: value, dispose: dispose, async: async });
     }
     else if (async) {
@@ -2602,20 +2614,34 @@
       env.error = env.hasError ? new _SuppressedError(e, env.error, "An error was suppressed during disposal.") : e;
       env.hasError = true;
     }
+    var r, s = 0;
     function next() {
-      while (env.stack.length) {
-        var rec = env.stack.pop();
+      while (r = env.stack.pop()) {
         try {
-          var result = rec.dispose && rec.dispose.call(rec.value);
-          if (rec.async) return Promise.resolve(result).then(next, function(e) { fail(e); return next(); });
+          if (!r.async && s === 1) return s = 0, env.stack.push(r), Promise.resolve().then(next);
+          if (r.dispose) {
+            var result = r.dispose.call(r.value);
+            if (r.async) return s |= 2, Promise.resolve(result).then(next, function(e) { fail(e); return next(); });
+          }
+          else s |= 1;
         }
         catch (e) {
-            fail(e);
+          fail(e);
         }
       }
+      if (s === 1) return env.hasError ? Promise.reject(env.error) : Promise.resolve();
       if (env.hasError) throw env.error;
     }
     return next();
+  }
+
+  function __rewriteRelativeImportExtension(path, preserveJsx) {
+    if (typeof path === "string" && /^\.\.?\//.test(path)) {
+        return path.replace(/\.(tsx)$|((?:\.d)?)((?:\.[^./]+?)?)\.([cm]?)ts$/i, function (m, tsx, d, ext, cm) {
+            return tsx ? preserveJsx ? ".jsx" : ".js" : d && (!ext || !cm) ? m : (d + ext + "." + cm.toLowerCase() + "js");
+        });
+    }
+    return path;
   }
 
   var tslib_es6 = {
@@ -2624,6 +2650,10 @@
     __rest,
     __decorate,
     __param,
+    __esDecorate,
+    __runInitializers,
+    __propKey,
+    __setFunctionName,
     __metadata,
     __awaiter,
     __generator,
@@ -2646,6 +2676,7 @@
     __classPrivateFieldIn,
     __addDisposableResource,
     __disposeResources,
+    __rewriteRelativeImportExtension,
   };
 
   var tslib_es6$1 = /*#__PURE__*/Object.freeze({
@@ -2675,6 +2706,7 @@
     __propKey: __propKey,
     __read: __read,
     __rest: __rest,
+    __rewriteRelativeImportExtension: __rewriteRelativeImportExtension,
     __runInitializers: __runInitializers,
     __setFunctionName: __setFunctionName,
     __spread: __spread,
@@ -8303,37 +8335,28 @@
   	            end: subtractPos(this.targetLoc.end, line, column),
   	        });
   	    };
-  	    Mapping.prototype.indent = function (by, skipFirstLine, noNegativeColumns) {
-  	        if (skipFirstLine === void 0) { skipFirstLine = false; }
-  	        if (noNegativeColumns === void 0) { noNegativeColumns = false; }
-  	        if (by === 0) {
+  	    Mapping.prototype.reindent = function (oldLines, newLines) {
+  	        var start = this.targetLoc.start;
+  	        var end = this.targetLoc.end;
+  	        // Ask the Lines objects how far each line really moved, rather than
+  	        // assuming every line moved by the same amount, because getIndentAt
+  	        // never reports a negative indentation, so lines that already begin at
+  	        // column zero stay put while the lines around them are dedented.
+  	        var startShift = newLines.getIndentAt(start.line) - oldLines.getIndentAt(start.line);
+  	        var endShift = newLines.getIndentAt(end.line) - oldLines.getIndentAt(end.line);
+  	        if (startShift === 0 && endShift === 0) {
   	            return this;
   	        }
-  	        var targetLoc = this.targetLoc;
-  	        var startLine = targetLoc.start.line;
-  	        var endLine = targetLoc.end.line;
-  	        if (skipFirstLine && startLine === 1 && endLine === 1) {
-  	            return this;
-  	        }
-  	        targetLoc = {
-  	            start: targetLoc.start,
-  	            end: targetLoc.end,
-  	        };
-  	        if (!skipFirstLine || startLine > 1) {
-  	            var startColumn = targetLoc.start.column + by;
-  	            targetLoc.start = {
-  	                line: startLine,
-  	                column: noNegativeColumns ? Math.max(0, startColumn) : startColumn,
-  	            };
-  	        }
-  	        if (!skipFirstLine || endLine > 1) {
-  	            var endColumn = targetLoc.end.column + by;
-  	            targetLoc.end = {
-  	                line: endLine,
-  	                column: noNegativeColumns ? Math.max(0, endColumn) : endColumn,
-  	            };
-  	        }
-  	        return new Mapping(this.sourceLines, this.sourceLoc, targetLoc);
+  	        return new Mapping(this.sourceLines, this.sourceLoc, {
+  	            start: {
+  	                line: start.line,
+  	                column: Math.max(0, start.column + startShift),
+  	            },
+  	            end: {
+  	                line: end.line,
+  	                column: Math.max(0, end.column + endShift),
+  	            },
+  	        });
   	    };
   	    return Mapping;
   	}());
@@ -8539,14 +8562,7 @@
   	            }
   	            return info;
   	        }));
-  	        if (this.mappings.length > 0) {
-  	            var newMappings_1 = lines.mappings;
-  	            (0, tiny_invariant_1.default)(newMappings_1.length === 0);
-  	            this.mappings.forEach(function (mapping) {
-  	                newMappings_1.push(mapping.indent(width, skipFirstLine, true));
-  	            });
-  	        }
-  	        return lines;
+  	        return this.reindentMappings(lines);
   	    };
   	    Lines.prototype.indent = function (by) {
   	        if (by === 0) {
@@ -8558,14 +8574,7 @@
   	            }
   	            return info;
   	        }));
-  	        if (this.mappings.length > 0) {
-  	            var newMappings_2 = lines.mappings;
-  	            (0, tiny_invariant_1.default)(newMappings_2.length === 0);
-  	            this.mappings.forEach(function (mapping) {
-  	                newMappings_2.push(mapping.indent(by));
-  	            });
-  	        }
-  	        return lines;
+  	        return this.reindentMappings(lines);
   	    };
   	    Lines.prototype.indentTail = function (by) {
   	        if (by === 0) {
@@ -8580,13 +8589,16 @@
   	            }
   	            return info;
   	        }));
-  	        if (this.mappings.length > 0) {
-  	            var newMappings_3 = lines.mappings;
-  	            (0, tiny_invariant_1.default)(newMappings_3.length === 0);
-  	            this.mappings.forEach(function (mapping) {
-  	                newMappings_3.push(mapping.indent(by, true));
-  	            });
-  	        }
+  	        return this.reindentMappings(lines);
+  	    };
+  	    // Copies this.mappings into the given reindented Lines, shifting each
+  	    // mapping by however far its own lines actually moved.
+  	    Lines.prototype.reindentMappings = function (lines) {
+  	        var _this = this;
+  	        (0, tiny_invariant_1.default)(lines.mappings.length === 0);
+  	        this.mappings.forEach(function (mapping) {
+  	            return lines.mappings.push(mapping.reindent(_this, lines));
+  	        });
   	        return lines;
   	    };
   	    Lines.prototype.lockIndentTail = function () {
@@ -8802,12 +8814,12 @@
   	        }
   	        var lines = new Lines(sliced);
   	        if (this.mappings.length > 0) {
-  	            var newMappings_4 = lines.mappings;
-  	            (0, tiny_invariant_1.default)(newMappings_4.length === 0);
+  	            var newMappings_1 = lines.mappings;
+  	            (0, tiny_invariant_1.default)(newMappings_1.length === 0);
   	            this.mappings.forEach(function (mapping) {
   	                var sliced = mapping.slice(this, start, end);
   	                if (sliced) {
-  	                    newMappings_4.push(sliced);
+  	                    newMappings_1.push(sliced);
   	                }
   	            }, this);
   	        }
@@ -9519,12 +9531,20 @@
   	    this.seen = new Map();
   	};
   	var TCp = TreeCopier.prototype;
+  	var originalProperty = {
+  	    configurable: false,
+  	    enumerable: false,
+  	    writable: true,
+  	};
   	TCp.copy = function (node) {
+  	    if (typeof node !== "object") {
+  	        return node;
+  	    }
   	    if (this.seen.has(node)) {
   	        return this.seen.get(node);
   	    }
   	    if (isArray.check(node)) {
-  	        var copy_1 = new Array(node.length);
+  	        var copy_1 = node.slice();
   	        this.seen.set(node, copy_1);
   	        node.forEach(function (item, i) {
   	            copy_1[i] = this.copy(item);
@@ -9535,31 +9555,25 @@
   	        return node;
   	    }
   	    util.fixFaultyLocations(node, this.lines);
-  	    var copy = Object.create(Object.getPrototypeOf(node), {
-  	        original: {
-  	            // Provide a link from the copy to the original.
-  	            value: node,
-  	            configurable: false,
-  	            enumerable: false,
-  	            writable: true,
-  	        },
-  	    });
+  	    var copy = Object.create(Object.getPrototypeOf(node));
+  	    // Provide a link from the copy to the original.
+  	    Object.defineProperty(copy, "original", originalProperty);
+  	    copy.original = node;
   	    this.seen.set(node, copy);
   	    var loc = node.loc;
   	    var oldIndent = this.indent;
   	    var newIndent = oldIndent;
-  	    var oldStartTokenIndex = this.startTokenIndex;
-  	    var oldEndTokenIndex = this.endTokenIndex;
+  	    var type = node.type;
   	    if (loc) {
   	        // When node is a comment, we set node.loc.indent to
   	        // node.loc.start.column so that, when/if we print the comment by
   	        // itself, we can strip that much whitespace from the left margin of
   	        // the comment. This only really matters for multiline Block comments,
   	        // but it doesn't hurt for Line comments.
-  	        if (node.type === "Block" ||
-  	            node.type === "Line" ||
-  	            node.type === "CommentBlock" ||
-  	            node.type === "CommentLine" ||
+  	        if (type === "Block" ||
+  	            type === "Line" ||
+  	            type === "CommentBlock" ||
+  	            type === "CommentLine" ||
   	            this.lines.isPrecededOnlyByWhitespace(loc.start)) {
   	            newIndent = this.indent = loc.start.column;
   	        }
@@ -9573,17 +9587,19 @@
   	        // all the tokens that make up this node.
   	        this.findTokenRange(loc);
   	    }
+  	    var oldStartTokenIndex = this.startTokenIndex;
+  	    var oldEndTokenIndex = this.endTokenIndex;
   	    var keys = Object.keys(node);
   	    var keyCount = keys.length;
   	    for (var i = 0; i < keyCount; ++i) {
   	        var key = keys[i];
   	        if (key === "loc") {
-  	            copy[key] = node[key];
+  	            copy.loc = loc;
   	        }
-  	        else if (key === "tokens" && node.type === "File") {
+  	        else if (key === "tokens" && type === "File") {
   	            // Preserve file.tokens (uncopied) in case client code cares about
   	            // it, even though Recast ignores it when reprinting.
-  	            copy[key] = node[key];
+  	            copy.tokens = node.tokens;
   	        }
   	        else {
   	            copy[key] = this.copy(node[key]);
@@ -9614,7 +9630,7 @@
   	    // *before* loc.end, we need to fast-forward this.endTokenIndex first.
   	    while (this.endTokenIndex < loc.tokens.length) {
   	        var token = loc.tokens[this.endTokenIndex];
-  	        if (util.comparePos(token.loc.end, loc.end) < 0) {
+  	        if (util.comparePos(token.loc.end, loc.end) <= 0) {
   	            ++this.endTokenIndex;
   	        }
   	        else
@@ -9953,6 +9969,27 @@
   	        parent.operator === "**") {
   	        return true;
   	    }
+  	    // The tag of a tagged template literal occupies a MemberExpression /
+  	    // CallExpression (LeftHandSideExpression) position, so a lower-precedence
+  	    // tag expression must be wrapped in parentheses, just like the callee of a
+  	    // call or new expression. Without this, e.g. the AST for `(a || b)`x``
+  	    // would print as `a || b`x``, which parses as `a || (b`x`)`.
+  	    if (parent.type === "TaggedTemplateExpression" &&
+  	        name === "tag" &&
+  	        parent.tag === node) {
+  	        switch (node.type) {
+  	            case "UnaryExpression":
+  	            case "UpdateExpression":
+  	            case "BinaryExpression":
+  	            case "LogicalExpression":
+  	            case "ConditionalExpression":
+  	            case "AssignmentExpression":
+  	            case "AwaitExpression":
+  	            case "YieldExpression":
+  	            case "ArrowFunctionExpression":
+  	                return true;
+  	        }
+  	    }
   	    switch (node.type) {
   	        case "UnaryExpression":
   	        case "SpreadElement":
@@ -9960,6 +9997,20 @@
   	            return (parent.type === "MemberExpression" &&
   	                name === "object" &&
   	                parent.object === node);
+  	        case "UpdateExpression":
+  	            // An UpdateExpression binds looser than a MemberExpression /
+  	            // CallExpression, so it needs parentheses in those positions, e.g.
+  	            // `(a++).b`, `(a++)()`, `new (a++)`. Without them the output is invalid
+  	            // syntax (`a++.b`) or changes meaning (`++a.b` parses as `++(a.b)`).
+  	            switch (parent.type) {
+  	                case "MemberExpression":
+  	                    return name === "object" && parent.object === node;
+  	                case "CallExpression":
+  	                case "NewExpression":
+  	                    return name === "callee" && parent.callee === node;
+  	                default:
+  	                    return false;
+  	            }
   	        case "BinaryExpression":
   	        case "LogicalExpression":
   	            switch (parent.type) {
@@ -9980,9 +10031,19 @@
   	                    if (pp > np) {
   	                        return true;
   	                    }
-  	                    if (pp === np && name === "right") {
-  	                        (0, tiny_invariant_1.default)(parent.right === node);
-  	                        return true;
+  	                    if (pp === np) {
+  	                        // `**` is right-associative, so `a ** b ** c` parses as
+  	                        // `a ** (b ** c)`: the left operand needs parentheses
+  	                        // (e.g. `(a ** b) ** c`), the right operand does not. Every other
+  	                        // binary/logical operator is left-associative, so the right
+  	                        // operand needs parentheses (e.g. `a - (b - c)`).
+  	                        if (po === "**") {
+  	                            return name === "left";
+  	                        }
+  	                        if (name === "right") {
+  	                            (0, tiny_invariant_1.default)(parent.right === node);
+  	                            return true;
+  	                        }
   	                    }
   	                    break;
   	                }
@@ -10971,11 +11032,11 @@
   	        case "ExportNamedDeclaration":
   	            return printExportDeclaration(path, options, print);
   	        case "ExportAllDeclaration":
-  	            parts.push("export *");
+  	            parts.push(n.exportKind === "type" ? "export type *" : "export *");
   	            if (n.exported) {
   	                parts.push(" as ", path.call(print, "exported"));
   	            }
-  	            parts.push(" from ", path.call(print, "source"), ";");
+  	            parts.push(" from ", path.call(print, "source"), maybePrintImportAssertions(path, options, print), ";");
   	            return (0, lines_1.concat)(parts);
   	        case "TSNamespaceExportDeclaration":
   	            parts.push("export as namespace ", path.call(print, "id"));
@@ -11092,17 +11153,16 @@
   	        case "CallExpression":
   	        case "OptionalCallExpression":
   	            parts.push(path.call(print, "callee"));
+  	            // Optional calls place the chain operator before type arguments:
+  	            // fn?.<T>(), not fn<T>?.().
+  	            if (types.getFieldValue(n, "optional")) {
+  	                parts.push("?.");
+  	            }
   	            if (n.typeParameters) {
   	                parts.push(path.call(print, "typeParameters"));
   	            }
   	            if (n.typeArguments) {
   	                parts.push(path.call(print, "typeArguments"));
-  	            }
-  	            // Like n.optional, but defaults to true for OptionalCallExpression
-  	            // nodes that are missing an n.optional property (unusual),
-  	            // according to the OptionalCallExpression definition in ast-types.
-  	            if (types.getFieldValue(n, "optional")) {
-  	                parts.push("?.");
   	            }
   	            parts.push(printArgumentsList(path, options, print));
   	            return (0, lines_1.concat)(parts);
@@ -11183,6 +11243,9 @@
   	            if (i_1 !== 0 && oneLine_1 && options.objectCurlySpacing) {
   	                parts[leftBraceIndex] = leftBrace + " ";
   	                parts[parts.length - 1] = " " + rightBrace;
+  	            }
+  	            if (n.optional) {
+  	                parts.push("?");
   	            }
   	            if (n.typeAnnotation) {
   	                parts.push(path.call(print, "typeAnnotation"));
@@ -11279,6 +11342,9 @@
   	            }
   	            else {
   	                parts.push("]");
+  	            }
+  	            if (n.optional) {
+  	                parts.push("?");
   	            }
   	            if (n.typeAnnotation) {
   	                parts.push(path.call(print, "typeAnnotation"));
@@ -11583,6 +11649,9 @@
   	                    typeof child.value === "string") {
   	                    if (/\S/.test(child.value)) {
   	                        return child.value.replace(/^\s+/g, "");
+  	                    }
+  	                    else if (/\n\s*\n/.test(child.value)) {
+  	                        return "\n\n";
   	                    }
   	                    else if (/\n/.test(child.value)) {
   	                        return "\n";
@@ -12187,6 +12256,9 @@
   	        case "TSNeverKeyword":
   	            return (0, lines_1.fromString)("never", options);
   	        case "TSArrayType":
+  	            if (n.elementType.type === "TSUnionType") {
+  	                return (0, lines_1.concat)(["(", path.call(print, "elementType"), ")", "[]"]);
+  	            }
   	            return (0, lines_1.concat)([path.call(print, "elementType"), "[]"]);
   	        case "TSLiteralType":
   	            return path.call(print, "literal");
@@ -12212,7 +12284,7 @@
   	            ]);
   	        case "TSConstructorType":
   	            return (0, lines_1.concat)([
-  	                "new ",
+  	                n.abstract ? "abstract new " : "new ",
   	                path.call(print, "typeParameters"),
   	                "(",
   	                printFunctionParams(path, options, print),
@@ -12220,7 +12292,13 @@
   	                path.call(print, "typeAnnotation", "typeAnnotation"),
   	            ]);
   	        case "TSMappedType": {
-  	            parts.push(n.readonly ? "readonly " : "", "[", path.call(print, "typeParameter"), "]", n.optional ? "?" : "");
+  	            var readonly = n.readonly === true
+  	                ? "readonly "
+  	                : n.readonly
+  	                    ? n.readonly + "readonly "
+  	                    : "";
+  	            var optional = n.optional === true ? "?" : n.optional ? n.optional + "?" : "";
+  	            parts.push(readonly, "[", path.call(print, "typeParameter"), "]", optional);
   	            if (n.typeAnnotation) {
   	                parts.push(": ", path.call(print, "typeAnnotation"), ";");
   	            }
@@ -12276,10 +12354,17 @@
   	            }
   	            return (0, lines_1.concat)(parts);
   	        case "TSTypeQuery":
-  	            return (0, lines_1.concat)(["typeof ", path.call(print, "exprName")]);
+  	            return (0, lines_1.concat)([
+  	                "typeof ",
+  	                path.call(print, "exprName"),
+  	                path.call(print, "typeParameters"),
+  	            ]);
   	        case "TSParameterProperty":
   	            if (n.accessibility) {
   	                parts.push(n.accessibility, " ");
+  	            }
+  	            if (n.override) {
+  	                parts.push("override ");
   	            }
   	            if (n.export) {
   	                parts.push("export ");
@@ -12387,6 +12472,15 @@
   	                ";",
   	            ]);
   	        case "TSTypeParameter": {
+  	            if (n.const) {
+  	                parts.push("const ");
+  	            }
+  	            if (n.in) {
+  	                parts.push("in ");
+  	            }
+  	            if (n.out) {
+  	                parts.push("out ");
+  	            }
   	            parts.push(path.call(print, "name"));
   	            // ambiguous because of TSMappedType
   	            var parent = path.getParentNode(0);
@@ -12439,7 +12533,11 @@
   	            return (0, lines_1.concat)(["{\n", lines.indent(options.tabWidth), "\n}"]);
   	        }
   	        case "TSImportType":
-  	            parts.push("import(", path.call(print, "argument"), ")");
+  	            parts.push("import(", path.call(print, "argument"));
+  	            if (n.options) {
+  	                parts.push(", ", path.call(print, "options"));
+  	            }
+  	            parts.push(")");
   	            if (n.qualifier) {
   	                parts.push(".", path.call(print, "qualifier"));
   	            }
@@ -12451,7 +12549,7 @@
   	            if (n.isExport) {
   	                parts.push("export ");
   	            }
-  	            parts.push("import ", path.call(print, "id"), " = ", path.call(print, "moduleReference"));
+  	            parts.push(n.importKind === "type" ? "import type " : "import ", path.call(print, "id"), " = ", path.call(print, "moduleReference"));
   	            return maybeAddSemicolon((0, lines_1.concat)(parts));
   	        case "TSExternalModuleReference":
   	            return (0, lines_1.concat)(["require(", path.call(print, "expression"), ")"]);
@@ -12469,6 +12567,12 @@
   	                        (n.id.type === "Literal" && typeof n.id.value === "string");
   	                    if (isExternal) {
   	                        parts.push("module ");
+  	                    }
+  	                    else if (n.kind === "module") {
+  	                        parts.push("module ");
+  	                    }
+  	                    else if (n.kind === "namespace") {
+  	                        parts.push("namespace ");
   	                    }
   	                    else if (n.loc && n.loc.lines && n.id.loc) {
   	                        var prefix = n.loc.lines.sliceString(n.loc.start, n.id.loc.start);
@@ -12811,9 +12915,13 @@
   	}
   	function maybePrintImportAssertions(path, options, print) {
   	    var n = path.getValue();
-  	    if (n.assertions && n.assertions.length > 0) {
-  	        var parts = [" assert {"];
+  	    if (n.assertions && (n.assertions.length > 0 || n.importAttributesKeyword)) {
+  	        var keyword = n.importAttributesKeyword === "with" ? " with {" : " assert {";
+  	        var parts = [keyword];
   	        var printed = path.map(print, "assertions");
+  	        if (printed.length === 0) {
+  	            return (0, lines_1.concat)([keyword, "}"]);
+  	        }
   	        var flat = (0, lines_1.fromString)(", ").join(printed);
   	        if (flat.length > 1 || flat.getLineLength(1) > options.wrapColumn) {
   	            parts.push("\n", (0, lines_1.fromString)(",\n").join(printed).indent(options.tabWidth), "\n}");
@@ -13083,6 +13191,7 @@
   	AggregateError: false,
   	"Array": false,
   	"ArrayBuffer": false,
+  	AsyncDisposableStack: false,
   	Atomics: false,
   	BigInt: false,
   	BigInt64Array: false,
@@ -13092,6 +13201,7 @@
   	"Date": false,
   	"decodeURI": false,
   	"decodeURIComponent": false,
+  	DisposableStack: false,
   	"encodeURI": false,
   	"encodeURIComponent": false,
   	"Error": false,
@@ -13129,6 +13239,7 @@
   	"Set": false,
   	SharedArrayBuffer: false,
   	"String": false,
+  	SuppressedError: false,
   	"Symbol": false,
   	"SyntaxError": false,
   	"TypeError": false,
@@ -15076,6 +15187,9 @@
   		    // Can be either `"script"`, `"module"` or `"commonjs"`. This influences global
   		    // strict mode and parsing of `import` and `export` declarations.
   		    sourceType: "script",
+  		    // When set to true, enable strict parsing mode even if `sourceType`
+  		    // is `"script"`.
+  		    strict: false,
   		    // `onInsertedSemicolon` can be a callback that will be called when
   		    // a semicolon is automatically inserted. It will be passed the
   		    // position of the inserted semicolon as an offset, and if
@@ -15117,6 +15231,11 @@
   		    // line being 1-based and column 0-based) will be attached to the
   		    // nodes.
   		    locations: false,
+  		    // Pass an optional `{line, column}` object to use for the start of
+  		    // the parse. This is mostly useful when using `parseExpressionAt`
+  		    // with `locations: true`, to prevent the parser from having to
+  		    // determine the line position at the start position.
+  		    startLocation: null,
   		    // A function can be passed as `onToken` option, which will
   		    // cause Acorn to call that function with object in the same
   		    // format as tokens returned from `tokenizer().getToken()`. Note
@@ -15270,13 +15389,17 @@
   		    // Set up token state
 
   		    // The current position of the tokenizer in the input.
-  		    if (startPos) {
-  		      this.pos = startPos;
+  		    this.pos = startPos || 0;
+  		    this.curLine = 1;
+  		    if (options.startLocation) {
+  		      this.lineStart = this.pos - options.startLocation.column;
+  		      this.curLine = options.startLocation.line;
+  		    } else if (startPos) {
   		      this.lineStart = this.input.lastIndexOf("\n", startPos - 1) + 1;
-  		      this.curLine = this.input.slice(0, this.lineStart).split(lineBreak).length;
+  		      if (this.options.locations)
+  		        { this.curLine = this.input.slice(0, this.lineStart).split(lineBreak).length; }
   		    } else {
-  		      this.pos = this.lineStart = 0;
-  		      this.curLine = 1;
+  		      this.lineStart = 0;
   		    }
 
   		    // Properties of the current token:
@@ -15302,7 +15425,7 @@
 
   		    // Figure out if it's a module code.
   		    this.inModule = options.sourceType === "module";
-  		    this.strict = this.inModule || this.strictDirective(this.pos);
+  		    this.strict = this.inModule || options.strict === true || this.strictDirective(this.pos);
 
   		    // Used to signify the start of a potential arrow function
   		    this.potentialArrowAt = -1;
@@ -15340,9 +15463,11 @@
   		  var prototypeAccessors = { inFunction: { configurable: true },inGenerator: { configurable: true },inAsync: { configurable: true },canAwait: { configurable: true },allowReturn: { configurable: true },allowSuper: { configurable: true },allowDirectSuper: { configurable: true },treatFunctionsAsVar: { configurable: true },allowNewDotTarget: { configurable: true },allowUsing: { configurable: true },inClassStaticBlock: { configurable: true } };
 
   		  Parser.prototype.parse = function parse () {
+  		      var this$1$1 = this;
+
   		    var node = this.options.program || this.startNode();
   		    this.nextToken();
-  		    return this.parseTopLevel(node)
+  		    return this.catchStackOverflow(function () { return this$1$1.parseTopLevel(node); })
   		  };
 
   		  prototypeAccessors.inFunction.get = function () { return (this.currentVarScope().flags & SCOPE_FUNCTION) > 0 };
@@ -15481,6 +15606,17 @@
   		    return true
   		  };
 
+  		  pp$9.catchStackOverflow = function(f) {
+  		    try {
+  		      return f()
+  		    } catch (e) {
+  		      if (e instanceof Error && (/\bstack\b.*\b(exceeded|overflow)\b/i.test(e.message) || /\btoo much recursion\b/i.test(e.message)))
+  		        { this.raise(this.start, "Not enough stack space to parse input"); }
+  		      else
+  		        { throw e }
+  		    }
+  		  };
+
   		  // Asserts that following token is given contextual keyword.
 
   		  pp$9.expectContextual = function(name) {
@@ -15584,10 +15720,10 @@
   		  // to its body instead of creating a new node.
 
   		  pp$8.parseTopLevel = function(node) {
-  		    var exports = Object.create(null);
+  		    var exports$1 = Object.create(null);
   		    if (!node.body) { node.body = []; }
   		    while (this.type !== types$1.eof) {
-  		      var stmt = this.parseStatement(null, true, exports);
+  		      var stmt = this.parseStatement(null, true, exports$1);
   		      node.body.push(stmt);
   		    }
   		    if (this.inModule)
@@ -15676,7 +15812,18 @@
   		    while (isIdentifierChar(ch = this.fullCharCodeAt(next)))
   		    if (ch === 92) { return true }
   		    var id = this.input.slice(idStart, next);
-  		    if (keywordRelationalOperator.test(id) || isFor && id === "of") { return false }
+  		    if (keywordRelationalOperator.test(id)) { return false }
+  		    if (isFor && !isAwaitUsing && id === "of") {
+  		      // Look ahead for using declaration with initializer, i.e., `for (using of = ...)`
+  		      skipWhiteSpace.lastIndex = next;
+  		      var skipAfterOf = skipWhiteSpace.exec(this.input);
+  		      next = next + skipAfterOf[0].length;
+  		      if (this.input.charCodeAt(next) !== 61 /* '=' */ ||
+  		        // Check for ==, === and => operators
+  		        (ch = this.input.charCodeAt(next + 1)) === 61 /* '=' */ || ch === 62 /* '>' */) {
+  		        return false
+  		      }
+  		    }
   		    return true
   		  };
 
@@ -15695,7 +15842,7 @@
   		  // `if (foo) /blah/.exec(foo)`, where looking at the previous token
   		  // does not help.
 
-  		  pp$8.parseStatement = function(context, topLevel, exports) {
+  		  pp$8.parseStatement = function(context, topLevel, exports$1) {
   		    var starttype = this.type, node = this.startNode(), kind;
 
   		    if (this.isLet(context)) {
@@ -15750,7 +15897,7 @@
   		        if (!this.inModule)
   		          { this.raise(this.start, "'import' and 'export' may appear only with 'sourceType: module'"); }
   		      }
-  		      return starttype === types$1._import ? this.parseImport(node) : this.parseExport(node, exports)
+  		      return starttype === types$1._import ? this.parseImport(node) : this.parseExport(node, exports$1)
 
   		      // If the statement does not start with a statement keyword or a
   		      // brace, it's an ExpressionStatement or LabeledStatement. We
@@ -15768,6 +15915,10 @@
   		      if (usingKind) {
   		        if (!this.allowUsing) {
   		          this.raise(this.start, "Using declaration cannot appear in the top level when source type is `script` or in the bare case statement");
+  		        }
+  		        if (context) {
+  		          // Cases like `for (;;) using x = ...;`, `if (true) await using x = ...;`, etc. are not allowed.
+  		          this.raise(this.start, "Using declaration is not allowed in single-statement positions");
   		        }
   		        if (usingKind === "await using") {
   		          if (!this.canAwait) {
@@ -15902,11 +16053,12 @@
   		  // Helper method to parse for loop after variable initialization
   		  pp$8.parseForAfterInit = function(node, init, awaitAt) {
   		    if ((this.type === types$1._in || (this.options.ecmaVersion >= 6 && this.isContextual("of"))) && init.declarations.length === 1) {
-  		      if (this.options.ecmaVersion >= 9) {
-  		        if (this.type === types$1._in) {
-  		          if (awaitAt > -1) { this.unexpected(awaitAt); }
-  		        } else { node.await = awaitAt > -1; }
-  		      }
+  		      if (this.type === types$1._in) {
+  		        if ((init.kind === "using" || init.kind === "await using") && !init.declarations[0].init) {
+  		          this.raise(this.start, "Using declaration is not allowed in for-in loops");
+  		        }
+  		        if (this.options.ecmaVersion >= 9 && awaitAt > -1) { this.unexpected(awaitAt); }
+  		      } else if (this.options.ecmaVersion >= 9) { node.await = awaitAt > -1; }
   		      return this.parseForIn(node, init)
   		    }
   		    if (awaitAt > -1) { this.unexpected(awaitAt); }
@@ -16511,11 +16663,11 @@
 
   		  // Parses module export declaration.
 
-  		  pp$8.parseExportAllDeclaration = function(node, exports) {
+  		  pp$8.parseExportAllDeclaration = function(node, exports$1) {
   		    if (this.options.ecmaVersion >= 11) {
   		      if (this.eatContextual("as")) {
   		        node.exported = this.parseModuleExportName();
-  		        this.checkExport(exports, node.exported, this.lastTokStart);
+  		        this.checkExport(exports$1, node.exported, this.lastTokStart);
   		      } else {
   		        node.exported = null;
   		      }
@@ -16529,14 +16681,14 @@
   		    return this.finishNode(node, "ExportAllDeclaration")
   		  };
 
-  		  pp$8.parseExport = function(node, exports) {
+  		  pp$8.parseExport = function(node, exports$1) {
   		    this.next();
   		    // export * from '...'
   		    if (this.eat(types$1.star)) {
-  		      return this.parseExportAllDeclaration(node, exports)
+  		      return this.parseExportAllDeclaration(node, exports$1)
   		    }
   		    if (this.eat(types$1._default)) { // export default ...
-  		      this.checkExport(exports, "default", this.lastTokStart);
+  		      this.checkExport(exports$1, "default", this.lastTokStart);
   		      node.declaration = this.parseExportDefaultDeclaration();
   		      return this.finishNode(node, "ExportDefaultDeclaration")
   		    }
@@ -16544,16 +16696,16 @@
   		    if (this.shouldParseExportStatement()) {
   		      node.declaration = this.parseExportDeclaration(node);
   		      if (node.declaration.type === "VariableDeclaration")
-  		        { this.checkVariableExport(exports, node.declaration.declarations); }
+  		        { this.checkVariableExport(exports$1, node.declaration.declarations); }
   		      else
-  		        { this.checkExport(exports, node.declaration.id, node.declaration.id.start); }
+  		        { this.checkExport(exports$1, node.declaration.id, node.declaration.id.start); }
   		      node.specifiers = [];
   		      node.source = null;
   		      if (this.options.ecmaVersion >= 16)
   		        { node.attributes = []; }
   		    } else { // export { x, y as z } [from '...']
   		      node.declaration = null;
-  		      node.specifiers = this.parseExportSpecifiers(exports);
+  		      node.specifiers = this.parseExportSpecifiers(exports$1);
   		      if (this.eatContextual("from")) {
   		        if (this.type !== types$1.string) { this.unexpected(); }
   		        node.source = this.parseExprAtom();
@@ -16603,47 +16755,47 @@
   		    }
   		  };
 
-  		  pp$8.checkExport = function(exports, name, pos) {
-  		    if (!exports) { return }
+  		  pp$8.checkExport = function(exports$1, name, pos) {
+  		    if (!exports$1) { return }
   		    if (typeof name !== "string")
   		      { name = name.type === "Identifier" ? name.name : name.value; }
-  		    if (hasOwn(exports, name))
+  		    if (hasOwn(exports$1, name))
   		      { this.raiseRecoverable(pos, "Duplicate export '" + name + "'"); }
-  		    exports[name] = true;
+  		    exports$1[name] = true;
   		  };
 
-  		  pp$8.checkPatternExport = function(exports, pat) {
+  		  pp$8.checkPatternExport = function(exports$1, pat) {
   		    var type = pat.type;
   		    if (type === "Identifier")
-  		      { this.checkExport(exports, pat, pat.start); }
+  		      { this.checkExport(exports$1, pat, pat.start); }
   		    else if (type === "ObjectPattern")
   		      { for (var i = 0, list = pat.properties; i < list.length; i += 1)
   		        {
   		          var prop = list[i];
 
-  		          this.checkPatternExport(exports, prop);
+  		          this.checkPatternExport(exports$1, prop);
   		        } }
   		    else if (type === "ArrayPattern")
   		      { for (var i$1 = 0, list$1 = pat.elements; i$1 < list$1.length; i$1 += 1) {
   		        var elt = list$1[i$1];
 
-  		          if (elt) { this.checkPatternExport(exports, elt); }
+  		          if (elt) { this.checkPatternExport(exports$1, elt); }
   		      } }
   		    else if (type === "Property")
-  		      { this.checkPatternExport(exports, pat.value); }
+  		      { this.checkPatternExport(exports$1, pat.value); }
   		    else if (type === "AssignmentPattern")
-  		      { this.checkPatternExport(exports, pat.left); }
+  		      { this.checkPatternExport(exports$1, pat.left); }
   		    else if (type === "RestElement")
-  		      { this.checkPatternExport(exports, pat.argument); }
+  		      { this.checkPatternExport(exports$1, pat.argument); }
   		  };
 
-  		  pp$8.checkVariableExport = function(exports, decls) {
-  		    if (!exports) { return }
+  		  pp$8.checkVariableExport = function(exports$1, decls) {
+  		    if (!exports$1) { return }
   		    for (var i = 0, list = decls; i < list.length; i += 1)
   		      {
   		      var decl = list[i];
 
-  		      this.checkPatternExport(exports, decl.id);
+  		      this.checkPatternExport(exports$1, decl.id);
   		    }
   		  };
 
@@ -16658,13 +16810,13 @@
 
   		  // Parses a comma-separated list of module exports.
 
-  		  pp$8.parseExportSpecifier = function(exports) {
+  		  pp$8.parseExportSpecifier = function(exports$1) {
   		    var node = this.startNode();
   		    node.local = this.parseModuleExportName();
 
   		    node.exported = this.eatContextual("as") ? this.parseModuleExportName() : node.local;
   		    this.checkExport(
-  		      exports,
+  		      exports$1,
   		      node.exported,
   		      node.exported.start
   		    );
@@ -16672,7 +16824,7 @@
   		    return this.finishNode(node, "ExportSpecifier")
   		  };
 
-  		  pp$8.parseExportSpecifiers = function(exports) {
+  		  pp$8.parseExportSpecifiers = function(exports$1) {
   		    var nodes = [], first = true;
   		    // export { x, y as z } [from '...']
   		    this.expect(types$1.braceL);
@@ -16682,7 +16834,7 @@
   		        if (this.afterTrailingComma(types$1.braceR)) { break }
   		      } else { first = false; }
 
-  		      nodes.push(this.parseExportSpecifier(exports));
+  		      nodes.push(this.parseExportSpecifier(exports$1));
   		    }
   		    return nodes
   		  };
@@ -17413,15 +17565,19 @@
   		  // delayed syntax error at correct position).
 
   		  pp$5.parseExpression = function(forInit, refDestructuringErrors) {
-  		    var startPos = this.start, startLoc = this.startLoc;
-  		    var expr = this.parseMaybeAssign(forInit, refDestructuringErrors);
-  		    if (this.type === types$1.comma) {
-  		      var node = this.startNodeAt(startPos, startLoc);
-  		      node.expressions = [expr];
-  		      while (this.eat(types$1.comma)) { node.expressions.push(this.parseMaybeAssign(forInit, refDestructuringErrors)); }
-  		      return this.finishNode(node, "SequenceExpression")
-  		    }
-  		    return expr
+  		    var this$1$1 = this;
+
+  		    return this.catchStackOverflow(function () {
+  		      var startPos = this$1$1.start, startLoc = this$1$1.startLoc;
+  		      var expr = this$1$1.parseMaybeAssign(forInit, refDestructuringErrors);
+  		      if (this$1$1.type === types$1.comma) {
+  		        var node = this$1$1.startNodeAt(startPos, startLoc);
+  		        node.expressions = [expr];
+  		        while (this$1$1.eat(types$1.comma)) { node.expressions.push(this$1$1.parseMaybeAssign(forInit, refDestructuringErrors)); }
+  		        return this$1$1.finishNode(node, "SequenceExpression")
+  		      }
+  		      return expr
+  		    })
   		  };
 
   		  // Parse an assignment expression. This includes applications of
@@ -17486,7 +17642,7 @@
   		    var startPos = this.start, startLoc = this.startLoc;
   		    var expr = this.parseExprOps(forInit, refDestructuringErrors);
   		    if (this.checkExpressionErrors(refDestructuringErrors)) { return expr }
-  		    if (this.eat(types$1.question)) {
+  		    if (!(expr.type === "ArrowFunctionExpression" && expr.start === startPos) && this.eat(types$1.question)) {
   		      var node = this.startNodeAt(startPos, startLoc);
   		      node.test = expr;
   		      node.consequent = this.parseMaybeAssign();
@@ -17586,7 +17742,7 @@
   		      }
   		    }
 
-  		    if (!incDec && this.eat(types$1.starstar)) {
+  		    if (!incDec && !(expr.type === "ArrowFunctionExpression" && expr.start === startPos) && this.eat(types$1.starstar)) {
   		      if (sawUnary)
   		        { this.unexpected(this.lastTokStart); }
   		      else
@@ -18038,6 +18194,8 @@
   		    }
   		    var startPos = this.start, startLoc = this.startLoc;
   		    node.callee = this.parseSubscripts(this.parseExprAtom(null, false, true), startPos, startLoc, true, false);
+  		    if (node.callee.type === "Super")
+  		      { this.raiseRecoverable(startPos, "Invalid use of 'super'"); }
   		    if (this.eat(types$1.parenL)) { node.arguments = this.parseExprList(types$1.parenR, this.options.ecmaVersion >= 8, false); }
   		    else { node.arguments = empty; }
   		    return this.finishNode(node, "NewExpression")
@@ -20954,7 +21112,7 @@
   		  // [ghbt]: https://github.com/acornjs/acorn/issues
 
 
-  		  var version = "8.16.0";
+  		  var version = "8.18.0";
 
   		  Parser.acorn = {
   		    Parser: Parser,
@@ -21874,7 +22032,7 @@
 
   /**
    * Transform the source code received via a compiler function
-   * @param   { Function } compiler - function needed to generate the output code
+   * @param   { function(string, object): object } compiler - function needed to generate the output code
    * @param   {object} meta - compilation meta information
    * @param   { string } source - source code
    * @returns { Output } output - the result of the compiler
@@ -21888,7 +22046,7 @@
 
   /**
    * Register a postprocessor that will be used after the parsing and compilation of the riot tags
-   * @param { Function } postprocessor - transformer that will receive the output code ans sourcemap
+   * @param { function(string, object): Output } postprocessor - transformer that will receive the output code ans sourcemap
    * @returns { Set } the postprocessors collection
    */
   function register$1(postprocessor) {
@@ -21954,7 +22112,7 @@
    * Register a custom preprocessor
    * @param   { string } type - preprocessor type either 'js', 'css' or 'template'
    * @param   { string } name - unique preprocessor id
-   * @param   { Function } preprocessor - preprocessor function
+   * @param   { function(string, object): Output } preprocessor - preprocessor function
    * @returns { Map } - the preprocessors map
    */
   function register$2(type, name, preprocessor) {
@@ -21990,8 +22148,8 @@
 
   /**
    * Simple clone deep function, do not use it for classes or recursive objects!
-   * @param   {*} source - possibily an object to clone
-   * @returns {*} the object we wanted to clone
+   * @param   {unknown} source - possibily an object to clone
+   * @returns {unknown} the object we wanted to clone
    */
   function cloneDeep(source) {
     return JSON.parse(JSON.stringify(source))
@@ -23065,7 +23223,7 @@
   /**
    * Traverse the ast children
    * @param {CSSParser.AST | CSSParser.NODE} ast - css parser node or ast
-   * @param {Function} fn - function that is needed to parse the single nodes
+   * @param {function(CSSParser.NODE): boolean|void} fn - function that is needed to parse the single nodes
    * @returns {CSSParser.AST | CSSParser.NODE} the original ast received
    */
   const traverse = (ast, fn) => {
@@ -23521,7 +23679,7 @@
    * Find whether there is html code outside of the root node
    * @param   {RiotParser.Node} root - node generated by the riot compiler
    * @param   {string}  code - riot tag source code
-   * @param   {Function} parse - riot parser function
+   * @param   { function(string): object } parse - riot parser function
    * @returns {boolean} true if extra markup is detected
    */
   function hasHTMLOutsideRootNode(root, code, parse) {
@@ -23746,7 +23904,7 @@
 
   /**
    * Prepare the riot parser node transformers
-   * @param   { Function } transformer - transformer function
+   * @param   { function(object, string, object, AST): AST } transformer - transformer function
    * @param   {object} sourceNode - riot parser node
    * @param   { string } source - component source code
    * @param   {object} meta - compilation meta information
@@ -25933,7 +26091,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v10.1.5';
+  const version = 'v10.1.6';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
