@@ -1,4 +1,4 @@
-/* Riot v10.1.6, @license MIT */
+/* Riot v10.0.7, @license MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
@@ -46,11 +46,12 @@
     IS_COMPONENT_UPDATING = Symbol('is_updating'),
     PARENT_KEY_SYMBOL = Symbol('parent'),
     TEMPLATE_KEY_SYMBOL = Symbol('template'),
-    ROOT_ATTRIBUTES_KEY_SYMBOL = Symbol('root-attributes');
+    ROOT_ATTRIBUTES_KEY_SYMBOL = Symbol('root-attributes'),
+    UPDATE_COMPONENTS_SYMBOL = Symbol('update-components');
 
   /**
    * Quick type checking
-   * @param   {*} element - anything
+   * @param   {unknown} element - anything
    * @param   {string} type - type definition
    * @returns {boolean} true if the type corresponds
    */
@@ -80,7 +81,7 @@
 
   /**
    * Check that will be passed if its argument is a function
-   * @param   {*} value - value to check
+   * @param   {unknown} value - value to check
    * @returns {boolean} - true if the value is a function
    */
   function isFunction(value) {
@@ -89,7 +90,7 @@
 
   /**
    * Check if a value is a Boolean
-   * @param   {*}  value - anything
+   * @param   {unknown}  value - anything
    * @returns {boolean} true only for the value is a boolean
    */
   function isBoolean(value) {
@@ -98,7 +99,7 @@
 
   /**
    * Check if a value is an Object
-   * @param   {*}  value - anything
+   * @param   {unknown}  value - anything
    * @returns {boolean} true only for the value is an object
    */
   function isObject(value) {
@@ -107,7 +108,7 @@
 
   /**
    * Check if a value is null or undefined
-   * @param   {*}  value - anything
+   * @param   {unknown}  value - anything
    * @returns {boolean} true only for the 'undefined' and 'null' types
    */
   function isNil(value) {
@@ -261,8 +262,8 @@
 
   /**
    * Call the first argument received only if it's a function otherwise return it as it is
-   * @param   {*} source - anything
-   * @returns {*} anything
+   * @param   {unknown} source - anything
+   * @returns {unknown} anything
    */
   function callOrAssign(source) {
     return isFunction(source)
@@ -284,8 +285,8 @@
   /**
    * Returns the memoized (cached) function.
    * // borrowed from https://www.30secondsofcode.org/js/s/memoize
-   * @param {Function} fn - function to memoize
-   * @returns {Function} memoize function
+   * @param {(val: unknown) => unknown} fn - function to memoize
+   * @returns {(val: unknown) => unknown} memoize function
    */
   function memoize(fn) {
     const cache = new Map();
@@ -336,7 +337,7 @@
    * Helper function to set an immutable property
    * @param   {object} source - object where the new property will be set
    * @param   {string} key - object key where the new property will be stored
-   * @param   {*} value - value of the new property
+   * @param   {unknown} value - value of the new property
    * @param   {object} options - set the property overriding the default options
    * @returns {object} - the original object modified
    */
@@ -437,7 +438,7 @@
   /**
    * ISC License
    *
-   * Copyright (c) 2020, Andrea Giammarchi, @WebReflection
+   * Copyright (c) 2020, Andrea Giammarchi, \@WebReflection
    *
    * Permission to use, copy, modify, and/or distribute this software for any
    * purpose with or without fee is hereby granted, provided that the above
@@ -649,9 +650,9 @@
 
   /**
    * Patch the DOM while diffing
-   * @param   {any[]} redundant - list of all the children (template, nodes, context) added via each
-   * @param   {*} parentScope - scope of the parent template
-   * @returns {Function} patch function used by domdiff
+   * @param   {{template: TemplateChunk, nodes: HTMLElement[], context: object}[]} redundant - list of all the children (template, nodes, context) added via each
+   * @param   {unknown} parentScope - scope of the parent template
+   * @returns {(iitem: HTMLElement, info: number) => void} patch function used by domdiff
    */
   function patch(redundant, parentScope) {
     return (item, info) => {
@@ -681,7 +682,7 @@
 
   /**
    * Check whether a template must be filtered from a loop
-   * @param   {Function} condition - filter function
+   * @param   {(context: object) => boolean} condition - filter function
    * @param   {object} context - argument passed to the filter function
    * @returns {boolean} true if this item should be skipped
    */
@@ -696,7 +697,7 @@
    * @param   {string} options.itemName - key to identify the looped item in the new context
    * @param   {string} options.indexName - key to identify the index of the looped item
    * @param   {number} options.index - current index
-   * @param   {*} options.item - collection item looped
+   * @param   {unknown} options.item - collection item looped
    * @returns {object} enhanced scope object
    */
   function extendScope(scope, { itemName, indexName, index, item }) {
@@ -709,8 +710,8 @@
   /**
    * Loop the current template items
    * @param   {Array} items - expression collection value
-   * @param   {*} scope - template scope
-   * @param   {*} parentScope - scope of the parent template
+   * @param   {unknown} scope - template scope
+   * @param   {unknown} parentScope - scope of the parent template
    * @param   {EachBinding} binding - each binding object instance
    * @returns {object} data - An object containing:
    * @property {Map} newChildrenMap - a Map containing the new children template structure
@@ -885,8 +886,8 @@
    * This method handles the REF attribute expressions
    * @param   {object} expression - expression data
    * @param   {HTMLElement} expression.node - target node
-   * @param   {*} expression.value - the old expression cached value
-   * @param   {*} value - new expression value
+   * @param   {unknown} expression.value - the old expression cached value
+   * @param   {unknown} value - new expression value
    * @returns {undefined}
    */
   function refExpression({ node, value: oldValue }, value) {
@@ -899,7 +900,7 @@
 
   /**
    * Normalize the user value in order to render a empty string in case of falsy values
-   * @param   {*} value - user input value
+   * @param   {unknown} value - user input value
    * @returns {string} hopefully a string
    */
   function normalizeStringValue(value) {
@@ -910,7 +911,7 @@
    * This methods handles the input fields value updates
    * @param   {object} expression - expression data
    * @param   {HTMLElement} expression.node - target node
-   * @param   {*} value - new expression value
+   * @param   {unknown} value - new expression value
    * @returns {undefined}
    */
   function valueExpression({ node }, value) {
@@ -941,7 +942,7 @@
    * @param   {object}  expression - event expression data
    * @param   {HTMLElement} expression.node - target node
    * @param   {string} expression.name - event name
-   * @param   {*} value - new expression value
+   * @param   {unknown} value - new expression value
    * @returns {undefined}
    */
   function eventExpression({ node, name }, value) {
@@ -973,7 +974,7 @@
    * Add all the attributes provided
    * @param   {HTMLElement} node - target node
    * @param   {object} attributes - object containing the attributes names and values
-   * @param   {*} oldAttributes - the old expression cached value
+   * @param   {unknown} oldAttributes - the old expression cached value
    * @returns {undefined} sorry it's a void function :(
    */
   function setAllAttributes(node, attributes, oldAttributes) {
@@ -1024,7 +1025,7 @@
 
   /**
    * Check whether the attribute value can be rendered
-   * @param {*} value - expression value
+   * @param {unknown} value - expression value
    * @returns {boolean} true if we can render this attribute value
    */
   function canRenderAttribute(value) {
@@ -1033,7 +1034,7 @@
 
   /**
    * Check whether the attribute should be removed
-   * @param {*} value - expression value
+   * @param {unknown} value - expression value
    * @param   {boolean} isBoolean - flag to handle boolean attributes
    * @returns {boolean} boolean - true if the attribute can be removed
    */
@@ -1051,8 +1052,8 @@
    * @param   {HTMLElement} expression.node - target node
    * @param   {string} expression.name - attribute name
    * @param   {boolean} expression.isBoolean - flag to handle boolean attributes
-   * @param   {*} expression.value - the old expression cached value
-   * @param   {*} value - new expression value
+   * @param   {unknown} expression.value - the old expression cached value
+   * @param   {unknown} value - new expression value
    * @returns {undefined}
    */
   function attributeExpression(
@@ -1092,7 +1093,7 @@
   /**
    * Get the value as string
    * @param   {string} name - attribute name
-   * @param   {*} value - user input value
+   * @param   {unknown} value - user input value
    * @param   {boolean} isBoolean - boolean attributes flag
    * @returns {string} input value as string
    */
@@ -1116,7 +1117,7 @@
    * This methods handles a simple text expression update
    * @param   {object} expression - expression data
    * @param   {HTMLElement} expression.node - target node
-   * @param   {*} value - new expression value
+   * @param   {unknown} value - new expression value
    * @returns {undefined}
    */
   function textExpression({ node }, value) {
@@ -1139,7 +1140,7 @@
     // API methods
     /**
      * Mount the expression evaluating its initial value
-     * @param   {*} scope - argument passed to the expression to evaluate its current values
+     * @param   {unknown} scope - argument passed to the expression to evaluate its current values
      * @returns {Expression} self
      */
     mount(scope) {
@@ -1156,7 +1157,7 @@
     },
     /**
      * Update the expression if its value changed
-     * @param   {*} scope - argument passed to the expression to evaluate its current values
+     * @param   {unknown} scope - argument passed to the expression to evaluate its current values
      * @returns {Expression} self
      */
     update(scope) {
@@ -1201,7 +1202,7 @@
    * on the whole collection
    * @param   {Array} collection - collection to iterate
    * @param   {Array<string>} methods - methods to execute on each item of the collection
-   * @param   {*} context - context returned by the new methods created
+   * @param   {unknown} context - context returned by the new methods created
    * @returns {object} a new object to simplify the the nested methods dispatching
    */
   function flattenCollectionMethods(collection, methods, context) {
@@ -1349,10 +1350,10 @@
   /**
    * Create a new tag object if it was registered before, otherwise fallback to the simple
    * template chunk
-   * @param   {Function} component - component factory function
+   * @param   {(data: object) => object} component - component factory function
    * @param   {Array<object>} slots - array containing the slots markup
-   * @param   {Array} attributes - dynamic attributes that will be received by the tag element
    * @returns {TagImplementation|TemplateChunk} a tag implementation or a template chunk as fallback
+   * @param   {Array} attributes - dynamic attributes that will be received by the tag element
    */
   function getTag(component, slots = [], attributes = []) {
     // if this tag was registered before we will return its implementation
@@ -1405,24 +1406,42 @@
     // tag: null,
     // attributes: null,
     // getComponent: null,
+    // componentFactory: null,
 
     mount(scope) {
       return this.update(scope)
     },
     update(scope, parentScope) {
       const name = this.evaluate(scope);
+      // resolve the latest component factory available for this tag name
+      const componentFactory = name ? this.getComponent(name) : undefined;
+      const mountComponent = () => {
+        this.componentFactory = componentFactory;
+        this.tag = getTag(componentFactory, this.slots, this.attributes);
+        this.tag.mount(this.node, scope);
+      };
 
       // simple update
       if (name && name === this.name) {
-        this.tag.update(scope);
+        // the component implementation might have been replaced at runtime
+        // (e.g. by the @riotjs/hot-reload package): in that case the tag must
+        // be re-rendered using the latest component factory available
+        if (componentFactory && componentFactory !== this.componentFactory) {
+          // unmount the old tag keeping its root node in the DOM
+          this.unmount(scope, parentScope, true);
+
+          // remount the component using the new component factory
+          mountComponent();
+        } else {
+          this.tag.update(scope);
+        }
       } else {
         // unmount the old tag if it exists
         this.unmount(scope, parentScope, true);
 
         // mount the new tag
         this.name = name;
-        this.tag = getTag(this.getComponent(name), this.slots, this.attributes);
-        this.tag.mount(this.node, scope);
+        mountComponent();
       }
 
       return this
@@ -1615,8 +1634,8 @@
     /**
      * Attach the template to a DOM node
      * @param   {HTMLElement} el - target DOM node
-     * @param   {*} scope - template data
-     * @param   {*} parentScope - scope of the parent template tag
+     * @param   {unknown} scope - template data
+     * @param   {unknown} parentScope - scope of the parent template tag
      * @param   {object} meta - meta properties needed to handle the <template> tags in loops
      * @returns {TemplateChunk} self
      */
@@ -1669,8 +1688,8 @@
 
     /**
      * Update the template with fresh data
-     * @param   {*} scope - template data
-     * @param   {*} parentScope - scope of the parent template tag
+     * @param   {unknown} scope - template data
+     * @param   {unknown} parentScope - scope of the parent template tag
      * @returns {TemplateChunk} self
      */
     update(scope, parentScope) {
@@ -1681,8 +1700,8 @@
 
     /**
      * Remove the template from the node where it was initially mounted
-     * @param   {*} scope - template data
-     * @param   {*} parentScope - scope of the parent template tag
+     * @param   {unknown} scope - template data
+     * @param   {unknown} parentScope - scope of the parent template tag
      * @param   {boolean|null} mustRemoveRoot - if true remove the root element,
      * if false or undefined clean the root tag content, if null don't touch the DOM
      * @returns {TemplateChunk} self
@@ -2316,12 +2335,12 @@
   }
 
   /**
-   * Create the subcomponents that can be included inside a tag in runtime
+   * Create the object containing the children components.
    * @param   {object} components - components imported in runtime
    * @returns {object} all the components transformed into Riot.Component factory functions
    */
-  function createChildrenComponentsObject(components = {}) {
-    return Object.entries(callOrAssign(components)).reduce(
+  function createChildrenComponents(components = {}) {
+    return Object.entries(callOrAssign(components) || {}).reduce(
       (acc, [key, value]) => {
         acc[camelToDashCase(key)] = createComponentFromWrapper(value);
         return acc
@@ -2331,23 +2350,41 @@
   }
 
   /**
+   * Create the callable proxy containing the children components.
+   * It normalizes on write the components names and factories and it can be
+   * called to update its components.
+   * @param   {object} components - components imported in runtime
+   * @returns {Proxy} callable proxy containing the children components factories
+   */
+  function createChildrenComponentsProxy(components = {}) {
+    return new Proxy(() => {}, {
+      componentsMap: createChildrenComponents(components),
+      get(_, name) {
+        return this.componentsMap[name]
+      },
+      apply(_, __, [name, component]) {
+        // replace only the given component, keeping the previous ones
+        Object.assign(this.componentsMap, {
+          [camelToDashCase(name)]: createComponentFromWrapper(component),
+        });
+      },
+    })
+  }
+
+  /**
    * Create the getter function to render the child components
    * @param   {RiotComponentWrapper} componentWrapper - riot compiler generated object
+   * @param   {Proxy} childrenComponents - proxy containing the children components factories
    * @returns {Function} function returning the component factory function
    */
-  const createChildComponentGetter = (componentWrapper) => {
-    const childrenComponents = createChildrenComponentsObject(
-      componentWrapper.exports ? componentWrapper.exports.components : {},
-    );
-
-    return (name) => {
+  const createChildComponentGetter =
+    (componentWrapper, childrenComponents) => (name) => {
       // improve support for recursive components
       if (name === componentWrapper.name)
         return memoizedCreateComponentFromWrapper(componentWrapper)
-      // return the registered components
+      // return the children components resolving also the globally registered ones
       return childrenComponents[name] || COMPONENTS_IMPLEMENTATION_MAP.get(name)
-    }
-  };
+    };
 
   /**
    * Performance optimization for the recursive components
@@ -2367,11 +2404,32 @@
    */
   function createComponentFromWrapper(componentWrapper) {
     const { css, template, exports, name } = componentWrapper;
+    const componentsSource = exports ? exports.components : null;
+    // The Proxy is needed only in development and only when the component has
+    // children components. The condition is inlined so that bundlers can
+    // tree-shake the Proxy code in the production builds
+    const childrenComponents =
+      componentsSource &&
+      typeof process !== 'undefined' &&
+      process.env &&
+      process.env.NODE_ENV === 'development'
+        ? createChildrenComponentsProxy(componentsSource)
+        : createChildrenComponents(componentsSource);
+    // update the children components (used by @riotjs/hot-reload):
+    // the Proxy is callable and replaces the given component when invoked,
+    // otherwise we assign it to the plain object
+    const updateComponents =
+      typeof childrenComponents === 'function'
+        ? childrenComponents
+        : (name, component) =>
+            Object.assign(childrenComponents, {
+              [camelToDashCase(name)]: createComponentFromWrapper(component),
+            });
     const templateFn = template
       ? componentTemplateFactory(
           template,
           componentWrapper,
-          createChildComponentGetter(componentWrapper),
+          createChildComponentGetter(componentWrapper, childrenComponents),
         )
       : MOCKED_TEMPLATE_INTERFACE;
 
@@ -2394,6 +2452,10 @@
         componentAPI,
         name,
       })({ slots, attributes, props });
+
+      // method callable via symbol to update the internal children components
+      // used by the component template (needed by @riotjs/hot-reload)
+      defineProperty(component, UPDATE_COMPONENTS_SYMBOL, updateComponents);
 
       // notice that for the components created via tag binding
       // we need to invert the mount (state/parentScope) arguments
@@ -2598,7 +2660,7 @@
   const withTypes = (component) => component;
 
   /** @type {string} current riot version */
-  const version = 'v10.1.6';
+  const version = 'v10.0.7';
 
   // expose some internal stuff that might be used from external tools
   const __ = {
@@ -2618,6 +2680,7 @@
       PLUGINS_SET,
       DOM_COMPONENT_INSTANCE_PROPERTY,
       PARENT_KEY_SYMBOL,
+      UPDATE_COMPONENTS_SYMBOL,
     },
   };
 
