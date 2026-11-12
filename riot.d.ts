@@ -263,6 +263,7 @@ export declare const __: {
     ATTRIBUTES_KEY_SYMBOL: symbol
     PARENT_KEY_SYMBOL: symbol
     DOM_COMPONENT_INSTANCE_PROPERTY: symbol
+    UPDATE_COMPONENTS_SYMBOL: symbol
     COMPONENTS_IMPLEMENTATION_MAP: RegisteredComponentsMap
     PLUGINS_SET: InstalledPluginsSet
   }
