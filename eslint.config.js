@@ -10,6 +10,7 @@ export default defineConfig([
     rules: {
       'fp/no-rest-parameters': 0,
       'fp/no-mutating-methods': 0,
+      'fp/no-proxy': 0,
       'jsdoc/no-undefined-types': 0,
     },
   },

@@ -38,6 +38,7 @@ ROLLUP_ESM_OPTIONS = --format esm \
 # Options we will pass to the minifier
 MINIFY_OPTIONS = --comments false \
 				 --toplevel \
+				 --define process.env.NODE_ENV='"production"' \
 				 --compress pure_funcs=['panic'],unsafe=true,unsafe_symbols=true,passes=5 \
 				 --mangle \
 

@@ -1,0 +1,12 @@
+<hmr-child-parent>
+  <hmr-child if={state.visible} count={state.count} />
+
+  <script>
+    import Child from './hmr-child-v1.riot'
+
+    export default {
+      components: { HmrChild: Child },
+      state: { visible: true, count: 0 },
+    }
+  </script>
+</hmr-child-parent>

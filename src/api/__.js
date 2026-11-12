@@ -6,6 +6,7 @@ import {
   PLUGINS_SET,
   PROPS_KEY,
   STATE_KEY,
+  UPDATE_COMPONENTS_SYMBOL,
 } from '@riotjs/util'
 import {
   bindingTypes,
@@ -34,5 +35,6 @@ export const __ = {
     PLUGINS_SET,
     DOM_COMPONENT_INSTANCE_PROPERTY,
     PARENT_KEY_SYMBOL,
+    UPDATE_COMPONENTS_SYMBOL,
   },
 }
